@@ -1,5 +1,13 @@
-
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+ - [Cloud Custodian](#cloud-custodian)
+ - [Links](#links)
+ - [Usage](#usage)
+ - [Get Involved](#get-involved)
+
+<!-- markdown-toc end -->
 
 # Cloud Custodian
 
@@ -112,7 +120,7 @@ Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 
 Irc - #cloud-custodian on irc.freenode.net
 
-### Contributors :
+### Contributors
 
 We welcome Your interest in Capital One’s Open Source Projects (the
 “Project”). Any Contributor to the Project must accept and sign an
