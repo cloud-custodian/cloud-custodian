@@ -5,8 +5,6 @@ Developer Install
 Requirements
 ------------
 
-- Ensure proxy is configured properly
-
 On Linux
 ~~~~~~~~
 
@@ -43,13 +41,13 @@ And then install the dependencies. Deployed systems will just use `requirements.
 
    $ pip install -r requirements-dev.txt
 
-And then the maid itself
+And then the Custodian itself
 
 .. code-block:: bash
 
    $ python setup.py develop
 
-You should have the cloud-maid command available now.
+You should have the ``custodian`` command available now.
 
 .. code-block:: bash
 
@@ -70,7 +68,7 @@ There are several additional dependencies for running unit tests.
 
 .. code-block:: bash
 
-   $ cd cloud-maid
+   $ cd cloud-custodian
    $ make install
 
 And then unit tests can be run with
