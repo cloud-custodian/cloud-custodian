@@ -69,3 +69,5 @@ with its log files for archival purposes.
 The s3 bucket and prefix can be specified via parameters::
 
   $ cloud-custodian run -c config.yml --output-dir s3://my-bucket/my/prefix
+
+CSV reports can be generated with the ``report`` subcommand.  

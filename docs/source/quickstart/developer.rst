@@ -28,14 +28,14 @@ First, clone the repository:
 
 .. code-block:: bash
 
-   $ git clone https://github.kdc.capitalone.com/cloud-maid/cloud-maid.git
+   $ git clone https://github.com/capitalone/cloud-custodian.git
 
 Also recommended is to use a virtualenv to sandbox this install from your system packages:
 
 .. code-block:: bash
 
-   $ virtualenv cloud-maid
-   $ source cloud-maid/bin/activate
+   $ virtualenv cloud-custodian
+   $ source cloud-custodian/bin/activate
 
 And then install the dependencies. Deployed systems will just use `requirements.txt`; you'll need the additional testing libraries in `requirements-dev.txt`.
 
@@ -53,15 +53,15 @@ You should have the cloud-maid command available now.
 
 .. code-block:: bash
 
-   $ cloud-maid -h
+   $ custodian -h
  
 Alternatively, you can just run the commands below 
 
 .. code-block:: bash
 
-   $ cd cloud-maid
+   $ cd cloud-custodian
    $ make install
-   $ bin/cloud-maid -h
+   $ ./bin/custodian -h
 
 Running tests
 -------------

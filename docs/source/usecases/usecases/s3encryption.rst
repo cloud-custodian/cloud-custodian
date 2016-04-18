@@ -9,8 +9,8 @@ remediate them such that they are encrypted.
    policies:
      - name: s3-key-encryption
        resource: s3
-       actions: encrypt-keys
-         - type: encrypt-keys
+       actions:
+         - encrypt-keys
 
 
 Options
