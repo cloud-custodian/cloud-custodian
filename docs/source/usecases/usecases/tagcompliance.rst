@@ -8,9 +8,9 @@ Mark
   Here's an example of renaming an extant tag
 
   .. code-block:: yaml
-  
+
      policies:
-     
+
        - name: ec2-tag-instances
          resource: ec2
          filters:
@@ -23,9 +23,9 @@ Mark
 
 Report on Tag Compliance
   .. code-block:: yaml
-  
+
      policies:
-  
+
        - name: ec2-tag-compliance
          resource: ec2
          comment: |
@@ -37,17 +37,17 @@ Report on Tag Compliance
 
 
 Enforce Tag Compliance
-  All instances that do not have the three required tags (CostCenter, Owner Project) will
+  All instances that do not have the three required tags (CostCenter, Owner, Project) will
   be stopped hourly after 2 days, and terminated after 5 days.
 
   .. code-block:: yaml
 
      policies:
-  
+
      - name: ec2-tag-compliance-mark
        resource: ec2
        comment: |
-         Find all (non-asg) instances that are not conformant
+         Find all (non-ASG) instances that are not conformant
          to tagging policies, and tag them for stoppage in 1 days.
        filters:
          - "tag:aws:autoscaling:groupName": absent
@@ -59,7 +59,7 @@ Enforce Tag Compliance
          - type: mark-for-op
            op: stop
            days: 1
-   
+
      - name: ec2-tag-compliance-unmark
        resource: ec2
        comment: |
@@ -74,7 +74,7 @@ Enforce Tag Compliance
        actions:
          - unmark
          - start
-   
+
      - name: ec2-tag-compliance-stop
        resource: ec2
        comment: |
@@ -94,7 +94,7 @@ Enforce Tag Compliance
          - type: mark-for-op
            op: terminate
            days: 3
-   
+
      - name: ec2-tag-compliance-terminate
        resource: ec2
        comment: |
@@ -110,12 +110,12 @@ Enforce Tag Compliance
        actions:
          - type: terminate
            force: true
-   
+
      - name: ec2-tag-compliance-nag-stop
        resource: ec2
        comment: |
          Stop all instances marked for termination every hour
-         starting 1 days before their termination.
+         starting 1 day before their termination.
        filters:
          - "tag:aws:autoscaling:groupName": absent
          - "tag:CostCenter": absent
@@ -126,4 +126,3 @@ Enforce Tag Compliance
            skew: 1
        actions:
          - stop
-   

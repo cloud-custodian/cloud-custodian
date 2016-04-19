@@ -41,19 +41,19 @@ And then install the dependencies. Deployed systems will just use `requirements.
 
    $ pip install -r requirements-dev.txt
 
-And then the Custodian itself
+And then the Custodian itself:
 
 .. code-block:: bash
 
    $ python setup.py develop
 
-You should have the ``custodian`` command available now.
+You should have the ``custodian`` command available now:
 
 .. code-block:: bash
 
    $ custodian -h
- 
-Alternatively, you can just run the commands below 
+
+Alternatively, you can just run the commands below:
 
 .. code-block:: bash
 
@@ -71,13 +71,13 @@ There are several additional dependencies for running unit tests.
    $ cd cloud-custodian
    $ make install
 
-And then unit tests can be run with
+Then unit tests can be run with:
 
 .. code-block:: bash
 
    $ make test
 
-Coverage reports can be generated and viewed with the following.
+Coverage reports can be generated and viewed with the following:
 
 .. code-block:: bash
 

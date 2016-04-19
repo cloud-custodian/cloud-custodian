@@ -12,21 +12,21 @@ Filters
   Check bucket acls for global grants
 
 ``missing-policy-statement``
-  Find buckets missing a set of named policy statements.
+  Find buckets missing a set of named policy statements
 
 Actions
 -------
 
 ``encrypt-keys``
-  Scan all keys in a bucket and optionally encrypt them in place.
+  Scan all keys in a bucket and optionally encrypt them in place
 
 ``encrypted-prefix``
   Path Prefix Object For Sub Path Encryption
 
 ``encryption-policy``
   Attach an encryption required policy to a bucket, this will break
-  applications that are not using encryption, including aws log
-  delivery.
+  applications that are not using encryption, including AWS log
+  delivery
 
 ``no-op``
   No operation

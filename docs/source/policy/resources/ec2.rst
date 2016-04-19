@@ -14,7 +14,7 @@ Query
    EC2_VALID_FILTERS = {
        'architecture': ('i386', 'x86_64'),
        'availability-zone': str,
-       'iam-instance-profile.arn': str, 
+       'iam-instance-profile.arn': str,
        'image-id': str,
        'instance-id': str,
        'instance-lifecycle': ('spot',),
@@ -50,11 +50,11 @@ Filter by State Transition Filter
   Filter on the ImageId of the instance
 
 ``offhour``
-  Filter for 
+  Filter for
   :py:class:`c7n.resources.ec2.InstanceOffHour`
 
 ``onhour``
-  Filter for 
+  Filter for
   :py:class:`c7n.resources.ec2.InstanceOnHour`
 
 ``ephemeral``
@@ -72,9 +72,9 @@ Actions
 Mark
   Tag instances with mark instances matching filters with a ``c7n_status`` tag by
   default and configurable value. Here's an example of renaming an extant tag:
-  
+
   .. code-block:: yaml
-  
+
      policies:
        - name: ec2-tag-instances
          resource: ec2
@@ -88,11 +88,11 @@ Mark
 Start
   Start a set of instances (presumably) already stopped, the start action will automatically
   filter instances to those that are already in the correct state.
-  
+
   This example will restart all stopped instances.
-  
+
   .. code-block:: yaml
-  
+
      policies:
        - name: ec2-start
          resources: ec2
@@ -100,9 +100,7 @@ Start
            - start
 
 Stop
-  Will stop the instances. Stopped instances do not incur ec2 instance costs.
+  Will stop the instances. Stopped instances do not incur EC2 instance costs.
 
 Terminate
   Will terminate the instances. Use with caution!
-
-
