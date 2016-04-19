@@ -6,16 +6,16 @@ Policy
 Sample Policy
 =============
 
-In this sample policy, we are querying for only running EC2
-instances. Based on the list that comes back, we are then filtering for EC2
-instances that are not part of an Auto Scaling Group (ASG), that are not
-already marked for an operation, have less 10 tags, and are missing one or more
+In this sample policy we are querying for only running EC2
+instances. Based on the list that comes back we are then filtering for EC2
+instances that are: not part of an Auto Scaling Group (ASG), not
+already marked for an operation, have less than 10 tags, and are missing one or more
 of the required tags. Once Custodian has filtered the list, it will
-mark all EC2 instances that match with a tag. That tag specifies an action
+mark all EC2 instances that match the above criteria with a tag. That tag specifies an action
 that will take place at a certain time. This policy is one of three that
-are needed to manage tag compliance. The other 2 policies in this set are,
+are needed to manage tag compliance. The other two policies in this set are, 1)
 checking to see if the tags have been corrected before the four day period
-is up and a policy for performing the operation of stopping all instances
+is up, and 2) performing the operation of stopping all instances
 with the status to be stopped on that particular day.
 
 .. code-block:: yaml
@@ -26,7 +26,7 @@ with the status to be stopped on that particular day.
      comment: |
        Mark non-compliant, Non-ASG EC2 instances with stoppage in 4 days
      query:
-       - instance-state-name: running ──▶ Only apply Filter to Running instances
+       - instance-state-name: running ──▶ Only apply filter to running instances
      filters:
    ▣──────  - "tag:aws:autoscaling:groupName": absent
    │▣─────  - "tag:c7n_status": absent
@@ -59,7 +59,7 @@ Resource - :py:class:`c7n.manager.ResourceManager`
   resource (e.g., ASG, S3, EC2, ELBs, etc).
 
 Mode
-  Provides for retrieval of a resources of a given type (typically via AWS API) and defines the vocabulary of filters and actions that can be used on those resource. Example resource types are autoscalegroups, s3 buckets, ec2 instances, elbs, etc).
+  Provides for retrieval of a resources of a given type (typically via AWS API) and defines the vocabulary of filters and actions that can be used on those resource. Example resource types are Auto Scaling Groups, S3 buckets, EC2 instances, Elastic Load Balancers, etc).
 
 .. code-block:: yaml
 
@@ -69,10 +69,10 @@ Mode
        - RunInstances
 
 Filters - :py:class:`c7n.filters`
-  Given a set of resources, how do we filter to the subset that we're
+  Given a set of resources, how we filter to the subset that we're
   interested in operating on. The :ref:`filtering language<filters>` has some
   default behaviors across resource types like value filtering with JMESPath
-  expressions against the JSON representation of a resource, as well
+  expressions against the JSON representation of a resource, as well as
   specific filters for particular resources types (instance age,
   tag count, etc).
 
@@ -92,7 +92,7 @@ Filters - :py:class:`c7n.filters`
        op: ne
 
 Actions - :py:class:`c7n.actions`
-  A verb to use on a given resource, ie. stop, start, suspend
+  A verb to use on a given resource, i.e. stop, start, suspend,
   delete, encrypt, etc.
 
 .. code-block:: yaml

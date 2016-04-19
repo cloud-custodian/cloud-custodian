@@ -5,22 +5,22 @@ Lambda Support
 
 Lambda provides for powerful realtime event based code execution in
 response to infrastructure and application behavior. A number of
-different amazon services can be used as event sources.
+different Amazon services can be used as event sources.
 
 CloudWatch Events
 ##################
 
 CloudWatch Events (CWE) is a general event bus for AWS infrastructure. Currently,
-it covers several major sources of information, CloudTrail API calls
+it covers several major sources of information: CloudTrail API calls
 over a poll period on CloudTrail delivery, real-time instance status
 events, autoscale group notifications, and scheduled/periodic events.
 
-Cloud trail provides a very rich data source over the entire range
-of AWS services exposed via the audit trail that allows Custodian to define
-realtime policies effectively against any AWS product.
+CloudTrail provides a very rich data source over the entire range
+of AWS services exposed via the audit trail that allows Custodian to define effective
+realtime policies against any AWS product.
 
 Additionally, for EC2 instances we can provide mandatory policy
-compliance, that effectively means the non-compliant resources never
+compliance - this means the non-compliant resources never
 became available.
 
 Cloud Custodian Integration
@@ -29,15 +29,14 @@ Cloud Custodian Integration
 Custodian provides for policy level execution against any CWE event
 stream. Each Custodian policy can be deployed as an independent Lambda
 function. The only difference between a Custodian policy that runs in
-Lambda and one that runs directly from the CLI in poll mode,
-is the specification of the events to subscribe to
-in the mode config block of the policy.
+Lambda and one that runs directly from the CLI in poll mode
+is the specification of the subscription of the events in the mode config block of the policy.
 
 Internally Custodian will reconstitute current state for all the resources
-in the event and execute the policy against them, matching against the
-policy filters, and applying the policy actions to matching resources.
+in the event, execute the policy against them, match against the
+policy filters, and apply the policy actions to matching resources.
 
-:ref:`Mu<mu>` is the letter after lambda, lambda is a keyword in python.
+:ref:`Mu<mu>` is the letter after Lambda, Lambda is a keyword in python.
 
 Configuration
 #############
@@ -59,22 +58,22 @@ Examples
          events:
           - RunInstances
 
-         # Note because the total aws api surface area is so large
-         # most cloud trail api event subscription needs two additional
+         # Note because the total AWS API surface area is so large
+         # most CloudTrail API event subscriptions need two additional
          # fields.
          #
-         # For cloud trail events we need to reference the source api call
+         # For CloudTrail events we need to reference the source API call
          # sources:
          #  - ec2.amazonaws.com
          #
          # To work transparently with existing resource policies, we also
-         # need to specify how to extract the resource ids from the event
-         # via jmespath so that the resources can be queried.
-         # ids: "detail.responseElements.instancesSet.items[].instanceId"
+         # need to specify how to extract the resource IDs from the event
+         # via JMESPath so that the resources can be queried.
+         # IDs: "detail.responseElements.instancesSet.items[].instanceId"
          #
-         # For very common api calls for policies, some shortchuts have
+         # For very common API calls for policies, some shortcuts have
          # been defined to allow for easier policy writing as for the
-         # RunInstances api call above.
+         # RunInstances API call above.
          #
 
        filters:
@@ -98,7 +97,7 @@ Examples
        actions:
          - mark
          # TODO delete instance volumes that
-         # are not set to delete on terminate
+         # are not set to delete on terminate;
          # currently we have a poll policy that
          # handles this.
          - terminate
