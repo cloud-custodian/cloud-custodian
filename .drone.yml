@@ -1,5 +1,5 @@
 build:
-  image: dockyardprod.kdc.capitalone.com/cloudmaid/python:2-alpine
+  image: python:2-alpine
   environment:
     - AWS_DEFAULT_REGION=us-east-1
   commands:
