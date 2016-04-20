@@ -107,7 +107,7 @@ Given that, you can run cloud-custodian
   $ custodian run -c policy.yml -s out
 ```
   
-Maid supports a few other useful subcommands and options, including
+Custodian supports a few other useful subcommands and options, including
 outputs to s3, cloud watch metrics, sts role assumption.
 
 
