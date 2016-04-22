@@ -68,20 +68,35 @@ def main():
    logging.basicConfig(level=logging.INFO)
    
    bucket = os.environ.get('BUCKET')
-   s = boto3.Session()
-   cw = s.client('cloudwatch')
-   s3 = s.client('s3')
-   buckets = s3.list_buckets()['Buckets'] 
-
+   
    results = {'buckets':[]}
    size_count = obj_count = 0.0
+   regions = ['eu-west-1',
+              'ap-southeast-1',
+              'ap-southeast-2',
+              'eu-central-1',
+              'ap-northeast-2',
+              'ap-northeast-1',
+              'us-east-1',
+              'sa-east-1',
+              'us-west-1',
+              'us-west-2']
+   for region in regions:
 
-   for b in buckets:
-      i = bucket_info(cw, b['Name'])
-      results['buckets'].append(i)
-      obj_count += i['ObjectCount']
-      size_count += i['SizeGB']
- 
+        s = boto3.Session(region_name=region)
+        cw = s.client('cloudwatch')
+        s3 = s.client('s3')
+        buckets = s3.list_buckets()['Buckets']
+
+        for b in buckets:
+              i = bucket_info(cw, b['Name'])
+              bucket_region = s3.get_bucket_location(Bucket=b['Name'])['LocationConstraint']
+              # bucket_region is `None` when it is in us-east-1 (US Standard)
+              if bucket_region == region or bucket_region == None:
+                results['buckets'].append(i)
+                obj_count += i['ObjectCount']
+                size_count += i['SizeGB']
+
    results['TotalObjects'] = obj_count
    results['TotalSizeGB'] = size_count
 
