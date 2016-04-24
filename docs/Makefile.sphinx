@@ -54,7 +54,7 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../maid $(SRCDIR)/../../tests
+	sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -90,9 +90,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/CloudMaid.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/CloudCustodian.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/CloudMaid.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/CloudCustodian.qhc"
 
 applehelp:
 	$(SPHINXBUILD) -b applehelp $(ALLSPHINXOPTS) $(BUILDDIR)/applehelp
@@ -107,8 +107,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/CloudMaid"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/CloudMaid"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/CloudCustodian"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/CloudCustodian"
 	@echo "# devhelp"
 
 epub:

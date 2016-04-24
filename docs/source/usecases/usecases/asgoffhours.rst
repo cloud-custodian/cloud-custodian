@@ -1,4 +1,4 @@
-EC2 - Offhours Support
+ASG - Offhours Support
 ======================
 
 - Offhours are based on current time of the instance
@@ -7,7 +7,7 @@ EC2 - Offhours Support
 
    policies:
      - name: offhour-stop-19
-       resource: ec2
+       resource: asg
        comments: |
          Daily stoppage at 7pm
        filters:
@@ -18,7 +18,7 @@ EC2 - Offhours Support
          - stop
    
      - name: onhour-start-10
-       resource: ec2
+       resource: asg
        comments: |
          Daily start at 10am
        filters:

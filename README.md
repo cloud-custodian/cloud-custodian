@@ -1,7 +1,17 @@
-
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+ - [Cloud Custodian](#cloud-custodian)
+ - [Links](#links)
+ - [Usage](#usage)
+ - [Get Involved](#get-involved)
+
+<!-- markdown-toc end -->
+
 # Cloud Custodian
+
+[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Cloud Custodian is a rules engine for AWS resource management. It
 allows users to define policies to be enforced to enable a well
@@ -30,8 +40,7 @@ resources.
 ## Links
 
 - [Docs](http://www.capitalone.io/cloud-custodian/)
-
-- [Developer Install](docs/developer.rst)
+- [Developer Install](http://www.capitalone.io/cloud-custodian/quickstart/developer.html)
 
 
 ## Usage
@@ -100,7 +109,7 @@ Given that, you can run cloud-custodian
   $ custodian run -c policy.yml -s out
 ```
   
-Maid supports a few other useful subcommands and options, including
+Custodian supports a few other useful subcommands and options, including
 outputs to s3, cloud watch metrics, sts role assumption.
 
 
@@ -113,7 +122,7 @@ Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 Gitter - https://gitter.im/capitalone/cloud-custodian
 
 
-### Contributors :
+### Contributors
 
 We welcome Your interest in Capital One’s Open Source Projects (the
 “Project”). Any Contributor to the Project must accept and sign an

@@ -3,20 +3,30 @@
 Simple Storage Service (S3)
 ===========================
 
-
 Filters
 -------
 
 - Standard Value Filter (see :ref:`filters`)
 
+``global-grants``
+  Check bucket acls for global grants
+
+``missing-policy-statement``
+  Find buckets missing a set of named policy statements
 
 Actions
 -------
 
-- *Mark*
+``encrypt-keys``
+  Scan all keys in a bucket and optionally encrypt them in place
 
-  Tag resources
+``encrypted-prefix``
+  Path Prefix Object For Sub Path Encryption
 
-- *Delete*
+``encryption-policy``
+  Attach an encryption required policy to a bucket, this will break
+  applications that are not using encryption, including AWS log
+  delivery
 
-  Delete resources
+``no-op``
+  No operation

@@ -17,7 +17,7 @@ import fnmatch
 import os
 import inspect
 
-import maid
+import c7n
 
 header = """\
 # Copyright 2016 Capital One Services, LLC
@@ -58,9 +58,10 @@ def update_headers(src_tree):
                     '%s%s%s' % (header, suffix, contents))
 
 def main():
-    srctree = os.path.dirname(inspect.getabsfile(maid))
+    srctree = os.path.dirname(inspect.getabsfile(c7n))
     update_headers(srctree)
     update_headers(os.path.abspath('tests'))
+    update_headers(os.path.abspath('ftests'))
  
 
 if __name__ == '__main__':

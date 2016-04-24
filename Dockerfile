@@ -1,4 +1,4 @@
-FROM dockyardprod.kdc.capitalone.com/cloudmaid/python:2-alpine
+FROM python:2.7-alpine
 
 ADD . /src
 WORKDIR /src

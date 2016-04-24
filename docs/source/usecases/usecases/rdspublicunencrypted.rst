@@ -1,11 +1,11 @@
-Security compliance around encrypted ebs volumes
-================================================
+RDS - Terminate Unencrypted Public Instances
+============================================
 
 .. code-block:: yaml
 
    - name: terminate-unencrypted-public-rds
      description: |
-       Terminate all unencrypted or publicly available RDS on create
+       Terminate all unencrypted or publicly available RDS upon creation
      resource: rds
      mode:
        type: cloudtrail
@@ -15,15 +15,15 @@ Security compliance around encrypted ebs volumes
        - or:
            - StorageEncrypted: false
            - PubliclyAccessible: true
-           # matches true if rds in default vpc
+           # matches true if RDS in default VPC
            - type: default-vpc
      actions:
        - type: delete
          skip-snapshot: true
-   
+
          - name: terminate-unencrypted-ebs
            description: |
-             Terminate all unencrypted EBS volumes on create
+             Terminate all unencrypted EBS volumes upon creation
            resource: ebs
            mode:
              type: cloudtrail
@@ -33,4 +33,3 @@ Security compliance around encrypted ebs volumes
              - Encrypted: false
            actions:
              - delete
-   

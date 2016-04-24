@@ -1,5 +1,5 @@
-Security compliance around elb cipher policies
-==============================================
+ELB - SSL Blacklist
+===================
 
 .. code-block:: yaml
 
@@ -15,7 +15,7 @@ Security compliance around elb cipher policies
          - SetLoadBalancerPoliciesOfListener
      filters:
        - type: ssl-policy
-         whitelist:
+         blacklist:
            - Protocol-TLSv1
            - Protocol-TLSv1.1
            - Protocol-TLSv1.2

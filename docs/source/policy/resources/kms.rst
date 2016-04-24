@@ -3,20 +3,16 @@
 Key Management Service (KMS)
 ============================
 
-
 Filters
 -------
 
 - Standard Value Filter (see :ref:`filters`)
 
+``grant-count``
+  Call ``list_grants`` and count ``Grants`` for each ``TargetKeyId``
 
 Actions
 -------
 
-- *Mark*
-
-  Tag resources
-
-- *Delete*
-
-  Delete resources
+No actions for KMS at this time. The KMS resource can only be used for reporting,
+so KMS policies do not have an Action section.
