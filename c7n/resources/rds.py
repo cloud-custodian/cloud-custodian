@@ -87,7 +87,7 @@ class RDS(ResourceManager):
         query = self.resource_query()
         if self._cache.load():
             dbs = self._cache.get(
-                {'resource': 'rds', 'q': query})
+                {'resource': 'rds', 'region': self.config.region, 'q': query})
             if dbs is not None:
                 self.log.debug("Using cached rds: %d" % (
                     len(dbs)))
@@ -97,7 +97,8 @@ class RDS(ResourceManager):
         results = p.paginate(Filters=query)
         dbs = list(itertools.chain(
             *[rp['DBInstances'] for rp in results]))
-        self._cache.save({'resource': 'rds', 'q': query}, dbs)
+        self._cache.save(
+            {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
 
     def get_resources(self, resource_ids):

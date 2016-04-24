@@ -58,7 +58,9 @@ class EC2(ResourceManager):
         instances = None
 
         if self._cache.load():
-            instances = self._cache.get(qf)
+            instances = self._cache.get(
+                {'resource': 'ec2', 'region': self.config.region, 'query': qf})
+
         if instances is not None:
             self.log.info(
                 'Using cached instance query: %s instances' % len(instances))
@@ -76,7 +78,8 @@ class EC2(ResourceManager):
             *[r["Instances"] for r in reservations]))
         self.log.debug("Found %d instances on %d reservations" % (
             len(instances), len(reservations)))
-        self._cache.save(qf, instances)
+        self._cache.save(
+            {'resource': 'ec2', 'region': self.config.region}, instances)
 
         # Filter instances
         return self.filter_resources(instances)

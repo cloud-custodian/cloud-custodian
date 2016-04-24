@@ -110,7 +110,8 @@ Consult the documentation for additional information.
 
 Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 
-Irc - #cloud-custodian on irc.freenode.net
+Gitter - https://gitter.im/capitalone/cloud-custodian
+
 
 ### Contributors :
 

@@ -35,9 +35,18 @@ class AMI(ResourceManager):
 
     def resources(self):
         c = self.session_factory().client('ec2')
-        query = self.resource_query()  # FIXME: Not used
+        query = self.resource_query()
+        if self._cache.load():
+            images = self._cache.get(
+                {'region': self.config.region, 'resource': 'ami', 'q': query})
+            if images is not None:
+                self.log.debug("Using cached images: %d" % len(images))
+                return self.filter_resources(images)
         self.log.info("Querying images")
         images = c.describe_images(Owners=['self'], Filters=query)['Images']
+        self._cache.save(
+            {'region': self.config.region, 'resource': 'ami', 'q': query},
+            images)
         return self.filter_resources(images)
 
 

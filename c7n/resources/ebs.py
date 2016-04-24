@@ -45,14 +45,20 @@ class Snapshot(ResourceManager):
         c = self.session_factory().client('ec2')
         query = self.resource_query()
         if self._cache.load():
-            snaps = self._cache.get({'resource': 'ebs-snapshot'})
+            snaps = self._cache.get(
+                {'region': self.config.region,
+                 'resource': 'ebs-snapshot',
+                 'q': query})
             if snaps is not None:
                 return self.filter_resources(snaps)
         self.log.info('Querying ebs snapshots')
         p = c.get_paginator('describe_snapshots')
         results = p.paginate(Filters=query, OwnerIds=['self'])
         snapshots = list(itertools.chain(*[rp['Snapshots'] for rp in results]))
-        self._cache.save({'resource': 'ebs-snapshot'}, snapshots)
+        self._cache.save(
+            {'region': self.config.region,
+             'resource': 'ebs-snapshot',
+             'q': query}, snapshots)
         return self.filter_resources(snapshots)
 
 
