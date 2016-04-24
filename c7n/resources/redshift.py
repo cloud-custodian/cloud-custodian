@@ -48,13 +48,15 @@ class Redshift(ResourceManager):
     def resources(self):
         c = local_session(self.session_factory).client('redshift')
         if self._cache.load():
-            dbs = self._cache.get({'resource': 'redshift'})
+            dbs = self._cache.get(
+                {'region': self.config.region, 'resource': 'redshift'})
             return self.filter_resources(dbs)
         self.log.info('Querying redshift dbs')
         p = c.get_paginator('describe_clusters')
         results = p.paginate()
         snapshots = list(itertools.chain(*[rp['Clusters'] for rp in results]))
-        self._cache.save({'resource': 'redshift'}, snapshots)
+        self._cache.save(
+            {'region': self.config.region, 'resource': 'redshift'}, snapshots)
         return self.filter_resources(snapshots)
 
     

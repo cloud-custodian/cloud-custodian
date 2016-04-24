@@ -7,4 +7,3 @@ build:
     - python setup.py develop
 #    - flake8 maid --ignore=W293,W291,W503,W391
     - nosetests -s -v tests
-#    - nosetests -s -v ftests

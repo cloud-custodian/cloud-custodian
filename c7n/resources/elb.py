@@ -78,7 +78,8 @@ class ELB(ResourceManager):
 
     def resources(self):
         if self._cache.load():
-            elbs = self._cache.get({'resource': 'elb'})
+            elbs = self._cache.get(
+                {'region': self.config.region, 'resource': 'elb'})
             if elbs is not None:
                 self.log.debug("Using cached rds: %d" % (
                     len(elbs)))
@@ -89,7 +90,8 @@ class ELB(ResourceManager):
         results = p.paginate()
         elbs = list(itertools.chain(
             *[rp['LoadBalancerDescriptions'] for rp in results]))
-        self._cache.save({'resource': 'elbs'}, elbs)
+        self._cache.save(
+            {'region': self.config.region, 'resource': 'elbs'}, elbs)
         
         return self.filter_resources(elbs)
 

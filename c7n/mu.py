@@ -49,8 +49,7 @@ class PythonPackageArchive(object):
     directory structure.
     """
     
-    def __init__(self,
-                 src_path, virtualenv_dir=None, skip=None,
+    def __init__(self, src_path, virtualenv_dir=None, skip=None,
                  lib_filter=None, src_filter=None):
 
         self.src_path = src_path

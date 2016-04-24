@@ -76,6 +76,10 @@ class FileCacheManager(object):
             return True
         
     def save(self, key, data):
-        with open(self.cache_path, 'w') as fh:
-            cPickle.dump({
-                cPickle.dumps(key): data}, fh, protocol=2)
+        try:
+            with open(self.cache_path, 'w') as fh:
+                cPickle.dump({
+                    cPickle.dumps(key): data}, fh, protocol=2)
+        except Exception as e:
+            log.warning("Could not save cache %s err: %s" % (
+                self.cache_path, e))

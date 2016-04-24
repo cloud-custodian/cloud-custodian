@@ -52,7 +52,8 @@ class ASG(ResourceManager):
         c = self.session_factory().client('autoscaling')
         query = self.resource_query()
         if self._cache.load():
-            asgs = self._cache.get({'resource': 'asg', 'q': query})
+            asgs = self._cache.get(
+                {'region': self.config.region, 'resource': 'asg', 'q': query})
             if asgs is not None:
                 self.log.debug("Using cached asgs: %d" % len(asgs))
                 return self.filter_resources(asgs)
@@ -61,7 +62,9 @@ class ASG(ResourceManager):
         results = p.paginate()
         asgs = list(itertools.chain(
             *[rp['AutoScalingGroups'] for rp in results]))
-        self._cache.save({'resource': 'asg', 'q': query}, asgs)
+        self._cache.save(
+            {'resource': 'asg', 'region': self.config.region, 'q': query},
+            asgs)
         return self.filter_resources(asgs)
 
 
@@ -401,7 +404,6 @@ class Resume(BaseAction):
         - Start any stopped ec2 instances
         - Reattach ELB
         - Resume ASG Processes
-
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')

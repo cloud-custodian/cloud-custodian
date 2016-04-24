@@ -1,5 +1,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
+[![Build Status](https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg)](https://ci.cloudcustodian.io/capitalone/cloud-custodian)
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
  - [Cloud Custodian](#cloud-custodian)
@@ -119,7 +121,8 @@ Consult the documentation for additional information.
 
 Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 
-Irc - #cloud-custodian on irc.freenode.net
+Gitter - https://gitter.im/capitalone/cloud-custodian
+
 
 ### Contributors
 
