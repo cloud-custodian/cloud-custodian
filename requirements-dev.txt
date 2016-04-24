@@ -6,4 +6,6 @@ Sphinx==1.3.3
 placebo==0.8.0
 flake8
 sphinx-rtd-theme==0.1.9
-setuptools-markdown==0.2
+
+# requires pandoc, fails on ci server, only used for pypi metadata
+# setuptools-markdown==0.2
