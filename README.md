@@ -2,6 +2,8 @@
 
 [![Build Status](https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg)](https://ci.cloudcustodian.io/capitalone/cloud-custodian)
 
+[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
  - [Cloud Custodian](#cloud-custodian)
@@ -13,7 +15,6 @@
 
 # Cloud Custodian
 
-[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Cloud Custodian is a rules engine for AWS resource management. It
 allows users to define policies to be enforced to enable a well
