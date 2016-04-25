@@ -68,20 +68,24 @@ def main():
    logging.basicConfig(level=logging.INFO)
    
    bucket = os.environ.get('BUCKET')
-   s = boto3.Session()
-   cw = s.client('cloudwatch')
-   s3 = s.client('s3')
-   buckets = s3.list_buckets()['Buckets'] 
-
+   
    results = {'buckets':[]}
    size_count = obj_count = 0.0
 
+   s = boto3.Session()
+   s3 = s.client('s3')
+   buckets = s3.list_buckets()['Buckets']
+
    for b in buckets:
+      bucket_region = s3.get_bucket_location(Bucket=b['Name'])['LocationConstraint']
+      # get the cloudwatch session for the region the bucket is in
+      cw = s.client('cloudwatch', region_name=bucket_region)
       i = bucket_info(cw, b['Name'])
+
       results['buckets'].append(i)
       obj_count += i['ObjectCount']
       size_count += i['SizeGB']
- 
+
    results['TotalObjects'] = obj_count
    results['TotalSizeGB'] = size_count
 
