@@ -209,8 +209,10 @@ class LambdaManager(object):
         func.arn = result['FunctionArn']
         if alias and changed:
             func.alias = self.publish_alias(result, alias)
-        else:
+        elif alias:
             func.alias = "%s:%s" % (func.arn, alias)
+        else:
+            func.alias = func.arn
 
         for e in func.get_events(self.session_factory):
             if e.add(func):
@@ -786,7 +788,7 @@ class CloudWatchLogSubscription(object):
             try:
                 lambda_client.add_permission(
                     FunctionName=func.name,
-                    StatementId=group['logGroupName'].replace('/', '-'),
+                    StatementId=group['logGroupName'][1:].replace('/', '-'),
                     SourceArn=group['arn'],
                     Action='lambda:InvokeFunction',
                     Principal='logs.%s.amazonaws.com' % region)
@@ -807,7 +809,7 @@ class CloudWatchLogSubscription(object):
             try:
                 response = lambda_client.remove_permission(
                     FunctionName=func.name,
-                    StatementId=group['logGroupName'].replace('/', '-'))
+                    StatementId=group['logGroupName'][1:].replace('/', '-'))
                 log.debug("Removed lambda permission result: %s" % response)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
