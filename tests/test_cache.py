@@ -41,10 +41,6 @@ class FileCacheManagerTest(TestCase):
 
 
 
-    def test_load(self):
-        pass
-
-
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
     @mock.patch.object(cache.cPickle, 'dump')
