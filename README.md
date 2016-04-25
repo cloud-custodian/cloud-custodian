@@ -11,10 +11,6 @@
 
 # Cloud Custodian
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream
 Cloud Custodian is a rules engine for AWS resource management. It
 allows users to define policies to be enforced to enable a well
 managed cloud, with metrics and structured outputs. It consolidates
