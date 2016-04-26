@@ -606,6 +606,8 @@ class CloudWatchEventSource(object):
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
     
     def __init__(self, data, session_factory, prefix="custodian-"):
+        import time
+        t = time.time()
         self.session_factory = session_factory
         self.session = session_factory()
         self.client = self.session.client('events')
@@ -691,7 +693,7 @@ class CloudWatchEventSource(object):
         schedule = self.data.get('schedule')        
         if schedule:
             params['ScheduleExpression'] = schedule
-            
+
         rule = self.get(func.name)
 
         if rule and self.delta(rule, params):
