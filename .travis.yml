@@ -1,9 +1,7 @@
 language: python
 env:
-  - AWS_DEFAULT_REGION="us-east-1"
-  # Bypass credential lookup
-  - AWS_ACCESS_KEY_ID="some"
-  - AWS_SECRET_ACCESS_KEY = "thing"
+  # Region required, and Bypass credential lookup
+  - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY = "thing"
   
 python:
   - "2.7"
