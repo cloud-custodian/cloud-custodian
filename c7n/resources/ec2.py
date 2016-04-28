@@ -389,7 +389,6 @@ class Terminate(BaseAction, StateTransitionFilter):
 @actions.register('snapshot')
 class Snapshots(BaseAction):
     def process(self, resources):
-        volume_set = {}
         for resource in resources:
             with self.executor_factory(max_workers=3) as w:
                 futures = []
