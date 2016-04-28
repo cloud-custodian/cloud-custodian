@@ -182,6 +182,8 @@ class InstanceImageBase(object):
 @filters.register('image-age')
 class ImageAge(AgeFilter, InstanceImageBase):
 
+    date_attribute = "CreationDate"
+
     schema = type_schema('image-age', days={'type': 'number'})
 
     def process(self, resources, event=None):
