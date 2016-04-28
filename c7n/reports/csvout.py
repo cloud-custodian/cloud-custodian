@@ -140,7 +140,8 @@ class S3Formatter(Formatter):
     def __init__(self):
         super(S3Formatter, self).__init__(
             'Name',
-            ['creation-date',
+            ['name',
+             'creation-date',
              'global-permissions',
              'ownercontact',
              'asv',
@@ -150,13 +151,15 @@ class S3Formatter(Formatter):
         return [
             record['Name'],
             record['CreationDate'],
-            ','.join(record['GlobalPermissions']),
+            # s3 formatter is used for multiple s3 rules.
+            # the buckets may not have any global permissions
+            ','.join(record.get('GlobalPermissions', '')),
             tag_map.get("OwnerContact", ""),
             tag_map.get("ASV", ""),
             tag_map.get("CMDBEnvironment", ""),
-        ]        
+        ]
 
-            
+
 class EC2Formatter(Formatter):
     def __init__(self):
         super(EC2Formatter, self).__init__(
@@ -198,11 +201,43 @@ class ASGFormatter(Formatter):
         ]
 
 
+class AMIFormatter(Formatter):
+    def __init__(self):
+        super(AMIFormatter, self).__init__(
+            'ImageId',
+            ['id', 'name'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['ImageId'],
+            record['Name']
+        ]
+
+
+class EBSFormatter(Formatter):
+    def __init__(self):
+        super(EBSFormatter, self).__init__(
+            'VolumeId',
+            ['id', 'instance-id', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        instance_id = (record['Attachments'][0]['InstanceId'] if
+                       len(record['Attachments']) > 0 else 'Unattached')
+        return [
+            record['VolumeId'],
+            instance_id,
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
 # FIXME: Should we use a PluginRegistry instead?
 RECORD_TYPE_FORMATTERS = {
     'ec2': EC2Formatter(),
     'asg': ASGFormatter(),
-    's3': S3Formatter()
+    's3': S3Formatter(),
+    'ami': AMIFormatter(),
+    'ebs': EBSFormatter()
 }
 
 
