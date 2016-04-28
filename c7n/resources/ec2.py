@@ -15,6 +15,7 @@ import itertools
 import operator
 
 from dateutil.parser import parse
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -384,6 +385,37 @@ class Terminate(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
+
+@actions.register('create-snapshot')
+class Snapshots(BaseAction):
+    def process(self, resources):
+        volume_sets = {}
+        for resource in resources:
+            volume_sets[resource['InstanceId']] = []
+            for blockDevice in resource['BlockDeviceMappings']:
+                volume_sets[resource['InstanceId']].append(blockDevice['Ebs']['VolumeId'])
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for volume_set in volume_sets:
+                futures.append(w.submit(self.process_volume_set, volume_set, volume_sets[volume_set]))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error("Exception creating snapshot set \n %s" % (f.exception()))
+
+    def process_volume_set(self, instanceId, volume_set):
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+        r = utils.local_session(self.manager.session_factory).resource('ec2')
+        for volumeId in volume_set:
+            snapDescription = "Automated,LocalBackup,%s,%s" % (instanceId, volumeId)
+            response = c.create_snapshot(DryRun=True, VolumeId=volumeId, Description=snapDescription)
+            snapShot = r.Snapshot(response['SnapshotId'])
+            snapshot.create_tags(
+                DryRun=True, 
+                Tags=[
+                    {'Key' : 'Name','Value' : volumeId},
+                    {'Key' : 'InstanceId','Value' : instanceId},
+                ]
+            )
             
 
 # Valid EC2 Query Filters
