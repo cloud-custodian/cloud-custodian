@@ -404,13 +404,13 @@ class Snapshots(BaseAction):
 
     def process_volume_set(self, instanceId, volume_set):
         c = utils.local_session(self.manager.session_factory).client('ec2')
-        r = utils.local_session(self.manager.session_factory).resource('ec2')
         for volumeId in volume_set:
             snapDescription = "Automated,LocalBackup,%s,%s" % (instanceId, volumeId)
-            response = c.create_snapshot(DryRun=True, VolumeId=volumeId, Description=snapDescription)
+            response = c.create_snapshot(DryRun=False, VolumeId=volumeId, Description=snapDescription)
             snapShot = r.Snapshot(response['SnapshotId'])
-            snapshot.create_tags(
-                DryRun=True, 
+            c.create_tags(
+                DryRun=False, 
+                Resources=[snapShot],
                 Tags=[
                     {'Key' : 'Name','Value' : volumeId},
                     {'Key' : 'InstanceId','Value' : instanceId},
