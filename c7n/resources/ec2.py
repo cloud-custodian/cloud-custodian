@@ -397,7 +397,6 @@ class Snapshots(BaseAction):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error("Exception creating snapshot set \n %s" % (f.exception()))
-            block_devices = []
             
             
 
