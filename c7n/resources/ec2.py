@@ -386,36 +386,37 @@ class Terminate(BaseAction, StateTransitionFilter):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
 
-@actions.register('create-snapshot')
+@actions.register('snapshot')
 class Snapshots(BaseAction):
     def process(self, resources):
-        volume_sets = {}
+        volume_set = {}
         for resource in resources:
-            volume_sets[resource['InstanceId']] = []
-            for blockDevice in resource['BlockDeviceMappings']:
-                volume_sets[resource['InstanceId']].append(blockDevice['Ebs']['VolumeId'])
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for volume_set in volume_sets:
-                futures.append(w.submit(self.process_volume_set, volume_set, volume_sets[volume_set]))
+            with self.executor_factory(max_workers=3) as w:
+                futures = []
+                futures.append(w.submit(self.process_volume_set, resource))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error("Exception creating snapshot set \n %s" % (f.exception()))
-
-    def process_volume_set(self, instanceId, volume_set):
-        c = utils.local_session(self.manager.session_factory).client('ec2')
-        for volumeId in volume_set:
-            snapDescription = "Automated,LocalBackup,%s,%s" % (instanceId, volumeId)
-            response = c.create_snapshot(DryRun=False, VolumeId=volumeId, Description=snapDescription)
-            c.create_tags(
-                DryRun=False, 
-                Resources=[response['SnapshotId']],
-                Tags=[
-                    {'Key' : 'Name','Value' : volumeId},
-                    {'Key' : 'InstanceId','Value' : instanceId},
-                ]
-            )
+            block_devices = []
             
+            
+
+    def process_volume_set(self, resource):
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+        volume_set = {}
+        for blockDevice in resource['BlockDeviceMappings']:
+            if 'Ebs' in blockDevice:
+                snapDescription = "Automated,LocalBackup,%s,%s" % (resource['InstanceId'], block_device['Ebs']['VolumeId'])
+                response = c.create_snapshot(DryRun=False, VolumeId=block_device['Ebs']['VolumeId'], Description=snapDescription)
+                c.create_tags(
+                    DryRun=False, 
+                    Resources=[response['SnapshotId']],
+                    Tags=[
+                        {'Key' : 'Name','Value' : volumeId},
+                        {'Key' : 'InstanceId','Value' : instanceId},
+                        {'Key' : 'DeviceName', 'Value' : blockDevice['DeviceName']},
+                    ]
+                )    
 
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
