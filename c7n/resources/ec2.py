@@ -407,10 +407,9 @@ class Snapshots(BaseAction):
         for volumeId in volume_set:
             snapDescription = "Automated,LocalBackup,%s,%s" % (instanceId, volumeId)
             response = c.create_snapshot(DryRun=False, VolumeId=volumeId, Description=snapDescription)
-            snapShot = r.Snapshot(response['SnapshotId'])
             c.create_tags(
                 DryRun=False, 
-                Resources=[snapShot],
+                Resources=[response['SnapshotId']],
                 Tags=[
                     {'Key' : 'Name','Value' : volumeId},
                     {'Key' : 'InstanceId','Value' : instanceId},
