@@ -402,7 +402,6 @@ class Snapshots(BaseAction):
 
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
-        volume_set = {}
         for blockDevice in resource['BlockDeviceMappings']:
             if 'Ebs' in blockDevice:
                 snapDescription = "Automated,LocalBackup,%s,%s" % (resource['InstanceId'], block_device['Ebs']['VolumeId'])
