@@ -396,24 +396,27 @@ class Snapshots(BaseAction):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error("Exception creating snapshot set \n %s" % (f.exception()))
-            
-            
 
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
         for blockDevice in resource['BlockDeviceMappings']:
-            if 'Ebs' in blockDevice:
-                snapDescription = "Automated,LocalBackup,%s,%s" % (resource['InstanceId'], block_device['Ebs']['VolumeId'])
-                response = c.create_snapshot(DryRun=False, VolumeId=block_device['Ebs']['VolumeId'], Description=snapDescription)
-                c.create_tags(
-                    DryRun=False, 
-                    Resources=[response['SnapshotId']],
-                    Tags=[
-                        {'Key' : 'Name','Value' : volumeId},
-                        {'Key' : 'InstanceId','Value' : instanceId},
-                        {'Key' : 'DeviceName', 'Value' : blockDevice['DeviceName']},
-                    ]
-                )    
+            if 'Ebs' not in blockDevice:
+                continue
+            # handle ebs volumes
+            snapDescription = "Automated,LocalBackup,%s,%s" % (resource['InstanceId'], block_device['Ebs']['VolumeId'])
+            response = c.create_snapshot(
+                DryRun=self.manager.config.dryrun, 
+                VolumeId=block_device['Ebs']['VolumeId'], 
+                Description=snapDescription)
+
+            c.create_tags(
+                DryRun=self.manager.config.dryrun, 
+                Resources=[
+                    response['SnapshotId']],
+                Tags=[
+                    {'Key' : 'Name','Value' : volumeId},
+                    {'Key' : 'InstanceId','Value' : instanceId},
+                    {'Key' : 'DeviceName', 'Value' : blockDevice['DeviceName']},])    
 
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
