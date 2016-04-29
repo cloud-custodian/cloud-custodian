@@ -12,8 +12,8 @@ ASG - Offhours Support
          Daily stoppage at 7pm
        filters:
          - type: offhour
-           tag: c7n_downtime
-           hour: 22
+           tag: custodian_downtime
+           offhour: 22
        actions:
          - stop
    
@@ -23,8 +23,8 @@ ASG - Offhours Support
          Daily start at 10am
        filters:
          - type: onhour
-           tag: c7n_downtime
-           hour: 10
+           tag: custodian_downtime
+           onhour: 10
        actions:
          - start
          

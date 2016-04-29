@@ -1,8 +1,8 @@
 Tag Compliance Across Resources (EC2, ASG, ELB, S3, etc)
 ========================================================
 
-Mark
-  Tag instances with mark instances matching filters with a 'c7n_status' tag by
+Tag
+  Tags instances matching filters with a 'c7n_status' tag by
   default and configurable value.
 
   Here's an example of renaming an extant tag
@@ -16,9 +16,9 @@ Mark
          filters:
            - "tag:CostCenter": foobar
          actions:
-           - type: mark
-             tag: CostCenter
-             msg: barrum
+           - type: tag
+             key: CostCenter
+             value: barrum
 
 
 Report on Tag Compliance
