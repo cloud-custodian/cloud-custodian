@@ -58,7 +58,7 @@ Alternatively, you can just run the commands below:
 .. code-block:: bash
 
    $ cd cloud-custodian
-   $ make install
+   $ make develop
    $ ./bin/custodian -h
 
 Running tests
