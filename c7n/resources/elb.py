@@ -298,9 +298,14 @@ class SSLPolicyFilter(Filter):
 
         for (elb, policy_names) in elb_policy_set:
             elb_name = elb['LoadBalancerName']
-            policies = client.describe_load_balancer_policies(
-                LoadBalancerName=elb_name,
-                PolicyNames=policy_names)['PolicyDescriptions']
+            try:
+                policies = client.describe_load_balancer_policies(
+                    LoadBalancerName=elb_name,
+                    PolicyNames=policy_names)['PolicyDescriptions']
+            except ClientError as e:
+                if e.response['Error']['Code'] == "LoadBalancerNotFound":
+                    continue
+                raise
             active_lb_policies = []
             for p in policies:
                 if p['PolicyTypeName'] != 'SSLNegotiationPolicyType':
