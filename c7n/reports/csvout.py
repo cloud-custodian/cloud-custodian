@@ -185,6 +185,41 @@ class EC2Formatter(Formatter):
         ]
 
 
+class ELBFormatter(Formatter):
+    def __init__(self):
+        super(ELBFormatter, self).__init__(
+            'DNSName',
+            ['name', 'dns name', 'vpc-id', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['LoadBalancerName'],
+            record['DNSName'],
+            record['VPCId'],
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
+
+class RDSFormatter(Formatter):
+    def __init__(self):
+        super(RDSFormatter, self).__init__(
+            'DBInstanceIdentifier',
+            ['instance id', 'db name', 'creation time', 'encrypted', 'publicly accessible', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['DBInstanceIdentifier'],
+            record.get('DBName', ''),
+            record['StorageEncrypted'],
+            record['PubliclyAccessible'],
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
+
 class ASGFormatter(Formatter):
     def __init__(self):
         super(ASGFormatter, self).__init__(
@@ -233,11 +268,13 @@ class EBSFormatter(Formatter):
 
 # FIXME: Should we use a PluginRegistry instead?
 RECORD_TYPE_FORMATTERS = {
-    'ec2': EC2Formatter(),
-    'asg': ASGFormatter(),
-    's3': S3Formatter(),
     'ami': AMIFormatter(),
-    'ebs': EBSFormatter()
+    'asg': ASGFormatter(),
+    'ebs': EBSFormatter(),
+    'ec2': EC2Formatter(),
+    'elb': ELBFormatter(),
+    'rds': RDSFormatter(),
+    's3': S3Formatter()
 }
 
 
