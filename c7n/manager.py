@@ -56,6 +56,8 @@ class ResourceManager(object):
         return []
     
     def filter_resources(self, resources, event=None):
+        if not resources:
+            return []
         original = len(resources)
         for f in self.filters:
             if event and event['debug']:
