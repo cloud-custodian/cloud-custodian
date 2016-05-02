@@ -10,16 +10,16 @@ develop:
 	source bin/activate && python setup.py develop
 
 coverage:
-	./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover tests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover tests
 
 lint:
 	flake8 janitor --ignore=W293,W291,W503,W391
 
 test:
-	./bin/nosetests -s -v --with-timer tests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v tests
 
 ftests:
-	./bin/nosetests -s -v ftests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
 
 depcache:
 	mkdir -p deps

@@ -63,7 +63,7 @@ from c7n.filters import Filter, FilterRegistry, FilterValidationError
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, chunks, type_schema
 
-log = logging.getLogger('cloudformation.elb')
+log = logging.getLogger('custodian.elb')
 
 
 filters = FilterRegistry('elb.filters')
@@ -84,7 +84,7 @@ class ELB(ResourceManager):
                 self.log.debug("Using cached rds: %d" % (
                     len(elbs)))
                 return self.filter_resources(elbs)
-            
+
         c = self.session_factory().client('elb')
         p = c.get_paginator('describe_load_balancers')
         results = p.paginate()
@@ -92,7 +92,7 @@ class ELB(ResourceManager):
             *[rp['LoadBalancerDescriptions'] for rp in results]))
         self._cache.save(
             {'region': self.config.region, 'resource': 'elbs'}, elbs)
-        
+
         return self.filter_resources(elbs)
 
     def get_resources(self, resource_ids):
@@ -121,6 +121,48 @@ class Delete(BaseAction):
         client.delete_load_balancer(LoadBalancerName=elb['LoadBalancerName'])
 
 
+@actions.register('set-ssl-listener-policy')
+class SetSslListenerPolicy(BaseAction):
+
+    schema = type_schema(
+        'set-ssl-listener-policy',
+        name={'type': 'string'},
+        attributes={'type': 'array', 'items': {'type': 'string'}},
+        required=['name', 'attributes'])
+
+    def process(self, load_balancers):
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_elb, load_balancers))
+
+    def process_elb(self, elb):
+        if not is_ssl(elb):
+            return
+
+        client = local_session(self.manager.session_factory).client('elb')
+
+        # Create a custom policy.
+        attrs = self.data.get('attributes')
+        # This name must be unique within the
+        # set of policies for this load balancer.
+        policy_name = self.data.get('name')
+        lb_name = elb['LoadBalancerName']
+        policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
+            for attr in attrs]
+        client.create_load_balancer_policy(
+            LoadBalancerName=lb_name,
+            PolicyName=policy_name,
+            PolicyTypeName='SSLNegotiationPolicyType',
+            PolicyAttributes=policy_attributes)
+
+        # Apply it to all SSL listeners.
+        for ld in elb['ListenerDescriptions']:
+            if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
+                client.set_load_balancer_policies_of_listener(
+                    LoadBalancerName=lb_name,
+                    LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
+                    PolicyNames=[policy_name])
+
+
 def is_ssl(b):
     for ld in b['ListenerDescriptions']:
         if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
@@ -136,7 +178,7 @@ class IsSSLFilter(Filter):
     def process(self, balancers, event=None):
         return [b for b in balancers if is_ssl(b)]
 
-    
+
 @filters.register('ssl-policy')
 class SSLPolicyFilter(Filter):
     """Filter ELBs on the properties of SSLNegotation policies.
@@ -175,7 +217,7 @@ class SSLPolicyFilter(Filter):
         if ('blacklist' in self.data and
                 not isinstance(self.data['blacklist'], list)):
             raise FilterValidationError("blacklist must be a list")
-        
+
         return self
 
     def process(self, balancers, event=None):
@@ -272,7 +314,7 @@ class SSLPolicyFilter(Filter):
             results.append((elb, active_lb_policies))
 
         return results
-        
+
 
 @filters.register('healthcheck-protocol-mismatch')
 class HealthCheckProtocolMismatch(Filter):
@@ -280,7 +322,7 @@ class HealthCheckProtocolMismatch(Filter):
     """
 
     schema = type_schema('healthcheck-protocol-mismatch')
-    
+
     def __call__(self, load_balancer):
         health_check_protocol = (
             load_balancer['HealthCheck']['Target'].split(':')[0])

@@ -30,9 +30,9 @@ use for managing their AWS accounts into one open source tool and
 provide unified operations and reporting.
 
 It integrates with lambda and cloudwatch events to provide for
-realtime enforcement of policies with builtin provisioning, or can
-isomorphically be used to query and operate against all of account
-resources.
+realtime enforcement of policies with builtin provisioning on new
+resources or it can be used to query and operate against all of
+account's extant resources.
 
 
 ## Links
@@ -53,7 +53,7 @@ policies:
    description: |
      Scan through all s3 buckets in an account and ensure all objects
      are encrypted (default to AES256).  
-   resources: s3
+   resource: s3
    actions:
      - encrypt-keys
 
@@ -73,7 +73,7 @@ policies:
      - terminate
 
  - name: tag-compliance
-   resources: ec2
+   resource: ec2
    description:
      Schedule a resource that does not meet tag compliance policies
      to be stopped in four days.
