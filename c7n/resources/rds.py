@@ -98,7 +98,7 @@ class RDS(ResourceManager):
         p = c.get_paginator('describe_db_instances')
         results = p.paginate(Filters=query)
         dbs = list(itertools.chain(
-            *[self.add_tags(c, rp['DBInstances']) for rp in results]))
+            *[self.get_dbs_from_result_page(c, rp) for rp in results]))
         self._cache.save(
             {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
@@ -112,14 +112,20 @@ class RDS(ResourceManager):
                     DBInstanceIdentifier=db_id)['DBInstances'])
         return results
 
-    def add_tags(self, client, dbs):
+    def get_dbs_from_result_page(self, client, rp):
+        dbs = rp['DBInstances']
+        self.add_tags_to_results(client, dbs)
+        return dbs
+
+    def add_tags_to_results(self, client, dbs):
         """
-        Adds the tags to the list of databases
+        Gets the tags for each of the databases and
+        adds them to the result set.
         """
         account_id = self.get_account_id()
-        fn = partial(self.process_tags, account_id=account_id ,client=client)
+        fn = partial(self.process_tags, account_id=account_id, client=client)
         with self.executor_factory(max_workers=3) as w:
-            return list(w.map(fn,dbs))
+            list(w.map(fn, dbs))
 
     def process_tags(self, db, **kwargs):
         region = self.get_region(db)
@@ -135,12 +141,12 @@ class RDS(ResourceManager):
         return db
 
     def get_account_id(self):
-        # TODO: This just gets a security group in the account
-        # and uses that as the ARN of the account. See notes
+        # TODO: This just gets a role from the current account
+        # and uses its ARN as the account ARN. See notes
         # at top of file for how else we can do this
-        client = self.session_factory().client('ec2')
+        client = self.session_factory().client('iam')
         account_id = (
-            client.describe_security_groups()['SecurityGroups'][0]['OwnerId']
+            client.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]
         )
         return account_id
 

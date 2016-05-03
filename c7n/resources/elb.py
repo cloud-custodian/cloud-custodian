@@ -63,6 +63,8 @@ from c7n.filters import Filter, FilterRegistry, FilterValidationError
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, chunks, type_schema
 
+from functools import partial
+
 log = logging.getLogger('custodian.elb')
 
 
@@ -81,7 +83,7 @@ class ELB(ResourceManager):
             elbs = self._cache.get(
                 {'region': self.config.region, 'resource': 'elb'})
             if elbs is not None:
-                self.log.debug("Using cached rds: %d" % (
+                self.log.debug("Using cached elb: %d" % (
                     len(elbs)))
                 return self.filter_resources(elbs)
 
@@ -89,7 +91,7 @@ class ELB(ResourceManager):
         p = c.get_paginator('describe_load_balancers')
         results = p.paginate()
         elbs = list(itertools.chain(
-            *[rp['LoadBalancerDescriptions'] for rp in results]))
+            *[self.get_elbs_from_result_page(c, rp) for rp in results]))
         self._cache.save(
             {'region': self.config.region, 'resource': 'elbs'}, elbs)
 
@@ -105,6 +107,46 @@ class ELB(ResourceManager):
             if e.response['Error']['Code'] == "LoadBalancerNotFound":
                 return []
             raise
+
+    def get_elbs_from_result_page(self, client, rp):
+        elb_descriptions = rp['LoadBalancerDescriptions']
+        self.add_tags_to_results(client, elb_descriptions)
+        return elb_descriptions
+
+    def add_tags_to_results(self, client, elbs):
+        """
+        Gets the tags for the ELBs and adds them to
+        the result set.
+        """
+        elb_names = [elb['LoadBalancerName'] for elb in elbs]
+        names_to_tags = {}
+        fn = partial(self.process_tags, client=client)
+        futures = []
+        with self.executor_factory(max_workers=3) as w:
+            # max 20 ELBs per call (API limitation)
+            for elb_names_chunk in chunks(elb_names, size=20):
+                    futures.append(
+                        w.submit(fn, elb_names_chunk))
+
+        for f in as_completed(futures):
+            if f.exception():
+                self.log.exception("Exception Processing ELB: %s" % (
+                    f.exception()))
+                continue
+            r = f.result()
+            if r:
+                names_to_tags.update(r)
+
+        for elb in elbs:
+            elb['Tags'] = names_to_tags[elb['LoadBalancerName']]
+
+    def process_tags(self, chunk, **kwargs):
+        tag_descriptions = kwargs['client'].describe_tags(LoadBalancerNames=chunk)
+
+        names_to_tags = {}
+        for desc in tag_descriptions['TagDescriptions']:
+            names_to_tags[desc['LoadBalancerName']] = desc['Tags']
+        return names_to_tags
 
 
 @actions.register('delete')
