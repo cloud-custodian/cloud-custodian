@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "00000000-0000-0000-0000-000000000000"
+        }, 
+        "TagDescriptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "value1", 
+                        "Key": "tag1"
+                    }, 
+                    {
+                        "Value": "value2", 
+                        "Key": "tag2"
+                    }
+                ], 
+                "LoadBalancerName": "test-elb-protocol-mismatch"
+            },
+            {
+                "Tags": [
+                    {
+                        "Value": "value1", 
+                        "Key": "tag1"
+                    }, 
+                    {
+                        "Value": "value2", 
+                        "Key": "tag2"
+                    }
+                ], 
+                "LoadBalancerName": "test-elb-protocol-matches"
+            },
+            {
+                "Tags": [
+                    {
+                        "Value": "value1", 
+                        "Key": "tag1"
+                    }, 
+                    {
+                        "Value": "value2", 
+                        "Key": "tag2"
+                    }
+                ], 
+                "LoadBalancerName": "test-elb-no-listeners"
+            },
+            {
+                "Tags": [
+                    {
+                        "Value": "value1", 
+                        "Key": "tag1"
+                    }, 
+                    {
+                        "Value": "value2", 
+                        "Key": "tag2"
+                    }
+                ], 
+                "LoadBalancerName": "test-elb-multiple-listeners"
+            }            
+        ]
+    }
+}

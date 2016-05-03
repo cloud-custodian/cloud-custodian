@@ -14,6 +14,7 @@
 import logging
 
 from c7n import cache
+from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.utils import dumps
 
@@ -27,7 +28,9 @@ class ResourceManager(object):
     action_registry = None
 
     supports_dry_run = False
-    
+
+    executor_factory = ThreadPoolExecutor
+
     def __init__(self, ctx, data):
         self.ctx = ctx
         self.session_factory = ctx.session_factory
