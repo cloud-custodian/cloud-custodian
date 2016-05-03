@@ -18,6 +18,7 @@ import time
 
 from botocore.client import ClientError
 
+from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
@@ -141,7 +142,10 @@ class Policy(object):
             self.log.info(
                 "policy: %s invoking action: %s resources: %d",
                 self.name, action.name, len(resources))
-            action.process(resources)
+            if isinstance(action, EventAction):
+                action.process(resources, event)
+            else:
+                action.process(resources)
 
     def provision(self):
         """Provision policy as a lambda function."""
