@@ -29,7 +29,7 @@ Actions:
  global-grants
 
    Check bucket acls for global grants
-  
+
  encryption-policy
 
    Attach an encryption required policy to a bucket, this will break
@@ -71,7 +71,7 @@ class S3(ResourceManager):
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
     action_registry = actions
-    
+
     def __init__(self, ctx, data):
         super(S3, self).__init__(ctx, data)
         self.log_dir = ctx.log_dir
@@ -85,7 +85,7 @@ class S3(ResourceManager):
                 zip(itertools.repeat(self.session_factory), buckets))
             results = filter(None, results)
         return results
-        
+
     def resources(self):
         c = self.session_factory().client('s3')
         log.debug('Retrieving buckets')
@@ -100,7 +100,7 @@ class S3(ResourceManager):
             results = filter(None, results)
         return self.filter_resources(results)
 
-    
+
 def assemble_bucket(item):
     """Assemble a document representing all the config state around a bucket.
     """
@@ -112,19 +112,19 @@ def assemble_bucket(item):
     methods = [
         ('get_bucket_location', 'Location', None, None),
         ('get_bucket_tagging', 'Tags', [], 'TagSet'),
-        ('get_bucket_policy',  'Policy', None, None),   
+        ('get_bucket_policy',  'Policy', None, None),
         ('get_bucket_acl', 'Acl', None, None),
         ('get_bucket_replication', 'Replication', None, None),
         ('get_bucket_versioning', 'Versioning', None, None),
         ('get_bucket_website', 'Website', None, None)
 #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
-#        ('get_bucket_cors', 'Cors'),        
+#        ('get_bucket_cors', 'Cors'),
 #        ('get_bucket_notification_configuration', 'Notification')
     ]
 
     # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
-    
+
     for m, k, default, select in methods:
         try:
             method = getattr(c, m)
@@ -170,18 +170,18 @@ def bucket_client(session, b, kms=False):
     else:
         config = None
     return session.client(
-        's3', region_name=region,        
+        's3', region_name=region,
         config=config)
 
 
-@filters.register('global-grants')        
+@filters.register('global-grants')
 class NoGlobalGrants(Filter):
 
     schema = type_schema('global-grants')
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
-    
+
     def process(self, buckets, event=None):
         with self.executor_factory(max_workers=5) as w:
             results = w.map(self.process_bucket, buckets)
@@ -213,12 +213,12 @@ class BucketActionBase(BaseAction):
     def get_permissions(self):
         return self.permissions
 
-    
+
 @actions.register('encrypted-prefix')
 class EncryptedPrefix(BucketActionBase):
 
     permissions = ("s3:GetObject", "s3:PutObject")
-    
+
     def process(self, buckets):
         prefix = self.data.get('prefix')
         with self.executor_factory(max_workers=5) as w:
@@ -251,14 +251,14 @@ class EncryptedPrefix(BucketActionBase):
                 ServerSideEncryption=crypto_method)
             return {'Bucket': b['Name'], 'Prefix': k, 'State': 'Created'}
 
-        # Note on copy we lose individual key acl grants        
+        # Note on copy we lose individual key acl grants
         s3.copy_object(
             Bucket=b['Name'], Key=k,
             CopySource="/%s/%s" % (b, k),
             MetadataDirective='COPY',
             ServerSideEncryption=crypto_method)
         return {'Bucket': b['Name'], 'Prefix': k, 'State': 'Updated'}
-        
+
 
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):
@@ -283,7 +283,7 @@ class MissingPolicyStatementFilter(Filter):
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
-        
+
         for s in list(statements):
             if s['StatementId'] in required:
                 required.remove(s['StatementId'])
@@ -291,17 +291,17 @@ class MissingPolicyStatementFilter(Filter):
             return None
         return b
 
-    
+
 @actions.register('no-op')
 class NoOp(BucketActionBase):
 
     schema = type_schema('no-op')
-    
+
     def process(self, buckets):
         return None
-            
-            
-@actions.register('encryption-policy')    
+
+
+@actions.register('encryption-policy')
 class EncryptionRequiredPolicy(BucketActionBase):
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
@@ -311,7 +311,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
     def __init__(self, data=None, manager=None):
         self.data = data or {}
         self.manager = manager
-        
+
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             results = w.map(self.process_bucket, buckets)
@@ -325,7 +325,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
             p = {'Version': "2012-10-17", "Statements": []}
         else:
             p = json.loads(p['Policy'])
-            
+
         statements = p.get('Statement', [])
         found = False
         for s in list(statements):
@@ -333,7 +333,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
                 log.debug(
                     "Bucket:%s Found extant Encryption Policy" % b['Name'])
                 return
-        
+
         session = self.manager.session_factory()
         s3 = bucket_client(session, b)
 
@@ -357,10 +357,10 @@ class EncryptionRequiredPolicy(BucketActionBase):
             Policy=json.dumps(p))
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
-        
+
 class BucketScanLog(object):
     """Offload remediated key ids to a disk file in batches
-    
+
     A bucket keyspace is effectively infinite, we need to store partial
     results out of memory, this class provides for a json log on disk
     with partial write support.
@@ -368,7 +368,7 @@ class BucketScanLog(object):
     json output format:
      - [list_of_serialized_keys],
      - [] # Empty list of keys at end when we close the buffer
-    
+
     """
     def __init__(self, log_dir, name):
         self.log_dir = log_dir
@@ -379,12 +379,12 @@ class BucketScanLog(object):
     @property
     def path(self):
         return os.path.join(self.log_dir, "%s.json" % self.name)
-    
+
     def __enter__(self):
         self.fh = open(self.path, 'w')
         self.fh.write("[\n")
         return self
-    
+
     def __exit__(self, exc_type=None, exc_value=None, exc_frame=None):
         # we need an empty marker list at end to avoid trailing commas
         self.fh.write("[]")
@@ -395,7 +395,7 @@ class BucketScanLog(object):
             os.remove(self.fh.name)
         self.fh = None
         return False
-        
+
     def add(self, keys):
         self.count += len(keys)
         self.fh.write(json.dumps(keys))
@@ -423,7 +423,7 @@ class ScanBucket(BucketActionBase):
         return (
             b.get('Versioning', {'Status': ''}).get('Status') == 'Enabled'
             and 'versioned' or 'standard')
-    
+
     def get_bucket_op(self, b, op_name):
         bucket_style = self.get_bucket_style(b)
         op = self.bucket_ops[bucket_style][op_name]
@@ -464,7 +464,7 @@ class ScanBucket(BucketActionBase):
                             b['Name'], p))
 
     __call__ = process_bucket
-    
+
     def _process_bucket(self, b, p, key_log, w):
         content_key = self.get_bucket_op(b, 'contents_key')
         count = 0
@@ -509,9 +509,9 @@ class ScanBucket(BucketActionBase):
 
     def process_version(self, s3, bucket, key):
         raise NotImplementedError()
-    
 
-@actions.register('encrypt-keys')    
+
+@actions.register('encrypt-keys')
 class EncryptExtantKeys(ScanBucket):
 
     permissions = (
@@ -551,7 +551,7 @@ class EncryptExtantKeys(ScanBucket):
             buffer=True
         )
         self.manager.ctx.metrics.flush()
-                
+
         log.info(
             ("EncryptExtant Complete keys:%d "
              "remediated:%d rate:%0.2f/s time:%0.2fs"),
@@ -588,7 +588,7 @@ class EncryptExtantKeys(ScanBucket):
             return k
 
         storage_class = key['StorageClass']
-        
+
         if storage_class == 'GLACIER':
             if not 'Restore' in info:
                 # This takes multiple hours, we let the next c7n
@@ -643,3 +643,49 @@ def restore_complete(restore):
     else:
         ongoing = restore
     return 'false' in ongoing
+
+
+@actions.register('delete-global-grants')
+class DeleteGlobalGrants(BucketActionBase):
+
+    schema = type_schema(
+        'delete-global-grants',
+        grantees={'type': 'array', 'items': {'type': 'string'}},
+        required=['grantees'])
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=5) as w:
+            list(w.map(self.process_bucket, buckets))
+
+    def process_bucket(self, b):
+        grantees = self.data.get('grantees')
+        s3 = bucket_client(self.manager.session_factory(), b)
+        log.info(b)
+
+        acl = b.get('Acl', {'Grants': []})
+        if not acl or not acl['Grants']:
+            return
+        new_grants = []
+        for grant in acl['Grants']:
+            grantee = grant.get('Grantee', {})
+            if not grantee:
+                continue
+            # Yuck, 'get_bucket_acl' doesn't return the grantee type.
+            if 'URI' in grantee:
+                grantee['Type'] = 'Group'
+            else:
+                grantee['Type'] = 'CanonicalUser'
+            if ('URI' in grantee and
+                grantee['URI'] in grantees and not
+                (grant['Permission'] == 'READ' and b['Website'])):
+                # Remove this grantee.
+                pass
+            else:
+                new_grants.append(grant)
+
+        log.info({'Owner': acl['Owner'], 'Grants': new_grants})
+
+        c = bucket_client(self.manager.session_factory(), b)
+        c.put_bucket_acl(
+            Bucket=b['Name'],
+            AccessControlPolicy={'Owner': acl['Owner'], 'Grants': new_grants})
