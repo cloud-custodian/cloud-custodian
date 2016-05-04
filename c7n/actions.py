@@ -97,8 +97,13 @@ class BaseAction(object):
                         self.__class__.__name__.lower()))
             raise
 
+        
+class EventAction(BaseAction):
+    """Actions which receive lambda event if present
+    """
 
-class Notify(BaseAction):
+    
+class Notify(EventAction):
     """
     Flexible notifications require quite a bit of implementation support
     on pluggable transports, templates, address resolution, variable
