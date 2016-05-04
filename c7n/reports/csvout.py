@@ -124,6 +124,9 @@ class Formatter(object):
         return uniq
 
     def to_csv(self, records, reverse=True):
+        if not records:
+            return []
+
         filtered = filter(self.filter_record, records)
         log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
         if 'CustodianDate' in records[0]:
@@ -300,17 +303,19 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     """
 
     s3 = local_session(session_factory).client('s3')
-    marker = key_prefix.strip("/") + "/" + start_date.strftime(
-        '%Y-%m-%d-00') + "/resources.json.gz"
 
     records = []
     key_count = 0
-    
+
+    marker = key_prefix.strip("/") + "/" + start_date.strftime(
+         '%Y/%m/%d/00') + "/resources.json.gz"
+
     p = s3.get_paginator('list_objects').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        Marker=marker)
-    
+        Marker=marker
+    )
+
     with ThreadPoolExecutor(max_workers=20) as w:
         for key_set in p:
             if 'Contents' not in key_set:
@@ -332,12 +337,15 @@ def get_records(bucket, key, session_factory):
     # we're doing a lot of this in memory, worst case
     # though we're talking about a 10k objects, else
     # we should spool to temp files
-    _, date_str, _ = key['Key'].rsplit("/", 2)
+
+    # key ends with 'YYYY/mm/dd/HH/resources.json.gz'
+    # so take the date parts only
+    date_str = '-'.join(key['Key'].rsplit('/', 5)[-5:-1])
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
     blob = StringIO(result['Body'].read())
-    
+
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",
               bucket, key['Key'], len(records))
