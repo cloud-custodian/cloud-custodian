@@ -23,7 +23,7 @@ import logging
 import itertools
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, ValueFilter
 
 from c7n.manager import ResourceManager, resources
 from c7n.offhours import Time, OffHour, OnHour
@@ -68,6 +68,34 @@ class ASG(ResourceManager):
         return self.filter_resources(asgs)
 
 
+@filters.register('vpc-id')
+class VpcIdFilter(ValueFilter):
+
+    schema = type_schema(
+        'vpc-id', rinherit=ValueFilter.schema)
+    schema['properties'].pop('key')
+
+    def __init__(self, data, manager=None):
+        super(VpcIdFilter, self).__init__(data, manager)
+        self.data['key'] = 'VpcId'
+        
+    def process(self, asgs, event=None):
+        subnets = {}
+        for a in asgs:
+            subnet_ids = a.get('VPCZoneIdentifier', '')
+            if not subnet_ids:
+                continue
+            subnets.setdefault(subnet_ids.split(',')[0], []).append(a)
+        session = local_session(self.manager.session_factory)
+        ec2 = session.client('ec2')
+        subnets_info = ec2.describe_subnets(SubnetIds=list(subnets))['Subnets']
+
+        for s in subnets_info:
+            for a in subnets[s['SubnetId']]:
+                a['VpcId'] = s['VpcId']
+        return super(VpcIdFilter, self).process(asgs)
+
+    
 @actions.register('remove-tag')
 @actions.register('untag')
 @actions.register('unmark')

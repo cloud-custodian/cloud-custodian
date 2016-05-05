@@ -15,9 +15,11 @@ ELB - SSL Whitelist
          - SetLoadBalancerPoliciesOfListener
      filters:
        - type: ssl-policy
-         whitelist:
+         whitelist: &POLICY
            - Protocol-TLSv1
            - Protocol-TLSv1.1
            - Protocol-TLSv1.2
      actions:
-       - delete
+       - type: set-ssl-listener-policy
+         name: CustodianEnforcedPolicy
+         attributes: *POLICY
