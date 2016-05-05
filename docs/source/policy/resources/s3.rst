@@ -28,5 +28,8 @@ Actions
   applications that are not using encryption, including AWS log
   delivery
 
+``delete-global-grants``
+  Delete global grants from bucket ACLs
+
 ``no-op``
   No operation

@@ -50,7 +50,8 @@ class Redshift(ResourceManager):
         if self._cache.load():
             dbs = self._cache.get(
                 {'region': self.config.region, 'resource': 'redshift'})
-            return self.filter_resources(dbs)
+            if dbs is not None:
+                return self.filter_resources(dbs)
         self.log.info('Querying redshift dbs')
         p = c.get_paginator('describe_clusters')
         results = p.paginate()

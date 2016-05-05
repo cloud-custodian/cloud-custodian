@@ -69,6 +69,8 @@ from c7n.filters import FilterRegistry, Filter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
+from functools import partial
+
 log = logging.getLogger('custodian.rds')
 
 
@@ -96,7 +98,7 @@ class RDS(ResourceManager):
         p = c.get_paginator('describe_db_instances')
         results = p.paginate(Filters=query)
         dbs = list(itertools.chain(
-            *[rp['DBInstances'] for rp in results]))
+            *[self.get_dbs_from_result_page(c, rp) for rp in results]))
         self._cache.save(
             {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
@@ -109,6 +111,52 @@ class RDS(ResourceManager):
                 c.describe_db_instances(
                     DBInstanceIdentifier=db_id)['DBInstances'])
         return results
+
+    def get_dbs_from_result_page(self, client, rp):
+        dbs = rp['DBInstances']
+        self.add_tags_to_results(client, dbs)
+        return dbs
+
+    def add_tags_to_results(self, client, dbs):
+        """
+        Gets the tags for each of the databases and
+        adds them to the result set.
+        """
+        account_id = self.get_account_id()
+        fn = partial(self.process_tags, account_id=account_id, client=client)
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(fn, dbs))
+
+    def process_tags(self, db, **kwargs):
+        region = self.get_region(db)
+        name = db['DBInstanceIdentifier']
+        arn = "arn:aws:rds:%s:%s:db:%s" % (region, kwargs['account_id'], name)
+        tag_list = (
+            kwargs['client'].list_tags_for_resource(ResourceName=arn)['TagList']
+        )
+        tags = []
+        if tag_list:
+            tags.extend(tag_list)
+        db['Tags'] = tags
+        return db
+
+    def get_account_id(self):
+        # TODO: This just gets a role from the current account
+        # and uses its ARN as the account ARN. See notes
+        # at top of file for how else we can do this
+        client = self.session_factory().client('iam')
+        account_id = (
+            client.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]
+        )
+        return account_id
+
+    def get_region(self, db):
+        # get the region from the endpoint
+        endpoint_parts = db['Endpoint']['Address'].split('.')
+
+        # format is "<db-id>.<region>.rds.amazonaws.com"
+        region = endpoint_parts[-4]
+        return region
 
 
 @filters.register('default-vpc')
