@@ -359,6 +359,7 @@ class TagDelayedAction(Action, ResourceTag):
 
     schema = utils.type_schema(
         'mark-for-op',
+        tag={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'enum': ACTIONS},
         batch_size={'type': 'integer', 'minimum': 1})
