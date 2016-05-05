@@ -179,7 +179,11 @@ class Delete(BaseAction):
 
 
 @actions.register('snapshot')
-class Snapshots(BaseAction):
+class Snapshot(BaseAction):
+
+    schema = {'properties': {
+        'type': {
+            'enum': ['snapshot']}}}
 
     def process(self, resources):
         with self.executor_factory(max_workers=3) as w:
@@ -206,6 +210,9 @@ class Snapshots(BaseAction):
 @actions.register('retention')
 class RetentionWindow(BaseAction):
 
+    date_attribute = "BackupRetentionPeriod"
+    schema = type_schema('retention', days={'type': 'number'})
+
     def process(self, resources):
         with self.executor_factory(max_workers=3) as w:
             futures = []
@@ -216,7 +223,7 @@ class RetentionWindow(BaseAction):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception creating rds snapshot  \n %s" % (
+                            "Exception setting rds retention  \n %s" % (
                                 f.exception()))
 
     def process_snapshot_retention(self, resource):
@@ -231,4 +238,4 @@ class RetentionWindow(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
-            BackupRetentionPeriod=7)
+            BackupRetentionPeriod=self.data['retention'])
