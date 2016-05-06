@@ -159,7 +159,7 @@ class Notify(EventAction):
 
     def process(self, resources, event=None):
         for batch in utils.chunks(resources, 500):
-            message = {'resources': resources,
+            message = {'resources': batch,
                        'event': event,
                        'action': self.data,
                        'policy': self.manager.data}            
