@@ -215,7 +215,7 @@ class Snapshot(BaseAction):
             futures = []
             for resource in resources:
                 futures.append(w.submit(
-                    self.process_rds_snapshot,
+                    self.process_snapshot_retention,
                     resource))
                 for f in as_completed(futures):
                     if f.exception():
@@ -252,15 +252,12 @@ class RetentionWindow(BaseAction):
                                 f.exception()))
 
     def process_snapshot_retention(self, resource):
-        try:
-            v = int(resource['BackupRetentionPeriod'])
-            if v == 0:
-                    self.retention_window(resource)
-        except ValueError:
-                self.set_retention_window(resource)
+        v = int(resource.get('BackupRetentionPeriod', 0))
+        if v == 0 or v != self.data['days']:
+            self.set_retention_window(resource)
 
     def set_retention_window(self, resource):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
-            BackupRetentionPeriod=self.data['retention'])
+            BackupRetentionPeriod=self.data['days'])
