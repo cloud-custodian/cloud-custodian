@@ -119,10 +119,10 @@ class RDS(ResourceManager):
 
 def _rds_tags(dbs, session_factory, executor_factory, account_id):
     """Augment rds instances with their respective tags."""
-    
+
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        
+
         region = db['Endpoint']['Address'].split('.')[-4]
         name = db['DBInstanceIdentifier']
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
@@ -136,7 +136,7 @@ def _rds_tags(dbs, session_factory, executor_factory, account_id):
         list(w.map(process_tags, dbs))
 
 
-    
+
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -243,7 +243,7 @@ class RetentionWindow(BaseAction):
             futures = []
             for resource in resources:
                 futures.append(w.submit(
-                    self.process_rds_snapshot,
+                    self.process_snapshot_retention,
                     resource))
                 for f in as_completed(futures):
                     if f.exception():
