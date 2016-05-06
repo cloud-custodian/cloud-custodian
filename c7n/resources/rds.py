@@ -25,14 +25,14 @@ Find rds instances that are publicly available
    policies:
       - name: rds-public
         resource: rds
-        filters: 
+        filters:
          - PubliclyAccessible: true
 
 Find rds instances that are not encrypted
 
 .. code-block:: yaml
 
-   policies: 
+   policies:
       - name: rds-non-encrypted
         resource: rds
         filters:
@@ -49,7 +49,7 @@ Todo/Notes
   requires full arns. The api never exposes
   arn. We should use a policy attribute
   for arn, that can dereference from assume
-  role, instance profile role, iam user (GetUser), 
+  role, instance profile role, iam user (GetUser),
   or for sts assume role users we need to
   require cli params for this resource type.
 
@@ -63,6 +63,7 @@ import logging
 import itertools
 
 from botocore.exceptions import ClientError
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
@@ -118,10 +119,10 @@ class RDS(ResourceManager):
 
 def _rds_tags(dbs, session_factory, executor_factory, account_id):
     """Augment rds instances with their respective tags."""
-    
+
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        
+
         region = db['Endpoint']['Address'].split('.')[-4]
         name = db['DBInstanceIdentifier']
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
@@ -135,7 +136,7 @@ def _rds_tags(dbs, session_factory, executor_factory, account_id):
         list(w.map(process_tags, dbs))
 
 
-    
+
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -166,7 +167,7 @@ class DefaultVpc(Filter):
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
 
-    
+
 @actions.register('delete')
 class Delete(BaseAction):
 
@@ -174,16 +175,16 @@ class Delete(BaseAction):
         'type': 'object',
         'properties': {
             'type': {'enum': ['delete'],
-            'skip-snapshot': {'type': 'boolean'}}
+                     'skip-snapshot': {'type': 'boolean'}}
             }
         }
 
     def process(self, resources):
         self.skip = self.data.get('skip-snapshot', False)
-        
+
         # Concurrency feels like over kill here.
         client = local_session(self.manager.session_factory).client('rds')
-        
+
         for rdb in resources:
             params = dict(
                 DBInstanceIdentifier=rdb['DBInstanceIdentifier'])
@@ -200,5 +201,63 @@ class Delete(BaseAction):
                 raise
 
             self.log.info("Deleted rds: %s" % rdb['DBInstanceIdentifier'])
-        
-        
+
+
+@actions.register('snapshot')
+class Snapshot(BaseAction):
+
+    schema = {'properties': {
+        'type': {
+            'enum': ['snapshot']}}}
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for resource in resources:
+                futures.append(w.submit(
+                    self.process_rds_snapshot,
+                    resource))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception creating rds snapshot  \n %s" % (
+                                f.exception()))
+
+    def process_rds_snapshot(self, resource):
+        c = local_session(self.manager.session_factory).client('rds')
+        c.create_db_snapshot(
+            DBSnapshotIdentifier="BKUP-%s-%s" % (
+                resource['DBInstanceIdentifier'],
+                resource['Engine']),
+            DBInstanceIdentifier=resource['DBInstanceIdentifier'])
+
+
+@actions.register('retention')
+class RetentionWindow(BaseAction):
+
+    date_attribute = "BackupRetentionPeriod"
+    schema = type_schema('retention', days={'type': 'number'})
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for resource in resources:
+                futures.append(w.submit(
+                    self.process_snapshot_retention,
+                    resource))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception setting rds retention  \n %s" % (
+                                f.exception()))
+
+    def process_snapshot_retention(self, resource):
+        v = int(resource.get('BackupRetentionPeriod', 0))
+        if v == 0 or v != self.data['days']:
+            self.set_retention_window(resource)
+
+    def set_retention_window(self, resource):
+        c = local_session(self.manager.session_factory).client('rds')
+        c.modify_db_instance(
+            DBInstanceIdentifier=resource['DBInstanceIdentifier'],
+            BackupRetentionPeriod=self.data['days'])
