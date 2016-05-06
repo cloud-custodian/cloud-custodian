@@ -131,6 +131,11 @@ def chunks(iterable, size=50):
         yield batch
 
 
+def get_account_id(session):
+    iam = session.client('iam')
+    return iam.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]
+
+
 def query_instances(session, client=None, **query):
     """Return a list of ec2 instances for the query.
     """
