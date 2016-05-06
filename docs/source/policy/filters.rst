@@ -13,8 +13,10 @@ scalar operators:
 - ``not-null``
 - ``equal`` or ``eq``
 - ``not-equal`` or ``ne``
-- ``greater-than`` or ``gt`` or ``gte``
-- ``less-than`` or ``lt`` or ``lte``
+- ``greater-than`` or ``gt``
+- ``gte`` or ``ge``
+- ``less-than`` or ``lt``
+- ``lte`` or ``le``
 - collection operators against user supplied lists:
     - ``in``
     - ``not-in`` or ``ni``
