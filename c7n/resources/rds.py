@@ -100,8 +100,9 @@ class RDS(ResourceManager):
         p = c.get_paginator('describe_db_instances')
         results = p.paginate(Filters=query)
         dbs = list(itertools.chain(*[rp['DBInstances'] for rp in results]))
+
         _rds_tags(dbs, self.session_factory, self.executor_factory,
-                  get_account_id(session))
+                  get_account_id(session), region=self.manager.config.region)
         self._cache.save(
             {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
@@ -117,13 +118,11 @@ class RDS(ResourceManager):
         return results
 
 
-def _rds_tags(dbs, session_factory, executor_factory, account_id):
+def _rds_tags(dbs, session_factory, executor_factory, account_id, region):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-
-        region = db['Endpoint']['Address'].split('.')[-4]
         name = db['DBInstanceIdentifier']
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
         tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']

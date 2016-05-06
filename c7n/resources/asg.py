@@ -21,6 +21,7 @@ from dateutil.tz import tzutc
 
 import logging
 import itertools
+import time
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
@@ -413,40 +414,57 @@ class Suspend(BaseAction):
 
 @actions.register('resume')
 class Resume(BaseAction):
+    """Resume a suspended autoscale group and its instances
     """
-    Todo.. Attach Tag to the ELB so it can be differentiated from unused.
-    """
-    schema = type_schema('resume')
+    schema = type_schema('resume', delay={'type': 'integer'})
 
     def process(self, asgs):
         original_count = len(asgs)
         asgs = [a for a in asgs if a['SuspendedProcesses']]
+        self.delay = self.data.get('delay', 30)
         self.log.debug("Filtered from %d to %d suspended asgs" % (
             original_count, len(asgs)))
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_asg, asgs))
-                
-    def process_asg(self, asg):
-        """Multi-step process to resume
 
-        - Start any stopped ec2 instances
-        - Reattach ELB
-        - Resume ASG Processes
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for a in asgs:
+                futures[w.submit(self.resume_asg_instances, a)] = a
+            for f in as_completed(futures):
+                if f.exception():
+                    log.error("Traceback resume asg:%s instances error:%s" % (
+                        futures[f]['AutoScalingGroupName'],
+                        f.exception()))
+                    continue
+
+        log.debug("Sleeping for asg health check grace")
+        time.sleep(self.delay)
+
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for a in asgs:
+                futures[w.submit(self.resume_asg, a)] = a
+            for f in as_completed(futures):
+                if f.exception():
+                    log.error("Traceback resumee asg:%s error:%s" % (
+                        futures[f]['AutoScalingGroupName'],
+                        f.exception()))
+
+    def resume_asg_instances(self, asg):
+        """Resume asg instances.
+        """
+        session = local_session(self.manager.session_factory)
+        ec2_client = session.client('ec2')
+        ec2_client.start_instances(
+            InstanceIds=[i['InstanceId'] for i in asg['Instances']])
+
+    def resume_asg(self, asg):
+        """Resume asg processes.
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        ec2_client = session.client('ec2')
-
-        try:
-            ec2_client.start_instances(
-                InstanceIds=[i['InstanceId'] for i in asg['Instances']])
-        except ClientError as e:
-            log.warning("asg:%s instances:%d error during instance restart %s" % (
-                asg['AutoScalingGroupName'], len(asg['Instances']), e))
-
         asg_client.resume_processes(
             AutoScalingGroupName=asg['AutoScalingGroupName'])
-            
+
 
 @actions.register('delete')
 class Delete(BaseAction):
