@@ -215,7 +215,7 @@ class Snapshot(BaseAction):
             futures = []
             for resource in resources:
                 futures.append(w.submit(
-                    self.process_snapshot_retention,
+                    self.process_rds_snapshot,
                     resource))
                 for f in as_completed(futures):
                     if f.exception():
