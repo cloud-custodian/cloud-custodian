@@ -142,6 +142,8 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_manager': {'type': 'boolean'},
+            'from': {'type': 'string'},
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
             'transport': {
@@ -156,11 +158,12 @@ class Notify(EventAction):
     }
 
     def process(self, resources, event=None):
-        message = {'resources': resources,
-                   'event': event,
-                   'action': self.data,
-                   'policy': self.manager.data}
-        self.send_data_message(message)
+        for batch in utils.chunks(resources, 500):
+            message = {'resources': resources,
+                       'event': event,
+                       'action': self.data,
+                       'policy': self.manager.data}            
+            self.send_data_message(message)
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
