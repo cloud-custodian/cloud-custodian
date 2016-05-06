@@ -390,7 +390,10 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 
 @actions.register('snapshot')
-class Snapshots(BaseAction):
+class Snapshot(BaseAction):
+    
+    schema = type_schema('snapshot')
+    
     def process(self, resources):
         for resource in resources:
             with self.executor_factory(max_workers=3) as w:
@@ -398,22 +401,22 @@ class Snapshots(BaseAction):
                 futures.append(w.submit(self.process_volume_set, resource))
                 for f in as_completed(futures):
                     if f.exception():
-                        self.log.error("Exception creating snapshot set \n %s" % (f.exception()))
+                        self.log.error(
+                            "Exception creating snapshot set \n %s" % (
+                                f.exception()))
 
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
         for block_device in resource['BlockDeviceMappings']:
             if 'Ebs' not in block_device:
                 continue
-            # handle ebs volumes
-            snapDescription = "Automated,LocalBackup,%s,%s" % (
+            description = "Automated,Backup,%s,%s" % (
                 resource['InstanceId'],
                 block_device['Ebs']['VolumeId'])
             response = c.create_snapshot(
                 DryRun=self.manager.config.dryrun,
                 VolumeId=block_device['Ebs']['VolumeId'],
-                Description=snapDescription)
-
+                Description=description)
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
