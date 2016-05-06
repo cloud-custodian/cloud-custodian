@@ -50,20 +50,33 @@ def regex_match(value, regex):
     # would be nice to use re2
     return bool(re.match(regex, value, flags=re.IGNORECASE))
 
-    
+
+def operator_in(x, y):
+    return x in y
+
+
+def operator_ni(x, y):
+    return x not in y
+
+
 OPERATORS = {
     'eq': operator.eq,
+    'equal': operator.eq,
     'ne': operator.ne,
+    'not-equal': operator.ne,
     'gt': operator.gt,
+    'greater-than': operator.gt,
     'ge': operator.ge,
     'gte': operator.ge,
     'le': operator.le,
     'lte': operator.le,
     'lt': operator.lt,
+    'less-than': operator.lt,
     'glob': glob_match,
     'regex': regex_match,
-    'in': lambda x, y: x in y,
-    'ni': lambda x, y: x not in y}
+    'in': operator_in,
+    'ni': operator_ni,
+    'not-in': operator_ni}
 
 
 class FilterRegistry(PluginRegistry):
@@ -74,7 +87,7 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
-        
+
     def parse(self, data, manager):
         results = []
         for d in data:
@@ -120,7 +133,7 @@ class Filter(object):
     log = logging.getLogger('custodian.filters')
 
     schema = {'type': 'object'}
-    
+
     def __init__(self, data, manager=None):
         self.data = data
         self.manager = manager
@@ -133,15 +146,15 @@ class Filter(object):
     def name(self):
         """ Name of the filter"""
         raise NotImplementedError()
-    
+
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
         return filter(self, resources)
-            
+
     def __call__(self, instance):
         """ Process an individual resource."""
         raise NotImplementedError()
-    
+
 
 class Or(Filter):
 
@@ -158,8 +171,8 @@ class Or(Filter):
                 return True
         return False
 
-    
-class And(Filter):    
+
+class And(Filter):
 
     def __init__(self, data, registry, manager):
         super(And, self).__init__(data)
@@ -171,8 +184,8 @@ class And(Filter):
             if not f(i):
                 return False
         return True
-    
-    
+
+
 class ValueFilter(Filter):
     """Generic value filter using jmespath
     """
@@ -194,7 +207,7 @@ class ValueFilter(Filter):
                 {'type': 'boolean'},
                 {'type': 'number'}]},
             'op': {'enum': OPERATORS.keys()}}}
-            
+
     def validate(self):
         if len(self.data) == 1:
             return self
@@ -222,11 +235,11 @@ class ValueFilter(Filter):
         if matched:
             set_annotation(i, ANNOTATION_KEY, self.k)
         return matched
-        
+
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None: 
+        elif self.v is None:
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             self.v = self.data.get('value')
@@ -269,7 +282,7 @@ class AgeFilter(Filter):
     date_attribute = None
 
     schema = None
-    
+
     def validate(self):
         if not self.date_attribute:
             raise NotImplementedError(
@@ -281,7 +294,7 @@ class AgeFilter(Filter):
         if not isinstance(v, datetime):
             v = parse(v)
         return v
-    
+
     def __call__(self, i):
         if not self.threshold_date:
             days = self.data.get('days', 60)
@@ -290,7 +303,7 @@ class AgeFilter(Filter):
         v = self.get_resource_date(i)
         return self.threshold_date > v
 
-    
+
 class EventFilter(ValueFilter):
     """Filter against a cloudwatch event associated to a resource type."""
 
