@@ -21,6 +21,7 @@ from dateutil.tz import tzutc
 
 import logging
 import itertools
+import time
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
@@ -416,14 +417,15 @@ class Resume(BaseAction):
     """
     Todo.. Attach Tag to the ELB so it can be differentiated from unused.
     """
-    schema = type_schema('resume')
+    schema = type_schema('resume', delay={'type': 'integer'})
 
     def process(self, asgs):
         original_count = len(asgs)
         asgs = [a for a in asgs if a['SuspendedProcesses']]
+        self.delay = self.data.get('delay', 30)
         self.log.debug("Filtered from %d to %d suspended asgs" % (
             original_count, len(asgs)))
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=min((10, len(asgs)))) as w:
             list(w.map(self.process_asg, asgs))
                 
     def process_asg(self, asg):
@@ -441,9 +443,10 @@ class Resume(BaseAction):
             ec2_client.start_instances(
                 InstanceIds=[i['InstanceId'] for i in asg['Instances']])
         except ClientError as e:
-            log.warning("asg:%s instances:%d error during instance restart %s" % (
-                asg['AutoScalingGroupName'], len(asg['Instances']), e))
-
+            log.warning(
+                "asg:%s instances:%d error during instance restart %s" % (
+                    asg['AutoScalingGroupName'], len(asg['Instances']), e))
+        time.sleep(self.delay)
         asg_client.resume_processes(
             AutoScalingGroupName=asg['AutoScalingGroupName'])
             
