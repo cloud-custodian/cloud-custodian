@@ -41,6 +41,14 @@ account's extant resources.
 - [Developer Install](http://www.capitalone.io/cloud-custodian/quickstart/developer.html)
 
 
+## Quick Install
+
+```shell
+$ virtualenv custodian
+$ source custodian/bin/activate
+$ pip install c7n
+```
+
 ## Usage
 
 First a policy file needs to be created in yaml format, as an example:
@@ -66,9 +74,12 @@ policies:
    mode:
      type: cloudtrail	
      events:
-  	  - RunInstances
+  	 - RunInstances
    filters:
-     - Encrypted: false
+	 - "tag:aws:autoscaling:groupName": absent
+	 - type: ebs
+	   key: Encrypted
+	   value: false
    actions:
      - terminate
 
