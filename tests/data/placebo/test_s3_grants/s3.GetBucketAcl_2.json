@@ -1,0 +1,15 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Grants": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "SoUwjjaJOyXmT1m2IHVtJjX01p80SYX2gROm0RXKjtQU/wDxqvjIG4w0W2sXMDSlFXWavPbPxlg=", 
+            "RequestId": "19A59980CCA6F5DA"
+        }
+    }
+}

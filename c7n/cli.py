@@ -15,8 +15,7 @@
 import argparse
 import logging
 
-# policy initializes a lot of stuff on load
-from c7n import policy, commands
+from c7n import commands
 
 
 def _default_options(p):
@@ -29,7 +28,7 @@ def _default_options(p):
     p.add_argument("-c", "--config", required=True,
                    help="Policy Configuration File")
     p.add_argument("-l", "--log-group", default=None,
-                   help="Cloudwatch Log Group to send policy logs")    
+                   help="Cloudwatch Log Group to send policy logs")
     p.add_argument("-p", "--policies", default=None,
                    help="Only execute named/matched policies")
     p.add_argument("-v", "--verbose", action="store_true",
@@ -42,13 +41,13 @@ def _default_options(p):
     p.add_argument("--cache-period", default=60, type=int,
                    help="Cache validity in seconds (Default 60)")
 
-    
+
 def _dryrun_option(p):
     p.add_argument(
         "-d", "--dryrun", action="store_true",
         help="Don't change infrastructure but verify access.")
 
-    
+
 def setup_parser():
     parser = argparse.ArgumentParser()
     subs = parser.add_subparsers()
@@ -63,10 +62,6 @@ def setup_parser():
         '--raw', type=argparse.FileType('wb'),
         help="Store raw json of collected records to given file path")
 
-    identify = subs.add_parser("identify")
-    identify.set_defaults(command=commands.identify)
-    _default_options(identify)
-
     logs = subs.add_parser('logs')
     logs.set_defaults(command=commands.logs)
     _default_options(logs)
@@ -79,7 +74,7 @@ def setup_parser():
                           help="Verbose Logging")
     validate.add_argument("--debug", action="store_true",
                           help="Dev Debug")
-    
+
     run = subs.add_parser("run")
     run.set_defaults(command=commands.run)
     _default_options(run)
@@ -87,8 +82,8 @@ def setup_parser():
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
-        help="Emit CloudWatch Metrics (default false)")    
-    
+        help="Emit CloudWatch Metrics (default false)")
+
     return parser
 
 
@@ -102,9 +97,8 @@ def main():
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
-    config = policy.load(options, options.config)
     try:
-        options.command(options, config)
+        options.command(options)
     except Exception:
         if not options.debug:
             raise
@@ -113,7 +107,7 @@ def main():
         import sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
-    
+
 
 if __name__ == '__main__':
     main()

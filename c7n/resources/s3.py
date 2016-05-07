@@ -101,15 +101,7 @@ class S3(ResourceManager):
         return self.filter_resources(results)
 
 
-def assemble_bucket(item):
-    """Assemble a document representing all the config state around a bucket.
-    """
-    factory, b = item
-
-    s = factory()
-    c = s.client('s3')
-
-    methods = [
+S3_AUGMENT_TABLE = (
         ('get_bucket_location', 'Location', None, None),
         ('get_bucket_tagging', 'Tags', [], 'TagSet'),
         ('get_bucket_policy',  'Policy', None, None),
@@ -120,17 +112,26 @@ def assemble_bucket(item):
 #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
 #        ('get_bucket_cors', 'Cors'),
 #        ('get_bucket_notification_configuration', 'Notification')
-    ]
+)
 
-    # Bucket Location, Current Client Location, Default Location
+
+def assemble_bucket(item):
+    """Assemble a document representing all the config state around a bucket.
+    """
+    factory, b = item
+
+    s = factory()
+    c = s.client('s3')
+
+     # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
-
+    methods = list(S3_AUGMENT_TABLE)
     for m, k, default, select in methods:
         try:
             method = getattr(c, m)
             v = method(Bucket=b['Name'])
             v.pop('ResponseMetadata')
-            if select is not None:
+            if select is not None and select in v:
                 v = v[select]
         except ClientError, e:
             code =  e.response['Error']['Code']
@@ -212,52 +213,6 @@ class BucketActionBase(BaseAction):
 
     def get_permissions(self):
         return self.permissions
-
-
-@actions.register('encrypted-prefix')
-class EncryptedPrefix(BucketActionBase):
-
-    permissions = ("s3:GetObject", "s3:PutObject")
-
-    def process(self, buckets):
-        prefix = self.data.get('prefix')
-        with self.executor_factory(max_workers=5) as w:
-            results = w.map(self.process_bucket, buckets)
-            results = filter(None, list(results))
-            return results
-
-    def process_bucket(self, b):
-        s3 = bucket_client(self.manager.session_factory(), b)
-        k = self.data.get('prefix', 'AWSLogs')
-
-        create = True
-        try:
-            data = s3.head_object(Bucket=b['Name'], Key=k)
-            create = False
-            if 'ServerSideEncryption' in data:
-                return None
-        except ClientError, e:
-            if e.response['Error']['Code'] != '404':
-                raise
-
-        crypto_method = self.data.get('crypto', 'AES256')
-        if create:
-            content = "Path Prefix Object For Sub Path Encryption"
-            s3.put_object(
-                Bucket=b['Name'],
-                Key=k,
-                ACL="bucket-owner-full-control",
-                Body=content,
-                ServerSideEncryption=crypto_method)
-            return {'Bucket': b['Name'], 'Prefix': k, 'State': 'Created'}
-
-        # Note on copy we lose individual key acl grants
-        s3.copy_object(
-            Bucket=b['Name'], Key=k,
-            CopySource="/%s/%s" % (b, k),
-            MetadataDirective='COPY',
-            ServerSideEncryption=crypto_method)
-        return {'Bucket': b['Name'], 'Prefix': k, 'State': 'Updated'}
 
 
 @filters.register('missing-policy-statement')
@@ -655,7 +610,7 @@ class DeleteGlobalGrants(BucketActionBase):
 
     def process(self, buckets):
         with self.executor_factory(max_workers=5) as w:
-            list(w.map(self.process_bucket, buckets))
+            return filter(None, list(w.map(self.process_bucket, buckets)))
 
     def process_bucket(self, b):
         grantees = self.data.get('grantees')
@@ -677,7 +632,7 @@ class DeleteGlobalGrants(BucketActionBase):
                 grantee['Type'] = 'CanonicalUser'
             if ('URI' in grantee and
                 grantee['URI'] in grantees and not
-                (grant['Permission'] == 'READ' and b['Website'])):
+                    (grant['Permission'] == 'READ' and b['Website'])):
                 # Remove this grantee.
                 pass
             else:
@@ -689,3 +644,4 @@ class DeleteGlobalGrants(BucketActionBase):
         c.put_bucket_acl(
             Bucket=b['Name'],
             AccessControlPolicy={'Owner': acl['Owner'], 'Grants': new_grants})
+        return b

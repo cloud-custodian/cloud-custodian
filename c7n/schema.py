@@ -24,19 +24,6 @@ allowedProperties and enum extension).
 
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
-
-Implemenation Notes / todo
-
-[x] Resource Policy (inherit base property)
-  
-[x] Or and And - special treatment, ref each other
-
-[x] Value filter - 'str': 'str' / operator
-
-[x] Handling aliases - match same class under multiple names
-  
-[x] Better handling of inheritance than builtin spec support.
-
 """
 import json
 import logging
