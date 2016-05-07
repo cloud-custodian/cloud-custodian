@@ -12,6 +12,8 @@ develop:
 coverage:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover tests
 
+ttest:
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-timer tests
 lint:
 	flake8 janitor --ignore=W293,W291,W503,W391
 
