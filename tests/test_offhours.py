@@ -21,6 +21,37 @@ from .common import BaseTest, instance
 from c7n.offhours import OffHour, OnHour
 
 
+# Per http://blog.xelnor.net/python-mocking-datetime/
+# naive implementation has issues with pypy
+
+real_datetime_class = datetime.datetime
+
+
+def mock_datetime_now(tgt, dt):
+    
+    class DatetimeSubclassMeta(type):
+        @classmethod
+        def __instancecheck__(mcs, obj):
+            return isinstance(obj, real_datetime_class)
+        
+    class BaseMockedDatetime(real_datetime_class):
+        target = tgt
+        
+        @classmethod
+        def now(cls, tz=None):
+            return cls.target.replace(tzinfo=tz)
+
+        @classmethod
+        def utcnow(cls):
+            return cls.target
+            
+        # Python2 & Python3 compatible metaclass
+        
+    MockedDatetime = DatetimeSubclassMeta(
+        'datetime', (BaseMockedDatetime,), {})
+    return mock.patch.object(dt, 'datetime', MockedDatetime)
+                                                                                                                
+
 class OffHoursFilterTest(BaseTest):
 
     def test_opt_out_behavior(self):
@@ -32,8 +63,7 @@ class OffHoursFilterTest(BaseTest):
         i = instance(Tags=[])
         f = OffHour({'opt-out': True})
 
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime):
             self.assertEqual(f(i), True)
             t = datetime.datetime(
                 year=2015, month=12, day=1, hour=7, minute=5,
@@ -51,8 +81,7 @@ class OffHoursFilterTest(BaseTest):
         i = instance(Tags=[])
         f = OffHour({})
 
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime):
             self.assertEqual(f(i), False)
             t = datetime.datetime(
                 year=2015, month=12, day=1, hour=7, minute=5,
@@ -69,10 +98,10 @@ class OffHoursFilterTest(BaseTest):
             {'Key': 'maid_offhours', 'Value': 'tz=est'}])
         f = OnHour({'skew': 1})
         results = []
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        
+        with mock_datetime_now(t, datetime) as dt:
             for n in range(0, 4):
-                t = t.replace(hour=hour+n)
+                dt.target = t.replace(hour=hour+n)
                 results.append(f(i))
         self.assertEqual(results, [True, True, False, False])
 
@@ -83,10 +112,10 @@ class OffHoursFilterTest(BaseTest):
         i = instance(Tags=[{'Key': 'maid_offhours', 'Value': 'tz=est'}])
         f = OnHour({})
         results = []
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime) as dt:
+
             for n in range(0, 4):
-                t = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day+n)
                 results.append(f(i))
         self.assertEqual(results, [True, False, False, True])
         
@@ -97,18 +126,16 @@ class OffHoursFilterTest(BaseTest):
         i = instance(Tags=[{'Key': 'maid_offhours', 'Value': 'tz=est'}])
         f = OffHour({})
         results = []
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime) as dt:
             for n in range(0, 4):
-                t = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day+n)
                 results.append(f(i))
         self.assertEqual(results, [True, False, False, True])
                 
     def test_current_time_test(self):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t        
+        with mock_datetime_now(t, datetime):
             i = instance(Tags=[
                 {'Key': 'maid_offhours', 'Value': 'tz=est'}])
             f = OffHour({})
@@ -123,8 +150,7 @@ class OffHoursFilterTest(BaseTest):
     def test_offhours_real_world_values(self):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime):
             for i in [
                     instance(Tags=[
                         {'Key': 'maid_offhours', 'Value': ''}]),
@@ -137,8 +163,7 @@ class OffHoursFilterTest(BaseTest):
     def test_offhours(self):
         t = datetime.datetime(year=2015, month=12, day=1, hour=19, minute=5,
                               tzinfo=zoneinfo.gettz('America/New_York'))
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz=None: t
+        with mock_datetime_now(t, datetime):
             i = instance(Tags=[
                 {'Key': 'maid_offhours', 'Value': 'tz=est'}])
             self.assertEqual(OffHour({})(i), True)
@@ -146,8 +171,7 @@ class OffHoursFilterTest(BaseTest):
     def test_onhour(self):
         t = datetime.datetime(year=2015, month=12, day=1, hour=7, minute=5,
                               tzinfo=zoneinfo.gettz('America/New_York'))
-        with mock.patch('datetime.datetime') as dt:
-            dt.now.side_effect = lambda tz: t    
+        with mock_datetime_now(t, datetime):
             i = instance(Tags=[
                 {'Key': 'maid_offhours', 'Value': 'tz=est'}])
             self.assertEqual(OnHour({})(i), True)

@@ -4,6 +4,7 @@ env:
   - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY="thing"
 python:
   - "2.7"
+  - "pypy"
 install:
   - pip install -r requirements-dev.txt
   - python setup.py develop

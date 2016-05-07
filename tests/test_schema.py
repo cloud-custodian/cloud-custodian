@@ -56,9 +56,11 @@ class SchemaTest(BaseTest):
         self.assertTrue(
             len(errors[0].absolute_schema_path) < len(
                 error.absolute_schema_path))
-        self.assertEqual(
-            error.message,
-            "{'skipped_devices': [], 'type': 'ebs'} is not of type 'array'")
+
+        self.assertTrue(
+            "'skipped_devices': []" in error.message)
+        self.assertTrue(
+            "'type': 'ebs'" in error.message)
 
     def test_semantic_error_on_value_derived(self):
         data = {
