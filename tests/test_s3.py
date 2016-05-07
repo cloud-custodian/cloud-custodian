@@ -16,9 +16,6 @@ import shutil
 import tempfile
 from unittest import TestCase
 
-import boto3
-from moto import mock_s3
-
 from c7n.resources import s3
 
 from common import BaseTest
