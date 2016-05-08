@@ -127,7 +127,13 @@ class RemoveTag(BaseAction):
 class Tag(BaseAction):
 
     schema = type_schema(
-        'tag', tag={'type': 'string'}, propagate_launch={'type': 'boolean'})
+        'tag',
+        key={'type': 'string'},
+        value={'type': 'string'},
+        # Backwards compatibility
+        tag={'type': 'string'},        
+        msg={'type': 'string'},
+        propagate={'type': 'boolean'})
 
     def process(self, asgs):
         with self.executor_factory(max_workers=10) as w:
@@ -136,13 +142,18 @@ class Tag(BaseAction):
     def process_asg(self, asg, msg=None):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
-        tag = self.data.get('tag', DEFAULT_TAG)
+        key = self.data.get('key', DEFAULT_TAG)
         propagate = self.data.get('propagate_launch', True)
         
         if msg is None:
-            msg = self.data.get(
-                'msg', 'AutoScaleGroup does not meet policy guidelines')
-        new_t = {"Key": tag,
+            for k in ('value', 'msg'):
+                if k in self.data:
+                    msg = self.data.get(k)
+                    break
+            if msg is None:
+                msg = 'AutoScaleGroup does not meet policy guidelines'
+            
+        new_t = {"Key": key,
              "PropagateAtLaunch": propagate,
              "ResourceType": "auto-scaling-group",
              "ResourceId": asg["AutoScalingGroupName"],
@@ -181,9 +192,10 @@ class PropagateTags(Tag):
         trim={'type': 'boolean'})
 
     def validate(self):
-        if not isinstance(self.data.get('tags', []), []):
+        if not isinstance(self.data.get('tags', []), (list, tuple)):
             raise ValueError("No tags specified")
-
+        return self
+    
     def process(self, asgs):
         if not asgs:
             return
@@ -230,7 +242,6 @@ class PropagateTags(Tag):
                 t['Key'] for t in i['Tags']
                 if not t['Key'].startswith('aws:')])
         for k, v in instance_tags.items():
-            # For now only remove tags present on all instances
             if not v >= instance_count:
                 extra_tags.append(k)
                 continue
@@ -242,8 +253,10 @@ class PropagateTags(Tag):
                 asg['AutoScalingGroupName'], instance_count, remove_tags))
         if extra_tags:
             log.debug("Asg: %s has uneven tags population: %s" % (
-                instance_tags))
-
+                asg['AutoScalingGroupName'], instance_tags))
+        # Remove orphan tags
+        remove_tags.extend(extra_tags)
+        
         if not self.manager.config.dryrun:
             client.delete_tags(
                 Resources=[i['InstanceId'] for i in instances],
@@ -316,12 +329,12 @@ class RenameTag(Tag):
         #
         # delete_first = len([t for t in tag_map if not t.startswith('aws:')])
         client.delete_tags(Tags=[
-            {'ResourceId': 'tags-auto-scaling-group',
+            {'ResourceId': asg['AutoScalingGroupName'],
              'ResourceType': 'auto-scaling-group',
              'Key': source_tag,
              'Value': source['Value']}])
         client.create_or_update_tags(Tags=[
-            {'ResourceId': 'tags-auto-scaling-group',
+            {'ResourceId': asg['AutoScalingGroupName'],
              'ResourceType': 'auto-scaling-group',
              'PropagateAtLaunch': propagate,
              'Key': destination_tag,
@@ -345,6 +358,7 @@ class MarkForOp(Tag):
         'mark-for-op',
         op={'enum': ['suspend', 'resume', 'delete']},
         tag={'type': 'string'},
+        key={'type': 'string'},        
         days={'type': 'number', 'minimum': 0})
 
     def process(self, asgs):
@@ -353,7 +367,10 @@ class MarkForOp(Tag):
             'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
         
         op = self.data.get('op', 'suspend')
-        tag = self.data.get('tag', DEFAULT_TAG)
+        if 'key' in self.data:
+            tag = self.data['key']
+        else:
+            tag = self.data.get('tag', DEFAULT_TAG)
         date = self.data.get('days', 4)
         
         n = datetime.now(tz=tzutc())

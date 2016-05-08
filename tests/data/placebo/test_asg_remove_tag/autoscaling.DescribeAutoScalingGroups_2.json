@@ -1,0 +1,80 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:74979cda-27ca-4e8d-a3e9-a562d37794d6:autoScalingGroupName/CustodianASG", 
+                "HealthCheckGracePeriod": 300, 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 3, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "CustodianASG", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "ubuntu", 
+                        "Key": "Platform"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "CustodianASG", 
+                "DefaultCooldown": 300, 
+                "MinSize": 3, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-west-2a", 
+                        "InstanceId": "i-9206fe54", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CustodianASGTest"
+                    }, 
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-west-2b", 
+                        "InstanceId": "i-7b5241a3", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CustodianASGTest"
+                    }, 
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-west-2c", 
+                        "InstanceId": "i-242dd4f9", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CustodianASGTest"
+                    }
+                ], 
+                "MaxSize": 3, 
+                "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "CustodianASGTest", 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 45, 
+                    "microsecond": 395000, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 12
+                }, 
+                "AvailabilityZones": [
+                    "us-west-2c", 
+                    "us-west-2b", 
+                    "us-west-2a"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "8f2dc36b-151b-11e6-a100-f71a6e2d0870"
+        }
+    }
+}

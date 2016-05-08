@@ -240,7 +240,7 @@ class MissingPolicyStatementFilter(Filter):
         statements = p.get('Statement', [])
 
         for s in list(statements):
-            if s['StatementId'] in required:
+            if s.get('StatementId') in required:
                 required.remove(s['StatementId'])
         if not required:
             return None
