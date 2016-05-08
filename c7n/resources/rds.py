@@ -102,7 +102,7 @@ class RDS(ResourceManager):
         dbs = list(itertools.chain(*[rp['DBInstances'] for rp in results]))
 
         _rds_tags(dbs, self.session_factory, self.executor_factory,
-                  get_account_id(session), region=self.manager.config.region)
+                  get_account_id(session), region=self.config.region)
         self._cache.save(
             {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
@@ -133,7 +133,6 @@ def _rds_tags(dbs, session_factory, executor_factory, account_id, region):
     # Rds maintains a low api call limit, so this can take some time :-(
     with executor_factory(max_workers=2) as w:
         list(w.map(process_tags, dbs))
-
 
 
 @filters.register('default-vpc')
@@ -221,11 +220,12 @@ class Snapshot(BaseAction):
                         self.log.error(
                             "Exception creating rds snapshot  \n %s" % (
                                 f.exception()))
+        return resources
 
     def process_rds_snapshot(self, resource):
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
-            DBSnapshotIdentifier="BKUP-%s-%s" % (
+            DBSnapshotIdentifier="Backup-%s-%s" % (
                 resource['DBInstanceIdentifier'],
                 resource['Engine']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
