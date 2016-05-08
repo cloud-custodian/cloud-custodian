@@ -16,6 +16,8 @@ import shutil
 import tempfile
 from unittest import TestCase
 
+from botocore.exceptions import ClientError
+
 from c7n.resources import s3
 
 from common import BaseTest
@@ -52,8 +54,102 @@ class BucketScanLogTests(TestCase):
                 [range(10)[:5], range(10)[5:], []])
 
 
+def destroyBucket(client, bucket):
+    for o in client.list_objects(Bucket=bucket).get('Contents', ()):
+        client.delete_object(Bucket=bucket, Key=o['Key'])
+    client.delete_bucket(Bucket=bucket)
+    
+            
+def generateBucketContents(s3, bucket, contents=None):
+    default_contents = {
+        'home.txt': 'hello',
+        'AWSLogs/2015/10/10': 'out',
+        'AWSLogs/2015/10/11': 'spot'}
+    if contents is None:
+        contents = default_contents
+    b = s3.Bucket(bucket)
+    for k, v in contents.items():
+        key = s3.Object(bucket, k)
+        key.put(
+            Body=v,
+            ContentLength=len(v),
+            ContentType='text/plain')
+
+        
 class S3Test(BaseTest):
 
+    def test_missing_policy_statement(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, None),
+        ])
+        session_factory = self.replay_flight_data('test_s3_missing_policy')
+        bname = "custodian-encrypt-test"
+        
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'missing-policy-statement',
+                 'statement-ids': ['RequireEncryptedPutObject']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+    def test_encrypt_policy(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, None),
+        ])
+        session_factory = self.replay_flight_data('test_s3_encrypt_policy')
+        bname = "custodian-encrypt-test"
+        
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': ['encryption-policy']}, session_factory=session_factory)
+        resources = p.run()
+
+        try:
+            resource = session.resource('s3')
+            key = resource.Object(bname, 'home.txt')
+            key.put(Body='hello', ContentLength=5, ContentType='text/plain')
+        except ClientError as e:
+            self.assertEqual(e.response['Error']['Code'], 'AccessDenied')
+        else:
+            self.fail("Encryption required policy")
+        
+    def test_encrypt_keys(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_encrypt')
+        bname = "custodian-encrypt-test"
+        
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': ['encrypt-keys']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(
+            'ServerSideEncryption' in client.head_object(
+                Bucket=bname, Key='home.txt'))
+                
     def test_global_grants_filter_and_remove(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)

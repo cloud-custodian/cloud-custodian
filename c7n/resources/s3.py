@@ -277,7 +277,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
         p = b['Policy']
         if p is None:
             log.info("No policy found, creating new")
-            p = {'Version': "2012-10-17", "Statements": []}
+            p = {'Version': "2012-10-17", "Statement": []}
         else:
             p = json.loads(p['Policy'])
 
@@ -297,11 +297,11 @@ class EncryptionRequiredPolicy(BucketActionBase):
              'Effect': 'Deny',
              'Principal': '*',
              'Action': 's3:PutObject',
-             "Resource":"arn:aws:s3:::%s/*" % b['Name'],
-             "Condition":{
+             "Resource": "arn:aws:s3:::%s/*" % b['Name'],
+             "Condition": {
                  # AWS Managed Keys or KMS keys, note policy language
                  # does not support custom kms (todo add issue)
-                 "StringNotEquals":{
+                 "StringNotEquals": {
                      "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}
              })
         p['Statement'] = statements

@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CopyObjectResult": {
+            "LastModified": {
+                "hour": 9, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 15, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 8, 
+                "minute": 39
+            }, 
+            "ETag": "\"b2e189abf85e809a51522cdb0e53083a\""
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "R+Xh+ZFwufQxkIBXxz8UQ9SimXs8mKWmUlJjtj4GltVE5uxe/Wxmnkp+en7apIPgLBrwF+MdwqY=", 
+            "RequestId": "60B6386BA7F6340E"
+        }, 
+        "ServerSideEncryption": "AES256"
+    }
+}
