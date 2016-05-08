@@ -1,0 +1,78 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "UCtFz//4TdHARMZd3LuFMy7HsinREcIPRIpZ1qFZccrNMM05zdec1QYrEKw33Yb5DPINNGO6Sss=", 
+            "RequestId": "5899018652E36BE9"
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 39
+                }, 
+                "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/10", 
+                "Owner": {
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Size": 3
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 39
+                }, 
+                "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/11", 
+                "Owner": {
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Size": 4
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 39
+                }, 
+                "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "home.txt", 
+                "Owner": {
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Size": 5
+            }
+        ]
+    }
+}
