@@ -22,6 +22,37 @@ from c7n.executor import MainThreadExecutor
 logging.basicConfig(level=logging.DEBUG)
 
 
+class SnapshotTrimTest(BaseTest):
+
+    def test_snapshot_trim(self):
+        factory = self.replay_flight_data('test_ebs_snapshot_delete')
+        p = self.load_policy({
+            'name': 'snapshot-trim',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'tag:InstanceId': 'not-null'}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class AttachedInstanceTest(BaseTest):
+
+    def test_ebs_instance_filter(self):
+        factory = self.replay_flight_data('test_ebs_instance_filter')
+        p = self.load_policy({
+            'name': 'attached-instance-test',
+            'resource': 'ebs',
+            'filters': [
+                {'type': 'instance',
+                 'key': 'tag:Name',
+                 'value': 'CompiledLambda'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
 class CopyInstanceTagsTest(BaseTest):
 
     def test_copy_instance_tags(self):
@@ -56,20 +87,19 @@ class CopyInstanceTagsTest(BaseTest):
             
 class EncryptExtantVolumesTest(BaseTest):
 
-    def xtest_encrypt_volumes(self):
-        # More a functional/coverage test then a unit test.
+    def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
         output = self.capture_logging(level=logging.DEBUG)
 
-        session_factory = self.record_flight_data('test_encrypt_volumes')
+        session_factory = self.replay_flight_data('test_encrypt_volumes')
         
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
             'filters': [
                 {'Encrypted': False},                
-                {'VolumeId': 'vol-2b047792'}],
+                {'VolumeId': 'vol-fdd1f844'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
                  'key': 'alias/ebs/crypto'}]},

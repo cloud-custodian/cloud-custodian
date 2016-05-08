@@ -254,6 +254,7 @@ class RetentionWindow(BaseAction):
         v = int(resource.get('BackupRetentionPeriod', 0))
         if v == 0 or v != self.data['days']:
             self.set_retention_window(resource)
+            return resource
 
     def set_retention_window(self, resource):
         c = local_session(self.manager.session_factory).client('rds')

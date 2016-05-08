@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AvailabilityZone": "us-west-2c", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "3d0a2da9-13dd-4d41-b833-cda44e920090"
+        }, 
+        "Encrypted": true, 
+        "VolumeType": "gp2", 
+        "VolumeId": "vol-add3fa14", 
+        "State": "creating", 
+        "Iops": 24, 
+        "SnapshotId": "snap-ee6f74be", 
+        "CreateTime": {
+            "hour": 11, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 26, 
+            "microsecond": 851000, 
+            "year": 2016, 
+            "day": 8, 
+            "minute": 13
+        }, 
+        "Size": 8
+    }
+}

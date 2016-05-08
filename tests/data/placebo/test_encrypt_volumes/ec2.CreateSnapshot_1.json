@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Description": "maid transient snapshot for encryption", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4eb8dc0-5f38-4fe2-9634-87c43e85590f"
+        }, 
+        "Encrypted": false, 
+        "VolumeId": "vol-fdd1f844", 
+        "State": "pending", 
+        "VolumeSize": 8, 
+        "Progress": "", 
+        "StartTime": {
+            "hour": 11, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 7, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 8, 
+            "minute": 9
+        }, 
+        "SnapshotId": "snap-c8965395", 
+        "OwnerId": "619193117841"
+    }
+}
