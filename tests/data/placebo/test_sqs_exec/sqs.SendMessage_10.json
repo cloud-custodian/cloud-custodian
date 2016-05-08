@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MD5OfMessageBody": "4899eede6b6fea7b98de42bdec36b155", 
+        "MD5OfMessageAttributes": "4304097573493dffcf7d17b79ed497de", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "04c1e0f0-9546-5229-93b3-af580bebe39b"
+        }, 
+        "MessageId": "066d8532-6886-4156-a31f-6630b9c285e1"
+    }
+}

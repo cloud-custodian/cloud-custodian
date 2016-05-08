@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrl": "https://us-west-1.queue.amazonaws.com/619193117841/cloud-c7n-test-sqsexec-map-hWE", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "39672838-34e2-5772-aaa8-6790aa48d03d"
+        }
+    }
+}
