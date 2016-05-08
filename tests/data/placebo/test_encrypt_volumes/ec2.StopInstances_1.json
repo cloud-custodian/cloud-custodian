@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "StoppingInstances": [
+            {
+                "InstanceId": "i-9432cb49", 
+                "CurrentState": {
+                    "Code": 64, 
+                    "Name": "stopping"
+                }, 
+                "PreviousState": {
+                    "Code": 16, 
+                    "Name": "running"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "ee37ee1a-46f8-4e15-9083-3a0ff58c68f9"
+        }
+    }
+}

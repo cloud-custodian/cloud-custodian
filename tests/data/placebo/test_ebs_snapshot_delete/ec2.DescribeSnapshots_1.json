@@ -1,0 +1,65 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "579c9969-f40b-4734-862a-c1f71db773d5"
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Created by CreateImage(i-1aebf7c0) for ami-d640b2b6 from vol-2b047792", 
+                "Encrypted": false, 
+                "VolumeId": "vol-2b047792", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 23
+                }, 
+                "SnapshotId": "snap-facd9a00", 
+                "OwnerId": "619193117841"
+            }, 
+            {
+                "Description": "Automated,Backup,i-1aebf7c0,vol-2b047792", 
+                "Tags": [
+                    {
+                        "Value": "/dev/xvda", 
+                        "Key": "DeviceName"
+                    }, 
+                    {
+                        "Value": "vol-2b047792", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "i-1aebf7c0", 
+                        "Key": "InstanceId"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-2b047792", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 13
+                }, 
+                "SnapshotId": "snap-a55e3c59", 
+                "OwnerId": "619193117841"
+            }
+        ]
+    }
+}

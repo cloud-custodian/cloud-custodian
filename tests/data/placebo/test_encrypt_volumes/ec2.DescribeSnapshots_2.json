@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "429f1dd2-aad5-47ef-b11a-315af3bd0789"
+        }, 
+        "Snapshots": [
+            {
+                "Description": "maid transient snapshot for encryption", 
+                "Tags": [
+                    {
+                        "Value": "true", 
+                        "Key": "maid-crypto-remediation"
+                    }
+                ], 
+                "Encrypted": true, 
+                "VolumeId": "vol-f4976c8e", 
+                "KmsKeyId": "arn:aws:kms:us-west-2:619193117841:key/00d9c89e-13ee-4758-9167-41de13b5bb68", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 10
+                }, 
+                "SnapshotId": "snap-ee6f74be", 
+                "OwnerId": "619193117841"
+            }
+        ]
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "KeyId": "00d9c89e-13ee-4758-9167-41de13b5bb68", 
+            "Description": "", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 21, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 40, 
+                "microsecond": 675000, 
+                "year": 2016, 
+                "day": 7, 
+                "minute": 3
+            }, 
+            "Arn": "arn:aws:kms:us-west-2:619193117841:key/00d9c89e-13ee-4758-9167-41de13b5bb68", 
+            "AWSAccountId": "619193117841"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "3582c758-150d-11e6-9d0b-a147b354389f"
+        }
+    }
+}

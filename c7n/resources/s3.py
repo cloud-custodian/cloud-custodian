@@ -374,6 +374,10 @@ class ScanBucket(BucketActionBase):
             }
         }
 
+    def __init__(self, data, manager=None):
+        super(ScanBucket, self).__init__(data, manager)
+        self.denied_buckets = []
+
     def get_bucket_style(self, b):
         return (
             b.get('Versioning', {'Status': ''}).get('Status') == 'Enabled'
@@ -391,6 +395,12 @@ class ScanBucket(BucketActionBase):
         with self.executor_factory(max_workers=3) as w:
             results.extend(
                 f for f in w.map(self, buckets) if f)
+        if self.denied_buckets:
+            with open(
+                    os.path.join(
+                        self.manager.log_dir, 'denied.json'), 'w') as fh:
+                json.dump(fh, indent=2)
+            self.denied_buckets = []
         return results
 
     def process_bucket(self, b):
@@ -413,6 +423,11 @@ class ScanBucket(BucketActionBase):
                     if e.response['Error']['Code'] == 'NoSuchBucket':
                         log.warning(
                             "Bucket:%s removed while scanning" % b['Name'])
+                        return
+                    if e.response['Error']['Code'] == 'AccessDenied':
+                        log.warning(
+                            "Access Denied Bucket:%s while scanning" % b['Name'])
+                        self.denied_buckets.append(b['Name'])
                         return
                     log.exception(
                         "Error processing bucket:%s paginator:%s" % (
