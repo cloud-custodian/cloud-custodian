@@ -16,6 +16,7 @@
 #
 import ami
 import asg
+import cfn
 import ebs
 import ec2
 import elb
