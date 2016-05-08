@@ -1,8 +1,8 @@
 -r requirements.txt
 coverage==4.0.3
 nose==1.3.7
-mock==1.3.0
-Sphinx==1.3.3
+mock==2.0.0
+Sphinx==1.4.1
 placebo==0.8.0
 flake8
 sphinx-rtd-theme==0.1.9
