@@ -26,7 +26,7 @@ from c7n.utils import CONN_CACHE
 from zpill import PillTest
 
 
-logging.getLogger('placebo.pill').setLevel(logging.WARNING)
+logging.getLogger('placebo.pill').setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
 
