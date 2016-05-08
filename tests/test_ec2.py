@@ -22,38 +22,138 @@ from .common import BaseTest
 
 class TestVolumeFilter(BaseTest):
 
-    # DISABLED / Re-record flight data on public account
-    def disabled_xtest_ec2_attached_ebs_filter(self):
+    def test_ec2_attached_ebs_filter(self):
         session_factory = self.replay_flight_data(
             'test_ec2_attached_ebs_filter')
         policy = self.load_policy({
             'name': 'ec2-unencrypted-vol',
             'resource': 'ec2',
             'filters': [
-                {'State.Name': 'running'},
                 {'type': 'ebs',
                  'key': 'Encrypted',
                  'value': False}]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 1)
 
     # DISABLED / Re-record flight data on public account        
-    def disabled_xtest_ec2_attached_volume_skip_block(self):
+    def test_ec2_attached_volume_skip_block(self):
         session_factory = self.replay_flight_data(
             'test_ec2_attached_ebs_filter')
         policy = self.load_policy({
             'name': 'ec2-unencrypted-vol',
             'resource': 'ec2',
             'filters': [
-                {'State.Name': 'running'},
                 {'type': 'ebs',
                  'skip-devices': ['/dev/sda1', '/dev/xvda', '/dev/sdb1'],
                  'key': 'Encrypted',
                  'value': False}]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 0)
+
+
+class TestImageAgeFilter(BaseTest):
+
+    def test_ec2_image_age(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_image_age_filter')
+        policy = self.load_policy({
+            'name': 'ec2-image-age',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'type': 'image-age',
+                 'days': 30}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestInstanceAge(BaseTest):
+
+    # placebo doesn't record tz information
+    def xtest_ec2_instance_age(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_instance_age_filter')
+        policy = self.load_policy({
+            'name': 'ec2-instance-age',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'type': 'instance-age',
+                 'days': 10}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestTag(BaseTest):
+
+    def test_ec2_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_mark')
+        policy = self.load_policy({
+            'name': 'ec2-test-mark',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'}],
+            'actions': [
+                {'type': 'tag',
+                 'key': 'Testing',
+                 'value': 'Testing123'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ec2_untag(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_untag')
+        policy = self.load_policy({
+            'name': 'ec2-test-unmark',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'key': 'Testing'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestStop(BaseTest):
+
+    def test_ec2_stop(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_stop')
+        policy = self.load_policy({
+            'name': 'ec2-test-stop',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'stop'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestSnapshot(BaseTest):
+
+    def test_ec2_snapshot(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_snapshot')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'CompileLambda'}],
+            'actions': [
+                {'type': 'snapshot'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
 
 
 class TestEC2QueryFilter(unittest.TestCase):

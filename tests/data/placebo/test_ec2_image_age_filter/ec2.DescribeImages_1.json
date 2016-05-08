@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "amzn-ami-hvm-2016.03.0.x86_64-gp2", 
+                "Hypervisor": "xen", 
+                "ImageOwnerAlias": "amazon", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-c229c0a2", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-eef4cdae", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "amazon/amzn-ami-hvm-2016.03.0.x86_64-gp2", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "137112412989", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2016-03-16T23:43:04.000Z", 
+                "Public": true, 
+                "ImageType": "machine", 
+                "Description": "Amazon Linux AMI 2016.03.0 x86_64 HVM GP2"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "0634bd36-0fd0-4bfc-8930-f1c1bec05822"
+        }
+    }
+}
