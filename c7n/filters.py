@@ -102,14 +102,16 @@ class FilterRegistry(PluginRegistry):
         """
 
         # Make the syntax a little nicer for common cases.
-        if len(data) == 1 and not 'type' in data:
+        if isinstance(data, dict) and len(data) == 1 and 'type' not in data:
             if data.keys()[0] == 'or':
                 return Or(data, self, manager)
             elif data.keys()[0] == 'and':
                 return And(data, self, manager)
             return ValueFilter(data, manager).validate()
-
-        filter_type = data.get('type')
+        if isinstance(data, basestring):
+            filter_type = data
+        else:
+            filter_type = data.get('type')
         if not filter_type:
             raise FilterValidationError(
                 "%s Invalid Filter %s" % (

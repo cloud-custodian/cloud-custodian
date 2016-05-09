@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancerDescriptions": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "8fe2bdba-15ee-11e6-8d4e-0b118cd09439"
+        }
+    }
+}

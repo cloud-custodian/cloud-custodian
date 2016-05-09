@@ -19,6 +19,8 @@ class Config(object):
         'type': 'object',
         'properties': {
             'assume_role': {'type': 'string'},
+            'config': {'type': 'string'},
+            'debug': {'type': 'boolean'},
             'cache_period': {'type': 'number'},
             'dryrun': {'type': 'boolean'},
             'log_group': {'type': 'string'},
@@ -30,16 +32,21 @@ class Config(object):
         }
     }
 
+    policies = None
+    
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
     def from_cli(self, options):
         self.__dict__.update(dict(
             verbose=options.verbose,
+            config=options.config,
             assume_role=options.assume_role,
             profile=options.profile,
+            policy_names=options.policies,
             log_group=options.log_group,
             cache_period=options.cache_period,
-            metrics_enabled=options.metrics_enabled,
+            metrics_enabled=getattr(options, 'metrics_enabled', None),
             output_dir=options.output_dir,
-            dryrun=getattr(options, 'dryrun')))
+            debug=options.debug,
+            dryrun=getattr(options, 'dryrun', None)))

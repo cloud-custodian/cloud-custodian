@@ -462,7 +462,7 @@ class Resume(BaseAction):
                 futures[w.submit(self.resume_asg, a)] = a
             for f in as_completed(futures):
                 if f.exception():
-                    log.error("Traceback resumee asg:%s error:%s" % (
+                    log.error("Traceback resume asg:%s error:%s" % (
                         futures[f]['AutoScalingGroupName'],
                         f.exception()))
 

@@ -78,6 +78,46 @@ def generateBucketContents(s3, bucket, contents=None):
         
 class S3Test(BaseTest):
 
+    def test_log_target(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')])
+        session_factory = self.replay_flight_data('test_s3_log_target')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-log-test'
+        client.create_bucket(Bucket='custodian-log-test')
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "k_vertigo",
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'WRITE'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'READ_ACP'},
+                    ]})
+        client.put_bucket_logging(
+            Bucket=bname,
+            BucketLoggingStatus={
+                'LoggingEnabled': {
+                    'TargetBucket': bname,
+                    'TargetPrefix': 's3-logs/'}})
+        p = self.load_policy({
+            'name': 's3-log-targets',
+            'resource': 's3',
+            'filters': ['is-log-target']}, session_factory=session_factory)
+        resources = p.run()
+        names = [b['Name'] for b in resources]
+        self.assertTrue(bname in names)
+        
     def test_missing_policy_statement(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, None),
