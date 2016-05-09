@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-log-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "EsA4gVbxKV4FvZlnflv2VCqJxejtUdTe+NR6Modq2H899nTV1EMTPvqp/XA99QopzbFkS/gUH2E=", 
+            "RequestId": "C1AA6C9124DD5871"
+        }
+    }
+}

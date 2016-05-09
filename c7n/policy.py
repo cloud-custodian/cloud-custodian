@@ -62,6 +62,8 @@ class PolicyCollection(object):
 
         return [p for p in policies if fnmatch.fnmatch(p.name, filters)]
 
+    filter = policies
+    
     def __iter__(self):
         return iter(self.policies())
 

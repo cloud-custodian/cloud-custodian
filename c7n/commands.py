@@ -39,6 +39,7 @@ def policy_command(f):
         collection = policy.load(options, options.config)
         return f(config, collection)
 
+    return _load_policies
 
 def validate(options):
     if not os.path.exists(options.config):
@@ -64,7 +65,7 @@ def validate(options):
 
 @policy_command
 def run(options, policy_collection):
-    for policy in policy_collection.policies(options.policies):
+    for policy in policy_collection.filter(options.policy_names):
         try:
             policy()
         except Exception:
@@ -77,7 +78,7 @@ def run(options, policy_collection):
 
 @policy_command
 def report(options, policy_collection):
-    policies = policy_collection.policies(options.policies)
+    policies = policy_collection.filter(options.policy_names)
     assert len(policies) == 1, "Only one policy report at a time"
     policy = policies.pop()
     d = datetime.now()
@@ -90,7 +91,7 @@ def report(options, policy_collection):
 
 @policy_command
 def logs(options, policy_collection):
-    policies = policy_collection.policies(options.policies)
+    policies = policy_collection.filter(options.policy_names)
     assert len(policies) == 1, "Only one policy log at a time"
     policy = policies.pop()
 
@@ -115,7 +116,6 @@ def resources(options, policy_collection):
         options.region, options.profile, options.assume_role)
     manager = mu.LambdaManager(session_factory)
     funcs = manager.list_functions('custodian-')
-
     if options.all:
         print(yaml.dump(funcs, dumper=yaml.SafeDumper))
 

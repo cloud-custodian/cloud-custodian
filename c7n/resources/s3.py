@@ -41,6 +41,7 @@ from botocore.client import Config
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
+import functools
 import json
 import itertools
 import logging
@@ -87,6 +88,12 @@ class S3(ResourceManager):
         return results
 
     def resources(self):
+        if self._cache.load():
+            buckets = self._cache.get({'resource': 's3'})
+            if buckets is not None:
+                log.info("Using cached s3 buckets")
+                return self.filter_resources(buckets)
+            
         c = self.session_factory().client('s3')
         log.debug('Retrieving buckets')
         response = c.list_buckets()
@@ -98,6 +105,8 @@ class S3(ResourceManager):
                 assemble_bucket,
                 zip(itertools.repeat(self.session_factory), buckets))
             results = filter(None, results)
+
+        self._cache.save({'resource': 's3'}, results)
         return self.filter_resources(results)
 
 
@@ -108,7 +117,8 @@ S3_AUGMENT_TABLE = (
         ('get_bucket_acl', 'Acl', None, None),
         ('get_bucket_replication', 'Replication', None, None),
         ('get_bucket_versioning', 'Versioning', None, None),
-        ('get_bucket_website', 'Website', None, None)
+        ('get_bucket_website', 'Website', None, None),
+        ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')
 #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
 #        ('get_bucket_cors', 'Cors'),
 #        ('get_bucket_notification_configuration', 'Notification')
@@ -443,6 +453,9 @@ class ScanBucket(BucketActionBase):
 
             # Empty bucket check
             if not content_key in key_set and not key_set['IsTruncated']:
+                # annotate bucket
+                b['KeyScanCount'] = count
+                b['KeyRemediated'] = key_log.count
                 return {'Bucket': b['Name'],
                         'Remediated': key_log.count,
                         'Count': count}
@@ -614,6 +627,115 @@ def restore_complete(restore):
         ongoing = restore
     return 'false' in ongoing
 
+
+@filters.register('is-log-target')
+class LogTarget(Filter):
+    """Filter and return buckets are log destinations.
+
+    Not suitable for use in lambda on large accounts, This is a api
+    heavy process to detect scan all possible log sources.
+
+    Sources:
+      - elb (Access Log)
+      - s3 (Access Log)
+      - cfn (Template writes)
+      - cloudtrail
+    """
+
+    schema = type_schema('is-log-target')
+    executor_factory = executor.MainThreadExecutor
+    
+    def process(self, buckets, event=None):
+        log_buckets = set()
+        count = 0
+        for bucket, _ in self.get_elb_bucket_locations():
+            log_buckets.add(bucket)
+            count += 1
+        self.log.debug("Found %d elb log targets" % count)
+
+        count = 0
+        for bucket, _ in self.get_s3_bucket_locations(buckets):
+            count +=1
+            log_buckets.add(bucket)
+        self.log.debug('Found %d s3 log targets' % count)
+
+        for bucket, _ in self.get_cloud_trail_locations(buckets):
+            log_buckets.add(bucket)
+            
+        self.log.info("Found %d log targets for %d buckets" % (
+            len(log_buckets), len(buckets)))
+        return [b for b in buckets if b['Name'] in log_buckets]
+
+    @staticmethod
+    def get_s3_bucket_locations(buckets):
+        """return (bucket_name, prefix) for all s3 logging targets"""
+        for b in buckets:
+            if b['Logging']:
+                yield (b['Logging']['TargetBucket'],
+                       b['Logging']['TargetPrefix'])
+            if b['Name'].startswith('cf-templates-'):
+                yield (b['Name'], '')
+
+    def get_cloud_trail_locations(self, buckets):
+        session = local_session(self.manager.session_factory)
+        client = session.client('cloudtrail')
+        names = set([b['Name'] for b in buckets])
+        for t in client.describe_trails().get('trailList', ()):
+            if t.get('S3BucketName') in names:
+                yield (t['S3BucketName'], t['S3KeyPrefix'])
+
+    def get_elb_bucket_locations(self):
+        session = local_session(self.manager.session_factory)
+        client = session.client('elb')
+
+        # Try to use the cache if it exists
+        elbs = self.manager._cache.get(
+            {'region': self.manager.config.region, 'resource': 'elb'})
+
+        # Sigh, post query refactor reuse, we can't save our cache here
+        # as that resource manager does extra lookups on tags. Not
+        # worth paginating, since with cache usage we have full set in
+        # mem.
+        if elbs is None:
+            p = client.get_paginator('describe_load_balancers')
+            results = p.paginate()
+            elbs = results.build_full_result().get(
+                'LoadBalancerDescriptions', ())
+
+        get_elb_attrs = functools.partial(
+            _query_elb_attrs, self.manager.session_factory)
+        
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for elb_set in chunks(elbs, 100):
+                futures.append(w.submit(get_elb_attrs, elb_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    log.error("Error while scanning elb log targets: %s" % (
+                        f.exception()))
+                    continue
+                for tgt in f.result():
+                    yield tgt
+                        
+
+def _query_elb_attrs(session_factory, elb_set):
+    session = local_session(session_factory)
+    client = session.client('elb')
+    log_targets = []
+    for e in elb_set:
+        try:
+            attrs = client.describe_load_balancer_attributes(
+                LoadBalancerName=e['LoadBalancerName'])
+            if 'AccessLog' in attrs and attrs['AccessLog']['Enabled']:
+                log_targets.append((
+                    attrs['AccessLog']['BucketName'],
+                    attrs['AccessLog']['S3BucketPrefix']))
+        except Exception as err:
+            log.warning(
+                "Could not retrieve load balancer %s: %s" % (
+                    e['LoadBalancerName'], err))
+    return log_targets
+        
 
 @actions.register('delete-global-grants')
 class DeleteGlobalGrants(BucketActionBase):
