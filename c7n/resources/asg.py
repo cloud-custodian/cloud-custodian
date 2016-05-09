@@ -30,7 +30,7 @@ from c7n.filters import FilterRegistry, ValueFilter, AgeFilter
 from c7n.manager import ResourceManager, resources
 from c7n.offhours import Time, OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG
-from c7n.utils import local_session, query_instances, type_schema
+from c7n.utils import local_session, query_instances, type_schema, chunks
 
 log = logging.getLogger('custodian.asg')
 
@@ -71,7 +71,8 @@ class ASG(ResourceManager):
 
 
 class LaunchConfigBase(object):
-
+    """Mixin base class for querying asg launch configs."""
+    
     def initialize(self, asgs):
         """Get launch configs for the set of asgs"""
         config_names = set()
@@ -80,17 +81,18 @@ class LaunchConfigBase(object):
 
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
-        paginator = client.get_paginator('describe_launch_configurations')
 
-        self.config = {}
-        for p in paginator.paginate(LaunchConfigurationNames=config_names):
-            for cfg in p['LaunchConfigurations']:
-                self.config[cfg['LaunchConfigurationName']] = cfg
+        self.configs = {}
+
+        for cfg_set in chunks(config_names, 50):
+            for cfg in client.describe_launch_configurations(
+                    LaunchConfigurationNames=cfg_set)['LaunchConfigurations']:
+                self.configs[cfg['LaunchConfigurationName']] = cfg
 
 
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
-
+    """Filter asg by launch config attributes."""
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
 
@@ -101,15 +103,20 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
         return super(LaunchConfigFilter, self).process(asgs, event)
         
     def __call__(self, asg):
-        cfg = self.config[asg['LaunchConfigurationName']]
+        cfg = self.configs[asg['LaunchConfigurationName']]
         return self.match(cfg)
 
 
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter, LaunchConfigBase):
+    """Filter asg by image age."""
 
     date_attribute = "CreationDate"    
     schema = type_schema('image-age', days={'type': 'number'})
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(ImageAgeFilter, self).process(asgs, event)
     
     def initialize(self, asgs):
         super(ImageAgeFilter, self).initialize(asgs)

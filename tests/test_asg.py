@@ -18,6 +18,29 @@ from common import BaseTest
 
 class AutoScalingTest(BaseTest):
 
+    def test_asg_image_age_filter(self):
+        factory = self.replay_flight_data('test_asg_image_age_filter')
+        p = self.load_policy({
+            'name': 'asg-cfg-filter',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'image-age',
+                 'days': 90}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)        
+
+    def test_asg_config_filter(self):
+        factory = self.replay_flight_data('test_asg_config_filter')
+        p = self.load_policy({
+            'name': 'asg-cfg-filter',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'launch-config',
+                 'key': 'ImageId',
+                 'value': 'ami-9abea4fb'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+    
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data('test_asg_vpc_filter')
         p = self.load_policy({
