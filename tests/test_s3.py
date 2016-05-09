@@ -113,7 +113,7 @@ class S3Test(BaseTest):
         p = self.load_policy({
             'name': 's3-log-targets',
             'resource': 's3',
-            'filters': ['is-log-target']})
+            'filters': ['is-log-target']}, session_factory=session_factory)
         resources = p.run()
         names = [b['Name'] for b in resources]
         self.assertTrue(bname in names)
