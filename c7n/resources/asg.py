@@ -17,6 +17,7 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
+from dateutil.parser import parse
 from dateutil.tz import tzutc
 
 import logging
@@ -24,12 +25,12 @@ import itertools
 import time
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters import FilterRegistry, ValueFilter, AgeFilter
 
 from c7n.manager import ResourceManager, resources
 from c7n.offhours import Time, OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG
-from c7n.utils import local_session, query_instances, type_schema
+from c7n.utils import local_session, query_instances, type_schema, chunks
 
 log = logging.getLogger('custodian.asg')
 
@@ -69,6 +70,69 @@ class ASG(ResourceManager):
         return self.filter_resources(asgs)
 
 
+class LaunchConfigBase(object):
+    """Mixin base class for querying asg launch configs."""
+    
+    def initialize(self, asgs):
+        """Get launch configs for the set of asgs"""
+        config_names = set()
+        for a in asgs:
+            config_names.add(a['LaunchConfigurationName'])
+
+        session = local_session(self.manager.session_factory)
+        client = session.client('autoscaling')
+
+        self.configs = {}
+
+        for cfg_set in chunks(config_names, 50):
+            for cfg in client.describe_launch_configurations(
+                    LaunchConfigurationNames=cfg_set)['LaunchConfigurations']:
+                self.configs[cfg['LaunchConfigurationName']] = cfg
+
+
+@filters.register('launch-config')
+class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
+    """Filter asg by launch config attributes."""
+    schema = type_schema(
+        'launch-config', rinherit=ValueFilter.schema)
+
+    config = None
+    
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(LaunchConfigFilter, self).process(asgs, event)
+        
+    def __call__(self, asg):
+        cfg = self.configs[asg['LaunchConfigurationName']]
+        return self.match(cfg)
+
+
+@filters.register('image-age')
+class ImageAgeFilter(AgeFilter, LaunchConfigBase):
+    """Filter asg by image age."""
+
+    date_attribute = "CreationDate"    
+    schema = type_schema('image-age', days={'type': 'number'})
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(ImageAgeFilter, self).process(asgs, event)
+    
+    def initialize(self, asgs):
+        super(ImageAgeFilter, self).initialize(asgs)
+        image_ids = set()
+        for cfg in self.configs.values():
+            image_ids.add(cfg['ImageId'])
+        ec2 = local_session(self.manager.session_factory).client('ec2')
+        results = ec2.describe_images(ImageIds=list(image_ids))
+        self.images = {i['ImageId']: i for i in results['Images']}
+    
+    def get_resource_date(self, i):
+        cfg = self.configs[i['LaunchConfigurationName']]
+        ami = self.images[cfg['ImageId']]
+        return parse(ami[self.date_attribute])
+
+    
 @filters.register('vpc-id')
 class VpcIdFilter(ValueFilter):
 

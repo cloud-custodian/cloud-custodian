@@ -1,0 +1,58 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "BaseIAMRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-west-2:619193117841:launchConfiguration:121ee85c-3c59-41e2-a1c5-a9b469b6bd28:launchConfigurationName/CustodianASGTest", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 16, 
+                    "microsecond": 613000, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 10
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "NoDevice": true
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "hazmat-west", 
+                "SecurityGroups": [
+                    "sg-47b76f22"
+                ], 
+                "LaunchConfigurationName": "CustodianASGTest", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-9abea4fb", 
+                "InstanceType": "m3.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "6e8332b3-1608-11e6-9cb6-553326ca8ab6"
+        }
+    }
+}
