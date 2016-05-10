@@ -312,7 +312,7 @@ class Start(BaseAction, StateTransitionFilter):
 class Stop(BaseAction, StateTransitionFilter):
     """Stop instances
     """
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running',)
 
     schema =  type_schema(
         'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
