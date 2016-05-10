@@ -65,15 +65,18 @@ def validate(options):
 
 @policy_command
 def run(options, policy_collection):
+    exit_code = 0    
     for policy in policy_collection.filter(options.policy_names):
         try:
             policy()
         except Exception:
+            exit_code = 1
             if options.debug:
                 raise
             # Output does an exception log
             log.warning("Error while executing policy %s, continuing" % (
                 policy.name))
+    sys.exit(exit_code)
 
 
 @policy_command
