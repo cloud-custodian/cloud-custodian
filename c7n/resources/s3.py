@@ -409,7 +409,7 @@ class ScanBucket(BucketActionBase):
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
-                json.dump(fh, indent=2)
+                json.dump(self.denied_buckets, fh, indent=2)
             self.denied_buckets = []
         return results
 
