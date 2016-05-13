@@ -109,7 +109,7 @@ def type_schema(
         s = {'allOf': [{'$ref': i} for i in inherits]}
         s['allOf'].append(extended)
     return s
-        
+
 
 class DateTimeEncoder(json.JSONEncoder):
 
@@ -118,7 +118,7 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-    
+
 def chunks(iterable, size=50):
     """Break an iterable into lists of size"""
     batch = []
@@ -147,7 +147,6 @@ def query_instances(session, client=None, **query):
         *[r["Instances"] for r in itertools.chain(
             *[pp['Reservations'] for pp in results])]))
 
-        
 CONN_CACHE = threading.local()
 
 
@@ -169,7 +168,7 @@ def annotation(i, k):
 
 
 def set_annotation(i, k, v):
-    """ 
+    """
     >>> x = {}
     >>> set_annotation(x, 'marker', 'a')
     >>> annotation(x, 'marker')
@@ -180,7 +179,7 @@ def set_annotation(i, k, v):
 
     if not isinstance(v, list):
         v = [v]
-        
+
     if k in i:
         ev = i.get(k)
         if isinstance(ev, list):
@@ -201,4 +200,4 @@ def parse_s3(s3_path):
         key_prefix = ""
     else:
         key_prefix = s3_path[s3_path.find('/', 5):]
-    return s3_path, bucket, key_prefix        
+    return s3_path, bucket, key_prefix

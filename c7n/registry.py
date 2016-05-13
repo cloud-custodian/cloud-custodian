@@ -24,7 +24,7 @@ class PluginRegistry(object):
     entry_point loading for external plugins.
 
     As an example of defining an external plugin using a python package
-    
+
     .. code-block:: python
 
        setup(
@@ -62,7 +62,7 @@ class PluginRegistry(object):
     def unregister(self, name):
         if name in self._factories:
             del self._factories[name]
-        
+
     def get(self, name):
         return self._factories.get(name)
 
@@ -71,7 +71,7 @@ class PluginRegistry(object):
 
     def items(self):
         return self._factories.items()
-    
+
     def load_plugins(self):
         """ Load external plugins.
 

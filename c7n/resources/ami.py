@@ -63,8 +63,8 @@ class Deregister(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
         client.deregister_image(ImageId=image['ImageId'])
 
-        
-@filters.register('image-age')        
+
+@filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
 
     date_attribute = "CreationDate"

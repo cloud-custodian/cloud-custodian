@@ -18,21 +18,21 @@ from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
 
 class ExecutionContext(object):
     """Policy Execution Context."""
-    
+
     def __init__(self, session_factory, policy, options):
         self.policy = policy
         self.options = options
         self.session_factory = session_factory
         self.cloudwatch_logs = None
         self.start_time = None
-        
+
         metrics_enabled = getattr(options, 'metrics_enabled', None)
         factory = MetricsOutput.select(metrics_enabled)
         self.metrics = factory(self)
 
         output_dir = getattr(options, 'output_dir', '')
         factory = FSOutput.select(output_dir)
-            
+
         self.output_path = factory.join(output_dir, policy.name)
         self.output = factory(self)
 

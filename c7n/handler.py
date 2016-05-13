@@ -32,7 +32,7 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
 
-# TODO move me / we should load config options directly from policy config   
+# TODO move me / we should load config options directly from policy config
 class Config(dict):
 
     def __getattr__(self, k):
@@ -40,7 +40,7 @@ class Config(dict):
             return self[k]
         except KeyError:
             raise AttributeError(k)
-        
+
     @classmethod
     def empty(cls, **kw):
         d = {}

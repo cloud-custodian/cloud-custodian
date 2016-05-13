@@ -20,7 +20,6 @@ from datetime import datetime
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
-    
 
 from c7n.manager import ResourceManager, resources
 from c7n.utils import type_schema, local_session, chunks
@@ -44,7 +43,7 @@ class Redshift(ResourceManager):
             results.extend(
                 c.describe_clusters(ClusterIdentifier=rid)['Clusters'])
         return results
-                    
+
     def resources(self):
         c = local_session(self.session_factory).client('redshift')
         if self._cache.load():
@@ -60,13 +59,13 @@ class Redshift(ResourceManager):
             {'region': self.config.region, 'resource': 'redshift'}, snapshots)
         return self.filter_resources(snapshots)
 
-    
+
 @filters.register('param')
 class Parameter(ValueFilter):
 
     schema = type_schema('param', rinherit=ValueFilter.schema)
     group_params = ()
-    
+
     def process(self, resources, event=None):
         groups = {}
         for r in resources:
@@ -86,13 +85,13 @@ class Parameter(ValueFilter):
                     v = json.loads(v)
                 params[p['ParameterName']] = v
             return params
-            
+
         with self.executor_factory(max_workers=3) as w:
             group_names = groups.keys()
             self.group_params = dict(
                 zip(group_names, w.map(get_params, group_names)))
         return super(Parameter, self).process(resources, event)
-            
+
     def __call__(self, db):
         params = {}
         for pg in db['ClusterParameterGroups']:
@@ -106,7 +105,7 @@ class Delete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'}})
-    
+
     def process(self, resources):
         self.skip = self.data.get('skip-snapshot', False)
         with self.executor_factory(max_workers=2) as w:
@@ -118,8 +117,8 @@ class Delete(BaseAction):
                     if f.exception():
                         self.log.error(
                             "Exception deleting redshift set \n %s" % (
-                                f.exception()))     
-    
+                                f.exception()))
+
     def process_db_set(self, db_set):
         c = local_session(self.session_factory).client('redshift')
         now = datetime.now()
@@ -132,4 +131,3 @@ class Delete(BaseAction):
                     "%s-%s" % (now.strftime("%Y-%m-%d"),
                                db['ClusterIdentifier']))
             c.delete_cluster(**params)
-                
