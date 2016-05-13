@@ -65,7 +65,7 @@ class GrantCount(Filter):
         grant_threshold = self.data.get('min', 5)
         if grant_count < grant_threshold:
             return None
-        
+
         self.manager.ctx.metrics.put_metric(
             "ExtantGrants", grant_count, "Count",
             Scope=key['AliasName'][6:])

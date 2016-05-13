@@ -391,9 +391,9 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    
+
     schema = type_schema('snapshot')
-    
+
     def process(self, resources):
         for resource in resources:
             with self.executor_factory(max_workers=3) as w:
