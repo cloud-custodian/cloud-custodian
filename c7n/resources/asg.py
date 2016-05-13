@@ -206,8 +206,12 @@ class Tag(BaseAction):
     def process_asg(self, asg, msg=None):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
-        key = self.data.get('key', DEFAULT_TAG)
         propagate = self.data.get('propagate_launch', True)
+
+        if 'key' in self.data:
+            key = self.data['key']
+        else:
+            key = self.data.get('tag', DEFAULT_TAG)
 
         if msg is None:
             for k in ('value', 'msg'):
@@ -217,11 +221,12 @@ class Tag(BaseAction):
             if msg is None:
                 msg = 'AutoScaleGroup does not meet policy guidelines'
 
-        new_t = {"Key": key,
-             "PropagateAtLaunch": propagate,
-             "ResourceType": "auto-scaling-group",
-             "ResourceId": asg["AutoScalingGroupName"],
-             "Value": msg}
+        new_t = {
+            "Key": key,
+            "PropagateAtLaunch": propagate,
+            "ResourceType": "auto-scaling-group",
+            "ResourceId": asg["AutoScalingGroupName"],
+            "Value": msg}
 
         client.create_or_update_tags(Tags=[new_t])
         update_tags(asg, new_t)
@@ -421,7 +426,6 @@ class MarkForOp(Tag):
     schema = type_schema(
         'mark-for-op',
         op={'enum': ['suspend', 'resume', 'delete']},
-        tag={'type': 'string'},
         key={'type': 'string'},
         days={'type': 'number', 'minimum': 0})
 
@@ -431,10 +435,6 @@ class MarkForOp(Tag):
             'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
 
         op = self.data.get('op', 'suspend')
-        if 'key' in self.data:
-            tag = self.data['key']
-        else:
-            tag = self.data.get('tag', DEFAULT_TAG)
         date = self.data.get('days', 4)
 
         n = datetime.now(tz=tzutc())

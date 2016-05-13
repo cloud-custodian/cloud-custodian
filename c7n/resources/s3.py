@@ -93,7 +93,7 @@ class S3(ResourceManager):
             if buckets is not None:
                 log.info("Using cached s3 buckets")
                 return self.filter_resources(buckets)
-            
+
         c = self.session_factory().client('s3')
         log.debug('Retrieving buckets')
         response = c.list_buckets()
@@ -111,14 +111,14 @@ class S3(ResourceManager):
 
 
 S3_AUGMENT_TABLE = (
-        ('get_bucket_location', 'Location', None, None),
-        ('get_bucket_tagging', 'Tags', [], 'TagSet'),
-        ('get_bucket_policy',  'Policy', None, None),
-        ('get_bucket_acl', 'Acl', None, None),
-        ('get_bucket_replication', 'Replication', None, None),
-        ('get_bucket_versioning', 'Versioning', None, None),
-        ('get_bucket_website', 'Website', None, None),
-        ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')
+    ('get_bucket_location', 'Location', None, None),
+    ('get_bucket_tagging', 'Tags', [], 'TagSet'),
+    ('get_bucket_policy',  'Policy', None, None),
+    ('get_bucket_acl', 'Acl', None, None),
+    ('get_bucket_replication', 'Replication', None, None),
+    ('get_bucket_versioning', 'Versioning', None, None),
+    ('get_bucket_website', 'Website', None, None),
+    ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')
 #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
 #        ('get_bucket_cors', 'Cors'),
 #        ('get_bucket_notification_configuration', 'Notification')
@@ -133,7 +133,7 @@ def assemble_bucket(item):
     s = factory()
     c = s.client('s3')
 
-     # Bucket Location, Current Client Location, Default Location
+    # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
     methods = list(S3_AUGMENT_TABLE)
     for m, k, default, select in methods:
@@ -155,8 +155,9 @@ def assemble_bucket(item):
                 methods.append((m, k))
                 continue
             else:
-                log.warning("Bucket:%s unable to invoke method:%s error:%s " % (
-                    b['Name'], m, e.response['Error']['Message']))
+                log.warning(
+                    "Bucket:%s unable to invoke method:%s error:%s " % (
+                        b['Name'], m, e.response['Error']['Message']))
                 return None
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:

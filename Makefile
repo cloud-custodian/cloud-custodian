@@ -15,7 +15,7 @@ coverage:
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-timer tests
 lint:
-	flake8 janitor --ignore=W293,W291,W503,W391
+	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v tests
