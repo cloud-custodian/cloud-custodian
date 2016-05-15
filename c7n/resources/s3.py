@@ -597,6 +597,7 @@ class EncryptExtantKeys(ScanBucket):
         'additonalProperties': False,
         'properties': {
             'report-only': {'type': 'boolean'},
+            'glacier': {'type': 'boolean'},
             'crypto': {'enum': ['AES256', 'aws:kms']}
             }
         }
@@ -658,10 +659,12 @@ class EncryptExtantKeys(ScanBucket):
         if self.data.get('report-only'):
             return k
 
-        storage_class = key.get('StorageClass', 'STANDARD')
+        storage_class = info.get('StorageClass', 'STANDARD')
 
         if storage_class == 'GLACIER':
-            if not 'Restore' in info:
+            if not self.data.get('glacier'):
+                return False
+            if 'Restore' not in info:
                 # This takes multiple hours, we let the next c7n
                 # run take care of followups.
                 s3.restore_object(
