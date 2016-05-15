@@ -743,7 +743,7 @@ class LogTarget(Filter):
 
         count = 0
         for bucket, _ in self.get_s3_bucket_locations(buckets):
-            count +=1
+            count += 1
             log_buckets.add(bucket)
         self.log.debug('Found %d s3 log targets' % count)
 

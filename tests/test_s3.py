@@ -18,6 +18,7 @@ from unittest import TestCase
 
 from botocore.exceptions import ClientError
 
+from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
@@ -81,6 +82,7 @@ def generateBucketContents(s3, bucket, contents=None):
 class S3Test(BaseTest):
 
     def test_log_target(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')])
         session_factory = self.replay_flight_data('test_s3_log_target')
