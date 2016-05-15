@@ -257,6 +257,27 @@ class S3Test(BaseTest):
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
+    def test_encrypt_keys(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_encrypt')
+        bname = "custodian-encrypt-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': ['encrypt-keys']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(
+            'ServerSideEncryption' in client.head_object(
+                Bucket=bname, Key='home.txt'))
+
     def test_global_grants_filter_and_remove(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
