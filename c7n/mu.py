@@ -119,6 +119,9 @@ class PythonPackageArchive(object):
                     os.path.join(root, f),
                     os.path.join(arc_prefix, f))
 
+    def add_file(self, src, dest):
+        self._zip_file.write(src, dest)
+        
     def add_contents(self, dest, contents):
         if not isinstance(dest, zipfile.ZipInfo):
             dest = zinfo(dest)
@@ -438,7 +441,7 @@ class LambdaFunction(AbstractLambdaFunction):
         required = set((
             'name', 'handler', 'memory_size',
             'timeout', 'role', 'runtime',
-            'description', 'events'))
+            'description'))
         missing = required.difference(func_data)
         if missing:
             raise ValueError("Missing required keys %s" % " ".join(missing))
@@ -481,7 +484,7 @@ class LambdaFunction(AbstractLambdaFunction):
         return self.func_data.get('subnets', None)
 
     def get_events(self, session_factory):
-        return self.func_data['events']
+        return self.func_data.get('events', ())
 
     def get_archive(self):
         return self.archive
@@ -767,6 +770,95 @@ class CloudWatchEventSource(object):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.name)
+
+
+class BucketNotification(object):
+    """ Subscribe a lambda to bucket notifications. """
+
+    def __init__(self, data, session_factory, bucket):
+        self.data = data
+        self.session_factory = session_factory
+        self.session = session_factory()
+        self.bucket = bucket
+
+    def delta(self, src, tgt):
+        for k in ['Id', 'LambdaFunctionArn', 'Events', 'Filters']:
+            if src.get(k) != tgt.get(k):
+                return True
+        return False
+
+    def _get_notifies(self, s3, func):
+        notifies = s3.get_bucket_notification_configuration(
+            Bucket=self.bucket['Name'])
+        found = False
+        for f in notifies.get('LambdaFunctionConfigurations', []):
+            if f['Id'] != func.name:
+                continue
+            found = f
+        return notifies, found
+    
+    def add(self, func):
+        s3 = self.session.client('s3')
+        notifies, found = self._get_notifies(s3, func)
+        notifies.pop('ResponseMetadata', None)
+        func_arn = func['FunctionArn']
+        if func_arn.rsplit(':', 1)[-1].isdigit():
+            func_arn = func_arn.rsplit(':', 1)[0]
+        n_params = {
+            'Id': func['FunctionName'],
+            'LambdaFunctionArn': func_arn,
+            'Events': self.data.get('events', ['s3:ObjectCreated:*'])}
+        if self.data.get('filters'):
+            n_params['Filters'] = {
+                'Key': {'FilterRules': self.filters}}
+
+        if found:
+            if self.delta(found, n_params):
+                notifies['LambdaFunctionConfigurations'].remove(found)
+            else:
+                log.info("Bucket lambda notification present")
+                return
+
+        lambda_client = self.session.client('lambda')
+        params = dict(
+            FunctionName=func['FunctionName'],
+            StatementId=self.bucket['Name'],
+            Action='lambda:InvokeFunction',
+            Principal='s3.amazonaws.com')
+        if not self.data.get('account_s3'):
+            params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
+
+        try:
+            lambda_client.add_permission(**params)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceConflictException':
+                raise
+            
+        notifies.setdefault('LambdaFunctionConfigurations', []).append(n_params)
+        s3.put_bucket_notification_configuration(
+            Bucket=self.bucket['Name'], NotificationConfiguration=notifies)
+            
+        return True
+
+    def remove(self, func):
+        s3 = self.session.client('s3')
+        notifies, found = self._get_notifies(s3, func)
+        if not found:
+            return
+
+        lambda_client = self.session.client('lambda')
+        try:
+            response = lambda_client.remove_permission(
+                FunctionName=func['FunctionName'], StatementId=self.bucket['Name'])
+            log.debug("Removed lambda permission result: %s" % response)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
+
+        notifies['LambdaFunctionConfigurations'].remove(found)
+        s3.put_bucket_notification_configuration(
+            Bucket=self.bucket['Name'],
+            NotificationConfiguration=notifies)
 
 
 class CloudWatchLogSubscription(object):

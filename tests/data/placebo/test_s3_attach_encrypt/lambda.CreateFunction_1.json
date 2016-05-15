@@ -1,0 +1,21 @@
+{
+    "status_code": 201, 
+    "data": {
+        "CodeSha256": "kghmbD8u5CDq6BbdjZKda1SsHQPGG1I5TI3OKVB5BqA=", 
+        "FunctionName": "custodian-s3-encrypt", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "73072fee-1acc-11e6-9247-e748149a1e9a"
+        }, 
+        "CodeSize": 561878, 
+        "MemorySize": 256, 
+        "FunctionArn": "arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt", 
+        "Version": "22", 
+        "Role": "arn:aws:iam::619193117841:role/lambda_s3_exec_role", 
+        "Timeout": 15, 
+        "LastModified": "2016-05-15T18:40:22.896+0000", 
+        "Handler": "s3crypt.process_key_event", 
+        "Runtime": "python2.7", 
+        "Description": "Custodian S3 Key Encrypt"
+    }
+}

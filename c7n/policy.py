@@ -25,14 +25,14 @@ from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n import utils
 
-# This import causes our resources to be registered into plugin registries
-import c7n.resources
+from c7n.resources import load_resources
 
 
 def load(options, path, format='yaml', validate=True):
     if not os.path.exists(path):
         raise ValueError("Invalid path for config %r" % path)
 
+    load_resources()
     with open(path) as fh:
         if format == 'yaml':
             data = utils.yaml_load(fh.read())
@@ -63,7 +63,7 @@ class PolicyCollection(object):
         return [p for p in policies if fnmatch.fnmatch(p.name, filters)]
 
     filter = policies
-    
+
     def __iter__(self):
         return iter(self.policies())
 
