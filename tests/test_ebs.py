@@ -102,6 +102,7 @@ class EncryptExtantVolumesTest(BaseTest):
                 {'VolumeId': 'vol-fdd1f844'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
+                 'delay': 0.1,
                  'key': 'alias/ebs/crypto'}]},
             session_factory=session_factory)
         resources = policy.run()

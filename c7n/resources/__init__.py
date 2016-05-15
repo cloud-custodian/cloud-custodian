@@ -11,16 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
+#
 # AWS resources to manage
 #
-import ami
-import asg
-import cfn
-import ebs
-import ec2
-import elb
-import kms
-import rds
-import redshift
-import s3
+
+
+def load_resources():
+    import ami
+    import asg
+    import cfn
+    import ebs
+    import ec2
+    import elb
+    import kms
+    import rds
+    import redshift
+    import s3
