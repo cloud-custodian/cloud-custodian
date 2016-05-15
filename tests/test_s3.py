@@ -123,6 +123,10 @@ class S3Test(BaseTest):
         self.assertTrue(bname in names)
 
     def test_missing_policy_statement(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, None),
         ])
