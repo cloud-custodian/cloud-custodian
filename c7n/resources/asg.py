@@ -225,6 +225,7 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
                 return result.get('Snapshots', ())
 
 
+@filters.register('image-age')
 class ImageAgeFilter(AgeFilter, LaunchConfigBase):
     """Filter asg by image age."""
 

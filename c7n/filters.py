@@ -110,6 +110,7 @@ class FilterRegistry(PluginRegistry):
             return ValueFilter(data, manager).validate()
         if isinstance(data, basestring):
             filter_type = data
+            data = {'type': data}
         else:
             filter_type = data.get('type')
         if not filter_type:
