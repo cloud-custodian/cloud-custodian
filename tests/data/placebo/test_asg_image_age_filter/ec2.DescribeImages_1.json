@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20160114.5", 
+                "Hypervisor": "xen", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-9abea4fb", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-306df873", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "VirtualName": "ephemeral1"
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "099720109477/ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20160114.5", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "099720109477", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2016-01-15T22:11:35.000Z", 
+                "Public": true, 
+                "ImageType": "machine"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "8004d5df-6ad5-4e1b-962a-b6f129441256"
+        }
+    }
+}

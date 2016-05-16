@@ -15,3 +15,81 @@
 
 from unittest import TestCase
 from c7n import cache
+from argparse import Namespace
+import cPickle
+import tempfile
+import mock
+
+
+class FileCacheManagerTest(TestCase):
+    def setUp(self):
+        self.test_config = Namespace(cache_period=60, cache='test-cloud-custodian.cache')
+        self.test_cache = cache.FileCacheManager(self.test_config)
+        self.test_key = 'test'
+        self.bad_key = 'bad'
+        self.test_value = [1, 2, 3]
+
+
+    def test_get(self):
+        #mock the pick and set it to the data variable
+        test_pickle = cPickle.dumps({cPickle.dumps(self.test_key): self.test_value}, protocol=2)
+        self.test_cache.data = cPickle.loads(test_pickle)
+
+        #assert
+        self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
+        self.assertEquals(self.test_cache.get(self.bad_key), None)
+
+
+
+    @mock.patch.object(cache.os, 'makedirs')
+    @mock.patch.object(cache.os.path, 'exists')
+    @mock.patch.object(cache.cPickle, 'dump')
+    @mock.patch.object(cache.cPickle, 'dumps')
+    def test_save_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
+        #path exists then we dont need to create the folder
+        mock_exists.return_value = True
+        #tempfile to hold the pickle
+        temp_cache_file = tempfile.NamedTemporaryFile()
+        self.test_cache.cache_path = temp_cache_file.name
+        #make the call
+        self.test_cache.save(self.test_key, self.test_value)
+
+        #assert if file already exists
+        self.assertFalse(mock_mkdir.called)
+        self.assertTrue(mock_dumps.called)
+        self.assertTrue(mock_dump.called)
+
+        #mkdir should NOT be called, but pickles should
+        self.assertEquals(mock_mkdir.call_count,0)
+        self.assertEquals(mock_dump.call_count,1)
+        self.assertEquals(mock_dumps.call_count,1)
+
+
+
+
+    @mock.patch.object(cache.os, 'makedirs')
+    @mock.patch.object(cache.os.path, 'exists')
+    @mock.patch.object(cache.cPickle, 'dump')
+    @mock.patch.object(cache.cPickle, 'dumps')
+    def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
+
+        temp_cache_file = tempfile.NamedTemporaryFile()
+        self.test_cache.cache_path = temp_cache_file.name
+
+        #path doesnt exists then we will create the folder
+        #raise some sort of exception in the try
+        mock_exists.return_value = False
+        mock_dump.side_effect = Exception('Error')
+
+        #make the call
+        self.test_cache.save(self.test_key, self.test_value)
+
+        #assert if file doesnt exists
+        self.assertTrue(mock_mkdir.called)
+        self.assertTrue(mock_dumps.called)
+        self.assertTrue(mock_dump.called)
+
+        #all 3 should be called once
+        self.assertEquals(mock_mkdir.call_count,1)
+        self.assertEquals(mock_dump.call_count,1)
+        self.assertEquals(mock_dumps.call_count,1)

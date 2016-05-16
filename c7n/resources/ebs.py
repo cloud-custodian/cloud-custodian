@@ -13,6 +13,7 @@
 # limitations under the License.
 import itertools
 import logging
+import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -45,14 +46,20 @@ class Snapshot(ResourceManager):
         c = self.session_factory().client('ec2')
         query = self.resource_query()
         if self._cache.load():
-            snaps = self._cache.get({'resource': 'ebs-snapshot'})
+            snaps = self._cache.get(
+                {'region': self.config.region,
+                 'resource': 'ebs-snapshot',
+                 'q': query})
             if snaps is not None:
                 return self.filter_resources(snaps)
         self.log.info('Querying ebs snapshots')
         p = c.get_paginator('describe_snapshots')
         results = p.paginate(Filters=query, OwnerIds=['self'])
         snapshots = list(itertools.chain(*[rp['Snapshots'] for rp in results]))
-        self._cache.save({'resource': 'ebs-snapshot'}, snapshots)
+        self._cache.save(
+            {'region': self.config.region,
+             'resource': 'ebs-snapshot',
+             'q': query}, snapshots)
         return self.filter_resources(snapshots)
 
 
@@ -92,6 +99,7 @@ class SnapshotDelete(BaseAction):
                         self.log.error(
                             "Exception deleting snapshot set \n %s" % (
                                 f.exception()))
+        return snapshots
 
     def process_snapshot_set(self, snapshots_set):
         c = local_session(self.manager.session_factory).client('ec2')
@@ -118,7 +126,7 @@ class EBS(ResourceManager):
         c = local_session(self.session_factory).client('ec2')
         results = c.describe_volumes(VolumeIds=resource_ids)
         return results['Volumes']
-        
+
     def resources(self):
         c = self.session_factory().client('ec2')
         query = self.resource_query()
@@ -134,7 +142,7 @@ class EBS(ResourceManager):
         self._cache.save({'resource': 'ebs', 'q': query}, volumes)
         return self.filter_resources(volumes)
 
-    
+
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
     """Filter volumes based on filtering on their attached instance"""
@@ -148,14 +156,14 @@ class AttachedInstanceFilter(ValueFilter):
             original_count, len(resources)))
         self.instance_map = self.get_instance_mapping(resources)
         return filter(self, resources)
-    
+
     def __call__(self, r):
         instance = self.instance_map[r['Attachments'][0]['InstanceId']]
         if self.match(instance):
             r['Instance'] = instance
             set_annotation(r, ANNOTATION_KEY, "instance-%s" % self.k)
             return True
-        
+
     def get_instance_mapping(self, resources):
         instance_ids = [r['Attachments'][0]['InstanceId'] for r in resources]
         instances = query_instances(
@@ -164,7 +172,7 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
-        
+
 
 @actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
@@ -215,10 +223,10 @@ class CopyInstanceTags(BaseAction):
             except Exception as e:
                 self.log.exception(
                     "Error copying instance tags to volumes \n %s" % e)
-        
+
     def process_instance_volumes(self, instance, volumes):
         client = local_session(self.manager.session_factory).client('ec2')
-        
+
         for v in volumes:
             copy_tags = self.get_volume_tags(v, instance, v['Attachments'][0])
             if not copy_tags:
@@ -247,7 +255,7 @@ class CopyInstanceTags(BaseAction):
         copy_tags = []
         extant_tags = dict([
             (t['Key'], t['Value']) for t in volume.get('Tags', [])])
-        
+
         for t in instance.get('Tags', ()):
             if only_tags and not t['Key'] in only_tags:
                 continue
@@ -261,7 +269,7 @@ class CopyInstanceTags(BaseAction):
         if 'LastAttachInstance' in extant_tags \
            and extant_tags['LastAttachInstance'] == attachment['InstanceId']:
             return copy_tags
-            
+
         copy_tags.append(
             {'Key': 'LastAttachTime',
              'Value': attachment['AttachTime'].isoformat()})
@@ -301,6 +309,7 @@ class EncryptInstanceVolumes(BaseAction):
         'encrypt-instance-volumes',
         required=['key'],
         key={'type': 'string'},
+        delay={'type': 'number'},
         verbose={'type': 'boolean'})
 
     def validate(self):
@@ -332,13 +341,13 @@ class EncryptInstanceVolumes(BaseAction):
             i['InstanceId']: i for i in query_instances(
                 local_session(self.manager.session_factory),
                 InstanceIds=instance_vol_map.keys())}
-            
+
         with self.executor_factory(max_workers=10) as w:
             futures = {}
             for instance_id, vol_set in instance_vol_map.items():
                 futures[w.submit(
                     self.process_volume, instance_id, vol_set)] = instance_id
-                
+
             for f in as_completed(futures):
                 if f.exception():
                     instance_id = futures[f]
@@ -355,14 +364,14 @@ class EncryptInstanceVolumes(BaseAction):
         key_id = self.get_encryption_key()
         if self.verbose:
             self.log.debug("Using encryption key: %s" % key_id)
-        
+
         client = local_session(self.manager.session_factory).client('ec2')
 
         # Only stop and start the instance if it was running.
         instance_running = self.stop_instance(instance_id)
         if instance_running is None:
             return
-        
+
         # Create all the volumes before patching the instance.
         paired = []
         for v in vol_set:
@@ -373,17 +382,19 @@ class EncryptInstanceVolumes(BaseAction):
         for v, vol_id in paired:
             client.detach_volume(
                 InstanceId=instance_id, VolumeId=v['VolumeId'])
+            # 5/8/2016 The detach isn't immediately consistent
+            self.data.get('delay', 3.2)
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
 
         if instance_running:
             client.start_instances(InstanceIds=[instance_id])
-        
+
         if self.verbose:
             self.log.debug(
                 "Deleting unencrypted volumes for: %s" % instance_id)
-            
+
         for v in vol_set:
             client.delete_volume(VolumeId=v['VolumeId'])
 
@@ -398,7 +409,7 @@ class EncryptInstanceVolumes(BaseAction):
             self.wait_on_resource(client, instance_id=instance_id)
             return True
         return False
-    
+
     def create_encrypted_volume(self, v, key_id, instance_id):
         # Create a current snapshot
         ec2 = local_session(self.manager.session_factory).client('ec2')
@@ -425,7 +436,7 @@ class EncryptInstanceVolumes(BaseAction):
             Tags=[
                 {'Key': 'maid-crypto-remediation', 'Value': 'true'}
             ])
-        self.wait_on_resource(ec2, snapshot_id=results['SnapshotId'])        
+        self.wait_on_resource(ec2, snapshot_id=results['SnapshotId'])
 
         # Create encrypted volume, also tag so we can recover
         results = ec2.create_volume(
@@ -441,10 +452,10 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
                  'Value': v['Attachments'][0]['Device']}])
-        
+
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])
-        
+
         # Delete transient snapshots
         for sid in transient_snapshots:
             ec2.delete_snapshot(SnapshotId=sid)
@@ -456,7 +467,7 @@ class EncryptInstanceVolumes(BaseAction):
         result = kms.describe_key(KeyId=key_alias)
         key_id = result['KeyMetadata']['KeyId']
         return key_id
-    
+
     def wait_on_resource(self, *args, **kw):
         # Sigh this is dirty, but failure in the middle of our workflow
         # due to overly long resource creation is complex to unwind,
@@ -473,7 +484,7 @@ class EncryptInstanceVolumes(BaseAction):
                 return self._wait_on_resource(*args, **kw)
             except Exception:
                 return self._wait_on_resource(*args, **kw)
-        
+
     def _wait_on_resource(
             self, client, snapshot_id=None, volume_id=None, instance_id=None):
         # boto client waiters poll every 15 seconds up to a max 600s (5m)
@@ -488,7 +499,7 @@ class EncryptInstanceVolumes(BaseAction):
         elif volume_id:
             if self.verbose:
                 self.log.debug("Waiting on volume creation %s" % volume_id)
-            waiter = client.get_waiter('volume_available')        
+            waiter = client.get_waiter('volume_available')
             waiter.wait(VolumeIds=[volume_id])
             if self.verbose:
                 self.log.debug("Volume: %s created" % volume_id)
@@ -499,8 +510,8 @@ class EncryptInstanceVolumes(BaseAction):
             waiter.wait(InstanceIds=[instance_id])
             if self.verbose:
                 self.log.debug("Instance: %s stopped" % instance_id)
-                        
-    
+
+
 @actions.register('delete')
 class Delete(BaseAction):
 
@@ -509,7 +520,7 @@ class Delete(BaseAction):
     def process(self, volumes):
         with self.executor_factory(max_workers=10) as w:
             list(w.map(self.process_volume, volumes))
-                
+
     def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
         self._run_api(

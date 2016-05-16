@@ -1,0 +1,10 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:s3:::custodian-attach-encrypt-test\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Sid\":\"custodian-attach-encrypt-test\"}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "7c3afd5e-1acc-11e6-ad2d-bd53c19bf551"
+        }
+    }
+}

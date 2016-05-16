@@ -55,11 +55,11 @@ class ActionRegistry(PluginRegistry):
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
-    
+
 class BaseAction(object):
 
     permissions = ()
-    
+
     log = logging.getLogger("custodian.actions")
 
     executor_factory = ThreadPoolExecutor
@@ -73,18 +73,18 @@ class BaseAction(object):
 
     def validate(self):
         return self
-    
+
     @property
     def name(self):
         return self.__class__.__name__.lower()
-    
+
     def process(self, resources):
         raise NotImplemented(
             "Base action class does not implement behavior")
 
     def get_permissions(self):
         return self.permissions
-    
+
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
@@ -98,7 +98,12 @@ class BaseAction(object):
             raise
 
 
-class Notify(BaseAction):
+class EventAction(BaseAction):
+    """Actions which receive lambda event if present
+    """
+
+
+class Notify(EventAction):
     """
     Flexible notifications require quite a bit of implementation support
     on pluggable transports, templates, address resolution, variable
@@ -130,13 +135,15 @@ class Notify(BaseAction):
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
-    
+
     schema = {
         'type': 'object',
         'required': ['type', 'transport', 'to'],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_manager': {'type': 'boolean'},
+            'from': {'type': 'string'},
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
             'transport': {
@@ -151,11 +158,12 @@ class Notify(BaseAction):
     }
 
     def process(self, resources, event=None):
-        message = {'resources': resources,
-                   'event': event,
-                   'action': self.data,
-                   'policy': self.manager.data}
-        self.send_data_message(message)
+        for batch in utils.chunks(resources, 500):
+            message = {'resources': batch,
+                       'event': event,
+                       'action': self.data,
+                       'policy': self.manager.data}
+            self.send_data_message(message)
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':

@@ -1,0 +1,121 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "86d7fa04-bf8f-4ca8-b7d2-10a88b5be072"
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [], 
+                "Tags": [
+                    {
+                        "Value": "2016-04-14T05:17:29+00:00", 
+                        "Key": "LastAttachTime"
+                    }, 
+                    {
+                        "Value": "CompileLambda", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "i-1aebf7c0", 
+                        "Key": "LastAttachInstance"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-2b047792", 
+                "State": "available", 
+                "Iops": 24, 
+                "SnapshotId": "snap-eef4cdae", 
+                "CreateTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 29, 
+                    "microsecond": 813000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 17
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [], 
+                "Tags": [
+                    {
+                        "Value": "i-1aebf7c0", 
+                        "Key": "maid-crypt-remediation"
+                    }, 
+                    {
+                        "Value": "/dev/xvda", 
+                        "Key": "maid-instance-device"
+                    }, 
+                    {
+                        "Value": "vol-2b047792", 
+                        "Key": "maid-origin-volume"
+                    }
+                ], 
+                "Encrypted": true, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-466f46ff", 
+                "State": "available", 
+                "Iops": 24, 
+                "KmsKeyId": "arn:aws:kms:us-west-2:619193117841:key/00d9c89e-13ee-4758-9167-41de13b5bb68", 
+                "SnapshotId": "snap-72a55c8f", 
+                "CreateTime": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 10, 
+                    "microsecond": 90000, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 9
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 10, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 32, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 8, 
+                            "minute": 26
+                        }, 
+                        "InstanceId": "i-6c3cc5b1", 
+                        "VolumeId": "vol-96c7ee2f", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/xvda"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-96c7ee2f", 
+                "State": "in-use", 
+                "Iops": 24, 
+                "SnapshotId": "snap-eef4cdae", 
+                "CreateTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 884000, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 26
+                }, 
+                "Size": 8
+            }
+        ]
+    }
+}

@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 35
+                }, 
+                "Name": "cf-templates-nyrabrca5x2n-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 23, 
+                    "minute": 54
+                }, 
+                "Name": "config-bucket-619193117841"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 55
+                }, 
+                "Name": "custodian-encrypt-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2013, 
+                    "day": 21, 
+                    "minute": 12
+                }, 
+                "Name": "hazmat-audit-logs"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "wf+bxcs6QQrPATBUX/mvMtDDA5u4KqAJRA9IXSb953ZRxyaPp+80pU+UDx1+SxXMSzR1FcNkKgk=", 
+            "RequestId": "D06F4DD35770F6E3"
+        }
+    }
+}

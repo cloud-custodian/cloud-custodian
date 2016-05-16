@@ -124,6 +124,9 @@ class Formatter(object):
         return uniq
 
     def to_csv(self, records, reverse=True):
+        if not records:
+            return []
+
         filtered = filter(self.filter_record, records)
         log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
         if 'CustodianDate' in records[0]:
@@ -140,7 +143,8 @@ class S3Formatter(Formatter):
     def __init__(self):
         super(S3Formatter, self).__init__(
             'Name',
-            ['creation-date',
+            ['name',
+             'creation-date',
              'global-permissions',
              'ownercontact',
              'asv',
@@ -150,13 +154,15 @@ class S3Formatter(Formatter):
         return [
             record['Name'],
             record['CreationDate'],
-            ','.join(record['GlobalPermissions']),
+            # s3 formatter is used for multiple s3 rules.
+            # the buckets may not have any global permissions
+            ','.join(record.get('GlobalPermissions', '')),
             tag_map.get("OwnerContact", ""),
             tag_map.get("ASV", ""),
             tag_map.get("CMDBEnvironment", ""),
-        ]        
+        ]
 
-            
+
 class EC2Formatter(Formatter):
     def __init__(self):
         super(EC2Formatter, self).__init__(
@@ -182,6 +188,41 @@ class EC2Formatter(Formatter):
         ]
 
 
+class ELBFormatter(Formatter):
+    def __init__(self):
+        super(ELBFormatter, self).__init__(
+            'DNSName',
+            ['name', 'dns name', 'vpc-id', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['LoadBalancerName'],
+            record['DNSName'],
+            record['VPCId'],
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
+
+class RDSFormatter(Formatter):
+    def __init__(self):
+        super(RDSFormatter, self).__init__(
+            'DBInstanceIdentifier',
+            ['instance id', 'db name', 'creation time', 'encrypted', 'publicly accessible', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['DBInstanceIdentifier'],
+            record.get('DBName', ''),
+            record['StorageEncrypted'],
+            record['PubliclyAccessible'],
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
+
 class ASGFormatter(Formatter):
     def __init__(self):
         super(ASGFormatter, self).__init__(
@@ -198,10 +239,44 @@ class ASGFormatter(Formatter):
         ]
 
 
+class AMIFormatter(Formatter):
+    def __init__(self):
+        super(AMIFormatter, self).__init__(
+            'ImageId',
+            ['id', 'name'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['ImageId'],
+            record['Name']
+        ]
+
+
+class EBSFormatter(Formatter):
+    def __init__(self):
+        super(EBSFormatter, self).__init__(
+            'VolumeId',
+            ['id', 'instance-id', 'asv', 'env', 'owner'])
+
+    def csv_fields(self, record, tag_map):
+        instance_id = (record['Attachments'][0]['InstanceId'] if
+                       len(record['Attachments']) > 0 else 'Unattached')
+        return [
+            record['VolumeId'],
+            instance_id,
+            tag_map.get("ASV", ""),
+            tag_map.get("CMDBEnvironment", ""),
+            tag_map.get("OwnerContact", "")
+        ]
+
 # FIXME: Should we use a PluginRegistry instead?
 RECORD_TYPE_FORMATTERS = {
-    'ec2': EC2Formatter(),
+    'ami': AMIFormatter(),
     'asg': ASGFormatter(),
+    'ebs': EBSFormatter(),
+    'ec2': EC2Formatter(),
+    'elb': ELBFormatter(),
+    'rds': RDSFormatter(),
     's3': S3Formatter()
 }
 
@@ -228,17 +303,19 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     """
 
     s3 = local_session(session_factory).client('s3')
-    marker = key_prefix.strip("/") + "/" + start_date.strftime(
-        '%Y-%m-%d-00') + "/resources.json.gz"
 
     records = []
     key_count = 0
-    
+
+    marker = key_prefix.strip("/") + "/" + start_date.strftime(
+         '%Y/%m/%d/00') + "/resources.json.gz"
+
     p = s3.get_paginator('list_objects').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        Marker=marker)
-    
+        Marker=marker
+    )
+
     with ThreadPoolExecutor(max_workers=20) as w:
         for key_set in p:
             if 'Contents' not in key_set:
@@ -260,12 +337,15 @@ def get_records(bucket, key, session_factory):
     # we're doing a lot of this in memory, worst case
     # though we're talking about a 10k objects, else
     # we should spool to temp files
-    _, date_str, _ = key['Key'].rsplit("/", 2)
+
+    # key ends with 'YYYY/mm/dd/HH/resources.json.gz'
+    # so take the date parts only
+    date_str = '-'.join(key['Key'].rsplit('/', 5)[-5:-1])
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
     blob = StringIO(result['Body'].read())
-    
+
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",
               bucket, key['Key'], len(records))

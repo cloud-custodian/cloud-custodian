@@ -24,19 +24,6 @@ allowedProperties and enum extension).
 
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
-
-Implemenation Notes / todo
-
-[x] Resource Policy (inherit base property)
-  
-[x] Or and And - special treatment, ref each other
-
-[x] Value filter - 'str': 'str' / operator
-
-[x] Handling aliases - match same class under multiple names
-  
-[x] Better handling of inheritance than builtin spec support.
-
 """
 import json
 import logging
@@ -308,8 +295,8 @@ def process_resource(type_name, resource_type, resource_defs):
 
 
 if __name__ == '__main__':
-    # side effect registration
-    import c7n.resources
+    from c7n.resources import load_resources
+    load_resources()
     # dump our schema
     # $ python -m c7n.schema
     print(json.dumps(generate(), indent=2))

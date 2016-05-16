@@ -47,7 +47,7 @@ class MetricsOutput(object):
         if metrics_enabled:
             return MetricsOutput
         return NullMetricsOutput
-    
+
     def __init__(self, ctx, namespace=DEFAULT_NAMESPACE):
         self.ctx = ctx
         self.namespace = namespace
@@ -57,7 +57,7 @@ class MetricsOutput(object):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
             self.buf = []
-    
+
     def put_metric(self, key, value, unit, buffer=False, **dimensions):
         d = {
             "MetricName": key,
@@ -90,7 +90,7 @@ class NullMetricsOutput(MetricsOutput):
     def __init__(self, ctx, namespace=DEFAULT_NAMESPACE):
         super(NullMetricsOutput, self).__init__(ctx, namespace)
         self.data = []
-    
+
     def _put_metrics(self, ns, metrics):
         self.data.append({'Namespace': ns, 'MetricData': metrics})
         for m in metrics:
@@ -107,18 +107,18 @@ class NullMetricsOutput(MetricsOutput):
 class LogOutput(object):
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    
+
     def __init__(self, ctx):
         self.ctx = ctx
 
     def get_handler(self):
         raise NotImplementedError()
-    
+
     def __enter__(self):
         log.info("Storing output with %s" % repr(self))
         self.join_log()
         return self
-    
+
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
             log.exception("Error while executing policy")
@@ -133,11 +133,11 @@ class LogOutput(object):
 
     def leave_log(self):
         mlog = logging.getLogger('custodian')
-        mlog.removeHandler(self.handler)        
+        mlog.removeHandler(self.handler)
         self.handler.flush()
         self.handler.close()
 
-    
+
 class CloudWatchLogOutput(LogOutput):
 
     log_format = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
@@ -164,11 +164,11 @@ class FSOutput(LogOutput):
             return S3Output
         else:
             return DirectoryOutput
-        
+
     @staticmethod
     def join(*parts):
         return os.path.join(*parts)
-    
+
     def __init__(self, ctx):
         super(FSOutput, self).__init__(ctx)
         self.root_dir = self.ctx.output_path or tempfile.mkdtemp()
@@ -176,7 +176,7 @@ class FSOutput(LogOutput):
     def get_handler(self):
         return logging.FileHandler(
             os.path.join(self.root_dir, 'custodian-run.log'))
-    
+
     def compress(self):
         # Compress files individually so thats easy to walk them, without
         # downloading tar and extracting.
@@ -188,7 +188,7 @@ class FSOutput(LogOutput):
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 
-                    
+
 class DirectoryOutput(FSOutput):
 
     permissions = ()
@@ -202,23 +202,23 @@ class DirectoryOutput(FSOutput):
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)
 
-    
+
 class S3Output(FSOutput):
     """
     Usage:
 
     .. code-block:: python
-    
+
        with S3Output(session_factory, 's3://bucket/prefix'):
            log.info('xyz')  # -> log messages sent to custodian-run.log.gz
 
     """
 
     permissions = ('S3:PutObject',)
-    
+
     def __init__(self, ctx):
         super(S3Output, self).__init__(ctx)
-        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')        
+        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
         self.s3_path, self.bucket, self.key_prefix = parse_s3(
             self.ctx.output_path)
         self.root_dir = tempfile.mkdtemp()
@@ -233,7 +233,7 @@ class S3Output(FSOutput):
     @staticmethod
     def join(*parts):
         return "/".join([s.strip('/') for s in parts])
-        
+
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
             log.exception("Error while executing policy")
@@ -259,7 +259,6 @@ class S3Output(FSOutput):
                     os.path.join(root, f), self.bucket, key,
                     extra_args={
                         'ServerSideEncryption': 'AES256'})
-                    
 
 s3_join = S3Output.join
 

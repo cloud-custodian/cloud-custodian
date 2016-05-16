@@ -1,0 +1,14 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoggingEnabled": {
+            "TargetPrefix": "s3-logs/", 
+            "TargetBucket": "custodian-log-test"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "uDsgMeNIzx7FUfKaxOwIfxy4fGE8riClmv1jWSgbl33wCtfRR6Kw92XSyYcDVf7Ru+FgLfcoPH0=", 
+            "RequestId": "3BB964B7EC9F5E96"
+        }
+    }
+}

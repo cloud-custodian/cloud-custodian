@@ -51,11 +51,9 @@ def process_log_event(event, context):
     for evt in data['logEvents']:
         message.append(message_event(evt))
         message.append("")
-        
+
     params = dict(
         TopicArn=config['topic'],
         Subject=config['subject'],
         Message='\n'.join(message))
     sns.publish(**params)
-
-        

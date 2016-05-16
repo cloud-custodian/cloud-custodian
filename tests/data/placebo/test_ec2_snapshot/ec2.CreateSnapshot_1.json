@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Description": "Automated,Backup,i-1aebf7c0,vol-2b047792", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "d34d98e7-79c5-4a7d-a9ac-460394ad3f1b"
+        }, 
+        "Encrypted": false, 
+        "VolumeId": "vol-2b047792", 
+        "State": "pending", 
+        "VolumeSize": 8, 
+        "Progress": "", 
+        "StartTime": {
+            "hour": 0, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 18, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 8, 
+            "minute": 13
+        }, 
+        "SnapshotId": "snap-a55e3c59", 
+        "OwnerId": "619193117841"
+    }
+}

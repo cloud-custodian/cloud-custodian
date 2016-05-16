@@ -71,7 +71,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, 'Dev', role=self.role)
-
+        
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
         event = events.pop()
@@ -83,9 +83,9 @@ class PolicyLambdaProvision(BaseTest):
         
         self.assert_items(
             result,
-            {'Description': 'cloud-maid lambda policy',
-             'FunctionName': 'maid-s3-bucket-policy',
-             'Handler': 'maid_policy.run',
+            {'Description': 'cloud-custodian lambda policy',
+             'FunctionName': 'custodian-s3-bucket-policy',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
              'Runtime': 'python2.7',
              'Timeout': 60})

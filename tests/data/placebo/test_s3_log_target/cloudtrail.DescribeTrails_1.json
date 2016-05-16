@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "trailList": [
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "Default", 
+                "S3KeyPrefix": "api", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:619193117841:trail/Default", 
+                "LogFileValidationEnabled": false, 
+                "SnsTopicARN": "arn:aws:sns:us-east-1:619193117841:cloud-audit-update", 
+                "IsMultiRegionTrail": false, 
+                "S3BucketName": "hazmat-audit-logs", 
+                "SnsTopicName": "cloud-audit-update", 
+                "HomeRegion": "us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "905136bb-15ee-11e6-b947-e3f2321611e4"
+        }
+    }
+}

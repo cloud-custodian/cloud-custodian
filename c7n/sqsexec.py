@@ -40,7 +40,7 @@ def resolve(o):
     name, func = o.rsplit(':', 1)
     module = __import__(name, fromlist=[True])
     return getattr(module, func)
-    
+
 
 class SQSExecutor(Executor):
 
@@ -51,7 +51,7 @@ class SQSExecutor(Executor):
         self.sqs = utils.local_session(self.session_factory).client('sqs')
         self.op_sequence = self.op_sequence_start = int(random.random() * 1000000)
         self.futures = {}
-        
+
     def submit(self, func, *args, **kwargs):
         self.op_sequence += 1
         self.sqs.send_message(
@@ -73,7 +73,7 @@ class SQSExecutor(Executor):
         self.futures[self.op_sequence] = f = SQSFuture(
             self.op_sequence)
         return f
-    
+
     def gather(self):
         """Fetch results from separate queue
         """
@@ -103,7 +103,7 @@ class SQSExecutor(Executor):
 class MessageIterator(object):
 
     msg_attributes = ['sequence_id', 'op', 'ser']
-    
+
     def __init__(self, client, queue_url, limit=0, timeout=10):
         self.client = client
         self.queue_url = queue_url
@@ -118,7 +118,7 @@ class MessageIterator(object):
         self.client.delete_message(
             QueueUrl=self.queue_url,
             ReceiptHandle=m['ReceiptHandle'])
-        
+
     def next(self):
         if self.messages:
             return self.messages.pop(0)
@@ -133,7 +133,7 @@ class MessageIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
-        
+
 
 class SQSWorker(object):
 
@@ -143,7 +143,7 @@ class SQSWorker(object):
         self.session_factory = session_factory
         self.client = utils.local_session(self.session_factory).client('sqs')
         self.receiver = MessageIterator(self.client, map_queue, limit)
-        
+
     def run(self):
         for m in self.receiver:
             while not self.stopped:
@@ -152,7 +152,7 @@ class SQSWorker(object):
 
     def stop(self):
         self.stopped = True
-        
+
     def process_message(self, m):
         msg = utils.loads(m['Body'])
         op_name = m['MessageAttributes']['op']['StringValue']
@@ -165,12 +165,12 @@ class SQSWorker(object):
                 "Error invoking %s %s" % (
                     op_name, e))
             return
-        
+
 
 class SQSFuture(Future):
 
     marker = object()
-               
+
     def __init__(self, sequence_id):
         super(SQSFuture, self).__init__()
         self.sequence_id = sequence_id

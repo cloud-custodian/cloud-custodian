@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "eefba08f-1525-11e6-bcd6-073d42180252"
+        }
+    }
+}

@@ -51,6 +51,8 @@ class LogTest(BaseTest):
         time.sleep(1.1)
         log.info('bye world')
         self.assertFalse(handler.buf)
+        handler.flush()
+        handler.close()
 
     def test_transport_buffer_flush(self):
         session_factory = self.replay_flight_data(

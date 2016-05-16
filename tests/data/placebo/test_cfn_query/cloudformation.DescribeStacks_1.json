@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Stacks": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "c8f8a441-1525-11e6-a538-b1d0d1fa7601"
+        }
+    }
+}

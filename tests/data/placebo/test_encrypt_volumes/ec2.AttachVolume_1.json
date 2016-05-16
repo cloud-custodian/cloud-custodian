@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "3eedaff7-930b-4616-a77c-423f747db840"
+        }, 
+        "AttachTime": {
+            "hour": 11, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 47, 
+            "microsecond": 83000, 
+            "year": 2016, 
+            "day": 8, 
+            "minute": 13
+        }, 
+        "InstanceId": "i-9432cb49", 
+        "VolumeId": "vol-add3fa14", 
+        "State": "attaching", 
+        "Device": "/dev/xvda"
+    }
+}

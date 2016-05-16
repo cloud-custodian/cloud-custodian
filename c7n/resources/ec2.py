@@ -15,6 +15,7 @@ import itertools
 import operator
 
 from dateutil.parser import parse
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -38,7 +39,7 @@ class EC2(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    
+
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
@@ -58,7 +59,9 @@ class EC2(ResourceManager):
         instances = None
 
         if self._cache.load():
-            instances = self._cache.get(qf)
+            instances = self._cache.get(
+                {'resource': 'ec2', 'region': self.config.region, 'query': qf})
+
         if instances is not None:
             self.log.info(
                 'Using cached instance query: %s instances' % len(instances))
@@ -76,11 +79,12 @@ class EC2(ResourceManager):
             *[r["Instances"] for r in reservations]))
         self.log.debug("Found %d instances on %d reservations" % (
             len(instances), len(reservations)))
-        self._cache.save(qf, instances)
+        self._cache.save(
+            {'resource': 'ec2', 'region': self.config.region}, instances)
 
         # Filter instances
         return self.filter_resources(instances)
-    
+
     def format_json(self, resources, fh):
         resources = sorted(
             resources, key=operator.itemgetter('LaunchTime'))
@@ -109,7 +113,7 @@ class StateTransitionFilter(object):
     Try to simplify construction for policy authors by automatically
     filtering elements (filters or actions) to the instances states
     they are valid for.
-    
+
     For more details see http://goo.gl/TZH9Q5
 
     """
@@ -166,7 +170,7 @@ class AttachedVolume(ValueFilter):
                         volumes.remove(v)
         return self.operator(map(self.match, volumes))
 
-    
+
 class InstanceImageBase(object):
 
     def get_image_mapping(self, resources):
@@ -178,6 +182,8 @@ class InstanceImageBase(object):
 
 @filters.register('image-age')
 class ImageAge(AgeFilter, InstanceImageBase):
+
+    date_attribute = "CreationDate"
 
     schema = type_schema('image-age', days={'type': 'number'})
 
@@ -212,7 +218,7 @@ class InstanceImage(ValueFilter, InstanceImageBase):
             return False
         return self.match(image)
 
-            
+
 @filters.register('offhour')
 class InstanceOffHour(OffHour, StateTransitionFilter):
 
@@ -223,10 +229,10 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
         return super(InstanceOffHour, self).process(
             self.filter_instance_state(resources))
 
-    
+
 @filters.register('onhour')
 class InstanceOnHour(OnHour, StateTransitionFilter):
-    
+
     valid_origin_states = ('stopped',)
 
     schema = type_schema('onhour', inherits=['#/definitions/filters/time'])
@@ -243,7 +249,7 @@ class EphemeralInstanceFilter(Filter):
 
     def __call__(self, i):
         return self.is_ephemeral(i)
-    
+
     @staticmethod
     def is_ephemeral(i):
         for bd in i.get('BlockDeviceMappings', []):
@@ -252,7 +258,7 @@ class EphemeralInstanceFilter(Filter):
                     return False
                 return True
         return True
-    
+
 
 @filters.register('instance-uptime')
 class UpTimeFilter(AgeFilter):
@@ -260,16 +266,16 @@ class UpTimeFilter(AgeFilter):
     date_attribute = "LaunchTime"
 
     schema = type_schema('instance-uptime', days={'type': 'number'})
-    
-    
-@filters.register('instance-age')        
+
+
+@filters.register('instance-age')
 class InstanceAgeFilter(AgeFilter):
 
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
 
     schema = type_schema('instance-age', days={'type': 'number'})
-    
+
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
         # been on, use the oldest ebs vol attach time
@@ -283,9 +289,9 @@ class InstanceAgeFilter(AgeFilter):
         # Lexographical sort on date
         ebs_vols = sorted(ebs_vols, key=self.ebs_key_func)
         return ebs_vols[0]['AttachTime']
-        
-    
-@actions.register('start')        
+
+
+@actions.register('start')
 class Start(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
@@ -306,7 +312,7 @@ class Start(BaseAction, StateTransitionFilter):
 class Stop(BaseAction, StateTransitionFilter):
     """Stop instances
     """
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running',)
 
     schema =  type_schema(
         'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
@@ -320,7 +326,7 @@ class Stop(BaseAction, StateTransitionFilter):
             else:
                 persistent.append(i)
         return ephemeral, persistent
-    
+
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
@@ -337,12 +343,12 @@ class Stop(BaseAction, StateTransitionFilter):
                 self.manager.client.stop_instances,
                 InstanceIds=[i['InstanceId'] for i in persistent],
                 DryRun=self.manager.config.dryrun)
-        
-        
-@actions.register('terminate')        
+
+
+@actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):
     """ Terminate a set of instances.
-    
+
     While ec2 offers a bulk delete api, any given instance can be configured
     with api deletion termination protection, so we can't use the bulk call
     reliabily, we need to process the instances individually. Additionally
@@ -381,14 +387,53 @@ class Terminate(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
-            
+
+
+@actions.register('snapshot')
+class Snapshot(BaseAction):
+
+    schema = type_schema('snapshot')
+
+    def process(self, resources):
+        for resource in resources:
+            with self.executor_factory(max_workers=3) as w:
+                futures = []
+                futures.append(w.submit(self.process_volume_set, resource))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception creating snapshot set \n %s" % (
+                                f.exception()))
+
+    def process_volume_set(self, resource):
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+        for block_device in resource['BlockDeviceMappings']:
+            if 'Ebs' not in block_device:
+                continue
+            description = "Automated,Backup,%s,%s" % (
+                resource['InstanceId'],
+                block_device['Ebs']['VolumeId'])
+            response = c.create_snapshot(
+                DryRun=self.manager.config.dryrun,
+                VolumeId=block_device['Ebs']['VolumeId'],
+                Description=description)
+            c.create_tags(
+                DryRun=self.manager.config.dryrun,
+                Resources=[
+                    response['SnapshotId']],
+                Tags=[
+                    {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+                    {'Key': 'InstanceId', 'Value': resource['InstanceId']},
+                    {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
+                ])
+
 
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {
     'architecture': ('i386', 'x86_64'),
     'availability-zone': str,
-    'iam-instance-profile.arn': str, 
+    'iam-instance-profile.arn': str,
     'image-id': str,
     'instance-id': str,
     'instance-lifecycle': ('spot',),
@@ -423,7 +468,7 @@ class QueryFilter(object):
         self.data = data
         self.key = None
         self.value = None
-        
+
     def validate(self):
         if not len(self.data.keys()) == 1:
             raise ValueError(
@@ -435,21 +480,17 @@ class QueryFilter(object):
                 'tag:'):
             raise ValueError(
                 "EC2 Query Filter invalid filter name %s" % (self.data))
-                
+
         if self.value is None:
             raise ValueError(
                 "EC2 Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
         return self
-    
+
     def query(self):
         value = self.value
         if isinstance(self.value, basestring):
             value = [self.value]
-            
+
         return {'Name': self.key, 'Values': value}
-
-
-    
-                                    
