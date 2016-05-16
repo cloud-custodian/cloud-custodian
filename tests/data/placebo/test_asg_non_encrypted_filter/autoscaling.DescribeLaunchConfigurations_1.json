@@ -1,0 +1,72 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "BaseIAMRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-west-2:619193117841:launchConfiguration:e99ebfb6-f44e-4fed-b441-b52a81a29add:launchConfigurationName/CustodianASGTestCopyCopy", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 33, 
+                    "microsecond": 170000, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 30
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sde", 
+                        "Ebs": {
+                            "DeleteOnTermination": false, 
+                            "Encrypted": false, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "Ebs": {
+                            "DeleteOnTermination": false, 
+                            "SnapshotId": "snap-8b0a6271", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "hazmat-west", 
+                "SecurityGroups": [
+                    "sg-47b76f22"
+                ], 
+                "LaunchConfigurationName": "CustodianASGTestCopyCopy", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-9abea4fb", 
+                "InstanceType": "m3.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "6fb4106f-1b94-11e6-a29b-750886ac0da7"
+        }
+    }
+}

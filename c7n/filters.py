@@ -144,11 +144,6 @@ class Filter(object):
         """validate filter config, return validation error or self"""
         return self
 
-    @property
-    def name(self):
-        """ Name of the filter"""
-        raise NotImplementedError()
-
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
         return filter(self, resources)
