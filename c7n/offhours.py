@@ -34,25 +34,25 @@ Tag Based Configuration
 =======================
 
 Note the tag name is configurable per policy configuration, examples below use
-default tag name, ie. custodian_downtime.
+default tag name, ie. maid_offhours.
 
-- custodian_downtime: 
+- maid_offhours: 
 
 An empty tag value implies night and weekend offhours using the default
 time zone configured in the policy (tz=est if unspecified).
 
-- custodian_downtime: tz=pt
+- maid_offhours: tz=pt
 
 Note all timezone aliases are referenced to a locality to ensure taking into
 account local daylight savings time (if any).
 
-- custodian_downtime: tz=Americas/Los_Angeles
+- maid_offhours: tz=Americas/Los_Angeles
 
 A geography can be specified but must be in the time zone database. 
 
 Per http://www.iana.org/time-zones
 
-- custodian_downtime: off
+- maid_offhours: off
 
 If offhours is configured to run in opt-out mode, this tag can be specified
 to disable offhours on a given instance.
