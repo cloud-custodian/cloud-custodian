@@ -102,6 +102,7 @@ class TagTrim(Action, ResourceTag):
 
     schema = utils.type_schema(
         'tag-trim',
+        space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, resources):

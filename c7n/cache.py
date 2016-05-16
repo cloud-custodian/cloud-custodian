@@ -78,8 +78,8 @@ class FileCacheManager(object):
     def save(self, key, data):
         try:
             with open(self.cache_path, 'w') as fh:
-                cPickle.dump({
-                    cPickle.dumps(key): data}, fh, protocol=2)
+                self.data[cPickle.dumps(key)] = data
+                cPickle.dump(self.data, fh, protocol=2)
         except Exception as e:
             log.warning("Could not save cache %s err: %s" % (
                 self.cache_path, e))

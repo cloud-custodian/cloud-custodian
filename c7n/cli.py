@@ -15,7 +15,7 @@
 import argparse
 import logging
 
-from c7n import commands
+from c7n import commands, resources
 
 
 def _default_options(p):
@@ -98,6 +98,7 @@ def main():
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
     try:
+        resources.load_resources()
         options.command(options)
     except Exception:
         if not options.debug:

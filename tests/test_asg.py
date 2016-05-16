@@ -18,6 +18,17 @@ from common import BaseTest
 
 class AutoScalingTest(BaseTest):
 
+    def test_asg_non_encrypted_filter(self):
+        factory = self.replay_flight_data('test_asg_non_encrypted_filter')
+        p = self.load_policy({
+            'name': 'asg-encrypted-filter',
+            'resource': 'asg',
+            'filters': [{'type': 'not-encrypted'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Unencrypted'], ['Image', 'LaunchConfig'])
+
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data('test_asg_image_age_filter')
         p = self.load_policy({
@@ -27,7 +38,7 @@ class AutoScalingTest(BaseTest):
                 {'type': 'image-age',
                  'days': 90}]}, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
+        self.assertEqual(len(resources), 1)
 
     def test_asg_config_filter(self):
         factory = self.replay_flight_data('test_asg_config_filter')
@@ -40,7 +51,7 @@ class AutoScalingTest(BaseTest):
                  'value': 'ami-9abea4fb'}]}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data('test_asg_vpc_filter')
         p = self.load_policy({
@@ -105,7 +116,7 @@ class AutoScalingTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in results}
         self.assertTrue('CustomerId' in tag_map)
         self.assertFalse('Home' in tag_map)
-        
+
     def test_asg_remove_tag(self):
         factory = self.replay_flight_data('test_asg_remove_tag')
         p = self.load_policy({
@@ -148,7 +159,7 @@ class AutoScalingTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in result['Tags']}
         self.assertTrue('custodian_action' in tag_map)
         self.assertTrue('suspend@' in tag_map['custodian_action'])
-        
+
     def test_asg_rename_tag(self):
         factory = self.replay_flight_data('test_asg_rename')
         p = self.load_policy({
@@ -169,8 +180,8 @@ class AutoScalingTest(BaseTest):
         tag_map = {t['Key']: (t['Value'], t['PropagateAtLaunch'])
                    for t in result['Tags']}
         self.assertFalse('Platform' in tag_map)
-        self.assertTrue('Linux' in tag_map)        
-        
+        self.assertTrue('Linux' in tag_map)
+
     def test_asg_suspend(self):
         factory = self.replay_flight_data('test_asg_suspend')
         p = self.load_policy({
@@ -204,7 +215,4 @@ class AutoScalingTest(BaseTest):
         result = client.describe_auto_scaling_groups(
             AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
                 'AutoScalingGroups'].pop()
-        self.assertFalse(result['SuspendedProcesses'])        
-        
-        
-        
+        self.assertFalse(result['SuspendedProcesses'])

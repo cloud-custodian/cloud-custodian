@@ -25,7 +25,7 @@ class SchemaTest(BaseTest):
         e = best_match(validator.iter_errors(data))
         ex = specific_error(list(validator.iter_errors(data))[0])
         return e, ex
-        
+
     def setUp(self):
         if not self.validator:
             self.validator = Validator(generate())
