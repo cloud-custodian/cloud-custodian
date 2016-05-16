@@ -29,7 +29,7 @@ def _default_options(p):
                    help="Policy Configuration File")
     p.add_argument("-l", "--log-group", default=None,
                    help="Cloudwatch Log Group to send policy logs")
-    p.add_argument("-p", "--policies", default=None,
+    p.add_argument("-p", "--policies", default=None, dest='policy_filter',
                    help="Only execute named/matched policies")
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Verbose Logging")
@@ -56,7 +56,7 @@ def setup_parser():
     report.set_defaults(command=commands.report)
     _default_options(report)
     report.add_argument(
-        '--days', type=int,
+        '--days', type=int, default=1,
         help="Number of days of history to consider")
     report.add_argument(
         '--raw', type=argparse.FileType('wb'),

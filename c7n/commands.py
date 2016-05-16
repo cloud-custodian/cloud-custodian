@@ -21,7 +21,6 @@ import time
 
 import yaml
 
-from c7n.config import Config
 from c7n.credentials import SessionFactory
 from c7n.reports import report as do_report
 from c7n import mu, schema, policy
@@ -34,12 +33,11 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
-        config = Config()
-        config.from_cli(options)
         collection = policy.load(options, options.config)
-        return f(config, collection)
+        return f(options, collection)
 
     return _load_policies
+
 
 def validate(options):
     if not os.path.exists(options.config):
@@ -65,8 +63,8 @@ def validate(options):
 
 @policy_command
 def run(options, policy_collection):
-    exit_code = 0    
-    for policy in policy_collection.filter(options.policy_names):
+    exit_code = 0
+    for policy in policy_collection.filter(options.policy_filter):
         try:
             policy()
         except Exception:
@@ -81,7 +79,7 @@ def run(options, policy_collection):
 
 @policy_command
 def report(options, policy_collection):
-    policies = policy_collection.filter(options.policy_names)
+    policies = policy_collection.filter(options.policy_filter)
     assert len(policies) == 1, "Only one policy report at a time"
     policy = policies.pop()
     d = datetime.now()
@@ -94,7 +92,7 @@ def report(options, policy_collection):
 
 @policy_command
 def logs(options, policy_collection):
-    policies = policy_collection.filter(options.policy_names)
+    policies = policy_collection.filter(options.policy_filter)
     assert len(policies) == 1, "Only one policy log at a time"
     policy = policies.pop()
 
