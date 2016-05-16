@@ -33,7 +33,7 @@ class CloudWatchEventsFacadeTest(TestCase):
                 {'detail': event_data('event-cloud-trail-run-instances.json')},
                 {'type': 'cloudtrail', 'events': ['RunInstances']}),
             ['i-d49cf94c'])
-            
+
     def test_non_cloud_trail_event(self):
         for event in ['event-instance-state.json', 'event-scheduled.json']:
             self.assertFalse(CloudWatchEvents.match(event_data(event)))
@@ -44,4 +44,3 @@ class CloudWatchEventsFacadeTest(TestCase):
                 event_data('event-cloud-trail-s3.json')),
             {'source': 'aws.s3',
              'ids': jmespath.compile('detail.requestParameters.bucketName')})
-    

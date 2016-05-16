@@ -21,6 +21,7 @@ import yaml
 
 from c7n import policy
 from c7n.ctx import ExecutionContext
+from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
 
 from zpill import PillTest
@@ -30,12 +31,15 @@ logging.getLogger('placebo.pill').setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
 
+load_resources()
+
+
 class BaseTest(PillTest):
 
     def cleanUp(self):
-        # Clear out thread local session cache        
+        # Clear out thread local session cache
         CONN_CACHE.session = None
-        
+
     def get_context(self, config=None, session_factory=None, policy=None):
         if config is None:
             self.context_output_dir = self.mkdtemp()
@@ -54,7 +58,7 @@ class BaseTest(PillTest):
         config['output_dir'] = temp_dir
         conf = Config.empty(**config)
         return policy.Policy(data, conf, session_factory)
-    
+
     def load_policy_set(self, data, config=None):
         t = tempfile.NamedTemporaryFile()
         t.write(yaml.dump(data, Dumper=yaml.SafeDumper))
@@ -72,7 +76,7 @@ class BaseTest(PillTest):
         self.addCleanup(setattr, obj, attr, old)
 
     def capture_logging(
-            self, name=None, level=logging.INFO, 
+            self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
             log_file = StringIO.StringIO()
@@ -91,7 +95,7 @@ class BaseTest(PillTest):
 
         return log_file
 
-    
+
 def placebo_dir(name):
     return os.path.join(
         os.path.dirname(__file__), 'data', 'placebo', name)
@@ -102,7 +106,7 @@ def event_data(name):
             os.path.join(
                 os.path.dirname(__file__), 'data', 'cwe', name)) as fh:
         return json.load(fh)
-        
+
 
 def load_data(file_name, state=None, **kw):
     data = json.loads(open(
@@ -121,14 +125,14 @@ def instance(state=None, **kw):
 
 
 class Bag(dict):
-        
+
     def __getattr__(self, k):
         try:
             return self[k]
         except KeyError:
             raise AttributeError(k)
 
-        
+
 class Config(Bag):
 
     @classmethod
@@ -147,7 +151,7 @@ class Config(Bag):
         d.update(kw)
         return cls(d)
 
-    
+
 class Instance(Bag): pass
 
 
@@ -164,6 +168,3 @@ class Client(object):
         self.filters = filters
         return [Reservation(
             {'instances': [i for i in self.instances]})]
-        
-        
-

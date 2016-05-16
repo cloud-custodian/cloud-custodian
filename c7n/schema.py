@@ -295,8 +295,8 @@ def process_resource(type_name, resource_type, resource_defs):
 
 
 if __name__ == '__main__':
-    # side effect registration
-    import c7n.resources
+    from c7n.resources import load_resources
+    load_resources()
     # dump our schema
     # $ python -m c7n.schema
     print(json.dumps(generate(), indent=2))

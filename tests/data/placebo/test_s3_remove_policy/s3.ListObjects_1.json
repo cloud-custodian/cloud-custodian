@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-policy-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "D/jaxH5r8SAsNYC3u4VJ4rg78Whz3ic5kT+CHA0qzqzDTRTJPv4HdsVdMCi+XW2/", 
+            "RequestId": "48D20D5C6B12AB65"
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

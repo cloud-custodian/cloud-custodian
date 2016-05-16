@@ -181,9 +181,7 @@ def bucket_client(session, b, kms=False):
         config = Config(signature_version='s3v4')
     else:
         config = None
-    return session.client(
-        's3', region_name=region,
-        config=config)
+    return session.client('s3', region_name=region, config=config)
 
 
 @filters.register('global-grants')
@@ -226,19 +224,19 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
+@filters.register('missing-statement')
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):
     """Find buckets missing a set of named policy statements."""
 
     schema = type_schema(
         'missing-policy-statement',
+        aliases=('missing-statement'),
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, buckets, event=None):
         with self.executor_factory(max_workers=5) as w:
-            results = w.map(self.process_bucket, buckets)
-            results = filter(None, list(results))
-            return results
+            return filter(None, w.map(self.process_bucket, buckets))
 
     def process_bucket(self, b):
         p = b['Policy']
@@ -265,6 +263,95 @@ class NoOp(BucketActionBase):
 
     def process(self, buckets):
         return None
+
+
+@actions.register('remove-statements')
+class RemovePolicyStatement(BucketActionBase):
+
+    schema = type_schema(
+        'remove-statements',
+        statement_ids={'type': 'array', 'items': {'type': 'string'}})
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            results = w.map(self.process_bucket, buckets)
+            return filter(None, list(results))
+
+    def process_bucket(self, bucket):
+        p = bucket['Policy']
+        if p is None:
+            return
+        else:
+            p = json.loads(p['Policy'])
+
+        statements = p.get('Statement', [])
+        found = []
+        for s in list(statements):
+            if s['Sid'] in self.data['statement_ids']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return
+
+        s3 = local_session(self.manager.session_factory).client('s3')
+        if not statements:
+            s3.delete_bucket_policy(Bucket=bucket['Name'])
+        else:
+            s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
+        return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
+
+
+@actions.register('attach-encrypt')
+class AttachLambdaEncrypt(BucketActionBase):
+    schema = type_schema(
+        'attach-encrypt', role={'type': 'string'})
+
+    def __init__(self, data=None, manager=None):
+        self.data = data or {}
+        self.manager = manager
+
+    def validate(self):
+        if not self.data.get('role', self.manager.config.assume_role):
+            raise ValueError(
+                "attach-encrypt: role must be specified either"
+                "via assume or in config")
+        return self
+
+    def process(self, buckets):
+        from c7n.mu import LambdaManager
+        from c7n.ufuncs.s3crypt import get_function
+        func = get_function(
+            None, self.data.get('role', self.manager.config.assume_role))
+
+        # Publish function to all of our buckets regions
+        region_funcs = {}
+        regions = set([
+            b.get('LocationConstraint', 'us-east-1') for b in buckets])
+        for r in regions:
+            lambda_mgr = LambdaManager(
+                functools.partial(self.manager.session_factory, region=r))
+            region_funcs[r] = lambda_mgr.publish(func)
+
+        with self.executor_factory(max_workers=3) as w:
+            results = []
+            futures = []
+            for b in buckets:
+                futures.append(
+                    w.submit(
+                        self.process_bucket,
+                        region_funcs[b.get('LocationConstraint', 'us-east-1')],
+                        b))
+            for f in as_completed(futures):
+                if f.exception():
+                    log.exception(
+                        "Error attaching lambda-encrypt %s" % (f.exception()))
+                results.append(f.result())
+            return filter(None, results)
+
+    def process_bucket(self, f, b):
+        from c7n.mu import BucketNotification
+        source = BucketNotification({}, self.manager.session_factory, b)
+        return source.add(f)
 
 
 @actions.register('encryption-policy')
@@ -510,6 +597,7 @@ class EncryptExtantKeys(ScanBucket):
         'additonalProperties': False,
         'properties': {
             'report-only': {'type': 'boolean'},
+            'glacier': {'type': 'boolean'},
             'crypto': {'enum': ['AES256', 'aws:kms']}
             }
         }
@@ -571,10 +659,12 @@ class EncryptExtantKeys(ScanBucket):
         if self.data.get('report-only'):
             return k
 
-        storage_class = key['StorageClass']
+        storage_class = info.get('StorageClass', 'STANDARD')
 
         if storage_class == 'GLACIER':
-            if not 'Restore' in info:
+            if not self.data.get('glacier'):
+                return False
+            if 'Restore' not in info:
                 # This takes multiple hours, we let the next c7n
                 # run take care of followups.
                 s3.restore_object(
@@ -645,7 +735,7 @@ class LogTarget(Filter):
 
     schema = type_schema('is-log-target')
     executor_factory = executor.MainThreadExecutor
-    
+
     def process(self, buckets, event=None):
         log_buckets = set()
         count = 0
@@ -656,13 +746,13 @@ class LogTarget(Filter):
 
         count = 0
         for bucket, _ in self.get_s3_bucket_locations(buckets):
-            count +=1
+            count += 1
             log_buckets.add(bucket)
         self.log.debug('Found %d s3 log targets' % count)
 
         for bucket, _ in self.get_cloud_trail_locations(buckets):
             log_buckets.add(bucket)
-            
+
         self.log.info("Found %d log targets for %d buckets" % (
             len(log_buckets), len(buckets)))
         return [b for b in buckets if b['Name'] in log_buckets]
@@ -705,7 +795,7 @@ class LogTarget(Filter):
 
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
-        
+
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for elb_set in chunks(elbs, 100):
@@ -717,7 +807,7 @@ class LogTarget(Filter):
                     continue
                 for tgt in f.result():
                     yield tgt
-                        
+
 
 def _query_elb_attrs(session_factory, elb_set):
     session = local_session(session_factory)
@@ -736,7 +826,7 @@ def _query_elb_attrs(session_factory, elb_set):
                 "Could not retrieve load balancer %s: %s" % (
                     e['LoadBalancerName'], err))
     return log_targets
-        
+
 
 @actions.register('delete-global-grants')
 class DeleteGlobalGrants(BucketActionBase):

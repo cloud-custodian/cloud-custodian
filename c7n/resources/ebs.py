@@ -309,6 +309,7 @@ class EncryptInstanceVolumes(BaseAction):
         'encrypt-instance-volumes',
         required=['key'],
         key={'type': 'string'},
+        delay={'type': 'number'},
         verbose={'type': 'boolean'})
 
     def validate(self):
@@ -382,7 +383,7 @@ class EncryptInstanceVolumes(BaseAction):
             client.detach_volume(
                 InstanceId=instance_id, VolumeId=v['VolumeId'])
             # 5/8/2016 The detach isn't immediately consistent
-            time.sleep(3.2)
+            self.data.get('delay', 3.2)
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
