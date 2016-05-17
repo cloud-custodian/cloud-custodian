@@ -142,6 +142,7 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'cc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_manager': {'type': 'boolean'},
             'from': {'type': 'string'},
             'subject': {'type': 'string'},
@@ -158,9 +159,13 @@ class Notify(EventAction):
     }
 
     def process(self, resources, event=None):
+        aliases = self.manager.session_factory().client(
+            'iam').list_account_aliases().get('AccountAliases', ())
+        account_name = aliases and aliases[0] or ''
         for batch in utils.chunks(resources, 500):
             message = {'resources': batch,
                        'event': event,
+                       'account': account_name,
                        'action': self.data,
                        'policy': self.manager.data}
             self.send_data_message(message)
@@ -171,7 +176,7 @@ class Notify(EventAction):
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = self.data['transport'].get('region', 'us-east-1')
+        region = queue.split('.', 2)[1]
         client = self.manager.session_factory(region=region).client('sqs')
         attrs = {
             'mtype': {

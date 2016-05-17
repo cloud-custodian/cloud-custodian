@@ -31,11 +31,11 @@ class CloudWatchEvents(object):
         'CreateCluster': {
             'ids': 'requestParameters.clusterIdentifier',
             'source': 'redshift.amazonaws.com'},
-        
+
         'CreateLoadBalancer': {
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
-        
+
         'CreateLoadBalancerPolicy': {
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
@@ -47,11 +47,11 @@ class CloudWatchEvents(object):
         'CreateVolume': {
             'ids': 'responseElements.volumeId',
             'source': 'ec2.amazonaws.com'},
-        
+
         'SetLoadBalancerPoliciesOfListener': {
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
-        
+
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
             'source': 'ec2.amazonaws.com'}}
@@ -59,7 +59,7 @@ class CloudWatchEvents(object):
     @classmethod
     def get(cls, event_name):
         return cls.trail_events.get(event_name)
-    
+
     @classmethod
     def match(cls, event):
         """Match a given cwe event as cloudtrail with an api call

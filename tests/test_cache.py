@@ -23,23 +23,40 @@ import mock
 
 class FileCacheManagerTest(TestCase):
     def setUp(self):
-        self.test_config = Namespace(cache_period=60, cache='test-cloud-custodian.cache')
+        self.test_config = Namespace(
+            cache_period=60, cache='test-cloud-custodian.cache')
         self.test_cache = cache.FileCacheManager(self.test_config)
         self.test_key = 'test'
         self.bad_key = 'bad'
         self.test_value = [1, 2, 3]
 
+    def test_get_set(self):
+        t = tempfile.NamedTemporaryFile()
+        self.addCleanup(t.close)
+        c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
+        self.assertFalse(c.load())
+        k1 = {'region': 'us-west-2', 'resource': 'ec2'}
+        c.save(k1, range(5))
+        self.assertEqual(c.get(k1), range(5))
+        k2 = {'region': 'eu-west-1', 'resource': 'asg'}
+        c.save(k2, range(2))
+        self.assertEqual(c.get(k1), range(5))
+        self.assertEqual(c.get(k2), range(2))
+
+        c2 = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
+        self.assertTrue(c2.load())
+        self.assertEqual(c2.get(k1), range(5))
+        self.assertEqual(c2.get(k2), range(2))
 
     def test_get(self):
         #mock the pick and set it to the data variable
-        test_pickle = cPickle.dumps({cPickle.dumps(self.test_key): self.test_value}, protocol=2)
+        test_pickle = cPickle.dumps(
+            {cPickle.dumps(self.test_key): self.test_value}, protocol=2)
         self.test_cache.data = cPickle.loads(test_pickle)
 
         #assert
         self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
         self.assertEquals(self.test_cache.get(self.bad_key), None)
-
-
 
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
@@ -64,15 +81,11 @@ class FileCacheManagerTest(TestCase):
         self.assertEquals(mock_dump.call_count,1)
         self.assertEquals(mock_dumps.call_count,1)
 
-
-
-
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
     @mock.patch.object(cache.cPickle, 'dump')
     @mock.patch.object(cache.cPickle, 'dumps')
     def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-
         temp_cache_file = tempfile.NamedTemporaryFile()
         self.test_cache.cache_path = temp_cache_file.name
 

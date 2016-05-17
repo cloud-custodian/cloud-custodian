@@ -60,14 +60,15 @@ class EC2(ResourceManager):
 
         if self._cache.load():
             instances = self._cache.get(
-                {'resource': 'ec2', 'region': self.config.region, 'query': qf})
+                {'resource': 'ec2', 'region': self.config.region,
+                 'query': qf})
 
         if instances is not None:
-            self.log.info(
+            self.log.debug(
                 'Using cached instance query: %s instances' % len(instances))
             return self.filter_resources(instances)
 
-        self.log.info("Querying ec2 instances with %s" % qf)
+        self.log.debug("Querying ec2 instances with %s" % qf)
         session = self.session_factory()
         client = session.client('ec2')
         p = client.get_paginator('describe_instances')
@@ -80,7 +81,8 @@ class EC2(ResourceManager):
         self.log.debug("Found %d instances on %d reservations" % (
             len(instances), len(reservations)))
         self._cache.save(
-            {'resource': 'ec2', 'region': self.config.region}, instances)
+            {'resource': 'ec2', 'query': qf,
+             'region': self.config.region}, instances)
 
         # Filter instances
         return self.filter_resources(instances)

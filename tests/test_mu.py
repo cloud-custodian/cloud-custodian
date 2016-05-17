@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime, timedelta
 import json
 import logging
 import unittest
@@ -25,7 +26,7 @@ from .common import BaseTest, Config
 class PolicyLambdaProvision(BaseTest):
 
     role = "arn:aws:iam::619193117841:role/lambda_basic_execution"
-    
+
     def assert_items(self, result, expected):
         for k, v in expected.items():
             self.assertEqual(v, result[k])
@@ -71,7 +72,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, 'Dev', role=self.role)
-        
+
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
         event = events.pop()
@@ -80,7 +81,7 @@ class PolicyLambdaProvision(BaseTest):
             {u'detail': {u'eventName': [u'CreateBucket'],
                          u'eventSource': [u'aws.s3']},
              u'detail-type': ['AWS API Call via CloudTrail']})
-        
+
         self.assert_items(
             result,
             {'Description': 'cloud-custodian lambda policy',
@@ -90,7 +91,27 @@ class PolicyLambdaProvision(BaseTest):
              'Runtime': 'python2.7',
              'Timeout': 60})
         mgr.remove(pl)
-                             
+
+    def test_mu_metrics(self):
+        session_factory = self.replay_flight_data('test_mu_metrics')
+        p = Policy({
+            'resources': 's3',
+            'name': 's3-bucket-policy',
+            'resource': 's3',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': ['CreateBucket'],
+                },
+            'actions': ['no-op']}, Config.empty())
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        end = datetime.utcnow()
+        start = end - timedelta(1)
+        results = mgr.metrics([pl], start, end, 3600)
+        self.assertEqual(
+            results, [{'Durations': [], 'Errors': [],
+                       'Throttles': [], 'Invocations': []}])
+
     def test_cwe_instance(self):
         session_factory = self.replay_flight_data(
             'test_cwe_instance', zdata=True)
@@ -117,7 +138,7 @@ class PolicyLambdaProvision(BaseTest):
         result = events.list_rules(NamePrefix="maid-ec2-encrypted-vol")
         self.assert_items(
             result['Rules'][0],
-            {"State": "ENABLED", 
+            {"State": "ENABLED",
              "Name": "maid-ec2-encrypted-vol"})
 
         self.assertEqual(
@@ -152,7 +173,7 @@ class PolicyLambdaProvision(BaseTest):
         result = events.list_rules(NamePrefix="maid-asg-spin-detector")
         self.assert_items(
             result['Rules'][0],
-            {"State": "ENABLED", 
+            {"State": "ENABLED",
              "Name": "maid-asg-spin-detector"})
 
         self.assertEqual(
@@ -160,7 +181,7 @@ class PolicyLambdaProvision(BaseTest):
             {"source": ["aws.autoscaling"],
              "detail-type": ["EC2 Instance Launch Unsuccessful"]})
         mgr.remove(pl)
-        
+
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data(
             'test_cwe_schedule', zdata=True)
@@ -182,15 +203,15 @@ class PolicyLambdaProvision(BaseTest):
              'Handler': 'maid_policy.run',
              'MemorySize': 512,
              'Runtime': 'python2.7',
-             'Timeout': 60})        
+             'Timeout': 60})
 
         events = session_factory().client('events')
         result = events.list_rules(NamePrefix="maid-periodic-ec2-checker")
         self.assert_items(
             result['Rules'][0],
             {
-                "State": "ENABLED", 
-                "ScheduleExpression": "rate(1 day)", 
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
                 "Name": "maid-periodic-ec2-checker"})
         mgr.remove(pl)
 
@@ -206,11 +227,11 @@ class PythonArchiveTest(unittest.TestCase):
         reader = zipfile.ZipFile(io, mode='r')
         fileset = [n.filename for n in reader.filelist]
         self.assertTrue('c7n/__init__.py' in fileset)
-        
+
     def test_archive_skip(self):
         self.archive = custodian_archive("*.pyc")
         self.archive.create()
-        self.addCleanup(self.archive.remove)        
+        self.addCleanup(self.archive.remove)
         self.archive.close()
         with open(self.archive.path) as fh:
             reader = zipfile.ZipFile(fh, mode='r')
@@ -219,6 +240,3 @@ class PythonArchiveTest(unittest.TestCase):
                       'c7n/resources/s3.pyc',
                       'boto3/__init__.py']:
                 self.assertFalse(i in fileset)
-        
-
-        

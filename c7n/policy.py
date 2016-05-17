@@ -53,10 +53,12 @@ class PolicyCollection(object):
         self.data = data
         self.options = options
 
-    def policies(self, filters=None):
+    def policies(self, filters=None, resource_type=None):
         # self.options is the CLI options specified in cli.setup_parser()
         policies = [Policy(p, self.options) for p in self.data.get(
-            'policies', [])]
+            'policies', [])
+                    if resource_type and resource_type == p.resource_type or 1]
+
         if not filters:
             return policies
 
@@ -84,6 +86,10 @@ class Policy(object):
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.get_resource_manager()
+
+    def __repr__(self):
+        return "<Policy resource: %s name: %s>" % (
+            self.resource_type, self.name)
 
     @property
     def name(self):
@@ -170,7 +176,8 @@ class Policy(object):
     def poll(self):
         """Query resources and apply policy."""
         with self.ctx:
-            self.log.info("Running policy %s" % self.name)
+            self.log.info("Running policy %s resource: %s",
+                          self.name, self.resource_type)
             s = time.time()
             resources = self.resource_manager.resources()
             rt = time.time() - s

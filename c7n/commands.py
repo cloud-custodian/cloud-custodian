@@ -34,7 +34,8 @@ def policy_command(f):
     @wraps(f)
     def _load_policies(options):
         collection = policy.load(options, options.config)
-        return f(options, collection)
+        policies = collection.filter(options.policy_filter)
+        return f(options, policies)
 
     return _load_policies
 
@@ -62,9 +63,9 @@ def validate(options):
 
 
 @policy_command
-def run(options, policy_collection):
+def run(options, policies):
     exit_code = 0
-    for policy in policy_collection.filter(options.policy_filter):
+    for policy in policies:
         try:
             policy()
         except Exception:
@@ -78,8 +79,7 @@ def run(options, policy_collection):
 
 
 @policy_command
-def report(options, policy_collection):
-    policies = policy_collection.filter(options.policy_filter)
+def report(options, policies):
     assert len(policies) == 1, "Only one policy report at a time"
     policy = policies.pop()
     d = datetime.now()
@@ -91,8 +91,7 @@ def report(options, policy_collection):
 
 
 @policy_command
-def logs(options, policy_collection):
-    policies = policy_collection.filter(options.policy_filter)
+def logs(options, policies):
     assert len(policies) == 1, "Only one policy log at a time"
     policy = policies.pop()
 
@@ -110,15 +109,19 @@ def logs(options, policy_collection):
             e['message'])
 
 
-@policy_command
-def resources(options, policy_collection):
+def resources(options):
     import yaml
     session_factory = SessionFactory(
         options.region, options.profile, options.assume_role)
     manager = mu.LambdaManager(session_factory)
-    funcs = manager.list_functions('custodian-')
+    funcs = list(manager.list_functions('custodian-'))
+
+    end = datetime.utcnow()
+    start = end - timedelta(1/24.0)
+
+    manager.metrics(funcs, start, end, period=60*30)
     if options.all:
-        print(yaml.dump(funcs, dumper=yaml.SafeDumper))
+        print(yaml.dump(funcs, Dumper=yaml.SafeDumper, default_flow_style=False))
 
 
 def resources_gc(options, policy_collection):

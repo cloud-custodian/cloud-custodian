@@ -93,7 +93,7 @@ class ELB(ResourceManager):
         elbs = list(itertools.chain(
             *[self.get_elbs_from_result_page(c, rp) for rp in results]))
         self._cache.save(
-            {'region': self.config.region, 'resource': 'elbs'}, elbs)
+            {'region': self.config.region, 'resource': 'elb'}, elbs)
 
         return self.filter_resources(elbs)
 
