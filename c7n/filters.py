@@ -307,6 +307,12 @@ class EventFilter(ValueFilter):
 
     schema = type_schema('event', rinherit=ValueFilter.schema)
 
+    def validate(self):
+        if 'mode' not in self.manager.data:
+            raise FilterValidationError(
+                "Event filters can only be used with lambda policies")
+        return self
+
     def process(self, resources, event=None):
         if event is None:
             return resources

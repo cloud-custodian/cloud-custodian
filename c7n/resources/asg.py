@@ -119,7 +119,8 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
         return super(LaunchConfigFilter, self).process(asgs, event)
 
     def __call__(self, asg):
-        cfg = self.configs[asg['LaunchConfigurationName']]
+        # Active launch configs can be deleted..
+        cfg = self.configs.get(asg['LaunchConfigurationName'])
         return self.match(cfg)
 
 

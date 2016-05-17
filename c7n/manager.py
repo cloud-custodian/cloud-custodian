@@ -47,7 +47,7 @@ class ResourceManager(object):
         if self.action_registry:
             self.actions = self.action_registry.parse(
                 self.data.get('actions', []), self)
-                
+
     def format_json(self, resources, fh):
         return dumps(resources, fh, indent=2)
 
@@ -57,7 +57,7 @@ class ResourceManager(object):
 
     def get_resources(self, resource_ids):
         return []
-    
+
     def filter_resources(self, resources, event=None):
         original = len(resources)
         for f in self.filters:
