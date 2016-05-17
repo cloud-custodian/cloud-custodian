@@ -91,7 +91,7 @@ class RDS(ResourceManager):
         query = self.resource_query()
         if self._cache.load():
             dbs = self._cache.get(
-                {'resource': 'rds', 'region': self.config.region, 'q': query})
+                {'region': self.config.region, 'resource': 'rds', 'q': query})
             if dbs is not None:
                 self.log.debug("Using cached rds: %d" % (
                     len(dbs)))
@@ -252,7 +252,7 @@ class RetentionWindow(BaseAction):
 
     def process_snapshot_retention(self, resource):
         v = int(resource.get('BackupRetentionPeriod', 0))
-        if v == 0 or v != self.data['days']:
+        if v == 0 or v < self.data['days']:
             self.set_retention_window(resource)
             return resource
 

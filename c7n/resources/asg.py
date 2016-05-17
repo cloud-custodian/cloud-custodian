@@ -58,7 +58,7 @@ class ASG(ResourceManager):
             if asgs is not None:
                 self.log.debug("Using cached asgs: %d" % len(asgs))
                 return self.filter_resources(asgs)
-        self.log.info("Querying autoscaling groups")
+        self.log.debug("Querying autoscaling groups")
         p = c.get_paginator('describe_auto_scaling_groups')
         results = p.paginate()
         asgs = list(itertools.chain(
@@ -93,7 +93,7 @@ class LaunchConfigBase(object):
                     cfg['LaunchConfigurationName']: cfg for cfg in configs}
                 return
 
-        self.log.info("querying %d launch configs" % len(config_names))
+        self.log.debug("querying %d launch configs" % len(config_names))
         for cfg_set in chunks(config_names, 50):
             for cfg in client.describe_launch_configurations(
                     LaunchConfigurationNames=cfg_set)['LaunchConfigurations']:

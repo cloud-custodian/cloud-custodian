@@ -32,6 +32,8 @@ import zipfile
 from boto3.s3.transfer import S3Transfer, TransferConfig
 from botocore.exceptions import ClientError
 
+from concurrent.futures import ThreadPoolExecutor
+
 import c7n
 
 # Static event mapping to help simplify cwe rules creation
@@ -233,6 +235,33 @@ class LambdaManager(object):
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
                 raise
+
+    def metrics(self, funcs, start, end, period=5*60):
+
+        def func_metrics(f):
+            metrics = self.session_factory().client('cloudwatch')
+            values = {}
+            for m in ('Errors', 'Invocations', 'Durations', 'Throttles'):
+                values[m] = metrics.get_metric_statistics(
+                    Namespace="AWS/Lambda",
+                    Dimensions=[{
+                        'Name': 'FunctionName',
+                        'Value': (
+                            isinstance(f, dict) and f['FunctionName']
+                            or f.name)}],
+                    Statistics=["Sum"],
+                    StartTime=start,
+                    EndTime=end,
+                    Period=period,
+                    MetricName=m)['Datapoints']
+            return values
+
+        with ThreadPoolExecutor(max_workers=3) as w:
+            results = list(w.map(func_metrics, funcs))
+            for m, f in zip(results, funcs):
+                if isinstance(f, dict):
+                    f['Metrics'] = m
+        return results
 
     def logs(self, func):
         logs = self.session_factory().client('logs')

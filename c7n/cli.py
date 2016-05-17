@@ -27,12 +27,16 @@ def _default_options(p):
                    help="Role to assume")
     p.add_argument("-c", "--config", required=True,
                    help="Policy Configuration File")
-    p.add_argument("-l", "--log-group", default=None,
-                   help="Cloudwatch Log Group to send policy logs")
     p.add_argument("-p", "--policies", default=None, dest='policy_filter',
                    help="Only execute named/matched policies")
+    p.add_argument("-t", "--resource", default=None, dest='resource_type',
+                   help="Only execute policies with the given resource type")
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Verbose Logging")
+    p.add_argument(
+        "-l", "--log-group", default=None,
+        help="Cloudwatch Log Group to send policy logs")
+
     p.add_argument("--debug", action="store_true",
                    help="Dev Debug")
     p.add_argument("-s", "--output-dir", required=True,
@@ -75,6 +79,11 @@ def setup_parser():
     validate.add_argument("--debug", action="store_true",
                           help="Dev Debug")
 
+    #resources = subs.add_parser('resources')
+    #resources.set_defaults(command=commands.resources)
+    #_default_options(resources)
+    #resources.add_argument('--all', default=True, action="store_false")
+
     run = subs.add_parser("run")
     run.set_defaults(command=commands.run)
     _default_options(run)
@@ -82,7 +91,7 @@ def setup_parser():
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
-        help="Emit CloudWatch Metrics (default false)")
+        help="Emit Metrics")
 
     return parser
 

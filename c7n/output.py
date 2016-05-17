@@ -115,7 +115,7 @@ class LogOutput(object):
         raise NotImplementedError()
 
     def __enter__(self):
-        log.info("Storing output with %s" % repr(self))
+        log.debug("Storing output with %s" % repr(self))
         self.join_log()
         return self
 

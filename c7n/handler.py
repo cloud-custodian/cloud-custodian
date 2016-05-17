@@ -45,7 +45,7 @@ class Config(dict):
     def empty(cls, **kw):
         d = {}
         d.update({
-            'region': "us-east-1",
+            'region': None,
             'cache': '',
             'profile': None,
             'assume_role': None,

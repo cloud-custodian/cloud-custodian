@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b4e5f24-1c21-11e6-8dcf-13e692d0eb26"
+        }, 
+        "Label": "Invocations"
+    }
+}

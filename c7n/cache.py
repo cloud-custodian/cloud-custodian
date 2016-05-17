@@ -66,13 +66,18 @@ class FileCacheManager(object):
         return self.data.get(k)
 
     def load(self):
+        if self.data:
+            return True
         if os.path.isfile(self.cache_path):
             if (time.time() - os.stat(self.cache_path).st_mtime >
                     self.config.cache_period * 60):
                 return False
             with open(self.cache_path) as fh:
-                self.data = cPickle.load(fh)
-            log.info("Using cache file %s" % self.cache_path)
+                try:
+                    self.data = cPickle.load(fh)
+                except EOFError:
+                    return False
+            log.debug("Using cache file %s" % self.cache_path)
             return True
 
     def save(self, key, data):
