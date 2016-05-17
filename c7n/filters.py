@@ -110,6 +110,7 @@ class FilterRegistry(PluginRegistry):
             return ValueFilter(data, manager).validate()
         if isinstance(data, basestring):
             filter_type = data
+            data = {'type': data}
         else:
             filter_type = data.get('type')
         if not filter_type:
@@ -143,11 +144,6 @@ class Filter(object):
     def validate(self):
         """validate filter config, return validation error or self"""
         return self
-
-    @property
-    def name(self):
-        """ Name of the filter"""
-        raise NotImplementedError()
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""

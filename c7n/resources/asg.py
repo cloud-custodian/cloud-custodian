@@ -25,7 +25,7 @@ import itertools
 import time
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter, AgeFilter
+from c7n.filters import FilterRegistry, ValueFilter, AgeFilter, Filter
 
 from c7n.manager import ResourceManager, resources
 from c7n.offhours import Time, OffHour, OnHour
@@ -52,20 +52,19 @@ class ASG(ResourceManager):
 
     def resources(self):
         c = self.session_factory().client('autoscaling')
-        query = self.resource_query()
         if self._cache.load():
             asgs = self._cache.get(
-                {'region': self.config.region, 'resource': 'asg', 'q': query})
+                {'region': self.config.region, 'resource': 'asg'})
             if asgs is not None:
                 self.log.debug("Using cached asgs: %d" % len(asgs))
                 return self.filter_resources(asgs)
-        self.log.info("Querying asg instances")
+        self.log.info("Querying autoscaling groups")
         p = c.get_paginator('describe_auto_scaling_groups')
         results = p.paginate()
         asgs = list(itertools.chain(
             *[rp['AutoScalingGroups'] for rp in results]))
         self._cache.save(
-            {'resource': 'asg', 'region': self.config.region, 'q': query},
+            {'resource': 'asg', 'region': self.config.region},
             asgs)
         return self.filter_resources(asgs)
 
@@ -84,10 +83,27 @@ class LaunchConfigBase(object):
 
         self.configs = {}
 
+        if len(asgs) > 50 and self.manager._cache.load():
+            configs = self.manager._cache.get(
+                {'region': self.manager.config.region,
+                 'resource': 'launch-config'})
+            if configs:
+                self.log.info("Using cached configs")
+                self.configs = {
+                    cfg['LaunchConfigurationName']: cfg for cfg in configs}
+                return
+
+        self.log.info("querying %d launch configs" % len(config_names))
         for cfg_set in chunks(config_names, 50):
             for cfg in client.describe_launch_configurations(
                     LaunchConfigurationNames=cfg_set)['LaunchConfigurations']:
                 self.configs[cfg['LaunchConfigurationName']] = cfg
+
+        if len(asgs) > 50:
+            self.manager._cache.save(
+                {'region': self.manager.config.region,
+                 'resource': 'launch-config'},
+                self.configs.values())
 
 
 @filters.register('launch-config')
@@ -105,6 +121,108 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
     def __call__(self, asg):
         cfg = self.configs[asg['LaunchConfigurationName']]
         return self.match(cfg)
+
+
+@filters.register('not-encrypted')
+class NotEncryptedFilter(Filter, LaunchConfigBase):
+    """Check if an asg is configured to have unencrypted volumes.
+
+    Checks both the ami snapshots and the launch configuration.
+    """
+    schema = type_schema('encrypted', exclude_image={'type': 'boolean'})
+    images = unencrypted_configs = unencrypted_images = None
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(NotEncryptedFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        cfg = self.configs.get(asg['LaunchConfigurationName'])
+        if not cfg:
+            self.log.warning(
+                "ASG %s instances: %d has missing config: %s",
+                asg['AutoScalingGroupName'], len(asg['Instances']),
+                asg['LaunchConfigurationName'])
+            return False
+        unencrypted = []
+        if (not self.data.get('exclude_image')
+               and cfg['ImageId'] in self.unencrypted_images):
+            unencrypted.append('Image')
+        if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
+            unencrypted.append('LaunchConfig')
+        if unencrypted:
+            asg['Unencrypted'] = unencrypted
+        return bool(unencrypted)
+
+    def initialize(self, asgs):
+        super(NotEncryptedFilter, self).initialize(asgs)
+        ec2 = local_session(self.manager.session_factory).client('ec2')
+        self.unencrypted_images = self.get_unencrypted_images(ec2)
+        self.unencrypted_configs = self.get_unencrypted_configs(ec2)
+
+    def get_unencrypted_images(self, ec2):
+        """retrieve images which have unencrypted snapshots referenced."""
+        image_ids = set()
+        for cfg in self.configs.values():
+            image_ids.add(cfg['ImageId'])
+
+        self.log.info("querying %d images", len(image_ids))
+        results = ec2.describe_images(ImageIds=list(image_ids))
+        self.images = {i['ImageId']: i for i in results['Images']}
+
+        unencrypted_images = set()
+        for i in self.images.values():
+            for bd in i['BlockDeviceMappings']:
+                if 'Ebs' in bd and not bd['Ebs'].get('Encrypted'):
+                    unencrypted_images.add(i['ImageId'])
+                    break
+        return unencrypted_images
+
+    def get_unencrypted_configs(self, ec2):
+        """retrieve configs that have unencrypted ebs voluems referenced."""
+        unencrypted_configs = set()
+        snaps = {}
+        for cid, c in self.configs.items():
+            image = self.images.get(c['ImageId'])
+            # image deregistered/unavailable
+            if image is not None:
+                image_block_devs = {
+                    bd['DeviceName']: bd['Ebs']
+                    for bd in image['BlockDeviceMappings'] if 'Ebs' in bd}
+            else:
+                image_block_devs = {}
+            for bd in c['BlockDeviceMappings']:
+                if 'Ebs' not in bd:
+                    continue
+                # Launch configs can shadow image devices, images have
+                # precedence.
+                if bd['DeviceName'] in image_block_devs:
+                    continue
+                if 'SnapshotId' in bd['Ebs']:
+                    snaps.setdefault(bd['Ebs']['SnapshotId'], []).append(cid)
+                elif not bd['Ebs'].get('Encrypted'):
+                    unencrypted_configs.add(cid)
+        if not snaps:
+            return unencrypted_configs
+
+        self.log.debug("querying %d snapshots", len(snaps))
+        for s in self.get_snapshots(ec2, snaps.keys()):
+            if not s.get('Encrypted'):
+                unencrypted_configs.update(snaps[s['SnapshotId']])
+        return unencrypted_configs
+
+    @staticmethod
+    def get_snapshots(ec2, snap_ids):
+        """get snapshots corresponding to id, but tolerant of missing."""
+        while True:
+            try:
+                result = ec2.describe_snapshots(SnapshotIds=snap_ids)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
+                    msg = e.response['Error']['Message']
+                    snap_ids.remove(msg[msg.find("'")+1:msg.rfind("'")])
+            else:
+                return result.get('Snapshots', ())
 
 
 @filters.register('image-age')
