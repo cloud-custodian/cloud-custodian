@@ -19,7 +19,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from .common import instance, event_data
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -213,12 +213,21 @@ class TestMarkedForAction(BaseFilterTest):
 class EventFilterTest(BaseFilterTest):
 
     def test_event_filter(self):
+        b = Bag(data={'mode': []})
         event = event_data('event-instance-state.json')
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
-        self.assertTrue(filters.factory(f).process(
+        self.assertTrue(filters.factory(f, b).process(
             [instance()], event))
+
+    def test_event_no_mode(self):
+        b = Bag(data={'resource': 'something'})
+        f = {'type': 'event',
+             'key': 'detail.state',
+             'value': 'pending'}
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, b)
 
 
 class TestInstanceValue(BaseFilterTest):
