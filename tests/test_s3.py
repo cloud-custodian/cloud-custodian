@@ -122,6 +122,45 @@ class S3Test(BaseTest):
         names = [b['Name'] for b in resources]
         self.assertTrue(bname in names)
 
+    def test_has_statement(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, None),
+        ])
+        session_factory = self.replay_flight_data('test_s3_has_statement')
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'Zebra',
+                    'Effect': 'Deny',
+                    'Principal': '*',
+                    'Action': 's3:PutObject',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname,
+                    'Condition': {
+                        'StringNotEquals': {
+                            's3:x-amz-server-side-encryption': [
+                                'AES256', 'aws:kms']}}}]}))
+        p = self.load_policy({
+            'name': 's3-has-policy',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'has-statement',
+                 'statement-ids': ['RequireEncryptedPutObject']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_missing_policy_statement(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -132,19 +171,31 @@ class S3Test(BaseTest):
         ])
         session_factory = self.replay_flight_data('test_s3_missing_policy')
         bname = "custodian-encrypt-test"
-
         session = session_factory()
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
         self.addCleanup(destroyBucket, client, bname)
-
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'Zebra',
+                    'Effect': 'Deny',
+                    'Principal': '*',
+                    'Action': 's3:PutObject',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname,
+                    'Condition': {
+                        'StringNotEquals': {
+                            's3:x-amz-server-side-encryption': [
+                                'AES256', 'aws:kms']}}}]}))
         p = self.load_policy({
             'name': 'encrypt-keys',
             'resource': 's3',
             'filters': [
                 {'Name': bname},
                 {'type': 'missing-policy-statement',
-                 'statement-ids': ['RequireEncryptedPutObject']}]},
+                 'statement_ids': ['RequireEncryptedPutObject']}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

@@ -4,8 +4,8 @@
         "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "5zimYC29uv3NzGBIdYWWBSJ9G7AUVuhm7KjoHviZ2XxOFKI3FtUHaJwedmt100yQ", 
-            "RequestId": "1722BF86F3DE98E1"
+            "HostId": "jL1IZT8BmFaliIyAn7834ng9hk11JPgxBLJYNMg2IPtcu8A6MVtzs/Yz6FMO5IVe4exEBQIGvGg=", 
+            "RequestId": "2592899758274ED6"
         }
     }
 }
