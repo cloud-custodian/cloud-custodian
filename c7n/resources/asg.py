@@ -29,7 +29,7 @@ from c7n.filters import FilterRegistry, ValueFilter, AgeFilter, Filter
 
 from c7n.manager import ResourceManager, resources
 from c7n.offhours import Time, OffHour, OnHour
-from c7n.tags import TagActionFilter, DEFAULT_TAG
+from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter
 from c7n.utils import local_session, query_instances, type_schema, chunks
 
 log = logging.getLogger('custodian.asg')
@@ -41,6 +41,7 @@ actions = ActionRegistry('asg.actions')
 filters.register('time', Time)
 filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
+filters.register('tag-count', TagCountFilter)
 filters.register('marked-for-op', TagActionFilter)
 
 
