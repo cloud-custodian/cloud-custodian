@@ -167,7 +167,7 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
         for cfg in self.configs.values():
             image_ids.add(cfg['ImageId'])
 
-        self.log.info("querying %d images", len(image_ids))
+        self.log.debug("querying %d images", len(image_ids))
         results = ec2.describe_images(ImageIds=list(image_ids))
         self.images = {i['ImageId']: i for i in results['Images']}
 
@@ -200,7 +200,8 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
                 if bd['DeviceName'] in image_block_devs:
                     continue
                 if 'SnapshotId' in bd['Ebs']:
-                    snaps.setdefault(bd['Ebs']['SnapshotId'], []).append(cid)
+                    snaps.setdefault(
+                        bd['Ebs']['SnapshotId'].strip(), []).append(cid)
                 elif not bd['Ebs'].get('Encrypted'):
                     unencrypted_configs.add(cid)
         if not snaps:
@@ -212,8 +213,7 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
                 unencrypted_configs.update(snaps[s['SnapshotId']])
         return unencrypted_configs
 
-    @staticmethod
-    def get_snapshots(ec2, snap_ids):
+    def get_snapshots(self, ec2, snap_ids):
         """get snapshots corresponding to id, but tolerant of missing."""
         while True:
             try:
@@ -221,7 +221,11 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
                     msg = e.response['Error']['Message']
-                    snap_ids.remove(msg[msg.find("'")+1:msg.rfind("'")])
+                    e_snap_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    self.log.warning("Snapshot not found %s" % e_snap_id)
+                    snap_ids.remove(e_snap_id)
+                    continue
+                raise
             else:
                 return result.get('Snapshots', ())
 
@@ -270,13 +274,22 @@ class VpcIdFilter(ValueFilter):
             if not subnet_ids:
                 continue
             subnets.setdefault(subnet_ids.split(',')[0], []).append(a)
+
         session = local_session(self.manager.session_factory)
         ec2 = session.client('ec2')
-        subnets_info = ec2.describe_subnets(SubnetIds=list(subnets))['Subnets']
 
-        for s in subnets_info:
-            for a in subnets[s['SubnetId']]:
-                a['VpcId'] = s['VpcId']
+        # Invalid subnets on asgs happen, so query all
+        all_subnets = {s['SubnetId']: s for s in ec2.describe_subnets()[
+            'Subnets']}
+
+        for s, s_asgs in subnets.items():
+            if s not in all_subnets:
+                self.log.warning(
+                    "invalid subnet %s for asgs: %s",
+                    s, [a['AutoScalingGroupName'] for a in s_asgs])
+                continue
+            for a in s_asgs:
+                a['VpcId'] = all_subnets[s]['VpcId']
         return super(VpcIdFilter, self).process(asgs)
 
 
