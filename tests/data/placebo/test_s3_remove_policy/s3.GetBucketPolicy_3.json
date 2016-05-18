@@ -1,15 +1,11 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs\"},{\"Sid\":\"AWSCloudTrailWrite20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs/api/AWSLogs/619193117841/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "HostId": "s8JkHnep3npJYHkUIL90SPsQwmrluLwlga2R7rpgzNeefH+o3KeKN/8IEV0kAOSA", 
-            "RequestId": "2B2806588E7A24A3"
-        }, 
-        "Error": {
-            "Message": "The bucket policy does not exist", 
-            "Code": "NoSuchBucketPolicy", 
-            "BucketName": "config-bucket-619193117841"
+            "HTTPStatusCode": 200, 
+            "HostId": "5j0kaGTsABin3xud3ac0BYsES3TeiiWKxUcjylLMTKzM3NySVytnXuSDZymN1XxA", 
+            "RequestId": "DCBD4A8CD30832FF"
         }
     }
 }

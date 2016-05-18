@@ -169,7 +169,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, None),
         ])
-        session_factory = self.record_flight_data('test_s3_missing_policy')
+        session_factory = self.replay_flight_data('test_s3_missing_policy')
         bname = "custodian-encrypt-test"
         session = session_factory()
         client = session.client('s3')
