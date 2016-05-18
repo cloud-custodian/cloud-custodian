@@ -276,8 +276,8 @@ class MissingPolicyStatementFilter(Filter):
             if s.get('StatementId') in required:
                 required.remove(s['StatementId'])
         if not required:
-            return None
-        return b
+            return False
+        return True
 
 
 @actions.register('no-op')
