@@ -118,10 +118,10 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_replication', 'Replication', None, None),
     ('get_bucket_versioning', 'Versioning', None, None),
     ('get_bucket_website', 'Website', None, None),
-    ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')
+    ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
+    ('get_bucket_notification_configuration', 'Notification', None, None)
 #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
 #        ('get_bucket_cors', 'Cors'),
-#        ('get_bucket_notification_configuration', 'Notification')
 )
 
 
@@ -224,6 +224,31 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
+@filters.register('has-statement')
+class HasStatementFilter(Filter):
+    """Find buckets with set of named policy statements."""
+    schema = type_schema(
+        'has-statement',
+        statement_ids={'type': 'array', 'items': {'type': 'string'}})
+
+    def process(self, buckets, event=None):
+        return filter(None, map(self.process_bucket, buckets))
+
+    def process_bucket(self, b):
+        p = b['Policy']
+        if p is None:
+            return b
+        p = json.loads(p['Policy'])
+        required = list(self.data.get('statement_ids', []))
+        statements = p.get('Statement', [])
+        for s in list(statements):
+            if s.get('StatementId') in required:
+                required.remove(s['StatementId'])
+        if not required:
+            return b
+        return None
+
+
 @filters.register('missing-statement')
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):
@@ -231,14 +256,13 @@ class MissingPolicyStatementFilter(Filter):
 
     schema = type_schema(
         'missing-policy-statement',
-        aliases=('missing-statement'),
+        aliases=('missing-statement',),
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, buckets, event=None):
-        with self.executor_factory(max_workers=5) as w:
-            return filter(None, w.map(self.process_bucket, buckets))
+        return filter(None, map(self, buckets))
 
-    def process_bucket(self, b):
+    def __call__(self, b):
         p = b['Policy']
         if p is None:
             return b
@@ -252,8 +276,8 @@ class MissingPolicyStatementFilter(Filter):
             if s.get('StatementId') in required:
                 required.remove(s['StatementId'])
         if not required:
-            return None
-        return b
+            return False
+        return True
 
 
 @actions.register('no-op')
@@ -733,7 +757,7 @@ class LogTarget(Filter):
       - cloudtrail
     """
 
-    schema = type_schema('is-log-target')
+    schema = type_schema('is-log-target', value={'type': 'boolean'})
     executor_factory = executor.MainThreadExecutor
 
     def process(self, buckets, event=None):
@@ -755,7 +779,10 @@ class LogTarget(Filter):
 
         self.log.info("Found %d log targets for %d buckets" % (
             len(log_buckets), len(buckets)))
-        return [b for b in buckets if b['Name'] in log_buckets]
+        if self.data.get('value', True):
+            return [b for b in buckets if b['Name'] in log_buckets]
+        else:
+            return [b for b in buckets if b['Name'] not in log_buckets]
 
     @staticmethod
     def get_s3_bucket_locations(buckets):
@@ -773,7 +800,7 @@ class LogTarget(Filter):
         names = set([b['Name'] for b in buckets])
         for t in client.describe_trails().get('trailList', ()):
             if t.get('S3BucketName') in names:
-                yield (t['S3BucketName'], t['S3KeyPrefix'])
+                yield (t['S3BucketName'], t.get('S3KeyPrefix', ''))
 
     def get_elb_bucket_locations(self):
         session = local_session(self.manager.session_factory)
@@ -792,6 +819,9 @@ class LogTarget(Filter):
             results = p.paginate()
             elbs = results.build_full_result().get(
                 'LoadBalancerDescriptions', ())
+            self.log.info("Queried %d elbs", len(elbs))
+        else:
+            self.log.info("Using %d cached elbs", len(elbs))
 
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
@@ -816,10 +846,11 @@ def _query_elb_attrs(session_factory, elb_set):
     for e in elb_set:
         try:
             attrs = client.describe_load_balancer_attributes(
-                LoadBalancerName=e['LoadBalancerName'])
+                LoadBalancerName=e['LoadBalancerName'])[
+                    'LoadBalancerAttributes']
             if 'AccessLog' in attrs and attrs['AccessLog']['Enabled']:
                 log_targets.append((
-                    attrs['AccessLog']['BucketName'],
+                    attrs['AccessLog']['S3BucketName'],
                     attrs['AccessLog']['S3BucketPrefix']))
         except Exception as err:
             log.warning(

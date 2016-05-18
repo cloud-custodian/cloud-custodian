@@ -825,7 +825,7 @@ class BucketNotification(object):
                 continue
             found = f
         return notifies, found
-    
+
     def add(self, func):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
@@ -862,11 +862,11 @@ class BucketNotification(object):
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceConflictException':
                 raise
-            
+
         notifies.setdefault('LambdaFunctionConfigurations', []).append(n_params)
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'], NotificationConfiguration=notifies)
-            
+
         return True
 
     def remove(self, func):
