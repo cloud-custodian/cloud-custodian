@@ -1,15 +1,11 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-encrypt-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "HostId": "1QT9qtI5HjSKKXzeAEOfbyRkUlQ25G+EpKXRz54XDfB7ktv9l0pm2IZ/YTy32cPdpDK1zhvl1OE=", 
-            "RequestId": "C429C627CD1E173A"
-        }, 
-        "Error": {
-            "Message": "The bucket policy does not exist", 
-            "Code": "NoSuchBucketPolicy", 
-            "BucketName": "config-bucket-619193117841"
+            "HTTPStatusCode": 200, 
+            "HostId": "jxh6eo0CJhqcDsV1NBsTqMZoF8uuWNIXRmWGd5W1vSgWAXGxgMYzSVaTxcycK6VbUUIk0yQ+PcU=", 
+            "RequestId": "F8BD1D97C3185136"
         }
     }
 }
