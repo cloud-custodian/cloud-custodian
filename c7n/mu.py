@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import sys
+import platform
 import tempfile
 import zipfile
 
@@ -84,7 +85,7 @@ class PythonPackageArchive(object):
 
     def create(self):
         assert not self._temp_archive_file, "Archive already created"
-        self._temp_archive_file = tempfile.NamedTemporaryFile()
+        self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
@@ -143,6 +144,7 @@ class PythonPackageArchive(object):
 
     def remove(self):
         # dispose of the temp file for garbag collection
+        os.remove(self._temp_archive_file.name)
         if self._temp_archive_file:
             self._temp_archive_file = None
 
@@ -171,7 +173,7 @@ def custodian_archive(skip=None):
 
     # Some aggressive shrinking
     required = ["concurrent", "yaml", "pkg_resources"]
-    host_platform = os.uname()[0]
+    host_platform = platform.uname()[0]
 
     def lib_filter(root, dirs, files):
         for f in list(files):
