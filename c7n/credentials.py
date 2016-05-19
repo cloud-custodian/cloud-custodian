@@ -23,15 +23,19 @@ from c7n.version import version
 
 class SessionFactory(object):
     
-    def __init__(self, region, profile=None, assume_role=None):
+    def __init__(self, region, profile=None, assume_role=None, keys=None):
         self.region = region
         self.profile = profile
         self.assume_role = assume_role
+        self.keys = keys
 
     def __call__(self, assume=True, region=None):
-        session = Session(
-            region_name=region or self.region,
-            profile_name=self.profile)
+        if self.keys:
+            session = Session(region_name=region or self.region,
+                              **self.keys.as_boto3_kwargs())
+        else:
+            session = Session(region_name=region or self.region,
+                              profile_name=self.profile)
         if self.assume_role and assume:
             session = assumed_session(
                 self.assume_role, "CloudCustodian", session)
