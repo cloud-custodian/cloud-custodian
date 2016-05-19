@@ -305,18 +305,31 @@ class RemoveTag(BaseAction):
         key={'type': 'string'})
 
     def process(self, asgs):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_asg, asgs))
+        error = False
+        key = self.data.get('key', DEFAULT_TAG)
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for asg_set in chunks(asgs, 20):
+                futures[w.submit(self.process_asg_set, asg_set, key)] = asg_set
+            for f in as_completed(futures):
+                asg_set = futures[f]
+                if f.exception():
+                    error = f.exception()
+                    self.log.exception(
+                        "Exception untagging asg:%s tag:%s error:%s" % (
+                            ", ".join([a['AutoScalingGroupName']
+                                       for a in asg_set]),
+                            self.data.get('key', DEFAULT_TAG),
+                            f.exception()))
+        if error:
+            raise error
 
-    def process_asg(self, asg, msg=None):
+    def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
-        tag = self.data.get('key', DEFAULT_TAG)
-        remove_t = {
-            "Key": tag,
-            "ResourceType": "auto-scaling-group",
-            "ResourceId": asg["AutoScalingGroupName"]}
-        client.delete_tags(Tags=[remove_t])
+        tags= [dict(Key=key, ResourceType='auto-scaling-group',
+                    ResourceId=a['AutoScalingGroupName']) for a in asgs]
+        client.delete_tags(Tags=tags)
 
 
 @actions.register('tag')
@@ -333,53 +346,44 @@ class Tag(BaseAction):
         propagate={'type': 'boolean'})
 
     def process(self, asgs):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_asg, asgs))
+        error = False
+        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
+        value = self.data.get(
+            'value', self.data.get(
+                'msg', 'AutoScaleGroup does not meet policy guidelines'))
+        return self.tag(asgs, key, value)
 
-    def process_asg(self, asg, msg=None):
+    def tag(self, asgs, key, value):
+        error = None
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for asg_set in chunks(asgs, 20):
+                futures[w.submit(
+                    self.process_asg_set, asg_set, key, value)] = asg_set
+            for f in as_completed(futures):
+                asg_set = futures[f]
+                if f.exception():
+                    error = f.exception()
+                    self.log.exception(
+                        "Exception untagging asg:%s tag:%s error:%s" % (
+                            ", ".join([a['AutoScalingGroupName']
+                                       for a in asg_set]),
+                            self.data.get('key', DEFAULT_TAG),
+                            f.exception()))
+        if error:
+            raise error
+
+    def process_asg_set(self, asgs, key, value):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
         propagate = self.data.get('propagate_launch', True)
-
-        if 'key' in self.data:
-            key = self.data['key']
-        else:
-            key = self.data.get('tag', DEFAULT_TAG)
-
-        if msg is None:
-            for k in ('value', 'msg'):
-                if k in self.data:
-                    msg = self.data.get(k)
-                    break
-            if msg is None:
-                msg = 'AutoScaleGroup does not meet policy guidelines'
-
-        new_t = {
-            "Key": key,
-            "PropagateAtLaunch": propagate,
-            "ResourceType": "auto-scaling-group",
-            "ResourceId": asg["AutoScalingGroupName"],
-            "Value": msg}
-
-        client.create_or_update_tags(Tags=[new_t])
-        update_tags(asg, new_t)
-
-
-def update_tags(asg, new_t):
-    tags = list(asg.get('Tags', []))
-    found = False
-    for idx, t in enumerate(asg.get('Tags', [])):
-        if t['Key'] == new_t['Key']:
-            tags[idx] = new_t
-            found = True
-            break
-    if not found:
-        tags.append(new_t)
-    asg['Tags'] = tags
+        tags= [dict(Key=key, ResourceType='auto-scaling-group', Value=value,
+                    ResourceId=a['AutoScalingGroupName']) for a in asgs]
+        client.create_or_update_tags(Tags=tags)
 
 
 @actions.register('propagate-tags')
-class PropagateTags(Tag):
+class PropagateTags(BaseAction):
     """Propagate tags to an asg instances.
 
     In AWS changing an asg tag does not propagate to instances.
@@ -479,7 +483,7 @@ class PropagateTags(Tag):
 
 
 @actions.register('rename-tag')
-class RenameTag(Tag):
+class RenameTag(BaseAction):
     """Rename a tag on an AutoScaleGroup.
     """
 
@@ -577,18 +581,7 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
-
-        futures = []
-        with self.executor_factory(max_workers=10) as w:
-            for a in asgs:
-                futures.append(
-                    w.submit(self.process_asg, a, msg))
-
-        for f in as_completed(futures):
-            if f.exception():
-                log.exception("Exception processing asg:%s" % (
-                    a['AutoScalingGroupName']))
-                continue
+        self.tag(asgs, self.data['key'], msg)
 
 
 @actions.register('suspend')
