@@ -39,7 +39,7 @@ class SessionFactory(object):
         self.aws_session_token = aws_session_token
 
     def __call__(self, assume=True, region=None):
-        if self.aws_access_key_id and self.aws_secret_access_key::
+        if self.aws_access_key_id and self.aws_secret_access_key:
             kwargs = {'aws_access_key_id': self.aws_access_key_id, 
                       'aws_secret_access_key': self.aws_secret_access_key,
                       'aws_session_token': self.aws_session_token if self.aws_session_token else None}
