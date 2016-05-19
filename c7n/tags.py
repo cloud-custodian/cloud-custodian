@@ -37,7 +37,7 @@ def register_tags(filters, actions, id_key):
     filters.register('tag-count', TagCountFilter)
     actions.register('mark-for-op', TagDelayedAction.set_id(id_key))
     actions.register('tag-trim', TagTrim.set_id(id_key))
-    
+
     tag = Tag.set_id(id_key)
     actions.register('mark', tag)
     actions.register('tag', tag)
@@ -46,7 +46,7 @@ def register_tags(filters, actions, id_key):
     actions.register('unmark', remove_tag)
     actions.register('untag', remove_tag)
     actions.register('remove-tag', remove_tag)
-    
+
 ACTIONS = [
     'suspend', 'resume', 'terminate', 'stop', 'start',
     'delete', 'deletion']
@@ -61,8 +61,8 @@ class ResourceTag(object):
     @classmethod
     def set_id(cls, key):
         return type(cls.__name__, (cls,), {'id_key': key})
-                    
-    
+
+
 class TagTrim(Action, ResourceTag):
     """Automatically remove tags from an ec2 resource.
 
@@ -72,7 +72,7 @@ class TagTrim(Action, ResourceTag):
     space while preserving a given set of tags.
 
     .. code-block :: yaml
-    
+
       - policies:
          - name: ec2-tag-trim
            comment: |
@@ -80,7 +80,7 @@ class TagTrim(Action, ResourceTag):
              they match the target tag count, in this case 7 so we
              that we free up a tag slot for another usage.
            resource: ec2
-           filters: 
+           filters:
                # Filter down to resources which already have 8 tags
                # as we need space for 3 more, this also ensures that
                # metrics reporting is correct for the policy.
@@ -91,7 +91,7 @@ class TagTrim(Action, ResourceTag):
            actions:
              - type: tag-trim
                space: 3
-               preserve: 
+               preserve:
                 - OwnerContact
                 - ASV
                 - CMDBEnvironment
@@ -109,10 +109,10 @@ class TagTrim(Action, ResourceTag):
         self.preserve = set(self.data.get('preserve'))
         self.seen = set()
         self.space = self.data.get('space', 3)
-        
+
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
-                      
+
     def process_resource(self, i):
         # Can't really go in batch parallel without some heuristics
         # without some more complex matching wrt to grouping resources
@@ -130,7 +130,7 @@ class TagTrim(Action, ResourceTag):
         keys = set(tag_map)
         preserve = self.preserve.union(keys)
         candidates = keys - self.preserve
-        
+
         if self.space:
             # Free up slots to fit
             remove = len(candidates) - (
@@ -179,14 +179,14 @@ class TagActionFilter(Filter):
         tag={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
         op={'enum': ACTIONS})
-    
+
     current_date = None
 
     def __call__(self, i):
         tag = self.data.get('tag', DEFAULT_TAG)
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
-        
+
         v = None
         for n in i.get('Tags', ()):
             if n['Key'] == tag:
@@ -203,7 +203,7 @@ class TagActionFilter(Filter):
 
         if action != op:
             return False
-        
+
         try:
             action_date = parse(action_date_str)
         except:
@@ -218,7 +218,7 @@ class TagActionFilter(Filter):
 
 class TagCountFilter(Filter):
     """Simplify tag counting..
-    
+
     ie. these two blocks are equivalent
 
     .. code-block :: yaml
@@ -245,7 +245,7 @@ class TagCountFilter(Filter):
         tag_count = len([
             t['Key'] for t in i.get('Tags', [])
             if not t['Key'].startswith('aws:')])
-        return op(tag_count, count)    
+        return op(tag_count, count)
 
 
 class Tag(Action, ResourceTag):
@@ -265,7 +265,7 @@ class Tag(Action, ResourceTag):
         # Legacy
         msg = self.data.get('msg')
         msg = self.data.get('value') or msg
-        
+
         tag = self.data.get('tag', DEFAULT_TAG)
         tag = self.data.get('key') or tag
 
@@ -306,7 +306,7 @@ class Tag(Action, ResourceTag):
 class RemoveTag(Action, ResourceTag):
     """Remove tags from ec2 resources.
     """
-    
+
     batch_size = 100
     concurrency = 2
 
@@ -317,7 +317,7 @@ class RemoveTag(Action, ResourceTag):
     def process(self, resources):
         tags = self.data.get('tags', [DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
-        
+
         with self.executor_factory(max_workers=self.concurrency) as w:
             futures = []
             for resource_set in utils.chunks(resources, size=batch_size):
@@ -337,7 +337,7 @@ class RemoveTag(Action, ResourceTag):
             Resources=[v[self.id_key] for v in vol_set],
             Tags=[{'Key': k for k in tag_keys}],
             DryRun=self.manager.config.dryrun)
-        
+
 
 class TagDelayedAction(Action, ResourceTag):
     """Tag resources for future action.
@@ -364,13 +364,13 @@ class TagDelayedAction(Action, ResourceTag):
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'enum': ACTIONS},
         batch_size={'type': 'integer', 'minimum': 1})
-    
+
     def process(self, resources):
-        
+
         # Move this to policy? / no resources bypasses actions?
         if not len(resources):
             return
-        
+
         msg_tmpl = self.data.get(
             'msg',
             'Resource does not meet policy: {op}@{action_date}')
@@ -378,7 +378,7 @@ class TagDelayedAction(Action, ResourceTag):
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
         date = self.data.get('days', 4)
-        
+
         n = datetime.now(tz=tzutc())
         action_date = n + timedelta(days=date)
         msg = msg_tmpl.format(
@@ -388,7 +388,7 @@ class TagDelayedAction(Action, ResourceTag):
             len(resources), op, action_date.strftime('%Y/%m/%d')))
 
         tags = [{'Key': tag, 'Value': msg}]
-        
+
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for resource_set in utils.chunks(resources, size=200):
@@ -408,5 +408,3 @@ class TagDelayedAction(Action, ResourceTag):
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
-        
-        

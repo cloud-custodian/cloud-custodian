@@ -3,13 +3,13 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 404, 
-            "HostId": "4/imlckF0aQn88KQhk7HN/tmZqMfhTqyfcBBoJh+v5uTU8kXQ4gzNSP1dWledxwRrLdMtrMzjQE=", 
-            "RequestId": "E5430424DB1ABAC6"
+            "HostId": "SGQM1cGSdb0JT3Ci77yEnhE//FAd3Stg6hu+8igNhBnMn01RukpI2sLvuCkgZ2NSV/rhAYEBN98=", 
+            "RequestId": "B3DEC61ED23D12E2"
         }, 
         "Error": {
             "Message": "The bucket policy does not exist", 
             "Code": "NoSuchBucketPolicy", 
-            "BucketName": "custodian-encrypt-test"
+            "BucketName": "cf-templates-nyrabrca5x2n-us-east-1"
         }
     }
 }

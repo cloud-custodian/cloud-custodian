@@ -242,6 +242,9 @@ class ValueFilter(Filter):
             self.op = self.data.get('op')
             self.v = self.data.get('value')
 
+        if i is None:
+            return False
+
         # Value extract
         if self.k.startswith('tag:'):
             tk = self.k.split(':', 1)[1]
