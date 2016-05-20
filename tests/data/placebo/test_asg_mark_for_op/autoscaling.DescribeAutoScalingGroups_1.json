@@ -3,7 +3,7 @@
     "data": {
         "AutoScalingGroups": [
             {
-                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:74979cda-27ca-4e8d-a3e9-a562d37794d6:autoScalingGroupName/CustodianASG", 
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG", 
                 "HealthCheckGracePeriod": 300, 
                 "SuspendedProcesses": [], 
                 "DesiredCapacity": 3, 
@@ -12,15 +12,15 @@
                         "ResourceType": "auto-scaling-group", 
                         "ResourceId": "CustodianASG", 
                         "PropagateAtLaunch": true, 
-                        "Value": "GetSome", 
-                        "Key": "CustomerId"
+                        "Value": "ubuntu", 
+                        "Key": "Platform"
                     }, 
                     {
                         "ResourceType": "auto-scaling-group", 
                         "ResourceId": "CustodianASG", 
                         "PropagateAtLaunch": true, 
-                        "Value": "ubuntu", 
-                        "Key": "Linux"
+                        "Value": "AutoScaleGroup does not meet org tag policy: suspend@2016/05/21", 
+                        "Key": "custodian_action"
                     }
                 ], 
                 "EnabledMetrics": [], 
@@ -28,47 +28,22 @@
                 "AutoScalingGroupName": "CustodianASG", 
                 "DefaultCooldown": 300, 
                 "MinSize": 3, 
-                "Instances": [
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2a", 
-                        "InstanceId": "i-9206fe54", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2b", 
-                        "InstanceId": "i-7b5241a3", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2c", 
-                        "InstanceId": "i-242dd4f9", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }
-                ], 
+                "Instances": [], 
                 "MaxSize": 3, 
                 "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
                 "TerminationPolicies": [
                     "Default"
                 ], 
-                "LaunchConfigurationName": "CustodianASGTest", 
+                "LaunchConfigurationName": "CustodianASGTestCopyCopy", 
                 "CreatedTime": {
-                    "hour": 12, 
+                    "hour": 18, 
                     "__class__": "datetime", 
                     "month": 5, 
-                    "second": 45, 
-                    "microsecond": 395000, 
+                    "second": 32, 
+                    "microsecond": 276000, 
                     "year": 2016, 
-                    "day": 8, 
-                    "minute": 12
+                    "day": 16, 
+                    "minute": 31
                 }, 
                 "AvailabilityZones": [
                     "us-west-2c", 
@@ -81,7 +56,7 @@
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "538dc492-1522-11e6-a468-37acb4b5a1b2"
+            "RequestId": "5478b762-1e90-11e6-8e08-192325a99f6e"
         }
     }
 }

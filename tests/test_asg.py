@@ -144,7 +144,7 @@ class AutoScalingTest(BaseTest):
             'name': 'asg-rename-tag',
             'resource': 'asg',
             'filters': [
-                {'tag:Linux': 'ubuntu'}],
+                {'tag:Platform': 'ubuntu'}],
             'actions': [
                 {'type': 'mark-for-op', 'key': 'custodian_action',
                  'op': 'suspend', 'days': 1}
