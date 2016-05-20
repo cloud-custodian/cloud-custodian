@@ -370,7 +370,6 @@ class Tag(BaseAction):
                             f.exception(),
                             ", ".join([a['AutoScalingGroupName']
                                        for a in asg_set])))
-
         if error:
             raise error
 
@@ -512,7 +511,7 @@ class RenameTag(BaseAction):
         self.log.info("Renaming %s to %s on %d asgs" % (
             source, dest, len(filtered)))
 
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 
     def process_asg(self, asg):
