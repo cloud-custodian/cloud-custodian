@@ -365,11 +365,11 @@ class Tag(BaseAction):
                 if f.exception():
                     error = f.exception()
                     self.log.exception(
-                        "Exception untagging asg:%s tag:%s error:%s" % (
-                            ", ".join([a['AutoScalingGroupName']
-                                       for a in asg_set]),
+                        "Exception untagging tag:%s error:%s asg:%s" % (
                             self.data.get('key', DEFAULT_TAG),
-                            f.exception()))
+                            f.exception(),
+                            ", ".join([a['AutoScalingGroupName']
+                                       for a in asg_set])))
         if error:
             raise error
 
@@ -378,6 +378,7 @@ class Tag(BaseAction):
         client = session.client('autoscaling')
         propagate = self.data.get('propagate_launch', True)
         tags= [dict(Key=key, ResourceType='auto-scaling-group', Value=value,
+                    PropagateAtLaunch=propagate,
                     ResourceId=a['AutoScalingGroupName']) for a in asgs]
         client.create_or_update_tags(Tags=tags)
 
@@ -510,7 +511,7 @@ class RenameTag(BaseAction):
         self.log.info("Renaming %s to %s on %d asgs" % (
             source, dest, len(filtered)))
 
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 
     def process_asg(self, asg):
