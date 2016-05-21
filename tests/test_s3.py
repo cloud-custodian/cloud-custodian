@@ -365,9 +365,6 @@ class S3Test(BaseTest):
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
-        # For recording
-        #import time
-        #time.sleep(7)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
@@ -392,6 +389,56 @@ class S3Test(BaseTest):
             'ServerSideEncryption' in client.head_object(
                 Bucket=bname, Key='home.txt'))
 
+    def test_global_grants_filter_option(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)        
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_acl', 'Acl', None, None)
+            ])
+        session_factory = self.replay_flight_data(
+            'test_s3_global_grants_filter')
+        bname = 'custodian-testing-grants'
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        
+        public = 'http://acs.amazonaws.com/groups/global/AllUsers'
+    
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "k_vertigo",
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': public},
+                     'Permission': 'WRITE'}
+                    ]})
+        p = self.load_policy(
+            {'name': 's3-global-check',
+             'resource': 's3',
+             'filters': [
+                 {'Name': 'custodian-testing-grants'},
+                 {'type': 'global-grants',
+                  'permissions': ['READ_ACP']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {'name': 's3-global-check',
+             'resource': 's3',
+             'filters': [
+                 {'Name': 'custodian-testing-grants'},
+                 {'type': 'global-grants',
+                  'permissions': ['WRITE']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)        
+        
     def test_global_grants_filter_and_remove(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
@@ -402,6 +449,7 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
+        
         public = 'http://acs.amazonaws.com/groups/global/AllUsers'
         client.put_bucket_acl(
             Bucket=bname,

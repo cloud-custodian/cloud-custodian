@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-testing-grants", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "MKo7h6OEHp9DAoPVDX9ljFCCFMueknq9ndzjBFiHti5Ci2MCprNMIBo8+t6SRPjfmbgR5CxrTZI=", 
+            "RequestId": "8C0D956BCC58B1F6"
+        }
+    }
+}

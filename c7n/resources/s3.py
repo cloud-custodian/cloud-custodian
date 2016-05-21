@@ -191,7 +191,10 @@ def bucket_client(session, b, kms=False):
 @filters.register('global-grants')
 class GlobalGrantsFilter(Filter):
 
-    schema = type_schema('global-grants')
+    schema = type_schema('global-grants', permissions={
+        'type': 'array', 'items': {
+            'type': 'string', 'enum': [
+                'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
@@ -207,12 +210,15 @@ class GlobalGrantsFilter(Filter):
         if not acl or not acl['Grants']:
             return
         results = []
+        perms = self.data.get('permissions', [])
         for grant in acl['Grants']:
             if 'URI' not in grant.get("Grantee", {}):
                 continue
-            if grant['Grantee']['URI'] in [self.AUTH_ALL, self.GLOBAL_ALL]:
-                if grant['Permission'] == 'READ' and b['Website']:
-                    continue
+            if grant['Grantee']['URI'] not in [self.AUTH_ALL, self.GLOBAL_ALL]:
+                continue
+            if grant['Permission'] == 'READ' and b['Website']:
+                continue
+            if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])
 
         c = bucket_client(self.manager.session_factory(), b)
