@@ -81,6 +81,63 @@ def generateBucketContents(s3, bucket, contents=None):
 
 class S3Test(BaseTest):
 
+    def test_multipart_large_file(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)        
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        self.patch(s3, 'MAX_COPY_SIZE', (1024 * 1024 * 6.1))
+        session_factory = self.replay_flight_data('test_s3_multipart_file')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-largef-test'
+        key = 'hello'
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        class wrapper(object):
+            def __init__(self, d, length):
+                self.d = d
+                self.len = length
+                self.counter = length
+                
+            def read(self, size):
+                if self.counter == 0:
+                    return ""
+                if size > self.counter:
+                    size = self.counter
+                    self.counter = 0
+                else:
+                    self.counter -= size
+                return self.d.read(size)
+
+            def seek(self, offset, whence=0):
+                if whence == 2 and offset == 0:
+                    self.counter = 0
+                elif whence == 0 and offset == 0:
+                    self.counter = self.len
+
+            def tell(self):
+                return self.len - self.counter
+            
+        size = 1024 * 1024 * 16
+        client.put_object(
+            Bucket=bname, Key=key,
+            Metadata={'planet': 'earth'},
+            Body=wrapper(open('/dev/zero'), size), ContentLength=size)
+        info = client.head_object(Bucket=bname, Key=key)
+        p = self.load_policy({
+            'name': 'encrypt-obj',
+            'resource': 's3',
+            'filters': [{"Name": bname}],
+            'actions': ['encrypt-keys']}, session_factory=session_factory)
+        p.run()
+        post_info = client.head_object(Bucket=bname, Key='hello')
+        self.assertTrue('ServerSideEncryption' in post_info)
+        self.assertEqual(post_info['Metadata'], {'planet': 'earth'})
+        # etags on multipart do not reflect md5 :-(
+        self.assertTrue(info['ContentLength'], post_info['ContentLength'])
+
     def test_log_target(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [

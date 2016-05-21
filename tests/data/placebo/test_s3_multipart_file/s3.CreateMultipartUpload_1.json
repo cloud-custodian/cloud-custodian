@@ -1,0 +1,14 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Bucket": "custodian-largef-test", 
+        "UploadId": "F2iE9ZirKQ0ysUYTDnzUpIFTA.MDKWSTg9snsI1Qe1e3q6.l0ZQrPcNVkaQG4cdNoL9PpS2Gd204NT4BHwbkelYHEKVEWOe0pult7n3Hs2oBs5yC4XAW_ZBlvnhglBaf", 
+        "Key": "hello", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "vPC6L09vdbMPFay1t8mPmW8AF41VadnzTRsHUHwE7mkImbIXKCY4+8sEsKz5hhiv", 
+            "RequestId": "94279BC9CAD19DF8"
+        }, 
+        "ServerSideEncryption": "AES256"
+    }
+}

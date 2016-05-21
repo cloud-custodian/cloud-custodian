@@ -32,6 +32,8 @@ def init():
     s3 = boto3.client('s3')
     with open('config.json') as fh:
         config = json.load(fh)
+        # multipart copy can on multigb file can take a long time
+        config['large'] = False
 
 
 def process_key_event(event, context):

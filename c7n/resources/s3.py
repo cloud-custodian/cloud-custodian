@@ -45,6 +45,7 @@ import functools
 import json
 import itertools
 import logging
+import math
 import os
 import time
 
@@ -64,6 +65,9 @@ log = logging.getLogger('custodian.s3')
 
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
+
+
+MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
 
 
 @resources.register('s3')
@@ -622,6 +626,7 @@ class EncryptExtantKeys(ScanBucket):
         'properties': {
             'report-only': {'type': 'boolean'},
             'glacier': {'type': 'boolean'},
+            'large': {'type': 'boolean'},
             'crypto': {'enum': ['AES256', 'aws:kms']}
             }
         }
@@ -673,7 +678,6 @@ class EncryptExtantKeys(ScanBucket):
 
     def process_key(self, s3, key, bucket_name, info=None):
         k = key['Key']
-
         if info is None:
             info = s3.head_object(Bucket=bucket_name, Key=k)
 
@@ -708,6 +712,10 @@ class EncryptExtantKeys(ScanBucket):
                   'MetadataDirective': 'COPY',
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
+
+        if key['Size'] > MAX_COPY_SIZE and self.data.get('large', True):
+            return self.process_large_file(s3, bucket_name, key, info, params)
+
         s3.copy_object(**params)
         return k
 
@@ -733,6 +741,50 @@ class EncryptExtantKeys(ScanBucket):
             Key=key['Key'],
             VersionId=key['VersionId'])
         return key['Key'], key['VersionId']
+
+    def process_large_file(self, s3, bucket_name, key, info, params):
+        """For objects over 5gb, use multipart upload to copy"""
+        part_size = MAX_COPY_SIZE - (1024 ** 2)
+        num_parts = int(math.ceil(key['Size'] / part_size))
+        source = params.pop('CopySource')
+
+        params.pop('MetadataDirective')
+        if 'Metadata' in info:
+            params['Metadata'] = info['Metadata']
+
+        upload_id = s3.create_multipart_upload(**params)['UploadId']
+
+        params = {'Bucket': bucket_name,
+                  'Key': key['Key'],
+                  'CopySource': "/%s/%s" % (bucket_name, key['Key']),
+                  'UploadId': upload_id,
+                  'CopySource': source,
+                  'CopySourceIfMatch': key['ETag']}
+
+        def upload_part(part_num):
+            part_params = dict(params)
+            part_params['CopySourceRange'] = "bytes=%d-%d" % (
+                part_size * (part_num - 1),
+                min(part_size * part_num - 1, key['Size'] - 1))
+            part_params['PartNumber'] = part_num
+            response = s3.upload_part_copy(**part_params)
+            return {'ETag': response['CopyPartResult']['ETag'],
+                    'PartNumber': part_num}
+
+        try:
+            with self.executor_factory(max_workers=2) as w:
+                parts = list(w.map(upload_part, range(1, num_parts+1)))
+        except Exception:
+            log.warning(
+                "Error during large key copy bucket: %s key: %s, "
+                "aborting upload", bucket_name, key, exc_info=True)
+            s3.abort_multipart_upload(
+                Bucket=bucket_name, Key=key['Key'], UploadId=upload_id)
+            raise
+        s3.complete_multipart_upload(
+            Bucket=bucket_name, Key=key['Key'], UploadId=upload_id,
+            MultipartUpload={'Parts': parts})
+        return key['Key']
 
 
 def restore_complete(restore):
