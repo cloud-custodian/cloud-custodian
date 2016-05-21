@@ -615,7 +615,11 @@ class Suspend(BaseAction):
             ec2_client.stop_instances(
                 InstanceIds=[i['InstanceId'] for i in asg['Instances']])
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
+            if e.response['Error']['Code'] in (
+                    'InvalidInstanceID.NotFound',
+                    'IncorrectInstanceState'):
+                log.warning("Erroring stopping asg instances %s %s" % (
+                    asg['AutoScalingGroupName'], e))
                 return
             raise
 

@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-testing-grants", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "Xr9zSKZaGDOpXEgD8/toaEBaOwgn50ddzIOPtugcHuooWVMv5XWhnr/2yDtT1hsyupKRdAoVpqw=", 
+            "RequestId": "5E4D9CB795DD19FF"
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

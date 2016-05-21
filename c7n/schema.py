@@ -132,7 +132,9 @@ def generate(resource_types=()):
             'required': ['name', 'resource'],
             'additionalProperties': False,
             'properties': {
-                'name': {'type': 'string'},
+                'name': {
+                    'type': 'string',
+                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
                 'resource': {'type': 'string'},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},                
