@@ -385,12 +385,13 @@ class S3Test(BaseTest):
             'filters': [{'Name': bname}],
             'actions': ['encrypt-keys']}, session_factory=session_factory)
         resources = p.run()
+
         self.assertTrue(
             'ServerSideEncryption' in client.head_object(
                 Bucket=bname, Key='home.txt'))
 
     def test_global_grants_filter_option(self):
-        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)        
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
             ])

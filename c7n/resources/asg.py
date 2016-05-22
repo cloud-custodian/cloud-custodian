@@ -51,6 +51,15 @@ class ASG(ResourceManager):
     filter_registry = filters
     action_registry = actions
 
+    def get_resources(self, asg_names):
+        c = local_session(self.session_factory).client('autoscaling')
+        try:
+            return c.describe_auto_scaling_groups(
+                AutoScalingGroupNames=asg_names)['AutoScalingGroups']
+        except ClientError as e:
+            log.warning("event, cwe not found: %s" % (asg_names))
+            return []
+
     def resources(self):
         c = self.session_factory().client('autoscaling')
         if self._cache.load():

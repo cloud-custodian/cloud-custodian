@@ -68,15 +68,17 @@ from concurrent.futures import as_completed
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
 from c7n.manager import ResourceManager, resources
+from c7n.tags import (
+    TagCountFilter, TagActionFilter, TagDelayedAction as _TagDelayedAction)
 from c7n.utils import local_session, type_schema, get_account_id
-
-from functools import partial
 
 log = logging.getLogger('custodian.rds')
 
-
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
+
+filters.register('tag-count', TagCountFilter)
+filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('rds')
@@ -84,6 +86,8 @@ class RDS(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+    account_id = None
 
     def resources(self):
         session = local_session(self.session_factory)
@@ -101,8 +105,11 @@ class RDS(ResourceManager):
         results = p.paginate(Filters=query)
         dbs = list(itertools.chain(*[rp['DBInstances'] for rp in results]))
 
+        if self.account_id is None:
+            self.account_id = get_account_id(session)
+
         _rds_tags(dbs, self.session_factory, self.executor_factory,
-                  get_account_id(session), region=self.config.region)
+                  self.account_id, region=self.config.region)
         self._cache.save(
             {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
         return self.filter_resources(dbs)
@@ -164,6 +171,28 @@ class DefaultVpc(Filter):
                 return []
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
+
+
+@actions.register('mark-for-op')
+class TagDelayedAction(_TagDelayedAction):
+
+    schema = type_schema(
+        'mark-for-op', rinherit=_TagDelayedAction.schema,
+        ops={'enum': ['delete', 'snapshot']})
+
+    batch_size = 5
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        return super(TagDelayedAction, self).process(resources)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
 @actions.register('delete')

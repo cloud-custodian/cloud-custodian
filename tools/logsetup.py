@@ -29,7 +29,6 @@ from c7n.mu import (
     LambdaFunction,
     LambdaManager,
     PythonPackageArchive)
-    
 
 log = logging.getLogger("custodian.logsetup")
 
@@ -40,7 +39,7 @@ def setup_parser():
 
     # Log Group match
     parser.add_argument("--prefix", default=None)
-    parser.add_argument("-g", "--group", action="append")    
+    parser.add_argument("-g", "--group", action="append")
     parser.add_argument("--pattern", default="Traceback")
 
     # Connection stuff
@@ -65,10 +64,15 @@ def get_groups(session_factory, options):
 
     results = logs.get_paginator('describe_log_groups').paginate(**params)
     groups = list(itertools.chain(*[rp['logGroups'] for rp in results]))
-    
+
     if options.group:
+        log.info("Filtering on %s for %d groups" % (
+            options.group,
+            len([g['logGroupName'] for g in groups])))
         groups = [g for g in groups if g['logGroupName'] in options.group]
 
+    log.info("Subscribing to groups: %s" % (
+        " \n".join([g['logGroupName'] for g in groups])))
     return groups
 
 
@@ -99,7 +103,7 @@ def get_function(session_factory, options, groups):
             'subject': options.subject
         }))
     archive.close()
-    
+
     return LambdaFunction(config, archive)
 
 
@@ -109,14 +113,14 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('botocore').setLevel(logging.ERROR)
-    
+
     if not options.group and not options.prefix:
         print("Error: Either group or prefix must be specified")
         sys.exit(1)
 
     session_factory = SessionFactory(
         options.region, options.profile, options.assume)
-    
+
     groups = get_groups(session_factory, options)
     func = get_function(session_factory, options, groups)
     manager = LambdaManager(session_factory)

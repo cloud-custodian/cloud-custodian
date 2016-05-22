@@ -362,8 +362,9 @@ class TagDelayedAction(Action, ResourceTag):
         'mark-for-op',
         tag={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
-        op={'enum': ACTIONS},
-        batch_size={'type': 'integer', 'minimum': 1})
+        op={'enum': ACTIONS})
+
+    batch_size = 200
 
     def process(self, resources):
 
@@ -391,7 +392,7 @@ class TagDelayedAction(Action, ResourceTag):
 
         with self.executor_factory(max_workers=2) as w:
             futures = []
-            for resource_set in utils.chunks(resources, size=200):
+            for resource_set in utils.chunks(resources, size=self.batch_size):
                 futures.append(
                     w.submit(self.process_resource_set, resource_set, tags))
 
@@ -402,8 +403,7 @@ class TagDelayedAction(Action, ResourceTag):
                             tags, f.exception()))
 
     def process_resource_set(self, resource_set, tags):
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
         client.create_tags(
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,

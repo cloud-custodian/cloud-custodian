@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n",
-    version='0.8.10',
+    version='0.8.11',
     description="Cloud Custodian - Policy Rules Engine",
     long_description_markdown_filename='README.md',
     classifiers=[

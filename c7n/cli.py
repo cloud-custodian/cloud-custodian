@@ -14,15 +14,19 @@
 
 import argparse
 import logging
+import os
 
 from c7n import commands, resources
 
 
 def _default_options(p):
-    p.add_argument("-r", "--region", default="us-east-1",
-                   help="AWS Region to target (Default: us-east-1)")
-    p.add_argument("--profile", default=None,
-                   help="AWS Account Config File Profile to utilize")
+    p.add_argument(
+        "-r", "--region",
+        default=os.environ.get('AWS_DEFAULT_REGION', "us-east-1"),
+        help="AWS Region to target (Default: us-east-1)")
+    p.add_argument(
+        "--profile", default=os.environ.get('AWS_PROFILE'),
+        help="AWS Account Config File Profile to utilize")
     p.add_argument("--assume", default=None, dest="assume_role",
                    help="Role to assume")
     p.add_argument("-c", "--config", required=True,

@@ -62,6 +62,15 @@ class SchemaTest(BaseTest):
         self.assertTrue(
             "'type': 'ebs'" in error.message)
 
+    def test_vars_and_tags(self):
+        data = {
+            'vars': {'alpha': 1, 'beta': 2},
+            'policies': [{
+                'name': 'test',
+                'resource': 'ec2',
+                'tags': ['controls']}]}
+        self.assertEqual(list(self.validator.iter_errors(data)), [])
+
     def test_semantic_error_on_value_derived(self):
         data = {
             'policies': [

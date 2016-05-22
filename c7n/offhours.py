@@ -129,6 +129,8 @@ import logging
 
 from dateutil import zoneinfo
 
+from c7n.utils import type_schema
+
 DEFAULT_TAG = "maid_offhours"
 
 TZ_ALIASES = {
@@ -282,12 +284,20 @@ class Time(Filter):
 
 class OffHour(Time):
 
+    schema = type_schema(
+        'offhour', rinherit=Time.schema, required=['offhour', 'default_tz'],
+        offhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+
     def get_sentinel_time(self, tz):
         t = super(OffHour, self).get_sentinel_time(tz)
         return t.replace(hour=self.data.get('offhour', DEFAULT_OFFHOUR))
 
                          
 class OnHour(Time):
+
+    schema = type_schema(
+        'onhour', rinherit=Time.schema, required=['onhour', 'default_tz'],
+        onhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
 
     def get_sentinel_time(self, tz):
         t = super(OnHour, self).get_sentinel_time(tz)
