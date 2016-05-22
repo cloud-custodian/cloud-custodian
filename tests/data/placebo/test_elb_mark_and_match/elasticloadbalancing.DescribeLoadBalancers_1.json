@@ -1,0 +1,75 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-389e3d53", 
+                    "subnet-3e9e3d55", 
+                    "subnet-3f9e3d54"
+                ], 
+                "CanonicalHostedZoneNameID": "Z33MTJ483KN6FU", 
+                "CanonicalHostedZoneName": "CloudCustodian-1762224948.us-west-2.elb.amazonaws.com", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 80, 
+                            "LoadBalancerPort": 80, 
+                            "Protocol": "HTTP", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": []
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 10, 
+                    "Interval": 30, 
+                    "Target": "HTTP:80/index.html", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "VPCId": "vpc-399e3d52", 
+                "BackendServerDescriptions": [], 
+                "Instances": [
+                    {
+                        "InstanceId": "i-9432cb49"
+                    }
+                ], 
+                "DNSName": "CloudCustodian-1762224948.us-west-2.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-0a08e365"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": []
+                }, 
+                "LoadBalancerName": "CloudCustodian", 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 17, 
+                    "microsecond": 610000, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 20
+                }, 
+                "AvailabilityZones": [
+                    "us-west-2a", 
+                    "us-west-2b", 
+                    "us-west-2c"
+                ], 
+                "Scheme": "internet-facing", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "619193117841", 
+                    "GroupName": "default"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "538ff653-201e-11e6-a63e-ab6d48bc31eb"
+        }
+    }
+}
