@@ -124,7 +124,7 @@ class Policy(object):
 
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
-            raise ValueError("Invalid push event mode %s" % self.data)
+            raise ValueError("Unknown push event mode %s" % self.data)
 
         self.log.info('Found resource ids: %s' % resource_ids)
         if not resource_ids:

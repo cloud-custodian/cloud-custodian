@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5418877a-201e-11e6-a63e-ab6d48bc31eb"
+        }, 
+        "TagDescriptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "ubuntu", 
+                        "Key": "Platform"
+                    }
+                ], 
+                "LoadBalancerName": "CloudCustodian"
+            }
+        ]
+    }
+}

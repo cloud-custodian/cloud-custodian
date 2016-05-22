@@ -60,16 +60,19 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, FilterValidationError
+from c7n.tags import (
+    TagCountFilter, TagActionFilter, TagDelayedAction as _TagDelayedAction)
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, chunks, type_schema
 
-from functools import partial
-
 log = logging.getLogger('custodian.elb')
-
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
+
+
+filters.register('tag-count', TagCountFilter)
+filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('elb')
@@ -90,8 +93,9 @@ class ELB(ResourceManager):
         c = self.session_factory().client('elb')
         p = c.get_paginator('describe_load_balancers')
         results = p.paginate()
-        elbs = list(itertools.chain(
-            *[self.get_elbs_from_result_page(c, rp) for rp in results]))
+        elbs= list(itertools.chain(
+            *[rp['LoadBalancerDescriptions'] for rp in results]))
+        _elb_tags(elbs, self.session_factory, self.executor_factory)
         self._cache.save(
             {'region': self.config.region, 'resource': 'elb'}, elbs)
 
@@ -100,53 +104,48 @@ class ELB(ResourceManager):
     def get_resources(self, resource_ids):
         c = local_session(self.session_factory).client('elb')
         try:
-            return c.describe_load_balancers(
-                LoadBalancerNames=resource_ids).get(
-                    'LoadBalancerDescriptions', ())
+            return _elb_tags(
+                c.describe_load_balancers(
+                    LoadBalancerNames=resource_ids).get(
+                        'LoadBalancerDescriptions', ()),
+                self.session_factory, self.executor_factory)
         except ClientError as e:
             if e.response['Error']['Code'] == "LoadBalancerNotFound":
                 return []
             raise
 
-    def get_elbs_from_result_page(self, client, rp):
-        elb_descriptions = rp['LoadBalancerDescriptions']
-        self.add_tags_to_results(client, elb_descriptions)
-        return elb_descriptions
 
-    def add_tags_to_results(self, client, elbs):
-        """
-        Gets the tags for the ELBs and adds them to
-        the result set.
-        """
-        elb_names = [elb['LoadBalancerName'] for elb in elbs]
-        names_to_tags = {}
-        fn = partial(self.process_tags, client=client)
-        futures = []
-        with self.executor_factory(max_workers=3) as w:
-            # max 20 ELBs per call (API limitation)
-            for elb_names_chunk in chunks(elb_names, size=20):
-                    futures.append(
-                        w.submit(fn, elb_names_chunk))
+def _elb_tags(elbs, session_factory, executor_factory):
 
-        for f in as_completed(futures):
-            if f.exception():
-                self.log.exception("Exception Processing ELB: %s" % (
-                    f.exception()))
-                continue
-            r = f.result()
-            if r:
-                names_to_tags.update(r)
+    def process_tags(elb_set):
+        client = local_session(session_factory).client('elb')
+        elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
+        try:
+            results = client.describe_tags(LoadBalancerNames=elb_map.keys())
+        except ClientError as e:
+            log.exception("Exception Processing ELB: %s", e)
+            raise
+        for tag_desc in results['TagDescriptions']:
+            elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
 
-        for elb in elbs:
-            elb['Tags'] = names_to_tags[elb['LoadBalancerName']]
+    with executor_factory(max_workers=2) as w:
+        list(w.map(process_tags, chunks(elbs, 20)))
 
-    def process_tags(self, chunk, **kwargs):
-        tag_descriptions = kwargs['client'].describe_tags(LoadBalancerNames=chunk)
 
-        names_to_tags = {}
-        for desc in tag_descriptions['TagDescriptions']:
-            names_to_tags[desc['LoadBalancerName']] = desc['Tags']
-        return names_to_tags
+@actions.register('mark-for-op')
+class TagDelayedAction(_TagDelayedAction):
+
+    schema = type_schema(
+        'mark-for-op', rinherit=_TagDelayedAction.schema,
+        ops={'enum': ['delete', 'set-ssl-listener-policy']})
+
+    batch_size = 20
+
+    def process_resource_set(self, resource_set, tags):
+        client = local_session(self.manager.session_factory).client('elb')
+        client.add_tags(
+            LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
+            Tags=tags)
 
 
 @actions.register('delete')

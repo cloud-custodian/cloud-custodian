@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "c1f90542-2025-11e6-bd28-ffcae44aaf1f"
+        }, 
+        "TagList": [
+            {
+                "Value": "postgres", 
+                "Key": "Platform"
+            }, 
+            {
+                "Value": "Resource does not meet policy: delete@2016/05/21", 
+                "Key": "custodian_next"
+            }, 
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }
+        ]
+    }
+}

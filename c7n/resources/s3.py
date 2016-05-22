@@ -570,12 +570,12 @@ class ScanBucket(BucketActionBase):
     def _process_bucket(self, b, p, key_log, w):
         content_key = self.get_bucket_op(b, 'contents_key')
         count = 0
+
         for key_set in p:
             count += len(key_set.get(content_key, []))
 
             # Empty bucket check
-            if not content_key in key_set and not key_set['IsTruncated']:
-                # annotate bucket
+            if content_key not in key_set and not key_set['IsTruncated']:
                 b['KeyScanCount'] = count
                 b['KeyRemediated'] = key_log.count
                 return {'Bucket': b['Name'],
@@ -604,7 +604,10 @@ class ScanBucket(BucketActionBase):
                 log.info('Scan Complete bucket:%s keys:%d remediated:%d',
                          b['Name'], count, key_log.count)
 
-        return {'Bucket': b['Name'], 'Remediated': key_log.count, 'Count': count}
+        b['KeyScanCount'] = count
+        b['KeyRemediated'] = key_log.count
+        return {
+            'Bucket': b['Name'], 'Remediated': key_log.count, 'Count': count}
 
     def process_chunk(self, batch, bucket):
         raise NotImplementedError()

@@ -12,8 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .common import BaseTest
+from c7n.executor import MainThreadExecutor
+from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
 from nose.tools import raises
+
+
+class ELBMarkForOpTest(BaseTest):
+
+    def test_elb_tags(self):
+        self.patch(ELB, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_elb_tags')
+        policy = self.load_policy({
+            'name': 'elb-mark',
+            'resource': 'elb',
+            'filters': [{"tag:Platform": "ubuntu"}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_mark_and_match(self):
+        session_factory = self.replay_flight_data(
+            'test_elb_mark_and_match')
+        policy = self.load_policy({
+            'name': 'elb-mark',
+            'resource': 'elb',
+            'filters': [{"LoadBalancerName": 'CloudCustodian'}],
+            'actions': [{
+                'type': 'mark-for-op', 'op': 'delete',
+                'tag': 'custodian_next', 'days': -1}]},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        tags = session_factory().client('elb').describe_tags(
+            LoadBalancerNames=['CloudCustodian'])['TagDescriptions'][0]['Tags']
+        tag_map = {t['Key']: t['Value'] for t in tags}
+        self.assertTrue('custodian_next' in tag_map)
+
+        policy = self.load_policy({
+            'name': 'elb-mark-filter',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
 
 
 class HealthCheckProtocolMismatchTest(BaseTest):

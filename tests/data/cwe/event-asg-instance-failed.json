@@ -1,0 +1,28 @@
+{
+    "account": "619193117841",
+    "region": "us-west-2",
+    "detail": {
+	"EndTime": "2016-05-21T16:43:34.000Z",
+	"Description": "Launching a new EC2 instance.  Status Reason: snapshotId can only be modified on EBS devices. Launching EC2 instance failed.",
+	"AutoScalingGroupName": "CustodianTest",
+	"ActivityId": "0e9d8daa-1fb8-4d84-91e0-0c4e57800be4",
+	"EC2InstanceId": "",
+	"Details": {
+	    "Availability Zone": "us-west-2b",
+	    "Subnet ID": "subnet-3f9e3d54"
+	},
+	"StartTime": "2016-05-21T16:43:34.112Z",
+	"StatusCode": "Failed",
+	"Cause": "At 2016-05-21T16:43:20Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 3.  At 2016-05-21T16:43:32Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 3.",
+	"StatusMessage": "snapshotId can only be modified on EBS devices. Launching EC2 instance failed.",
+	"RequestId": "0e9d8daa-1fb8-4d84-91e0-0c4e57800be4"
+    },
+    "detail-type": "EC2 Instance Launch Unsuccessful",
+    "source": "aws.autoscaling",
+    "version": "0",
+    "time": "2016-05-21T16:43:34Z",
+    "id": "6318c183-0f23-41a5-84e1-a0106fbc4da1",
+    "resources": [
+	"arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:d2323979-c12a-4509-a97b-4b0589c06325:autoScalingGroupName/CustodianTest"
+    ]
+}

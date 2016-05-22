@@ -22,17 +22,40 @@ from c7n.cwe import CloudWatchEvents
 class CloudWatchEventsFacadeTest(TestCase):
 
     # DISABLED / Record flight data
-    def disabled_xtest_get_ids(self):
+
+    def test_get_ids(self):
+        self.assertEqual(
+            CloudWatchEvents.get_ids(
+                {'detail': event_data('event-cloud-trail-run-instances.json')},
+                {'type': 'cloudtrail', 'events': ['RunInstances']}),
+            ['i-784cdacd', u'i-7b4cdace'])
+
+    def test_ec2_state(self):
         self.assertEqual(
             CloudWatchEvents.get_ids(
                 event_data('event-instance-state.json'),
                 {'type': 'ec2-instance-state'}),
             ['i-a2d74f12'])
+
+    def test_asg_state(self):
         self.assertEqual(
             CloudWatchEvents.get_ids(
-                {'detail': event_data('event-cloud-trail-run-instances.json')},
-                {'type': 'cloudtrail', 'events': ['RunInstances']}),
-            ['i-d49cf94c'])
+                event_data('event-asg-instance-failed.json'),
+                {'type': 'asg-instance-state',
+                 'events': ['EC2 Instance Launch Unsuccessful']}),
+            ['CustodianTest'])
+
+    def test_custom_event(self):
+        d = {'detail': event_data('event-cloud-trail-run-instances.json')}
+        d['detail']['eventName'] = 'something-unique'
+        self.assertEqual(
+            CloudWatchEvents.get_ids(
+                d,
+                {'type': 'cloudtrail', 'events': [{
+                     'event': 'RunInstances',
+                     'ids': 'responseElements.instancesSet.items[].instanceId',
+                     'source': 'ec2.amazonaws.com'}]}),
+            ['i-784cdacd', u'i-7b4cdace'])
 
     def test_non_cloud_trail_event(self):
         for event in ['event-instance-state.json', 'event-scheduled.json']:
