@@ -23,15 +23,32 @@ from c7n.version import version
 
 class SessionFactory(object):
     
-    def __init__(self, region, profile=None, assume_role=None):
+    def __init__(self, region, profile=None, assume_role=None,
+                 aws_access_key_id=None, aws_secret_access_key=None, 
+                 aws_session_token=None):
+
+        if profile and aws_access_key_id and aws_secret_access_key:
+            raise Exception('You have passed 2 forms of authentication. \
+                            Please pass either a profile or AWS keys')
+
         self.region = region
         self.profile = profile
         self.assume_role = assume_role
+        self.aws_access_key_id = aws_access_key_id
+        self.aws_secret_access_key = aws_secret_access_key
+        self.aws_session_token = aws_session_token
 
     def __call__(self, assume=True, region=None):
-        session = Session(
-            region_name=region or self.region,
-            profile_name=self.profile)
+        if self.aws_access_key_id and self.aws_secret_access_key:
+            kwargs = {'aws_access_key_id': self.aws_access_key_id, 
+                      'aws_secret_access_key': self.aws_secret_access_key,
+                      'aws_session_token': self.aws_session_token if self.aws_session_token else None}
+            session = Session(region_name=region or self.region, **kwargs)
+        else:
+            session = Session(
+                region_name=region or self.region,
+                profile_name=self.profile)
+
         if self.assume_role and assume:
             session = assumed_session(
                 self.assume_role, "CloudCustodian", session)
@@ -40,7 +57,6 @@ class SessionFactory(object):
         session._session.user_agent_version = version
         return session
 
-    
 def assumed_session(role_arn, session_name, session=None):
     """STS Role assume a boto3.Session
 
