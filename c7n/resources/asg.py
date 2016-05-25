@@ -83,11 +83,6 @@ class LaunchConfigBase(object):
     """Mixin base class for querying asg launch configs."""
 
     def initialize(self, asgs):
-        """Get launch configs for the set of asgs"""
-        config_names = set()
-        for a in asgs:
-            config_names.add(a['LaunchConfigurationName'])
-
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
 
@@ -102,6 +97,12 @@ class LaunchConfigBase(object):
                 self.configs = {
                     cfg['LaunchConfigurationName']: cfg for cfg in configs}
                 return
+
+        """Get launch configs for the set of asgs"""
+        config_names = set()
+        for a in asgs:
+            if 'LaunchConfigurationName' in a:
+                config_names.add(a['LaunchConfigurationName'])
 
         self.log.debug("querying %d launch configs" % len(config_names))
         for cfg_set in chunks(config_names, 50):
