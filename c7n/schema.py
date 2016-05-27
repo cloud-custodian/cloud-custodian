@@ -163,7 +163,7 @@ def generate(resource_types=()):
         },            
         'policy-mode': {
             'type': 'object',
-            'required': ['type', 'events'],
+            'required': ['type'],
             'properties': {
                 'type': {
                     'enum': [
