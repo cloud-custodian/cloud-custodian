@@ -19,11 +19,19 @@
 def load_resources():
     import ami
     import asg
+    import cache
     import cfn
+    import cw
+    import dynamodb
     import ebs
     import ec2
     import elb
+    import iam
     import kms
-    import rds
     import redshift
+    import rds
+    import route53
     import s3
+    import sns
+    import sqs
+    import vpc

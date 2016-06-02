@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InternetGateways": [
+            {
+                "Tags": [], 
+                "InternetGatewayId": "igw-3d9e3d56", 
+                "Attachments": [
+                    {
+                        "State": "available", 
+                        "VpcId": "vpc-399e3d52"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5f5e6ecd-7f2d-4816-a126-8eed251c697e"
+        }
+    }
+}

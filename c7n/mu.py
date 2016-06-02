@@ -212,7 +212,8 @@ class LambdaManager(object):
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(func, role, s3_uri, qualifier=alias)
+        result, changed = self._create_or_update(
+            func, role, s3_uri, qualifier=alias)
         func.arn = result['FunctionArn']
         if alias and changed:
             func.alias = self.publish_alias(result, alias)
