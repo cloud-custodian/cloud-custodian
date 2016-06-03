@@ -14,21 +14,14 @@
 """Cloud Watch Log Subscription Email Relay
 """
 import argparse
-import json
-import inspect
 import itertools
 import logging
-import os
 import sys
 
-import c7n
 
 from c7n.credentials import SessionFactory
-from c7n.mu import (
-    CloudWatchLogSubscription,
-    LambdaFunction,
-    LambdaManager,
-    PythonPackageArchive)
+from c7n.mu import LambdaManager
+from c7n.ufuncs import logsub
 
 log = logging.getLogger("custodian.logsetup")
 
@@ -76,37 +69,6 @@ def get_groups(session_factory, options):
     return groups
 
 
-def get_function(session_factory, options, groups):
-    config = dict(
-        name='cloud-maid-error-notify',
-        handler='logsub.process_log_event',
-        runtime='python2.7',
-        memory_size=512,
-        timeout=15,
-        role=options.role,
-        description='Maid Error Notify',
-        events=[
-            CloudWatchLogSubscription(
-                session_factory, groups, options.pattern)])
-
-
-    archive = PythonPackageArchive(
-        # Directory to lambda file
-        os.path.join(
-            os.path.dirname(inspect.getabsfile(c7n)), 'logsub.py'),
-        # Don't include virtualenv deps
-        lib_filter=lambda x, y, z: ([], []))
-    archive.create()
-    archive.add_contents(
-        'config.json', json.dumps({
-            'topic': options.topic,
-            'subject': options.subject
-        }))
-    archive.close()
-
-    return LambdaFunction(config, archive)
-
-
 def main():
     parser = setup_parser()
     options = parser.parse_args()
@@ -122,7 +84,14 @@ def main():
         options.region, options.profile, options.assume)
 
     groups = get_groups(session_factory, options)
-    func = get_function(session_factory, options, groups)
+    func = logsub.get_function(
+        session_factory,
+        "cloud-custodian-error-notify",
+        role=options.role,
+        sns_topic=options.topic,
+        subject=options.subject,
+        log_groups=groups,
+        pattern=options.pattern)
     manager = LambdaManager(session_factory)
 
     try:

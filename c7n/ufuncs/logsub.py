@@ -21,7 +21,14 @@ import json
 import textwrap
 import zlib
 
-sns = boto3.client('sns')
+
+sns = None
+
+
+def init():
+    global sns
+    if sns is None:
+        sns = boto3.client('sns')
 
 
 def message_event(evt):
@@ -33,6 +40,7 @@ def message_event(evt):
 def process_log_event(event, context):
     """Format log events and relay via sns/email"""
 
+    init()
     with open('config.json') as fh:
         config = json.load(fh)
     serialized = event['awslogs'].pop('data')
@@ -57,3 +65,47 @@ def process_log_event(event, context):
         Subject=config['subject'],
         Message='\n'.join(message))
     sns.publish(**params)
+
+
+def get_function(session_factory, name, role, sns_topic, log_groups,
+                 subject="Lambda Error", pattern="Traceback"):
+    """Lambda function provisioning.
+
+    Self contained within the component, to allow for easier reuse.
+    """
+
+    # Lazy import to avoid runtime dependency
+    import inspect
+    import os
+
+    import c7n
+    from c7n.mu import (
+        LambdaFunction, PythonPackageArchive, CloudWatchLogSubscription)
+
+    config = dict(
+        name='cloud-maid-error-notify',
+        handler='logsub.process_log_event',
+        runtime='python2.7',
+        memory_size=512,
+        timeout=15,
+        role=role,
+        description='Custodian Ops Error Notify',
+        events=[
+            CloudWatchLogSubscription(
+                session_factory, log_groups, pattern)])
+
+    archive = PythonPackageArchive(
+        # Directory to lambda file
+        os.path.join(
+            os.path.dirname(inspect.getabsfile(c7n)), 'logsub.py'),
+        # Don't include virtualenv deps
+        lib_filter=lambda x, y, z: ([], []))
+    archive.create()
+    archive.add_contents(
+        'config.json', json.dumps({
+            'topic': sns_topic,
+            'subject': subject
+        }))
+    archive.close()
+
+    return LambdaFunction(config, archive)

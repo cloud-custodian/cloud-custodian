@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import sys
+import time
 import platform
 import tempfile
 import zipfile
@@ -212,7 +213,8 @@ class LambdaManager(object):
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(func, role, s3_uri, qualifier=alias)
+        result, changed = self._create_or_update(
+            func, role, s3_uri, qualifier=alias)
         func.arn = result['FunctionArn']
         if alias and changed:
             func.alias = self.publish_alias(result, alias)
@@ -917,6 +919,8 @@ class CloudWatchLogSubscription(object):
                     Action='lambda:InvokeFunction',
                     Principal='logs.%s.amazonaws.com' % region)
                 log.debug("Added lambda invoke log group permission")
+                # iam eventual consistency and propagation
+                time.sleep(1.5)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise

@@ -96,7 +96,6 @@ class Parameter(ValueFilter):
         params = {}
         for pg in db['ClusterParameterGroups']:
             params.update(self.group_params[pg['ParameterGroupName']])
-        print params['require_ssl'], self.data['key'], self.data['value']
         return self.match(params)
 
 
