@@ -38,7 +38,7 @@ class CloudWatchEvents(object):
 
         'CreateBucket': {
             'ids': 'requestParameters.bucketName',
-            'source': 'aws.s3'},
+            'source': 's3.amazonaws.com'},
 
         'CreateCluster': {
             'ids': 'requestParameters.clusterIdentifier',
