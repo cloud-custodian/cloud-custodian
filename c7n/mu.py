@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import sys
+import time
 import platform
 import tempfile
 import zipfile
@@ -918,6 +919,8 @@ class CloudWatchLogSubscription(object):
                     Action='lambda:InvokeFunction',
                     Principal='logs.%s.amazonaws.com' % region)
                 log.debug("Added lambda invoke log group permission")
+                # iam eventual consistency and propagation
+                time.sleep(1.5)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise

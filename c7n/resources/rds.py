@@ -115,13 +115,21 @@ class RDS(ResourceManager):
         return self.filter_resources(dbs)
 
     def get_resources(self, resource_ids):
-        c = local_session(self.session_factory).client('rds')
+        session = local_session(self.session_factory)
+        c = session.client('rds')
         results = []
         for db_id in resource_ids:
             results.extend(
                 c.describe_db_instances(
                     DBInstanceIdentifier=db_id)['DBInstances'])
-        _rds_tags(results)
+
+        # For lambda usage this requires two extra api calls which is a
+        # bit unfortunate.
+        if self.account_id is None:
+            self.account_id = get_account_id(session)
+        _rds_tags(results, self.session_factory, self.executor_factory,
+                  self.account_id, region=self.config.region)
+
         return results
 
 
