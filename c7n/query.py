@@ -29,6 +29,8 @@ class QueryMeta(type):
         if 'action_registry' not in attrs:
             attrs['action_registry'] = ActionRegistry(
                 '%s.filters' % name.lower())
+        #if attrs['resource_type']:
+        #    m = ResourceQuery.resolve(attrs['resource_type'])
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
@@ -83,7 +85,8 @@ class ResourceQuery(object):
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
-    def resolve(self, resource_type):
+    @staticmethod
+    def resolve(resource_type):
         if not isinstance(resource_type, type):
             m = find_resource_class(resource_type).Meta
         else:
@@ -96,6 +99,9 @@ class ResourceQuery(object):
         client = local_session(self.session_factory).client(
             m.service)
         enum_op, path, extra_args = m.enum_spec
+        if extra_args:
+            params.update(extra_args)
+
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
             results = p.paginate(**params)

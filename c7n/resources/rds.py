@@ -60,16 +60,15 @@ Todo/Notes
 
 """
 import logging
-import itertools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
-from c7n.manager import ResourceManager, resources
-from c7n.tags import (
-    TagCountFilter, TagActionFilter, TagDelayedAction as _TagDelayedAction)
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
+from c7n import tags
 from c7n.utils import local_session, type_schema, get_account_id
 
 log = logging.getLogger('custodian.rds')
@@ -77,71 +76,36 @@ log = logging.getLogger('custodian.rds')
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
 
-filters.register('tag-count', TagCountFilter)
-filters.register('marked-for-op', TagActionFilter)
+filters.register('tag-count', tags.TagCountFilter)
+filters.register('marked-for-op', tags.TagActionFilter)
 
 
 @resources.register('rds')
-class RDS(ResourceManager):
+class RDS(QueryResourceManager):
 
+    resource_type = "aws.rds.db"
     filter_registry = filters
     action_registry = actions
-
     account_id = None
 
-    def resources(self):
+    def augment(self, resources):
         session = local_session(self.session_factory)
-        c = session.client('rds')
-        query = self.resource_query()
-        if self._cache.load():
-            dbs = self._cache.get(
-                {'region': self.config.region, 'resource': 'rds', 'q': query})
-            if dbs is not None:
-                self.log.debug("Using cached rds: %d" % (
-                    len(dbs)))
-                return self.filter_resources(dbs)
-        self.log.info("Querying rds instances")
-        p = c.get_paginator('describe_db_instances')
-        results = p.paginate(Filters=query)
-        dbs = list(itertools.chain(*[rp['DBInstances'] for rp in results]))
-
         if self.account_id is None:
             self.account_id = get_account_id(session)
-
-        _rds_tags(dbs, self.session_factory, self.executor_factory,
-                  self.account_id, region=self.config.region)
-        self._cache.save(
-            {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
-        return self.filter_resources(dbs)
-
-    def get_resources(self, resource_ids):
-        session = local_session(self.session_factory)
-        c = session.client('rds')
-        results = []
-        for db_id in resource_ids:
-            results.extend(
-                c.describe_db_instances(
-                    DBInstanceIdentifier=db_id)['DBInstances'])
-
-        # For lambda usage this requires two extra api calls which is a
-        # bit unfortunate.
-        if self.account_id is None:
-            self.account_id = get_account_id(session)
-        _rds_tags(results, self.session_factory, self.executor_factory,
-                  self.account_id, region=self.config.region)
-
-        return results
+        _rds_tags(
+            self.query.resolve(self.resource_type),
+            resources, self.session_factory, self.executor_factory,
+            self.account_id, region=self.config.region)
 
 
-def _rds_tags(dbs, session_factory, executor_factory, account_id, region):
+def _rds_tags(
+        model, dbs, session_factory, executor_factory, account_id, region):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        name = db['DBInstanceIdentifier']
-        arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
+        arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, db[model.id])
         tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
-
         db['Tags'] = tag_list or []
         return db
 
@@ -182,10 +146,10 @@ class DefaultVpc(Filter):
 
 
 @actions.register('mark-for-op')
-class TagDelayedAction(_TagDelayedAction):
+class TagDelayedAction(tags.TagDelayedAction):
 
     schema = type_schema(
-        'mark-for-op', rinherit=_TagDelayedAction.schema,
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
         ops={'enum': ['delete', 'snapshot']})
 
     batch_size = 5
@@ -201,6 +165,39 @@ class TagDelayedAction(_TagDelayedAction):
                 self.manager.config.region, self.manager.account_id,
                 r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('tag')
+class Tag(tags.Tag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('remove-tag')
+class RemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
 
 
 @actions.register('delete')
