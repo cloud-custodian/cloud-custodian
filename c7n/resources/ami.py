@@ -16,7 +16,9 @@ import logging
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.tags import register_tags
 from c7n.utils import local_session, type_schema
 
 
@@ -26,28 +28,17 @@ log = logging.getLogger('custodian.ami')
 filters = FilterRegistry('ami.filters')
 actions = ActionRegistry('ami.actions')
 
+register_tags(filters, actions, 'AmiId')
+
 
 @resources.register('ami')
-class AMI(ResourceManager):
+class AMI(QueryResourceManager):
+
+    class resource_type(ResourceQuery.resolve('aws.ec2.image')):
+        date = 'CreationDate'
 
     filter_registry = filters
     action_registry = actions
-
-    def resources(self):
-        c = self.session_factory().client('ec2')
-        query = self.resource_query()
-        if self._cache.load():
-            images = self._cache.get(
-                {'region': self.config.region, 'resource': 'ami', 'q': query})
-            if images is not None:
-                self.log.debug("Using cached images: %d" % len(images))
-                return self.filter_resources(images)
-        self.log.info("Querying images")
-        images = c.describe_images(Owners=['self'], Filters=query)['Images']
-        self._cache.save(
-            {'region': self.config.region, 'resource': 'ami', 'q': query},
-            images)
-        return self.filter_resources(images)
 
 
 @actions.register('deregister')

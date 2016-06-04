@@ -1,5 +1,8 @@
 from common import BaseTest
 
+from c7n.executor import MainThreadExecutor
+from c7n.resources import rds
+
 
 class RDSTest(BaseTest):
 
@@ -13,6 +16,45 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rds_tag_and_remove(self):
+        self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)        
+        session_factory = self.replay_flight_data('test_rds_tag_and_remove')
+        client = session_factory().client('rds')
+
+        p = self.load_policy({
+            'name': 'rds-tag',
+            'resource': 'rds',
+            'filters': [
+                {'tag:Platform': 'postgres'}],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        arn = "arn:aws:rds:%s:%s:db:%s" % (
+            p.resource_manager.config.region, p.resource_manager.account_id,
+            resources[0]['DBInstanceIdentifier'])
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('xyz' in tag_map)
+
+        policy = self.load_policy({
+            'name': 'rds-remove-tag',
+            'resource': 'rds',
+            'filters': [
+                {'tag:xyz': 'not-null'}],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['xyz']}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('xyz' in tag_map)
 
     def test_rds_mark_and_match(self):
         session_factory = self.replay_flight_data('test_rds_mark_and_match')
