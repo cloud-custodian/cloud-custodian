@@ -79,7 +79,7 @@ class PolicyLambdaProvision(BaseTest):
         self.assertEqual(
             json.loads(event.render_event_pattern()),
             {u'detail': {u'eventName': [u'CreateBucket'],
-                         u'eventSource': [u'aws.s3']},
+                         u'eventSource': [u's3.amazonaws.com']},
              u'detail-type': ['AWS API Call via CloudTrail']})
 
         self.assert_items(

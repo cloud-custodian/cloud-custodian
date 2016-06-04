@@ -84,7 +84,7 @@ class S3(ResourceManager):
     def get_resources(self, resource_ids):
         with self.executor_factory(
                 max_workers=min((5, len(resource_ids)))) as w:
-            buckets = {'Name': r for r in resource_ids}
+            buckets = [{'Name': r} for r in resource_ids]
             results = w.map(
                 assemble_bucket,
                 zip(itertools.repeat(self.session_factory), buckets))
