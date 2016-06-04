@@ -450,9 +450,9 @@ class S3Test(BaseTest):
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
         self.addCleanup(destroyBucket, client, bname)
-        
+
         public = 'http://acs.amazonaws.com/groups/global/AllUsers'
-    
+
         client.put_bucket_acl(
             Bucket=bname,
             AccessControlPolicy={
@@ -486,8 +486,8 @@ class S3Test(BaseTest):
                   'permissions': ['WRITE']}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
-        
+        self.assertEqual(len(resources), 1)
+
     def test_global_grants_filter_and_remove(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
@@ -498,7 +498,7 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
-        
+
         public = 'http://acs.amazonaws.com/groups/global/AllUsers'
         client.put_bucket_acl(
             Bucket=bname,

@@ -65,5 +65,5 @@ class CloudWatchEventsFacadeTest(TestCase):
         self.assertEqual(
             CloudWatchEvents.match(
                 event_data('event-cloud-trail-s3.json')),
-            {'source': 'aws.s3',
+            {'source': 's3.amazonaws.com',
              'ids': jmespath.compile('detail.requestParameters.bucketName')})
