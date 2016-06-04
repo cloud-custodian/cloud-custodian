@@ -173,7 +173,7 @@ def custodian_archive(skip=None):
     """Create a lambda code archive for running custodian."""
 
     # Some aggressive shrinking
-    required = ["concurrent", "yaml", "pkg_resources"]
+    required = ["concurrent", "yaml", "pkg_resources", "skew"]
     host_platform = platform.uname()[0]
 
     def lib_filter(root, dirs, files):
