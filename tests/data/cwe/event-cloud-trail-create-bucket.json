@@ -1,0 +1,42 @@
+{
+    "account": "619193117841",
+    "region": "us-west-2",
+    "detail": {
+        "eventVersion": "1.03",
+        "eventID": "c4fa3db1-2303-40e4-bde0-3b7246bdbf0b",
+        "eventTime": "2016-06-04T12:19:03Z",
+        "requestParameters": {
+            "CreateBucketConfiguration": {
+                "xmlns": "http://s3.amazonaws.com/doc/2006-03-01/",
+                "LocationConstraint": "us-west-2"
+            },
+            "bucketName": "custodian-create-bucket-v4"
+        },
+        "eventType": "AwsApiCall",
+        "responseElements": null,
+        "awsRegion": "us-west-2",
+        "eventName": "CreateBucket",
+        "userIdentity": {
+            "sessionContext": {
+                "attributes": {
+                    "creationDate": "2016-06-04T11:18:26Z",
+                    "mfaAuthenticated": "false"
+                }
+            },
+            "type": "Root",
+            "arn": "arn:aws:iam::619193117841:root",
+            "principalId": "619193117841",
+            "accountId": "619193117841"
+        },
+        "eventSource": "s3.amazonaws.com",
+        "requestID": "A279EE6B879FE5ED",
+        "userAgent": "[S3Console/0.4]",
+        "sourceIPAddress": "204.63.44.148"
+    },
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.s3",
+    "version": "0",
+    "time": "2016-06-04T12:19:03Z",
+    "id": "075efcc5-cc27-4041-accc-5fe2f65ef80d",
+    "resources": []
+}
