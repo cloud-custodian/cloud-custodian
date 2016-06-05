@@ -69,6 +69,9 @@ class PolicyCollection(object):
     def __iter__(self):
         return iter(self.policies())
 
+    def __contains__(self, policy_name):
+        return policy_name in [p['name'] for p in self.data['policies']]
+
 
 class Policy(object):
 
