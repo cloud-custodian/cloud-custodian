@@ -52,7 +52,8 @@ import time
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import chunks, local_session, set_annotation, type_schema
 
 """
@@ -71,7 +72,9 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
 
 
 @resources.register('s3')
-class S3(ResourceManager):
+class S3(QueryResourceManager):
+
+    resource_type = "aws.s3.bucket"
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -81,38 +84,14 @@ class S3(ResourceManager):
         super(S3, self).__init__(ctx, data)
         self.log_dir = ctx.log_dir
 
-    def get_resources(self, resource_ids):
+    def augment(self, buckets):
         with self.executor_factory(
-                max_workers=min((5, len(resource_ids)))) as w:
-            buckets = [{'Name': r} for r in resource_ids]
+                max_workers=min((10, len(buckets)))) as w:
             results = w.map(
                 assemble_bucket,
                 zip(itertools.repeat(self.session_factory), buckets))
             results = filter(None, results)
-        return results
-
-    def resources(self):
-        if self._cache.load():
-            buckets = self._cache.get({'resource': 's3'})
-            if buckets is not None:
-                log.info("Using cached s3 buckets")
-                return self.filter_resources(buckets)
-
-        c = self.session_factory().client('s3')
-        log.debug('Retrieving buckets')
-        response = c.list_buckets()
-        buckets = response['Buckets']
-        log.debug('Got %d buckets' % len(buckets))
-        log.debug('Assembling bucket documents')
-        with self.executor_factory(max_workers=10) as w:
-            results = w.map(
-                assemble_bucket,
-                zip(itertools.repeat(self.session_factory), buckets))
-            results = filter(None, results)
-
-        self._cache.save({'resource': 's3'}, results)
-        return self.filter_resources(results)
-
+            return results
 
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),

@@ -54,7 +54,6 @@ In addition to value filters
 """
 from concurrent.futures import as_completed
 import logging
-import itertools
 
 from botocore.exceptions import ClientError
 

@@ -3,8 +3,8 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 404, 
-            "HostId": "tIDujFrBeEYRHvzjI9W1+DxMQiNucdgkkpQOHrDCeI2kce8dITkInffXW5I7TDgRPTvQTSVxngo=", 
-            "RequestId": "383A59C56334003D"
+            "HostId": "4tbXPrkIvHzDe7UTWOeiJGxuomJ8SVVvn9cSKQHVTVJdJtVeYDAkwOkd7C0K9k4WtVzvKf1R2iU=", 
+            "RequestId": "29DAAD9315A10452"
         }, 
         "Error": {
             "Message": "The bucket policy does not exist", 

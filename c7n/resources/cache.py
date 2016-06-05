@@ -20,4 +20,3 @@ class ClusterSubnetGroup(QueryResourceManager):
 class CacheSnapshot(QueryResourceManager):
 
     resource_type = 'aws.elasticache.Snapshot'
-    

@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
 import logging
-import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -22,7 +20,8 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY)
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
@@ -37,30 +36,11 @@ tags.register_tags(filters, actions, 'VolumeId')
 
 
 @resources.register('ebs-snapshot')
-class Snapshot(ResourceManager):
+class Snapshot(QueryResourceManager):
 
+    resource_type = "aws.ec2.snapshot"
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
-
-    def resources(self):
-        c = self.session_factory().client('ec2')
-        query = self.resource_query()
-        if self._cache.load():
-            snaps = self._cache.get(
-                {'region': self.config.region,
-                 'resource': 'ebs-snapshot',
-                 'q': query})
-            if snaps is not None:
-                return self.filter_resources(snaps)
-        self.log.info('Querying ebs snapshots')
-        p = c.get_paginator('describe_snapshots')
-        results = p.paginate(Filters=query, OwnerIds=['self'])
-        snapshots = list(itertools.chain(*[rp['Snapshots'] for rp in results]))
-        self._cache.save(
-            {'region': self.config.region,
-             'resource': 'ebs-snapshot',
-             'q': query}, snapshots)
-        return self.filter_resources(snapshots)
 
 
 @Snapshot.filter_registry.register('age')
@@ -117,30 +97,11 @@ class SnapshotDelete(BaseAction):
 
 
 @resources.register('ebs')
-class EBS(ResourceManager):
+class EBS(QueryResourceManager):
 
+    resource_type = "aws.ec2.volume"
     filter_registry = filters
     action_registry = actions
-
-    def get_resources(self, resource_ids):
-        c = local_session(self.session_factory).client('ec2')
-        results = c.describe_volumes(VolumeIds=resource_ids)
-        return results['Volumes']
-
-    def resources(self):
-        c = self.session_factory().client('ec2')
-        query = self.resource_query()
-        if self._cache.load():
-            vols = self._cache.get({'resource': 'ebs', 'q': query})
-            if vols is not None:
-                self.log.debug("Using cached ebs: %d" % len(vols))
-                return self.filter_resources(vols)
-        self.log.info("Querying ebs volumes")
-        p = c.get_paginator('describe_volumes')
-        results = p.paginate(Filters=query)
-        volumes = list(itertools.chain(*[rp['Volumes'] for rp in results]))
-        self._cache.save({'resource': 'ebs', 'q': query}, volumes)
-        return self.filter_resources(volumes)
 
 
 @filters.register('instance')

@@ -27,7 +27,8 @@ import time
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter, AgeFilter, Filter
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.offhours import Time, OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter
 from c7n.utils import local_session, query_instances, type_schema, chunks
@@ -46,37 +47,11 @@ filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('asg')
-class ASG(ResourceManager):
+class ASG(QueryResourceManager):
 
+    resource_type = "aws.autoscaling.autoScalingGroup"
     filter_registry = filters
     action_registry = actions
-
-    def get_resources(self, asg_names):
-        c = local_session(self.session_factory).client('autoscaling')
-        try:
-            return c.describe_auto_scaling_groups(
-                AutoScalingGroupNames=asg_names)['AutoScalingGroups']
-        except ClientError as e:
-            log.warning("event, cwe not found: %s" % (asg_names))
-            return []
-
-    def resources(self):
-        c = self.session_factory().client('autoscaling')
-        if self._cache.load():
-            asgs = self._cache.get(
-                {'region': self.config.region, 'resource': 'asg'})
-            if asgs is not None:
-                self.log.debug("Using cached asgs: %d" % len(asgs))
-                return self.filter_resources(asgs)
-        self.log.debug("Querying autoscaling groups")
-        p = c.get_paginator('describe_auto_scaling_groups')
-        results = p.paginate()
-        asgs = list(itertools.chain(
-            *[rp['AutoScalingGroups'] for rp in results]))
-        self._cache.save(
-            {'resource': 'asg', 'region': self.config.region},
-            asgs)
-        return self.filter_resources(asgs)
 
 
 class LaunchConfigBase(object):

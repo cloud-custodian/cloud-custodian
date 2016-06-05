@@ -6,8 +6,8 @@
         "Name": "custodian-create-bucket-v4", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "2d3PUVY5NsaXf4xxbwPTazzbQa9r2pSBYtiJIXFD9BsKxlM/ESqY3gMUIDQVJ8l7imCmFAubAWk=", 
-            "RequestId": "661100C0789DCFCA"
+            "HostId": "kOtoYN5XNVD7EhgkWWgOl6GVm+gVTR6yk8IIr7r/GeVYt9odtUZyaePHEiZ5QYeU2WasGmFcHnk=", 
+            "RequestId": "8829756D3B66011E"
         }, 
         "Marker": "", 
         "EncodingType": "url", 
