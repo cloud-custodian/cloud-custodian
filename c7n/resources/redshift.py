@@ -13,7 +13,6 @@
 # limitations under the License.
 import json
 import logging
-import itertools
 
 from concurrent.futures import as_completed
 from datetime import datetime
@@ -21,7 +20,8 @@ from datetime import datetime
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import type_schema, local_session, chunks
 
 log = logging.getLogger('custodian.redshift')
@@ -31,33 +31,11 @@ actions = ActionRegistry('redshift.actions')
 
 
 @resources.register('redshift')
-class Redshift(ResourceManager):
+class Redshift(QueryResourceManager):
 
+    resource_type = "aws.redshift.cluster"
     filter_registry = filters
     action_registry = actions
-
-    def get_resources(self, resource_ids):
-        c = local_session(self.session_factory).client('redshift')
-        results = []
-        for rid in resource_ids:
-            results.extend(
-                c.describe_clusters(ClusterIdentifier=rid)['Clusters'])
-        return results
-
-    def resources(self):
-        c = local_session(self.session_factory).client('redshift')
-        if self._cache.load():
-            dbs = self._cache.get(
-                {'region': self.config.region, 'resource': 'redshift'})
-            if dbs is not None:
-                return self.filter_resources(dbs)
-        self.log.info('Querying redshift dbs')
-        p = c.get_paginator('describe_clusters')
-        results = p.paginate()
-        snapshots = list(itertools.chain(*[rp['Clusters'] for rp in results]))
-        self._cache.save(
-            {'region': self.config.region, 'resource': 'redshift'}, snapshots)
-        return self.filter_resources(snapshots)
 
 
 @filters.register('param')
