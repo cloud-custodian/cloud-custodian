@@ -23,7 +23,7 @@ import yaml
 
 from c7n.credentials import SessionFactory
 from c7n.reports import report as do_report
-from c7n import mu, schema, policy
+from c7n import mu, schema, policy, version
 
 
 log = logging.getLogger('custodian.commands')
@@ -124,5 +124,5 @@ def resources(options):
         print(yaml.dump(funcs, Dumper=yaml.SafeDumper, default_flow_style=False))
 
 
-def resources_gc(options, policy_collection):
-    pass
+def cmd_version(options):
+    print(version.version)

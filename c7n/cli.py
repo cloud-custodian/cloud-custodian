@@ -15,6 +15,10 @@
 import argparse
 import logging
 import os
+import pdb
+import sys
+import traceback
+
 
 from c7n import commands, resources
 
@@ -74,6 +78,12 @@ def setup_parser():
     logs.set_defaults(command=commands.logs)
     _default_options(logs)
 
+    version = subs.add_parser('version')
+    version.set_defaults(command=commands.cmd_version)
+    version.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Verbose Logging")
+
     validate = subs.add_parser('validate')
     validate.set_defaults(command=commands.validate)
     validate.add_argument("-c", "--config", required=True,
@@ -116,12 +126,6 @@ def main():
     except Exception:
         if not options.debug:
             raise
-        import traceback
-        import pdb
-        import sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
-
-if __name__ == '__main__':
-    main()
