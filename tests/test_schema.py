@@ -40,6 +40,20 @@ class SchemaTest(BaseTest):
     def test_empty_skeleton(self):
         self.assertEqual(validate({'policies': []}), [])
 
+    def test_duplicate_policies(self):
+        data = {
+            'policies': [
+                {'name': 'monday-morning',
+                 'resource': 'ec2'},
+                {'name': 'monday-morning',
+                 'resource': 'ec2'},
+                ]}
+
+        result = validate(data)
+        self.assertEqual(len(result), 1)
+        self.assertTrue(isinstance(result[0], ValueError))
+        self.assertTrue('monday-morning' in str(result[0]))
+
     def test_semantic_error(self):
         data = {
             'policies': [

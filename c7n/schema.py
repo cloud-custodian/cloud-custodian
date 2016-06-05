@@ -25,6 +25,7 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
+from collections import Counter
 import json
 import logging
 
@@ -43,6 +44,15 @@ def validate(data):
 
     errors = list(validator.iter_errors(data))
     if not errors:
+        counter = Counter([p['name'] for p in data.get('policies')])
+        dupes = []
+        for k, v in counter.items():
+            if v > 1:
+                dupes.append(k)
+        if dupes:
+            return [ValueError(
+                "Only one policy with a given name allowed, duplicates: %s" % (
+                    ", ".join(dupes)))]
         return []
     try:
         return [specific_error(errors[0])]
