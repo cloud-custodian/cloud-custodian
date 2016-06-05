@@ -266,16 +266,18 @@ class SSLPolicyFilter(Filter):
         whitelist = set(self.data.get('whitelist', []))
         blacklist = set(self.data.get('blacklist', []))
 
+        invalid_elbs = []
+
         if blacklist:
-            invalid_elbs = [
-                elb for elb, active_policies in
-                active_policy_attribute_tuples
-                if len(blacklist.intersection(active_policies))]
+            for elb, active_policies in active_policy_attribute_tuples:
+                if len(blacklist.intersection(active_policies)) > 0:
+                    elb["ProhibitedPolicies"] = list(blacklist.intersection(active_policies))
+                    invalid_elbs.append(elb)
         elif whitelist:
-            invalid_elbs = [
-                elb for elb, active_policies in
-                active_policy_attribute_tuples
-                if len(set(active_policies).difference(whitelist))]
+            for elb, active_policies in active_policy_attribute_tuples:
+                if len(set(active_policies).difference(whitelist)) > 0:
+                    elb["ProhibitedPolicies"] = list(set(active_policies).difference(whitelist))
+                    invalid_elbs.append(elb)
         return invalid_elbs
 
     def create_elb_active_policy_attribute_tuples(self, elbs):
