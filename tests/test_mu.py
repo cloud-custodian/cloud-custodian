@@ -66,7 +66,13 @@ class PolicyLambdaProvision(BaseTest):
         params['sns_topic'] = "arn:123"
         manager.publish(func)
 
-    def test_cwe_update_no_change(self):
+    def test_cwe_update_config_and_code(self):
+        # Originally this was testing the no update case.. but
+        # That is tricky to record, any updates to the code end up
+        # causing issues due to checksum mismatches which imply updating
+        # the function code / which invalidate the recorded data and
+        # the focus of the test.
+
         session_factory = self.replay_flight_data(
             'test_cwe_update', zdata=True)
         p = Policy({
@@ -85,9 +91,33 @@ class PolicyLambdaProvision(BaseTest):
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.addCleanup(mgr.remove, pl)
+
+        p = Policy({
+            'resource': 's3',
+            'name': 's3-bucket-policy',
+            'mode': {
+                'type': 'cloudtrail',
+                'memory': 256,
+                'events': [
+                    "CreateBucket",
+                    {'event': 'PutBucketPolicy',
+                     'ids': 'requestParameters.bucketName',
+                     'source': 's3.amazonaws.com'}]
+            },
+            'filters': [
+                {'type': 'missing-policy-statement',
+                 'statement_ids': ['RequireEncryptedPutObject']}],
+            'actions': ['no-op']
+        }, Config.empty())
+
         output = self.capture_logging('custodian.lambda', level=logging.DEBUG)
         result2 = mgr.publish(PolicyLambda(p), 'Dev', role=self.role)
-        self.assertEqual(len(output.getvalue().strip().split('\n')), 1)
+
+        lines = output.getvalue().strip().split('\n')
+        self.assertTrue(
+            'Updating function custodian-s3-bucket-policy code' in lines)
+        self.assertTrue(
+            'Updating function: custodian-s3-bucket-policy config' in lines)
         self.assertEqual(result['FunctionName'], result2['FunctionName'])
         # drive by coverage
         functions = [i for i in mgr.list_functions()

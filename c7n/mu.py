@@ -671,24 +671,28 @@ class CloudWatchEventSource(object):
         return False
 
     def __repr__(self):
-        return "<CWEvent Type:%s Sources:%s Events:%s>" % (
+        return "<CWEvent Type:%s Events:%s>" % (
             self.data.get('type'),
-            ', '.join(self.data.get('sources', [])),
-            ', '.join(self.data.get('events', [])))
+            ', '.join(map(str, self.data.get('events', []))))
 
     def resolve_cloudtrail_payload(self, payload):
         ids = []
         sources = self.data.get('sources', [])
-
+        events = []
         for e in self.data.get('events'):
-            event_info = CloudWatchEvents.get(e)
-            if event_info is None:
-                continue
+            if not isinstance(e, dict):
+                events.append(e)
+                event_info = CloudWatchEvents.get(e)
+                if event_info is None:
+                    continue
+            else:
+                event_info = e
+                events.append(e['event'])
             sources.append(event_info['source'])
 
         payload['detail'] = {
             'eventSource': list(set(sources)),
-            'eventName': self.data.get('events', [])}
+            'eventName': events}
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
