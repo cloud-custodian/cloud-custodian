@@ -22,7 +22,7 @@ from c7n.version import version
 
 
 class SessionFactory(object):
-    
+
     def __init__(self, region, profile=None, assume_role=None):
         self.region = region
         self.profile = profile
@@ -40,7 +40,7 @@ class SessionFactory(object):
         session._session.user_agent_version = version
         return session
 
-    
+
 def assumed_session(role_arn, session_name, session=None):
     """STS Role assume a boto3.Session
 
