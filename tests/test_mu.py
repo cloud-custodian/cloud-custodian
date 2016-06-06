@@ -18,8 +18,11 @@ import unittest
 import StringIO
 import zipfile
 
-from c7n.mu import custodian_archive, LambdaManager, PolicyLambda
+from c7n.mu import (
+    custodian_archive, LambdaManager, PolicyLambda,
+    CloudWatchLogSubscription)
 from c7n.policy import Policy
+from c7n.ufuncs import logsub
 from .common import BaseTest, Config
 
 
@@ -31,7 +34,45 @@ class PolicyLambdaProvision(BaseTest):
         for k, v in expected.items():
             self.assertEqual(v, result[k])
 
-    def xtest_cwe_update_no_change(self):
+    def test_cwl_subscriber(self):
+        self.patch(CloudWatchLogSubscription, 'iam_delay', 0.01)
+        session_factory = self.replay_flight_data('test_cwl_subscriber')
+        session = session_factory()
+        client = session.client('logs')
+
+        lname = "custodian-test-log-sub"
+        self.addCleanup(client.delete_log_group, logGroupName=lname)
+        client.create_log_group(logGroupName=lname)
+        linfo = client.describe_log_groups(
+            logGroupNamePrefix=lname)['logGroups'][0]
+
+        params = dict(
+            session_factory=session_factory,
+            name="c7n-log-sub",
+            role=self.role,
+            sns_topic="arn:",
+            log_groups=[linfo])
+
+        func = logsub.get_function(**params)
+        manager = LambdaManager(session_factory)
+        finfo = manager.publish(func)
+        self.addCleanup(manager.remove, func)
+
+        results = client.describe_subscription_filters(logGroupName=lname)
+        self.assertEqual(len(results['subscriptionFilters']), 1)
+        self.assertEqual(results['subscriptionFilters'][0]['destinationArn'],
+                         finfo['FunctionArn'])
+        # try and update
+        params['sns_topic'] = "arn:123"
+        manager.publish(func)
+
+    def test_cwe_update_config_and_code(self):
+        # Originally this was testing the no update case.. but
+        # That is tricky to record, any updates to the code end up
+        # causing issues due to checksum mismatches which imply updating
+        # the function code / which invalidate the recorded data and
+        # the focus of the test.
+
         session_factory = self.replay_flight_data(
             'test_cwe_update', zdata=True)
         p = Policy({
@@ -49,11 +90,40 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, 'Dev', role=self.role)
+        self.addCleanup(mgr.remove, pl)
+
+        p = Policy({
+            'resource': 's3',
+            'name': 's3-bucket-policy',
+            'mode': {
+                'type': 'cloudtrail',
+                'memory': 256,
+                'events': [
+                    "CreateBucket",
+                    {'event': 'PutBucketPolicy',
+                     'ids': 'requestParameters.bucketName',
+                     'source': 's3.amazonaws.com'}]
+            },
+            'filters': [
+                {'type': 'missing-policy-statement',
+                 'statement_ids': ['RequireEncryptedPutObject']}],
+            'actions': ['no-op']
+        }, Config.empty())
+
         output = self.capture_logging('custodian.lambda', level=logging.DEBUG)
         result2 = mgr.publish(PolicyLambda(p), 'Dev', role=self.role)
-        self.assertEqual(len(output.getvalue().strip().split('\n')), 1)
+
+        lines = output.getvalue().strip().split('\n')
+        self.assertTrue(
+            'Updating function custodian-s3-bucket-policy code' in lines)
+        self.assertTrue(
+            'Updating function: custodian-s3-bucket-policy config' in lines)
         self.assertEqual(result['FunctionName'], result2['FunctionName'])
-        mgr.remove(pl)
+        # drive by coverage
+        functions = [i for i in mgr.list_functions()
+                     if i['FunctionName'] == 'custodian-s3-bucket-policy']
+        self.assertTrue(len(functions), 1)
+        self.assertEqual(list(mgr.logs(pl)), [])
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data('test_cwe_trail', zdata=True)

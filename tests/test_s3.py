@@ -64,6 +64,13 @@ def destroyBucket(client, bucket):
     client.delete_bucket(Bucket=bucket)
 
 
+def destroyVersionedBucket(client, bucket):
+    for o in client.list_object_versions(Bucket=bucket).get('Versions'):
+        client.delete_object(
+            Bucket=bucket, Key=o['Key'], VersionId=o['VersionId'])
+    client.delete_bucket(Bucket=bucket)
+
+
 def generateBucketContents(s3, bucket, contents=None):
     default_contents = {
         'home.txt': 'hello',
@@ -85,7 +92,7 @@ class S3Test(BaseTest):
     def test_multipart_large_file(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
-            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)        
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         self.patch(s3, 'MAX_COPY_SIZE', (1024 * 1024 * 6.1))
         session_factory = self.replay_flight_data('test_s3_multipart_file')
@@ -101,7 +108,7 @@ class S3Test(BaseTest):
                 self.d = d
                 self.len = length
                 self.counter = length
-                
+
             def read(self, size):
                 if self.counter == 0:
                     return ""
@@ -120,7 +127,7 @@ class S3Test(BaseTest):
 
             def tell(self):
                 return self.len - self.counter
-            
+
         size = 1024 * 1024 * 16
         client.put_object(
             Bucket=bname, Key=key,
@@ -286,10 +293,38 @@ class S3Test(BaseTest):
         else:
             self.fail("Encryption required policy")
 
+    def test_remove_policy_none_extant(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, None),
+        ])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_remove_empty_policy')
+        bname = "custodian-policy-test"
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy({
+            'name': 'remove-policy',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [
+                {'type': 'remove-statements', 'statement_ids': [
+                    'Zebra', 'Moon']}],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
     def test_remove_policy(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, None),
         ])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.RemovePolicyStatement, 'executor_factory', MainThreadExecutor)
+
         session_factory = self.replay_flight_data('test_s3_remove_policy')
         bname = "custodian-policy-test"
         session = session_factory()
@@ -415,6 +450,58 @@ class S3Test(BaseTest):
             Body='hello world', ContentType='text/plain')
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
+
+    def test_encrypt_versioned_bucket(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_versioning', 'Versioning', None, None)])
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_s3_encrypt_versioned')
+        bname = "custodian-encrypt-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_versioning(
+            Bucket=bname,
+            VersioningConfiguration={'Status': 'Enabled'})
+        self.addCleanup(destroyVersionedBucket, client, bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': ['encrypt-keys']}, session_factory=session_factory)
+        resources = p.run()
+
+        self.assertTrue(
+            len(client.list_object_versions(Bucket=bname)['Versions']) == 3)
+        self.assertTrue(
+            'ServerSideEncryption' in client.head_object(
+                Bucket=bname, Key='home.txt'))
+
+    def test_encrypt_key_empty_bucket(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_s3_encrypt_empty')
+        bname = "custodian-encrypt-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': ['encrypt-keys']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_encrypt_keys(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])

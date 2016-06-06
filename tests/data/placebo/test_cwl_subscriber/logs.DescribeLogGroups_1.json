@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "56252454-2bad-11e6-a6c5-ff6d7a1d7a6f"
+        }, 
+        "logGroups": [
+            {
+                "arn": "arn:aws:logs:us-west-2:619193117841:log-group:custodian-test-log-sub:*", 
+                "creationTime": 1465193415475, 
+                "metricFilterCount": 0, 
+                "logGroupName": "custodian-test-log-sub", 
+                "storedBytes": 0
+            }
+        ]
+    }
+}

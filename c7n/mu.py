@@ -209,7 +209,7 @@ class LambdaManager(object):
             for f in rp.get('Functions', []):
                 if not prefix:
                     yield f
-                if f['FunctionName'].startswith(prefix):
+                elif f['FunctionName'].startswith(prefix):
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
@@ -671,24 +671,28 @@ class CloudWatchEventSource(object):
         return False
 
     def __repr__(self):
-        return "<CWEvent Type:%s Sources:%s Events:%s>" % (
+        return "<CWEvent Type:%s Events:%s>" % (
             self.data.get('type'),
-            ', '.join(self.data.get('sources', [])),
-            ', '.join(self.data.get('events', [])))
+            ', '.join(map(str, self.data.get('events', []))))
 
     def resolve_cloudtrail_payload(self, payload):
         ids = []
         sources = self.data.get('sources', [])
-
+        events = []
         for e in self.data.get('events'):
-            event_info = CloudWatchEvents.get(e)
-            if event_info is None:
-                continue
+            if not isinstance(e, dict):
+                events.append(e)
+                event_info = CloudWatchEvents.get(e)
+                if event_info is None:
+                    continue
+            else:
+                event_info = e
+                events.append(e['event'])
             sources.append(event_info['source'])
 
         payload['detail'] = {
             'eventSource': list(set(sources)),
-            'eventName': self.data.get('events', [])}
+            'eventName': events}
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
@@ -898,6 +902,8 @@ class CloudWatchLogSubscription(object):
     """ Subscribe a lambda to a log group[s]
     """
 
+    iam_delay = 1.5
+
     def __init__(self, session_factory, log_groups, filter_pattern):
         self.log_groups = log_groups
         self.filter_pattern = filter_pattern
@@ -918,9 +924,9 @@ class CloudWatchLogSubscription(object):
                     SourceArn=group['arn'],
                     Action='lambda:InvokeFunction',
                     Principal='logs.%s.amazonaws.com' % region)
-                log.debug("Added lambda invoke log group permission")
+                log.debug("Added lambda ipo nvoke log group permission")
                 # iam eventual consistency and propagation
-                time.sleep(1.5)
+                time.sleep(self.iam_delay)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise
