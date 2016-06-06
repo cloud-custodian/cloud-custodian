@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CopySourceVersionId": "MgRj9joM2xR4BC90cYjPCRWmuC6DB.eA", 
+        "CopyObjectResult": {
+            "LastModified": {
+                "hour": 14, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 18, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 5, 
+                "minute": 11
+            }, 
+            "ETag": "\"b2e189abf85e809a51522cdb0e53083a\""
+        }, 
+        "VersionId": "KsPcYN9hHvlePGJAUJLNmtWUUxWqTz6c", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "hd2ybVgOmwUOKzKNxdSJZ1bqEoposleTXVYLY4ps81qIUvyzz35eX02cSBUNoawT+x1Ux4WfVo4=", 
+            "RequestId": "CD257D86D9A50BA7"
+        }, 
+        "ServerSideEncryption": "AES256"
+    }
+}

@@ -4,8 +4,8 @@
         "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"RequireEncryptedPutObject\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::policy-testv321/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "JVqkUywVyjrU3/1EMYJ55iqWuaSDxsa3WYjhQKtOjfWb9ZMbruxCA+ljzet+b8KqY8gtGauggVg=", 
-            "RequestId": "77E550C7C5653528"
+            "HostId": "Uq5IbUqqmKxTpVefp5o9bOgMvTF3rcbeHLGz3opejmwoXcarsZmbHk7weO2H3V99PGNdemJ608A=", 
+            "RequestId": "AD646B2784255BC5"
         }
     }
 }

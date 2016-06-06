@@ -209,7 +209,7 @@ class LambdaManager(object):
             for f in rp.get('Functions', []):
                 if not prefix:
                     yield f
-                if f['FunctionName'].startswith(prefix):
+                elif f['FunctionName'].startswith(prefix):
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
@@ -898,6 +898,8 @@ class CloudWatchLogSubscription(object):
     """ Subscribe a lambda to a log group[s]
     """
 
+    iam_delay = 1.5
+
     def __init__(self, session_factory, log_groups, filter_pattern):
         self.log_groups = log_groups
         self.filter_pattern = filter_pattern
@@ -918,9 +920,9 @@ class CloudWatchLogSubscription(object):
                     SourceArn=group['arn'],
                     Action='lambda:InvokeFunction',
                     Principal='logs.%s.amazonaws.com' % region)
-                log.debug("Added lambda invoke log group permission")
+                log.debug("Added lambda ipo nvoke log group permission")
                 # iam eventual consistency and propagation
-                time.sleep(1.5)
+                time.sleep(self.iam_delay)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise

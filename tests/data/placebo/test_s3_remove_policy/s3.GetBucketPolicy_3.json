@@ -1,11 +1,11 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs\"},{\"Sid\":\"AWSCloudTrailWrite20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs/api/AWSLogs/619193117841/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "5j0kaGTsABin3xud3ac0BYsES3TeiiWKxUcjylLMTKzM3NySVytnXuSDZymN1XxA", 
-            "RequestId": "DCBD4A8CD30832FF"
+            "HostId": "971wqhlMrmo9LAgELQZo//wg014tHs7+9ODvQPztzM5JoO6Wt3pbPOxRojlHLqnSpNkcojEREFs=", 
+            "RequestId": "090FFB1B550370C2"
         }
     }
 }
