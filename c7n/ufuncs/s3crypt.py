@@ -57,7 +57,7 @@ def get_function(session_factory, role, buckets=None):
         LambdaFunction, custodian_archive, BucketNotification)
 
     config = dict(
-        name='custodian-s3-encrypt',
+        name='c7n-s3-encrypt',
         handler='s3crypt.process_key_event',
         memory_size=256,
         timeout=15,
