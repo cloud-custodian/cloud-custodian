@@ -7,25 +7,25 @@ from c7n.manager import resources
 @resources.register('iam-group')
 class Group(QueryResourceManager):
 
-    resource_type = 'aws.iam.Group'
+    resource_type = 'aws.iam.group'
 
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
 
-    resource_type = 'aws.iam.Role'
+    resource_type = 'aws.iam.role'
 
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
 
-    resource_type = 'aws.iam.User'
+    resource_type = 'aws.iam.user'
 
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
 
-    resource_type = 'aws.iam.Policy'
+    resource_type = 'aws.iam.policy'
 
 
 @resources.register('iam-profile')
@@ -37,6 +37,6 @@ class InstanceProfile(QueryResourceManager):
 @resources.register('server-cert')
 class ServerCerficate(QueryResourceManager):
 
-    resource_type = 'aws.iam.server-certficate'
+    resource_type = 'aws.iam.server-certificate'
 
 
