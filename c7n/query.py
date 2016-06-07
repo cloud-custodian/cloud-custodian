@@ -46,7 +46,7 @@ class QueryResourceManager(ResourceManager):
 
     def resources(self, query=None):
         key = {'region': self.config.region,
-               'resource': self.resource_type,
+               'resource': str(self.resource_type),
                'q': query}
 
         if self._cache.load():
