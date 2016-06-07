@@ -361,7 +361,9 @@ class Terminate(BaseAction, StateTransitionFilter):
 @actions.register('snapshot')
 class Snapshot(BaseAction):
 
-    schema = type_schema('snapshot')
+    schema = type_schema(
+        'snapshot',
+        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
 
     def process(self, resources):
         for resource in resources:
@@ -386,15 +388,34 @@ class Snapshot(BaseAction):
                 DryRun=self.manager.config.dryrun,
                 VolumeId=block_device['Ebs']['VolumeId'],
                 Description=description)
+
+            tags = [
+                {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+                {'Key': 'InstanceId', 'Value': resource['InstanceId']},
+                {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
+            ]
+
+            copy_keys = self.data.get('copy-tags', [])
+            copy_tags = []
+            if copy_keys:
+                for t in resource.get('Tags', []):
+                    if t['Key'] in copy_keys:
+                        copy_tags.append(t)
+
+            if len(copy_tags) + len(tags) > 10:
+                log.warning(
+                    "action:%s volume:%s too many tags to copy" % (
+                        self.__class__.__name__.lower(),
+                        block_device['Ebs']['VolumeId']))
+                copy_tags = []
+
+            tags.extend(copy_tags)
+
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
-                Tags=[
-                    {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
-                    {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                    {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
-                ])
+                Tags=tags)
 
 
 # Valid EC2 Query Filters

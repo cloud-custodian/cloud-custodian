@@ -36,7 +36,7 @@ class TestVolumeFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-    # DISABLED / Re-record flight data on public account        
+    # DISABLED / Re-record flight data on public account
     def test_ec2_attached_volume_skip_block(self):
         session_factory = self.replay_flight_data(
             'test_ec2_attached_ebs_filter')
@@ -141,7 +141,7 @@ class TestStop(BaseTest):
 
 class TestSnapshot(BaseTest):
 
-    def test_ec2_snapshot(self):
+    def test_ec2_snapshot_no_copy_tags(self):
         session_factory = self.replay_flight_data(
             'test_ec2_snapshot')
         policy = self.load_policy({
@@ -151,6 +151,20 @@ class TestSnapshot(BaseTest):
                 {'tag:Name': 'CompileLambda'}],
             'actions': [
                 {'type': 'snapshot'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ec2_snapshot_copy_tags(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_snapshot')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'CompileLambda'}],
+            'actions': [
+                {'type': 'snapshot', 'copy-tags': ['ASV' 'Testing123']}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -165,7 +179,7 @@ class TestEC2QueryFilter(unittest.TestCase):
         self.assertEqual(
             x[0].query(),
             {'Name': 'instance-state-name', 'Values': ['running']})
-        
+
         self.assertTrue(
             isinstance(
                 QueryFilter.parse(
@@ -176,7 +190,7 @@ class TestEC2QueryFilter(unittest.TestCase):
             ValueError,
             QueryFilter.parse,
             [{'tag:ASV': None}])
-        
+
 
 class TestActions(unittest.TestCase):
 
@@ -192,7 +206,4 @@ class TestActions(unittest.TestCase):
 
         self.assertIsInstance(
             actions.factory('terminate', None),
-            ec2.Terminate)        
-
-        
-
+            ec2.Terminate)
