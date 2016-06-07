@@ -7,4 +7,4 @@ from c7n.manager import resources
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
-    resource_type = 'aws.sns.Topic'
+    resource_type = 'aws.sns.topic'

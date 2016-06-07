@@ -71,6 +71,8 @@ from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import local_session, type_schema, get_account_id
 
+from skew.resources.aws import rds
+
 log = logging.getLogger('custodian.rds')
 
 filters = FilterRegistry('rds.filters')
@@ -83,7 +85,9 @@ filters.register('marked-for-op', tags.TagActionFilter)
 @resources.register('rds')
 class RDS(QueryResourceManager):
 
-    resource_type = "aws.rds.db"
+    class resource_type(rds.DBInstance.Meta):
+        filter_name = 'DBInstanceIdentifier'
+
     filter_registry = filters
     action_registry = actions
     account_id = None

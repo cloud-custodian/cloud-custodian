@@ -7,7 +7,4 @@ from c7n.manager import resources
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
-    resource_type = 'aws.sqs.Queue'
-
-
-        
+    resource_type = 'aws.sqs.queue'
