@@ -196,14 +196,18 @@ def create_instance(session, dry_run, ami_id, instance, bdm, user_data):
         InstanceType=instance['InstanceType'],
         SubnetId=instance['SubnetId'],
         BlockDeviceMappings=bdm,
-        IamInstanceProfile=pull_iam_profile(instance),
+        IamInstanceProfile={'Arn': instance['IamInstanceProfile']['Arn']},
         UserData=user_data)
     instance_id = instances[0].instance_id
     restored = ec2.Instance(instance_id)
     print "\n\tRestoring instance from snapshot..."
-    while restored.state['Name'] != 'running':
-        time.sleep(5)
-        restored = ec2.Instance(instance_id)
+
+    client = session.client('ec2')
+    waiter = client.get_waiter('instance_running')
+    waiter.wait(
+        DryRun=dry_run,
+        InstanceIds=[instance_id]
+    )
     restored.create_tags(
         DryRun=dry_run,
         Tags=create_tags(instance['Tags']))
@@ -222,13 +226,6 @@ def confirm_selection(snapshots, ami):
         response = raw_input("\nAre these values correct? [Y/N]: ")
         if response.upper() == "Y" or response.upper() == "N":
             return response
-
-
-def pull_iam_profile(instance):
-    iam = instance['IamInstanceProfile']
-    arn = iam['Arn']
-    name = arn.split('/')[1]
-    return {'Arn': arn}
 
 
 def main():
