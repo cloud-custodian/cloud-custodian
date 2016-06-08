@@ -16,7 +16,7 @@
 class PluginRegistry(object):
     """A plugin registry
 
-    Maid is intended to be innately pluggable both internally and
+    Custodian is intended to be innately pluggable both internally and
     externally, for resource types and their filters and actions.
 
     This plugin registry abstraction provides the core mechanism for

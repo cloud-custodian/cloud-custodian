@@ -33,7 +33,6 @@ class KMS(ResourceManager):
 
     def resources(self):
         c = self.session_factory().client('kms')
-        query = self.resource_query()  # FIXME: Not used
         self.log.info("Querying kms keys")
         keys = c.list_aliases()['Aliases']
         original_count = len(keys)

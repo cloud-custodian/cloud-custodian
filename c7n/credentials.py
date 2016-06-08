@@ -34,14 +34,15 @@ class SessionFactory(object):
             profile_name=self.profile)
         if self.assume_role and assume:
             session = assumed_session(
-                self.assume_role, "CloudCustodian", session)
+                self.assume_role, "CloudCustodian", session,
+                region or self.region)
 
         session._session.user_agent_name = "CloudCustodian"
         session._session.user_agent_version = version
         return session
 
 
-def assumed_session(role_arn, session_name, session=None):
+def assumed_session(role_arn, session_name, session=None, region=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
@@ -80,9 +81,10 @@ def assumed_session(role_arn, session_name, session=None):
     # but its pretty baroque as well with upstream support.
     # https://github.com/boto/boto3/issues/443
     # https://github.com/boto/botocore/issues/761
-    
+
     s = get_session()
     s._credentials = session_credentials
-    region = s.get_config_variable('region') or 'us-east-1'
+    if region is None:
+        region = s.get_config_variable('region') or 'us-east-1'
     s.set_config_variable('region', region)
     return Session(botocore_session=s)
