@@ -179,8 +179,8 @@ class Policy(object):
     def poll(self):
         """Query resources and apply policy."""
         with self.ctx:
-            self.log.info("Running policy %s resource: %s",
-                          self.name, self.resource_type)
+            self.log.info("Running policy %s resource: %s region:%s",
+                          self.name, self.resource_type, self.options.region)
             s = time.time()
             resources = self.resource_manager.resources()
             rt = time.time() - s
