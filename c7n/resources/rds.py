@@ -67,7 +67,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter, AgeFilter
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import local_session, type_schema, get_account_id, chunks
@@ -303,30 +303,24 @@ class RetentionWindow(BaseAction):
 
 
 @resources.register('rds-snapshot')
-class RDSSnapshot(ResourceManager):
+class RDSSnapshot(QueryResourceManager):
+
+    class Meta(object):
+
+        service = 'rds'
+        type = 'rds-snapshot'
+        enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
+        name = id = 'DBSnapshotIdentifier'
+        filter_name = None
+        filter_type = None
+        dimension = None
+        date = 'SnapshotCreateTime'
+
+    resource_type = Meta
 
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
 
-    def resources(self):
-        c = self.session_factory().client('rds')
-        query = self.resource_query()
-        if self._cache.load():
-            snaps = self._cache.get(
-                {'region': self.config.region,
-                 'resource': 'rds-snapshot',
-                 'q': query})
-            if snaps is not None:
-                return self.filter_resources(snaps)
-        self.log.info('Querying rds snapshots')
-        p = c.get_paginator('describe_db_snapshots')
-        results = p.paginate(Filters=query)
-        snapshots = list(itertools.chain(*[rp['DBSnapshots'] for rp in results]))
-        self._cache.save(
-            {'region': self.config.region,
-             'resource': 'rds-snapshot',
-             'q': query}, snapshots)
-        return self.filter_resources(snapshots)
 
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
