@@ -60,7 +60,6 @@ Todo/Notes
 
 """
 import logging
-import itertools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
