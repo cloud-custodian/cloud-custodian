@@ -109,10 +109,14 @@ def _rds_tags(
     def process_tags(db):
         client = local_session(session_factory).client('rds')
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         region = db['Endpoint']['Address'].split('.')[-4]
         name = db['DBInstanceIdentifier']
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
+=======
+        arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, db[model.id])
+>>>>>>> capitalone/master
 =======
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, db[model.id])
 >>>>>>> capitalone/master
@@ -126,7 +130,10 @@ def _rds_tags(
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> capitalone/master
 =======
 >>>>>>> capitalone/master
 @filters.register('default-vpc')
@@ -161,7 +168,10 @@ class DefaultVpc(Filter):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> capitalone/master
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
 
@@ -217,6 +227,9 @@ class RemoveTag(tags.RemoveTag):
                 ResourceName=arn, TagKeys=tag_keys)
 
 
+<<<<<<< HEAD
+>>>>>>> capitalone/master
+=======
 >>>>>>> capitalone/master
 @actions.register('delete')
 class Delete(BaseAction):
@@ -273,6 +286,10 @@ class Snapshot(BaseAction):
                             "Exception creating rds snapshot  \n %s" % (
                                 f.exception()))
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        return resources
+>>>>>>> capitalone/master
 =======
         return resources
 >>>>>>> capitalone/master
@@ -281,7 +298,11 @@ class Snapshot(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
 <<<<<<< HEAD
+<<<<<<< HEAD
             DBSnapshotIdentifier="BKUP-%s-%s" % (
+=======
+            DBSnapshotIdentifier="Backup-%s-%s" % (
+>>>>>>> capitalone/master
 =======
             DBSnapshotIdentifier="Backup-%s-%s" % (
 >>>>>>> capitalone/master
@@ -312,8 +333,14 @@ class RetentionWindow(BaseAction):
     def process_snapshot_retention(self, resource):
         v = int(resource.get('BackupRetentionPeriod', 0))
 <<<<<<< HEAD
+<<<<<<< HEAD
         if v == 0 or v != self.data['days']:
             self.set_retention_window(resource)
+=======
+        if v == 0 or v < self.data['days']:
+            self.set_retention_window(resource)
+            return resource
+>>>>>>> capitalone/master
 =======
         if v == 0 or v < self.data['days']:
             self.set_retention_window(resource)
@@ -326,7 +353,10 @@ class RetentionWindow(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=self.data['days'])
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> capitalone/master
 
 
 @resources.register('rds-snapshot')
@@ -380,4 +410,7 @@ class RDSSnapshotDelete(BaseAction):
                     DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
             except ClientError as e:
                 raise
+<<<<<<< HEAD
+>>>>>>> capitalone/master
+=======
 >>>>>>> capitalone/master
