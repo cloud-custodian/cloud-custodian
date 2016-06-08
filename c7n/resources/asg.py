@@ -60,8 +60,17 @@ class LaunchConfigBase(object):
     def initialize(self, asgs):
         """Get launch configs for the set of asgs"""
         config_names = set()
+        skip = []
+
         for a in asgs:
+            # Per https://github.com/capitalone/cloud-custodian/issues/143
+            if 'LaunchConfigurationName' not in a:
+                skip.append(a)
+                continue
             config_names.add(a['LaunchConfigurationName'])
+
+        for a in skip:
+            asgs.remove(a)
 
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
