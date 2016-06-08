@@ -197,7 +197,7 @@ class Policy(object):
             if not resources:
                 return []
 
-            if self.options.dryrun and not self.resource_manager.supports_dry_run:
+            if self.options.dryrun:
                 self.log.debug("dryrun: skipping actions")
                 return resources
 
