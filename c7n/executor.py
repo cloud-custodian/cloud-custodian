@@ -58,7 +58,7 @@ class MainThreadExecutor(object):
     def __exit__(self, *args):
         return False
 
-    
+
 class MainThreadFuture(object):
     # For Dev/Unit Testing with concurrent.futures
 
@@ -68,7 +68,7 @@ class MainThreadFuture(object):
         self._state = 'FINISHED'
         self._waiters = []
         self._condition = threading.Condition()
-        
+
     def cancel(self):
         return False
 
@@ -91,4 +91,3 @@ class MainThreadFuture(object):
 executors = ExecutorRegistry('executor')
 executors.load_plugins()
 
-    

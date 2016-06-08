@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Grants": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "ce236f11-14ba-11e6-896d-71e93c4b130b"
+        }, 
+        "Truncated": false
+    }
+}

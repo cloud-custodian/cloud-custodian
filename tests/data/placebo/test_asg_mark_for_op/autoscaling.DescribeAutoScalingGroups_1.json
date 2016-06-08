@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG", 
+                "HealthCheckGracePeriod": 300, 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 3, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "CustodianASG", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "ubuntu", 
+                        "Key": "Platform"
+                    }, 
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "CustodianASG", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "AutoScaleGroup does not meet org tag policy: suspend@2016/05/21", 
+                        "Key": "custodian_action"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "CustodianASG", 
+                "DefaultCooldown": 300, 
+                "MinSize": 3, 
+                "Instances": [], 
+                "MaxSize": 3, 
+                "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "CustodianASGTestCopyCopy", 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 276000, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 31
+                }, 
+                "AvailabilityZones": [
+                    "us-west-2c", 
+                    "us-west-2b", 
+                    "us-west-2a"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5478b762-1e90-11e6-8e08-192325a99f6e"
+        }
+    }
+}

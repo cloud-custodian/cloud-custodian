@@ -33,7 +33,6 @@ class KMS(ResourceManager):
 
     def resources(self):
         c = self.session_factory().client('kms')
-        query = self.resource_query()  # FIXME: Not used
         self.log.info("Querying kms keys")
         keys = c.list_aliases()['Aliases']
         original_count = len(keys)
@@ -65,7 +64,7 @@ class GrantCount(Filter):
         grant_threshold = self.data.get('min', 5)
         if grant_count < grant_threshold:
             return None
-        
+
         self.manager.ctx.metrics.put_metric(
             "ExtantGrants", grant_count, "Count",
             Scope=key['AliasName'][6:])

@@ -19,7 +19,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from .common import instance, event_data
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -88,8 +88,8 @@ class TestAndFilter(unittest.TestCase):
                 Architecture='x86_64')),
             False)
 
-        
-class TestGlobValue(unittest.TestCase):        
+
+class TestGlobValue(unittest.TestCase):
 
     def test_regex_match(self):
         f = filters.factory(
@@ -107,8 +107,8 @@ class TestGlobValue(unittest.TestCase):
                 Architecture='x86_64',
                 Color='blue')),
             False)
-    
-    
+
+
 class TestRegexValue(unittest.TestCase):
 
     def test_regex_validate(self):
@@ -213,14 +213,23 @@ class TestMarkedForAction(BaseFilterTest):
 class EventFilterTest(BaseFilterTest):
 
     def test_event_filter(self):
+        b = Bag(data={'mode': []})
         event = event_data('event-instance-state.json')
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
-        self.assertTrue(filters.factory(f).process(
+        self.assertTrue(filters.factory(f, b).process(
             [instance()], event))
 
-        
+    def test_event_no_mode(self):
+        b = Bag(data={'resource': 'something'})
+        f = {'type': 'event',
+             'key': 'detail.state',
+             'value': 'pending'}
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, b)
+
+
 class TestInstanceValue(BaseFilterTest):
 
     def test_filter_tag_count(self):
@@ -296,6 +305,180 @@ class TestInstanceValue(BaseFilterTest):
              "type": "value"},
             instance(),
             True)
+
+
+class TestEqualValue(unittest.TestCase):
+
+    def test_eq(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'eq'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            True)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            False)
+
+    def test_equal(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'equal'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            True)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            False)
+
+
+class TestNotEqualValue(unittest.TestCase):
+
+    def test_ne(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'ne'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            False)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            True)
+
+    def test_not_equal(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'not-equal'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            False)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            True)
+
+
+class TestGreaterThanValue(unittest.TestCase):
+
+    def test_gt(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'gt'})
+        self.assertEqual(
+            f(instance(Number=11)),
+            True)
+        self.assertEqual(
+            f(instance(Number=9)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+    def test_greater_than(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'greater-than'})
+        self.assertEqual(
+            f(instance(Number=11)),
+            True)
+        self.assertEqual(
+            f(instance(Number=9)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+
+class TestLessThanValue(unittest.TestCase):
+
+    def test_lt(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'lt'})
+        self.assertEqual(
+            f(instance(Number=9)),
+            True)
+        self.assertEqual(
+            f(instance(Number=11)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+    def test_less_than(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'less-than'})
+        self.assertEqual(
+            f(instance(Number=9)),
+            True)
+        self.assertEqual(
+            f(instance(Number=11)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+
+class TestInList(unittest.TestCase):
+
+    def test_in(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'in'})
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            False)
+
+
+class TestNotInList(unittest.TestCase):
+
+    def test_ni(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'ni'})
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            False)
+
+    def test_not_in(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'not-in'})
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            False)
+
 
 if __name__ == '__main__':
     unittest.main()

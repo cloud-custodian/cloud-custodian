@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b2aaa04-1c21-11e6-bd27-0b9695a4d2da"
+        }, 
+        "Label": "Errors"
+    }
+}

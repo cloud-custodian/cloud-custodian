@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "2e239436-7c65-41c2-a39b-0e444b518051"
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [], 
+                "Tags": [
+                    {
+                        "Value": "vol-fdd1f844", 
+                        "Key": "maid-origin-volume"
+                    }, 
+                    {
+                        "Value": "/dev/xvda", 
+                        "Key": "maid-instance-device"
+                    }, 
+                    {
+                        "Value": "i-9432cb49", 
+                        "Key": "maid-crypt-remediation"
+                    }
+                ], 
+                "Encrypted": true, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-add3fa14", 
+                "State": "available", 
+                "Iops": 24, 
+                "KmsKeyId": "arn:aws:kms:us-west-2:619193117841:key/00d9c89e-13ee-4758-9167-41de13b5bb68", 
+                "SnapshotId": "snap-ee6f74be", 
+                "CreateTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 26, 
+                    "microsecond": 851000, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 13
+                }, 
+                "Size": 8
+            }
+        ]
+    }
+}

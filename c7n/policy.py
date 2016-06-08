@@ -25,14 +25,14 @@ from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n import utils
 
-# This import causes our resources to be registered into plugin registries
-import c7n.resources
+from c7n.resources import load_resources
 
 
 def load(options, path, format='yaml', validate=True):
     if not os.path.exists(path):
         raise ValueError("Invalid path for config %r" % path)
-    
+
+    load_resources()
     with open(path) as fh:
         if format == 'yaml':
             data = utils.yaml_load(fh.read())
@@ -52,19 +52,26 @@ class PolicyCollection(object):
     def __init__(self, data, options):
         self.data = data
         self.options = options
-        
-    def policies(self, filters=None):
+
+    def policies(self, filters=None, resource_type=None):
         # self.options is the CLI options specified in cli.setup_parser()
         policies = [Policy(p, self.options) for p in self.data.get(
-            'policies', [])]
+            'policies', [])
+                    if resource_type and resource_type == p.resource_type or 1]
+
         if not filters:
             return policies
 
         return [p for p in policies if fnmatch.fnmatch(p.name, filters)]
 
+    filter = policies
+
     def __iter__(self):
         return iter(self.policies())
-    
+
+    def __contains__(self, policy_name):
+        return policy_name in [p['name'] for p in self.data['policies']]
+
 
 class Policy(object):
 
@@ -82,7 +89,11 @@ class Policy(object):
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.get_resource_manager()
-            
+
+    def __repr__(self):
+        return "<Policy resource: %s name: %s>" % (
+            self.resource_type, self.name)
+
     @property
     def name(self):
         return self.data['name']
@@ -96,13 +107,13 @@ class Policy(object):
         if not 'mode' in self.data:
             return False
         return True
-    
+
     def push(self, event, lambda_ctx):
         """Run policy in push mode against given event.
- 
+
         Lambda automatically generates cloud watch logs, and metrics
         for us, albeit with some deficienies, metrics no longer count
-        against valid resources matches, but against execution. 
+        against valid resources matches, but against execution.
         Fortunately we already have replacements.
 
         TODO: better customization around execution context outputs
@@ -116,9 +127,9 @@ class Policy(object):
 
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
-            raise ValueError("Invalid push event mode %s" % self.data)
+            raise ValueError("Unknown push event mode %s" % self.data)
 
-        self.log.info('Found resource ids: %s' % resource_ids)        
+        self.log.info('Found resource ids: %s' % resource_ids)
         if not resource_ids:
             self.log.warning("Could not find resource ids")
             return
@@ -130,7 +141,7 @@ class Policy(object):
         resources = self.resource_manager.filter_resources(resources, event)
         if 'debug' in event:
             self.log.info("Filtered resources %d" % len(resources))
-        
+
         if not resources:
             self.log.info("policy: %s resources: %s no resources matched" % (
                 self.name, self.resource_type))
@@ -164,11 +175,12 @@ class Policy(object):
                     lambda assume=False: self.session_factory(assume))
             return manager.publish(
                 PolicyLambda(self), 'current', role=self.options.assume_role)
-            
+
     def poll(self):
         """Query resources and apply policy."""
         with self.ctx:
-            self.log.info("Running policy %s" % self.name)
+            self.log.info("Running policy %s resource: %s region:%s",
+                          self.name, self.resource_type, self.options.region)
             s = time.time()
             resources = self.resource_manager.resources()
             rt = time.time() - s
@@ -185,11 +197,11 @@ class Policy(object):
             if not resources:
                 return []
 
-            if self.options.dryrun and not self.resource_manager.supports_dry_run:
+            if self.options.dryrun:
                 self.log.debug("dryrun: skipping actions")
                 return resources
 
-            at = time.time()            
+            at = time.time()
             for a in self.resource_manager.actions:
                 s = time.time()
                 results = a.process(resources)
@@ -209,7 +221,7 @@ class Policy(object):
             return self.poll()
 
     run = __call__
-    
+
     def _write_file(self, rel_p, value):
         with open(
                 os.path.join(self.ctx.log_dir, rel_p), 'w') as fh:
@@ -222,5 +234,3 @@ class Policy(object):
             raise ValueError(
                 "Invalid resource type: %s" % resource_type)
         return factory(self.ctx, self.data)
-
-    

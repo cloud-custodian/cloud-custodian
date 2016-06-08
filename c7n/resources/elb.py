@@ -54,99 +54,95 @@ In addition to value filters
 """
 from concurrent.futures import as_completed
 import logging
-import itertools
 
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, FilterValidationError
-from c7n.manager import ResourceManager, resources
+from c7n import tags
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session, chunks, type_schema
 
-from functools import partial
-
 log = logging.getLogger('custodian.elb')
-
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
 
 
-@resources.register('elb')
-class ELB(ResourceManager):
+filters.register('tag-count', tags.TagCountFilter)
+filters.register('marked-for-op', tags.TagActionFilter)
 
+
+@resources.register('elb')
+class ELB(QueryResourceManager):
+
+    resource_type = "aws.elb.loadbalancer"
     filter_registry = filters
     action_registry = actions
 
-    def resources(self):
-        if self._cache.load():
-            elbs = self._cache.get(
-                {'region': self.config.region, 'resource': 'elb'})
-            if elbs is not None:
-                self.log.debug("Using cached elb: %d" % (
-                    len(elbs)))
-                return self.filter_resources(elbs)
+    def augment(self, resources):
+        return _elb_tags(
+            resources, self.session_factory, self.executor_factory)
 
-        c = self.session_factory().client('elb')
-        p = c.get_paginator('describe_load_balancers')
-        results = p.paginate()
-        elbs = list(itertools.chain(
-            *[self.get_elbs_from_result_page(c, rp) for rp in results]))
-        self._cache.save(
-            {'region': self.config.region, 'resource': 'elbs'}, elbs)
 
-        return self.filter_resources(elbs)
+def _elb_tags(elbs, session_factory, executor_factory):
 
-    def get_resources(self, resource_ids):
-        c = local_session(self.session_factory).client('elb')
+    def process_tags(elb_set):
+        client = local_session(session_factory).client('elb')
+        elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
         try:
-            return c.describe_load_balancers(
-                LoadBalancerNames=resource_ids).get(
-                    'LoadBalancerDescriptions', ())
+            results = client.describe_tags(LoadBalancerNames=elb_map.keys())
         except ClientError as e:
-            if e.response['Error']['Code'] == "LoadBalancerNotFound":
-                return []
+            log.exception("Exception Processing ELB: %s", e)
             raise
+        for tag_desc in results['TagDescriptions']:
+            elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
 
-    def get_elbs_from_result_page(self, client, rp):
-        elb_descriptions = rp['LoadBalancerDescriptions']
-        self.add_tags_to_results(client, elb_descriptions)
-        return elb_descriptions
+    with executor_factory(max_workers=2) as w:
+        list(w.map(process_tags, chunks(elbs, 20)))
 
-    def add_tags_to_results(self, client, elbs):
-        """
-        Gets the tags for the ELBs and adds them to
-        the result set.
-        """
-        elb_names = [elb['LoadBalancerName'] for elb in elbs]
-        names_to_tags = {}
-        fn = partial(self.process_tags, client=client)
-        futures = []
-        with self.executor_factory(max_workers=3) as w:
-            # max 20 ELBs per call (API limitation)
-            for elb_names_chunk in chunks(elb_names, size=20):
-                    futures.append(
-                        w.submit(fn, elb_names_chunk))
 
-        for f in as_completed(futures):
-            if f.exception():
-                self.log.exception("Exception Processing ELB: %s" % (
-                    f.exception()))
-                continue
-            r = f.result()
-            if r:
-                names_to_tags.update(r)
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
 
-        for elb in elbs:
-            elb['Tags'] = names_to_tags[elb['LoadBalancerName']]
+    schema = type_schema(
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
+        ops={'enum': ['delete', 'set-ssl-listener-policy']})
 
-    def process_tags(self, chunk, **kwargs):
-        tag_descriptions = kwargs['client'].describe_tags(LoadBalancerNames=chunk)
+    batch_size = 20
 
-        names_to_tags = {}
-        for desc in tag_descriptions['TagDescriptions']:
-            names_to_tags[desc['LoadBalancerName']] = desc['Tags']
-        return names_to_tags
+    def process_resource_set(self, resource_set, tags):
+        client = local_session(self.manager.session_factory).client('elb')
+        client.add_tags(
+            LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
+            Tags=tags)
+
+
+@actions.register('tag')
+class Tag(tags.Tag):
+
+    batch_size = 20
+
+    def process_resource_set(self, resource_set, tags):
+        client = local_session(
+            self.manager.session_factory).client('elb')
+        client.add_tags(
+            LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
+            Tags=tags)
+
+
+@actions.register('remove-tag')
+class RemoveTag(tags.RemoveTag):
+
+    batch_size = 20
+
+    def process_resource_set(self, resource_set, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elb')
+        client.remove_tags(
+            LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
+            Tags=[{'Key': k for k in tag_keys}])
 
 
 @actions.register('delete')
@@ -270,16 +266,18 @@ class SSLPolicyFilter(Filter):
         whitelist = set(self.data.get('whitelist', []))
         blacklist = set(self.data.get('blacklist', []))
 
+        invalid_elbs = []
+
         if blacklist:
-            invalid_elbs = [
-                elb for elb, active_policies in
-                active_policy_attribute_tuples
-                if len(blacklist.intersection(active_policies))]
+            for elb, active_policies in active_policy_attribute_tuples:
+                if len(blacklist.intersection(active_policies)) > 0:
+                    elb["ProhibitedPolicies"] = list(blacklist.intersection(active_policies))
+                    invalid_elbs.append(elb)
         elif whitelist:
-            invalid_elbs = [
-                elb for elb, active_policies in
-                active_policy_attribute_tuples
-                if len(set(active_policies).difference(whitelist))]
+            for elb, active_policies in active_policy_attribute_tuples:
+                if len(set(active_policies).difference(whitelist)) > 0:
+                    elb["ProhibitedPolicies"] = list(set(active_policies).difference(whitelist))
+                    invalid_elbs.append(elb)
         return invalid_elbs
 
     def create_elb_active_policy_attribute_tuples(self, elbs):

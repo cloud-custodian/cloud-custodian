@@ -1,0 +1,149 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "619193117841", 
+                "ReservationId": "r-518aecff", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 11, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 33, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 8, 
+                            "minute": 6
+                        }, 
+                        "PrivateIpAddress": "172.31.6.75", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-399e3d52", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-9432cb49", 
+                        "ImageId": "ami-c229c0a2", 
+                        "PrivateDnsName": "ip-172-31-6-75.us-west-2.compute.internal", 
+                        "KeyName": "HazmatGreenField", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "jlxc", 
+                                "GroupId": "sg-47b76f22"
+                            }, 
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-0a08e365"
+                            }
+                        ], 
+                        "ClientToken": "RMwtS1462705593120", 
+                        "SubnetId": "subnet-389e3d53", 
+                        "InstanceType": "m3.medium", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0a:b3:a8:83:54:ff", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-399e3d52", 
+                                "Description": "Primary network interface", 
+                                "NetworkInterfaceId": "eni-d23dd48e", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-6-75.us-west-2.compute.internal", 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.6.75"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-6-75.us-west-2.compute.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-a741656e", 
+                                    "AttachTime": {
+                                        "hour": 11, 
+                                        "__class__": "datetime", 
+                                        "month": 5, 
+                                        "second": 33, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 8, 
+                                        "minute": 6
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "jlxc", 
+                                        "GroupId": "sg-47b76f22"
+                                    }, 
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-0a08e365"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-389e3d53", 
+                                "OwnerId": "619193117841", 
+                                "PrivateIpAddress": "172.31.6.75"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-west-2c"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-fdd1f844", 
+                                    "AttachTime": {
+                                        "hour": 11, 
+                                        "__class__": "datetime", 
+                                        "month": 5, 
+                                        "second": 34, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 8, 
+                                        "minute": 6
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "CompiledLambda", 
+                                "Key": "Name"
+                            }, 
+                            {
+                                "Value": "Testing123", 
+                                "Key": "Testing"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "52c75e54-d5a7-42d0-aa8f-f508de78fcff"
+        }
+    }
+}

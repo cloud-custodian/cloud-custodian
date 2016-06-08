@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "5pyFMZtQ70VhhVLcTrt7/3L2v5P/0eq8NakfA5tbuPJzsUe3IbZg/RAT4mnNEv2kCcC65ItsOnM=", 
+            "RequestId": "90AB2AA2BCF1AADB"
+        }
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InternetGateways": [
+            {
+                "Tags": [], 
+                "InternetGatewayId": "igw-3d9e3d56", 
+                "Attachments": [
+                    {
+                        "State": "available", 
+                        "VpcId": "vpc-399e3d52"
+                    }
+                ]
+            }, 
+            {
+                "Tags": [], 
+                "InternetGatewayId": "igw-5bce113e", 
+                "Attachments": [
+                    {
+                        "State": "available", 
+                        "VpcId": "vpc-cb3e8cae"
+                    }
+                ]
+            }, 
+            {
+                "Tags": [], 
+                "InternetGatewayId": "igw-e74b2b82", 
+                "Attachments": [
+                    {
+                        "State": "available", 
+                        "VpcId": "vpc-1cc8e779"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "cf33d5da-5bbd-47ba-810e-277d1be64cfa"
+        }
+    }
+}

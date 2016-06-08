@@ -37,7 +37,7 @@ class ZippedPill(pill.Pill):
     def playback(self):
         self.archive = zipfile.ZipFile(self.path, 'r')
         self._files = set(self.archive.namelist())
-        return super(ZippedPill, self).playback()        
+        return super(ZippedPill, self).playback()
 
     def record(self):
         self.archive = zipfile.ZipFile(self.path, 'a', zipfile.ZIP_DEFLATED)
@@ -62,7 +62,7 @@ class ZippedPill(pill.Pill):
                 continue
             self.archive.writestr(n, src.read(n))
         os.remove("%s.tmp" % self.path)
-        return super(ZippedPill, self).record()        
+        return super(ZippedPill, self).record()
 
     def stop(self):
         super(ZippedPill, self).stop()
@@ -131,12 +131,12 @@ class ZippedPill(pill.Pill):
                 raise IOError('response file ({0}) not found'.format(fn))
         return fn
 
-    
+
 def attach(session, data_path, prefix=None, debug=False):
     pill = ZippedPill(data_path, prefix=prefix, debug=debug)
     pill.attach(session, prefix)
     return pill
-    
+
 
 class PillTest(unittest.TestCase):
 
@@ -145,14 +145,14 @@ class PillTest(unittest.TestCase):
 
     placebo_dir = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', 'placebo')
-    
+
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
         self.assertEqual(value, expected)
 
     def cleanUp(self):
         pass
-    
+
     def record_flight_data(self, test_case, zdata=False):
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
@@ -165,26 +165,26 @@ class PillTest(unittest.TestCase):
             pill = placebo.attach(session, test_dir, debug=True)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
-            
+
         pill.record()
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
         # return session factory
         return lambda region=None, assume=None: session
-    
+
     def replay_flight_data(self, test_case, zdata=False):
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if not os.path.exists(test_dir):
                 raise RuntimeError(
                     "Invalid Test Dir for flight data %s" % test_dir)
-        
+
         session = boto3.Session()
         if not zdata:
             pill = placebo.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
-            
+
         pill.playback()
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)

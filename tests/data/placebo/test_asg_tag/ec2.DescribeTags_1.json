@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "1ae8553c-51b9-4ff4-9022-24e2cd2f9076"
+        }, 
+        "Tags": [
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-9206fe54", 
+                "Value": "GetSome", 
+                "Key": "CustomerId"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-9206fe54", 
+                "Value": "ubuntu", 
+                "Key": "Platform"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-9206fe54", 
+                "Value": "CustodianASG", 
+                "Key": "aws:autoscaling:groupName"
+            }
+        ]
+    }
+}

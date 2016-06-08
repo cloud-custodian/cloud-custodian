@@ -1,0 +1,13 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RequestId": "5676edab-2bad-11e6-a476-63c1e7221cfd"
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

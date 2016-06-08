@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "En5vmt7KZ5lK/xWQ29ufodJvcwcxSK9EnPgo3g7Gtld3MkHQIeDUMwaY0fBVGyloMFPHo+SuYWU=", 
+            "RequestId": "BABA283F9227B194"
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

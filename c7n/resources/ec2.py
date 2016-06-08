@@ -22,7 +22,8 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
 from c7n import tags, utils
 from c7n.utils import type_schema
@@ -35,8 +36,9 @@ tags.register_tags(filters, actions, 'InstanceId')
 
 
 @resources.register('ec2')
-class EC2(ResourceManager):
+class EC2(QueryResourceManager):
 
+    resource_type = "aws.ec2.instance"
     filter_registry = filters
     action_registry = actions
 
@@ -44,51 +46,12 @@ class EC2(ResourceManager):
         super(EC2, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
 
-    @property
-    def client(self):
-        return self.session_factory().client('ec2')
-
-    def get_resources(self, resource_ids):
-        return utils.query_instances(
-            None,
-            client=self.session_factory().client('ec2'),
-            InstanceIds=resource_ids)
-
-    def resources(self):
-        qf = self.resource_query()
-        instances = None
-
-        if self._cache.load():
-            instances = self._cache.get(
-                {'resource': 'ec2', 'region': self.config.region, 'query': qf})
-
-        if instances is not None:
-            self.log.info(
-                'Using cached instance query: %s instances' % len(instances))
-            return self.filter_resources(instances)
-
-        self.log.info("Querying ec2 instances with %s" % qf)
-        session = self.session_factory()
-        client = session.client('ec2')
-        p = client.get_paginator('describe_instances')
-
-        results = p.paginate(Filters=qf)
-        reservations = list(
-            itertools.chain(*[pp['Reservations'] for pp in results]))
-        instances =  list(itertools.chain(
-            *[r["Instances"] for r in reservations]))
-        self.log.debug("Found %d instances on %d reservations" % (
-            len(instances), len(reservations)))
-        self._cache.save(
-            {'resource': 'ec2', 'region': self.config.region}, instances)
-
-        # Filter instances
-        return self.filter_resources(instances)
-
-    def format_json(self, resources, fh):
-        resources = sorted(
-            resources, key=operator.itemgetter('LaunchTime'))
-        utils.dumps(resources, fh, indent=2)
+    def resources(self, query=None):
+        q = self.resource_query()
+        if q is not None:
+            query = query or {}
+            query['Filters'] = q
+        return super(EC2, self).resources(query=query)
 
     def resource_query(self):
         qf = []
@@ -302,8 +265,10 @@ class Start(BaseAction, StateTransitionFilter):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         self._run_api(
-            self.manager.client.start_instances,
+            client.start_instances,
             InstanceIds=[i['InstanceId'] for i in instances],
             DryRun=self.manager.config.dryrun)
 
@@ -312,7 +277,7 @@ class Start(BaseAction, StateTransitionFilter):
 class Stop(BaseAction, StateTransitionFilter):
     """Stop instances
     """
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running',)
 
     schema =  type_schema(
         'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
@@ -331,16 +296,18 @@ class Stop(BaseAction, StateTransitionFilter):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
             self._run_api(
-                self.manager.client.terminate_instances,
+                client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in ephemeral],
                 DryRun=self.manager.config.dryrun)
         if persistent:
             self._run_api(
-                self.manager.client.stop_instances,
+                client.stop_instances,
                 InstanceIds=[i['InstanceId'] for i in persistent],
                 DryRun=self.manager.config.dryrun)
 
@@ -367,10 +334,12 @@ class Terminate(BaseAction, StateTransitionFilter):
         if self.data.get('force'):
             self.log.info("Disabling termination protection on instances")
             self.disable_deletion_protection(instances)
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
             self._run_api(
-                self.manager.client.terminate_instances,
+                client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in instances],
                 DryRun=self.manager.config.dryrun)
 
@@ -391,9 +360,11 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    
-    schema = type_schema('snapshot')
-    
+
+    schema = type_schema(
+        'snapshot',
+        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
+
     def process(self, resources):
         for resource in resources:
             with self.executor_factory(max_workers=3) as w:
@@ -417,15 +388,34 @@ class Snapshot(BaseAction):
                 DryRun=self.manager.config.dryrun,
                 VolumeId=block_device['Ebs']['VolumeId'],
                 Description=description)
+
+            tags = [
+                {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+                {'Key': 'InstanceId', 'Value': resource['InstanceId']},
+                {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
+            ]
+
+            copy_keys = self.data.get('copy-tags', [])
+            copy_tags = []
+            if copy_keys:
+                for t in resource.get('Tags', []):
+                    if t['Key'] in copy_keys:
+                        copy_tags.append(t)
+
+            if len(copy_tags) + len(tags) > 10:
+                log.warning(
+                    "action:%s volume:%s too many tags to copy" % (
+                        self.__class__.__name__.lower(),
+                        block_device['Ebs']['VolumeId']))
+                copy_tags = []
+
+            tags.extend(copy_tags)
+
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
-                Tags=[
-                    {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
-                    {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                    {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
-                ])
+                Tags=tags)
 
 
 # Valid EC2 Query Filters

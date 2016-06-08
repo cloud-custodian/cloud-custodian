@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "CanonicalUser", 
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Permission": "FULL_CONTROL"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "X3fI6W7zl0Xdv7YZe9ux1Dd/s4B0Qvf4JT/5vyVdOFfTlqJVLTxS5uvs/OA50w3jU+vxdzymyNw=", 
+            "RequestId": "1F10200ED017014A"
+        }
+    }
+}

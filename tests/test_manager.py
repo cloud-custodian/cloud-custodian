@@ -42,7 +42,7 @@ class TestEC2Manager(BaseTest):
         ec2 = self.get_manager({
             'filters': [
                 {'tag:CMDBEnvironment': 'absent'}]})
-        
+
         self.assertEqual(
             len(ec2.filter_resources([
                 instance(Tags=[{"Key": "ASV", "Value": "xyz"}])])),
@@ -51,8 +51,8 @@ class TestEC2Manager(BaseTest):
         self.assertEqual(
             len(ec2.filter_resources([
                 instance(Tags=[{"Key": "CMDBEnvironment", "Value": "xyz"}])])),
-            0)        
-    
+            0)
+
     def test_actions(self):
         # a simple action by string
         ec2 = self.get_manager({'actions': ['mark']})
@@ -68,5 +68,4 @@ class TestEC2Manager(BaseTest):
         self.assertTrue(isinstance(ec2.actions[0], Tag))
         self.assertEqual(ec2.actions[0].data,
                          {'msg': 'Missing proper tags', 'type': 'mark'})
-        
 

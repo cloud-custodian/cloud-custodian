@@ -1,0 +1,13 @@
+{
+    "status_code": 409, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 409, 
+            "RequestId": "58bfa580-2bad-11e6-8554-afa89872ee06"
+        }, 
+        "Error": {
+            "Message": "The statement id (ustodian-test-log-sub) provided already exists. Please provide a new statement id, or remove the existing statement.", 
+            "Code": "ResourceConflictException"
+        }
+    }
+}

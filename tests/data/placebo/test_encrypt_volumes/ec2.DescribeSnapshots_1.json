@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "b700bf35-dbd2-4c41-af4c-c9d8bfc6e438"
+        }, 
+        "Snapshots": [
+            {
+                "Description": "maid transient snapshot for encryption", 
+                "Tags": [
+                    {
+                        "Value": "true", 
+                        "Key": "maid-crypto-remediation"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-fdd1f844", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 9
+                }, 
+                "SnapshotId": "snap-c8965395", 
+                "OwnerId": "619193117841"
+            }
+        ]
+    }
+}

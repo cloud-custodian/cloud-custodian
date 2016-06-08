@@ -1,0 +1,9 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "bab681a6-44d2-5b78-a884-ce0eda6e1aca"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-policy-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "smi6nrramsnwRSkv9St9B0jLxx4RkvsD2/2++3beXc7B/8D9iVOPbRJhSnIBhQT+eWkCG/DqOwg=", 
+            "RequestId": "A87DDD7265B7C8D6"
+        }
+    }
+}

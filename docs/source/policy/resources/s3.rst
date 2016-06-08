@@ -20,9 +20,6 @@ Actions
 ``encrypt-keys``
   Scan all keys in a bucket and optionally encrypt them in place
 
-``encrypted-prefix``
-  Path Prefix Object For Sub Path Encryption
-
 ``encryption-policy``
   Attach an encryption required policy to a bucket, this will break
   applications that are not using encryption, including AWS log

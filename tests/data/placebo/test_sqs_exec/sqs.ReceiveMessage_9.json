@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Messages": [
+            {
+                "Body": "{\n\"args\": [\n6\n], \n\"kwargs\": {}\n}", 
+                "ReceiptHandle": "AQEB+mr9pKsqrFX3z859gENsgg1zt/RM3MFLOQFt5mPKF+OU88roGQQh1MfhUTFej3v+4NWHZ0OvU7zDPkf71sk5n0q1KiluSWDP1NaUwq1FYjjoE6j1s4PmeUOLroe/TfMQtAIG7zv4kOM0BA/Dm3BGvspc0/ihI1QS0qn+LpiTtFtwMpWeylWAEnIt3seAqMVqeFM4qtPxP0BD2vAbHBRDYYu6+XWtT18L9vCaMfhryJjKFeZyLbH5TFyFJbIJQUdb28nrn4h/1EPh8sTTxmtPwyfVzDQgaiqT+lDf6uy68PWONDc7kKIMKH11vvi5hRlpk+mVYaA92C5LQxG+zX8Ltm6nBmPgbyjRxBxfyGWk0ndonT0KqhhdXFYtpnG5nrkqmF3omSUCMIT3kqopmJnuXGxVTrhx1rNlhDyhF1opLJg=", 
+                "MD5OfBody": "fe30ca6e68020e9d0a4f0389b4740315", 
+                "MD5OfMessageAttributes": "e5af9b2b3b8c441b0eaf5ebe8a728d31", 
+                "MessageId": "112e51a7-0427-4abd-b76a-61ed9b01d8e8", 
+                "MessageAttributes": {
+                    "sequence_id": {
+                        "DataType": "Number", 
+                        "StringValue": "699730"
+                    }, 
+                    "ser": {
+                        "DataType": "String", 
+                        "StringValue": "json"
+                    }, 
+                    "op": {
+                        "DataType": "String", 
+                        "StringValue": "tests.test_sqsexec:int_processor"
+                    }
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "6f292412-feab-52dd-b585-6bba6004f592"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-encrypt-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "jxh6eo0CJhqcDsV1NBsTqMZoF8uuWNIXRmWGd5W1vSgWAXGxgMYzSVaTxcycK6VbUUIk0yQ+PcU=", 
+            "RequestId": "F8BD1D97C3185136"
+        }
+    }
+}

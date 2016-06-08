@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AcceptRanges": "bytes", 
+        "ContentType": "text/plain", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "eLVof3TvwM2jN1xszWCn0cWkpWmrNgZD21Jl3tV2XZBX9zB9icgjaHzCcCcvnlFqHPwPeakHEC4=", 
+            "RequestId": "1513B213176F5B0D"
+        }, 
+        "LastModified": {
+            "hour": 9, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 14, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 8, 
+            "minute": 39
+        }, 
+        "ContentLength": 4, 
+        "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
+        "Metadata": {}
+    }
+}

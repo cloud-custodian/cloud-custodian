@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-attach-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "NZdMIjYiyaJtCO9fDwpZJRBJGOZK2JmNgWyVbI2hbg0vrAHuWImg0xGbZj7esHqv", 
+            "RequestId": "A6F1505346A5A59D"
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 40
+                }, 
+                "ETag": "\"5eb63bbbe01eeed093cb22bb8f5acdc3\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "hello-world.txt", 
+                "Owner": {
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Size": 11
+            }
+        ]
+    }
+}

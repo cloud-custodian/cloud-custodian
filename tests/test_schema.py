@@ -25,7 +25,7 @@ class SchemaTest(BaseTest):
         e = best_match(validator.iter_errors(data))
         ex = specific_error(list(validator.iter_errors(data))[0])
         return e, ex
-        
+
     def setUp(self):
         if not self.validator:
             self.validator = Validator(generate())
@@ -39,6 +39,20 @@ class SchemaTest(BaseTest):
 
     def test_empty_skeleton(self):
         self.assertEqual(validate({'policies': []}), [])
+
+    def test_duplicate_policies(self):
+        data = {
+            'policies': [
+                {'name': 'monday-morning',
+                 'resource': 'ec2'},
+                {'name': 'monday-morning',
+                 'resource': 'ec2'},
+                ]}
+
+        result = validate(data)
+        self.assertEqual(len(result), 1)
+        self.assertTrue(isinstance(result[0], ValueError))
+        self.assertTrue('monday-morning' in str(result[0]))
 
     def test_semantic_error(self):
         data = {
@@ -56,9 +70,20 @@ class SchemaTest(BaseTest):
         self.assertTrue(
             len(errors[0].absolute_schema_path) < len(
                 error.absolute_schema_path))
-        self.assertEqual(
-            error.message,
-            "{'skipped_devices': [], 'type': 'ebs'} is not of type 'array'")
+
+        self.assertTrue(
+            "'skipped_devices': []" in error.message)
+        self.assertTrue(
+            "'type': 'ebs'" in error.message)
+
+    def test_vars_and_tags(self):
+        data = {
+            'vars': {'alpha': 1, 'beta': 2},
+            'policies': [{
+                'name': 'test',
+                'resource': 'ec2',
+                'tags': ['controls']}]}
+        self.assertEqual(list(self.validator.iter_errors(data)), [])
 
     def test_semantic_error_on_value_derived(self):
         data = {

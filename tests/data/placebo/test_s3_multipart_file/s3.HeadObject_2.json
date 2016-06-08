@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AcceptRanges": "bytes", 
+        "ContentType": "binary/octet-stream", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "BaAAmQeZbr7fTbhGFXwHJ2tilI/x7RMMI+yBbz8Z2S10RCMD+R8IeMJS4+b8O018UWSNfBs9hx0=", 
+            "RequestId": "02B3BEB3DC328A45"
+        }, 
+        "LastModified": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 5, 
+            "second": 58, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 21, 
+            "minute": 9
+        }, 
+        "ContentLength": 16777216, 
+        "ETag": "\"2c7ab85a893283e98c931e9511add182\"", 
+        "Metadata": {
+            "planet": "earth"
+        }
+    }
+}

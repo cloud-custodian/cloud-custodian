@@ -1,0 +1,13 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400, 
+            "RequestId": "40b01a89-395c-436b-b65e-8a5751ff7237"
+        }, 
+        "Error": {
+            "Message": "The internetGateway ID 'igw-5bce113f' does not exist", 
+            "Code": "InvalidInternetGatewayID.NotFound"
+        }
+    }
+}

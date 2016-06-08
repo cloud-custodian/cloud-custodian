@@ -22,16 +22,46 @@ from c7n.executor import MainThreadExecutor
 logging.basicConfig(level=logging.DEBUG)
 
 
+class SnapshotTrimTest(BaseTest):
+
+    def test_snapshot_trim(self):
+        factory = self.replay_flight_data('test_ebs_snapshot_delete')
+        p = self.load_policy({
+            'name': 'snapshot-trim',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'tag:InstanceId': 'not-null'}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class AttachedInstanceTest(BaseTest):
+
+    def test_ebs_instance_filter(self):
+        factory = self.replay_flight_data('test_ebs_instance_filter')
+        p = self.load_policy({
+            'name': 'attached-instance-test',
+            'resource': 'ebs',
+            'filters': [
+                {'type': 'instance',
+                 'key': 'tag:Name',
+                 'value': 'CompiledLambda'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
 class CopyInstanceTagsTest(BaseTest):
 
-    # DISABLED / Re-record flight data on public account
-    def disabled_xtest_copy_instance_tags(self):
+    def test_copy_instance_tags(self):
         # More a functional/coverage test then a unit test.        
         self.patch(
             CopyInstanceTags, 'executor_factory', MainThreadExecutor)
         factory = self.replay_flight_data('test_ebs_copy_instance_tags')
             
-        volume_id = 'vol-8930675f'
+        volume_id = 'vol-2b047792'
     
         results = factory().client('ec2').describe_tags(
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
@@ -41,10 +71,10 @@ class CopyInstanceTagsTest(BaseTest):
         policy = self.load_policy({
             'name': 'test-copy-instance-tags',
             'resource': 'ebs',
-            'filters': [{'VolumeId': volume_id}],
             'actions': [{
                 'type': 'copy-instance-tags',
-                'tags': ['CMDBEnvironment', 'ASV']}]},
+                'tags': ['Name']}]},
+            config={'region': 'us-west-2'},
             session_factory=factory)
 
         resources = policy.run()
@@ -52,15 +82,12 @@ class CopyInstanceTagsTest(BaseTest):
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
         
         tags = {t['Key']: t['Value'] for t in results}
-        self.assertEqual(tags['ASV'], 'example-32')
-        self.assertEqual(tags['CMDBEnvironment'], 'example-21')
+        self.assertEqual(tags['Name'], 'CompileLambda')
 
             
 class EncryptExtantVolumesTest(BaseTest):
 
-    # DISABLED / Re-record flight data on public account
-    def disabled_xtest_encrypt_volumes(self):
-        # More a functional/coverage test then a unit test.
+    def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
         output = self.capture_logging(level=logging.DEBUG)
@@ -72,10 +99,11 @@ class EncryptExtantVolumesTest(BaseTest):
             'resource': 'ebs',
             'filters': [
                 {'Encrypted': False},                
-                {'VolumeId': 'vol-5fc3ca80'}],
+                {'VolumeId': 'vol-fdd1f844'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
-                 'key': 'alias/cof/ebs/encrypted'}]},
+                 'delay': 0.1,
+                 'key': 'alias/ebs/crypto'}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)

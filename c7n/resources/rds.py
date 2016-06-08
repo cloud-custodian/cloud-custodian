@@ -60,74 +60,63 @@ Todo/Notes
 
 """
 import logging
-import itertools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, Filter
-from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, get_account_id
+from c7n.filters import FilterRegistry, Filter, AgeFilter
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
+from c7n import tags
+from c7n.utils import local_session, type_schema, get_account_id, chunks
 
-from functools import partial
+from skew.resources.aws import rds
 
 log = logging.getLogger('custodian.rds')
-
 
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
 
+filters.register('tag-count', tags.TagCountFilter)
+filters.register('marked-for-op', tags.TagActionFilter)
+
 
 @resources.register('rds')
-class RDS(ResourceManager):
+class RDS(QueryResourceManager):
+
+    class resource_type(rds.DBInstance.Meta):
+        filter_name = 'DBInstanceIdentifier'
 
     filter_registry = filters
     action_registry = actions
+    account_id = None
 
-    def resources(self):
+    def augment(self, resources):
         session = local_session(self.session_factory)
-        c = session.client('rds')
-        query = self.resource_query()
-        if self._cache.load():
-            dbs = self._cache.get(
-                {'resource': 'rds', 'region': self.config.region, 'q': query})
-            if dbs is not None:
-                self.log.debug("Using cached rds: %d" % (
-                    len(dbs)))
-                return self.filter_resources(dbs)
-        self.log.info("Querying rds instances")
-        p = c.get_paginator('describe_db_instances')
-        results = p.paginate(Filters=query)
-        dbs = list(itertools.chain(*[rp['DBInstances'] for rp in results]))
-        _rds_tags(dbs, self.session_factory, self.executor_factory,
-                  get_account_id(session))
-        self._cache.save(
-            {'region': self.config.region, 'resource': 'rds', 'q': query}, dbs)
-        return self.filter_resources(dbs)
-
-    def get_resources(self, resource_ids):
-        c = local_session(self.session_factory).client('rds')
-        results = []
-        for db_id in resource_ids:
-            results.extend(
-                c.describe_db_instances(
-                    DBInstanceIdentifier=db_id)['DBInstances'])
-        _rds_tags(results)
-        return results
+        if self.account_id is None:
+            self.account_id = get_account_id(session)
+        _rds_tags(
+            self.query.resolve(self.resource_type),
+            resources, self.session_factory, self.executor_factory,
+            self.account_id, region=self.config.region)
 
 
-def _rds_tags(dbs, session_factory, executor_factory, account_id):
+def _rds_tags(
+        model, dbs, session_factory, executor_factory, account_id, region):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
+<<<<<<< HEAD
 
         region = db['Endpoint']['Address'].split('.')[-4]
         name = db['DBInstanceIdentifier']
         arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, name)
+=======
+        arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, db[model.id])
+>>>>>>> capitalone/master
         tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
-
         db['Tags'] = tag_list or []
         return db
 
@@ -136,7 +125,10 @@ def _rds_tags(dbs, session_factory, executor_factory, account_id):
         list(w.map(process_tags, dbs))
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> capitalone/master
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -168,6 +160,64 @@ class DefaultVpc(Filter):
         return vpc_id == self.default_vpc and True or False
 
 
+<<<<<<< HEAD
+=======
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+
+    schema = type_schema(
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
+        ops={'enum': ['delete', 'snapshot']})
+
+    batch_size = 5
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        return super(TagDelayedAction, self).process(resources)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('tag')
+class Tag(tags.Tag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('remove-tag')
+class RemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = "arn:aws:rds:%s:%s:db:%s" % (
+                self.manager.config.region, self.manager.account_id,
+                r['DBInstanceIdentifier'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
+
+
+>>>>>>> capitalone/master
 @actions.register('delete')
 class Delete(BaseAction):
 
@@ -222,11 +272,19 @@ class Snapshot(BaseAction):
                         self.log.error(
                             "Exception creating rds snapshot  \n %s" % (
                                 f.exception()))
+<<<<<<< HEAD
+=======
+        return resources
+>>>>>>> capitalone/master
 
     def process_rds_snapshot(self, resource):
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
+<<<<<<< HEAD
             DBSnapshotIdentifier="BKUP-%s-%s" % (
+=======
+            DBSnapshotIdentifier="Backup-%s-%s" % (
+>>>>>>> capitalone/master
                 resource['DBInstanceIdentifier'],
                 resource['Engine']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
@@ -253,11 +311,73 @@ class RetentionWindow(BaseAction):
 
     def process_snapshot_retention(self, resource):
         v = int(resource.get('BackupRetentionPeriod', 0))
+<<<<<<< HEAD
         if v == 0 or v != self.data['days']:
             self.set_retention_window(resource)
+=======
+        if v == 0 or v < self.data['days']:
+            self.set_retention_window(resource)
+            return resource
+>>>>>>> capitalone/master
 
     def set_retention_window(self, resource):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=self.data['days'])
+<<<<<<< HEAD
+=======
+
+
+@resources.register('rds-snapshot')
+class RDSSnapshot(QueryResourceManager):
+
+    class Meta(object):
+
+        service = 'rds'
+        type = 'rds-snapshot'
+        enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
+        name = id = 'DBSnapshotIdentifier'
+        filter_name = None
+        filter_type = None
+        dimension = None
+        date = 'SnapshotCreateTime'
+
+    resource_type = Meta
+
+    filter_registry = FilterRegistry('rds-snapshot.filters')
+    action_registry = ActionRegistry('rds-snapshot.actions')
+
+
+@RDSSnapshot.filter_registry.register('age')
+class RDSSnapshotAge(AgeFilter):
+
+    schema = type_schema('age', days={'type': 'number'})
+    date_attribute = 'SnapshotCreateTime'
+
+@RDSSnapshot.action_registry.register('delete')
+class RDSSnapshotDelete(BaseAction):
+
+    def process(self, snapshots):
+        log.info("Deleting %d rds snapshots", len(snapshots))
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for snapshot_set in chunks(reversed(snapshots), size=50):
+                futures.append(
+                    w.submit(self.process_snapshot_set, snapshot_set))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception deleting snapshot set \n %s" % (
+                                f.exception()))
+        return snapshots
+
+    def process_snapshot_set(self, snapshots_set):
+        c = local_session(self.manager.session_factory).client('rds')
+        for s in snapshots_set:
+            try:
+                c.delete_db_snapshot(
+                    DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+            except ClientError as e:
+                raise
+>>>>>>> capitalone/master

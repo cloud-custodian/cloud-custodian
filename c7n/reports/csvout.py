@@ -283,19 +283,19 @@ RECORD_TYPE_FORMATTERS = {
 
 def fs_record_set(output_path, policy_name):
     record_path = os.path.join(output_path, 'resources.json')
-    
+
     if not os.path.exists(record_path):
         return []
-    
+
     mdate = datetime.fromtimestamp(
         os.stat(record_path).st_ctime)
-    
+
     with open(record_path) as fh:
         records = json.load(fh)
         [r.__setitem__('CustodianDate', mdate) for r in records]
         return records
 
-    
+
 def record_set(session_factory, bucket, key_prefix, start_date):
     """Retrieve all s3 records for the given policy output url
 

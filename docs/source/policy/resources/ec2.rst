@@ -104,3 +104,19 @@ Stop
 
 Terminate
   Will terminate the instances. Use with caution!
+
+Snapshot
+  Snapshots the instances' attached EBS volumes.
+
+  This example will create snapshots for all instances and copy the Owner tag value
+  from the instance to the new snapshot.
+
+  .. code-block:: yaml
+
+     policies:
+        - name: ec2-nightly-backup
+          resource: ec2
+          actions:
+            - type: snapshot
+              copy-tags:
+                - Owner

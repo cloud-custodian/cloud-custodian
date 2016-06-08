@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "Group", 
+                    "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+                }, 
+                "Permission": "WRITE"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "dspQCiTsLlGf/TsvK//K4jNqwucW9WSFAChDV/dDlBL06Z5muJCbcfB7dAcBVdpQ15cDLqItZUk=", 
+            "RequestId": "13EBDFB64DC5134E"
+        }
+    }
+}

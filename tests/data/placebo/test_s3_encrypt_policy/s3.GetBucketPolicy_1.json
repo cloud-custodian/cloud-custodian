@@ -1,0 +1,15 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "HostId": "yEFC8dSbV0k9chjwEYkxYWndvSuHIsE4/IHeDnWMu2hCeBYMqo0rty2/5KqJmjmlA1s5N6P7r/c=", 
+            "RequestId": "51F2B3480B6DA87A"
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "cf-templates-nyrabrca5x2n-us-east-1"
+        }
+    }
+}

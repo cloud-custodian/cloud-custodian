@@ -1,0 +1,15 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "\"62fab0c89818028866ed731aa8278264-4\"", 
+        "Location": "https://custodian-largef-test.s3.amazonaws.com/hello", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "pjUGnYQwFmDvCSkQDGutr6dOHiwmf7DxSdjazP7x3xPIikUFQsP2wY1EsQD3FkTFPYKPAVzjXp4=", 
+            "RequestId": "D9CB0A7616AEB00A"
+        }, 
+        "ServerSideEncryption": "AES256", 
+        "Bucket": "custodian-largef-test", 
+        "Key": "hello"
+    }
+}

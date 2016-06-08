@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "StoppingInstances": [
+            {
+                "InstanceId": "i-242dd4f9", 
+                "CurrentState": {
+                    "Code": 64, 
+                    "Name": "stopping"
+                }, 
+                "PreviousState": {
+                    "Code": 16, 
+                    "Name": "running"
+                }
+            }, 
+            {
+                "InstanceId": "i-9206fe54", 
+                "CurrentState": {
+                    "Code": 64, 
+                    "Name": "stopping"
+                }, 
+                "PreviousState": {
+                    "Code": 16, 
+                    "Name": "running"
+                }
+            }, 
+            {
+                "InstanceId": "i-7b5241a3", 
+                "CurrentState": {
+                    "Code": 64, 
+                    "Name": "stopping"
+                }, 
+                "PreviousState": {
+                    "Code": 16, 
+                    "Name": "running"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "cfc3a548-e5a5-432c-a0db-142a84d2a273"
+        }
+    }
+}
