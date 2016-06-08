@@ -65,11 +65,11 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, Filter
+from c7n.filters import FilterRegistry, Filter, AgeFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
-from c7n.utils import local_session, type_schema, get_account_id
+from c7n.utils import local_session, type_schema, get_account_id, chunks
 
 from skew.resources.aws import rds
 
@@ -299,3 +299,56 @@ class RetentionWindow(BaseAction):
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=self.data['days'])
+
+
+@resources.register('rds-snapshot')
+class RDSSnapshot(QueryResourceManager):
+
+    class Meta(object):
+
+        service = 'rds'
+        type = 'rds-snapshot'
+        enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
+        name = id = 'DBSnapshotIdentifier'
+        filter_name = None
+        filter_type = None
+        dimension = None
+        date = 'SnapshotCreateTime'
+
+    resource_type = Meta
+
+    filter_registry = FilterRegistry('rds-snapshot.filters')
+    action_registry = ActionRegistry('rds-snapshot.actions')
+
+
+@RDSSnapshot.filter_registry.register('age')
+class RDSSnapshotAge(AgeFilter):
+
+    schema = type_schema('age', days={'type': 'number'})
+    date_attribute = 'SnapshotCreateTime'
+
+@RDSSnapshot.action_registry.register('delete')
+class RDSSnapshotDelete(BaseAction):
+
+    def process(self, snapshots):
+        log.info("Deleting %d rds snapshots", len(snapshots))
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for snapshot_set in chunks(reversed(snapshots), size=50):
+                futures.append(
+                    w.submit(self.process_snapshot_set, snapshot_set))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception deleting snapshot set \n %s" % (
+                                f.exception()))
+        return snapshots
+
+    def process_snapshot_set(self, snapshots_set):
+        c = local_session(self.manager.session_factory).client('rds')
+        for s in snapshots_set:
+            try:
+                c.delete_db_snapshot(
+                    DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+            except ClientError as e:
+                raise

@@ -18,7 +18,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_tag_and_remove(self):
-        self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)        
+        self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_rds_tag_and_remove')
         client = session_factory().client('rds')
 
@@ -81,7 +81,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_default_vpc(self):
-        session_factory = self.replay_flight_data('test_rds_default_vpc')            
+        session_factory = self.replay_flight_data('test_rds_default_vpc')
         p = self.load_policy(
             {'name': 'rds-default-filters',
              'resource': 'rds',
@@ -94,7 +94,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot(self):
-        session_factory = self.replay_flight_data('test_rds_snapshot')            
+        session_factory = self.replay_flight_data('test_rds_snapshot')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
@@ -116,7 +116,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_rds_delete(self):
         session_factory = self.replay_flight_data('test_rds_delete')
         p = self.load_policy(
@@ -130,4 +130,17 @@ class RDSTest(BaseTest):
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
+        self.assertEqual(len(resources), 1)
+
+
+class RDSSnapshotTrimTest(BaseTest):
+
+    def test_rds_snapshot_trim(self):
+        factory = self.replay_flight_data('test_rds_snapshot_delete')
+        p = self.load_policy({
+            'name': 'rds-snapshot-trim',
+            'resource': 'rds-snapshot',
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
