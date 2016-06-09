@@ -5,15 +5,15 @@
         "FunctionName": "cloud-maid-error-notify", 
         "ResponseMetadata": {
             "HTTPStatusCode": 201, 
-            "RequestId": "5975ea8a-2e2b-11e6-857b-57287728baf4"
+            "RequestId": "cf1c24af-2e2e-11e6-81ee-7f55600e12a8"
         }, 
         "CodeSize": 1880, 
         "MemorySize": 512, 
-        "FunctionArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
-        "Version": "4", 
+        "FunctionArn": "arn:aws:lambda:us-east-1:619193117841:function:cloud-maid-error-notify", 
+        "Version": "1", 
         "Role": "arn:aws:iam::619193117841:role/lambda_basic_execution", 
         "Timeout": 15, 
-        "LastModified": "2016-06-09T10:17:20.090+0000", 
+        "LastModified": "2016-06-09T10:42:05.965+0000", 
         "Handler": "logsub.process_log_event", 
         "Runtime": "python2.7", 
         "Description": "Custodian Ops Error Notify"

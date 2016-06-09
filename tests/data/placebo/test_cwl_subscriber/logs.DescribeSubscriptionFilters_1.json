@@ -4,15 +4,15 @@
         "subscriptionFilters": [
             {
                 "filterName": "cloud-maid-error-notify", 
-                "destinationArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
-                "creationTime": 1465467443753, 
+                "destinationArn": "arn:aws:lambda:us-east-1:619193117841:function:cloud-maid-error-notify", 
+                "creationTime": 1465468926829, 
                 "filterPattern": "Traceback", 
                 "logGroupName": "custodian-test-log-sub"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "5bcb4ba2-2e2b-11e6-a448-adf2ab89728f"
+            "RequestId": "cfb556fd-2e2e-11e6-b2e0-93a11f543013"
         }
     }
 }
