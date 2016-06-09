@@ -479,12 +479,17 @@ class Delete(BaseAction):
     schema = type_schema('delete')
 
     def process(self, volumes):
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_volume, volumes))
 
     def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
-        self._run_api(
-            client.delete_volume,
-            VolumeId=volume['VolumeId'],
-            DryRun=self.manager.config.dryrun)
+        try:
+            self._run_api(
+                client.delete_volume,
+                VolumeId=volume['VolumeId'],
+                DryRun=self.manager.config.dryrun)
+        except ClientError as e:
+            if e.response['Error']['Code'] == "InvalidVolume.NotFound":
+                return
+            raise
