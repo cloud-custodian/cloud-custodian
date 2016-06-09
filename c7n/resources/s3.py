@@ -112,10 +112,8 @@ def assemble_bucket(item):
     """Assemble a document representing all the config state around a bucket.
     """
     factory, b = item
-
     s = factory()
     c = s.client('s3')
-
     # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
     methods = list(S3_AUGMENT_TABLE)
@@ -131,11 +129,10 @@ def assemble_bucket(item):
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
             elif code == 'PermanentRedirect':
-                # log.warning(e.response)
                 s = factory()
                 c = bucket_client(s, b)
                 # Requeue with the correct region given location constraint
-                methods.append((m, k))
+                methods.append((m, k, default, select))
                 continue
             else:
                 log.warning(

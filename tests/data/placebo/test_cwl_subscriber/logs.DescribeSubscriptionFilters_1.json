@@ -3,16 +3,16 @@
     "data": {
         "subscriptionFilters": [
             {
-                "filterName": "cloud-maid-error-notify", 
-                "destinationArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
-                "creationTime": 1465193419258, 
+                "filterName": "c7n-log-sub", 
+                "destinationArn": "arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub", 
+                "creationTime": 1465469364827, 
                 "filterPattern": "Traceback", 
                 "logGroupName": "custodian-test-log-sub"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "586e77b0-2bad-11e6-92b9-3900904d5652"
+            "RequestId": "d4dfb58f-2e2f-11e6-930f-2717ec2d6f28"
         }
     }
 }
