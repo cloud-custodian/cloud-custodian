@@ -327,6 +327,7 @@ class RDSSnapshotAge(AgeFilter):
     schema = type_schema('age', days={'type': 'number'})
     date_attribute = 'SnapshotCreateTime'
 
+
 @RDSSnapshot.action_registry.register('delete')
 class RDSSnapshotDelete(BaseAction):
 
