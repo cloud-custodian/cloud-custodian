@@ -3,12 +3,12 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "ce3d5c9b-2e2e-11e6-9956-cd2f2a4207d7"
+            "RequestId": "d3b1bc73-2e2f-11e6-98ee-b9574c144d7a"
         }, 
         "logGroups": [
             {
                 "arn": "arn:aws:logs:us-east-1:619193117841:log-group:custodian-test-log-sub:*", 
-                "creationTime": 1465468924427, 
+                "creationTime": 1465469363080, 
                 "metricFilterCount": 0, 
                 "logGroupName": "custodian-test-log-sub", 
                 "storedBytes": 0

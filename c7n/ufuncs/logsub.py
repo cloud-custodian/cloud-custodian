@@ -98,7 +98,7 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
         LambdaFunction, PythonPackageArchive, CloudWatchLogSubscription)
 
     config = dict(
-        name='cloud-maid-error-notify',
+        name=name,
         handler='logsub.process_log_event',
         runtime='python2.7',
         memory_size=512,
