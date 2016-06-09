@@ -3,25 +3,25 @@
     "data": {
         "Code": {
             "RepositoryType": "S3", 
-            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/619193117841/cloud-maid-error-notify-b075e791-e71a-4d64-92ff-b91c45d2c51c?x-amz-security-token=FQoDYXdzEJ7%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDM2dDgkPKszx%2B%2Fg%2BASK0A8VVh%2Bwds%2FvV%2FHAmEc4bMjLwtCcOlPnrLroQGM7%2FYJmmD%2Fn4%2FmgxxI8zOWJG0nhb9czURwtugZm7CaiTDT2JeIe6V6d6vNkDbTAZlAMWd5rIHQkljD%2BstXImpj%2FTqpMjbx2pesarig9L%2FpNMfI%2BkOPhPTJ27yoJgpas%2F7v%2B7WspaQandWoVqM1p1VhtyuJqrE4gqP%2FralzjmOfmwSfUY7dvw2KD3ghN9q37P2SvRlYQre%2BZK86FagwYgL%2F1UVg39kaXG%2BQp1BgcUxPK%2BC%2FnPiCaHgNBCSzB%2FcVUENMdpYqOEYc3M7X2Z1qRzlNHqdfiafo8YzuhsLD9w1eVBCeOjVnh4gA55Bh6kTtPDM2liVF%2BXBzI5phsp7Rb8qlkrh5lp%2F37NGFo0LcYxcJTR2bMLcRJ09DR5Ioh%2BjJ4Tkputc0g6Yoe8dLmAGGu7IzmgOTVdZRIS4%2By7zn4j5ZjJ5Ffe2XWcAeTfLi8KI%2BigY1tIP%2BtJ9SOvY7M8owtfbUeb2x2x%2B1aS%2BPDYbfE9PZ3ALRZcZgZAubknG%2Fa4neFH6pS67VcifN1XlaH%2BhLJ83fsBUI1e0VMhrdsouIrUugU%3D&AWSAccessKeyId=ASIAIYGCHDDKHJRF7USA&Expires=1465194019&Signature=VzUYf70VPOTSLS2LVwOEvfSzR%2FM%3D"
+            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/619193117841/cloud-maid-error-notify-afe00cb7-34ab-491f-a002-b6c438e0b659?x-amz-security-token=FQoDYXdzEOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDMZhAVfA0J%2BIwBVYYyK0A60yMgwTiYdBvjhOV9Qu5CLIoekgK9DqinB0TkroQEbq%2FLWltz%2F2bVuxatCi6ySV8wL%2Ba4ClTpPB5%2Flzwm9n3RQXPsmJt3AuqDyAXPhICFfn312AhHjwOQImW9%2BvyhslJ4tTFngzfEmoPWkEyR2wgCxWKMJsg%2FU%2F7cVnqDo4YtVmPh3RSKpcDrYYz0aHlqrBu1b7N42F%2BYGh6tGHgWSxQRiLn0x977HhFed%2Bydh3ACKL87Wjl8IOwrGn3YlhA1LVDE%2FMEXYxBImfz0LQTXVScSck3Au6VghU7yWUpBLOi1DOmbpemg%2BR14hyYP6g1DQsCoaIkUB2C4tAmOwQLyIHlfLG03eaL7f%2Fp799j70PQctt%2BjSatQQNVkqIyD4Ts40Ze1XZBJzsHfbgpuJlZZd9IvizahB4e9eTVaQLh1hvHX%2Bf2UF0YpFPSEhuWruvhHLetXL0nYYG4%2FerX7hz0g5%2FhwMdxICfS8NT%2BuRNNpLOfe4JAb3L0GhgbdE%2BkuFpsplhoj8vOYKMl7mAEoav3ARWfaGMs1aYQMwXW0MO2qPS6ZTsE6bwcle67RxWHCtoqzPF02m34mMo9enkugU%3D&AWSAccessKeyId=ASIAJY756SFQ35TXEOKQ&Expires=1465468044&Signature=jCaeuDDnB5mYLUlLUhtNcfZpTMw%3D"
         }, 
         "Configuration": {
             "Version": "$LATEST", 
-            "CodeSha256": "xGVZbpzQqGJDsChS8s28KUihccXap6zvtllJ1mi9oHk=", 
+            "CodeSha256": "nBUCTeN6rgRtg49MwBpKT1LNMnIfgRSUPq76IDWAr/k=", 
             "FunctionName": "cloud-maid-error-notify", 
             "MemorySize": 512, 
-            "CodeSize": 164, 
+            "CodeSize": 1880, 
             "FunctionArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
             "Handler": "logsub.process_log_event", 
             "Role": "arn:aws:iam::619193117841:role/lambda_basic_execution", 
             "Timeout": 15, 
-            "LastModified": "2016-06-06T06:10:16.261+0000", 
+            "LastModified": "2016-06-09T10:17:20.090+0000", 
             "Runtime": "python2.7", 
             "Description": "Custodian Ops Error Notify"
         }, 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "58818b48-2bad-11e6-9b5b-2bacf7d91ba0"
+            "RequestId": "5bf653cd-2e2b-11e6-9fb0-a1de6ba16a42"
         }
     }
 }

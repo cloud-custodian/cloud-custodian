@@ -5,14 +5,14 @@
             {
                 "filterName": "cloud-maid-error-notify", 
                 "destinationArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
-                "creationTime": 1465193419258, 
+                "creationTime": 1465467443753, 
                 "filterPattern": "Traceback", 
                 "logGroupName": "custodian-test-log-sub"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "586e77b0-2bad-11e6-92b9-3900904d5652"
+            "RequestId": "5bcb4ba2-2e2b-11e6-a448-adf2ab89728f"
         }
     }
 }
