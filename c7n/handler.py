@@ -18,10 +18,8 @@ Mostly this serves to load up the policy and dispatch
 an event.
 """
 
-from cStringIO import StringIO
-
 import logging
-import json
+import os
 
 from c7n.policy import load
 from c7n.utils import format_event
@@ -45,7 +43,7 @@ class Config(dict):
     def empty(cls, **kw):
         d = {}
         d.update({
-            'region': None,
+            'region': os.environ.get('AWS_DEFAULT_REGION'),
             'cache': '',
             'profile': None,
             'assume_role': None,
@@ -59,14 +57,15 @@ class Config(dict):
 
 
 def dispatch_event(event, context):
-    log.info("Processing event\n %s", format_event(event))
+    event['debug'] = True
+    if event['debug']:
+        log.info("Processing event\n %s", format_event(event))
 
     error = event.get('detail', {}).get('errorCode')
     if error:
         log.debug("Skipping failed operation: %s" % error)
         return
 
-    event['debug'] = True
     policies = load(Config.empty(), 'config.json', format='json')
     for p in policies:
         p.push(event, context)
