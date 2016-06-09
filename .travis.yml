@@ -1,4 +1,5 @@
 language: python
+cache: pip
 env:
   # Region required, and Bypass credential lookup
   - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY="thing"
