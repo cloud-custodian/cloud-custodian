@@ -272,8 +272,8 @@ class Snapshot(BaseAction):
 @actions.register('retention')
 class RetentionWindow(BaseAction):
 
+    schema = type_schema('days', days={'type': 'number'})
     date_attribute = "BackupRetentionPeriod"
-    schema = type_schema('retention', days={'type': 'number'})
 
     def process(self, resources):
         with self.executor_factory(max_workers=3) as w:
@@ -290,7 +290,7 @@ class RetentionWindow(BaseAction):
 
     def process_snapshot_retention(self, resource):
         v = int(resource.get('BackupRetentionPeriod', 0))
-        if v == 0 or v < self.data['days']:
+        if v != self.data['days']:
             self.set_retention_window(resource)
             return resource
 
