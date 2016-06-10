@@ -1,19 +1,19 @@
 {
     "status_code": 201, 
     "data": {
-        "CodeSha256": "xGVZbpzQqGJDsChS8s28KUihccXap6zvtllJ1mi9oHk=", 
-        "FunctionName": "cloud-maid-error-notify", 
+        "CodeSha256": "ih5rPVgTxj0+C4dUtqoCFyrHrEGCw4deCTqtMl9WgV0=", 
+        "FunctionName": "c7n-log-sub", 
         "ResponseMetadata": {
             "HTTPStatusCode": 201, 
-            "RequestId": "56896408-2bad-11e6-868d-13410977d607"
+            "RequestId": "d44103d0-2e2f-11e6-8a95-e302e1da7d91"
         }, 
-        "CodeSize": 164, 
+        "CodeSize": 1872, 
         "MemorySize": 512, 
-        "FunctionArn": "arn:aws:lambda:us-west-2:619193117841:function:cloud-maid-error-notify", 
-        "Version": "3", 
+        "FunctionArn": "arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub", 
+        "Version": "2", 
         "Role": "arn:aws:iam::619193117841:role/lambda_basic_execution", 
         "Timeout": 15, 
-        "LastModified": "2016-06-06T06:10:16.261+0000", 
+        "LastModified": "2016-06-09T10:49:24.081+0000", 
         "Handler": "logsub.process_log_event", 
         "Runtime": "python2.7", 
         "Description": "Custodian Ops Error Notify"

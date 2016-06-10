@@ -63,8 +63,8 @@ class PolicyLambdaProvision(BaseTest):
         self.assertEqual(results['subscriptionFilters'][0]['destinationArn'],
                          finfo['FunctionArn'])
         # try and update
-        params['sns_topic'] = "arn:123"
-        manager.publish(func)
+        #params['sns_topic'] = "arn:123"
+        #manager.publish(func)
 
     def test_cwe_update_config_and_code(self):
         # Originally this was testing the no update case.. but
