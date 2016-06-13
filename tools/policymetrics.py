@@ -1,7 +1,8 @@
 import argparse
+from dateutil.parser import parse
 from datetime import datetime, timedelta
 import logging
-
+import os
 
 from c7n.credentials import SessionFactory
 from c7n.policy import load
@@ -14,11 +15,12 @@ def setup_parser():
     parser.add_argument('-c', '--config', required=True)
     parser.add_argument('--assume', dest="assume_role")
     parser.add_argument('--profile')
-    parser.add_argument('--region', default='us-east-1')
-    parser.add_argument('--start', default='us-east-1')
-    parser.add_argument('--end', default='us-east-1')
-    parser.add_argument('--days', default='us-east-1')
-    parser.add_argument('--period', type=int, default=3600)
+    parser.add_argument(
+        '--region', default=os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'))
+    parser.add_argument('--start', type=parse)
+    parser.add_argument('--end', type=parse)
+    parser.add_argument('--days', type=int, default=14)
+    parser.add_argument('--period', type=int, default=60*24*24)
     return parser
 
 
@@ -40,16 +42,16 @@ def main():
     load_resources()
     policies = load(options, options.config)
 
-    start = datetime.now().replace(
-          hour=0, minute=0, second=0, microsecond=0) - timedelta(14)
-    end = datetime.now().replace(
-          hour=0, minute=0, second=0, microsecond=0)
-    period = 24 * 60 * 14
-
+    if options.start and options.end:
+        start = options.start
+        end = options.end
+    elif options.days:
+        end = datetime.utcnow()
+        start = end - timedelta(options.days)
     data = {}
     for p in policies:
         logging.info('Getting %s metrics', p)
-        data[p.name] = p.get_metrics(start, end, period)
+        data[p.name] = p.get_metrics(start, end, options.period)
     print dumps(data, indent=2)
 
 
