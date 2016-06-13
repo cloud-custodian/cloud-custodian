@@ -13,44 +13,6 @@
 # limitations under the License.
 """
 Elastic Load Balancers
-----------------------
-
-
-TODO
-####
-
-- SSL Policy enforcement
-- Empty instance waste collection
-
-Actions
-#######
-
-filters:
-  - Instances: []
-actions:
-  - type: mark-for-op
-    op: 'delete'
-    days: 7
-
-filters:
-  - type: marked-for-op
-    op: delete
-actions:
-  - delete
-
-
-Filters
-#######
-
-In addition to value filters
-
-.. code-block:: yaml
-
-  filters:
-    # Matches when the backend listener and health check are
-    # not on the same protocol
-    - healthcheck-protocol-mismatch
-
 """
 from concurrent.futures import as_completed
 import logging
@@ -110,7 +72,7 @@ class TagDelayedAction(tags.TagDelayedAction):
         'mark-for-op', rinherit=tags.TagDelayedAction.schema,
         ops={'enum': ['delete', 'set-ssl-listener-policy']})
 
-    batch_size = 20
+    batch_size = 1
 
     def process_resource_set(self, resource_set, tags):
         client = local_session(self.manager.session_factory).client('elb')
@@ -122,7 +84,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 @actions.register('tag')
 class Tag(tags.Tag):
 
-    batch_size = 20
+    batch_size = 1
 
     def process_resource_set(self, resource_set, tags):
         client = local_session(
@@ -135,7 +97,7 @@ class Tag(tags.Tag):
 @actions.register('remove-tag')
 class RemoveTag(tags.RemoveTag):
 
-    batch_size = 20
+    batch_size = 1
 
     def process_resource_set(self, resource_set, tag_keys):
         client = local_session(
@@ -224,6 +186,7 @@ class SSLPolicyFilter(Filter):
 
     filters:
       - type: ssl-policy
+
         whitelist: []
         blacklist:
         - "Protocol-SSLv2"

@@ -30,7 +30,7 @@ class RouteTable(QueryResourceManager):
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
-    resource_type = 'aws.ec2.vpc-peer-connection'
+    resource_type = 'aws.ec2.vpc-peering-connection'
 
 
 @resources.register('network-acl')

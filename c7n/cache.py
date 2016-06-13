@@ -29,7 +29,7 @@ def factory(config):
         return NullCache(None)
 
     if not config.cache or not config.cache_period:
-        log.info("Disabling cache")
+        log.debug("Disabling cache")
         return NullCache(config)
 
     return FileCacheManager(config)

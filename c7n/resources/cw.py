@@ -7,6 +7,6 @@ from c7n.manager import resources
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
 
-    resource_type = 'aws.sns.Alarm'
+    resource_type = 'aws.cloudwatch.alarm'
 
 

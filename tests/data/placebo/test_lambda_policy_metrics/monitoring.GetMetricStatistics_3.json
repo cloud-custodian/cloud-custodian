@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "b38ffaed-3154-11e6-8af7-87776803b1d3"
+        }, 
+        "Label": "Durations"
+    }
+}

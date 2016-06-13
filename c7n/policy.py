@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import fnmatch
+import itertools
 import logging
 import os
 import time
@@ -23,6 +24,7 @@ from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
 from c7n.manager import resources
+from c7n.output import DEFAULT_NAMESPACE
 from c7n import utils
 
 from c7n.resources import load_resources
@@ -147,6 +149,10 @@ class Policy(object):
                 self.name, self.resource_type))
             return
 
+        self.ctx.metrics.put_metric(
+            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            buffer=False)
+
         if 'debug' in event:
             self.log.info("Invoking actions %s", self.resource_manager.actions)
         for action in self.resource_manager.actions:
@@ -212,6 +218,53 @@ class Policy(object):
             self.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
+
+    def get_metrics(self, start, end, period):
+        # Avoiding runtime lambda dep, premature optimization?
+        from c7n.mu import PolicyLambda, LambdaManager
+
+        values = {}
+        # Pickup lambda specific metrics (errors, invocations, durations)
+        if self.is_lambda:
+            manager = LambdaManager(self.session_factory)
+            values = manager.metrics(
+                [PolicyLambda(self)], start, end, period)[0]
+            metrics = ['ResourceCount']
+        else:
+            metrics = ['ResourceCount', 'ResourceTime', 'ActionTime']
+
+        default_dimensions = {
+            'Policy': self.name, 'ResType': self.resource_type,
+            'Scope': 'Policy'}
+
+        # Support action, and filter custom metrics
+        for el in itertools.chain(
+                self.resource_manager.actions, self.resource_manager.filters):
+            if el.metrics:
+                metrics.extend(el.metrics)
+
+        session = utils.local_session(self.session_factory)
+        client = session.client('cloudwatch')
+
+        for m in metrics:
+            if isinstance(m, basestring):
+                dimensions = default_dimensions
+            else:
+                m, m_dimensions = m
+                dimensions = dict(default_dimensions)
+                dimensions.update(m_dimensions)
+            results = client.get_metric_statistics(
+                Namespace=DEFAULT_NAMESPACE,
+                Dimensions=[
+                    {'Name': k, 'Value': v} for k, v
+                    in dimensions.items()],
+                Statistics=['Sum', 'Average'],
+                StartTime=start,
+                EndTime=end,
+                Period=period,
+                MetricName=m)
+            values[m] = results['Datapoints']
+        return values
 
     def __call__(self):
         """Run policy in default mode"""

@@ -616,6 +616,10 @@ class EncryptExtantKeys(ScanBucket):
             }
         }
 
+    metrics = [
+        ('Total Keys', {'Scope': 'Account'}),
+        ('Unencrypted', {'Scope': 'Account'})]
+
     def process(self, buckets):
         t = time.time()
         results = super(EncryptExtantKeys, self).process(buckets)

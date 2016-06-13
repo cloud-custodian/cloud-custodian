@@ -48,7 +48,7 @@ class Config(dict):
             'profile': None,
             'assume_role': None,
             'log_group': None,
-            'metrics_enabled': False,
+            'metrics_enabled': True,
             'output_dir': '/tmp/',
             'cache_period': 0,
             'dryrun': False})
