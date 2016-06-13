@@ -137,6 +137,8 @@ class Filter(object):
 
     schema = {'type': 'object'}
 
+    metrics = ()
+
     def __init__(self, data, manager=None):
         self.data = data
         self.manager = manager

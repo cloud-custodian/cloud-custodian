@@ -7,4 +7,4 @@ from c7n.manager import resources
 @resources.register('table')
 class Table(QueryResourceManager):
 
-    resource_type = 'aws.dynamodb.Table'
+    resource_type = 'aws.dynamodb.table'

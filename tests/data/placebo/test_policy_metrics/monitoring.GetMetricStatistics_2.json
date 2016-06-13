@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 0
+                }, 
+                "Average": 8.682969363532667, 
+                "Sum": 130.24454045299, 
+                "Unit": "Seconds"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "efd5a3f9-314c-11e6-826d-5ba5b1d13f5b"
+        }, 
+        "Label": "ResourceTime"
+    }
+}

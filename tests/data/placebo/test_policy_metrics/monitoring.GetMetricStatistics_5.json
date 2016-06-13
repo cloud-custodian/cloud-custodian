@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 0
+                }, 
+                "Average": 10942.266666666666, 
+                "Sum": 164134.0, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "f08656df-314c-11e6-a7f4-d5d453633b9e"
+        }, 
+        "Label": "Unencrypted"
+    }
+}
