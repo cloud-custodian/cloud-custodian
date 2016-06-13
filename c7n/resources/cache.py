@@ -7,7 +7,7 @@ from c7n.manager import resources
 @resources.register('cache-cluster')
 class CacheCluster(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.Cluster'
+    resource_type = 'aws.elasticache.cluster'
 
 
 @resources.register('cache-subnet-group')
@@ -19,4 +19,4 @@ class ClusterSubnetGroup(QueryResourceManager):
 @resources.register('cache-snapshot')
 class CacheSnapshot(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.Snapshot'
+    resource_type = 'aws.elasticache.snapshot'

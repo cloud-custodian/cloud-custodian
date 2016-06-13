@@ -10,7 +10,7 @@ class HostedZone(QueryResourceManager):
     resource_type = 'aws.route53.hostedzone'
 
 
-@resources.register('hostedzone')
+@resources.register('healthcheck')
 class HealthCheck(QueryResourceManager):
 
     resource_type = 'aws.route53.healthcheck'

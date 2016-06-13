@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 50
+                }, 
+                "Sum": 0.0, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "b3a5cc2e-3154-11e6-8007-2dcbe1db6e13"
+        }, 
+        "Label": "Throttles"
+    }
+}

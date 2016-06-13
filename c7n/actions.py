@@ -59,6 +59,7 @@ class ActionRegistry(PluginRegistry):
 class BaseAction(object):
 
     permissions = ()
+    metrics = ()
 
     log = logging.getLogger("custodian.actions")
 
