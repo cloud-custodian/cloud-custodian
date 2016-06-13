@@ -306,7 +306,7 @@ class SSLPolicyFilter(Filter):
                     LoadBalancerName=elb_name,
                     PolicyNames=policy_names)['PolicyDescriptions']
             except ClientError as e:
-                if e.response['Error']['Code'] == "LoadBalancerNotFound":
+                if e.response['Error']['Code'] in ['LoadBalancerNotFound', 'PolicyNotFound']:
                     continue
                 raise
             active_lb_policies = []
