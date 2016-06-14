@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n",
-    version='0.8.14',
+    version='0.8.14.1',
     description="Cloud Custodian - Policy Rules Engine",
     long_description_markdown_filename='README.md',
     classifiers=[
@@ -16,6 +16,6 @@ setup(
     entry_points={
         'console_scripts': [
             'custodian = c7n.cli:main']},
-    install_requires=["boto3", "pyyaml", "jsonschema"],
+    install_requires=["boto3", "pyyaml", "jsonschema", "skew"],
 )
 
