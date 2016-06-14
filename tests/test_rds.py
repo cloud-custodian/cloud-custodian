@@ -115,7 +115,7 @@ class RDSTest(BaseTest):
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 6)
 
     def test_rds_delete(self):
         session_factory = self.replay_flight_data('test_rds_delete')

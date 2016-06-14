@@ -381,16 +381,26 @@ class Snapshot(BaseAction):
         for block_device in resource['BlockDeviceMappings']:
             if 'Ebs' not in block_device:
                 continue
+            volume_id = block_device['Ebs']['VolumeId']
             description = "Automated,Backup,%s,%s" % (
                 resource['InstanceId'],
-                block_device['Ebs']['VolumeId'])
-            response = c.create_snapshot(
-                DryRun=self.manager.config.dryrun,
-                VolumeId=block_device['Ebs']['VolumeId'],
-                Description=description)
+                volume_id)
+            try:
+                response = c.create_snapshot(
+                    DryRun=self.manager.config.dryrun,
+                    VolumeId=volume_id,
+                    Description=description)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectState':
+                    log.warning(
+                        "action:%s volume:%s is incorrect state" % (
+                            self.__class__.__name__.lower(),
+                            volume_id))
+                    continue
+                raise
 
             tags = [
-                {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+                {'Key': 'Name', 'Value': volume_id},
                 {'Key': 'InstanceId', 'Value': resource['InstanceId']},
                 {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
             ]
@@ -406,7 +416,7 @@ class Snapshot(BaseAction):
                 log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
-                        block_device['Ebs']['VolumeId']))
+                        volume_id))
                 copy_tags = []
 
             tags.extend(copy_tags)
