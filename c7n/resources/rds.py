@@ -114,7 +114,7 @@ def _rds_tags(
         return db
 
     # Rds maintains a low api call limit, so this can take some time :-(
-    with executor_factory(max_workers=2) as w:
+    with executor_factory(max_workers=1) as w:
         list(w.map(process_tags, dbs))
 
 

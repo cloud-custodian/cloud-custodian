@@ -97,7 +97,7 @@ class Delete(BaseAction):
                                 f.exception()))
 
     def process_db_set(self, db_set):
-        c = local_session(self.session_factory).client('redshift')
+        c = local_session(self.manager.session_factory).client('redshift')
         now = datetime.now()
         for db in db_set:
             params = {'ClusterIdentifier': db['ClusterIdentifier']}
