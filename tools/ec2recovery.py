@@ -313,8 +313,7 @@ def main():
         rebuild(session, args.dryrun, args.ami, args.instanceid,
                 args.keypair, args.securitygroups,
                 args.type, args.subnet,
-                snapshots, args.rolename, userdata,
-                args.tags)
+                snapshots, args.rolename, userdata)
 
 
 if __name__ == '__main__':
