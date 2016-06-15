@@ -274,7 +274,9 @@ class Snapshot(BaseAction):
 class RetentionWindow(BaseAction):
 
     date_attribute = "BackupRetentionPeriod"
-    schema = type_schema('retention', days={'type': 'number'})
+    schema = type_schema(
+        'retention',
+        **{'days': {'type': 'number'}, 'copy-tags': {'type': 'boolean'}})
 
     def process(self, resources):
         with self.executor_factory(max_workers=3) as w:
@@ -290,17 +292,26 @@ class RetentionWindow(BaseAction):
                                 f.exception()))
 
     def process_snapshot_retention(self, resource):
-        v = int(resource.get('BackupRetentionPeriod', 0))
-        if ((v == 0 or v < self.data['days']) and
+        current_retention = int(resource.get('BackupRetentionPeriod', 0))
+        current_copy_tags = resource['CopyTagsToSnapshot']
+        new_retention = self.data['days']
+        new_copy_tags = self.data.get('copy-tags', False)
+
+        if ((current_retention < new_retention or
+                current_copy_tags != new_copy_tags) and
                 self._db_instance_eligible_for_backup(resource)):
-            self.set_retention_window(resource)
+            self.set_retention_window(
+                resource,
+                max(current_retention, new_retention),
+                new_copy_tags)
             return resource
 
-    def set_retention_window(self, resource):
+    def set_retention_window(self, resource, retention, copy_tags):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
-            BackupRetentionPeriod=self.data['days'])
+            BackupRetentionPeriod=retention,
+            CopyTagsToSnapshot=copy_tags)
 
     def _db_instance_eligible_for_backup(self, resource):
         db_instance_id = resource['DBInstanceIdentifier']
