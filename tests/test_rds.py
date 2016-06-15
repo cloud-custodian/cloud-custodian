@@ -117,6 +117,18 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 6)
 
+    def test_rds_retention_copy_tags(self):
+        session_factory = self.replay_flight_data('test_rds_retention')
+        p = self.load_policy(
+            {'name': 'rds-snapshot',
+             'resource': 'rds',
+             'actions': [
+                 {'type': 'retention', 'days': 21, 'copy-tags': True}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 6)
+
     def test_rds_delete(self):
         session_factory = self.replay_flight_data('test_rds_delete')
         p = self.load_policy(
