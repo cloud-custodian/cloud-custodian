@@ -340,7 +340,8 @@ class AttachLambdaEncrypt(BucketActionBase):
         for r in regions:
             lambda_mgr = LambdaManager(
                 functools.partial(self.manager.session_factory, region=r))
-            region_funcs[r] = lambda_mgr.publish(func)
+            lambda_mgr.publish(func)
+            region_funcs[r] = func
 
         with self.executor_factory(max_workers=3) as w:
             results = []
