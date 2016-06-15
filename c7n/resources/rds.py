@@ -295,7 +295,7 @@ class RetentionWindow(BaseAction):
         current_retention = int(resource.get('BackupRetentionPeriod', 0))
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
-        new_copy_tags = self.data.get('copy-tags', False)
+        new_copy_tags = self.data.get('copy-tags', True)
 
         if ((current_retention < new_retention or
                 current_copy_tags != new_copy_tags) and
