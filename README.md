@@ -11,27 +11,26 @@
 
 # Cloud Custodian
 
-Cloud Custodian is a rules engine for AWS resource management. It
-allows users to define policies to be enforced to enable a well
-managed cloud, with metrics and structured outputs. It consolidates
-many of the adhoc scripts organizations have into a lightweight
-and flexible tool.
+Cloud Custodian is a rules engine for AWS fleet management. It
+allows users to define policies to enable a well managed cloud, with 
+metrics and structured outputs. It consolidates many of the adhoc 
+scripts organizations have into a lightweight and flexible tool.
 
 Organizations can use Custodian to manage their AWS environments by
-ensuring compliance to security policies, tag policies, garbage
+ensuring real time compliance to security policies, tag policies, garbage
 collection of unused resources, and cost management via off-hours
 resource management.
 
 Custodian policies are written in simple YAML configuration files that
-specify given a resource type (ec2, asg, redshift, etc) and are
-constructed from a vocabulary of filters and actions. Custodian was
-created to unify the dozens of tools and scripts most organizations
+enable specify policies on a resource type (ec2, asg, redshift, etc) 
+and are constructed from a vocabulary of filters and actions. Custodian 
+was created to unify the dozens of tools and scripts most organizations
 use for managing their AWS accounts into one open source tool and
 provide unified operations and reporting.
 
 It integrates with lambda and cloudwatch events to provide for
-realtime enforcement of policies with builtin provisioning on new
-resources or it can be used to query and operate against all of
+realtime enforcement of policies with builtin provisioning for enforcement
+on new resources or it can be used to query and operate against all of
 account's extant resources.
 
 
