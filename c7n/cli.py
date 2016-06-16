@@ -68,7 +68,7 @@ def setup_parser():
     report.set_defaults(command=commands.report)
     _default_options(report)
     report.add_argument(
-        '--days', type=int, default=1,
+        '--days', type=float, default=1,
         help="Number of days of history to consider")
     report.add_argument(
         '--raw', type=argparse.FileType('wb'),
