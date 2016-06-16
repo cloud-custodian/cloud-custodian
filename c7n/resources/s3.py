@@ -221,7 +221,7 @@ class HasStatementFilter(Filter):
         return filter(None, map(self.process_bucket, buckets))
 
     def process_bucket(self, b):
-        p = b['Policy']
+        p = b.get('Policy')
         if p is None:
             return b
         p = json.loads(p['Policy'])
@@ -249,7 +249,7 @@ class MissingPolicyStatementFilter(Filter):
         return filter(None, map(self, buckets))
 
     def __call__(self, b):
-        p = b['Policy']
+        p = b.get('Policy')
         if p is None:
             return b
 
@@ -340,7 +340,8 @@ class AttachLambdaEncrypt(BucketActionBase):
         for r in regions:
             lambda_mgr = LambdaManager(
                 functools.partial(self.manager.session_factory, region=r))
-            region_funcs[r] = lambda_mgr.publish(func)
+            lambda_mgr.publish(func)
+            region_funcs[r] = func
 
         with self.executor_factory(max_workers=3) as w:
             results = []

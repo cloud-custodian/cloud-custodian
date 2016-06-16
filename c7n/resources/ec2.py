@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
 import operator
 
+from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
@@ -301,16 +301,26 @@ class Stop(BaseAction, StateTransitionFilter):
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
-            self._run_api(
+            self._run_instances_op(
                 client.terminate_instances,
-                InstanceIds=[i['InstanceId'] for i in ephemeral],
-                DryRun=self.manager.config.dryrun)
+                [i['InstanceId'] for i in ephemeral])
         if persistent:
-            self._run_api(
-                client.stop_instances,
-                InstanceIds=[i['InstanceId'] for i in persistent],
-                DryRun=self.manager.config.dryrun)
 
+            self._run_instances_op(
+                client.stop_instances,
+                [i['InstanceId'] for i in persistent])
+
+    def _run_instances_op(self, op, instance_ids):
+        while True:
+            try:
+                return op(InstanceIds=instance_ids)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    msg = e.response['Error']['Message']
+                    e_instance_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    instance_ids.remove(e_instance_id)
+                    continue
+                raise
 
 @actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):

@@ -3,7 +3,11 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n",
+<<<<<<< HEAD
     version='0.8.14',
+=======
+    version='0.8.14.3',
+>>>>>>> capitalone/master
     description="Cloud Custodian - Policy Rules Engine",
     long_description_markdown_filename='README.md',
     classifiers=[

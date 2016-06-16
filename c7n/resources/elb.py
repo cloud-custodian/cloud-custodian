@@ -148,11 +148,16 @@ class SetSslListenerPolicy(BaseAction):
         lb_name = elb['LoadBalancerName']
         policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
             for attr in attrs]
-        client.create_load_balancer_policy(
-            LoadBalancerName=lb_name,
-            PolicyName=policy_name,
-            PolicyTypeName='SSLNegotiationPolicyType',
-            PolicyAttributes=policy_attributes)
+
+        try:
+            client.create_load_balancer_policy(
+                LoadBalancerName=lb_name,
+                PolicyName=policy_name,
+                PolicyTypeName='SSLNegotiationPolicyType',
+                PolicyAttributes=policy_attributes)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'DuplicatePolicyName':
+                raise
 
         # Apply it to all SSL listeners.
         for ld in elb['ListenerDescriptions']:
@@ -306,7 +311,8 @@ class SSLPolicyFilter(Filter):
                     LoadBalancerName=elb_name,
                     PolicyNames=policy_names)['PolicyDescriptions']
             except ClientError as e:
-                if e.response['Error']['Code'] in ['LoadBalancerNotFound', 'PolicyNotFound']:
+                if e.response['Error']['Code'] in [
+                        'LoadBalancerNotFound', 'PolicyNotFound']:
                     continue
                 raise
             active_lb_policies = []

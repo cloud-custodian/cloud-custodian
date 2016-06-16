@@ -838,11 +838,11 @@ class BucketNotification(object):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         notifies.pop('ResponseMetadata', None)
-        func_arn = func['FunctionArn']
+        func_arn = func.arn
         if func_arn.rsplit(':', 1)[-1].isdigit():
             func_arn = func_arn.rsplit(':', 1)[0]
         n_params = {
-            'Id': func['FunctionName'],
+            'Id': func.name,
             'LambdaFunctionArn': func_arn,
             'Events': self.data.get('events', ['s3:ObjectCreated:*'])}
         if self.data.get('filters'):
@@ -858,7 +858,7 @@ class BucketNotification(object):
 
         lambda_client = self.session.client('lambda')
         params = dict(
-            FunctionName=func['FunctionName'],
+            FunctionName=func.name,
             StatementId=self.bucket['Name'],
             Action='lambda:InvokeFunction',
             Principal='s3.amazonaws.com')

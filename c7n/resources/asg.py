@@ -155,6 +155,21 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
         self.unencrypted_images = self.get_unencrypted_images(ec2)
         self.unencrypted_configs = self.get_unencrypted_configs(ec2)
 
+    def _fetch_images(self, ec2, image_ids):
+        while True:
+            try:
+                return ec2.describe_images(ImageIds=list(image_ids))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidAMIID.NotFound':
+                    msg = e.response['Error']['Message']
+                    e_ami_id = msg[msg.find("'[")+2:msg.rfind("']")]
+                    self.log.warning(
+                        "asg:not-encrypted filter image not found %s",
+                        e_ami_id)
+                    image_ids.remove(e_ami_id)
+                    continue
+                raise
+
     def get_unencrypted_images(self, ec2):
         """retrieve images which have unencrypted snapshots referenced."""
         image_ids = set()
@@ -162,7 +177,7 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
             image_ids.add(cfg['ImageId'])
 
         self.log.debug("querying %d images", len(image_ids))
-        results = ec2.describe_images(ImageIds=list(image_ids))
+        results = self._fetch_images(ec2, image_ids)
         self.images = {i['ImageId']: i for i in results['Images']}
 
         unencrypted_images = set()

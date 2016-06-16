@@ -12,4 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+<<<<<<< HEAD
 version = "0.8.14"
+=======
+version = "0.8.14.3"
+>>>>>>> capitalone/master
