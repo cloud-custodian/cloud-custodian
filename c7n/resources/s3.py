@@ -221,7 +221,7 @@ class HasStatementFilter(Filter):
         return filter(None, map(self.process_bucket, buckets))
 
     def process_bucket(self, b):
-        p = b['Policy']
+        p = b.get('Policy')
         if p is None:
             return b
         p = json.loads(p['Policy'])
@@ -249,7 +249,7 @@ class MissingPolicyStatementFilter(Filter):
         return filter(None, map(self, buckets))
 
     def __call__(self, b):
-        p = b['Policy']
+        p = b.get('Policy')
         if p is None:
             return b
 
