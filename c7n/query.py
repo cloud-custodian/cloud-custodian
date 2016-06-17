@@ -69,7 +69,7 @@ class QueryResourceManager(ResourceManager):
             self.augment(resources)
             return resources
         except ClientError as e:
-            self.log.exception("event ids not resolved: %s error:%s" % (ids, e))
+            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
 
     def augment(self, resources):

@@ -18,7 +18,9 @@
 
 def load_resources():
     import ami
+    import apigw
     import asg
+    import awslambda
     import cache
     import cfn
     import cw
@@ -27,6 +29,7 @@ def load_resources():
     import ec2
     import elb
     import iam
+    import kinesis
     import kms
     import redshift
     import rds

@@ -211,10 +211,10 @@ class ValueFilter(Filter):
     def validate(self):
         if len(self.data) == 1:
             return self
-        if not 'key' in self.data:
+        if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if not 'value' in self.data:
+        if 'value' not in self.data:
             raise FilterValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
