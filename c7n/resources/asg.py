@@ -25,7 +25,8 @@ import itertools
 import time
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter, AgeFilter, Filter
+from c7n.filters import (
+    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError)
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -54,7 +55,7 @@ class ASG(QueryResourceManager):
     action_registry = actions
 
 
-class LaunchConfigBase(object):
+class LaunchConfigFilterBase(object):
     """Mixin base class for querying asg launch configs."""
 
     def initialize(self, asgs):
@@ -77,31 +78,21 @@ class LaunchConfigBase(object):
 
         self.configs = {}
 
-        if len(asgs) > 50 and self.manager._cache.load():
-            configs = self.manager._cache.get(
-                {'region': self.manager.config.region,
-                 'resource': 'launch-config'})
-            if configs:
-                self.log.info("Using cached configs")
-                self.configs = {
-                    cfg['LaunchConfigurationName']: cfg for cfg in configs}
-                return
-
-        self.log.debug("querying %d launch configs" % len(config_names))
-        for cfg_set in chunks(config_names, 50):
-            for cfg in client.describe_launch_configurations(
-                    LaunchConfigurationNames=cfg_set)['LaunchConfigurations']:
-                self.configs[cfg['LaunchConfigurationName']] = cfg
-
-        if len(asgs) > 50:
-            self.manager._cache.save(
-                {'region': self.manager.config.region,
-                 'resource': 'launch-config'},
-                self.configs.values())
+        self.log.debug(
+            "Querying launch configs for filter %s",
+            self.__class__.__name__)
+        config_manager = LaunchConfig(self.manager.ctx, {})
+        if len(asgs) < 20:
+            configs = config_manager.get_resources(
+                [asg['LaunchConfigurationName'] for asg in asgs])
+        else:
+            configs = config_manager.resources()
+        self.configs = {
+            cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
 
 @filters.register('launch-config')
-class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
+class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes."""
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
@@ -118,8 +109,100 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigBase):
         return self.match(cfg)
 
 
+@filters.register('invalid')
+class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
+    """
+    Filter autoscale groups to find those that are structurally invalid.
+
+    Structurally invalid means that the auto scale group will not be able
+    to launch an instance succesfully as the instance.
+
+    - invalid subnets
+    - invalid launch config snapshots
+    - invalid amis
+    - invalid health check elb (slower)
+
+    Internally this tries to reuse other resource managers to get
+    their cache effiency.
+    """
+    schema = type_schema('invalid')
+
+    def validate(self):
+        if self.manager.data.get('mode'):
+            raise FilterValidationError(
+                "invalid-config makes too many queries to be run efficiently in lambda")
+        return self
+
+    def initialize(self, asgs):
+        super(InvalidConfigFilter, self).initialize(asgs)
+        session = local_session(self.manager.session_factory)
+        self.subnets = self.get_subnets()
+        self.elbs = self.get_elbs()
+        self.images = self.get_images()
+        self.snapshots = self.get_snapshots()
+
+    def get_subnets(self):
+        from c7n.resources.vpc import Subnet
+        manager = Subnet(self.manager.ctx, {})
+        return set([s['SubnetId'] for s in manager.resources()])
+
+    def get_elbs(self):
+        from c7n.resources.elb import ELB
+        manager = ELB(self.manager.ctx, {})
+        return set([e['LoadBalancerName'] for e in manager.resources()])
+
+    def get_images(self):
+        from c7n.resources.ami import AMI
+        manager = AMI(self.manager.ctx, {})
+        return set([i['ImageId'] for i in manager.resources()])
+
+    def get_snapshots(self):
+        from c7n.resources.ebs import Snapshot
+        manager = Snapshot(self.manager.ctx, {})
+        return set([s['SnapshotId'] for s in manager.resources()])
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(InvalidConfigFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        errors = []
+        subnets = asg.get('VPCZoneIdentifier', '').split(',')
+
+        for s in subnets:
+            if not s in self.subnets:
+                errors.append(('invalid-subnet', s))
+
+        for elb in asg['LoadBalancerNames']:
+            if elb not in self.elbs:
+                errors.append(('invalid-elb', elb))
+
+        cfg_id = asg.get(
+            'LaunchConfigurationName', asg['AutoScalingGroupName'])
+
+        cfg = self.configs.get(cfg_id)
+        if cfg is None:
+            errors.append(('invalid-config', cfg_id))
+            self.log.debug(
+                "asg:%s no launch config found" % asg['AutoScalingGroupName'])
+            asg['Invalid'] = errors
+            return True
+
+        if cfg['ImageId'] not in self.images:
+            errors.append(('invalid-image', cfg['ImageId']))
+
+        for bd in cfg['BlockDeviceMappings']:
+            if 'SnapshotId' not in bd:
+                continue
+            if bd['SnapshotId'] not in self.snapshots:
+                errors.append(('invalid-snapshot', cfg['SnapshotId']))
+        if errors:
+            asg['Invalid'] = errors
+            return True
+
+
 @filters.register('not-encrypted')
-class NotEncryptedFilter(Filter, LaunchConfigBase):
+class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
     """Check if an asg is configured to have unencrypted volumes.
 
     Checks both the ami snapshots and the launch configuration.
@@ -240,7 +323,7 @@ class NotEncryptedFilter(Filter, LaunchConfigBase):
 
 
 @filters.register('image-age')
-class ImageAgeFilter(AgeFilter, LaunchConfigBase):
+class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     """Filter asg by image age."""
 
     date_attribute = "CreationDate"
@@ -692,7 +775,7 @@ class Delete(BaseAction):
     schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, asgs):
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=5) as w:
             list(w.map(self.process_asg, asgs))
 
     def process_asg(self, asg):
@@ -705,3 +788,59 @@ class Delete(BaseAction):
         asg_client.delete_auto_scaling_group(
                 AutoScalingGroupName=asg['AutoScalingGroupName'],
                 ForceDelete=force_delete)
+
+
+@resources.register('launch-config')
+class LaunchConfig(QueryResourceManager):
+
+    resource_type = "aws.autoscaling.launchConfigurationName"
+
+
+@LaunchConfig.filter_registry.register('age')
+class LaunchConfigAge(AgeFilter):
+
+    date_attribute = "CreatedTime"
+    schema = type_schema('age', days={'type': 'number'})
+
+
+@LaunchConfig.filter_registry.register('unused')
+class UnusedLaunchConfig(Filter):
+
+    schema = type_schema('unused')
+
+    def process(self, configs, event=None):
+        asgs = self.manager._cache.get(
+            {'region': self.manager.config.region,
+             'resource': 'asg'})
+        if asgs is None:
+            self.log.debug(
+                "Querying asgs to determine unused launch configs")
+            asg_manager = ASG(self.manager.ctx, {})
+            asgs = asg_manager.resources()
+        self.used = set([a['LaunchConfigurationName'] for a in asgs])
+        return super(UnusedLaunchConfig, self).process(configs)
+
+    def __call__(self, config):
+        return config['LaunchConfigurationName'] not in self.used
+
+
+@LaunchConfig.action_registry.register('delete')
+class LaunchConfigDelete(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, configs):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_config, configs))
+
+    def process_config(self, config):
+        session = local_session(self.manager.session_factory)
+        client = session.client('autoscaling')
+        try:
+            client.delete_launch_configuration(
+                LaunchConfigurationName=config[
+                    'LaunchConfigurationName'])
+        except ClientError as e:
+            # Catch already deleted
+            if e.response['Error']['Code'] == 'ValidationError':
+                return
