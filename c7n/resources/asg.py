@@ -90,9 +90,6 @@ class LaunchConfigFilterBase(object):
         self.configs = {
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
-    def __call__(self, config):
-        return config['LaunchConfigurationName'] not in self.used
-            
 
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
@@ -129,7 +126,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
     their cache effiency.
     """
     schema = type_schema('invalid')
-    
+
     def validate(self):
         if self.manager.data.get('mode'):
             raise FilterValidationError(
@@ -138,23 +135,22 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(InvalidConfigFilter, self).initialize(asgs)
-        import pdb; pdb.set_trace()
         session = local_session(self.manager.session_factory)
         self.subnets = self.get_subnets()
         self.elbs = self.get_elbs()
         self.images = self.get_images()
         self.snapshots = self.get_snapshots()
-    
+
     def get_subnets(self):
         from c7n.resources.vpc import Subnet
         manager = Subnet(self.manager.ctx, {})
         return set([s['SubnetId'] for s in manager.resources()])
-    
+
     def get_elbs(self):
         from c7n.resources.elb import ELB
         manager = ELB(self.manager.ctx, {})
         return set([e['LoadBalancerName'] for e in manager.resources()])
-    
+
     def get_images(self):
         from c7n.resources.ami import AMI
         manager = AMI(self.manager.ctx, {})
@@ -168,9 +164,9 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
     def process(self, asgs, event=None):
         self.initialize(asgs)
         return super(InvalidConfigFilter, self).process(asgs, event)
-    
+
     def __call__(self, asg):
-        errors = []        
+        errors = []
         subnets = asg.get('VPCZoneIdentifier', '').split(',')
 
         for s in subnets:
@@ -180,9 +176,10 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
         for elb in asg['LoadBalancerNames']:
             if elb not in self.elbs:
                 errors.append(('invalid-elb', elb))
-                    
-        cfg_id = asg.get('LaunchConfigurationName', asg['AutoScalingGroupName'])
-        
+
+        cfg_id = asg.get(
+            'LaunchConfigurationName', asg['AutoScalingGroupName'])
+
         cfg = self.configs.get(cfg_id)
         if cfg is None:
             errors.append(('invalid-config', cfg_id))
@@ -192,7 +189,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
             return True
 
         if cfg['ImageId'] not in self.images:
-            errors.append(('invaid-image', cfg['ImageId']))
+            errors.append(('invalid-image', cfg['ImageId']))
 
         for bd in cfg['BlockDeviceMappings']:
             if 'SnapshotId' not in bd:
@@ -203,7 +200,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
             asg['Invalid'] = errors
             return True
 
-        
+
 @filters.register('not-encrypted')
 class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
     """Check if an asg is configured to have unencrypted volumes.
@@ -798,7 +795,7 @@ class LaunchConfig(QueryResourceManager):
 
     resource_type = "aws.autoscaling.launchConfigurationName"
 
-    
+
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
 
@@ -847,5 +844,3 @@ class LaunchConfigDelete(BaseAction):
             # Catch already deleted
             if e.response['Error']['Code'] == 'ValidationError':
                 return
-
-        
