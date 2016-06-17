@@ -319,6 +319,8 @@ class Stop(BaseAction, StateTransitionFilter):
                     msg = e.response['Error']['Message']
                     e_instance_id = msg[msg.find("'")+1:msg.rfind("'")]
                     instance_ids.remove(e_instance_id)
+                    if not instance_ids:
+                        return
                     continue
                 raise
 
