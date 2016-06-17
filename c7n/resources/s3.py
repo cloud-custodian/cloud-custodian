@@ -288,7 +288,7 @@ class RemovePolicyStatement(BucketActionBase):
             return filter(None, list(results))
 
     def process_bucket(self, bucket):
-        p = bucket['Policy']
+        p = bucket.get('Policy')
         if p is None:
             return
         else:
