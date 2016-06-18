@@ -135,9 +135,9 @@ class Filter(object):
 
     log = logging.getLogger('custodian.filters')
 
-    schema = {'type': 'object'}
-
     metrics = ()
+
+    schema = {'type': 'object'}
 
     def __init__(self, data, manager=None):
         self.data = data
@@ -162,14 +162,16 @@ class Or(Filter):
         super(Or, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
+        self.manager = manager
 
-    # TODO support resource set processing with or (will need identity
-    # metadata per resource type), ala tags set_id or query metamodel branch
-    def __call__(self, i):
+    def process(self, resources, event=None):
+        resource_type = self.manager.query.resolve(self.manager.resource_type)
+        resource_map = {r[resource_type.id]: r for r in resources}
+        results = set()
         for f in self.filters:
-            if f(i):
-                return True
-        return False
+            results = results.union([
+                r[resource_type.id] for r in f.process(resources, event)])
+        return [resource_map[r_id] for r_id in results]
 
 
 class And(Filter):
@@ -179,11 +181,10 @@ class And(Filter):
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
 
-    def __call__(self, i):
+    def process(self, resources, events=None):
         for f in self.filters:
-            if not f(i):
-                return False
-        return True
+            resources = f.process(resources, events)
+        return resources
 
 
 class ValueFilter(Filter):

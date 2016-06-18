@@ -59,10 +59,10 @@ class TestOrFilter(unittest.TestCase):
                 {'Architecture': 'x86_64'},
                 {'Architecture': 'armv8'}]})
         self.assertEqual(
-            f(instance(Architecture='x86_64')),
+            f.process([instance(Architecture='x86_64')]),
             True)
         self.assertEqual(
-            f(instance(Architecture='amd64')),
+            f.process([instance(Architecture='amd64')]),
             False)
 
 
@@ -74,18 +74,21 @@ class TestAndFilter(unittest.TestCase):
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='green')),
+            f.process([
+                instance(
+                    Architecture='x86_64',
+                    Color='green')]),
             True)
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='blue')),
+            f.process([
+                instance(
+                    Architecture='x86_64',
+                    Color='blue')]),
             False)
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64')),
+            f.process([
+                instance(
+                    Architecture='x86_64')]),
             False)
 
 
