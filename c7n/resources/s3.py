@@ -93,6 +93,7 @@ class S3(QueryResourceManager):
             results = filter(None, results)
             return results
 
+
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),
     ('get_bucket_tagging', 'Tags', [], 'TagSet'),

@@ -101,6 +101,7 @@ class RDS(QueryResourceManager):
             self.query.resolve(self.resource_type),
             resources, self.session_factory, self.executor_factory,
             self.account_id, region=self.config.region)
+        return resources
 
 
 def _rds_tags(

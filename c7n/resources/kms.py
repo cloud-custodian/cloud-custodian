@@ -13,44 +13,52 @@
 # limitations under the License.
 import logging
 
-from c7n.actions import ActionRegistry
-from c7n.filters import FilterRegistry, Filter
+from c7n.filters import Filter
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
 log = logging.getLogger('custodian.kms')
 
-filters = FilterRegistry('kms.filters')
-actions = ActionRegistry('kms.actions')
-
 
 @resources.register('kms')
-class KMS(ResourceManager):
+class KeyAlias(QueryResourceManager):
 
-    filter_registry = filters
-    action_registry = actions
+    class Meta(object):
+        service = 'kms'
+        type = 'key-alias'
+        enum_spec = ('list_aliases', 'Aliases', None)
+        name = "AliasName"
+        id = "AliasArn"
 
-    def resources(self):
-        c = self.session_factory().client('kms')
-        self.log.info("Querying kms keys")
-        keys = c.list_aliases()['Aliases']
-        original_count = len(keys)
-        keys = [k for k in keys if 'TargetKeyId' in k]
-        log.debug(
-            "Filtered aliases without targets from %d to %d" % (
-                original_count, len(keys)))
-        return self.filter_resources(keys)
+    resource_type = Meta
+
+    def augment(self, resources):
+        return [r for r in resources if 'TargetKeyId' in r]
 
 
-@filters.register('grant-count')
+@resources.register('kms-key')
+class Key(QueryResourceManager):
+
+    class Meta(object):
+        service = 'kms'
+        type = "key"
+        enum_spec = ('list_keys', 'Keys', None)
+        name = "KeyId"
+        id = "KeyArn"
+
+    resource_type = Meta
+
+
+@KeyAlias.filter_registry.register('grant-count')
 class GrantCount(Filter):
 
     schema = type_schema(
         'grant-count', min={'type': 'integer', 'minimum': 0})
 
     def process(self, keys, event=None):
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=3) as w:
             return filter(None, (w.map(self.process_key, keys)))
 
     def process_key(self, key):
