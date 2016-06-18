@@ -59,14 +59,14 @@ class QueryResourceManager(ResourceManager):
             query = {}
 
         resources = self.query.filter(self.resource_type, **query)
-        self.augment(resources)
+        resources = self.augment(resources)
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
     def get_resources(self, ids):
         try:
             resources = self.query.get(self.resource_type, ids)
-            self.augment(resources)
+            resources = self.augment(resources)
             return resources
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
@@ -78,6 +78,7 @@ class QueryResourceManager(ResourceManager):
         ie. we want tags by default (rds, elb), and policy, location, acl for
         s3 buckets.
         """
+        return resources
 
 
 class ResourceQuery(object):

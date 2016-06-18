@@ -44,8 +44,9 @@ class ELB(QueryResourceManager):
     action_registry = actions
 
     def augment(self, resources):
-        return _elb_tags(
+        _elb_tags(
             resources, self.session_factory, self.executor_factory)
+        return resources
 
 
 def _elb_tags(elbs, session_factory, executor_factory):

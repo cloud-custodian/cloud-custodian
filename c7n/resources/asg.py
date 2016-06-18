@@ -111,19 +111,19 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
 
 @filters.register('invalid')
 class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
-    """
-    Filter autoscale groups to find those that are structurally invalid.
+    """Filter autoscale groups to find those that are structurally invalid.
 
     Structurally invalid means that the auto scale group will not be able
-    to launch an instance succesfully as the instance.
+    to launch an instance succesfully as the configuration has
 
     - invalid subnets
-    - invalid launch config snapshots
+    - invalid launch config volume snapshots
     - invalid amis
     - invalid health check elb (slower)
 
-    Internally this tries to reuse other resource managers to get
-    their cache effiency.
+    Internally this tries to reuse other resource managers for better
+    cache utilization.
+
     """
     schema = type_schema('invalid')
 
@@ -135,7 +135,6 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(InvalidConfigFilter, self).initialize(asgs)
-        session = local_session(self.manager.session_factory)
         self.subnets = self.get_subnets()
         self.elbs = self.get_elbs()
         self.images = self.get_images()

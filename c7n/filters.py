@@ -324,3 +324,4 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
+
