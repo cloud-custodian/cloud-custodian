@@ -1,0 +1,148 @@
+[
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:CreateLinkedAccountResponseQueue/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:CreateLinkedAccountResponseTopic"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:CreateLinkedAccountResponseQueue",
+                "Sid": "Sid1461177809259"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:mandeep-pce/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::911807234853:role/GR_GG_EXO_Engineering"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:mandeep-pce",
+                "Sid": "Sid1460403686420"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:test-cross-account/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::902103845600:root"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:test-cross-account",
+                "Sid": "Sid1460131872568"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Statement": [
+            {
+                "Action": "sqs:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:zebr10-api-test-2-CLATopic-1P369WNTUXX6"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": "*",
+                "Resource": "*"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:zebr10-cwe-test/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:zebr10-cwe-test"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:zebr10-cwe-test",
+                "Sid": "Sid1462067940485"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:zebr10-deploy-commit-hook-poller/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:zebr10-deploy-commit-hook"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:zebr10-deploy-commit-hook-poller",
+                "Sid": "Sid1456114233464"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:zebr10-deploy-post-commit-poller/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:zebr10-deploy-post-commit"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:zebr10-deploy-post-commit-poller",
+                "Sid": "Sid1456114147023"
+            }
+        ],
+        "Version": "2012-10-17"
+    },
+    {
+        "Id": "arn:aws:sqs:us-east-1:221800032964:zebr10-self-service-cloud-mail-incoming/SQSDefaultPolicy",
+        "Statement": [
+            {
+                "Action": "SQS:SendMessage",
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:221800032964:zebr10-self-service-cloud-mail-incoming"
+                    }
+                },
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Resource": "arn:aws:sqs:us-east-1:221800032964:zebr10-self-service-cloud-mail-incoming",
+                "Sid": "Sid1462148388580"
+            }
+        ],
+        "Version": "2012-10-17"
+    }
+]
