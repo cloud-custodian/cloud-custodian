@@ -244,11 +244,14 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidAMIID.NotFound':
                     msg = e.response['Error']['Message']
-                    e_ami_id = msg[msg.find("'[")+2:msg.rfind("']")]
+                    e_ami_ids = [
+                        e_ami_id.strip() for e_ami_id
+                        in msg[msg.find("'[")+2:msg.rfind("]'")].split(',')]
                     self.log.warning(
                         "asg:not-encrypted filter image not found %s",
-                        e_ami_id)
-                    image_ids.remove(e_ami_id)
+                        e_ami_ids)
+                    for e_ami_id in e_ami_ids:
+                        image_ids.remove(e_ami_id)
                     continue
                 raise
 

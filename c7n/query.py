@@ -54,6 +54,7 @@ class QueryResourceManager(ResourceManager):
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
                     self.resource_type, len(resources)))
+                return self.filter_resources(resources)
 
         if query is None:
             query = {}
