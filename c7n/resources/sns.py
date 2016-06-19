@@ -1,7 +1,6 @@
-
-
-from c7n.query import QueryResourceManager
+from c7n.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session
 
 
@@ -19,5 +18,9 @@ class SNS(QueryResourceManager):
             r.update(attrs)
             return r
 
+        self.log.debug("retrieving details for %d topics" % len(resources))
         with self.executor_factory(max_workers=4) as w:
             return list(w.map(_augment, resources))
+
+
+SNS.filter_registry.register('cross-account', CrossAccountAccessFilter)

@@ -57,6 +57,10 @@ class CrossAccountAccessFilter(Filter):
 
 
 def _account(arn):
+    # we could try except but some minor runtime cost, basically flag
+    # invalids values
+    if ':' not in arn:
+        return arn
     return arn.split(':', 5)[4]
 
 
@@ -81,6 +85,12 @@ def check_cross_account(policy_text, allowed_accounts):
             violations.append(s)
             continue
 
+        assert len(s['Principal']) == 1, "Too many principals %s" % s
+
+        # Skip relays for events to sns
+        if 'Service' in s['Principal']:
+            continue
+
         # At this point principal is required?
         p = (
             isinstance(s['Principal'], basestring) and s['Principal']
@@ -102,6 +112,13 @@ def check_cross_account(policy_text, allowed_accounts):
             violations.append(s)
             continue
 
+        if 'StringEquals' in s['Condition']:
+            # Default SNS Policy does this
+            if 'AWS:SourceOwner' in s['Condition']['StringEquals']:
+                so = s['Condition']['StringEquals']['AWS:SourceOwner']
+                if so in allowed_accounts:
+                    principal_ok = True
+
         if 'ArnEquals' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
             # duplicate block from below, inline closure func
@@ -115,7 +132,7 @@ def check_cross_account(policy_text, allowed_accounts):
                     violations.append(s)
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
-            v = s['Condition']['ArnEquals']['aws:SourceArn']
+            v = s['Condition']['ArnLike']['aws:SourceArn']
             v = isinstance(v, basestring) and (v,) or v
             principal_ok = True
             for arn in v:
