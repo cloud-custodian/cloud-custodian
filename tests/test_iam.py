@@ -1,6 +1,6 @@
 from unittest import TestCase
 from common import load_data
-from c7n.iam import check_cross_account
+from c7n.iamaccess import check_cross_account
 
 
 class CrossAccountChecker(TestCase):
