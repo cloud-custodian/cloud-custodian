@@ -34,7 +34,7 @@ class InstanceProfile(QueryResourceManager):
     resource_type = 'aws.iam.instance-profile'
 
 
-@resources.register('server-cert')
+@resources.register('iam-certificate')
 class ServerCerficate(QueryResourceManager):
 
     resource_type = 'aws.iam.server-certificate'
