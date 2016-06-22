@@ -324,6 +324,7 @@ class Stop(BaseAction, StateTransitionFilter):
                     continue
                 raise
 
+
 @actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):
     """ Terminate a set of instances.

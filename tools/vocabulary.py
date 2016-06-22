@@ -51,6 +51,16 @@ def resource_vocabulary():
     return vocabulary
 
 
+def summary(vocabulary):
+    print "resource count: %d" % len(vocabulary)
+    action_count = filter_count = 0
+    for rv in vocabulary.values():
+        action_count += len(rv.get('actions', ()))
+        filter_count += len(rv.get('filters', ()))
+    print "actions count: %d" % action_count
+    print "filter count: %d" % filter_count
+
+
 def main():
     c7n.resources.load_resources()
     result = resource_vocabulary()
