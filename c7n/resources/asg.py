@@ -665,6 +665,7 @@ class MarkForOp(Tag):
             'msg',
             'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
 
+        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
         date = self.data.get('days', 4)
 
@@ -675,7 +676,7 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
-        self.tag(asgs, self.data['key'], msg)
+        self.tag(asgs, key, msg)
 
 
 @actions.register('suspend')
@@ -819,7 +820,9 @@ class UnusedLaunchConfig(Filter):
                 "Querying asgs to determine unused launch configs")
             asg_manager = ASG(self.manager.ctx, {})
             asgs = asg_manager.resources()
-        self.used = set([a['LaunchConfigurationName'] for a in asgs])
+        self.used = set([
+            a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
+            for a in asgs])
         return super(UnusedLaunchConfig, self).process(configs)
 
     def __call__(self, config):
