@@ -56,18 +56,18 @@ class AttachedInstanceTest(BaseTest):
 class CopyInstanceTagsTest(BaseTest):
 
     def test_copy_instance_tags(self):
-        # More a functional/coverage test then a unit test.        
+        # More a functional/coverage test then a unit test.
         self.patch(
             CopyInstanceTags, 'executor_factory', MainThreadExecutor)
         factory = self.replay_flight_data('test_ebs_copy_instance_tags')
-            
+
         volume_id = 'vol-2b047792'
-    
+
         results = factory().client('ec2').describe_tags(
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags, {})
-        
+
         policy = self.load_policy({
             'name': 'test-copy-instance-tags',
             'resource': 'ebs',
@@ -80,11 +80,11 @@ class CopyInstanceTagsTest(BaseTest):
         resources = policy.run()
         results = factory().client('ec2').describe_tags(
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
-        
+
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags['Name'], 'CompileLambda')
 
-            
+
 class EncryptExtantVolumesTest(BaseTest):
 
     def test_encrypt_volumes(self):

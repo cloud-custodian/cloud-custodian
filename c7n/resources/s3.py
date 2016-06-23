@@ -246,9 +246,6 @@ class MissingPolicyStatementFilter(Filter):
         aliases=('missing-statement',),
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
 
-    def process(self, buckets, event=None):
-        return filter(None, map(self, buckets))
-
     def __call__(self, b):
         p = b.get('Policy')
         if p is None:
@@ -517,6 +514,7 @@ class ScanBucket(BucketActionBase):
         log.info(
             "Scanning bucket:%s visitor:%s style:%s" % (
                 b['Name'], self.__class__.__name__, self.get_bucket_style(b)))
+
         s = self.manager.session_factory()
         s3 = bucket_client(s, b)
 
