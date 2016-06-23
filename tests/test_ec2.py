@@ -20,6 +20,48 @@ from c7n import tags
 from .common import BaseTest
 
 
+class TestTagTrim(BaseTest):
+
+    def test_ec2_tag_trim(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_tag_trim')
+        ec2 = session_factory().client('ec2')
+        start_tags = {
+            t['Key']: t['Value'] for t in
+            ec2.describe_tags(
+                Filters=[{'Name': 'resource-id',
+                          'Values': ['i-fdb01920']}])['Tags']}
+        policy = self.load_policy({
+            'name': 'ec2-tag-trim',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'tag-count', 'count': 10}],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 1,
+                 'preserve': [
+                     'Name',
+                     'Env',
+                     'Account',
+                     'Platform',
+                     'Classification',
+                     'Planet'
+                     ]}
+                ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        end_tags = {
+            t['Key']: t['Value'] for t in
+            ec2.describe_tags(
+                Filters=[{'Name': 'resource-id',
+                          'Values': ['i-fdb01920']}])['Tags']}
+
+        self.assertEqual(len(start_tags)-1, len(end_tags))
+        self.assertTrue('Containers' in start_tags)
+        self.assertFalse('Containers' in end_tags)
+
+
 class TestVolumeFilter(BaseTest):
 
     def test_ec2_attached_ebs_filter(self):
