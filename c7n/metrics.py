@@ -62,7 +62,7 @@ class MetricsFilter(Filter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()},
         value={'type': 'number'},
-        required=('dimensions', 'value', 'name'))
+        required=('value', 'name'))
 
     MAX_QUERY_POINTS = 50850
     MAX_RESULT_POINTS = 1440
@@ -95,14 +95,14 @@ class MetricsFilter(Filter):
         'sqs': 'AWS/SQS',
     }
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         days = self.data.get('days', 14)
         duration = timedelta(days)
 
-        self.metric = self.data['metric']
+        self.metric = self.data['name']
         self.end = datetime.utcnow()
         self.start = self.end - duration
-        self.period = self.data.get('period', duration.total_seconds())
+        self.period = int(self.data.get('period', duration.total_seconds()))
         self.statistics = self.data.get('statistics', 'Average')
         self.model = self.manager.query.resolve(self.manager.resource_type)
         self.op = OPERATORS[self.data.get('op', 'less-than')]
@@ -116,7 +116,7 @@ class MetricsFilter(Filter):
         self.namespace = ns
 
         matched = []
-        with self.execution_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=3) as w:
             futures = []
             for resource_set in chunks(resources, 50):
                 futures.append(
@@ -143,13 +143,13 @@ class MetricsFilter(Filter):
                  'Value': r[self.model.dimension]}]
             r['Metrics'] = client.get_metric_statistics(
                 Namespace=self.namespace,
-                Metric=self.metric,
+                MetricName=self.metric,
                 Statistics=[self.statistics],
                 StartTime=self.start,
                 EndTime=self.end,
                 Period=self.period,
                 Dimensions=dimensions)['Datapoints']
-            if self.op(self.value, r['Metrics'][0][self.statistics]):
+            if self.op(r['Metrics'][0][self.statistics], self.value):
                 matched.append(r)
         return matched
 
