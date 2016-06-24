@@ -1,0 +1,97 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "4258a59a-3a4c-11e6-b0d9-a31a376a0445"
+        }, 
+        "Parameters": [
+            {
+                "Description": "Sets the display format for date and time values.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "Source": "engine-default", 
+                "ParameterValue": "ISO, MDY", 
+                "ParameterName": "datestyle", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "parameter for audit logging purpose", 
+                "DataType": "boolean", 
+                "IsModifiable": true, 
+                "AllowedValues": "true,false", 
+                "Source": "engine-default", 
+                "ParameterValue": "false", 
+                "ParameterName": "enable_user_activity_logging", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "Sets the number of digits displayed for floating-point values", 
+                "DataType": "integer", 
+                "IsModifiable": true, 
+                "AllowedValues": "-15-2", 
+                "Source": "engine-default", 
+                "ParameterValue": "0", 
+                "ParameterName": "extra_float_digits", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "Sets the max cursor result set size", 
+                "DataType": "integer", 
+                "IsModifiable": true, 
+                "AllowedValues": "0-14400000", 
+                "Source": "engine-default", 
+                "ParameterValue": "default", 
+                "ParameterName": "max_cursor_result_set_size", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "This parameter applies a user-defined label to a group of queries that are run during the same session..", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "Source": "engine-default", 
+                "ParameterValue": "default", 
+                "ParameterName": "query_group", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "require ssl for all databaseconnections", 
+                "DataType": "boolean", 
+                "IsModifiable": true, 
+                "AllowedValues": "true,false", 
+                "Source": "engine-default", 
+                "ParameterValue": "false", 
+                "ParameterName": "require_ssl", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "Sets the schema search order for names that are not schema-qualified.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "Source": "engine-default", 
+                "ParameterValue": "$user, public", 
+                "ParameterName": "search_path", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "Aborts any statement that takes over the specified number of milliseconds.", 
+                "DataType": "integer", 
+                "IsModifiable": true, 
+                "AllowedValues": "0,100-2147483647", 
+                "Source": "engine-default", 
+                "ParameterValue": "0", 
+                "ParameterName": "statement_timeout", 
+                "ApplyType": "static"
+            }, 
+            {
+                "Description": "wlm json configuration", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "Source": "engine-default", 
+                "ParameterValue": "[{\"query_concurrency\":5}]", 
+                "ParameterName": "wlm_json_configuration", 
+                "ApplyType": "static"
+            }
+        ]
+    }
+}
