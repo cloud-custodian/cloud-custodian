@@ -706,8 +706,11 @@ class Suspend(BaseAction):
             AutoScalingGroupName=asg['AutoScalingGroupName'])
         ec2_client = session.client('ec2')
         try:
+            instance_ids = [i['InstanceId'] for i in asg['Instances']]
+            if not instance_ids:
+                return
             ec2_client.stop_instances(
-                InstanceIds=[i['InstanceId'] for i in asg['Instances']])
+                InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
                     'InvalidInstanceID.NotFound',
@@ -760,8 +763,10 @@ class Resume(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         ec2_client = session.client('ec2')
-        ec2_client.start_instances(
-            InstanceIds=[i['InstanceId'] for i in asg['Instances']])
+        instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not instance_ids:
+            return
+        ec2_client.start_instances(InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.

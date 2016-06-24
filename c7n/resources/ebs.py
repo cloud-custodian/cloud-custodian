@@ -21,7 +21,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY)
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n import tags
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
@@ -99,7 +99,9 @@ class SnapshotDelete(BaseAction):
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
-    resource_type = "aws.ec2.volume"
+    class resource_type(ResourceQuery.resolve("aws.ec2.volume")):
+        default_namespace = 'AWS/EBS'
+    
     filter_registry = filters
     action_registry = actions
 

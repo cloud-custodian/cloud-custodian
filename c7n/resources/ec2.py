@@ -405,7 +405,7 @@ class Snapshot(BaseAction):
                     Description=description)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
-                    log.warning(
+                    self.log.warning(
                         "action:%s volume:%s is incorrect state" % (
                             self.__class__.__name__.lower(),
                             volume_id))
@@ -426,7 +426,7 @@ class Snapshot(BaseAction):
                         copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 10:
-                log.warning(
+                self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
                         volume_id))
