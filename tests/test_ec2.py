@@ -20,6 +20,26 @@ from c7n import tags
 from .common import BaseTest
 
 
+class TestMetricFilter(BaseTest):
+
+    def test_metric_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_metric')
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-utilization',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'days': 3,
+                 'value': 1.5}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        
+
 class TestTagTrim(BaseTest):
 
     def test_ec2_tag_trim(self):

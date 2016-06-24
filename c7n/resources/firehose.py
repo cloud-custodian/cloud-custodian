@@ -6,5 +6,5 @@ from c7n.query import QueryResourceManager
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
-    rseource_type = "aws.firehose.deliverystream"
+    resource_type = "aws.firehose.deliverystream"
 

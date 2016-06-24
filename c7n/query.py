@@ -18,68 +18,7 @@ from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.utils import local_session
 from c7n.manager import ResourceManager
-
-
-class QueryMeta(type):
-
-    def __new__(cls, name, parents, attrs):
-        if 'filter_registry' not in attrs:
-            attrs['filter_registry'] = FilterRegistry(
-                '%s.filters' % name.lower())
-        if 'action_registry' not in attrs:
-            attrs['action_registry'] = ActionRegistry(
-                '%s.filters' % name.lower())
-        #if attrs['resource_type']:
-        #    m = ResourceQuery.resolve(attrs['resource_type'])
-        return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
-
-
-class QueryResourceManager(ResourceManager):
-
-    __metaclass__ = QueryMeta
-
-    resource_type = ""
-
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
-        self.query = ResourceQuery(self.session_factory)
-
-    def resources(self, query=None):
-        key = {'region': self.config.region,
-               'resource': str(self.resource_type),
-               'q': query}
-
-        if self._cache.load():
-            resources = self._cache.get(key)
-            if resources is not None:
-                self.log.debug("Using cached %s: %d" % (
-                    self.resource_type, len(resources)))
-                return self.filter_resources(resources)
-
-        if query is None:
-            query = {}
-
-        resources = self.query.filter(self.resource_type, **query)
-        resources = self.augment(resources)
-        self._cache.save(key, resources)
-        return self.filter_resources(resources)
-
-    def get_resources(self, ids):
-        try:
-            resources = self.query.get(self.resource_type, ids)
-            resources = self.augment(resources)
-            return resources
-        except ClientError as e:
-            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
-            return []
-
-    def augment(self, resources):
-        """subclasses may want to augment resources with additional information.
-
-        ie. we want tags by default (rds, elb), and policy, location, acl for
-        s3 buckets.
-        """
-        return resources
+from c7n.metrics import MetricsFilter
 
 
 class ResourceQuery(object):
@@ -142,3 +81,67 @@ class ResourceQuery(object):
 
         return resources
 
+
+class QueryMeta(type):
+
+    def __new__(cls, name, parents, attrs):
+        if 'filter_registry' not in attrs:
+            attrs['filter_registry'] = FilterRegistry(
+                '%s.filters' % name.lower())
+        if 'action_registry' not in attrs:
+            attrs['action_registry'] = ActionRegistry(
+                '%s.filters' % name.lower())
+
+        if attrs['resource_type']:
+            m = ResourceQuery.resolve(attrs['resource_type'])
+            if m.dimension:
+                attrs['filter_registry'].register('metrics', MetricsFilter)
+        return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
+
+
+class QueryResourceManager(ResourceManager):
+
+    __metaclass__ = QueryMeta
+
+    resource_type = ""
+
+    def __init__(self, data, options):
+        super(QueryResourceManager, self).__init__(data, options)
+        self.query = ResourceQuery(self.session_factory)
+
+    def resources(self, query=None):
+        key = {'region': self.config.region,
+               'resource': str(self.resource_type),
+               'q': query}
+
+        if self._cache.load():
+            resources = self._cache.get(key)
+            if resources is not None:
+                self.log.debug("Using cached %s: %d" % (
+                    self.resource_type, len(resources)))
+                return self.filter_resources(resources)
+
+        if query is None:
+            query = {}
+
+        resources = self.query.filter(self.resource_type, **query)
+        resources = self.augment(resources)
+        self._cache.save(key, resources)
+        return self.filter_resources(resources)
+
+    def get_resources(self, ids):
+        try:
+            resources = self.query.get(self.resource_type, ids)
+            resources = self.augment(resources)
+            return resources
+        except ClientError as e:
+            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            return []
+
+    def augment(self, resources):
+        """subclasses may want to augment resources with additional information.
+
+        ie. we want tags by default (rds, elb), and policy, location, acl for
+        s3 buckets.
+        """
+        return resources
