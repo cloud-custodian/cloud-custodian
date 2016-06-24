@@ -23,7 +23,7 @@ from .common import BaseTest
 class TestMetricFilter(BaseTest):
 
     def test_metric_filter(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_metric')
         ec2 = session_factory().client('ec2')
         policy = self.load_policy({

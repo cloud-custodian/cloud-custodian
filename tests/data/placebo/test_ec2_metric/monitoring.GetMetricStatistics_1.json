@@ -11,15 +11,15 @@
                     "microsecond": 0, 
                     "year": 2016, 
                     "day": 21, 
-                    "minute": 56
+                    "minute": 59
                 }, 
-                "Average": 0.022000000000000002, 
+                "Average": 0.02857142857142857, 
                 "Unit": "Percent"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "2c1ce554-3a4e-11e6-88e2-4f5540a9a729"
+            "RequestId": "91db306b-3a4e-11e6-9ad5-2928ec06fac4"
         }, 
         "Label": "CPUUtilization"
     }
