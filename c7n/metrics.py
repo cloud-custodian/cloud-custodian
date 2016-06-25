@@ -52,7 +52,7 @@ class MetricsFilter(Filter):
     """
 
     schema = type_schema(
-        'metric',
+        'metrics',
         namespace={'type': 'string'},
         name={'type': 'string'},
         dimensions={'type': 'array', 'items': {'type': 'string'}},
