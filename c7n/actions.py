@@ -23,6 +23,7 @@ from botocore.exceptions import ClientError
 from c7n.registry import PluginRegistry
 from c7n.executor import ThreadPoolExecutor
 from c7n import utils
+from c7n.version import version as VERSION
 
 
 class ActionRegistry(PluginRegistry):
@@ -30,6 +31,7 @@ class ActionRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
+        self.register('invoke-lambda', LambdaInvoke)
 
     def parse(self, data, manager):
         results = []
@@ -102,6 +104,56 @@ class BaseAction(object):
 class EventAction(BaseAction):
     """Actions which receive lambda event if present
     """
+
+
+class LambdaInvoke(EventAction):
+    """ Invoke an arbitrary lambda
+
+    serialized invocation parameters
+     - resources / collection of resources
+     - policy / policy that is invoke the lambda
+     - action / action that is invoking the lambda
+     - event / cloud trail event if any
+     - version / version of custodian invoking the lambda
+
+    We try to utilize async invocation by default, this imposes
+    some greater size limits of 128kb which means we batch
+    invoke.
+    """
+
+    schema = utils.type_schema(
+        'invoke-lambda',
+        function={'type': 'string'},
+        async={'type': 'boolean'},
+        qualifier={'type': 'string'},
+        batch_size={'type': 'integer'},
+        required=('function',))
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('lambda')
+
+        params = dict(FunctionName=self.data['function'])
+        if self.data.get('qualfiier'):
+            params['Qualifier'] = self.data['Qualifier']
+
+        if self.data.get('async', True):
+            params['InvocationType'] = 'Event'
+
+        payload = {
+            'version': VERSION,
+            'event': event,
+            'action': self.data,
+            'policy': self.manager.data}
+
+        results = []
+        for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
+            payload['resources'] = resource_set
+            params['Payload'] = utils.dumps(payload)
+            result = client.invoke(**params)
+            result['Payload'] = result['Payload'].read()
+            results.append(result)
+        return results
 
 
 class Notify(EventAction):
