@@ -62,11 +62,19 @@ def resource_vocabulary():
 def summary(vocabulary):
     print "resource count: %d" % len(vocabulary)
     action_count = filter_count = 0
+
+    common_actions = set(['notify', 'invoke-lambda'])
+    common_filters = set(['value', 'and', 'or', 'event'])
+
     for rv in vocabulary.values():
-        action_count += len(rv.get('actions', ()))
-        filter_count += len(rv.get('filters', ()))
-    print "actions count: %d" % action_count
-    print "filter count: %d" % filter_count
+        action_count += len(
+            set(rv.get('actions', ())).difference(common_actions))
+        filter_count += len(
+            set(rv.get('filters', ())).difference(common_filters))
+    print "unique actions: %d" % action_count
+    print "common actions: %d" % len(common_actions)
+    print "unique filters: %d" % filter_count
+    print "common filtesr: %s" % len(common_filters)
 
 
 def main():
