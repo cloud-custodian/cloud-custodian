@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Keys": [
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/062c1ded-b803-4b8a-ad1d-872d4c85cf06", 
+                "KeyId": "062c1ded-b803-4b8a-ad1d-872d4c85cf06"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/33533ee7-293a-4af1-9fe3-19059e725612", 
+                "KeyId": "33533ee7-293a-4af1-9fe3-19059e725612"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/5ad57a96-4867-4896-a3d9-f3a54ec6c8a4", 
+                "KeyId": "5ad57a96-4867-4896-a3d9-f3a54ec6c8a4"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/7160c129-54c4-4c64-92d0-c70d5916d16d", 
+                "KeyId": "7160c129-54c4-4c64-92d0-c70d5916d16d"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/77025106-bbe2-4fb5-9578-8a31eec97e58", 
+                "KeyId": "77025106-bbe2-4fb5-9578-8a31eec97e58"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/854efb96-9767-4cae-a186-04c71e1af5f2", 
+                "KeyId": "854efb96-9767-4cae-a186-04c71e1af5f2"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73", 
+                "KeyId": "9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/c324f4d6-1bbd-4ce1-9e23-62b6c1a27c0b", 
+                "KeyId": "c324f4d6-1bbd-4ce1-9e23-62b6c1a27c0b"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/dd09e3af-48eb-484f-b783-0801786e6239", 
+                "KeyId": "dd09e3af-48eb-484f-b783-0801786e6239"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "779b1989-3bc8-11e6-97cc-19f7aa4bf563", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "779b1989-3bc8-11e6-97cc-19f7aa4bf563", 
+                "content-length": "1252", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:04:46 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Truncated": false
+    }
+}

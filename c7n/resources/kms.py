@@ -14,7 +14,7 @@
 import logging
 
 from c7n.filters import Filter
-
+from c7n.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -22,8 +22,20 @@ from c7n.utils import local_session, type_schema
 log = logging.getLogger('custodian.kms')
 
 
+class KeyBase(object):
+
+    def augment(self, resources):
+        client = local_session(
+            self.session_factory).client('kms')
+        for r in resources:
+            key_id = r.get('AliasArn') or r.get('KeyArn')
+            info = client.describe_key(KeyId=key_id)['KeyMetadata']
+            r.update(info)
+        return resources
+
+
 @resources.register('kms')
-class KeyAlias(QueryResourceManager):
+class KeyAlias(KeyBase, QueryResourceManager):
 
     class Meta(object):
         service = 'kms'
@@ -36,11 +48,12 @@ class KeyAlias(QueryResourceManager):
     resource_type = Meta
 
     def augment(self, resources):
-        return [r for r in resources if 'TargetKeyId' in r]
+        resources = [r for r in resources if 'TargetKeyId' in r]
+        return super(KeyAlias, self).augment(resources)
 
 
 @resources.register('kms-key')
-class Key(QueryResourceManager):
+class Key(KeyBase, QueryResourceManager):
 
     class Meta(object):
         service = 'kms'
@@ -51,6 +64,28 @@ class Key(QueryResourceManager):
         dimension = None
 
     resource_type = Meta
+
+
+@Key.filter_registry.register('cross-account')
+@KeyAlias.filter_registry.register('cross-account')
+class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
+
+    def process(self, resources, event=None):
+        def _augment(r):
+            client = local_session(
+                self.manager.session_factory).client('kms')
+            key_id = r.get('TargetKeyId', r.get('KeyId'))
+            assert key_id, "Invalid key resources %s" % r
+            r['Policy'] = client.get_key_policy(
+                KeyId=key_id, PolicyName='default')['Policy']
+            return r
+
+        self.log.debug("fetching policy for %d kms keys" % len(resources))
+        with self.executor_factory(max_workers=1) as w:
+            resources = filter(None, w.map(_augment, resources))
+
+        return super(KMSCrossAccountAccessFilter, self).process(
+            resources, event)
 
 
 @KeyAlias.filter_registry.register('grant-count')

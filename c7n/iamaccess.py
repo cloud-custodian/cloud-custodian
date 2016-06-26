@@ -132,6 +132,12 @@ def check_cross_account(policy_text, allowed_accounts):
                 if so in allowed_accounts:
                     principal_ok = True
 
+            # Default keys in kms do this
+            if 'kms:CallerAccount' in s['Condition']['StringEquals']:
+                so = s['Condition']['StringEquals']['kms:CallerAccount']
+                if so in allowed_accounts:
+                    principal_ok = True
+
         if 'ArnEquals' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
             # duplicate block from below, inline closure func
