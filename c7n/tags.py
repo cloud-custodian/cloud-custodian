@@ -124,8 +124,6 @@ class TagTrim(Action, ResourceTag):
         if self.space and len(tag_map) + self.space <= self.max_tag_count:
             return
 
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
         keys = set(tag_map)
         preserve = self.preserve.intersection(keys)
         candidates = keys - self.preserve
@@ -136,9 +134,16 @@ class TagTrim(Action, ResourceTag):
                 self.max_tag_count - (self.space + len(preserve)))
             candidates = list(sorted(candidates))[:remove]
 
+        if not candidates:
+            self.log.warning(
+                "Could not find any candidates to trim %s" % i[self.id_key])
+                
+    def process_tag_removal(self, resource, tags):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         client.delete_tags(
-            Tags=[{'Key': c} for c in candidates],
-            Resources=[i[self.id_key]],
+            Tags=[{'Key': c} for c in tags],
+            Resources=[resource[self.id_key]],
             DryRun=self.manager.config.dryrun)
 
 

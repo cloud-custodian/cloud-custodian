@@ -31,7 +31,7 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import Time, OffHour, OnHour
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter
+from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import local_session, query_instances, type_schema, chunks
 
 log = logging.getLogger('custodian.asg')
@@ -385,6 +385,20 @@ class VpcIdFilter(ValueFilter):
             for a in s_asgs:
                 a['VpcId'] = all_subnets[s]['VpcId']
         return super(VpcIdFilter, self).process(asgs)
+
+
+@actions.register('tag-trim')
+class GroupTagTrim(TagTrim):
+
+    def process_tag_removal(self, resource, candidates):
+        client = local_session(
+            self.manager.session_factory).client('asg')
+        tags = []
+        for t in candidates:
+            tags.append(
+                dict(Key=t, ResourceType='auto-scaling-group',
+                     ResourceId=resource['AutoScalingGroupName']))
+        client.delete_tags(Tags=tags)
 
 
 @actions.register('remove-tag')
