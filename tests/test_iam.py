@@ -29,9 +29,8 @@ class KMSCrossAccount(BaseTest):
     def test_kms_cross_account(self):
         self.patch(
             CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
-        session_factory = self.record_flight_data('test_cross_account_kms')
+        session_factory = self.replay_flight_data('test_cross_account_kms')
         client = session_factory().client('kms')
-        name = 'c7n-cross-check'
 
         policy = {
             'Id': 'Lulu',
