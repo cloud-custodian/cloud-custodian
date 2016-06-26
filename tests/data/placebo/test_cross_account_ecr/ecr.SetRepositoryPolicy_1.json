@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policyText": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"Foo\",\n  \"Statement\" : [ {\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"ecr:BatchGetImage\"\n  } ]\n}", 
+        "repositoryName": "c7n/cross-check", 
+        "registryId": "644160558196", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "c7d27b34-3bb8-11e6-85e2-4be215f39d76"
+        }
+    }
+}

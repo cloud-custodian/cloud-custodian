@@ -1,0 +1,21 @@
+{
+    "status_code": 201, 
+    "data": {
+        "CodeSha256": "lu9AsAbO4+Lpcc2/rcv/G6um6GqvLgA/sp9SQ8BGzvg=", 
+        "FunctionName": "c7n-cross-check", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "a377f6b6-3bbb-11e6-82a1-fb2f9cd9e52e"
+        }, 
+        "CodeSize": 176, 
+        "MemorySize": 128, 
+        "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-cross-check", 
+        "Version": "4", 
+        "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+        "Timeout": 5, 
+        "LastModified": "2016-06-26T16:32:56.891+0000", 
+        "Handler": "handler.handler", 
+        "Runtime": "python2.7", 
+        "Description": ""
+    }
+}

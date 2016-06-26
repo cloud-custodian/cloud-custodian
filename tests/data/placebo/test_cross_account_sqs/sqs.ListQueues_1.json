@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrls": [
+            "https://us-west-2.queue.amazonaws.com/644160558196/c7n-cross-check"
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "93b4873e-03c1-56fc-be01-c8d7fd0b9e64"
+        }
+    }
+}

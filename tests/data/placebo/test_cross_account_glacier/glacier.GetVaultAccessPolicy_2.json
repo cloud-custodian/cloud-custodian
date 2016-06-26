@@ -1,0 +1,13 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RequestId": "DDHjmazajkX4ozumOxHQmQPLwmt_v7ZWZIwR0OLZktaKPvI"
+        }, 
+        "Error": {
+            "Message": "No vault access policy is set for: testing", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

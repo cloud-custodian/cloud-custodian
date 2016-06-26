@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "SubscriptionsConfirmed": "0", 
+            "DisplayName": "", 
+            "SubscriptionsDeleted": "0", 
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
+            "Owner": "644160558196", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Foo\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-west-2:644160558196:c7n-cross-check\"}]}", 
+            "TopicArn": "arn:aws:sns:us-west-2:644160558196:c7n-cross-check", 
+            "SubscriptionsPending": "0"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "9334367a-8df2-5201-8eae-799373023016"
+        }
+    }
+}

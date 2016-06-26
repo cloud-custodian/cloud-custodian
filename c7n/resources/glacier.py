@@ -32,6 +32,7 @@ class Glacier(QueryResourceManager):
     resource_type = Meta
 
 
+    
 @Glacier.filter_registry.register('cross-account')
 class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
 
@@ -41,7 +42,8 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
                 self.manager.session_factory).client('glacier')
             try:
                 r['Policy'] = client.get_vault_access_policy(
-                    vaultName=r['VaultName'])
+                    vaultName=r['VaultName'])['policy']['Policy']
+                return r
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(

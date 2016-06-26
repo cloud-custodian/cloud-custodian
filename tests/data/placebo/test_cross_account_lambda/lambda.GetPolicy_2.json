@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-cross-check\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Sid\":\"oops\"}],\"Id\":\"default\"}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4e2aa6e-3bbb-11e6-bb79-c33106081401"
+        }
+    }
+}

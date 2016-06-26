@@ -36,6 +36,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
             try:
                 r['Policy'] = client.get_policy(
                     FunctionName=r['FunctionName'])['Policy']
+                return r
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
