@@ -54,7 +54,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
 from c7n.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import chunks, local_session, set_annotation, type_schema
 
 """
@@ -75,7 +75,8 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    resource_type = "aws.s3.bucket"
+    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+        dimension = 'BucketName'
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters

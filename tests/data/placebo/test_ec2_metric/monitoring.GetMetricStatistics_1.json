@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 59
+                }, 
+                "Average": 0.02857142857142857, 
+                "Unit": "Percent"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "91db306b-3a4e-11e6-9ad5-2928ec06fac4"
+        }, 
+        "Label": "CPUUtilization"
+    }
+}

@@ -31,6 +31,7 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
+        dimension = None
 
     resource_type = Meta
 
@@ -47,6 +48,7 @@ class Key(QueryResourceManager):
         enum_spec = ('list_keys', 'Keys', None)
         name = "KeyId"
         id = "KeyArn"
+        dimension = None
 
     resource_type = Meta
 
