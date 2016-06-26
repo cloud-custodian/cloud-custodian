@@ -31,6 +31,7 @@ def load_resources():
     import ecr
     import ecs
     import elb
+    import emr
     import firehose
     import glacier
     import iam
