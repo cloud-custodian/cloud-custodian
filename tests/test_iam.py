@@ -27,6 +27,8 @@ from c7n.executor import MainThreadExecutor
 class GlacierCrossAccount(BaseTest):
 
     def test_glacier_cross_account(self):
+        self.patch(
+            CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_cross_account_glacier')
         client = session_factory().client('glacier')
         name = 'c7n-cross-check'
@@ -73,7 +75,8 @@ class LambdaCrossAccount(BaseTest):
     role = "arn:aws:iam::644160558196:role/lambda_basic_execution"
 
     def test_lambda_cross_account(self):
-        self.patch(CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
         
         session_factory = self.replay_flight_data('test_cross_account_lambda')
         client = session_factory().client('lambda')

@@ -32,7 +32,6 @@ class Glacier(QueryResourceManager):
     resource_type = Meta
 
 
-    
 @Glacier.filter_registry.register('cross-account')
 class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
 
