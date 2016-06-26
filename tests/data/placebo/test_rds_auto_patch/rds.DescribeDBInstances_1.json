@@ -1,0 +1,116 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstances": [
+            {
+                "PubliclyAccessible": true, 
+                "MasterUsername": "mydbuser", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "postgresql-license", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-f6a42890"
+                    }
+                ], 
+                "InstanceCreateTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 54, 
+                    "microsecond": 265000, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 23
+                }, 
+                "CopyTagsToSnapshot": false, 
+                "OptionGroupMemberships": [
+                    {
+                        "Status": "in-sync", 
+                        "OptionGroupName": "default:postgres-9-5"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "Engine": "postgres", 
+                "MultiAZ": false, 
+                "LatestRestorableTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 30
+                }, 
+                "DBSecurityGroups": [], 
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.postgres9.5", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "AutoMinorVersionUpgrade": false, 
+                "PreferredBackupWindow": "11:03-11:33", 
+                "DBSubnetGroup": {
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-15452171", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-63c97615", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-5fb47507", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            }
+                        }
+                    ], 
+                    "DBSubnetGroupName": "default", 
+                    "VpcId": "vpc-4a9ff72e", 
+                    "DBSubnetGroupDescription": "default", 
+                    "SubnetGroupStatus": "Complete"
+                }, 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 5, 
+                "BackupRetentionPeriod": 7, 
+                "PreferredMaintenanceWindow": "tue:07:37-tue:08:07", 
+                "Endpoint": {
+                    "Port": 5432, 
+                    "Address": "mydb.cnhganveedh2.us-west-2.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "EngineVersion": "9.5.2", 
+                "AvailabilityZone": "us-west-2b", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-OCZWPGLNE2BOYMEW72NS2SBJCU", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "StorageEncrypted": false, 
+                "DBInstanceClass": "db.m3.medium", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "mydb"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "00c05d6f-3bcd-11e6-a2d2-83999282af9f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "00c05d6f-3bcd-11e6-a2d2-83999282af9f", 
+                "date": "Sun, 26 Jun 2016 18:37:14 GMT", 
+                "content-length": "3862", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
