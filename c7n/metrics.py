@@ -115,6 +115,7 @@ class MetricsFilter(Filter):
                 ns = self.DEFAULT_NAMESPACE[self.model.service]
         self.namespace = ns
 
+        self.log.debug("Querying metrics for %d", len(resources))
         matched = []
         with self.executor_factory(max_workers=3) as w:
             futures = []

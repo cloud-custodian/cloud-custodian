@@ -104,6 +104,17 @@ class EventAction(BaseAction):
     """
 
 
+class LambdaInvoke(EventAction):
+    """ Invoke an arbitrary lambda
+
+    serialized invocation parameters
+     - resources
+     - policy
+     - action
+
+    """
+
+
 class Notify(EventAction):
     """
     Flexible notifications require quite a bit of implementation support

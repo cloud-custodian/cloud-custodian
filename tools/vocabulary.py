@@ -2,12 +2,20 @@
 Generate a yaml file showing full capability set of custodian
 filters and actions by resource type.
 """
+import argparse
+
+import yaml
 
 import c7n.resources
 
 from c7n.manager import resources
 from c7n.query import ResourceQuery
-import yaml
+
+
+def setup_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--summary', action="store_true")
+    return parser
 
 
 def resources_by_service():
@@ -62,11 +70,15 @@ def summary(vocabulary):
 
 
 def main():
+    parser = setup_parser()
+    options = parser.parse_args()
+
     c7n.resources.load_resources()
     result = resource_vocabulary()
-    #result = resources_by_service()
-    #result = all_resources()
-    print(yaml.safe_dump(result, default_flow_style=False))
+    if options.summary:
+        summary(result)
+    else:
+        print(yaml.safe_dump(result, default_flow_style=False))
 
 
 if __name__ == '__main__':

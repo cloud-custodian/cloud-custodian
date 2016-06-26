@@ -27,8 +27,9 @@ def load_resources():
     import dynamodb
     import ebs
     import ec2
-    import firehose
     import elb
+    import emr
+    import firehose
     import iam
     import kinesis
     import kms
