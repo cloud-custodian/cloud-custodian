@@ -24,3 +24,6 @@ class ECSCluster(QueryResourceManager):
         enum_spec = ('describe_clusters', 'clusters', None)
         name = "clusterName"
         id = "clusterArn"
+        dimension = None
+
+    resource_type = Meta

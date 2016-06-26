@@ -27,6 +27,7 @@ class Glacier(QueryResourceManager):
         enum_spec = ('list_vaults', 'VaultList', None)
         name = "VaultName"
         id = "VaultARN"
+        dimension = None
 
     resource_type = Meta
 

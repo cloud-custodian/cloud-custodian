@@ -26,6 +26,7 @@ class Certificate(QueryResourceManager):
         id = 'CertificateArn'
         name = 'DomainName'
         date = 'CreatedAt'
+        dimension = None
 
     resource_type = Meta
 
@@ -39,5 +40,3 @@ class Certificate(QueryResourceManager):
 
         with self.executor_factory(max_workers=3) as w:
             return list(w.map(_augment, resources))
-                
-            

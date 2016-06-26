@@ -27,6 +27,7 @@ class ECR(QueryResourceManager):
         enum_spec = ('describe_repositories', 'repositories', None)
         name = "repositoryName"
         id = "repositoryArn"
+        dimension = None
 
     resource_type = Meta
 
