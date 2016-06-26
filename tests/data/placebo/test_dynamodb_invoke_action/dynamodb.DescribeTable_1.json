@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Table": {
+            "TableArn": "arn:aws:dynamodb:us-west-2:644160558196:table/rolltop", 
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "customer_id", 
+                    "AttributeType": "S"
+                }
+            ], 
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0, 
+                "WriteCapacityUnits": 5, 
+                "ReadCapacityUnits": 5
+            }, 
+            "TableSizeBytes": 0, 
+            "TableName": "rolltop", 
+            "TableStatus": "ACTIVE", 
+            "KeySchema": [
+                {
+                    "KeyType": "HASH", 
+                    "AttributeName": "customer_id"
+                }
+            ], 
+            "ItemCount": 0, 
+            "CreationDateTime": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 39, 
+                "microsecond": 637000, 
+                "year": 2016, 
+                "day": 26, 
+                "minute": 20
+            }
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "03CCGB0R89G5VVQBLEEOO4D5KVVV4KQNSO5AEMVJF66Q9ASUAAJG"
+        }
+    }
+}
