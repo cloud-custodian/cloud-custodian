@@ -173,6 +173,27 @@ class TagDelayedAction(tags.TagDelayedAction):
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
+@actions.register('auto-patch')
+class AutoPatch(BaseAction):
+
+    schema = type_schema(
+        'auto-patch',
+        minor={'type': 'boolean'}, window={'type': 'string'})
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+
+        params = {'AutoMinorVersionUpgrade': self.data.get('minor', True)}
+        if self.data.get('window'):
+            params['PreferredMaintenanceWindow'] = self.data['minor']
+
+        for r in resources:
+            client.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                **params)
+
+
 @actions.register('tag')
 class Tag(tags.Tag):
 
