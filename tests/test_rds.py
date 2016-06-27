@@ -19,6 +19,18 @@ from c7n.resources import rds
 
 class RDSTest(BaseTest):
 
+    def test_rds_autopatch(self):
+        session_factory = self.replay_flight_data('test_rds_auto_patch')
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [
+                {'AutoMinorVersionUpgrade': False}],
+            'actions': ['auto-patch']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_tags(self):
         session_factory = self.replay_flight_data('test_rds_tags')
         p = self.load_policy({
