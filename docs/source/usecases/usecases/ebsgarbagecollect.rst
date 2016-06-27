@@ -12,10 +12,10 @@ EBS - Garbage Collect Unattached Volumes
          appear to be just garbage creation.
        filters:
          - Attachments: []
-         - "tag:c7n_status": absent
+         - "tag:maid_status": absent
        actions:
          - type: mark-for-op
-           op: deletion
+           op: delete
            days: 30
 
      - name: ebs-unmark-attached-deletion
