@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SnapshotId": "snap-7fc4f06d", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "bbd827ba-d0f1-436f-bffb-77ba112952f1", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 27 Jun 2016 13:03:28 GMT"
+            }
+        }
+    }
+}
