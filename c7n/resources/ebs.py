@@ -145,6 +145,7 @@ class CopySnapshot(BaseAction):
             client.create_tags(
                 Resources=[snapshot_id],
                 Tags=r['Tags'])
+            r['CopiedSnapshot'] = snapshot_id
 
 
 @resources.register('ebs')
