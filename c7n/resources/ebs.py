@@ -18,7 +18,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY)
+    FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
+    FilterValidationError)
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
@@ -58,7 +59,7 @@ class SnapshotDelete(BaseAction):
 
     def process(self, snapshots):
         self.image_snapshots = snaps = set()
-        # Be careful re image snapshots, we do this by default
+         # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         if self.data.get('skip-ami-snapshots', True):
@@ -96,12 +97,63 @@ class SnapshotDelete(BaseAction):
                 raise
 
 
+@Snapshot.action_registry.register('copy')
+class CopySnapshot(BaseAction):
+    """Copy a snapshot across regions
+
+    http://goo.gl/CP3dq
+    """
+
+    schema = type_schema(
+        'copy',
+        target_region={'type': 'string'},
+        target_key={'type': 'string'},
+        encrypted={'type': 'boolean'},
+    )
+
+    def validate(self):
+        if self.data.get('encrypted', True):
+            key = self.data.get('target_key')
+            if not key:
+                raise FilterValidationError(
+                    "Encrypted snapshot copy requires kms key")
+        return self
+
+    def process(self, resources):
+        if self.data['target_region'] == self.manager.config.region:
+            self.log.info(
+                "Source and destination region are the same, skipping")
+            return
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_resource_set, chunks(resources, 20)))
+
+    def process_resource_set(self, resource_set):
+        client = self.manager.session_factory(
+            region=self.data['target_region']).client('ec2')
+
+        params = {}
+        params['Encrypted'] = self.data.get('encrypted', True)
+        if params['Encrypted']:
+            params['KmsKeyId'] = self.data['target_key']
+
+        for r in resource_set:
+            snapshot_id = client.copy_snapshot(
+                SourceRegion=self.manager.config.region,
+                SourceSnapshotId=r['SnapshotId'],
+                Description=r.get('Description', ''),
+                **params)['SnapshotId']
+            client.create_tags(
+                Resources=[snapshot_id],
+                Tags=r['Tags'])
+            r['CopiedSnapshot'] = snapshot_id
+
+
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve("aws.ec2.volume")):
         default_namespace = 'AWS/EBS'
-    
+
     filter_registry = filters
     action_registry = actions
 

@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "596ad0b3-092f-4936-8f29-705475ce9b91", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 27 Jun 2016 13:03:28 GMT"
+            }
+        }, 
+        "Tags": [
+            {
+                "ResourceType": "snapshot", 
+                "ResourceId": "snap-7fc4f06d", 
+                "Value": "RoadKill", 
+                "Key": "ASV"
+            }, 
+            {
+                "ResourceType": "snapshot", 
+                "ResourceId": "snap-7fc4f06d", 
+                "Value": "BlockBiddy", 
+                "Key": "Name"
+            }, 
+            {
+                "ResourceType": "snapshot", 
+                "ResourceId": "snap-7fc4f06d", 
+                "Value": "Toasty", 
+                "Key": "Platforum"
+            }
+        ]
+    }
+}
