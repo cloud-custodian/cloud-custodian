@@ -42,7 +42,7 @@ class CrossAccountAccessFilter(Filter):
     """
 
     schema = type_schema(
-        'cross-account', whitelist={'type': 'array', 'items': 'string'})
+        'cross-account', whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
 
