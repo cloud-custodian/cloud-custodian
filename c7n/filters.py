@@ -304,7 +304,8 @@ class AgeFilter(Filter):
             n = datetime.now(tz=tzutc())
             self.threshold_date = n - timedelta(days)
         v = self.get_resource_date(i)
-        return self.threshold_date > v
+        op = OPERATORS[self.data.get('op', 'less-than')]
+        return op(v, self.threshold_date)
 
 
 class EventFilter(ValueFilter):

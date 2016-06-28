@@ -26,7 +26,8 @@ import time
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError)
+    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
+    OPERATORS)
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -329,7 +330,10 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     """Filter asg by image age."""
 
     date_attribute = "CreationDate"
-    schema = type_schema('image-age', days={'type': 'number'})
+    schema = type_schema(
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
@@ -827,7 +831,10 @@ class LaunchConfig(QueryResourceManager):
 class LaunchConfigAge(AgeFilter):
 
     date_attribute = "CreatedTime"
-    schema = type_schema('age', days={'type': 'number'})
+    schema = type_schema(
+        'age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
 
 @LaunchConfig.filter_registry.register('unused')

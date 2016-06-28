@@ -19,7 +19,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
 )
 
 from c7n.manager import resources
@@ -148,7 +148,10 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     date_attribute = "CreationDate"
 
-    schema = type_schema('image-age', days={'type': 'number'})
+    schema = type_schema(
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
@@ -228,7 +231,10 @@ class UpTimeFilter(AgeFilter):
 
     date_attribute = "LaunchTime"
 
-    schema = type_schema('instance-uptime', days={'type': 'number'})
+    schema = type_schema(
+        'instance-uptime',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
 
 @filters.register('instance-age')
@@ -237,7 +243,10 @@ class InstanceAgeFilter(AgeFilter):
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
 
-    schema = type_schema('instance-age', days={'type': 'number'})
+    schema = type_schema(
+        'instance-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
