@@ -251,7 +251,7 @@ class HasStatementFilter(Filter):
         p = b.get('Policy')
         if p is None:
             return b
-        p = json.loads(p['Policy'])
+        p = json.loads(p)
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
         for s in list(statements):
@@ -277,7 +277,7 @@ class MissingPolicyStatementFilter(Filter):
         if p is None:
             return b
 
-        p = json.loads(p['Policy'])
+        p = json.loads(p)
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
@@ -316,7 +316,7 @@ class RemovePolicyStatement(BucketActionBase):
         if p is None:
             return
         else:
-            p = json.loads(p['Policy'])
+            p = json.loads(p)
 
         statements = p.get('Statement', [])
         found = []
@@ -412,7 +412,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
             log.info("No policy found, creating new")
             p = {'Version': "2012-10-17", "Statement": []}
         else:
-            p = json.loads(p['Policy'])
+            p = json.loads(p)
 
         statements = p.get('Statement', [])
         found = False
