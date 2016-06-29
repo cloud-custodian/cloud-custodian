@@ -118,6 +118,8 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
     to launch an instance succesfully as the configuration has
 
     - invalid subnets
+    - invalid security groups
+    - invalid key pair name
     - invalid launch config volume snapshots
     - invalid amis
     - invalid health check elb (slower)
@@ -137,6 +139,8 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
     def initialize(self, asgs):
         super(InvalidConfigFilter, self).initialize(asgs)
         self.subnets = self.get_subnets()
+        self.security_groups = self.get_security_groups()
+        self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
         self.images = self.get_images()
         self.snapshots = self.get_snapshots()
@@ -145,6 +149,16 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
         from c7n.resources.vpc import Subnet
         manager = Subnet(self.manager.ctx, {})
         return set([s['SubnetId'] for s in manager.resources()])
+
+    def get_security_groups(self):
+        from c7n.resources.vpc import SecurityGroup
+        manager = SecurityGroup(self.manager.ctx, {})
+        return set([s['GroupId'] for s in manager.resources()])
+
+    def get_key_pairs(self):
+        from c7n.resources.vpc import KeyPair
+        manager = KeyPair(self.manager.ctx, {})
+        return set([k['KeyName'] for k in manager.resources()])
 
     def get_elbs(self):
         from c7n.resources.elb import ELB
@@ -188,6 +202,13 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
             asg['Invalid'] = errors
             return True
 
+        for sg in cfg['SecurityGroups']:
+            if sg not in self.security_groups:
+                errors.append(('invalid-security-group', sg))
+
+        if cfg['KeyName'] not in self.key_pairs:
+            errors.append(('invalid-key-pair', k))
+
         if cfg['ImageId'] not in self.images:
             errors.append(('invalid-image', cfg['ImageId']))
 
@@ -196,6 +217,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
                 continue
             if bd['SnapshotId'] not in self.snapshots:
                 errors.append(('invalid-snapshot', cfg['SnapshotId']))
+
         if errors:
             asg['Invalid'] = errors
             return True

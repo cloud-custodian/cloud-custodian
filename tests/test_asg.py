@@ -216,3 +216,27 @@ class AutoScalingTest(BaseTest):
             AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
                 'AutoScalingGroups'].pop()
         self.assertFalse(result['SuspendedProcesses'])
+
+    def test_asg_invalid_filter_good(self):
+        factory = self.replay_flight_data('test_asg_invalid_filter_good')
+        p = self.load_policy({
+            'name': 'asg-invalid-filter',
+            'resource': 'asg',
+            'filters': ['invalid']
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_asg_invalid_filter_bad(self):
+        factory = self.replay_flight_data('test_asg_invalid_filter_bad')
+        p = self.load_policy({
+            'name': 'asg-invalid-filter',
+            'resource': 'asg',
+            'filters': ['invalid']
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        s = set([x[0] for x in resources[0]['Invalid']])
+        self.assertTrue('invalid-subnet' in s)
+        self.assertTrue('invalid-security-group' in s)
