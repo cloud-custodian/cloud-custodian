@@ -22,6 +22,18 @@ from .common import BaseTest
 
 class TestTagAugmentation(BaseTest):
 
+    def test_tag_augment_empty(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_augment_tag_empty')
+        # recording was modified to be sans tags
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-tags',
+            'resource': 'ec2'},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
     def test_tag_augment(self):
         session_factory = self.replay_flight_data(
             'test_ec2_augment_tags')
