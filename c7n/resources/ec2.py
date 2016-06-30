@@ -86,14 +86,15 @@ class EC2(QueryResourceManager):
 
         # First if we're in event based lambda go ahead and skip this,
         # tags can't be trusted in  ec2 instances anyways.
-        if self.data.get('mode', {}).get('type', '') in (
+        if not resources or self.data.get('mode', {}).get('type', '') in (
                 'cloudtrail', 'ec2-instance-state'):
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
         resource_count = len(resources)
         search_count = min(int(resource_count % 0.05) + 1, 5)
-
+        if search_count > resource_count:
+            search_count = resource_count
         found = False
         for r in random.sample(resources, search_count):
             if 'Tags' in r:
