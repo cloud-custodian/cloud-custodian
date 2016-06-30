@@ -114,7 +114,7 @@ class Delete(BaseAction):
     schema = type_schema('delete')
 
     def process(self, load_balancers):
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_elb, load_balancers))
 
     def process_elb(self, elb):
