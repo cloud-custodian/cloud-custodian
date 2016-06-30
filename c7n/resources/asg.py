@@ -811,9 +811,16 @@ class Delete(BaseAction):
                 asg['AutoScalingGroupName']))
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        asg_client.delete_auto_scaling_group(
-                AutoScalingGroupName=asg['AutoScalingGroupName'],
-                ForceDelete=force_delete)
+        try:
+            asg_client.delete_auto_scaling_group(
+                    AutoScalingGroupName=asg['AutoScalingGroupName'],
+                    ForceDelete=force_delete)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ValidationError':
+                log.warning("Erroring deleting asg %s %s" % (
+                    asg['AutoScalingGroupName'], e))
+                return
+            raise
 
 
 @resources.register('launch-config')
