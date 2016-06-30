@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "371b9995-525e-57a7-bb96-d67cacb1f528"
+        }, 
+        "TopicArn": "arn:aws:sns:us-west-2:644160558196:c7n-cross-check"
+    }
+}

@@ -161,6 +161,7 @@ class PillTest(unittest.TestCase):
             os.makedirs(test_dir)
 
         session = boto3.Session()
+        default_region = session.region_name
         if not zdata:
             pill = placebo.attach(session, test_dir, debug=True)
         else:
@@ -169,7 +170,19 @@ class PillTest(unittest.TestCase):
         pill.record()
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
+
+        def factory(region=None, assume=None):
+            if region and region != default_region:
+                new_session = boto3.Session(region_name=region)
+                assert not zdata
+                new_pill = placebo.attach(new_session, test_dir, debug=True)
+                new_pill.record()
+                self.addCleanup(new_pill.stop)
+                return new_session
+            return session
+
         # return session factory
+        return factory
         return lambda region=None, assume=None: session
 
     def replay_flight_data(self, test_case, zdata=False):

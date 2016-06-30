@@ -1,0 +1,10 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-cross-check\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Sid\":\"oops\"}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "a41373f6-3bbb-11e6-8a80-9b71ecc7be7d"
+        }
+    }
+}

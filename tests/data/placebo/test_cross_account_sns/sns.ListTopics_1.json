@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-west-2:644160558196:c7n-cross-check"
+            }, 
+            {
+                "TopicArn": "arn:aws:sns:us-west-2:644160558196:dynamodb"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "c95027aa-d6df-597d-9cd9-684328302256"
+        }
+    }
+}

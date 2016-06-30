@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "557a4b79-7495-475e-8995-80fb684cc13d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 30 Jun 2016 12:23:21 GMT"
+            }
+        }, 
+        "Tags": [
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-0dc224bad2cb08740", 
+                "Value": "Production", 
+                "Key": "Env"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-0dc224bad2cb08740", 
+                "Value": "custodian-tester", 
+                "Key": "Name"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-0dc224bad2cb08740", 
+                "Value": "robot", 
+                "Key": "Owner"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-0dc224bad2cb08740", 
+                "Value": "Linux", 
+                "Key": "Platform"
+            }
+        ]
+    }
+}

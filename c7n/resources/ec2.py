@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import operator
+import random
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
@@ -19,7 +20,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
 )
 
 from c7n.manager import resources
@@ -68,6 +69,56 @@ class EC2(QueryResourceManager):
                 qf_names.add(qd['Name'])
                 qf.append(qd)
         return qf
+
+    def augment(self, resources):
+        """EC2 API and AWOL Tags
+
+        While ec2 api generally returns tags when doing describe_x on for
+        various resources, it may also silently fail to do so unless a tag
+        is used as a filter.
+
+        See footnote on http://goo.gl/YozD9Q for official documentation.
+
+        Apriori we may be using custodian to ensure tags (including
+        name), so there isn't a good default to ensure that we will
+        always get tags from describe_ calls.
+        """
+
+        # First if we're in event based lambda go ahead and skip this,
+        # tags can't be trusted in  ec2 instances anyways.
+        if not resources or self.data.get('mode', {}).get('type', '') in (
+                'cloudtrail', 'ec2-instance-state'):
+            return resources
+
+        # AWOL detector, so we don't make extraneous api calls.
+        resource_count = len(resources)
+        search_count = min(int(resource_count % 0.05) + 1, 5)
+        if search_count > resource_count:
+            search_count = resource_count
+        found = False
+        for r in random.sample(resources, search_count):
+            if 'Tags' in r:
+                found = True
+                break
+
+        if found:
+            return resources
+
+        # Okay go and do the tag lookup
+        client = utils.local_session(self.session_factory).client('ec2')
+        tag_set = client.describe_tags(
+            Filters=[{'Name': 'resource-type',
+                      'Values': ['instance']}])['Tags']
+        resource_tags = {}
+        for t in tag_set:
+            t.pop('ResourceType')
+            rid = t.pop('ResourceId')
+            resource_tags.setdefault(rid, []).append(t)
+
+        m = self.query.resolve(self.resource_type)
+        for r in resources:
+            r['Tags'] = resource_tags.get(r[m.id], ())
+        return resources
 
 
 class StateTransitionFilter(object):
@@ -148,7 +199,10 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     date_attribute = "CreationDate"
 
-    schema = type_schema('image-age', days={'type': 'number'})
+    schema = type_schema(
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
@@ -228,7 +282,10 @@ class UpTimeFilter(AgeFilter):
 
     date_attribute = "LaunchTime"
 
-    schema = type_schema('instance-uptime', days={'type': 'number'})
+    schema = type_schema(
+        'instance-uptime',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
 
 @filters.register('instance-age')
@@ -237,7 +294,10 @@ class InstanceAgeFilter(AgeFilter):
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
 
-    schema = type_schema('instance-age', days={'type': 'number'})
+    schema = type_schema(
+        'instance-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
@@ -324,6 +384,7 @@ class Stop(BaseAction, StateTransitionFilter):
                     continue
                 raise
 
+
 @actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):
     """ Terminate a set of instances.
@@ -404,7 +465,7 @@ class Snapshot(BaseAction):
                     Description=description)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
-                    log.warning(
+                    self.log.warning(
                         "action:%s volume:%s is incorrect state" % (
                             self.__class__.__name__.lower(),
                             volume_id))
@@ -425,7 +486,7 @@ class Snapshot(BaseAction):
                         copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 10:
-                log.warning(
+                self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
                         volume_id))

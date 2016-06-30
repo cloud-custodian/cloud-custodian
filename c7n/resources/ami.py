@@ -14,7 +14,7 @@
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
@@ -60,4 +60,6 @@ class ImageAgeFilter(AgeFilter):
 
     date_attribute = "CreationDate"
     schema = type_schema(
-        'image-age', days={'type': 'integer', 'minimum': 0})
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'integer', 'minimum': 0})

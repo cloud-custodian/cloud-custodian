@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "09954f91-3cd3-48fd-a151-179bdd5a01b4"
+        }, 
+        "Tags": [
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "unknown", 
+                "Key": "Account"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "nocker", 
+                "Key": "Containers"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "DNS", 
+                "Key": "Discovery"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "Prod", 
+                "Key": "Env"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "None", 
+                "Key": "Medicine"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "Heavy", 
+                "Key": "Music"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "VocalReason", 
+                "Key": "Name"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "weekends", 
+                "Key": "Offhours"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "Sleepy", 
+                "Key": "State"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-fdb01920", 
+                "Value": "Testing123", 
+                "Key": "Testing"
+            }
+        ]
+    }
+}

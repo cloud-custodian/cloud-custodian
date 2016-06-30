@@ -193,7 +193,7 @@ class S3Test(BaseTest):
             s3.MissingPolicyStatementFilter, 'executor_factory',
             MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         session_factory = self.replay_flight_data('test_s3_has_statement')
         bname = "custodian-policy-test"
@@ -232,7 +232,7 @@ class S3Test(BaseTest):
             s3.MissingPolicyStatementFilter, 'executor_factory',
             MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         session_factory = self.replay_flight_data('test_s3_missing_policy')
         bname = "custodian-encrypt-test"
@@ -267,7 +267,7 @@ class S3Test(BaseTest):
 
     def test_encrypt_policy(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         session_factory = self.replay_flight_data('test_s3_encrypt_policy')
         bname = "custodian-encrypt-test"
@@ -295,7 +295,7 @@ class S3Test(BaseTest):
 
     def test_remove_policy_none_extant(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data(
@@ -319,7 +319,7 @@ class S3Test(BaseTest):
 
     def test_remove_policy(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -366,7 +366,7 @@ class S3Test(BaseTest):
 
     def test_create_bucket_event(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy',  'Policy', None, None),
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_s3_create')

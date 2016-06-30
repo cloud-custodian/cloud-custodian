@@ -15,11 +15,42 @@ import logging
 
 from .common import BaseTest
 from c7n.resources.ebs import (
-    CopyInstanceTags, EncryptInstanceVolumes)
+    CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot)
 from c7n.executor import MainThreadExecutor
 
 
 logging.basicConfig(level=logging.DEBUG)
+
+
+class SnapshotCopyTest(BaseTest):
+
+    def test_snapshot_copy(self):
+        self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
+        # DEFAULT_REGION needs to be set to west for recording
+        factory = self.replay_flight_data('test_ebs_snapshot_copy')
+        p = self.load_policy({
+            'name': 'snap-copy',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'tag:ASV': 'RoadKill'}],
+            'actions': [
+                {'type': 'copy',
+                 'target_region': 'us-east-1',
+                 'target_key': '82645407-2faa-4d93-be71-7d6a8d59a5fc'}]
+            }, session_factory=factory)
+        resources = p.run()
+        # If test region is target region aka us-east-1, then the action
+        # skips, and so does the test
+        if factory().region_name == 'us-east-1':
+            return
+    
+        self.assertEqual(len(resources), 1)
+        client = factory(region="us-east-1").client('ec2')
+        tags = client.describe_tags(
+            Filters=[{'Name': 'resource-id',
+                       'Values': [resources[0]['CopiedSnapshot']]}])['Tags']
+        tags = {t['Key']: t['Value'] for t in tags}
+        self.assertEqual(tags['ASV'], 'RoadKill')
 
 
 class SnapshotTrimTest(BaseTest):
@@ -56,18 +87,18 @@ class AttachedInstanceTest(BaseTest):
 class CopyInstanceTagsTest(BaseTest):
 
     def test_copy_instance_tags(self):
-        # More a functional/coverage test then a unit test.        
+        # More a functional/coverage test then a unit test.
         self.patch(
             CopyInstanceTags, 'executor_factory', MainThreadExecutor)
         factory = self.replay_flight_data('test_ebs_copy_instance_tags')
-            
+
         volume_id = 'vol-2b047792'
-    
+
         results = factory().client('ec2').describe_tags(
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags, {})
-        
+
         policy = self.load_policy({
             'name': 'test-copy-instance-tags',
             'resource': 'ebs',
@@ -80,11 +111,11 @@ class CopyInstanceTagsTest(BaseTest):
         resources = policy.run()
         results = factory().client('ec2').describe_tags(
             Filters=[{'Name': 'resource-id', 'Values': [volume_id]}])['Tags']
-        
+
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags['Name'], 'CompileLambda')
 
-            
+
 class EncryptExtantVolumesTest(BaseTest):
 
     def test_encrypt_volumes(self):
@@ -93,12 +124,12 @@ class EncryptExtantVolumesTest(BaseTest):
         output = self.capture_logging(level=logging.DEBUG)
 
         session_factory = self.replay_flight_data('test_encrypt_volumes')
-        
+
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
             'filters': [
-                {'Encrypted': False},                
+                {'Encrypted': False},
                 {'VolumeId': 'vol-fdd1f844'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',

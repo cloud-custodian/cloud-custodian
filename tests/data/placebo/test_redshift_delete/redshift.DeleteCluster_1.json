@@ -1,0 +1,14 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400, 
+            "RequestId": "41272a18-3a4c-11e6-92de-e90e284a0835"
+        }, 
+        "Error": {
+            "Message": "There is an operation running on the Cluster. Please try to delete it at a later time.", 
+            "Code": "InvalidClusterState", 
+            "Type": "Sender"
+        }
+    }
+}

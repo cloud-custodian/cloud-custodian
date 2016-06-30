@@ -1,0 +1,53 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "72b653cc-1dd0-4bb4-840b-60500481aa17", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 27 Jun 2016 13:03:27 GMT"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Nance", 
+                "Tags": [
+                    {
+                        "Value": "BlockBiddy", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "RoadKill", 
+                        "Key": "ASV"
+                    }, 
+                    {
+                        "Value": "Toasty", 
+                        "Key": "Platforum"
+                    }
+                ], 
+                "Encrypted": true, 
+                "VolumeId": "vol-cc3fc645", 
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d21dba12-ec3d-4115-a600-5779ae051580", 
+                "State": "completed", 
+                "VolumeSize": 5, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 11
+                }, 
+                "SnapshotId": "snap-f8c07c02", 
+                "OwnerId": "644160558196"
+            }
+        ]
+    }
+}

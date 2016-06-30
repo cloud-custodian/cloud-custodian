@@ -26,12 +26,13 @@ import time
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError)
+    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
+    OPERATORS)
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import Time, OffHour, OnHour
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter
+from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import local_session, query_instances, type_schema, chunks
 
 log = logging.getLogger('custodian.asg')
@@ -329,7 +330,10 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     """Filter asg by image age."""
 
     date_attribute = "CreationDate"
-    schema = type_schema('image-age', days={'type': 'number'})
+    schema = type_schema(
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
@@ -385,6 +389,20 @@ class VpcIdFilter(ValueFilter):
             for a in s_asgs:
                 a['VpcId'] = all_subnets[s]['VpcId']
         return super(VpcIdFilter, self).process(asgs)
+
+
+@actions.register('tag-trim')
+class GroupTagTrim(TagTrim):
+
+    def process_tag_removal(self, resource, candidates):
+        client = local_session(
+            self.manager.session_factory).client('asg')
+        tags = []
+        for t in candidates:
+            tags.append(
+                dict(Key=t, ResourceType='auto-scaling-group',
+                     ResourceId=resource['AutoScalingGroupName']))
+        client.delete_tags(Tags=tags)
 
 
 @actions.register('remove-tag')
@@ -665,6 +683,7 @@ class MarkForOp(Tag):
             'msg',
             'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
 
+        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
         date = self.data.get('days', 4)
 
@@ -675,7 +694,7 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
-        self.tag(asgs, self.data['key'], msg)
+        self.tag(asgs, key, msg)
 
 
 @actions.register('suspend')
@@ -705,8 +724,11 @@ class Suspend(BaseAction):
             AutoScalingGroupName=asg['AutoScalingGroupName'])
         ec2_client = session.client('ec2')
         try:
+            instance_ids = [i['InstanceId'] for i in asg['Instances']]
+            if not instance_ids:
+                return
             ec2_client.stop_instances(
-                InstanceIds=[i['InstanceId'] for i in asg['Instances']])
+                InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
                     'InvalidInstanceID.NotFound',
@@ -759,8 +781,10 @@ class Resume(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         ec2_client = session.client('ec2')
-        ec2_client.start_instances(
-            InstanceIds=[i['InstanceId'] for i in asg['Instances']])
+        instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not instance_ids:
+            return
+        ec2_client.start_instances(InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.
@@ -787,9 +811,16 @@ class Delete(BaseAction):
                 asg['AutoScalingGroupName']))
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        asg_client.delete_auto_scaling_group(
-                AutoScalingGroupName=asg['AutoScalingGroupName'],
-                ForceDelete=force_delete)
+        try:
+            asg_client.delete_auto_scaling_group(
+                    AutoScalingGroupName=asg['AutoScalingGroupName'],
+                    ForceDelete=force_delete)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ValidationError':
+                log.warning("Erroring deleting asg %s %s" % (
+                    asg['AutoScalingGroupName'], e))
+                return
+            raise
 
 
 @resources.register('launch-config')
@@ -797,12 +828,20 @@ class LaunchConfig(QueryResourceManager):
 
     resource_type = "aws.autoscaling.launchConfigurationName"
 
+    def augment(self, resources):
+        for r in resources:
+            r.pop('UserData', None)
+        return resources
+
 
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
 
     date_attribute = "CreatedTime"
-    schema = type_schema('age', days={'type': 'number'})
+    schema = type_schema(
+        'age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
 
 @LaunchConfig.filter_registry.register('unused')
@@ -819,7 +858,9 @@ class UnusedLaunchConfig(Filter):
                 "Querying asgs to determine unused launch configs")
             asg_manager = ASG(self.manager.ctx, {})
             asgs = asg_manager.resources()
-        self.used = set([a['LaunchConfigurationName'] for a in asgs])
+        self.used = set([
+            a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
+            for a in asgs])
         return super(UnusedLaunchConfig, self).process(configs)
 
     def __call__(self, config):

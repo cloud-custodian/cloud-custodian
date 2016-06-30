@@ -52,8 +52,9 @@ import time
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, Filter
+from c7n.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import chunks, local_session, set_annotation, type_schema
 
 """
@@ -74,7 +75,8 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    resource_type = "aws.s3.bucket"
+    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+        dimension = 'BucketName'
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -97,7 +99,7 @@ class S3(QueryResourceManager):
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),
     ('get_bucket_tagging', 'Tags', [], 'TagSet'),
-    ('get_bucket_policy',  'Policy', None, None),
+    ('get_bucket_policy',  'Policy', None, 'Policy'),
     ('get_bucket_acl', 'Acl', None, None),
     ('get_bucket_replication', 'Replication', None, None),
     ('get_bucket_versioning', 'Versioning', None, None),
@@ -165,6 +167,30 @@ def bucket_client(session, b, kms=False):
     return session.client('s3', region_name=region, config=config)
 
 
+@filters.register('cross-account')
+class S3CrossAccountFilter(CrossAccountAccessFilter):
+
+    def get_accounts(self):
+        """add in elb access by default
+
+        ELB Accounts by region http://goo.gl/a8MXxd
+        """
+        accounts = super(S3CrossAccountFilter, self).get_accounts()
+        return accounts.union(
+            ['127311923021',  # us-east-1
+             '797873946194',  # us-west-2
+             '027434742980',  # us-west-1
+             '156460612806',  # eu-west-1
+             '054676820928',  # eu-central-1
+             '114774131450',  # ap-southeast-1
+             '582318560864',  # ap-northeast-1
+             '783225319266',  # ap-southeast-2
+             '600734575887',  # ap-northeast-2
+             '507241528517',  # sa-east-1
+             '048591011584',  # gov-cloud-1
+             ])
+
+
 @filters.register('global-grants')
 class GlobalGrantsFilter(Filter):
 
@@ -225,7 +251,7 @@ class HasStatementFilter(Filter):
         p = b.get('Policy')
         if p is None:
             return b
-        p = json.loads(p['Policy'])
+        p = json.loads(p)
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
         for s in list(statements):
@@ -251,7 +277,7 @@ class MissingPolicyStatementFilter(Filter):
         if p is None:
             return b
 
-        p = json.loads(p['Policy'])
+        p = json.loads(p)
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
@@ -290,7 +316,7 @@ class RemovePolicyStatement(BucketActionBase):
         if p is None:
             return
         else:
-            p = json.loads(p['Policy'])
+            p = json.loads(p)
 
         statements = p.get('Statement', [])
         found = []
@@ -386,7 +412,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
             log.info("No policy found, creating new")
             p = {'Version': "2012-10-17", "Statement": []}
         else:
-            p = json.loads(p['Policy'])
+            p = json.loads(p)
 
         statements = p.get('Statement', [])
         found = False

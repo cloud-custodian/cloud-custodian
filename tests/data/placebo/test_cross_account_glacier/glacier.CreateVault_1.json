@@ -1,0 +1,10 @@
+{
+    "status_code": 201, 
+    "data": {
+        "location": "/644160558196/vaults/c7n-cross-check", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "D5Uy0b5nunxSQz0_6Y5t3Jp5w7HUEdPP2H2BWLdCItUcMes"
+        }
+    }
+}

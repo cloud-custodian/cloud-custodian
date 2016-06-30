@@ -42,7 +42,7 @@ class BaseTest(PillTest):
 
     def get_context(self, config=None, session_factory=None, policy=None):
         if config is None:
-            self.context_output_dir = self.mkdtemp()
+            self.context_output_dir = tempfile.mkdtemp()
             self.addCleanup(shutil.rmtree, self.context_output_dir)
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
