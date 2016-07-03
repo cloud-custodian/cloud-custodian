@@ -1,15 +1,8 @@
 [![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/capitalone/cloud-custodian.svg?branch=master)](https://travis-ci.org/capitalone/cloud-custodian) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Requires.io](https://img.shields.io/requires/github/capitalone/cloud-custodian.svg?maxAge=86400)](https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master)
 
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
-**Table of Contents**
- - [Cloud Custodian](#cloud-custodian)
- - [Links](#links)
- - [Usage](#usage)
- - [Get Involved](#get-involved)
 
-<!-- markdown-toc end -->
-
-# Cloud Custodian
+Cloud Custodian
+---------------
 
 Cloud Custodian is a rules engine for AWS fleet management. It
 allows users to define policies to enable a well managed cloud, with 
@@ -34,13 +27,15 @@ on new resources or it can be used to query and operate against all of
 account's extant resources.
 
 
-## Links
+Links
+#####
 
 - [Docs](http://www.capitalone.io/cloud-custodian/)
 - [Developer Install](http://www.capitalone.io/cloud-custodian/quickstart/developer.html)
 
 
-## Quick Install
+Quick Install
+#############
 
 ```shell
 $ virtualenv custodian
@@ -48,7 +43,8 @@ $ source custodian/bin/activate
 $ pip install c7n
 ```
 
-## Usage
+Usage
+#####
 
 First a policy file needs to be created in yaml format, as an example:
 
@@ -73,7 +69,7 @@ policies:
    mode:
      type: cloudtrail	
      events:
-  	 - RunInstances
+         - RunInstances
    filters:
 	 - "tag:aws:autoscaling:groupName": absent
 	 - type: ebs
@@ -123,14 +119,16 @@ outputs to s3, cloud watch metrics, sts role assumption.
 
 Consult the documentation for additional information.
 
-## Get Involved
+Get Involved
+############
 
 Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 
 Gitter - https://gitter.im/capitalone/cloud-custodian
 
 
-### Contributors
+Contributors
+############
 
 We welcome Your interest in Capital One’s Open Source Projects (the
 “Project”). Any Contributor to the Project must accept and sign an
