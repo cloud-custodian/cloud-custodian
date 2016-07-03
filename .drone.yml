@@ -27,7 +27,7 @@ build:
 
 deploy:
   git_push:
-    remote: git@github.com:kapilt/cloud-custodian.git
+    remote_name: origin
     remote_branch: gh-pages
     local_branch: gh-pages
 
