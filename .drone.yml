@@ -16,6 +16,7 @@ build:
      commands:
        - apk update
        - apk add make
+       - pip install -r requirements-dev.txt --cache-dir=cache
        - make sphinx
        - make ghpages
 
