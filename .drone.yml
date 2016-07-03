@@ -26,9 +26,9 @@ build:
 
 deploy:
   git_push:
-    local_branch: gh-pages
+    remote_name: origin
     remote_branch: gh-pages
-    force: false
+    local_branch: gh-pages
 
 #notify:
 #  gitter:
