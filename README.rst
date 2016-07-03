@@ -1,5 +1,18 @@
-[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/capitalone/cloud-custodian.svg?branch=master)](https://travis-ci.org/capitalone/cloud-custodian) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![Requires.io](https://img.shields.io/requires/github/capitalone/cloud-custodian.svg?maxAge=86400)](https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master)
+[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
+[![Build Status](https://travis-ci.org/capitalone/cloud-custodian.svg?branch=master)](https://travis-ci.org/capitalone/cloud-custodian) 
 
+
+.. image: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
+     :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian)
+     :alt: Build Status
+
+.. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
+     :target: https://www.apache.org/licenses/LICENSE-2.0
+     :alt: License
+
+.. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
+     :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
+     :alt: Requirements Status
 
 Cloud Custodian
 ---------------
