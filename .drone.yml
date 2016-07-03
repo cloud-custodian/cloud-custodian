@@ -17,6 +17,8 @@ build:
      commands:
        - apk update
        - apk add git make
+       - git config --global user.email "cibot@cloud-custodian.io"
+       - git config --global user.name "Custodian CI"
        - pip install -r requirements-dev.txt --cache-dir=cache
        - make sphinx
        - git remote update origin --prune
