@@ -41,6 +41,8 @@ except ImportError:
 FLUSH_MARKER = object()
 SHUTDOWN_MARKER = object()
 
+EMPTY = Queue.Empty
+
 
 class Error(object):
 
@@ -212,7 +214,9 @@ class Transport(object):
         while True:
             try:
                 datum = self.queue.get(block=True, timeout=self.batch_interval)
-            except Queue.Empty:
+            except EMPTY:
+                if Queue is None:
+                    return
                 datum = None
             if datum is None:
                 # Timeout reached, flush
