@@ -20,7 +20,6 @@ build:
        - pip install -r requirements-dev.txt --cache-dir=cache
        - make sphinx
        - git remote update origin --prune
-       - git checkout -b gh-pages origin/gh-pages
        - make ghpages
 
 #notify:
