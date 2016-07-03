@@ -1,11 +1,15 @@
+import os
 from setuptools import setup, find_packages
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 setup(
     name="c7n",
     version='0.8.16.3',
     description="Cloud Custodian - Policy Rules Engine",
-    long_description_markdown_filename='README.md',
+    long_description=read('README.rst'),
     classifiers=[
       "Topic :: System :: Systems Administration",
       "Topic :: System :: Distributed Computing"
