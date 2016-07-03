@@ -1,15 +1,26 @@
 build:
-  image: python:2-alpine
-  environment:
-    - AWS_DEFAULT_REGION=us-east-1
-    - AWS_ACCESS_KEY_ID=foo
-    - AWS_SECRET_ACCESS_KEY=bar
-  commands:
-    - mkdir -p cache
-    - pip install -r requirements-dev.txt --cache-dir=cache
-    - python setup.py develop
-    - nosetests -s -v tests
+  unit_tests:
+    image: python:2-alpine
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+    commands:
+      - mkdir -p cache
+      - pip install -r requirements-dev.txt --cache-dir=cache
+      - python setup.py develop
+      - nosetests -s -v tests
 
+  documentation:
+     image: python:2-alpine
+     commands:
+       - make sphinx
+       - make ghpages
+
+notify:
+  gitter:
+    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
+        
 cache:
   mount:
     - cache
