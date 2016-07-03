@@ -5,6 +5,7 @@ build:
     - AWS_ACCESS_KEY_ID=foo
     - AWS_SECRET_ACCESS_KEY=bar
   commands:
-    - pip install -r requirements-dev.txt
+    - mkdir cache
+    - pip install -r requirements-dev.txt --cache-dir=cache
     - python setup.py develop
     - nosetests -s -v tests
