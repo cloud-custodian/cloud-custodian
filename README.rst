@@ -3,7 +3,7 @@
      :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
 .. image:: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
-     :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian)
+     :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian
      :alt: Build Status
 
 .. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
@@ -19,119 +19,124 @@ Cloud Custodian
 ---------------
 
 Cloud Custodian is a rules engine for AWS fleet management. It
-allows users to define policies to enable a well managed cloud, with 
-metrics and structured outputs. It consolidates many of the adhoc 
-scripts organizations have into a lightweight and flexible tool.
+allows users to define policies to enable a well managed cloud infrastructure,
+that's both secure, and cost optimized. It consolidates many of the adhoc
+scripts organizations have into a lightweight and flexible tool, with unified
+metrics and reporting.
 
-Organizations can use Custodian to manage their AWS environments by
-ensuring real time compliance to security policies, tag policies, garbage
-collection of unused resources, and cost management via off-hours
-resource management.
+Custodian can be used manage to AWS accounts by ensuring real time
+compliance to security policies (like encryption and access requirements),
+tag policies and cost management via garbage collection of unused resources
+and off-hours resource management for examples.
 
 Custodian policies are written in simple YAML configuration files that
 enable specify policies on a resource type (ec2, asg, redshift, etc) 
-and are constructed from a vocabulary of filters and actions. Custodian 
-was created to unify the dozens of tools and scripts most organizations
-use for managing their AWS accounts into one open source tool and
-provide unified operations and reporting.
+and are constructed from a vocabulary of filters and actions.
 
 It integrates with lambda and cloudwatch events to provide for
-realtime enforcement of policies with builtin provisioning for enforcement
-on new resources or it can be used to query and operate against all of
-account's extant resources.
+realtime enforcement of policies with builtin provisioning of the lambdas, or
+as a simple cron job on a server to execute against large existing fleets.
 
+
+Features
+########
+
+- Comprehensive support for aws services and resources (~50), along with
+  65 unique actions and 75 filters to build policies with.
+- Supports arbitrary filtering on resources with nested boolean conditions.
+- Dry run any policy to see what it would do.
+- Automatically provisions lambda functions and cloud watch event targets for
+  real-time policies.
+- Cloudwatch metrics outputs on resources that matched a policy
+- Structured outputs into s3 of which resources matched a policy.
+- Utilizes a cache utilization, to minimize api calls.
+- Battle-tested, In production on against some very large aws accounts.
+- Supports cross account usage via STS role assumption.
+- Supports integration with custom/user supplied lambdas as actions.
 
 Links
 #####
 
-- [Docs](http://www.capitalone.io/cloud-custodian/)
-- [Developer Install](http://www.capitalone.io/cloud-custodian/quickstart/developer.html)
+- `Docs <http://www.capitalone.io/cloud-custodian/>`_
+- `Developer Install <http://www.capitalone.io/cloud-custodian/quickstart/developer.html>`_
 
 
 Quick Install
 #############
 
-```shell
-$ virtualenv custodian
-$ source custodian/bin/activate
-$ pip install c7n
-```
+Shell::
+
+  $ virtualenv custodian
+  $ source custodian/bin/activate
+  $ pip install c7n
 
 Usage
 #####
 
-First a policy file needs to be created in yaml format, as an example:
+First a policy file needs to be created in yaml format, as an example::
+
+  policies:
+  - name: remediate-extant-keys
+    description: |
+      Scan through all s3 buckets in an account and ensure all objects
+      are encrypted (default to AES256).
+    resource: s3
+    actions:
+      - encrypt-keys
+
+  - name: ec2-require-non-public-and-encrypted-volumes
+    resource: ec2
+    description: |
+      Provision a lambda and cloud watch event target
+      that looks at all new instances and terminates those with
+      unencrypted volumes.
+    mode:
+      type: cloudtrail
+      events:
+          - RunInstances
+    filters:
+      - type: ebs
+        key: Encrypted
+        value: false
+    actions:
+      - terminate
+
+  - name: tag-compliance
+    resource: ec2
+    description:
+      Schedule a resource that does not meet tag compliance policies
+      to be stopped in four days.
+    filters:
+      - State.Name: running
+      - "tag:Environment": absent
+      - "tag:AppId": absent
+      - or:
+        - "tag:OwnerContact": absent
+        - "tag:DeptID": absent
+    actions:
+      - type: mark-for-op
+        op: stop
+        days: 4
 
 
-```yaml
+Given that, you can run cloud-custodian with::
 
-policies:
- - name: remediate-extant-keys
-   description: |
-     Scan through all s3 buckets in an account and ensure all objects
-     are encrypted (default to AES256).  
-   resource: s3
-   actions:
-     - encrypt-keys
-
- - name: ec2-require-non-public-and-encrypted-volumes
-   resource: ec2 
-   description: |
-     Provision a lambda and cloud watch event target
-     that looks at all new instances not in an autoscale group
-     and terminates those with unencrypted volumes.
-   mode:
-     type: cloudtrail	
-     events:
-         - RunInstances
-   filters:
-	 - "tag:aws:autoscaling:groupName": absent
-	 - type: ebs
-	   key: Encrypted
-	   value: false
-   actions:
-     - terminate
-
- - name: tag-compliance
-   resource: ec2
-   description:
-     Schedule a resource that does not meet tag compliance policies
-     to be stopped in four days.
-   filters:
-     - State.Name: running
-     - "tag:Environment": absent
-     - "tag:AppId": absent
-     - or:
-       - "tag:OwnerContact": absent
-       - "tag:DeptID": absent
-   actions:
-     - type: mark-for-op
-       op: stop
-       days: 4
-
-```
-
-Given that, you can run cloud-custodian 
-
-```shell
-  # Directory for outputs
-  $ mkdir out
-
-  # Validate the configuration
+  # Validate the configuration (note this happens by default on run)
   $ custodian validate -c policy.yml
 
-  # Dryrun on the policies (no actions executed)
+  # Dryrun on the policies (no actions executed) to see what resources
+  # match each policy.
   $ custodian run --dryrun -c policy.yml -s out
 
-  # Run the policy 
+  # Run the policy
   $ custodian run -c policy.yml -s out
-```
-  
+
+
 Custodian supports a few other useful subcommands and options, including
-outputs to s3, cloud watch metrics, sts role assumption.
+outputs to s3, cloud watch metrics, sts role assumption. Policies go together
+like lego bricks with actions and filters.
 
-
-Consult the documentation for additional information.
+Consult the documentation for additional information, or reach out on gitter.
 
 Get Involved
 ############
