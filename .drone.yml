@@ -35,11 +35,15 @@ deploy:
     remote_name: origin
     branch: gh-pages
     local_branch: gh-pages
+    when:
+      event: push
+      branch: master
 
 notify:
   gitter:
     webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
-
+    when:
+      repo: capitalone/cloud-custodian
 
 # TODO explore caching the whole venv for speed
 cache:
