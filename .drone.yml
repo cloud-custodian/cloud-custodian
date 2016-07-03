@@ -19,12 +19,13 @@ build:
        - apk add git make
        - pip install -r requirements-dev.txt --cache-dir=cache
        - make sphinx
+       - git remote update origin --prune
        - git checkout -b gh-pages origin/gh-pages
        - make ghpages
 
-notify:
-  gitter:
-    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
+#notify:
+#  gitter:
+#    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
         
 cache:
   mount:
