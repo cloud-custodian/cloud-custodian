@@ -1,16 +1,17 @@
 build:
-#  unit_tests:
-#    image: python:2-alpine
-#    environment:
-#      - AWS_DEFAULT_REGION=us-east-1
-#      - AWS_ACCESS_KEY_ID=foo
-#      - AWS_SECRET_ACCESS_KEY=bar
-#    commands:
-#      - mkdir -p cache
-#      - pip install -r requirements-dev.txt --cache-dir=cache
-#      - pip install coveralls --cache-dir=cache
-#      - python setup.py develop
-#      - nosetests -s -v tests
+
+  unit_tests:
+    image: python:2-alpine
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+    commands:
+      - mkdir -p cache
+      - pip install -r requirements-dev.txt --cache-dir=cache
+      - pip install coveralls --cache-dir=cache
+      - python setup.py develop
+      - nosetests -s -v tests
 
   documentation:
      image: python:2-alpine
@@ -24,17 +25,23 @@ build:
        - git remote update origin --prune
        - make ghpages
        - git remote -v
+     when:
+       event: push
+       branch: master
 
 deploy:
+  # documentation build
   git_push:
     remote_name: origin
     branch: gh-pages
     local_branch: gh-pages
 
-#notify:
-#  gitter:
-#    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
-        
+notify:
+  gitter:
+    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
+
+
+# TODO explore caching the whole venv for speed
 cache:
   mount:
     - cache
