@@ -1,8 +1,8 @@
-[![Join the chat at https://gitter.im/capitalone/cloud-custodian](https://badges.gitter.im/capitalone/cloud-custodian.svg)](https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
-[![Build Status](https://travis-ci.org/capitalone/cloud-custodian.svg?branch=master)](https://travis-ci.org/capitalone/cloud-custodian) 
+.. image:: https://badges.gitter.im/capitalone/cloud-custodian.svg
+     :target: https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+     :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
-
-.. image: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
+.. image:: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
      :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian)
      :alt: Build Status
 
@@ -13,6 +13,7 @@
 .. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
      :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
      :alt: Requirements Status
+
 
 Cloud Custodian
 ---------------
