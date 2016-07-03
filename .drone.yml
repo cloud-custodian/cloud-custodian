@@ -1,9 +1,51 @@
 build:
-  image: python:2-alpine
-  environment:
-    - AWS_DEFAULT_REGION=us-east-1
-  commands:
-    - pip install -r requirements-dev.txt
-    - python setup.py develop
-#    - flake8 maid --ignore=W293,W291,W503,W391
-    - nosetests -s -v tests
+
+  unit_tests:
+    image: python:2-alpine
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+    commands:
+      - mkdir -p cache
+      - pip install -r requirements-dev.txt --cache-dir=cache
+      - pip install coveralls --cache-dir=cache
+      - python setup.py develop
+      - nosetests -s -v tests
+
+  documentation:
+     image: python:2-alpine
+     commands:
+       - apk update
+       - apk add git make
+       - git config --global user.email "cibot@cloud-custodian.io"
+       - git config --global user.name "Custodian CI"
+       - pip install -r requirements-dev.txt --cache-dir=cache
+       - make sphinx
+       - git remote update origin --prune
+       - make ghpages
+       - git remote -v
+     when:
+       event: push
+       branch: master
+
+deploy:
+  # documentation build
+  git_push:
+    remote_name: origin
+    branch: gh-pages
+    local_branch: gh-pages
+    when:
+      event: push
+      branch: master
+
+notify:
+  gitter:
+    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
+    when:
+      repo: capitalone/cloud-custodian
+
+# TODO explore caching the whole venv for speed
+cache:
+  mount:
+    - cache
