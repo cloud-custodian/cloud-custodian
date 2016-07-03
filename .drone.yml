@@ -14,6 +14,8 @@ build:
   documentation:
      image: python:2-alpine
      commands:
+       - apk update
+       - apk add make
        - make sphinx
        - make ghpages
 
