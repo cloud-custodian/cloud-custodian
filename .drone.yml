@@ -14,6 +14,7 @@ build:
       - nosetests -s -v tests
 
   pypy_unit_tests:
+    # just enough variation to make a matrix not viable
     image: pypy:2
     environment:
       - AWS_DEFAULT_REGION=us-east-1
@@ -26,7 +27,6 @@ build:
       - pypy setup.py develop
       - nosetests -s -v tests
 
-
   documentation:
      image: python:2-alpine
      commands:
@@ -38,13 +38,12 @@ build:
        - make sphinx
        - git remote update origin --prune
        - make ghpages
-       - git remote -v
      when:
        event: push
        branch: master
 
 deploy:
-  # documentation build
+  # sphinx documentation build / per documentation build section
   git_push:
     remote_name: origin
     branch: gh-pages
@@ -53,11 +52,35 @@ deploy:
       event: push
       branch: master
 
+publish:
+  pypi:
+    repository: https://pypi.python.org/pypi
+    username: c7nbot
+    password: $$PYPI_PASS
+    distributions:
+      - sdist
+    when:
+      event: tag
+      branch: master
+      repo: capitalone/cloud-custodian
+
+  docker:
+    username: c7nbot
+    password: $$HUB_PASS
+    repo: capitalone/cloud-custodian
+    tag: latest
+    when:
+      event: push
+      branch: master
+      repo: capitalone/cloud-custodian
+
+
 notify:
   gitter:
     webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
     when:
       repo: capitalone/cloud-custodian
+
 
 # TODO explore caching the whole venv for speed
 cache:
