@@ -14,7 +14,7 @@ build:
       - nosetests -s -v tests
 
   pypy_unit_tests:
-    image: pypy:latest
+    image: pypy:2
     environment:
       - AWS_DEFAULT_REGION=us-east-1
       - AWS_ACCESS_KEY_ID=foo
