@@ -64,7 +64,7 @@ Links
 Quick Install
 #############
 
-Shell::
+::
 
   $ virtualenv custodian
   $ source custodian/bin/activate

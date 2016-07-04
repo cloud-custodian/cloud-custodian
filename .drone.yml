@@ -13,6 +13,20 @@ build:
       - python setup.py develop
       - nosetests -s -v tests
 
+  pypy_unit_tests:
+    # just enough variation to make a matrix not viable
+    image: pypy:2
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+    commands:
+      - mkdir -p cache
+      - pip install -r requirements-dev.txt --cache-dir=cache
+      - pip install coveralls --cache-dir=cache
+      - pypy setup.py develop
+      - nosetests -s -v tests
+
   documentation:
      image: python:2-alpine
      commands:
@@ -24,13 +38,12 @@ build:
        - make sphinx
        - git remote update origin --prune
        - make ghpages
-       - git remote -v
      when:
        event: push
        branch: master
 
 deploy:
-  # documentation build
+  # sphinx documentation build / per documentation build section
   git_push:
     remote_name: origin
     branch: gh-pages
@@ -38,6 +51,28 @@ deploy:
     when:
       event: push
       branch: master
+
+publish:
+  pypi:
+    repository: https://pypi.python.org/pypi
+    username: c7nbot
+    password: $$PYPI_PASS
+    distributions:
+      - sdist
+    when:
+      event: tag
+      branch: master
+      repo: capitalone/cloud-custodian
+
+  docker:
+    username: c7nbot
+    password: $$HUB_PASS
+    repo: capitalone/cloud-custodian
+    tag: latest
+    when:
+      event: push
+      branch: master
+      repo: capitalone/cloud-custodian
 
 notify:
   gitter:
