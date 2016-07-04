@@ -42,6 +42,9 @@ build:
        - make sphinx
        - git remote update origin --prune
        - make ghpages
+       - git branch
+       # switch back to master post doc-build
+       - git checkout master
      when:
        event: push
        branch: master
