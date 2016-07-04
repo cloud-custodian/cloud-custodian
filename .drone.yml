@@ -70,14 +70,14 @@ publish:
 
   docker:
     username: c7nbot
-    email: kapil.foss@gmail.com
+    email: $$HUB_EMAIL
     password: $$HUB_PASS
     repo: capitalone/cloud-custodian
     tag: latest
-#    when:
-#      event: push
-#      branch: master
-#      repo: capitalone/cloud-custodian
+    when:
+      event: push
+      branch: master
+      repo: capitalone/cloud-custodian
 
 notify:
   gitter:
