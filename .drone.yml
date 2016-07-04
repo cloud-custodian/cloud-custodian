@@ -66,7 +66,7 @@ publish:
 
   docker:
     username: c7nbot
-    email: ""
+    email: $$HUB_EMAIL
     password: $$HUB_PASS
     repo: capitalone/cloud-custodian
     tag: latest
