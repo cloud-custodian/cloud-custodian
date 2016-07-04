@@ -13,6 +13,20 @@ build:
       - python setup.py develop
       - nosetests -s -v tests
 
+  pypy_unit_tests:
+    image: pypy:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+    commands:
+      - mkdir -p cache
+      - pip install -r requirements-dev.txt --cache-dir=cache
+      - pip install coveralls --cache-dir=cache
+      - python setup.py develop
+      - nosetests -s -v tests
+
+
   documentation:
      image: python:2-alpine
      commands:
