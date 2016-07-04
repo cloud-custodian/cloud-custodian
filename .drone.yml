@@ -26,6 +26,10 @@ build:
       - pip install coveralls --cache-dir=cache
       - pypy setup.py develop
       - nosetests -s -v tests
+    when:
+      event: push
+      branch: master
+
 
   documentation:
      image: python:2-alpine
@@ -66,7 +70,7 @@ publish:
 
   docker:
     username: c7nbot
-    email: ""
+    email: $$HUB_EMAIL
     password: $$HUB_PASS
     repo: capitalone/cloud-custodian
     tag: latest
