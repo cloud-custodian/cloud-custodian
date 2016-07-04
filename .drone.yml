@@ -23,7 +23,7 @@ build:
       - mkdir -p cache
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
-      - python setup.py develop
+      - pypy setup.py develop
       - nosetests -s -v tests
 
 
