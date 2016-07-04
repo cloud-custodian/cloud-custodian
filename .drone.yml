@@ -70,7 +70,7 @@ publish:
 
   docker:
     username: c7nbot
-    email: $$HUB_EMAIL
+    email: kapil.foss@gmail.com
     password: $$HUB_PASS
     repo: capitalone/cloud-custodian
     tag: latest
