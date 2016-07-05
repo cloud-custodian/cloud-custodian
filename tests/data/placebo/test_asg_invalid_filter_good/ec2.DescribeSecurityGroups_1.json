@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123",
+                                "GroupId": "sg-2"
+                            }
+                        ],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Description": "DDD",
+                "Tags": [],
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123",
+                                "GroupId": "sg-2"
+                            }
+                        ],
+                        "PrefixListIds": []
+                    }
+                ],
+                "GroupName": "GN",
+                "VpcId": "vpc-1",
+                "OwnerId": "123",
+                "GroupId": "sg-1"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "a5424d02-1d02-40d3-a237-3483aecd7f9b"
+        }
+    }
+}

@@ -79,3 +79,8 @@ class InternetGateway(QueryResourceManager):
         date = None
 
     resource_type = Meta
+
+@resources.register('key-pair')
+class KeyPair(QueryResourceManager):
+
+    resource_type = 'aws.ec2.key-pair'
