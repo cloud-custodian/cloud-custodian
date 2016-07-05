@@ -57,6 +57,8 @@ def _elb_tags(elbs, session_factory, executor_factory):
         try:
             results = client.describe_tags(LoadBalancerNames=elb_map.keys())
         except ClientError as e:
+            if e.response['Error']['Code'] == 'LoadBalancerNotFound':
+                return
             log.exception("Exception Processing ELB: %s", e)
             raise
         for tag_desc in results['TagDescriptions']:
