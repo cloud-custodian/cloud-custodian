@@ -23,6 +23,8 @@ detail_spec
    - aws.dymanodb.table ->
 """
 import jmespath
+import os
+import re
 
 from botocore.client import ClientError
 from skew.resources import find_resource_class
@@ -50,6 +52,19 @@ class ResourceQuery(object):
     def filter(self, resource_type, **params):
         """Query a set of resources."""
         m = self.resolve(resource_type)
+
+        https_proxy = os.environ.get('HTTPS_PROXY')
+        no_proxy = ''
+        if https_proxy and https_proxy != '':
+            reg = re.compile("^"+m.service+"(-[a-z]{2}-[a-z]+-[0-9]{,2})?\.amazonaws.com$")
+            no_proxy = os.environ.get('NO_PROXY','')
+            no_proxy_hosts = no_proxy.split(',')
+            new_no_proxy_hosts = []
+            for host in no_proxy_hosts:
+                if not reg.match(host):
+                    new_no_proxy_hosts.append(host)
+            os.environ['NO_PROXY'] = ','.join(new_no_proxy_hosts)
+
         client = local_session(self.session_factory).client(
             m.service)
         enum_op, path, extra_args = m.enum_spec
@@ -66,6 +81,10 @@ class ResourceQuery(object):
         if path:
             path = jmespath.compile(path)
             data = path.search(data)
+
+        if no_proxy != '':
+            os.environ['NO_PROXY'] = no_proxy
+
         return data
 
     def get(self, resource_type, identity):
