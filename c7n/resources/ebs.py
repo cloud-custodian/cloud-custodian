@@ -131,21 +131,36 @@ class CopySnapshot(BaseAction):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
 
+        if self.data['target_region'] != self.manager.config.region:
+            cross_region = True
+
         params = {}
         params['Encrypted'] = self.data.get('encrypted', True)
         if params['Encrypted']:
             params['KmsKeyId'] = self.data['target_key']
 
-        for r in resource_set:
-            snapshot_id = client.copy_snapshot(
-                SourceRegion=self.manager.config.region,
-                SourceSnapshotId=r['SnapshotId'],
-                Description=r.get('Description', ''),
-                **params)['SnapshotId']
-            client.create_tags(
-                Resources=[snapshot_id],
-                Tags=r['Tags'])
-            r['CopiedSnapshot'] = snapshot_id
+        for snapshot_set in chunks(resource_set, 5):
+            for r in snapshot_set:
+                snapshot_id = client.copy_snapshot(
+                    SourceRegion=self.manager.config.region,
+                    SourceSnapshotId=r['SnapshotId'],
+                    Description=r.get('Description', ''),
+                    **params)['SnapshotId']
+                client.create_tags(
+                    Resources=[snapshot_id],
+                    Tags=r['Tags'])
+                r['CopiedSnapshot'] = snapshot_id
+
+            if not cross_region or len(snapshot_set) < 5:
+                continue
+
+            copy_ids = [r['CopiedSnapshot'] for r in snapshot_set]
+            self.log.debug(
+                "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
+            waiter = client.get_waiter('snapshot_completed')
+            waiter.wait(SnapshotIds=copy_ids)
+            self.log.debug(
+                "Cross region copy complete %s", ",".join(copy_ids))
 
 
 @resources.register('ebs')

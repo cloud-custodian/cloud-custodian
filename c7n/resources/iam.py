@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime, timedelta
+from dateutil.parser import parse
+from dateutil.tz import tzutc
 
-from c7n.query import QueryResourceManager
+from c7n.actions import BaseAction
+from c7n.filters import ValueFilter
 from c7n.manager import resources
+from c7n.query import QueryResourceManager
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('iam-group')
@@ -33,6 +39,95 @@ class Role(QueryResourceManager):
 class User(QueryResourceManager):
 
     resource_type = 'aws.iam.user'
+
+
+@User.filter_registry.register('policy')
+class UserAttachedPolicy(ValueFilter):
+
+    schema = type_schema('policy', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _user_policies(resource):
+            client = local_session(self.manager.session_factory).client('iam')
+            resource['AttachedPolicies'] = client.list_attached_user_policies(
+                UserName=resource['UserName'])['AttachedPolicies']
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'AttachedPolicies' not in r]
+            self.log.debug("Querying %d users policies" % len(query_resources))
+            list(w.map(_user_policies, query_resources))
+
+        matched = []
+        for r in resources:
+            for p in r['AttachedPolicies']:
+                if self.match(p):
+                    matched.append(r)
+                    break
+        return matched
+
+
+@User.filter_registry.register('access-key')
+class UserAccessKey(ValueFilter):
+
+    schema = type_schema('access-key', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _user_keys(resource):
+            client = local_session(self.manager.session_factory).client('iam')
+            resource['AccessKeys'] = client.list_access_keys(
+                UserName=resource['UserName'])['AccessKeyMetadata']
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'AccessKeys' not in r]
+            self.log.debug("Querying %d users' api keys" % len(query_resources))
+            list(w.map(_user_keys, query_resources))
+
+        matched = []
+        for r in resources:
+            for p in r['AccessKeys']:
+                if self.match(p):
+                    matched.append(r)
+                    break
+        return matched
+
+
+@User.action_registry.register('remove-keys')
+class UserRemoveAccessKey(BaseAction):
+
+    schema = type_schema(
+        'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+
+        age = self.data.get('age')
+        disable = self.data.get('disable')
+
+        if age:
+            threshold_date = datetime(tz=tzutc()) - timedelta(age)
+
+        for r in resources:
+            if 'AccessKeys' not in r:
+                r['AccessKeys'] = client.list_access_keys(
+                    UserName=r['UserName'])['AccessKeyMetadata']
+            keys = r['AccessKeys']
+            for k in keys:
+                if age:
+                    if not parse(k['CreateDate']) < threshold_date:
+                        continue
+                if disable:
+                    client.update_access_key(
+                        UserName=r['UserName'],
+                        AccessKeyId=k['AccessKeyId'],
+                        Status='Inactive')
+                else:
+                    client.delete_access_key(
+                        UserName=r['UserName'],
+                        AccessKeyId=k['AccessKeyId'])
 
 
 @resources.register('iam-policy')

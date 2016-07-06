@@ -190,7 +190,7 @@ class ValueFilter(Filter):
     """Generic value filter using jmespath
     """
     expr = None
-    op = v = None
+    op = v = vtype = None
 
     schema = {
         'type': 'object',
@@ -201,6 +201,7 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
+            'value_type': {'enum': ['age', 'integer']},
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
@@ -243,6 +244,7 @@ class ValueFilter(Filter):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             self.v = self.data.get('value')
+            self.vtype = self.data.get('value_type')
 
         if i is None:
             return False
@@ -263,17 +265,36 @@ class ValueFilter(Filter):
             self.expr = jmespath.compile(self.k)
             r = self.expr.search(i)
 
+        # value type conversion
+        if self.vtype is not None:
+            v, r = self.process_value_type(self.v, r)
+        else:
+            v = self.v
+
         # Value match
-        if r is None and self.v == 'absent':
+        if r is None and v == 'absent':
             return True
-        elif self.v == 'not-null' and r:
+        elif v == 'not-null' and r:
             return True
         elif self.op:
             op = OPERATORS[self.op]
-            return op(r, self.v)
+            return op(r, v)
         elif r == self.v:
             return True
         return False
+
+    def process_value_type(self, sentinel, value):
+        if self.vtype == 'age':
+            if not isinstance(sentinel, datetime):
+                sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
+
+            if not isinstance(value, datetime):
+                value = parse(value)
+
+            # Reverse the age comparison, we want to compare the value being
+            # greater than the sentinel typically. Else the syntax for age
+            # comparisons is intuitively wrong.
+            return value, sentinel
 
 
 class AgeFilter(Filter):
@@ -304,8 +325,8 @@ class AgeFilter(Filter):
             n = datetime.now(tz=tzutc())
             self.threshold_date = n - timedelta(days)
         v = self.get_resource_date(i)
-        op = OPERATORS[self.data.get('op', 'less-than')]
-        return op(v, self.threshold_date)
+        op = OPERATORS[self.data.get('op', 'greater-than')]
+        return op(self.threshold_date, v)
 
 
 class EventFilter(ValueFilter):

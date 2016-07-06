@@ -74,7 +74,7 @@ def summary(vocabulary):
     print "unique actions: %d" % action_count
     print "common actions: %d" % len(common_actions)
     print "unique filters: %d" % filter_count
-    print "common filtesr: %s" % len(common_filters)
+    print "common filters: %s" % len(common_filters)
 
 
 def main():
