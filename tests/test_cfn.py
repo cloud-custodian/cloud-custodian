@@ -24,5 +24,3 @@ class TestCFN(BaseTest):
             'resource': 'cfn'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(resources, [])
-        
-        
