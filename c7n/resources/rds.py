@@ -195,6 +195,7 @@ class AutoPatch(BaseAction):
 
 
 @actions.register('tag')
+@actions.register('mark')
 class Tag(tags.Tag):
 
     concurrency = 2
@@ -211,6 +212,7 @@ class Tag(tags.Tag):
 
 
 @actions.register('remove-tag')
+@actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
 
     concurrency = 2

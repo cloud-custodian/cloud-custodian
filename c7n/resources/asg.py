@@ -418,7 +418,7 @@ class GroupTagTrim(TagTrim):
 
     def process_tag_removal(self, resource, candidates):
         client = local_session(
-            self.manager.session_factory).client('asg')
+            self.manager.session_factory).client('autoscaling')
         tags = []
         for t in candidates:
             tags.append(
