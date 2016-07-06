@@ -56,7 +56,6 @@ class ResourceQuery(object):
         https_proxy = os.environ.get('HTTPS_PROXY')
         no_proxy = ''
         if https_proxy and https_proxy != '':
-            print "PROXY FOUND"
             reg = re.compile("^"+m.service+"(-[a-z]{2}-[a-z]+-[0-9]{,2})?\.amazonaws.com$")
             no_proxy = os.environ.get('NO_PROXY','')
             no_proxy_hosts = no_proxy.split(',')
@@ -65,8 +64,6 @@ class ResourceQuery(object):
                 if not reg.match(host):
                     new_no_proxy_hosts.append(host)
             os.environ['NO_PROXY'] = ','.join(new_no_proxy_hosts)
-            print "SET NO_PROXY TO", os.environ.get('NO_PROXY')
-            print "HTTPS_PROXY IS", os.environ.get('HTTPS_PROXY')
 
         client = local_session(self.session_factory).client(
             m.service)
