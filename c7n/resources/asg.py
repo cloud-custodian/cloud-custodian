@@ -206,7 +206,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
             if sg not in self.security_groups:
                 errors.append(('invalid-security-group', sg))
 
-        if cfg['KeyName'] not in self.key_pairs:
+        if cfg['KeyName'] and cfg['KeyName'] not in self.key_pairs:
             errors.append(('invalid-key-pair', cfg['KeyName']))
 
         if cfg['ImageId'] not in self.images:
