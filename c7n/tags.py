@@ -137,6 +137,9 @@ class TagTrim(Action, ResourceTag):
         if not candidates:
             self.log.warning(
                 "Could not find any candidates to trim %s" % i[self.id_key])
+            return
+
+        self.process_tag_removal(i, candidates)
 
     def process_tag_removal(self, resource, tags):
         client = utils.local_session(
