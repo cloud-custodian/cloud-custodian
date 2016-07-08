@@ -58,8 +58,7 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        arn = "arn:aws:rds:%s:%s:db:%s" % (
-            p.resource_manager.config.region, p.resource_manager.account_id,
+        arn = p.resource_manager.arn_generator.generate(
             resources[0]['DBInstanceIdentifier'])
 
         tags = client.list_tags_for_resource(ResourceName=arn)
