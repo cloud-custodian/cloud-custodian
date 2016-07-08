@@ -64,3 +64,8 @@ class ResourceManager(object):
         self.log.info("Filtered from %d to %d %s" % (
             original, len(resources), self.__class__.__name__.lower()))
         return resources
+
+    def get_model(self):
+        """Returns the resource meta-model.
+        """
+        return self.query.resolve(self.resource_type)
