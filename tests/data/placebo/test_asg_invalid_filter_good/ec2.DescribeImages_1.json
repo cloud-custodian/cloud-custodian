@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm",
+                "Name": "NNN",
+                "Hypervisor": "xen",
+                "SriovNetSupport": "simple",
+                "ImageId": "ami-1",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-1",
+                            "VolumeSize": 20,
+                            "VolumeType": "gp2",
+                            "Encrypted": true
+                        }
+                    }
+                ],
+                "Architecture": "x86_64",
+                "ImageLocation": "123/NNN",
+                "RootDeviceType": "ebs",
+                "OwnerId": "123",
+                "RootDeviceName": "/dev/sda1",
+                "CreationDate": "2016-06-24T20:28:16.000Z",
+                "Public": false,
+                "ImageType": "machine",
+                "Description": "DDD"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "e1678255-2aae-4a1c-a424-85721c62d6c3"
+        }
+    }
+}

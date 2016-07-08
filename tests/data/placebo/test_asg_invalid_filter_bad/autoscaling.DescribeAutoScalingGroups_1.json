@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:123:autoScalingGroup:f03353dd-fb08-4f12-912a-a72319cf47e4:autoScalingGroupName/abc",
+                "HealthCheckGracePeriod": 0,
+                "SuspendedProcesses": [],
+                "DesiredCapacity": 3,
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "abc",
+                        "PropagateAtLaunch": true,
+                        "Value": "abc",
+                        "Key": "Name"
+                    }
+                ],
+                "EnabledMetrics": [],
+                "LoadBalancerNames": [
+                    "abc-elb"
+                ],
+                "AutoScalingGroupName": "abc",
+                "DefaultCooldown": 300,
+                "MinSize": 3,
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "us-west-2a",
+                        "InstanceId": "i-1",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "abc-lc"
+                    },
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "us-west-2c",
+                        "InstanceId": "i-2",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "abc-lc"
+                    },
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "us-west-2b",
+                        "InstanceId": "i-3",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "abc-lc"
+                    }
+                ],
+                "MaxSize": 3,
+                "VPCZoneIdentifier": "subnet-1,subnet-2",
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "LaunchConfigurationName": "abc-lc",
+                "CreatedTime": {
+                    "hour": 18,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 46,
+                    "microsecond": 612000,
+                    "year": 2016,
+                    "day": 5,
+                    "minute": 57
+                },
+                "AvailabilityZones": [
+                    "us-west-2a",
+                    "us-west-2b",
+                    "us-west-2c"
+                ],
+                "HealthCheckType": "EC2",
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "6f007004-3ed3-11e6-b978-ed42136cd099"
+        }
+    }
+}

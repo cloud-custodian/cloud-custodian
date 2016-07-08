@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPairs": [
+            {
+                "KeyName": "k1", 
+                "KeyFingerprint": "81:2c:ad:55:96:f5:86:af:7c:e1:4b:fc:4b:f2:6a:43:71:63:ab:44"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "bf4239a5-3fd0-4c6d-832f-a13a07c893b4"
+        }
+    }
+}

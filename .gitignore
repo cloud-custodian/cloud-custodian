@@ -14,3 +14,4 @@ cover/
 tmp/
 docs/source/generated/
 docs/build/
+cache/
