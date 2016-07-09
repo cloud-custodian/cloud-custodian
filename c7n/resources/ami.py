@@ -28,7 +28,7 @@ log = logging.getLogger('custodian.ami')
 filters = FilterRegistry('ami.filters')
 actions = ActionRegistry('ami.actions')
 
-register_tags(filters, actions, 'AmiId')
+register_tags(filters, actions)
 
 
 @resources.register('ami')

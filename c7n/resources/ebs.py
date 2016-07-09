@@ -33,7 +33,7 @@ log = logging.getLogger('custodian.ebs')
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
 
-tags.register_tags(filters, actions, 'VolumeId')
+tags.register_tags(filters, actions)
 
 
 @resources.register('ebs-snapshot')
