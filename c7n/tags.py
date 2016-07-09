@@ -30,40 +30,27 @@ from c7n.filters import Filter, OPERATORS
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
-
-
-def register_tags(filters, actions, id_key):
-    filters.register('marked-for-op', TagActionFilter)
-    filters.register('tag-count', TagCountFilter)
-    actions.register('mark-for-op', TagDelayedAction.set_id(id_key))
-    actions.register('tag-trim', TagTrim.set_id(id_key))
-
-    tag = Tag.set_id(id_key)
-    actions.register('mark', tag)
-    actions.register('tag', tag)
-
-    remove_tag = RemoveTag.set_id(id_key)
-    actions.register('unmark', remove_tag)
-    actions.register('untag', remove_tag)
-    actions.register('remove-tag', remove_tag)
-
 ACTIONS = [
     'suspend', 'resume', 'terminate', 'stop', 'start',
     'delete', 'deletion']
 
 
-class ResourceTag(object):
+def register_tags(filters, actions):
+    filters.register('marked-for-op', TagActionFilter)
+    filters.register('tag-count', TagCountFilter)
 
-    @property
-    def id_key(self):
-        raise NotImplementedError()
+    actions.register('mark-for-op', TagDelayedAction)
+    actions.register('tag-trim', TagTrim)
 
-    @classmethod
-    def set_id(cls, key):
-        return type(cls.__name__, (cls,), {'id_key': key})
+    actions.register('mark', Tag)
+    actions.register('tag', Tag)
+
+    actions.register('unmark', RemoveTag)
+    actions.register('untag', RemoveTag)
+    actions.register('remove-tag', RemoveTag)
 
 
-class TagTrim(Action, ResourceTag):
+class TagTrim(Action):
     """Automatically remove tags from an ec2 resource.
 
     EC2 Resources have a limit of 10 tags, in order to make
@@ -106,6 +93,8 @@ class TagTrim(Action, ResourceTag):
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, resources):
+        self.id_key = self.manager.get_model().id
+
         self.preserve = set(self.data.get('preserve'))
         self.space = self.data.get('space', 3)
 
@@ -255,7 +244,7 @@ class TagCountFilter(Filter):
         return op(tag_count, count)
 
 
-class Tag(Action, ResourceTag):
+class Tag(Action):
     """Tag an ec2 resource.
     """
 
@@ -269,6 +258,8 @@ class Tag(Action, ResourceTag):
         )
 
     def process(self, resources):
+        self.id_key = self.manager.get_model().id
+
         # Legacy
         msg = self.data.get('msg')
         msg = self.data.get('value') or msg
@@ -289,8 +280,6 @@ class Tag(Action, ResourceTag):
 
         batch_size = self.data.get('batch_size', self.batch_size)
 
-        id_key = self.manager.get_model().id
-
         with self.executor_factory(max_workers=self.concurrency) as w:
             futures = {}
             for resource_set in utils.chunks(resources, size=batch_size):
@@ -303,7 +292,9 @@ class Tag(Action, ResourceTag):
                 if f.exception():
                     self.log.error(
                         "Exception removing tags: %s on resources:%s \n %s" % (
-                            tags, self.id_key, f.exception()))
+                            tags,
+                            ", ".join([r[self.id_key] for r in resource_set]),
+                            f.exception()))
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(
@@ -314,7 +305,7 @@ class Tag(Action, ResourceTag):
             DryRun=self.manager.config.dryrun)
 
 
-class RemoveTag(Action, ResourceTag):
+class RemoveTag(Action):
     """Remove tags from ec2 resources.
     """
 
@@ -326,10 +317,10 @@ class RemoveTag(Action, ResourceTag):
         tags={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, resources):
+        self.id_key = self.manager.get_model().id
+
         tags = self.data.get('tags', [DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
-
-        id_key = self.manager.get_model().id
 
         with self.executor_factory(max_workers=self.concurrency) as w:
             futures = {}
@@ -345,7 +336,7 @@ class RemoveTag(Action, ResourceTag):
                     self.log.error(
                         "Exception removing tags: %s on resources:%s \n %s" % (
                             tags,
-                            ", ".join([r[id_key] for r in resource_set]),
+                            ", ".join([r[self.id_key] for r in resource_set]),
                             f.exception()))
 
     def process_resource_set(self, vol_set, tag_keys):
@@ -357,7 +348,7 @@ class RemoveTag(Action, ResourceTag):
             DryRun=self.manager.config.dryrun)
 
 
-class TagDelayedAction(Action, ResourceTag):
+class TagDelayedAction(Action):
     """Tag resources for future action.
 
     .. code-block :: yaml
@@ -385,6 +376,7 @@ class TagDelayedAction(Action, ResourceTag):
     batch_size = 200
 
     def process(self, resources):
+        self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
         if not len(resources):

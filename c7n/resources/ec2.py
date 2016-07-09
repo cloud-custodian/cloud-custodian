@@ -33,7 +33,7 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-tags.register_tags(filters, actions, 'InstanceId')
+tags.register_tags(filters, actions)
 
 
 @resources.register('ec2')
@@ -115,7 +115,7 @@ class EC2(QueryResourceManager):
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.query.resolve(self.resource_type)
+        m = self.get_model()
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources

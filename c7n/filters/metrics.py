@@ -117,7 +117,7 @@ class MetricsFilter(Filter):
         self.start = self.end - duration
         self.period = int(self.data.get('period', duration.total_seconds()))
         self.statistics = self.data.get('statistics', 'Average')
-        self.model = self.manager.query.resolve(self.manager.resource_type)
+        self.model = self.manager.get_model()
         self.op = OPERATORS[self.data.get('op', 'less-than')]
         self.value = self.data['value']
 
@@ -166,5 +166,3 @@ class MetricsFilter(Filter):
             if self.op(r['Metrics'][0][self.statistics], self.value):
                 matched.append(r)
         return matched
-
-

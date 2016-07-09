@@ -85,6 +85,8 @@ filters.register('marked-for-op', tags.TagActionFilter)
 
 @resources.register('rds')
 class RDS(QueryResourceManager):
+    """Resource manager for RDS DB instances.
+    """
 
     class resource_type(rds.DBInstance.Meta):
         filter_name = 'DBInstanceIdentifier'
@@ -93,24 +95,31 @@ class RDS(QueryResourceManager):
     action_registry = actions
     account_id = None
 
-    def augment(self, resources):
+    def __init__(self, data, options):
+        super(RDS, self).__init__(data, options)
+
         session = local_session(self.session_factory)
         if self.account_id is None:
             self.account_id = get_account_id(session)
+        self.arn_generator = DBInstanceARNGenerator(
+            self.config.region,
+            self.account_id)
+
+    def augment(self, resources):
         _rds_tags(
-            self.query.resolve(self.resource_type),
+            self.get_model(),
             resources, self.session_factory, self.executor_factory,
-            self.account_id, region=self.config.region)
+            self.arn_generator)
         return resources
 
 
 def _rds_tags(
-        model, dbs, session_factory, executor_factory, account_id, region):
+        model, dbs, session_factory, executor_factory, arn_generator):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, db[model.id])
+        arn = arn_generator.generate(db[model.id])
         tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
         db['Tags'] = tag_list or []
         return db
@@ -167,9 +176,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for r in resources:
-            arn = "arn:aws:rds:%s:%s:db:%s" % (
-                self.manager.config.region, self.manager.account_id,
-                r['DBInstanceIdentifier'])
+            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -205,9 +212,7 @@ class Tag(tags.Tag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for r in resources:
-            arn = "arn:aws:rds:%s:%s:db:%s" % (
-                self.manager.config.region, self.manager.account_id,
-                r['DBInstanceIdentifier'])
+            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -222,9 +227,7 @@ class RemoveTag(tags.RemoveTag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for r in resources:
-            arn = "arn:aws:rds:%s:%s:db:%s" % (
-                self.manager.config.region, self.manager.account_id,
-                r['DBInstanceIdentifier'])
+            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
 
@@ -373,6 +376,8 @@ class RetentionWindow(BaseAction):
 
 @resources.register('rds-snapshot')
 class RDSSnapshot(QueryResourceManager):
+    """Resource manager for RDS DB snapshots.
+    """
 
     class Meta(object):
 
@@ -426,3 +431,30 @@ class RDSSnapshotDelete(BaseAction):
                     DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
             except ClientError as e:
                 raise
+
+
+class ARNGenerator(object):
+    """Base class for RDS ARN generators.
+    """
+
+    def __init__(self, region, account_id, resource_type):
+        self._region = region
+        self._account_id = account_id
+        self._resource_type = resource_type
+
+    def generate(self, name):
+        """Generates an Amazon Resource Name for the specified resource.
+
+        See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.html
+        """
+        arn = 'arn:aws:rds:%s:%s:%s:%s' % (
+            self._region, self._account_id, self._resource_type, name)
+        return arn
+
+
+class DBInstanceARNGenerator(ARNGenerator):
+    """RDS DB instance ARN generator.
+    """
+
+    def __init__(self, region, account_id):
+        super(DBInstanceARNGenerator, self).__init__(region, account_id, 'db')
