@@ -19,7 +19,7 @@ from concurrent.futures import as_completed
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
-    FilterValidationError)
+    FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
@@ -47,7 +47,10 @@ class Snapshot(QueryResourceManager):
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
 
-    schema = type_schema('age', days={'type': 'number'})
+    schema = type_schema(
+        'age',
+        days={'type': 'number'},
+        op={'type': 'string', 'enum': OPERATORS.keys()})
     date_attribute = 'StartTime'
 
 
@@ -124,6 +127,7 @@ class CopySnapshot(BaseAction):
             self.log.info(
                 "Source and destination region are the same, skipping")
             return
+
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
@@ -158,6 +162,8 @@ class CopySnapshot(BaseAction):
             self.log.debug(
                 "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
+            waiter.config.delay = 60
+            waiter.config.max_attempts = 60
             waiter.wait(SnapshotIds=copy_ids)
             self.log.debug(
                 "Cross region copy complete %s", ",".join(copy_ids))

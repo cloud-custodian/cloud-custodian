@@ -13,8 +13,7 @@
 # limitations under the License.
 import logging
 
-from c7n.filters import Filter
-from c7n.iamaccess import CrossAccountAccessFilter
+from c7n.filters import Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
