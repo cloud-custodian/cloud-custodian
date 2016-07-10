@@ -105,6 +105,14 @@ class Policy(object):
         return self.data['resource']
 
     @property
+    def region(self):
+        return self.data.get('region')
+
+    @property
+    def max_resources(self):
+        return self.data.get('max-resources')
+
+    @property
     def is_lambda(self):
         if not 'mode' in self.data:
             return False
@@ -184,6 +192,12 @@ class Policy(object):
 
     def poll(self):
         """Query resources and apply policy."""
+        if self.region and self.region != self.options.region:
+            self.log.info(
+                "Skipping policy %s target-region: %s current-region: %s",
+                self.name, self.region, self.options.region)
+            return
+
         with self.ctx:
             self.log.info("Running policy %s resource: %s region:%s",
                           self.name, self.resource_type, self.options.region)
@@ -202,6 +216,12 @@ class Policy(object):
 
             if not resources:
                 return []
+            elif (self.max_resources is not None and
+                  len(resources) > self.max_resources):
+                msg = "policy %s matched %d resources max resources %s" % (
+                    self.name, len(resources), self.max_resources)
+                self.log.warning(msg)
+                raise RuntimeError(msg)
 
             if self.options.dryrun:
                 self.log.debug("dryrun: skipping actions")

@@ -66,7 +66,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, Filter, AgeFilter
+from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
@@ -399,7 +399,10 @@ class RDSSnapshot(QueryResourceManager):
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
 
-    schema = type_schema('age', days={'type': 'number'})
+    schema = type_schema(
+        'age', days={'type': 'number'},
+        op={'type': 'string', 'enum': OPERATORS.keys()})
+
     date_attribute = 'SnapshotCreateTime'
 
 

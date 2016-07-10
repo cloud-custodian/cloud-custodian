@@ -28,10 +28,9 @@ from botocore.client import ClientError
 from skew.resources import find_resource_class
 
 from c7n.actions import ActionRegistry
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.utils import local_session
 from c7n.manager import ResourceManager
-from c7n.metrics import MetricsFilter
 
 
 class ResourceQuery(object):
@@ -121,6 +120,9 @@ class QueryResourceManager(ResourceManager):
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
         self.query = ResourceQuery(self.session_factory)
+
+    def get_model(self):
+        return self.query.resolve(self.resource_type)
 
     def resources(self, query=None):
         key = {'region': self.config.region,
