@@ -51,8 +51,7 @@ import time
 
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, Filter
-from c7n.iamaccess import CrossAccountAccessFilter
+from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import chunks, local_session, set_annotation, type_schema
