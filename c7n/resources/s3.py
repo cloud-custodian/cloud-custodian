@@ -254,8 +254,8 @@ class HasStatementFilter(Filter):
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
         for s in list(statements):
-            if s.get('StatementId') in required:
-                required.remove(s['StatementId'])
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
         if not required:
             return b
         return None
@@ -280,10 +280,9 @@ class MissingPolicyStatementFilter(Filter):
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
-
         for s in list(statements):
-            if s.get('StatementId') in required:
-                required.remove(s['StatementId'])
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
         if not required:
             return False
         return True

@@ -221,7 +221,7 @@ class S3Test(BaseTest):
             'filters': [
                 {'Name': bname},
                 {'type': 'has-statement',
-                 'statement-ids': ['RequireEncryptedPutObject']}]},
+                 'statement_ids': ['Zebra']}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

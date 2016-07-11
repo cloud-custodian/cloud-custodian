@@ -221,11 +221,14 @@ class Notify(EventAction):
                        'account': account_name,
                        'action': self.data,
                        'policy': self.manager.data}
-            self.send_data_message(message)
+            receipt = self.send_data_message(message)
+            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+                receipt, self.manager.data['name'],
+                self.data.get('template', 'default'), len(batch)))
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
-            self.send_sqs(message)
+            return self.send_sqs(message)
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -237,7 +240,8 @@ class Notify(EventAction):
                 'StringValue': self.C7N_DATA_MESSAGE,
                 },
             }
-        client.send_message(
+        result = client.send_message(
             QueueUrl=queue,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
             MessageAttributes=attrs)
+        return result['MessageId']
