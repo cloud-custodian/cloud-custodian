@@ -476,7 +476,7 @@ class Snapshot(BaseAction):
                 {'Key': 'Name', 'Value': volume_id},
                 {'Key': 'InstanceId', 'Value': resource['InstanceId']},
                 {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
-                {'Key': 'custodian_snapshot', 'Value': ['true']}
+                {'Key': 'custodian_snapshot', 'Value': ''}
             ]
 
             copy_keys = self.data.get('copy-tags', [])
