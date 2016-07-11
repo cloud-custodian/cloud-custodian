@@ -18,7 +18,7 @@ import tempfile
 from unittest import TestCase
 from common import load_data, BaseTest
 
-from c7n.iamaccess import check_cross_account, CrossAccountAccessFilter
+from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.executor import MainThreadExecutor

@@ -145,7 +145,9 @@ def generate(resource_types=()):
                 'name': {
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
+                'region': {'type': 'string'},
                 'resource': {'type': 'string'},
+                'max-resources': {'type': 'integer'},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
