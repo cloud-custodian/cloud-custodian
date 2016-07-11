@@ -98,11 +98,14 @@ def check_cross_account(policy_text, allowed_accounts):
             violations.append(s)
             continue
 
-        assert len(s['Principal']) == 1, "Too many principals %s" % s
-
         # Skip relays for events to sns
         if 'Service' in s['Principal']:
-            continue
+            s['Principal'].pop('Service')
+            if not s['Principal']:
+                continue
+
+        assert len(s['Principal']) == 1, "Too many principals %s" % s
+
 
         # At this point principal is required?
         p = (
@@ -137,6 +140,28 @@ def check_cross_account(policy_text, allowed_accounts):
                 so = s['Condition']['StringEquals']['kms:CallerAccount']
                 if so in allowed_accounts:
                     principal_ok = True
+
+        ## BEGIN S3 WhiteList
+        ## Note these are transient white lists for s3
+        ## we need to refactor this to verify ip against a
+        ## cidr white list, and verify vpce/vpc against the
+        ## accounts.
+
+            # For now allow vpce/vpc conditions as sufficient on s3
+            if s['Condition']['StringEquals'].keys()[0] in (
+                    "aws:sourceVpce", "aws:sourceVpce"):
+                principal_ok = True
+
+        if 'StringLike' in s['Condition']:
+            # For now allow vpce/vpc conditions as sufficient on s3
+            if s['Condition']['StringLike'].keys()[0] in (
+                    "aws:sourceVpce", "aws:sourceVpce"):
+                principal_ok = True
+
+        if 'IpAddress' in s['Condition']:
+            principal_ok = True
+
+        ## END S3 WhiteList
 
         if 'ArnEquals' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
