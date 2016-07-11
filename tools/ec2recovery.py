@@ -256,7 +256,6 @@ def rebuild(session, dryrun, ami, instanceid,
             IamInstanceProfile={'Name': iamrolename},
             UserData=userdata)
         instance_id = instances[0].instance_id
-        restored = ec2.Instance(instance_id)
         print "\n\tRestoring instance from snapshot..."
 
         waiter = client.get_waiter('instance_running')
@@ -297,19 +296,22 @@ def main():
         args.dryrun,
         client,
         args.snapshots)
-    userdata = ""
 
     if sys.argv[1] == 'restore':
         restore(args.dryrun, session,
                 args.instanceid, snapshots)
 
     if sys.argv[1] == 'rebuild':
-        if args.userdata:
+        try:
             userdata = read_user_date(args.userdata)
+        except:
+            userdata = ""
+
         if userdata:
             print "Use of the 'userdata' feature does not guarantee " \
                   "that the restored instance will run the userdata. " \
                   "This feature is experimental."
+
         rebuild(session, args.dryrun, args.ami, args.instanceid,
                 args.keypair, args.securitygroups,
                 args.type, args.subnet,
