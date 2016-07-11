@@ -280,7 +280,6 @@ class MissingPolicyStatementFilter(Filter):
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
-        import pdb; pdb.set_trace()
         for s in list(statements):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
