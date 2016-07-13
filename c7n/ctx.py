@@ -31,17 +31,20 @@ class ExecutionContext(object):
         self.metrics = factory(self)
 
         output_dir = getattr(options, 'output_dir', '')
-        factory = FSOutput.select(output_dir)
-
-        self.output_path = factory.join(output_dir, policy.name)
-        self.output = factory(self)
+        if output_dir:
+            factory = FSOutput.select(output_dir)
+            self.output_path = factory.join(output_dir, policy.name)
+            self.output = factory(self)
+        else:
+            self.output_path = self.output = None
 
         if options.log_group:
             self.cloudwatch_logs = CloudWatchLogOutput(self)
 
     @property
     def log_dir(self):
-        return self.output.root_dir
+        if self.output:
+            return self.output.root_dir
 
     def __enter__(self):
         self.output.__enter__()

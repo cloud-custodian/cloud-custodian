@@ -116,6 +116,7 @@ class LambdaInvoke(EventAction):
      - event / cloud trail event if any
      - version / version of custodian invoking the lambda
 
+    We automatically batch into sets of 250 for invocation,
     We try to utilize async invocation by default, this imposes
     some greater size limits of 128kb which means we batch
     invoke.
