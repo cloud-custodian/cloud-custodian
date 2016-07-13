@@ -472,11 +472,17 @@ class BucketScanLog(object):
         return os.path.join(self.log_dir, "%s.json" % self.name)
 
     def __enter__(self):
+        # Don't require output directories
+        if self.log_dir is None:
+            return
+
         self.fh = open(self.path, 'w')
         self.fh.write("[\n")
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_frame=None):
+        if self.fh is None:
+            return
         # we need an empty marker list at end to avoid trailing commas
         self.fh.write("[]")
         # and close the surrounding list
@@ -489,6 +495,8 @@ class BucketScanLog(object):
 
     def add(self, keys):
         self.count += len(keys)
+        if self.fh is None:
+            return
         self.fh.write(json.dumps(keys))
         self.fh.write(",\n")
 
@@ -531,7 +539,7 @@ class ScanBucket(BucketActionBase):
         with self.executor_factory(max_workers=3) as w:
             results.extend(
                 f for f in w.map(self, buckets) if f)
-        if self.denied_buckets:
+        if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
