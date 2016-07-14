@@ -391,7 +391,6 @@ class AttachLambdaEncrypt(BucketActionBase):
 class EncryptionRequiredPolicy(BucketActionBase):
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
-
     schema = type_schema('encryption-policy')
 
     def __init__(self, data=None, manager=None):
@@ -412,29 +411,35 @@ class EncryptionRequiredPolicy(BucketActionBase):
         else:
             p = json.loads(p)
 
+        encryption_sid = "RequiredEncryptedPutObject"
+        encryption_statement = {
+            'Sid': encryption_sid,
+            'Effect': 'Deny',
+            'Principal': '*',
+            'Action': 's3:PutObject',
+            "Resource": "arn:aws:s3:::%s/*" % b['Name'],
+            "Condition": {
+                # AWS Managed Keys or KMS keys, note policy language
+                # does not support custom kms (todo add issue)
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
+
         statements = p.get('Statement', [])
         found = False
         for s in list(statements):
             if s['Sid'] == 'RequireEncryptedPutObject':
-                log.debug(
-                    "Bucket:%s Found extant Encryption Policy" % b['Name'])
-                return
+                log.debug("Bucket:%s Found extant encrypt policy", b['Name'])
+                if s != encryption_statement:
+                    log.info(
+                        "Bucket:%s updating extant encrypt policy", b['Name'])
+                    statements.remove(s)
+                else:
+                    return
 
         session = self.manager.session_factory()
         s3 = bucket_client(session, b)
 
-        statements.append(
-            {'Sid': 'RequireEncryptedPutObject',
-             'Effect': 'Deny',
-             'Principal': '*',
-             'Action': 's3:PutObject',
-             "Resource": "arn:aws:s3:::%s/*" % b['Name'],
-             "Condition": {
-                 # AWS Managed Keys or KMS keys, note policy language
-                 # does not support custom kms (todo add issue)
-                 "StringNotEquals": {
-                     "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}
-             })
+        statements.append(encryption_statement)
         p['Statement'] = statements
         log.info('Bucket:%s attached encryption policy' % b['Name'])
 
@@ -467,11 +472,17 @@ class BucketScanLog(object):
         return os.path.join(self.log_dir, "%s.json" % self.name)
 
     def __enter__(self):
+        # Don't require output directories
+        if self.log_dir is None:
+            return
+
         self.fh = open(self.path, 'w')
         self.fh.write("[\n")
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_frame=None):
+        if self.fh is None:
+            return
         # we need an empty marker list at end to avoid trailing commas
         self.fh.write("[]")
         # and close the surrounding list
@@ -484,6 +495,8 @@ class BucketScanLog(object):
 
     def add(self, keys):
         self.count += len(keys)
+        if self.fh is None:
+            return
         self.fh.write(json.dumps(keys))
         self.fh.write(",\n")
 
@@ -526,7 +539,7 @@ class ScanBucket(BucketActionBase):
         with self.executor_factory(max_workers=3) as w:
             results.extend(
                 f for f in w.map(self, buckets) if f)
-        if self.denied_buckets:
+        if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
