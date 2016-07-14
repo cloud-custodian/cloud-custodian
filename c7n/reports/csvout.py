@@ -272,15 +272,17 @@ class EBSFormatter(Formatter):
 class EBSSnapshotFormatter(Formatter):
     def __init__(self):
         super(EBSSnapshotFormatter, self).__init__(
-            'VolumeId',
-            ['VolumeId', 'SnapshotId', 'VolumeSize', 'State'])
+            'SnapshotId',
+            ['SnapshotId', 'VolumeId', 'InstanceId', 'VolumeSize', 'StartTime', 'State'])
 
     def csv_fields(self, record, tag_map):
         return [
-            record['VolumeId'],
             record['SnapshotId'],
+            record['VolumeId'],
+            tag_map.get("InstanceId", ""),
             record['VolumeSize'],
-            record['State']
+            record['StartTime'],
+            record['State'],
         ]
 
 # FIXME: Should we use a PluginRegistry instead?
