@@ -93,17 +93,25 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    account_id = None
+    _arn_generator = _account_id = None
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
 
-        session = local_session(self.session_factory)
-        if self.account_id is None:
-            self.account_id = get_account_id(session)
-        self.arn_generator = DBInstanceARNGenerator(
-            self.config.region,
-            self.account_id)
+    @property
+    def account_id(self):
+        if self._account_id is None:
+            session = local_session(self.session_factory)
+            self._account_id = get_account_id(session)
+        return self._account_id
+
+    @property
+    def arn_generator(self):
+        if self._arn_generator is None:
+            self._arn_generator = DBInstanceARNGenerator(
+                self.config.region,
+                self.account_id)
+        return self._arn_generator
 
     def augment(self, resources):
         _rds_tags(
