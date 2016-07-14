@@ -269,11 +269,26 @@ class EBSFormatter(Formatter):
             tag_map.get("OwnerContact", "")
         ]
 
+class EBSSnapshotFormatter(Formatter):
+    def __init__(self):
+        super(EBSSnapshotFormatter, self).__init__(
+            'VolumeId',
+            ['VolumeId', 'SnapshotId', 'VolumeSize', 'State'])
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['VolumeId'],
+            record['SnapshotId'],
+            record['VolumeSize'],
+            record['State']
+        ]
+
 # FIXME: Should we use a PluginRegistry instead?
 RECORD_TYPE_FORMATTERS = {
     'ami': AMIFormatter(),
     'asg': ASGFormatter(),
     'ebs': EBSFormatter(),
+    'ebs-snapshot': EBSSnapshotFormatter(),
     'ec2': EC2Formatter(),
     'elb': ELBFormatter(),
     'rds': RDSFormatter(),
