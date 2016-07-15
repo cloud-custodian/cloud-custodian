@@ -1,9 +1,0 @@
-2016-07-11 16:11:42,756 - custodian.policy - INFO - Running policy ami-unencrypted-detected resource: ami region:us-east-1
-2016-07-11 16:11:44,739 - custodian.resources.ami - INFO - Filtered from 81 to 80 ami
-2016-07-11 16:11:44,740 - custodian.policy - INFO - policy: ami-unencrypted-detected resource:ami has count:80 time:1.98
-2016-07-11 16:12:13,479 - custodian.policy - INFO - Running policy ami-unencrypted-detected resource: ami region:us-east-1
-2016-07-11 16:12:15,424 - custodian.resources.ami - INFO - Filtered from 81 to 80 ami
-2016-07-11 16:12:15,426 - custodian.policy - INFO - policy: ami-unencrypted-detected resource:ami has count:80 time:1.95
-2016-07-11 16:12:28,456 - custodian.policy - INFO - Running policy ami-unencrypted-detected resource: ami region:us-east-1
-2016-07-11 16:12:30,279 - custodian.resources.ami - INFO - Filtered from 81 to 48 ami
-2016-07-11 16:12:30,280 - custodian.policy - INFO - policy: ami-unencrypted-detected resource:ami has count:48 time:1.82
