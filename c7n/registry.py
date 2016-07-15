@@ -50,12 +50,14 @@ class PluginRegistry(object):
     def register(self, name, klass=None):
         # invoked as function
         if klass:
+            klass.type = name
             self._factories[name] = klass
             return klass
 
         # invoked as class decorator
         def _register_class(klass):
             self._factories[name] = klass
+            klass.type = name
             return klass
         return _register_class
 

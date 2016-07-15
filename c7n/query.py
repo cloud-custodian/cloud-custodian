@@ -65,6 +65,8 @@ class ResourceQuery(object):
         if path:
             path = jmespath.compile(path)
             data = path.search(data)
+        if data is None:
+            data = []
         return data
 
     def get(self, resource_type, identity):
