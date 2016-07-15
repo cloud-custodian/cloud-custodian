@@ -296,7 +296,8 @@ class ValueFilter(Filter):
             # comparisons is intuitively wrong.
             return value, sentinel
 
-        # CHECK George's Expiration Code
+        # Allows for expiration filtering, for events in the future as opposed
+        # to events in the past which age filtering allows for.
         elif self.vtype == 'expiration':
             if not isinstance(sentinel, datetime):
                 sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)

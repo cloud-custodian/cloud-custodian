@@ -94,7 +94,7 @@ class UserAccessKey(ValueFilter):
                     break
         return matched
 
-# New mfa-device filter for iam-users
+# Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
 
