@@ -94,6 +94,34 @@ class UserAccessKey(ValueFilter):
                     break
         return matched
 
+# Mfa-device filter for iam-users
+@User.filter_registry.register('mfa-device')
+class UserMfaDevice(ValueFilter):
+
+    schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _user_mfa_devices(resource):
+            client = local_session(self.manager.session_factory).client('iam')
+            resource['MfaDevices'] = client.list_mfa_devices(
+                UserName=resource['UserName'])['MFADevices']
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'MfaDevices' not in r]
+            self.log.debug("Querying %d users' mfa devices" % len(query_resources))
+            list(w.map(_user_mfa_devices, query_resources))
+
+        matched = []
+        for r in resources:
+            for p in r['MfaDevices']:
+                if self.match(p):
+                    matched.append(r)
+                    break
+        return matched
+
+
 
 @User.action_registry.register('remove-keys')
 class UserRemoveAccessKey(BaseAction):
@@ -146,5 +174,3 @@ class InstanceProfile(QueryResourceManager):
 class ServerCerficate(QueryResourceManager):
 
     resource_type = 'aws.iam.server-certificate'
-
-
