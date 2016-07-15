@@ -39,6 +39,7 @@ Actions:
 """
 from botocore.client import Config
 from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 
 import functools
@@ -48,6 +49,7 @@ import logging
 import math
 import os
 import time
+import ssl
 
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction
@@ -126,7 +128,13 @@ def assemble_bucket(item):
             v.pop('ResponseMetadata')
             if select is not None and select in v:
                 v = v[select]
-        except ClientError, e:
+        except (ssl.SSLError, SSLError) as e:
+            # Proxy issues? i assume
+            log.warning("Bucket ssl error %s: %s %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        e)
+            continue
+        except ClientError as e:
             code =  e.response['Error']['Code']
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
