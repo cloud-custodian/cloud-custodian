@@ -97,6 +97,10 @@ def check_cross_account(policy_text, allowed_accounts):
         if 'NotPrincipal' in s:
             violations.append(s)
             continue
+        # Does this wildcard
+        if 'Principal' not in s:
+            violations.append(s)
+            continue
 
         # Skip relays for events to sns
         if 'Service' in s['Principal']:
