@@ -39,6 +39,7 @@ Actions:
 """
 from botocore.client import Config
 from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 
 import functools
@@ -48,6 +49,7 @@ import logging
 import math
 import os
 import time
+import ssl
 
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction
@@ -68,7 +70,7 @@ filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
 
 
-MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
+MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
 
 @resources.register('s3')
@@ -126,7 +128,13 @@ def assemble_bucket(item):
             v.pop('ResponseMetadata')
             if select is not None and select in v:
                 v = v[select]
-        except ClientError, e:
+        except (ssl.SSLError, SSLError) as e:
+            # Proxy issues?
+            log.warning("Bucket ssl error %s: %s %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        e)
+            return None
+        except ClientError as e:
             code =  e.response['Error']['Code']
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
@@ -537,8 +545,21 @@ class ScanBucket(BucketActionBase):
     def process(self, buckets):
         results = []
         with self.executor_factory(max_workers=3) as w:
-            results.extend(
-                f for f in w.map(self, buckets) if f)
+            futures = {}
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error on bucket:%s region:%s policy:% error: %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        self.manager.data.get('name'), f.exception())
+                    self.denied_buckets.append(b['Name'])
+                    continue
+                result = f.result()
+                if result:
+                    results.append(result)
+
         if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(

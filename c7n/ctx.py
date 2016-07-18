@@ -47,7 +47,8 @@ class ExecutionContext(object):
             return self.output.root_dir
 
     def __enter__(self):
-        self.output.__enter__()
+        if self.output:
+            self.output.__enter__()
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__enter__()
         self.start_time = time.time()
@@ -58,4 +59,5 @@ class ExecutionContext(object):
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__exit__(exc_type, exc_value, exc_traceback)
             self.cloudwatch_logs = None
-        self.output.__exit__(exc_type, exc_value, exc_traceback)
+        if self.output:
+            self.output.__exit__(exc_type, exc_value, exc_traceback)
