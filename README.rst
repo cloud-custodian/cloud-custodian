@@ -157,10 +157,11 @@ of software distributed by Capital One, You reserve all right, title,
 and interest in and to Your Contributions; this Agreement does not
 impact Your rights to use Your own Contributions for any other purpose
 
-##### [Link to Agreement] (https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform)
+`Download the Agreement <https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform>`_
 
-This project adheres to the
-[Open Code of Conduct][code-of-conduct]. By participating, you are
+Code of Conduct
+###############
+
+This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_ By participating, you are
 expected to honor this code.
 
-[code-of-conduct]: http://www.capitalone.io/codeofconduct/
