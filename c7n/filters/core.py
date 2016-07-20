@@ -209,6 +209,8 @@ class ValueFilter(Filter):
                 {'type': 'number'}]},
             'op': {'enum': OPERATORS.keys()}}}
 
+    annotate = True
+
     def validate(self):
         if len(self.data) == 1:
             return self
@@ -233,7 +235,7 @@ class ValueFilter(Filter):
 
     def __call__(self, i):
         matched = self.match(i)
-        if matched:
+        if matched and self.annotate:
             set_annotation(i, ANNOTATION_KEY, self.k)
         return matched
 
