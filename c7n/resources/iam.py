@@ -105,7 +105,7 @@ class UserMfaDevice(ValueFilter):
         def _user_mfa_devices(resource):
             client = local_session(self.manager.session_factory).client('iam')
             resource['MfaDevices'] = client.list_mfa_devices(
-                UserName=resource['UserName'])['MFADevices']
+                UserName=resource['UserName'])
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
@@ -115,10 +115,9 @@ class UserMfaDevice(ValueFilter):
 
         matched = []
         for r in resources:
-            for p in r['MfaDevices']:
-                if self.match(p):
-                    matched.append(r)
-                    break
+            if self.match(r['MfaDevices']):
+                matched.append(r)
+
         return matched
 
 
