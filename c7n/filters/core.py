@@ -201,7 +201,7 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
-            'value_type': {'enum': ['age', 'integer']},
+            'value_type': {'enum': ['age', 'integer', 'expiration']},
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
@@ -295,6 +295,17 @@ class ValueFilter(Filter):
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
             return value, sentinel
+
+        # Allows for expiration filtering, for events in the future as opposed
+        # to events in the past which age filtering allows for.
+        elif self.vtype == 'expiration':
+            if not isinstance(sentinel, datetime):
+                sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)
+
+            if not isinstance(value, datetime):
+                value = parse(value)
+
+            return sentinel, value
 
 
 class AgeFilter(Filter):
