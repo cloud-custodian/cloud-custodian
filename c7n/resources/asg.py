@@ -437,12 +437,14 @@ class RemoveTag(BaseAction):
         aliases=('untag', 'unmark'),
         key={'type': 'string'})
 
+    batch_size = 5
+
     def process(self, asgs):
         error = False
         key = self.data.get('key', DEFAULT_TAG)
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for asg_set in chunks(asgs, 20):
+            for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(self.process_asg_set, asg_set, key)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
@@ -736,8 +738,6 @@ class Suspend(BaseAction):
         """Multistep process to stop an asg aprori of setup
 
         - suspend processes
-        - note load balancer in tag
-        - detach load balancer
         - stop instances
         """
         session = local_session(self.manager.session_factory)

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.filters.core import ValueFilter
+from c7n.actions import BaseAction
+from c7n.filters import ValueFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session
@@ -39,18 +40,28 @@ class SecurityGroup(QueryResourceManager):
 class SGPermission(ValueFilter):
     """Base class for verifying security group permissions
 
-    All attributes of a security group permission are available as value filters.
+    All attributes of a security group permission are available as
+    value filters.
 
-    If multiple attributes are specified the permission must satisfy all of them.
+    If multiple attributes are specified the permission must satisfy
+    all of them.
 
-    If a group has any permissions that match all conditions, then it matches the
-    filter.
+    If a group has any permissions that match all conditions, then it
+    matches the filter.
 
     Permissions that match on the group are annotated onto the group.
+
+      - type: ingress
+        IpProtocol: -1
+        FromPort: 445
+        IpRanges[].CidrIp:
+          value: 24
+           value_type: cidr_size
+          op: greater-than
     """
 
-    attrs = set('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs', 
-                'IpRanges', 'PrefixListIds')
+    attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
+                'IpRanges', 'PrefixListIds'))
 
     def process(self, resources, event=None):
         self.vfilters = []
@@ -71,7 +82,7 @@ class SGPermission(ValueFilter):
         for p in resource[self.ip_permissions_key]:
             found = True
             for f in self.vfilters:
-                if not f(r):
+                if not f(resource):
                     found = False
                     break
             if not found:
@@ -83,19 +94,19 @@ class SGPermission(ValueFilter):
             return True
 
 
-@SecurityGroup.filters_registry.register('ingress')
+@SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
 
     ip_permissions_key = "IpPermissions"
 
 
-@SecurityGroup.filters_registry.register('egress')
+@SecurityGroup.filter_registry.register('egress')
 class IPPermissionEgress(SGPermission):
 
     ip_permissions_key = "IpPermissionsEgress"
 
 
-@SecurityGroup.actions_registry.register('remove-permissions')
+@SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermisssions(BaseAction):
 
     def process(self, resources):
@@ -119,6 +130,72 @@ class RemovePermisssions(BaseAction):
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
+
+
+@resources.register('eni')
+class NetworkInterface(QueryResourceManager):
+
+    class Meta(object):
+
+        service = 'ec2'
+        type = 'eni'
+        enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
+        name = id = 'NetworkInterfaceId'
+        filter_name = 'NetworkInterfaceIds'
+        filter_type = 'list'
+        dimension = None
+        date = None
+
+    resource_type = Meta
+
+
+@NetworkInterface.filter_registry.register('subnet')
+class InterfaceSubnet(ValueFilter):
+
+    annotate = False
+
+    def process_resources(self, resources, event=None):
+        subnets = set([r['SubnetId'] for r in resources])
+        manager = Subnet(self.manager.ctx, {})
+        self.subnets = {s['SubnetId']: s for s
+                        in manager.get_resources(list(subnets))}
+        return super(InterfaceSubnet, self).process_resources(resources, event)
+
+    def process(self, resource):
+        return self.match(self.subnets[resource['SubnetId']])
+
+
+@NetworkInterface.filter_registry.register('group')
+class InterfaceGroup(ValueFilter):
+
+    annotate = False
+
+    def process_resources(self, resources, event=None):
+        groups = set()
+        for r in resources:
+            for g in r.get('Groups', ()):
+                groups.add(g['GroupId'])
+        manager = SecurityGroup(self.manager.ctx, {})
+        self.groups = {s['GroupId']: s for s
+                        in manager.get_resources(list(groups))}
+        return super(InterfaceGroup, self).process_resources(resources, event)
+
+    def process(self, resource):
+        matched = []
+        for g in resource.get('Groups', ()):
+            if self.match(g):
+                matched.append(g)
+        if matched:
+            resource['MatchedSecurityGroups'] = matched
+            return True
+
+
+@NetworkInterface.action_registry.register('remove-groups')
+class InterfaceRemoveGroups(BaseAction):
+
+    def process(self, resources):
+        group_ids = self.data.get('groups')
+        quarantine_group = self.data.get('quaratine_group')
 
 
 @resources.register('route-table')
