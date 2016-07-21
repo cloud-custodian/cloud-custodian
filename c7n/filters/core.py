@@ -305,7 +305,7 @@ class ValueFilter(Filter):
             if not isinstance(value, datetime):
                 value = parse(value)
 
-            return value, sentinel
+            return sentinel, value
 
 
 class AgeFilter(Filter):
