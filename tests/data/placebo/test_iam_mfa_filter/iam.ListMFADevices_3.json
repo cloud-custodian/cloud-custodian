@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MFADevices": [
+            {
+                "UserName": "mandeep", 
+                "SerialNumber": "arn:aws:iam::644160558196:mfa/mandeep", 
+                "EnableDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 24
+                }
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "99bc8eae-4f53-11e6-a1fc-ad832f90b1d6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "99bc8eae-4f53-11e6-a1fc-ad832f90b1d6", 
+                "date": "Thu, 21 Jul 2016 14:58:36 GMT", 
+                "content-length": "528", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
