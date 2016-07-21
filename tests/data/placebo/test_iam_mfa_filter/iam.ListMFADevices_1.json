@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MFADevices": [], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "998eef51-4f53-11e6-8c6f-4db199007c25", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "998eef51-4f53-11e6-8c6f-4db199007c25", 
+                "date": "Thu, 21 Jul 2016 14:58:35 GMT", 
+                "content-length": "314", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
