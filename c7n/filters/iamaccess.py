@@ -32,6 +32,7 @@ References
 
 """
 import json
+import logging
 
 from c7n.filters import Filter
 from c7n.utils import get_account_id, local_session, type_schema
@@ -172,12 +173,35 @@ def check_cross_account(policy_text, allowed_accounts):
             # duplicate block from below, inline closure func
             # would remove, but slower, else move to class eval
             principal_ok = True
-            v = s['Condition']['ArnEquals']['aws:SourceArn']
-            v = isinstance(v, basestring) and (v,) or v
-            for arn in v:
-                aid = _account(arn)
-                if aid not in allowed_accounts:
-                    violations.append(s)
+
+            """
+            {u'Action': [u'SNS:Subscribe',
+             u'SNS:ListSubscriptionsByTopic',
+             u'SNS:DeleteTopic',
+             u'SNS:GetTopicAttributes',
+             u'SNS:Publish',
+             u'SNS:RemovePermission',
+             u'SNS:AddPermission',
+             u'SNS:Receive',
+             u'SNS:SetTopicAttributes'],
+u'Condition': {u'ArnEquals': {u'AWS:SourceArn': u'arn:aws:s3:::cmltest'}},
+ u'Effect': u'Allow',
+ u'Principal': {u'AWS': u'*'},
+ u'Resource': u'arn:aws:sns:us-east-1:111111143756:testS3',
+ u'Sid': u'__default_statement_ID'}
+            """
+            keys = ('aws:SourceArn', 'AWS:SourceArn')
+            for k in keys:
+                if k in s['Condition']['ArnEquals']:
+                    v = s['Condition']['ArnEquals'][k]
+            if v is None:
+                violations.append(s)
+            else:
+                v = isinstance(v, basestring) and (v,) or v
+                for arn in v:
+                    aid = _account(arn)
+                    if aid not in allowed_accounts:
+                        violations.append(s)
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
             v = s['Condition']['ArnLike']['aws:SourceArn']
