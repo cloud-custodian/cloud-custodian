@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import operator
 import random
 
@@ -133,10 +134,11 @@ class StateTransitionFilter(object):
     """
     valid_origin_states = ()
 
-    def filter_instance_state(self, instances):
+    def filter_instance_state(self, instances, states=None):
+        states = states or self.valid_origin_states
         orig_length = len(instances)
         results = [i for i in instances
-                   if i['State']['Name'] in self.valid_origin_states]
+                   if i['State']['Name'] in states]
         self.log.info("%s %d of %d instances" % (
             self.__class__.__name__, len(results), orig_length))
         return results
@@ -333,6 +335,74 @@ class Start(BaseAction, StateTransitionFilter):
             DryRun=self.manager.config.dryrun)
 
 
+@actions.register('resize')
+class Resize(BaseAction, StateTransitionFilter):
+    """Change an instance's size.
+
+    An instance can only be resized when its stopped, this action
+    can optionally restart an instance if needed to effect the instance
+    type change. Instances are always left in the run state they were
+    found in.
+
+    There are a few caveats to be aware of, instance resizing
+    needs to maintain compatibility for architecture, virtualization type
+    hvm/pv, and ebs optimization at minimum.
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+    """
+    valid_origin_states = ('running', 'stopped')
+
+    def process(self, resources):
+        stopped_instances = self.filter_instance_state(
+            resources, ('stopped',))
+        running_instances = self.filter_instance_state(
+            resources, ('running',))
+
+        if self.data.get('restart') and running_instances:
+            Stop({'terminate-ephemeral': False},
+                 self.manager).process(running_instances)
+            client = utils.local_session(
+                self.manager.session_factory).client('ec2')
+            waiter = client.get_waiter('instance_stopped')
+            try:
+                waiter.wait(
+                    InstanceIds=[r['InstanceId'] for r in running_instances])
+            except ClientError as e:
+                self.log.exception(
+                    "Exception stopping instances for resize:\n %s" % e)
+
+        for instance_set in utils.chunks(itertools.chain(
+                stopped_instances, running_instances), 20):
+            self.process_resource_set(instance_set)
+
+        if self.data.get('restart') and running_instances:
+            client.start_instances(
+                InstanceIds=[i['InstanceId'] for i in running_instances])
+        return list(itertools.chain(stopped_instances, running_instances))
+
+    def process_resource_set(self, instance_set):
+        type_map = self.data.get('type-map')
+        default_type = self.data.get('default')
+
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        for i in instance_set:
+            self.log.debug(
+                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
+            new_type = type_map.get(i['InstanceType'], default_type)
+            if new_type == i['InstanceType']:
+                continue
+            try:
+                client.modify_instance_attribute(
+                    InstanceId=i['InstanceId'],
+                    InstanceType={'Value': new_type})
+            except ClientError as e:
+                self.log.exception(
+                    "Exception resizing instance:%s new:%s old:%s \n %s" % (
+                        i['InstanceId'], new_type, i['InstanceType'], e))
+
+
 @actions.register('stop')
 class Stop(BaseAction, StateTransitionFilter):
     """Stop instances
@@ -365,10 +435,10 @@ class Stop(BaseAction, StateTransitionFilter):
                 client.terminate_instances,
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
-
             self._run_instances_op(
                 client.stop_instances,
                 [i['InstanceId'] for i in persistent])
+        return instances
 
     def _run_instances_op(self, op, instance_ids):
         while True:

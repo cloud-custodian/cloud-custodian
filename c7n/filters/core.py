@@ -220,7 +220,8 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize']},
+                'age', 'integer', 'expiration', 'normalize', 'size']},
+            'default': {'type': 'object'},
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
@@ -312,6 +313,11 @@ class ValueFilter(Filter):
                 v = int(value.strip())
             except ValueError:
                 v = 0
+        elif self.vtype == 'size':
+            try:
+                return sentinel, len(value)
+            except TypeError:
+                return sentinel, 0
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime):
                 sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
