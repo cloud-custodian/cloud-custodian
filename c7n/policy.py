@@ -19,7 +19,7 @@ import time
 
 from botocore.client import ClientError
 
-#from c7n.actions import EventAction
+from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory

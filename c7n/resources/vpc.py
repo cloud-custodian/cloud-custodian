@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter
+from c7n.filters import Filter, ValueFilter, DefaultVpcBase
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('vpc')
@@ -37,7 +37,18 @@ class SecurityGroup(QueryResourceManager):
     resource_type = 'aws.ec2.security-group'
 
 
-class SGPermission(ValueFilter):
+@SecurityGroup.filter_registry.register('default-vpc')
+class SGDefaultVpc(DefaultVpcBase):
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, resource, event=None):
+        if 'VpcId' not in resource:
+            return False
+        return self.match(resource['VpcId'])
+
+
+class SGPermission(Filter):
     """Base class for verifying security group permissions
 
     All attributes of a security group permission are available as
@@ -54,10 +65,6 @@ class SGPermission(ValueFilter):
       - type: ingress
         IpProtocol: -1
         FromPort: 445
-        IpRanges[].CidrIp:
-          value: 24
-           value_type: cidr_size
-          op: greater-than
     """
 
     attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
@@ -76,19 +83,19 @@ class SGPermission(ValueFilter):
             vf = ValueFilter(fv)
             vf.annotate = False
             self.vfilters.append(vf)
+        return super(SGPermission, self).process(resources, event)
 
     def __call__(self, resource):
         matched = []
         for p in resource[self.ip_permissions_key]:
             found = True
             for f in self.vfilters:
-                if not f(resource):
+                if not f(p):
                     found = False
                     break
             if not found:
                 continue
             matched.append(p)
-
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
             return True
@@ -98,19 +105,34 @@ class SGPermission(ValueFilter):
 class IPPermission(SGPermission):
 
     ip_permissions_key = "IpPermissions"
+    schema = {
+        'type': 'object',
+        #'additionalProperties': True,
+        'properties': {
+            'type': {'enum': ['ingress']}
+            },
+        'required': ['type']}
 
 
 @SecurityGroup.filter_registry.register('egress')
 class IPPermissionEgress(SGPermission):
 
     ip_permissions_key = "IpPermissionsEgress"
+    schema = {
+        'type': 'object',
+        #'additionalProperties': True,
+        'properties': {
+            'type': {'enum': ['egress']}
+            },
+        'required': ['type']}
 
 
 @SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermisssions(BaseAction):
 
-    def process(self, resources):
+    schema = type_schema('remove-permissions')
 
+    def process(self, resources):
         i_perms = self.data.get('ingress')
         e_perms = self.data.get('egress')
 
@@ -118,14 +140,17 @@ class RemovePermisssions(BaseAction):
         for r in resources:
             for label, perms in [('ingress', i_perms), ('egress', e_perms)]:
                 if perms == 'matched':
-                    groups = r.get('MatchedIpPermissions%s' % (
-                        label == 'ingress' and '' or 'Egress'), ())
+                    key = 'MatchedIpPermissions%s' % (
+                        label == 'egress' and 'Egress' or '')
+                    groups = r.get(key, ())
                 elif perms == 'all':
-                    groups = r['IpPermissions%s' % (
-                        label == 'ingress' and '' or 'Egress')]
+                    key = 'IpPermissions%s' % (
+                        label == 'egress' and 'Egress' or '')
+                    groups = r.get(key, ())
                 elif isinstance(perms, list):
                    groups = perms
-
+                else:
+                    continue
                 if not groups:
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
