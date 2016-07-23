@@ -700,21 +700,28 @@ class MarkForOp(Tag):
         'mark-for-op',
         op={'enum': ['suspend', 'resume', 'delete']},
         key={'type': 'string'},
+        tag={'type': 'string'},
+        message={'type', 'string'},
         days={'type': 'number', 'minimum': 0})
 
-    def process(self, asgs):
-        msg_tmpl = self.data.get(
-            'msg',
-            'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
+    default_template = (
+        'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
+    def process(self, asgs):
+        msg_tmpl = self.data.get('message', self.default_template)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
         date = self.data.get('days', 4)
 
         n = datetime.now(tz=tzutc())
         stop_date = n + timedelta(days=date)
-        msg = msg_tmpl.format(
-            op=op, stop_date=stop_date.strftime('%Y/%m/%d'))
+        try:
+            msg = msg_tmpl.format(
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+        except Exception:
+            self.log.warning("invalid template %s" % msg_tmpl)
+            msg = self.default_template.format(
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
