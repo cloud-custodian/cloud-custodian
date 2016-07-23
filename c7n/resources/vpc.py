@@ -128,7 +128,7 @@ class IPPermissionEgress(SGPermission):
 
 
 @SecurityGroup.action_registry.register('remove-permissions')
-class RemovePermisssions(BaseAction):
+class RemovePermissions(BaseAction):
 
     schema = type_schema('remove-permissions')
 
@@ -148,7 +148,7 @@ class RemovePermisssions(BaseAction):
                         label == 'egress' and 'Egress' or '')
                     groups = r.get(key, ())
                 elif isinstance(perms, list):
-                   groups = perms
+                    groups = perms
                 else:
                     continue
                 if not groups:
@@ -177,16 +177,17 @@ class NetworkInterface(QueryResourceManager):
 @NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnet(ValueFilter):
 
+    schema = type_schema('subnet', rinherits=ValueFilter.schema)
     annotate = False
 
-    def process_resources(self, resources, event=None):
+    def process(self, resources, event=None):
         subnets = set([r['SubnetId'] for r in resources])
         manager = Subnet(self.manager.ctx, {})
         self.subnets = {s['SubnetId']: s for s
                         in manager.get_resources(list(subnets))}
-        return super(InterfaceSubnet, self).process_resources(resources, event)
+        return super(InterfaceSubnet, self).process(resources, event)
 
-    def process(self, resource):
+    def __call__(self, resource):
         return self.match(self.subnets[resource['SubnetId']])
 
 
@@ -194,22 +195,25 @@ class InterfaceSubnet(ValueFilter):
 class InterfaceGroup(ValueFilter):
 
     annotate = False
+    schema = type_schema('group', rinherits=ValueFilter.schema)
 
-    def process_resources(self, resources, event=None):
+    def process(self, resources, event=None):
         groups = set()
         for r in resources:
-            for g in r.get('Groups', ()):
+            for g in r['Groups']:
                 groups.add(g['GroupId'])
         manager = SecurityGroup(self.manager.ctx, {})
         self.groups = {s['GroupId']: s for s
-                        in manager.get_resources(list(groups))}
-        return super(InterfaceGroup, self).process_resources(resources, event)
+                       in manager.resources()}
+        # todo, something odd here
+        #in manager.get_resources(sorted(list(groups)))}
+        return super(InterfaceGroup, self).process(resources, event)
 
-    def process(self, resource):
+    def __call__(self, resource):
         matched = []
         for g in resource.get('Groups', ()):
-            if self.match(g):
-                matched.append(g)
+            if self.match(self.groups[g['GroupId']]):
+                matched.append(g['GroupId'])
         if matched:
             resource['MatchedSecurityGroups'] = matched
             return True
@@ -217,10 +221,54 @@ class InterfaceGroup(ValueFilter):
 
 @NetworkInterface.action_registry.register('remove-groups')
 class InterfaceRemoveGroups(BaseAction):
+    """Remove security groups from an interface.
+
+    Can target either physical groups as a list of group ids or
+    symbolic groups like 'matched' or 'all'. 'matched' uses
+    the annotations of the 'group' interface filter.
+
+    Note an interface always gets at least one security group, so
+    we also allow specification of an isolation/quarantine group
+    that can be specified if there would otherwise be no groups.
+    """
+
+    schema = type_schema(
+        'remove-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
-        group_ids = self.data.get('groups')
-        quarantine_group = self.data.get('quaratine_group')
+        target_group_ids = self.data.get('groups')
+        isolation_group = self.data.get('isolation-group')
+
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for r in resources:
+            rgroups = [g['GroupId'] for g in r['Groups']]
+            if target_group_ids == 'matched':
+                group_ids = r.get('MatchedSecurityGroups', ())
+            elif target_group_ids == 'all':
+                group_ids = rgroups
+            elif isinstance(target_group_ids, list):
+                group_ids = target_group_ids
+            else:
+                continue
+
+            if not group_ids:
+                continue
+
+            for g in group_ids:
+                if g in rgroups:
+                    rgroups.remove(g)
+
+            if not rgroups:
+                rgroups.append(isolation_group)
+
+            client.modify_network_interface_attribute(
+                NetworkInterfaceId=r['NetworkInterfaceId'],
+                Groups=rgroups)
 
 
 @resources.register('route-table')
