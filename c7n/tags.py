@@ -370,6 +370,7 @@ class TagDelayedAction(Action):
     schema = utils.type_schema(
         'mark-for-op',
         tag={'type': 'string'},
+        msg_template={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'enum': ACTIONS})
 
@@ -383,7 +384,7 @@ class TagDelayedAction(Action):
             return
 
         msg_tmpl = self.data.get(
-            'msg',
+            'msg_template',
             'Resource does not meet policy: {op}@{action_date}')
 
         op = self.data.get('op', 'stop')

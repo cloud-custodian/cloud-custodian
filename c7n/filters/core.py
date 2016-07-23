@@ -20,6 +20,7 @@ import fnmatch
 import logging
 import operator
 import re
+import time
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -87,6 +88,7 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
+        self.register('delay', Delay)
 
     def parse(self, data, manager):
         results = []
@@ -186,6 +188,22 @@ class And(Filter):
         return True
 
 
+class Delay(Filter):
+
+    schema = {'type': 'object', 'additionalProperties': False,
+              'required': ['type', 'seconds'],
+              'properties': {
+                  'type': {'enum': ['delay']},
+                  'seconds': {'type': 'integer'}}}
+
+    def process(self, resources, event=None):
+        if not event:
+            return
+        seconds = self.data.get('seconds')
+        if seconds:
+            time.sleep(seconds)
+
+
 class ValueFilter(Filter):
     """Generic value filter using jmespath
     """
@@ -201,13 +219,16 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
-            'value_type': {'enum': ['age', 'integer', 'expiration']},
+            'value_type': {'enum': [
+                'age', 'integer', 'expiration', 'normalize']},
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
                 {'type': 'boolean'},
                 {'type': 'number'}]},
             'op': {'enum': OPERATORS.keys()}}}
+
+    annotate = True
 
     def validate(self):
         if len(self.data) == 1:
@@ -233,7 +254,7 @@ class ValueFilter(Filter):
 
     def __call__(self, i):
         matched = self.match(i)
-        if matched:
+        if matched and self.annotate:
             set_annotation(i, ANNOTATION_KEY, self.k)
         return matched
 
@@ -284,7 +305,14 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value):
-        if self.vtype == 'age':
+        if self.vtype == 'normalize':
+            return sentinel, value.strip().lower()
+        elif self.vtype == 'integer':
+            try:
+                v = int(value.strip())
+            except ValueError:
+                v = 0
+        elif self.vtype == 'age':
             if not isinstance(sentinel, datetime):
                 sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
 

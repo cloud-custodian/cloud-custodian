@@ -161,7 +161,6 @@ class DefaultVpc(Filter):
             vpcs = [v['VpcId'] for v
                     in client.describe_vpcs(VpcIds=[vpc_id])['Vpcs']
                     if v['IsDefault']]
-            self.vpcs.add(vpc_id)
             if not vpcs:
                 return []
             self.default_vpc = vpcs.pop()

@@ -435,7 +435,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
         statements = p.get('Statement', [])
         found = False
         for s in list(statements):
-            if s['Sid'] == 'RequireEncryptedPutObject':
+            if s['Sid'] == encryption_sid:
                 log.debug("Bucket:%s Found extant encrypt policy", b['Name'])
                 if s != encryption_statement:
                     log.info(
@@ -446,7 +446,6 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
         session = self.manager.session_factory()
         s3 = bucket_client(session, b)
-
         statements.append(encryption_statement)
         p['Statement'] = statements
         log.info('Bucket:%s attached encryption policy' % b['Name'])

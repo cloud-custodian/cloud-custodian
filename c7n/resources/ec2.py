@@ -420,12 +420,17 @@ class Terminate(BaseAction, StateTransitionFilter):
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
-            self._run_api(
-                client.modify_instance_attribute,
-                InstanceId=i['InstanceId'],
-                Attribute='disableApiTermination',
-                Value='false',
-                DryRun=self.manager.config.dryrun)
+            try:
+                self._run_api(
+                    client.modify_instance_attribute,
+                    InstanceId=i['InstanceId'],
+                    Attribute='disableApiTermination',
+                    Value='false',
+                    DryRun=self.manager.config.dryrun)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    return
+                raise
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
