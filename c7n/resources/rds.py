@@ -114,10 +114,10 @@ class RDS(QueryResourceManager):
         return self._arn_generator
 
     def augment(self, resources):
-        _rds_tags(
+        filter(None, _rds_tags(
             self.get_model(),
             resources, self.session_factory, self.executor_factory,
-            self.arn_generator)
+            self.arn_generator))
         return resources
 
 
@@ -128,13 +128,17 @@ def _rds_tags(
     def process_tags(db):
         client = local_session(session_factory).client('rds')
         arn = arn_generator.generate(db[model.id])
-        tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
+        try:
+            tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
+        except ClientError as e:
+            if e.response['Error']['Code'] == "DBInstanceNotFound":
+                return None
         db['Tags'] = tag_list or []
         return db
 
     # Rds maintains a low api call limit, so this can take some time :-(
     with executor_factory(max_workers=1) as w:
-        list(w.map(process_tags, dbs))
+        return list(w.map(process_tags, dbs))
 
 
 @filters.register('default-vpc')

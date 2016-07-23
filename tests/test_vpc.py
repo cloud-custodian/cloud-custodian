@@ -13,7 +13,6 @@ class NetworkInterfaceTest(BaseTest):
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
-        self.addCleanup(time.sleep, 3)
 
         sub_id = client.create_subnet(
             VpcId=vpc_id, CidrBlock="10.4.8.0/24")[
@@ -75,7 +74,6 @@ class SecurityGroupTest(BaseTest):
             VpcId=vpc_id,
             Description="for apps")['GroupId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
-        #self.addCleanup(time.sleep, 3)
         client.authorize_security_group_ingress(
             GroupId=sg_id,
             IpProtocol='tcp',

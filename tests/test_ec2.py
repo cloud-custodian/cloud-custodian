@@ -15,7 +15,7 @@ import unittest
 
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
-from c7n import tags
+from c7n import tags, utils
 
 from .common import BaseTest
 
@@ -142,6 +142,66 @@ class TestVolumeFilter(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 0)
+
+
+class TestResizeInstance(BaseTest):
+
+    def test_ec2_resize(self):
+        # preconditions - three instances (2 m4.4xlarge, 1 m4.1xlarge)
+        # one of the instances stopped
+        session_factory = self.replay_flight_data('test_ec2_resize')
+        policy = self.load_policy({
+            'name': 'ec2-resize',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'value',
+                 'key': 'State.Name',
+                 'value': ['running', 'stopped'],
+                 'op': 'in'},
+                {'type': 'value',
+                 'key': 'InstanceType',
+                 'value': ['m4.2xlarge', 'm4.4xlarge'],
+                 'op': 'in'},
+                ],
+            'actions': [
+                {'type': 'resize',
+                 'restart': True,
+                 'default': 'm4.large',
+                 'type-map': {
+                     'm4.4xlarge': 'm4.2xlarge'}}]
+            }, session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
+        stopped, running = [], []
+        for i in resources:
+            if i['State']['Name'] == 'running':
+                running.append(i['InstanceId'])
+            if i['State']['Name'] == 'stopped':
+                stopped.append(i['InstanceId'])
+
+        instances = utils.query_instances(
+            session_factory(),
+            InstanceIds=[r['InstanceId'] for r in resources])
+
+        cur_stopped, cur_running = [], []
+        for i in instances:
+            if i['State']['Name'] == 'running':
+                cur_running.append(i['InstanceId'])
+            if i['State']['Name'] == 'stopped':
+                cur_stopped.append(i['InstanceId'])
+
+        cur_running.sort()
+        running.sort()
+
+        self.assertEqual(cur_stopped, stopped)
+        self.assertEqual(cur_running, running)
+        instance_types = [i['InstanceType'] for i in instances]
+        instance_types.sort()
+        self.assertEqual(
+            instance_types,
+            list(sorted(['m4.large', 'm4.2xlarge', 'm4.2xlarge'])))
 
 
 class TestImageAgeFilter(BaseTest):
