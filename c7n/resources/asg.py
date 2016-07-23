@@ -705,7 +705,7 @@ class MarkForOp(Tag):
         days={'type': 'number', 'minimum': 0})
 
     default_template = (
-        'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
+        'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
     def process(self, asgs):
         msg_tmpl = self.data.get('message', self.default_template)
@@ -717,11 +717,11 @@ class MarkForOp(Tag):
         stop_date = n + timedelta(days=date)
         try:
             msg = msg_tmpl.format(
-                op=op, stop_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
         except Exception:
             self.log.warning("invalid template %s" % msg_tmpl)
             msg = self.default_template.format(
-                op=op, stop_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
