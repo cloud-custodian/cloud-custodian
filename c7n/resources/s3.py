@@ -130,11 +130,11 @@ def assemble_bucket(item):
             if select is not None and select in v:
                 v = v[select]
         except (ssl.SSLError, SSLError) as e:
-            # Proxy issues?
+            # Proxy issues? i assume
             log.warning("Bucket ssl error %s: %s %s",
                         b['Name'], b.get('Location', 'unknown'),
                         e)
-            return None
+            continue
         except ClientError as e:
             code =  e.response['Error']['Code']
             if code.startswith("NoSuch") or "NotFound" in code:
