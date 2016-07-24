@@ -137,7 +137,10 @@ def check_cross_account(policy_text, allowed_accounts):
             # Default SNS Policy does this
             if 'AWS:SourceOwner' in s['Condition']['StringEquals']:
                 so = s['Condition']['StringEquals']['AWS:SourceOwner']
-                if so in allowed_accounts:
+                if not isinstance(so, list):
+                    so = [so]
+                so = [pso for pso in so if pso not in allowed_accounts]
+                if not so:
                     principal_ok = True
 
             # Default keys in kms do this
