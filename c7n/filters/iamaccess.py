@@ -177,22 +177,6 @@ def check_cross_account(policy_text, allowed_accounts):
             # would remove, but slower, else move to class eval
             principal_ok = True
 
-            """
-            {u'Action': [u'SNS:Subscribe',
-             u'SNS:ListSubscriptionsByTopic',
-             u'SNS:DeleteTopic',
-             u'SNS:GetTopicAttributes',
-             u'SNS:Publish',
-             u'SNS:RemovePermission',
-             u'SNS:AddPermission',
-             u'SNS:Receive',
-             u'SNS:SetTopicAttributes'],
-u'Condition': {u'ArnEquals': {u'AWS:SourceArn': u'arn:aws:s3:::cmltest'}},
- u'Effect': u'Allow',
- u'Principal': {u'AWS': u'*'},
- u'Resource': u'arn:aws:sns:us-east-1:111111143756:testS3',
- u'Sid': u'__default_statement_ID'}
-            """
             keys = ('aws:SourceArn', 'AWS:SourceArn')
             for k in keys:
                 if k in s['Condition']['ArnEquals']:
