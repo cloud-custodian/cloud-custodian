@@ -171,6 +171,7 @@ class Policy(object):
                 action.process(resources, event)
             else:
                 action.process(resources)
+        return resources
 
     def provision(self):
         """Provision policy as a lambda function."""

@@ -52,10 +52,11 @@ import time
 import ssl
 
 from c7n import executor
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.tags import Tag
 from c7n.utils import chunks, local_session, set_annotation, type_schema
 
 """
@@ -68,9 +69,9 @@ log = logging.getLogger('custodian.s3')
 
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
+actions.register('auto-tag-user', AutoTagUser)
 
-
-MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
+MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
 
 @resources.register('s3')
@@ -435,7 +436,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
         statements = p.get('Statement', [])
         found = False
         for s in list(statements):
-            if s['Sid'] == 'RequireEncryptedPutObject':
+            if s['Sid'] == encryption_sid:
                 log.debug("Bucket:%s Found extant encrypt policy", b['Name'])
                 if s != encryption_statement:
                     log.info(
@@ -446,7 +447,6 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
         session = self.manager.session_factory()
         s3 = bucket_client(session, b)
-
         statements.append(encryption_statement)
         p['Statement'] = statements
         log.info('Bucket:%s attached encryption policy' % b['Name'])
@@ -545,8 +545,21 @@ class ScanBucket(BucketActionBase):
     def process(self, buckets):
         results = []
         with self.executor_factory(max_workers=3) as w:
-            results.extend(
-                f for f in w.map(self, buckets) if f)
+            futures = {}
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error on bucket:%s region:%s policy:% error: %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        self.manager.data.get('name'), f.exception())
+                    self.denied_buckets.append(b['Name'])
+                    continue
+                result = f.result()
+                if result:
+                    results.append(result)
+
         if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
@@ -992,3 +1005,25 @@ class DeleteGlobalGrants(BucketActionBase):
             Bucket=b['Name'],
             AccessControlPolicy={'Owner': acl['Owner'], 'Grants': new_grants})
         return b
+
+
+@actions.register('tag')
+class BucketTag(Tag):
+
+    def process_resource_set(self, resource_set, tags):
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resource_set:
+            # all the tag marshalling back and forth is a bit gross :-(
+            new_tags = {t['Key']: t['Value'] for t in tags}
+            for t in r.get('Tags', ()):
+                if t['Key'] not in new_tags:
+                    new_tags[t['Key']] = t['Value']
+            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+            try:
+                client.put_bucket_tagging(
+                    Bucket=r['Name'], Tagging={'TagSet': tag_set})
+            except ClientError as e:
+                raise
+                self.log.exception(
+                    "Error while tagging bucket %s err: %s" % (
+                        r['Name'], e))
