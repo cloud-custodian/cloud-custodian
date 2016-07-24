@@ -65,7 +65,7 @@ import re
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -81,6 +81,7 @@ actions = ActionRegistry('rds.actions')
 
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('rds')
