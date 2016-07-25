@@ -551,7 +551,7 @@ class ScanBucket(BucketActionBase):
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Error on bucket:%s region:%s policy:% error: %s",
+                        "Error on bucket:%s region:%s policy:%s error: %s",
                         b['Name'], b.get('Location', 'unknown'),
                         self.manager.data.get('name'), f.exception())
                     self.denied_buckets.append(b['Name'])
@@ -1001,9 +1001,14 @@ class DeleteGlobalGrants(BucketActionBase):
         log.info({'Owner': acl['Owner'], 'Grants': new_grants})
 
         c = bucket_client(self.manager.session_factory(), b)
-        c.put_bucket_acl(
-            Bucket=b['Name'],
-            AccessControlPolicy={'Owner': acl['Owner'], 'Grants': new_grants})
+        try:
+            c.put_bucket_acl(
+                Bucket=b['Name'],
+                AccessControlPolicy={
+                    'Owner': acl['Owner'], 'Grants': new_grants})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
         return b
 
 
