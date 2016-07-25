@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-tagger", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "tREfReiNXJRMH6GOD5FrApdu802yEFwu4NLCl8WViaKxL2rpQZUflo1Jv9GJTPsf", 
+            "RequestId": "4418C7A2DB1A52C3", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "tREfReiNXJRMH6GOD5FrApdu802yEFwu4NLCl8WViaKxL2rpQZUflo1Jv9GJTPsf", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "4418C7A2DB1A52C3", 
+                "date": "Sun, 24 Jul 2016 17:36:56 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

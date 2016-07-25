@@ -143,6 +143,51 @@ class TestRegexValue(unittest.TestCase):
             False)
 
 
+class TestValueTypes(BaseFilterTest):
+
+    def test_age(self):
+        now = datetime.now(tz=tz.tzutc())
+        three_months = now - timedelta(90)
+        two_months = now - timedelta(60)
+        one_month = now - timedelta(30)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        fdata = {
+            'type': 'value',
+            'key': 'LaunchTime',
+            'op': 'less-than',
+            'value_type': 'age',
+            'value': 32}
+
+        self.assertFilter(fdata, i(three_months), False)
+        self.assertFilter(fdata, i(two_months), False)
+        self.assertFilter(fdata, i(one_month), True)
+        self.assertFilter(fdata, i(now), True)        
+        
+    def test_expiration(self):
+
+        now = datetime.now(tz=tz.tzutc())
+        three_months = now + timedelta(90)
+        two_months = now + timedelta(60)
+        one_month = now + timedelta(30)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        fdata = {
+            'type': 'value',
+            'key': 'LaunchTime',
+            'op': 'less-than',
+            'value_type': 'expiration',
+            'value': 61}
+
+        self.assertFilter(fdata, i(three_months), False)
+        self.assertFilter(fdata, i(two_months), True)
+        self.assertFilter(fdata, i(now), True)        
+
+
 class TestInstanceAge(BaseFilterTest):
 
     def test_filter_instance_age(self):

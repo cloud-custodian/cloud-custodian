@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "for apps", 
+                "IpPermissions": [], 
+                "GroupName": "web-tier", 
+                "VpcId": "vpc-5d62f03a", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-6bbeb710"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "4bc82b8c-0de6-4bc3-8641-344358dc2d5c", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 23 Jul 2016 11:52:01 GMT"
+            }
+        }
+    }
+}

@@ -32,6 +32,7 @@ References
 
 """
 import json
+import logging
 
 from c7n.filters import Filter
 from c7n.utils import get_account_id, local_session, type_schema
@@ -136,7 +137,10 @@ def check_cross_account(policy_text, allowed_accounts):
             # Default SNS Policy does this
             if 'AWS:SourceOwner' in s['Condition']['StringEquals']:
                 so = s['Condition']['StringEquals']['AWS:SourceOwner']
-                if so in allowed_accounts:
+                if not isinstance(so, list):
+                    so = [so]
+                so = [pso for pso in so if pso not in allowed_accounts]
+                if not so:
                     principal_ok = True
 
             # Default keys in kms do this
@@ -172,12 +176,19 @@ def check_cross_account(policy_text, allowed_accounts):
             # duplicate block from below, inline closure func
             # would remove, but slower, else move to class eval
             principal_ok = True
-            v = s['Condition']['ArnEquals']['aws:SourceArn']
-            v = isinstance(v, basestring) and (v,) or v
-            for arn in v:
-                aid = _account(arn)
-                if aid not in allowed_accounts:
-                    violations.append(s)
+
+            keys = ('aws:SourceArn', 'AWS:SourceArn')
+            for k in keys:
+                if k in s['Condition']['ArnEquals']:
+                    v = s['Condition']['ArnEquals'][k]
+            if v is None:
+                violations.append(s)
+            else:
+                v = isinstance(v, basestring) and (v,) or v
+                for arn in v:
+                    aid = _account(arn)
+                    if aid not in allowed_accounts:
+                        violations.append(s)
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
             v = s['Condition']['ArnLike']['aws:SourceArn']

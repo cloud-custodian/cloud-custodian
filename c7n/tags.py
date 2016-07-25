@@ -253,6 +253,7 @@ class Tag(Action):
 
     schema = utils.type_schema(
         'tag', aliases=('mark',),
+        tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
         )
@@ -370,10 +371,13 @@ class TagDelayedAction(Action):
     schema = utils.type_schema(
         'mark-for-op',
         tag={'type': 'string'},
+        msg={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'enum': ACTIONS})
 
     batch_size = 200
+
+    default_template = 'Resource does not meet policy: {op}@{action_date}'
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -382,9 +386,7 @@ class TagDelayedAction(Action):
         if not len(resources):
             return
 
-        msg_tmpl = self.data.get(
-            'msg',
-            'Resource does not meet policy: {op}@{action_date}')
+        msg_tmpl = self.data.get('msg', self.default_template)
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)

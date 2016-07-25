@@ -19,7 +19,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import Filter, FilterRegistry, FilterValidationError
 from c7n import tags
 from c7n.manager import resources
@@ -31,7 +31,7 @@ log = logging.getLogger('custodian.elb')
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
 
-
+actions.register('auto-tag-user', AutoTagUser)
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
 
