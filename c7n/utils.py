@@ -131,6 +131,19 @@ def chunks(iterable, size=50):
         yield batch
 
 
+def camelResource(obj):
+    """Some sources from apis return lowerCased where as describe calls
+
+    always return TitleCase, this function turns the former to the later
+    """
+
+    for k in list(obj.keys()):
+        v = obj.pop(k)
+        obj[k.title()] = v
+        if isinstance(v, dict):
+            camelResource(v)
+
+
 def get_account_id(session):
     iam = session.client('iam')
     return iam.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]

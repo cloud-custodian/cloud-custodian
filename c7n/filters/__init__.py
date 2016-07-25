@@ -11,3 +11,4 @@ from .core import (
     EventFilter)
 from .iamaccess import CrossAccountAccessFilter
 from .metrics import MetricsFilter
+from .vpc import DefaultVpcBase

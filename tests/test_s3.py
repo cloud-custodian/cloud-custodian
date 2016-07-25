@@ -14,14 +14,13 @@
 import json
 import shutil
 import tempfile
-import time
 from unittest import TestCase
 
 from botocore.exceptions import ClientError
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
-from c7n.mu import LambdaManager, PolicyLambda
+from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 
 from common import BaseTest, event_data
@@ -85,6 +84,47 @@ def generateBucketContents(s3, bucket, contents=None):
             Body=v,
             ContentLength=len(v),
             ContentType='text/plain')
+
+
+class BucketTag(BaseTest):
+
+    def test_tag_bucket(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        session_factory = self.replay_flight_data('test_s3_tag')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-tagger'
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        client.put_bucket_tagging(
+            Bucket=bname,
+            Tagging={'TagSet': [
+                {'Key': 'rudolph', 'Value': 'reindeer'},
+                {'Key': 'platform', 'Value': 'lxwee'}]})
+
+        p = self.load_policy({
+            'name': 's3-tagger',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [
+                {'type': 'tag', 'tags': {
+                    'borrowed': 'new', 'platform': 'serverless'}}]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = {t['Key']: t['Value'] for t in client.get_bucket_tagging(
+            Bucket=bname)['TagSet']}
+        self.assertEqual(
+            {'rudolph': 'reindeer',
+             'platform': 'serverless',
+             'borrowed': 'new'},
+            tags)
 
 
 class S3Test(BaseTest):
