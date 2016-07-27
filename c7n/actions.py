@@ -110,6 +110,7 @@ class LambdaInvoke(EventAction):
     """ Invoke an arbitrary lambda
 
     serialized invocation parameters
+
      - resources / collection of resources
      - policy / policy that is invoke the lambda
      - action / action that is invoking the lambda

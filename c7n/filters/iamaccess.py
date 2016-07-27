@@ -111,7 +111,6 @@ def check_cross_account(policy_text, allowed_accounts):
 
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
-
         # At this point principal is required?
         p = (
             isinstance(s['Principal'], basestring) and s['Principal']
@@ -121,6 +120,8 @@ def check_cross_account(policy_text, allowed_accounts):
         for pid in p:
             if pid == '*':
                 principal_ok = False
+            elif pid.startswith('arn:aws:iam::cloudfront:user'):
+                continue
             else:
                 account_id = _account(pid)
                 if account_id not in allowed_accounts:
@@ -162,8 +163,13 @@ def check_cross_account(policy_text, allowed_accounts):
 
         if 'StringLike' in s['Condition']:
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition']['StringLike'].keys()[0] in (
-                    "aws:sourceVpce", "aws:sourceVpce"):
+            if s['Condition'][
+                    'StringLike'].keys()[0].lower() == "aws:sourcevpce":
+                principal_ok = True
+
+        if 'ForAnyValue:StringLike' in s['Condition']:
+            if s['Condition']['ForAnyValue:StringLike'].keys()[
+                    0].lower() == 'aws:sourcevpce':
                 principal_ok = True
 
         if 'IpAddress' in s['Condition']:
