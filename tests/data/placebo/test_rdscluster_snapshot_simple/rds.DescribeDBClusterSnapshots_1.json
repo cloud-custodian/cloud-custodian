@@ -1,0 +1,90 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshots": [
+            {
+                "Engine": "aurora",
+                "SnapshotCreateTime": {
+                    "hour": 11,
+                    "__class__": "datetime",
+                    "month": 12,
+                    "second": 35,
+                    "microsecond": 118000,
+                    "year": 2015,
+                    "day": 19,
+                    "minute": 6
+                },
+                "VpcId": "vpc-1",
+                "DBClusterIdentifier": "aaa",
+                "MasterUsername": "root",
+                "LicenseModel": "aurora",
+                "Status": "available",
+                "PercentProgress": 100,
+                "DBClusterSnapshotIdentifier": "aaa-final-snapshot",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+                "ClusterCreateTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 12,
+                    "second": 52,
+                    "microsecond": 866000,
+                    "year": 2015,
+                    "day": 19,
+                    "minute": 38
+                },
+                "StorageEncrypted": true,
+                "AllocatedStorage": 1,
+                "SnapshotType": "manual",
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1e"
+                ],
+                "Port": 0
+            },
+            {
+                "Engine": "aurora",
+                "SnapshotCreateTime": {
+                    "hour": 13,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 42,
+                    "microsecond": 566000,
+                    "year": 2016,
+                    "day": 4,
+                    "minute": 51
+                },
+                "VpcId": "vpc-2",
+                "DBClusterIdentifier": "bbb",
+                "MasterUsername": "root",
+                "LicenseModel": "aurora",
+                "Status": "available",
+                "PercentProgress": 100,
+                "DBClusterSnapshotIdentifier": "bbb-final-snapshot",
+                "ClusterCreateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 11,
+                    "second": 0,
+                    "microsecond": 549000,
+                    "year": 2015,
+                    "day": 20,
+                    "minute": 46
+                },
+                "StorageEncrypted": false, 
+                "AllocatedStorage": 1,
+                "SnapshotType": "manual",
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1e"
+                ],
+                "Port": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "ea909505-55a4-11e6-8ef5-b3205bcebfaa"
+        }
+    }
+}
