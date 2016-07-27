@@ -451,9 +451,17 @@ class EncryptionRequiredPolicy(BucketActionBase):
         p['Statement'] = statements
         log.info('Bucket:%s attached encryption policy' % b['Name'])
 
-        s3.put_bucket_policy(
-            Bucket=b['Name'],
-            Policy=json.dumps(p))
+        try:
+            s3.put_bucket_policy(
+                Bucket=b['Name'],
+                Policy=json.dumps(p))
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
+            self.log.exception(
+                "Error on bucket:%s putting policy\n%s error:%s",
+                json.dumps(indent=2), e)
+            raise
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
 
