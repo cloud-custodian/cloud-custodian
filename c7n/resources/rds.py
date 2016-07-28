@@ -74,6 +74,8 @@ from c7n import tags
 from c7n.utils import (
     local_session, type_schema, get_account_id, chunks, generate_arn)
 
+from datetime import datetime
+
 from skew.resources.aws import rds
 
 log = logging.getLogger('custodian.rds')
@@ -274,15 +276,17 @@ class Delete(BaseAction):
 
         # Concurrency feels like over kill here.
         client = local_session(self.manager.session_factory).client('rds')
-
+        now = datetime.now()
         for rdb in resources:
             params = dict(
                 DBInstanceIdentifier=rdb['DBInstanceIdentifier'])
             if self.skip:
                 params['SkipFinalSnapshot'] = True
             else:
-                params[
-                    'FinalDBSnapshotIdentifier'] = rdb['DBInstanceIdentifier']
+                params['FinalDBSnapshotIdentifier'] = "%s-%s" % (
+                        now.strftime("%Y-%m-%d"),
+                        rdb['DBInstanceIdentifier']
+                        )
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
