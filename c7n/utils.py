@@ -214,3 +214,18 @@ def parse_s3(s3_path):
     else:
         key_prefix = s3_path[s3_path.find('/', 5):]
     return s3_path, bucket, key_prefix
+
+
+def generate_arn(
+        service, resource, partition='aws',
+        region=None, account_id=None, resource_type=None, separator='/'):
+    """Generate an Amazon Resource Name.
+    See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
+    """
+    arn = 'arn:%s:%s:%s:%s:' % (
+        partition, service, region if region else '', account_id if account_id else '')
+    if resource_type:
+        arn = arn + '%s%s%s' % (resource_type, separator, resource)
+    else:
+        arn = arn + resource
+    return arn

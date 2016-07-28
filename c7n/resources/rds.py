@@ -59,6 +59,7 @@ Todo/Notes
 
 
 """
+import functools
 import logging
 import re
 
@@ -70,7 +71,8 @@ from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
-from c7n.utils import local_session, type_schema, get_account_id, chunks
+from c7n.utils import (
+    local_session, type_schema, get_account_id, chunks, generate_arn)
 
 from skew.resources.aws import rds
 
@@ -94,7 +96,7 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _arn_generator = _account_id = None
+    _generate_arn = _account_id = None
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
@@ -107,33 +109,35 @@ class RDS(QueryResourceManager):
         return self._account_id
 
     @property
-    def arn_generator(self):
-        if self._arn_generator is None:
-            self._arn_generator = DBInstanceARNGenerator(
-                self.config.region,
-                self.account_id)
-        return self._arn_generator
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds', region=self.config.region,
+                account_id=self.account_id, resource_type='db', separator=':')
+        return self._generate_arn
 
     def augment(self, resources):
         filter(None, _rds_tags(
             self.get_model(),
             resources, self.session_factory, self.executor_factory,
-            self.arn_generator))
+            self.generate_arn))
         return resources
 
 
 def _rds_tags(
-        model, dbs, session_factory, executor_factory, arn_generator):
+        model, dbs, session_factory, executor_factory, generate_arn):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        arn = arn_generator.generate(db[model.id])
+        arn = generate_arn(db[model.id])
+        tag_list = None
         try:
             tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
         except ClientError as e:
-            if e.response['Error']['Code'] == "DBInstanceNotFound":
-                return None
+            if e.response['Error']['Code'] not in ['DBInstanceNotFound']:
+                log.warning("Exception getting rds tags  \n %s" % (e))
+            return None
         db['Tags'] = tag_list or []
         return db
 
@@ -188,7 +192,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for r in resources:
-            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
+            arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -224,7 +228,7 @@ class Tag(tags.Tag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for r in resources:
-            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
+            arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -239,9 +243,19 @@ class RemoveTag(tags.RemoveTag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for r in resources:
-            arn = self.manager.arn_generator.generate(r['DBInstanceIdentifier'])
+            arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
+
+
+@actions.register('tag-trim')
+class TagTrim(tags.TagTrim):
+
+    def process_tag_removal(self, resource, candidates):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
+        client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
 @actions.register('delete')
@@ -443,30 +457,3 @@ class RDSSnapshotDelete(BaseAction):
                     DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
             except ClientError as e:
                 raise
-
-
-class ARNGenerator(object):
-    """Base class for RDS ARN generators.
-    """
-
-    def __init__(self, region, account_id, resource_type):
-        self._region = region
-        self._account_id = account_id
-        self._resource_type = resource_type
-
-    def generate(self, name):
-        """Generates an Amazon Resource Name for the specified resource.
-
-        See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.html
-        """
-        arn = 'arn:aws:rds:%s:%s:%s:%s' % (
-            self._region, self._account_id, self._resource_type, name)
-        return arn
-
-
-class DBInstanceARNGenerator(ARNGenerator):
-    """RDS DB instance ARN generator.
-    """
-
-    def __init__(self, region, account_id):
-        super(DBInstanceARNGenerator, self).__init__(region, account_id, 'db')
