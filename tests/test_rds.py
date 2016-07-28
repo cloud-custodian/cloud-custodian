@@ -42,6 +42,19 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_tag_trim(self):
+        session_factory = self.replay_flight_data('test_rds_tag_trim')
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [
+                {'tag:Platform': 'postgres'}],
+            'actions': [
+                {'type': 'tag-trim', 'preserve': ['Name', 'Owner']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_tag_and_remove(self):
         self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_rds_tag_and_remove')
@@ -58,7 +71,7 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        arn = p.resource_manager.arn_generator.generate(
+        arn = p.resource_manager.generate_arn(
             resources[0]['DBInstanceIdentifier'])
 
         tags = client.list_tags_for_resource(ResourceName=arn)
