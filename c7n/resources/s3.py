@@ -460,7 +460,8 @@ class EncryptionRequiredPolicy(BucketActionBase):
                 return
             self.log.exception(
                 "Error on bucket:%s putting policy\n%s error:%s",
-                json.dumps(indent=2), e)
+                b['Name'],
+                json.dumps(statements, indent=2), e)
             raise
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
