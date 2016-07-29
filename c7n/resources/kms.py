@@ -13,7 +13,7 @@
 # limitations under the License.
 import logging
 
-from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -63,6 +63,30 @@ class Key(KeyBase, QueryResourceManager):
         dimension = None
 
     resource_type = Meta
+
+@Key.filter_registry.register('key-rotation-status')
+class KeyRotationStatus(ValueFilter):
+
+    schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _key_rotation_status(resource):
+            client = local_session(self.manager.session_factory).client('kms')
+            resource['KeyRotationEnabled'] = client.get_key_rotation_status(
+                KeyId=resource['KeyId'])
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'KeyRotationEnabled' not in r]
+            self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
+            list(w.map(_key_rotation_status, query_resources))
+
+        matched = []
+        for r in resources:
+            if self.match(r['KeyRotationEnabled']):
+                matched.append(r)
+        return matched
 
 
 @Key.filter_registry.register('cross-account')
