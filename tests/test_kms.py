@@ -27,3 +27,16 @@ class KMSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_key_rotation(self):
+        session_factory = self.replay_flight_data('test_key_rotation')
+        p = self.load_policy(
+            {'name': 'kms-key-rotation',
+             'resource': 'kms-key',
+             'filters': [
+                 {'type': 'key-rotation-status', 'key': 'KeyRotationEnabled',
+                  'value': False}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 7)

@@ -128,6 +128,20 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_rds_kms_alias(self):
+        session_factory = self.replay_flight_data('test_rds_kms_alias')
+        p = self.load_policy(
+            {'name': 'rds-aws-managed-kms-keys-filters',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'kms-alias', 'key': 'AliasName',
+                  'value': '^(alias/aws/)', 'op': 'regex'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot(self):
