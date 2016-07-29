@@ -1,7 +1,7 @@
 {
     "status_code": 200, 
     "data": {
-        "Marker": "ADI9kp9K5lWCxPFj+K6phCfOjIqM6bMDLtYyyQRaJvyKoIO4TP4YeeNsZPyKTR1SSKxz5B8GW3oyVDWQmx/oNsk3", 
+        "Marker": "AAZMGxZ52d7suLRf63A1/56iqwshHeGmyNqu8xmtQ4i9V9kHC9mbmLFmN6IQW5vP/8fVMZJGMT6NtYW74Bp00mDb", 
         "IsTruncated": true, 
         "Roles": [
             {
@@ -24,10 +24,10 @@
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "3dd67c83-54fb-11e6-b7d4-4141c6ad91c4", 
+            "RequestId": "8180d24d-55ba-11e6-945e-5dbedde336ba", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3dd67c83-54fb-11e6-b7d4-4141c6ad91c4", 
-                "date": "Thu, 28 Jul 2016 19:41:12 GMT", 
+                "x-amzn-requestid": "8180d24d-55ba-11e6-945e-5dbedde336ba", 
+                "date": "Fri, 29 Jul 2016 18:30:19 GMT", 
                 "content-length": "1003", 
                 "content-type": "text/xml"
             }
