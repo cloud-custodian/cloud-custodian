@@ -21,14 +21,14 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
 from c7n import tags, utils
-from c7n.utils import type_schema
+from c7n.utils import type_schema, local_session
 
 
 filters = FilterRegistry('ec2.filters')
@@ -315,6 +315,25 @@ class InstanceAgeFilter(AgeFilter):
         # Lexographical sort on date
         ebs_vols = sorted(ebs_vols, key=self.ebs_key_func)
         return ebs_vols[0]['AttachTime']
+
+
+@filters.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an ec2 database is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+
+    def __call__(self, ec2):
+
+        vpc_id = None
+
+        if 'VpcId' in ec2:
+            vpc_id = ec2['VpcId']
+        else:
+            return False
+        return self.match(vpc_id)
 
 
 @actions.register('start')

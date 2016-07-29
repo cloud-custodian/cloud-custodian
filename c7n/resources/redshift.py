@@ -18,7 +18,7 @@ from concurrent.futures import as_completed
 from datetime import datetime
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters import FilterRegistry, ValueFilter, DefaultVpcBase
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -36,6 +36,20 @@ class Redshift(QueryResourceManager):
     resource_type = "aws.redshift.cluster"
     filter_registry = filters
     action_registry = actions
+
+@filters.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an redshift database is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, redshift):
+        if 'VpcId' in redshift:
+            vpc_id = redshift['VpcId']
+        else:
+            return False
+        return self.match(vpc_id)
 
 
 @filters.register('param')
