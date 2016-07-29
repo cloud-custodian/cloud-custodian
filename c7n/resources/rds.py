@@ -67,7 +67,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
@@ -147,38 +147,6 @@ def _rds_tags(
     with executor_factory(max_workers=1) as w:
         return list(w.map(process_tags, dbs))
 
-def _db_instance_eligible_for_backup(resource):
-    db_instance_id = resource['DBInstanceIdentifier']
-
-    # Database instance is not in available state
-    if resource.get('DBInstanceStatus', '') != 'available':
-        log.debug("DB instance %s is not in available state" %
-            (db_instance_id))
-        return False
-    # The specified DB Instance is a member of a cluster and its backup retention should not be modified directly.
-    #   Instead, modify the backup retention of the cluster using the ModifyDbCluster API
-    if resource.get('DBClusterIdentifier', ''):
-        log.debug("DB instance %s is a cluster member" %
-            (db_instance_id))
-        return False
-    # DB Backups not supported on a read replica for engine postgres
-    if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
-            resource.get('Engine', '') == 'postgres'):
-        log.debug("DB instance %s is a postgres read-replica" %
-            (db_instance_id))
-        return False
-    # DB Backups not supported on a read replica running a mysql version before 5.6.
-    if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
-            resource.get('Engine', '') == 'mysql'):
-        engine_version = resource.get('EngineVersion', '')
-        # Assume "<major>.<minor>.<whatever>"
-        match = re.match(r'(?P<major>\d+)\.(?P<minor>\d+)\..*', engine_version)
-        if (match and int(match.group('major')) < 5 or
-            (int(match.group('major')) == 5 and int(match.group('minor')) < 6)):
-            log.debug("DB instance %s is a version %s mysql read-replica" %
-                (db_instance_id, engine_version))
-            return False
-    return True
 
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
@@ -208,6 +176,38 @@ class DefaultVpc(Filter):
                 return []
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ValueFilter):
+
+    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _user_kms_alias(resource):
+            client = local_session(self.manager.session_factory).client('kms')
+            key_aliases = client.list_aliases()['Aliases']
+            for alias in key_aliases:
+                if 'TargetKeyId' in alias:
+                    alias_regex = re.compile(alias['TargetKeyId'] + "$")
+                    if 'KmsKeyId' in resource:
+                        if alias_regex.search(resource['KmsKeyId']) is not None:
+                            resource['Alias'] = alias
+                            break
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'Alias' not in r]
+            self.log.debug("Querying %d users' aliases" % len(query_resources))
+            list(w.map(_user_kms_alias, query_resources))
+
+
+        matched = []
+        for r in resources:
+            if 'Alias' in r and self.match(r['Alias']):
+                matched.append(r)
+
+        return matched
 
 
 @actions.register('mark-for-op')
@@ -351,9 +351,6 @@ class Snapshot(BaseAction):
         return resources
 
     def process_rds_snapshot(self, resource):
-        if not _db_instance_eligible_for_backup(resource):
-            return
-
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
             DBSnapshotIdentifier="Backup-%s-%s" % (
@@ -391,7 +388,7 @@ class RetentionWindow(BaseAction):
 
         if ((current_retention < new_retention or
                 current_copy_tags != new_copy_tags) and
-                _db_instance_eligible_for_backup(resource)):
+                self._db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
                 resource,
                 max(current_retention, new_retention),
@@ -404,6 +401,39 @@ class RetentionWindow(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=retention,
             CopyTagsToSnapshot=copy_tags)
+
+    def _db_instance_eligible_for_backup(self, resource):
+        db_instance_id = resource['DBInstanceIdentifier']
+
+        # Database instance is not in available state
+        if resource.get('DBInstanceStatus', '') != 'available':
+            log.debug("DB instance %s is not in available state" %
+                (db_instance_id))
+            return False
+        # The specified DB Instance is a member of a cluster and its backup retention should not be modified directly.
+        #   Instead, modify the backup retention of the cluster using the ModifyDbCluster API
+        if resource.get('DBClusterIdentifier', ''):
+            log.debug("DB instance %s is a cluster member" %
+                (db_instance_id))
+            return False
+        # DB Backups not supported on a read replica for engine postgres
+        if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
+                resource.get('Engine', '') == 'postgres'):
+            log.debug("DB instance %s is a postgres read-replica" %
+                (db_instance_id))
+            return False
+        # DB Backups not supported on a read replica running a mysql version before 5.6.
+        if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
+                resource.get('Engine', '') == 'mysql'):
+            engine_version = resource.get('EngineVersion', '')
+            # Assume "<major>.<minor>.<whatever>"
+            match = re.match(r'(?P<major>\d+)\.(?P<minor>\d+)\..*', engine_version)
+            if (match and int(match.group('major')) < 5 or
+                (int(match.group('major')) == 5 and int(match.group('minor')) < 6)):
+                log.debug("DB instance %s is a version %s mysql read-replica" %
+                    (db_instance_id, engine_version))
+                return False
+        return True
 
 
 @resources.register('rds-snapshot')
