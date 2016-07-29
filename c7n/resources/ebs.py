@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import re
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -208,6 +209,39 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
+
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ValueFilter):
+
+    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _user_kms_alias(resource):
+            client = local_session(self.manager.session_factory).client('kms')
+            key_aliases = client.list_aliases()['Aliases']
+            for alias in key_aliases:
+                if 'TargetKeyId' in alias:
+                    alias_regex = re.compile(alias['TargetKeyId'] + "$")
+                    if 'KmsKeyId' in resource:
+                        if alias_regex.search(resource['KmsKeyId']) is not None:
+                            resource['Alias'] = alias
+                            break
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'Alias' not in r]
+            self.log.debug("Querying %d users' aliases" % len(query_resources))
+            list(w.map(_user_kms_alias, query_resources))
+
+
+        matched = []
+        for r in resources:
+            if 'Alias' in r and self.match(r['Alias']):
+                matched.append(r)
+
+        return matched
 
 
 @actions.register('copy-instance-tags')
