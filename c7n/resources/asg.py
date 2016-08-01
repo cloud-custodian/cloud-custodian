@@ -438,7 +438,7 @@ class RemoveTag(BaseAction):
         aliases=('untag', 'unmark'),
         key={'type': 'string'})
 
-    batch_size = 5
+    batch_size = 1
 
     def process(self, asgs):
         error = False
@@ -460,6 +460,7 @@ class RemoveTag(BaseAction):
         if error:
             raise error
 
+    # retry on error code - ResourceInUse
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
