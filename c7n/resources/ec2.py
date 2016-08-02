@@ -326,14 +326,7 @@ class DefaultVpc(DefaultVpcBase):
 
 
     def __call__(self, ec2):
-
-        vpc_id = None
-
-        if 'VpcId' in ec2:
-            vpc_id = ec2['VpcId']
-        else:
-            return False
-        return self.match(vpc_id)
+        return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
 @actions.register('start')

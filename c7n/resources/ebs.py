@@ -216,18 +216,24 @@ class KmsKeyAlias(ValueFilter):
 
     schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
 
+    def get_kms_aliases(self):
+        from c7n.resources.kms import KeyAlias
+        manager = KeyAlias(self.manager.ctx, {})
+        return [k for k in manager.resources()]
+
     def process(self, resources, event=None):
 
+        key_aliases = self.get_kms_aliases()
+
         def _user_kms_alias(resource):
-            client = local_session(self.manager.session_factory).client('kms')
-            key_aliases = client.list_aliases()['Aliases']
             for alias in key_aliases:
                 if 'TargetKeyId' in alias:
-                    alias_regex = re.compile(alias['TargetKeyId'] + "$")
                     if 'KmsKeyId' in resource:
-                        if alias_regex.search(resource['KmsKeyId']) is not None:
+                        if alias['TargetKeyId'] in resource['KmsKeyId']:
                             resource['Alias'] = alias
                             break
+                    else:
+                        break
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [

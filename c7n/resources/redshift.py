@@ -45,12 +45,7 @@ class DefaultVpc(DefaultVpcBase):
     schema = type_schema('default-vpc')
 
     def __call__(self, redshift):
-        if 'VpcId' in redshift:
-            vpc_id = redshift['VpcId']
-        else:
-            return False
-        return self.match(vpc_id)
-
+        return redshift.get('VpcId') and self.match(redshift.get('VpcId')) or False
 
 @filters.register('param')
 class Parameter(ValueFilter):

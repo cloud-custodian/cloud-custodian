@@ -363,8 +363,4 @@ class DefaultVpc(DefaultVpcBase):
     schema = type_schema('default-vpc')
 
     def __call__(self, elb):
-        if 'VPCId' in elb:
-            vpc_id = elb['VPCId']
-        else:
-            return False
-        return self.match(vpc_id)
+        return elb.get('VPCId') and self.match(elb.get('VPCId')) or False
