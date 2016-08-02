@@ -437,7 +437,7 @@ class RemoveTag(BaseAction):
         aliases=('untag', 'unmark'),
         key={'type': 'string'})
 
-    batch_size = 5
+    batch_size = 1
 
     def process(self, asgs):
         error = False
