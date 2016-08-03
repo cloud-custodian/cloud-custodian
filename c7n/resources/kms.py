@@ -138,3 +138,35 @@ class GrantCount(Filter):
             Scope=key['AliasName'][6:])
 
         return key
+
+class ResourceKmsKeyAlias(ValueFilter):
+
+    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    def get_matching_aliases(self, resources, event=None):
+
+        key_aliases = KeyAlias(self.manager.ctx, {}).resources()
+
+        # def _user_kms_alias(resource):
+        #     kms_key_id = resource.get('KmsKeyId')
+        #     target_key_aliases = [k for k in key_aliases
+        #         if k.get('TargetKeyId') and kms_key_id
+        #         and k.get('TargetKeyId') in kms_key_id]
+        #     for kms_alias in target_key_aliases:
+        #         resource['Alias'] = kms_alias
+        #         break
+
+        # key_dict = None
+
+        # for r in resources:
+        # kms_key_id = r.get('KmsKeyId')
+        key_alias_dict = {r.get('KmsKeyId'): a for r in resources for a in key_aliases
+            if r.get('KmsKeyId') and a.get('TargetKeyId')
+            if a.get('TargetKeyId') in r.get('KmsKeyId')}
+
+        matched = []
+        for r in resources:
+            r['KmsAlias'] = key_alias_dict.get(r.get('KmsKeyId'))
+            if self.match(r['KmsAlias']):
+                matched.append(r)
+
+        return matched

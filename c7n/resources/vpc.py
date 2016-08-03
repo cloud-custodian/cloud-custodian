@@ -38,27 +38,13 @@ class SubnetsOfVpc(ValueFilter):
         super(SubnetsOfVpc, self).__init__(*args, **kw)
         self.data['key'] = 'Subnets'
 
-    def get_vpc_subnets(self):
-        # from c7n.resources.vpc import Subnet
-        manager = Subnet(self.manager.ctx, {})
-        return [s for s in manager.resources()]
-
     def process(self, resources, event=None):
 
-        subnets = self.get_vpc_subnets()
-
-        def _user_vpc_subnets(resource):
-            resource['Subnets'] = [s for s in subnets if s['VpcId'] == resource['VpcId']]
-
-        with self.executor_factory(max_workers=1) as w:
-            query_resources = [
-                r for r in resources if 'Subnets' not in r]
-            self.log.debug("Querying %d vpcs' subnets" % len(query_resources))
-            list(w.map(_user_vpc_subnets, query_resources))
-
+        subnets = Subnet(self.manager.ctx, {}).resources()
 
         matched = []
         for r in resources:
+            r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
             if self.match(r):
                 matched.append(r)
 

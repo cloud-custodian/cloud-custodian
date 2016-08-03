@@ -23,6 +23,7 @@ from c7n.filters import (
     FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
+from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n import tags
 from c7n.utils import (
@@ -212,42 +213,36 @@ class AttachedInstanceFilter(ValueFilter):
 
 
 @filters.register('kms-alias')
-class KmsKeyAlias(ValueFilter):
-
-    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
-
-    def get_kms_aliases(self):
-        from c7n.resources.kms import KeyAlias
-        manager = KeyAlias(self.manager.ctx, {})
-        return [k for k in manager.resources()]
+class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
-
-        key_aliases = self.get_kms_aliases()
-
-        def _user_kms_alias(resource):
-            for alias in key_aliases:
-                if 'TargetKeyId' in alias:
-                    if 'KmsKeyId' in resource:
-                        if alias['TargetKeyId'] in resource['KmsKeyId']:
-                            resource['Alias'] = alias
-                            break
-                    else:
-                        break
-
-        with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'Alias' not in r]
-            self.log.debug("Querying %d users' aliases" % len(query_resources))
-            list(w.map(_user_kms_alias, query_resources))
+        return self.get_matching_aliases(resources)
 
 
-        matched = []
-        for r in resources:
-            if 'Alias' in r and self.match(r['Alias']):
-                matched.append(r)
-
-        return matched
+    # schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    # def process(self, resources, event=None):
+    #
+    #     key_aliases = KeyAlias(self.manager.ctx, {}).resources()
+    #
+    #     def _user_kms_alias(resource):
+    #         kms_key_id = resource.get('KmsKeyId')
+    #         target_key_aliases = [k for k in key_aliases
+    #             if k.get('TargetKeyId') and kms_key_id
+    #             and k.get('TargetKeyId') in kms_key_id]
+    #         for kms_alias in target_key_aliases:
+    #             resource['Alias'] = kms_alias
+    #             break
+    #
+    #     for r in resources:
+    #         _user_kms_alias(r)
+    #
+    #
+    #     matched = []
+    #     for r in resources:
+    #         if 'Alias' in r and self.match(r['Alias']):
+    #             matched.append(r)
+    #
+    #     return matched
 
 
 @actions.register('copy-instance-tags')

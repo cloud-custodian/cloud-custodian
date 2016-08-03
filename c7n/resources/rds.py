@@ -73,6 +73,7 @@ from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
     local_session, type_schema, get_account_id, chunks, generate_arn)
+from c7n.resources.kms import ResourceKmsKeyAlias
 
 from datetime import datetime
 
@@ -211,42 +212,45 @@ class DefaultVpc(Filter):
         return vpc_id == self.default_vpc and True or False
 
 @filters.register('kms-alias')
-class KmsKeyAlias(ValueFilter):
-
-    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
-
-    def get_kms_aliases(self):
-        from c7n.resources.kms import KeyAlias
-        manager = KeyAlias(self.manager.ctx, {})
-        return [k for k in manager.resources()]
+class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
+        return self.get_matching_aliases(resources)
 
-        key_aliases = self.get_kms_aliases()
-
-        def _user_kms_alias(resource):
-            for alias in key_aliases:
-                if 'TargetKeyId' in alias:
-                    if 'KmsKeyId' in resource:
-                        if alias['TargetKeyId'] in resource['KmsKeyId']:
-                            resource['Alias'] = alias
-                            break
-                    else:
-                        break
-
-        with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'Alias' not in r]
-            self.log.debug("Querying %d users' aliases" % len(query_resources))
-            list(w.map(_user_kms_alias, query_resources))
-
-
-        matched = []
-        for r in resources:
-            if 'Alias' in r and self.match(r['Alias']):
-                matched.append(r)
-
-        return matched
+    # schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    #
+    # def get_kms_aliases(self):
+    #     from c7n.resources.kms import KeyAlias
+    #     manager = KeyAlias(self.manager.ctx, {})
+    #     return [k for k in manager.resources()]
+    #
+    # def process(self, resources, event=None):
+    #
+    #     key_aliases = self.get_kms_aliases()
+    #
+    #     def _user_kms_alias(resource):
+    #         for alias in key_aliases:
+    #             if 'TargetKeyId' in alias:
+    #                 if 'KmsKeyId' in resource:
+    #                     if alias['TargetKeyId'] in resource['KmsKeyId']:
+    #                         resource['Alias'] = alias
+    #                         break
+    #                 else:
+    #                     break
+    #
+    #     with self.executor_factory(max_workers=2) as w:
+    #         query_resources = [
+    #             r for r in resources if 'Alias' not in r]
+    #         self.log.debug("Querying %d users' aliases" % len(query_resources))
+    #         list(w.map(_user_kms_alias, query_resources))
+    #
+    #
+    #     matched = []
+    #     for r in resources:
+    #         if 'Alias' in r and self.match(r['Alias']):
+    #             matched.append(r)
+    #
+    #     return matched
 
 
 @actions.register('mark-for-op')
