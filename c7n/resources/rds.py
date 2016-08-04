@@ -316,8 +316,8 @@ class Delete(BaseAction):
                 params['SkipFinalSnapshot'] = True
             else:
                 params['FinalDBSnapshotIdentifier'] = "%s-%s" % (
-                        now.strftime("%Y-%m-%d"),
-                        rdb['DBInstanceIdentifier']
+                        rdb['DBInstanceIdentifier'],
+                        now.strftime("%Y-%m-%d")
                         )
             try:
                 client.delete_db_instance(**params)
