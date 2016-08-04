@@ -20,6 +20,7 @@ an event.
 
 import logging
 import os
+import uuid
 
 from c7n.policy import load
 from c7n.utils import format_event
@@ -49,10 +50,12 @@ class Config(dict):
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': True,
-            'output_dir': '/tmp/',
+            'output_dir': '/tmp/' + str(uuid.uuid4()),
             'cache_period': 0,
             'dryrun': False})
         d.update(kw)
+        if not os.path.exists(d['output_dir']):
+            os.mkdir(d['output_dir'])
         return cls(d)
 
 

@@ -49,7 +49,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
                         "Access denied getting policy glacier:%s",
                         r['FunctionName'])
 
-        self.log.debug("fetching policy for %d lambdas" % len(resources))
+        self.log.debug("fetching policy for %d glacier" % len(resources))
         with self.executor_factory(max_workers=3) as w:
             resources = filter(None, w.map(_augment, resources))
 

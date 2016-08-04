@@ -24,6 +24,20 @@ from c7n.resources.sns import SNS
 from c7n.executor import MainThreadExecutor
 
 
+class IAMMFAFilter(BaseTest):
+
+    def test_iam_mfa_filter(self):
+        session_factory = self.replay_flight_data('test_iam_mfa_filter')
+        p = self.load_policy({
+            'name': 'iam-mfa',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'mfa-device',
+                 'value': []}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+
 class KMSCrossAccount(BaseTest):
 
     def test_kms_cross_account(self):

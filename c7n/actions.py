@@ -110,12 +110,14 @@ class LambdaInvoke(EventAction):
     """ Invoke an arbitrary lambda
 
     serialized invocation parameters
+
      - resources / collection of resources
      - policy / policy that is invoke the lambda
      - action / action that is invoking the lambda
      - event / cloud trail event if any
      - version / version of custodian invoking the lambda
 
+    We automatically batch into sets of 250 for invocation,
     We try to utilize async invocation by default, this imposes
     some greater size limits of 128kb which means we batch
     invoke.
@@ -221,11 +223,14 @@ class Notify(EventAction):
                        'account': account_name,
                        'action': self.data,
                        'policy': self.manager.data}
-            self.send_data_message(message)
+            receipt = self.send_data_message(message)
+            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+                receipt, self.manager.data['name'],
+                self.data.get('template', 'default'), len(batch)))
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
-            self.send_sqs(message)
+            return self.send_sqs(message)
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -237,7 +242,100 @@ class Notify(EventAction):
                 'StringValue': self.C7N_DATA_MESSAGE,
                 },
             }
-        client.send_message(
+        result = client.send_message(
             QueueUrl=queue,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
             MessageAttributes=attrs)
+        return result['MessageId']
+
+
+class AutoTagUser(EventAction):
+    """Tag a resource with the user who created/modified it.
+
+    policies:
+      - name: ec2-auto-tag-owner
+        resource: ec2
+        filters:
+         - tag:Owner: absent
+        actions:
+         - type: auto-tag-creator
+           tag: OwnerContact
+
+    There's a number of caveats to usage, resources which don't
+    include tagging as part of their api, may have some delay before
+    automation kicks in to create a tag. Real world delay may be several
+    minutes, with worst case into hours[0]. This creates a race condition
+    between auto tagging and automation.
+
+    In practice this window is on the order of a fraction of a second, as
+    we fetch the resource and evaluate the presence of the tag before
+    attempting to tag it.
+
+    References
+     - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
+     - CloudTrail User - http://goo.gl/XQhIG6 q
+    """
+
+    schema = utils.type_schema(
+        'auto-tag',
+        required=['tag'],
+        **{'user-type': {
+            'type': 'array',
+            'items': {'type': 'string',
+                      'enum': [
+                          'IAMUser',
+                          'AssumedRole',
+                          'FederatedUser'
+                      ]}},
+           'update': {'type': 'boolean'},
+           'tag': {'type': 'string'},
+           }
+    )
+
+    def validate(self):
+        if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
+            raise ValueError("Auto tag owner requires an event")
+        if self.manager.action_registry.get('tag') is None:
+            raise ValueError("Resources does not support tagging")
+        return self
+
+    def process(self, resources, event):
+        if event is None:
+            return
+        event = event['detail']
+        utype = event['userIdentity']['type']
+        if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser']):
+            return
+
+        user = None
+        if utype == "IAMUser":
+            user = event['userIdentity']['userName']
+        elif utype == "AssumedRole":
+            user = event['userIdentity']['arn']
+            prefix, user = user.rsplit('/', 1)
+            # instance role
+            if user.startswith('i-'):
+                return
+            # lambda function
+            elif user.startswith('awslambda'):
+                return
+        if user is None:
+            return
+        if not self.data.get('update', False):
+            untagged = []
+            for r in resources:
+                found = False
+                for t in r.get('Tags', ()):
+                    if t['Key'] == self.data['tag']:
+                        found = True
+                        break
+                if not found:
+                    untagged.append(r)
+        else:
+            untagged = resources
+
+        tag_action = self.manager.action_registry.get('tag')
+        tag_action(
+            {'key': self.data['tag'], 'value': user},
+            self.manager).process(untagged)
+        return untagged

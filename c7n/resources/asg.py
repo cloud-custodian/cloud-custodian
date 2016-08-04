@@ -24,7 +24,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -46,6 +46,7 @@ filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
 filters.register('tag-count', TagCountFilter)
 filters.register('marked-for-op', TagActionFilter)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('asg')
@@ -437,12 +438,14 @@ class RemoveTag(BaseAction):
         aliases=('untag', 'unmark'),
         key={'type': 'string'})
 
+    batch_size = 1
+
     def process(self, asgs):
         error = False
         key = self.data.get('key', DEFAULT_TAG)
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for asg_set in chunks(asgs, 20):
+            for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(self.process_asg_set, asg_set, key)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
@@ -457,6 +460,7 @@ class RemoveTag(BaseAction):
         if error:
             raise error
 
+    # retry on error code - ResourceInUse
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
@@ -698,21 +702,28 @@ class MarkForOp(Tag):
         'mark-for-op',
         op={'enum': ['suspend', 'resume', 'delete']},
         key={'type': 'string'},
+        tag={'type': 'string'},
+        message={'type', 'string'},
         days={'type': 'number', 'minimum': 0})
 
-    def process(self, asgs):
-        msg_tmpl = self.data.get(
-            'msg',
-            'AutoScaleGroup does not meet org tag policy: {op}@{stop_date}')
+    default_template = (
+        'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
+    def process(self, asgs):
+        msg_tmpl = self.data.get('message', self.default_template)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
         date = self.data.get('days', 4)
 
         n = datetime.now(tz=tzutc())
         stop_date = n + timedelta(days=date)
-        msg = msg_tmpl.format(
-            op=op, stop_date=stop_date.strftime('%Y/%m/%d'))
+        try:
+            msg = msg_tmpl.format(
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+        except Exception:
+            self.log.warning("invalid template %s" % msg_tmpl)
+            msg = self.default_template.format(
+                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, stop_date.strftime('%Y/%m/%d')))
@@ -736,8 +747,6 @@ class Suspend(BaseAction):
         """Multistep process to stop an asg aprori of setup
 
         - suspend processes
-        - note load balancer in tag
-        - detach load balancer
         - stop instances
         """
         session = local_session(self.manager.session_factory)

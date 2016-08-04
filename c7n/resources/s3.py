@@ -39,6 +39,7 @@ Actions:
 """
 from botocore.client import Config
 from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 
 import functools
@@ -48,12 +49,14 @@ import logging
 import math
 import os
 import time
+import ssl
 
 from c7n import executor
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.tags import Tag
 from c7n.utils import chunks, local_session, set_annotation, type_schema
 
 """
@@ -66,9 +69,9 @@ log = logging.getLogger('custodian.s3')
 
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
+actions.register('auto-tag-user', AutoTagUser)
 
-
-MAX_COPY_SIZE = 1024 * 1024 * 1024 * 5
+MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
 
 @resources.register('s3')
@@ -126,7 +129,13 @@ def assemble_bucket(item):
             v.pop('ResponseMetadata')
             if select is not None and select in v:
                 v = v[select]
-        except ClientError, e:
+        except (ssl.SSLError, SSLError) as e:
+            # Proxy issues? i assume
+            log.warning("Bucket ssl error %s: %s %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        e)
+            continue
+        except ClientError as e:
             code =  e.response['Error']['Code']
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
@@ -254,8 +263,8 @@ class HasStatementFilter(Filter):
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
         for s in list(statements):
-            if s.get('StatementId') in required:
-                required.remove(s['StatementId'])
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
         if not required:
             return b
         return None
@@ -280,10 +289,9 @@ class MissingPolicyStatementFilter(Filter):
 
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
-
         for s in list(statements):
-            if s.get('StatementId') in required:
-                required.remove(s['StatementId'])
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
         if not required:
             return False
         return True
@@ -392,7 +400,6 @@ class AttachLambdaEncrypt(BucketActionBase):
 class EncryptionRequiredPolicy(BucketActionBase):
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
-
     schema = type_schema('encryption-policy')
 
     def __init__(self, data=None, manager=None):
@@ -413,35 +420,49 @@ class EncryptionRequiredPolicy(BucketActionBase):
         else:
             p = json.loads(p)
 
+        encryption_sid = "RequiredEncryptedPutObject"
+        encryption_statement = {
+            'Sid': encryption_sid,
+            'Effect': 'Deny',
+            'Principal': '*',
+            'Action': 's3:PutObject',
+            "Resource": "arn:aws:s3:::%s/*" % b['Name'],
+            "Condition": {
+                # AWS Managed Keys or KMS keys, note policy language
+                # does not support custom kms (todo add issue)
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
+
         statements = p.get('Statement', [])
         found = False
         for s in list(statements):
-            if s['Sid'] == 'RequireEncryptedPutObject':
-                log.debug(
-                    "Bucket:%s Found extant Encryption Policy" % b['Name'])
-                return
+            if s['Sid'] == encryption_sid:
+                log.debug("Bucket:%s Found extant encrypt policy", b['Name'])
+                if s != encryption_statement:
+                    log.info(
+                        "Bucket:%s updating extant encrypt policy", b['Name'])
+                    statements.remove(s)
+                else:
+                    return
 
         session = self.manager.session_factory()
         s3 = bucket_client(session, b)
-
-        statements.append(
-            {'Sid': 'RequireEncryptedPutObject',
-             'Effect': 'Deny',
-             'Principal': '*',
-             'Action': 's3:PutObject',
-             "Resource": "arn:aws:s3:::%s/*" % b['Name'],
-             "Condition": {
-                 # AWS Managed Keys or KMS keys, note policy language
-                 # does not support custom kms (todo add issue)
-                 "StringNotEquals": {
-                     "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}
-             })
+        statements.append(encryption_statement)
         p['Statement'] = statements
         log.info('Bucket:%s attached encryption policy' % b['Name'])
 
-        s3.put_bucket_policy(
-            Bucket=b['Name'],
-            Policy=json.dumps(p))
+        try:
+            s3.put_bucket_policy(
+                Bucket=b['Name'],
+                Policy=json.dumps(p))
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
+            self.log.exception(
+                "Error on bucket:%s putting policy\n%s error:%s",
+                b['Name'],
+                json.dumps(statements, indent=2), e)
+            raise
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
 
@@ -468,11 +489,17 @@ class BucketScanLog(object):
         return os.path.join(self.log_dir, "%s.json" % self.name)
 
     def __enter__(self):
+        # Don't require output directories
+        if self.log_dir is None:
+            return
+
         self.fh = open(self.path, 'w')
         self.fh.write("[\n")
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_frame=None):
+        if self.fh is None:
+            return
         # we need an empty marker list at end to avoid trailing commas
         self.fh.write("[]")
         # and close the surrounding list
@@ -485,6 +512,8 @@ class BucketScanLog(object):
 
     def add(self, keys):
         self.count += len(keys)
+        if self.fh is None:
+            return
         self.fh.write(json.dumps(keys))
         self.fh.write(",\n")
 
@@ -525,9 +554,22 @@ class ScanBucket(BucketActionBase):
     def process(self, buckets):
         results = []
         with self.executor_factory(max_workers=3) as w:
-            results.extend(
-                f for f in w.map(self, buckets) if f)
-        if self.denied_buckets:
+            futures = {}
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error on bucket:%s region:%s policy:%s error: %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        self.manager.data.get('name'), f.exception())
+                    self.denied_buckets.append(b['Name'])
+                    continue
+                result = f.result()
+                if result:
+                    results.append(result)
+
+        if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
@@ -968,7 +1010,34 @@ class DeleteGlobalGrants(BucketActionBase):
         log.info({'Owner': acl['Owner'], 'Grants': new_grants})
 
         c = bucket_client(self.manager.session_factory(), b)
-        c.put_bucket_acl(
-            Bucket=b['Name'],
-            AccessControlPolicy={'Owner': acl['Owner'], 'Grants': new_grants})
+        try:
+            c.put_bucket_acl(
+                Bucket=b['Name'],
+                AccessControlPolicy={
+                    'Owner': acl['Owner'], 'Grants': new_grants})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
         return b
+
+
+@actions.register('tag')
+class BucketTag(Tag):
+
+    def process_resource_set(self, resource_set, tags):
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resource_set:
+            # all the tag marshalling back and forth is a bit gross :-(
+            new_tags = {t['Key']: t['Value'] for t in tags}
+            for t in r.get('Tags', ()):
+                if t['Key'] not in new_tags:
+                    new_tags[t['Key']] = t['Value']
+            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+            try:
+                client.put_bucket_tagging(
+                    Bucket=r['Name'], Tagging={'TagSet': tag_set})
+            except ClientError as e:
+                raise
+                self.log.exception(
+                    "Error while tagging bucket %s err: %s" % (
+                        r['Name'], e))
