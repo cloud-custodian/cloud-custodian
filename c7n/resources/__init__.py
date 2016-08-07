@@ -17,6 +17,7 @@
 
 
 def load_resources():
+    import account
     import ami
     import acm
     import apigw
