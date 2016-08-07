@@ -19,7 +19,7 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
 )
@@ -35,6 +35,7 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 tags.register_tags(filters, actions)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('ec2')

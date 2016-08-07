@@ -253,6 +253,7 @@ class Tag(Action):
 
     schema = utils.type_schema(
         'tag', aliases=('mark',),
+        tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
         )

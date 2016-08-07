@@ -24,7 +24,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -46,6 +46,7 @@ filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
 filters.register('tag-count', TagCountFilter)
 filters.register('marked-for-op', TagActionFilter)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('asg')
@@ -459,6 +460,7 @@ class RemoveTag(BaseAction):
         if error:
             raise error
 
+    # retry on error code - ResourceInUse
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
