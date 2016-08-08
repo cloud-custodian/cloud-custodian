@@ -1,0 +1,21 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RequestId": "99fddad1-5d56-11e6-8e75-f36f02dcd776", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "99fddad1-5d56-11e6-8e75-f36f02dcd776", 
+                "content-length": "120", 
+                "connection": "keep-alive", 
+                "date": "Mon, 08 Aug 2016 10:55:20 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException:http://internal.amazon.com/coral/com.amazonaws.awsgirapi/"
+            }
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified:Dev", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

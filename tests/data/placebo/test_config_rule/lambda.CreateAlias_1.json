@@ -1,0 +1,20 @@
+{
+    "status_code": 201, 
+    "data": {
+        "AliasArn": "arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified:Dev", 
+        "FunctionVersion": "15", 
+        "Name": "Dev", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "9d794673-5d56-11e6-b9d5-c538778f7672", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Aug 2016 10:55:26 GMT", 
+                "x-amzn-requestid": "9d794673-5d56-11e6-b9d5-c538778f7672", 
+                "content-length": "140", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Description": ""
+    }
+}

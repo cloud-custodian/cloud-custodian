@@ -34,6 +34,19 @@ class PolicyLambdaProvision(BaseTest):
         for k, v in expected.items():
             self.assertEqual(v, result[k])
 
+    def test_config_rule(self):
+        session_factory = self.record_flight_data('test_config_rule')
+        session = session_factory()
+        p = Policy({
+            'resource': 'security-group',
+            'name': 'sg-modified',
+            'mode': {'type': 'config-rule'},
+        }, Config.empty())
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        result = mgr.publish(pl, 'Dev', role=self.role)
+        self.addCleanup(mgr.remove, pl)
+
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, 'iam_delay', 0.01)
         session_factory = self.replay_flight_data('test_cwl_subscriber')

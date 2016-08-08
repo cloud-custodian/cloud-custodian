@@ -1,0 +1,28 @@
+{
+    "status_code": 201, 
+    "data": {
+        "CodeSha256": "vqAV02+Y32G/5caCzRoUoerCSrPwKvtkZIsDs+WZ+Vg=", 
+        "FunctionName": "custodian-sg-modified", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "9a40d721-5d56-11e6-92c6-23096fa97432", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Aug 2016 10:55:26 GMT", 
+                "x-amzn-requestid": "9a40d721-5d56-11e6-92c6-23096fa97432", 
+                "content-length": "532", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "CodeSize": 418010, 
+        "MemorySize": 512, 
+        "FunctionArn": "arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified", 
+        "Version": "15", 
+        "Role": "arn:aws:iam::619193117841:role/lambda_basic_execution", 
+        "Timeout": 60, 
+        "LastModified": "2016-08-08T10:55:26.537+0000", 
+        "Handler": "custodian_policy.run", 
+        "Runtime": "python2.7", 
+        "Description": "cloud-custodian lambda policy"
+    }
+}
