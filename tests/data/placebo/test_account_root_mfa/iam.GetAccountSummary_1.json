@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SummaryMap": {
+            "UsersQuota": 5000, 
+            "GroupsPerUserQuota": 10, 
+            "AttachedPoliciesPerGroupQuota": 10, 
+            "PoliciesQuota": 1000, 
+            "GroupsQuota": 100, 
+            "InstanceProfiles": 0, 
+            "SigningCertificatesPerUserQuota": 2, 
+            "PolicySizeQuota": 5120, 
+            "PolicyVersionsInUseQuota": 10000, 
+            "RolePolicySizeQuota": 10240, 
+            "AccountSigningCertificatesPresent": 0, 
+            "Users": 5, 
+            "ServerCertificatesQuota": 20, 
+            "ServerCertificates": 0, 
+            "AssumeRolePolicySizeQuota": 2048, 
+            "Groups": 1, 
+            "MFADevicesInUse": 2, 
+            "RolesQuota": 250, 
+            "VersionsPerPolicyQuota": 5, 
+            "AccountAccessKeysPresent": 0, 
+            "Roles": 4, 
+            "AccountMFAEnabled": 1, 
+            "MFADevices": 3, 
+            "Policies": 3, 
+            "GroupPolicySizeQuota": 5120, 
+            "InstanceProfilesQuota": 100, 
+            "AccessKeysPerUserQuota": 2, 
+            "AttachedPoliciesPerRoleQuota": 10, 
+            "PolicyVersionsInUse": 5, 
+            "Providers": 0, 
+            "AttachedPoliciesPerUserQuota": 10, 
+            "UserPolicySizeQuota": 2048
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "044c3405-5cf3-11e6-ba82-a7ccb4118a5f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "044c3405-5cf3-11e6-ba82-a7ccb4118a5f", 
+                "date": "Sun, 07 Aug 2016 23:02:30 GMT", 
+                "content-length": "3284", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

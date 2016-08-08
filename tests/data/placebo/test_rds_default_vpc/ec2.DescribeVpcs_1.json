@@ -3,17 +3,24 @@
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-399e3d52", 
+                "VpcId": "vpc-4a9ff72e", 
                 "InstanceTenancy": "default", 
                 "State": "available", 
-                "DhcpOptionsId": "dopt-369e3d5d", 
+                "DhcpOptionsId": "dopt-78ab4f1c", 
                 "CidrBlock": "172.31.0.0/16", 
                 "IsDefault": true
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "af618b15-1d98-47e5-b82e-212f48387977"
+            "RequestId": "d9bf1211-a37f-43fb-8dc5-02bad6cfdffc", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 28 Jul 2016 19:41:14 GMT"
+            }
         }
     }
 }

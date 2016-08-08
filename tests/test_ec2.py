@@ -343,6 +343,25 @@ class TestEC2QueryFilter(unittest.TestCase):
             [{'tag:ASV': None}])
 
 
+class TestDefaultVpc(BaseTest):
+
+    def test_ec2_default_vpc(self):
+        session_factory = self.replay_flight_data('test_ec2_default_vpc')
+        p = self.load_policy(
+            {'name': 'ec2-default-filters',
+             'resource': 'ec2',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        # import pdb; pdb.set_trace()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')
+
+
 class TestActions(unittest.TestCase):
 
     def test_action_construction(self):

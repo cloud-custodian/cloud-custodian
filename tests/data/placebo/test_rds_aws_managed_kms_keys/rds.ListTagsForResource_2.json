@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "6c875662-54f8-11e6-a482-df710ee09d8d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6c875662-54f8-11e6-a482-df710ee09d8d", 
+                "date": "Thu, 28 Jul 2016 19:21:03 GMT", 
+                "content-length": "481", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "kapilt", 
+                "Key": "OwnerContact"
+            }, 
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }
+        ]
+    }
+}

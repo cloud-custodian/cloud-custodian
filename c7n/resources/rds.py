@@ -67,12 +67,13 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
     local_session, type_schema, get_account_id, chunks, generate_arn)
+from c7n.resources.kms import ResourceKmsKeyAlias
 
 from datetime import datetime
 
@@ -180,6 +181,7 @@ def _db_instance_eligible_for_backup(resource):
             return False
     return True
 
+
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -208,6 +210,13 @@ class DefaultVpc(Filter):
                 return []
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
+
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ResourceKmsKeyAlias):
+
+    def process(self, resources, event=None):
+        return self.get_matching_aliases(resources)
 
 
 @actions.register('mark-for-op')

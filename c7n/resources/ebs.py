@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import re
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -22,6 +23,7 @@ from c7n.filters import (
     FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
+from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n import tags
 from c7n.utils import (
@@ -208,6 +210,13 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
+
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ResourceKmsKeyAlias):
+
+    def process(self, resources, event=None):
+        return self.get_matching_aliases(resources)
 
 
 @actions.register('copy-instance-tags')
