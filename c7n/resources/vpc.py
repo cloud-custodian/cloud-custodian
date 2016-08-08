@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter, ValueFilter, DefaultVpcBase
+from c7n.filters import (
+    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -94,11 +96,19 @@ class SGPermission(Filter):
     """
 
     attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-                'IpRanges', 'PrefixListIds'))
+                 'IpRanges', 'PrefixListIds', 'Ports'))
+
+    def validate(self):
+        delta = set(self.data.keys()).difference(self.attrs)
+        delta.remove('type')
+        if delta:
+            raise FilterValidationError("Unknown keys %s" % ", ".join(delta))
+        return self
 
     def process(self, resources, event=None):
         self.vfilters = []
         fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
+        self.ports = 'Ports' in self.data and self.data['Ports'] or ()
 
         for f in fattrs:
             fv = self.data.get(f)
@@ -114,14 +124,19 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         for p in resource[self.ip_permissions_key]:
-            found = True
+            found = False
             for f in self.vfilters:
-                if not f(p):
-                    found = False
+                if f(p):
+                    found = True
+                    break
+            for p in self.ports:
+                if p >= resource['FromPort'] and p <= resource['ToPort']:
+                    found = True
                     break
             if not found:
                 continue
             matched.append(p)
+
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
             return True
@@ -135,7 +150,8 @@ class IPPermission(SGPermission):
         'type': 'object',
         #'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['ingress']}
+            'type': {'enum': ['ingress']},
+            'Ports': {'type': 'array', 'items': {'type': 'integer'}}
             },
         'required': ['type']}
 

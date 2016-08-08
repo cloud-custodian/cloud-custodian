@@ -1,6 +1,3 @@
-import time
-
-
 from common import BaseTest
 
 
@@ -64,6 +61,35 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    def test_port_within_range(self):
+        factory = self.replay_flight_data(
+            'test_security_group_port_in_range')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol='tcp',
+            FromPort=60000,
+            ToPort=62000,
+            CidrIp='10.2.0.0/16')
+        p = self.load_policy({
+            'name': 'sg-find',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'IpProtocol': 'tcp',
+                 'FromPort': 60000},
+                {'GroupName': 'web-tier'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_ingress_remove(self):
         factory = self.replay_flight_data(
             'test_security_group_ingress_filter')
@@ -85,6 +111,7 @@ class SecurityGroupTest(BaseTest):
             'name': 'sg-find',
             'resource': 'security-group',
             'filters': [
+                {'VpcId': vpc_id},
                 {'type': 'ingress',
                  'IpProtocol': 'tcp',
                  'FromPort': 0},

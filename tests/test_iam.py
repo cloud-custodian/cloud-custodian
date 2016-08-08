@@ -71,7 +71,7 @@ class KMSCrossAccount(BaseTest):
             client.schedule_key_deletion,
             KeyId=key_info['KeyId'], PendingWindowInDays=7)
         self.addCleanup(client.disable_key, KeyId=key_info['KeyId'])
-        
+
         p = self.load_policy(
             {'name': 'kms-cross',
              'resource': 'kms-key',
@@ -79,7 +79,7 @@ class KMSCrossAccount(BaseTest):
                  {'KeyState': 'Enabled'},
                  'cross-account']},
             session_factory=session_factory)
-        
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['KeyId'], key_info['KeyId'])
@@ -93,7 +93,7 @@ class GlacierCrossAccount(BaseTest):
         session_factory = self.replay_flight_data('test_cross_account_glacier')
         client = session_factory().client('glacier')
         name = 'c7n-cross-check'
-        
+
         url = client.create_vault(vaultName=name)['location']
         self.addCleanup(client.delete_vault, vaultName=name)
 
@@ -101,7 +101,7 @@ class GlacierCrossAccount(BaseTest):
         arn = "arn:aws:glacier:%s:%s:vaults/%s" % (
             os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
             account_id, name)
-        
+
         policy = {
             'Id': 'Foo',
             "Version": "2012-10-17",
@@ -110,16 +110,16 @@ class GlacierCrossAccount(BaseTest):
                  'Resource': arn,
                  'Effect': 'Allow',
                  'Principal': '*'}]}
-        
+
         client.set_vault_access_policy(
             vaultName=name, policy={'Policy': json.dumps(policy)})
-    
+
         p = self.load_policy(
             {'name': 'glacier-cross',
              'resource': 'glacier',
              'filters': ['cross-account']},
             session_factory=session_factory)
-        
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VaultName'], name)
@@ -138,7 +138,7 @@ class LambdaCrossAccount(BaseTest):
     def test_lambda_cross_account(self):
         self.patch(
             CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
-        
+
         session_factory = self.replay_flight_data('test_cross_account_lambda')
         client = session_factory().client('lambda')
         name = 'c7n-cross-check'
@@ -186,7 +186,7 @@ class ECRCrossAccount(BaseTest):
         
         repo = client.create_repository(repositoryName=repo_name)['repository']
         self.addCleanup(client.delete_repository, repositoryName=repo_name)
-        
+
         policy = {
             'Id': 'Foo',
             "Version": "2012-10-17",
@@ -194,16 +194,16 @@ class ECRCrossAccount(BaseTest):
                 {'Action': 'ecr:BatchGetImage',
                  'Effect': 'Allow',
                  'Principal': '*'}]}
-        
+
         client.set_repository_policy(
             repositoryName=repo_name, policyText=json.dumps(policy))
-    
+
         p = self.load_policy(
             {'name': 'ecr-cross',
              'resource': 'ecr',
              'filters': ['cross-account']},
             session_factory=session_factory)
-        
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['repositoryName'], repo_name)
@@ -231,20 +231,20 @@ class SQSCrossAccount(BaseTest):
                  'Effect': 'Allow',
                  'Resource': arn,
                  'Principal': '*'}]}
-        
+
         client.set_queue_attributes(
             QueueUrl=url, Attributes={'Policy': json.dumps(policy)})
-    
+
         p = self.load_policy(
             {'name': 'sqs-cross',
              'resource': 'sqs',
              'filters': ['cross-account']},
             session_factory=session_factory)
-        
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['QueueUrl'], url)
-        
+
 
 class SNSCrossAccount(BaseTest):
 
@@ -266,21 +266,21 @@ class SNSCrossAccount(BaseTest):
                  'Effect': 'Allow',
                  'Resource': arn,
                  'Principal': '*'}]}
-        
+
         client.set_topic_attributes(
             TopicArn=arn, AttributeName='Policy',
             AttributeValue=json.dumps(policy))
-    
+
         p = self.load_policy(
             {'name': 'sns-cross',
              'resource': 'sns',
              'filters': ['cross-account']},
             session_factory=session_factory)
-        
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TopicArn'], arn)
-        
+
 
 class CrossAccountChecker(TestCase):
 

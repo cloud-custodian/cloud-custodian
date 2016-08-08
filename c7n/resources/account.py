@@ -15,7 +15,7 @@ class Account(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    
+
     def resources(self):
         session = local_session(self.session_factory)
         client = session.client('iam')
@@ -25,13 +25,13 @@ class Account(ResourceManager):
               ).get('AccountAliases', ('',))[0]}])
 
 
-@filters.register('cloudtrail-enabled')
+@filters.register('check-cloudtrail')
 class CloudTrailEnabled(Filter):
     """Is cloud trail enabled for this account, returns
     annotated account resource if trail is not enabled.
     """
     schema = type_schema(
-        'cloudtrail-enabled',
+        'check-cloudtrail',
         **{'multi-region': {'type': 'boolean'},
            'global-events': {'type': 'boolean'},
            'running': {'type': 'boolean'},
@@ -39,7 +39,7 @@ class CloudTrailEnabled(Filter):
            'file-digest': {'type': 'boolean'},
            'kms': {'type': 'boolean'},
            'kms-key': {'type': 'string'}})
-    
+
     def process(self, resources, event=None):
         client = local_session(
             self.manager.session_factory).client('cloudtrail')
@@ -73,17 +73,17 @@ class CloudTrailEnabled(Filter):
         return resources
 
 
-@filters.register('config-enabled')
+@filters.register('check-config')
 class ConfigEnabled(Filter):
     """ Is config service enabled for this account
     """
 
     schema = type_schema(
-        'config-enabled', **{
+        'check-config', **{
             'all-resources': {'type': 'boolean'},
             'running': {'type': 'boolean'},
             'global-resources': {'type': 'boolean'}})
-                                 
+
     def process(self, resources, event=None):
         client = local_session(
             self.manager.session_factory).client('config')
@@ -122,37 +122,37 @@ class IAMSummary(ValueFilter):
     Example iam summary wrt to matchable fields::
 
       {
-            "UsersQuota": 5000, 
-            "GroupsPerUserQuota": 10, 
-            "AttachedPoliciesPerGroupQuota": 10, 
-            "PoliciesQuota": 1000, 
-            "GroupsQuota": 100, 
-            "InstanceProfiles": 0, 
-            "SigningCertificatesPerUserQuota": 2, 
-            "PolicySizeQuota": 5120, 
-            "PolicyVersionsInUseQuota": 10000, 
-            "RolePolicySizeQuota": 10240, 
-            "AccountSigningCertificatesPresent": 0, 
-            "Users": 5, 
-            "ServerCertificatesQuota": 20, 
-            "ServerCertificates": 0, 
-            "AssumeRolePolicySizeQuota": 2048, 
-            "Groups": 1, 
-            "MFADevicesInUse": 2, 
-            "RolesQuota": 250, 
-            "VersionsPerPolicyQuota": 5, 
-            "AccountAccessKeysPresent": 0, 
-            "Roles": 4, 
-            "AccountMFAEnabled": 1, 
-            "MFADevices": 3, 
-            "Policies": 3, 
-            "GroupPolicySizeQuota": 5120, 
-            "InstanceProfilesQuota": 100, 
-            "AccessKeysPerUserQuota": 2, 
-            "AttachedPoliciesPerRoleQuota": 10, 
-            "PolicyVersionsInUse": 5, 
-            "Providers": 0, 
-            "AttachedPoliciesPerUserQuota": 10, 
+    "UsersQuota": 5000,
+            "GroupsPerUserQuota": 10,
+            "AttachedPoliciesPerGroupQuota": 10,
+            "PoliciesQuota": 1000,
+            "GroupsQuota": 100,
+            "InstanceProfiles": 0,
+            "SigningCertificatesPerUserQuota": 2,
+            "PolicySizeQuota": 5120,
+            "PolicyVersionsInUseQuota": 10000,
+            "RolePolicySizeQuota": 10240,
+            "AccountSigningCertificatesPresent": 0,
+            "Users": 5,
+            "ServerCertificatesQuota": 20,
+            "ServerCertificates": 0,
+            "AssumeRolePolicySizeQuota": 2048,
+            "Groups": 1,
+            "MFADevicesInUse": 2,
+            "RolesQuota": 250,
+            "VersionsPerPolicyQuota": 5,
+            "AccountAccessKeysPresent": 0,
+            "Roles": 4,
+            "AccountMFAEnabled": 1,
+            "MFADevices": 3,
+            "Policies": 3,
+            "GroupPolicySizeQuota": 5120,
+            "InstanceProfilesQuota": 100,
+            "AccessKeysPerUserQuota": 2,
+            "AttachedPoliciesPerRoleQuota": 10,
+            "PolicyVersionsInUse": 5,
+            "Providers": 0,
+            "AttachedPoliciesPerUserQuota": 10,
             "UserPolicySizeQuota": 2048
         }
 
@@ -174,7 +174,7 @@ class AccountPasswordPolicy(ValueFilter):
     """Check an account's password policy
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
-                         
+
     def process(self, resources):
         if not resources[0].get('password_policy'):
             client = local_session(self.manager.session_factory).client('iam')
