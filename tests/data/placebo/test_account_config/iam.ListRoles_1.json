@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "ADK2kLdUhVAC1a/3Q4kzIQxsJETLmX04vKoNEwf/ZH6za5obPRPFUt4oQDGXSKJdJGJf1Kf4TVdUa5TTGpoC68rN", 
+        "IsTruncated": true, 
+        "Roles": [
+            {
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22config.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "RoleId": "AROAJUQKESVQ5AAKMZYH4", 
+                "CreateDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "RoleName": "config-role-us-east-1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::644160558196:role/service-role/config-role-us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "7ada6a5b-5ce1-11e6-81c7-dd747433a5c8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7ada6a5b-5ce1-11e6-81c7-dd747433a5c8", 
+                "date": "Sun, 07 Aug 2016 20:56:57 GMT", 
+                "content-length": "1003", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -169,9 +169,9 @@ def bucket_client(session, b, kms=False):
         region = location['LocationConstraint'] or 'us-east-1'
     if kms:
         # Need v4 signature for aws:kms crypto
-        config = Config(signature_version='s3v4')
+        config = Config(signature_version='s3v4', read_timeout=200)
     else:
-        config = None
+        config = Config(read_timeout=200)
     return session.client('s3', region_name=region, config=config)
 
 
