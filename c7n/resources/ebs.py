@@ -219,32 +219,6 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(resources)
 
 
-    # schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
-    # def process(self, resources, event=None):
-    #
-    #     key_aliases = KeyAlias(self.manager.ctx, {}).resources()
-    #
-    #     def _user_kms_alias(resource):
-    #         kms_key_id = resource.get('KmsKeyId')
-    #         target_key_aliases = [k for k in key_aliases
-    #             if k.get('TargetKeyId') and kms_key_id
-    #             and k.get('TargetKeyId') in kms_key_id]
-    #         for kms_alias in target_key_aliases:
-    #             resource['Alias'] = kms_alias
-    #             break
-    #
-    #     for r in resources:
-    #         _user_kms_alias(r)
-    #
-    #
-    #     matched = []
-    #     for r in resources:
-    #         if 'Alias' in r and self.match(r['Alias']):
-    #             matched.append(r)
-    #
-    #     return matched
-
-
 @actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.

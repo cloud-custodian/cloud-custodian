@@ -82,11 +82,7 @@ class KeyRotationStatus(ValueFilter):
             self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
-        matched = []
-        for r in resources:
-            if self.match(r['KeyRotationEnabled']):
-                matched.append(r)
-        return matched
+        return [r for r in resources if self.match(r['KeyRotationEnabled'])]
 
 
 @Key.filter_registry.register('cross-account')
@@ -145,28 +141,12 @@ class ResourceKmsKeyAlias(ValueFilter):
     def get_matching_aliases(self, resources, event=None):
 
         key_aliases = KeyAlias(self.manager.ctx, {}).resources()
-
-        # def _user_kms_alias(resource):
-        #     kms_key_id = resource.get('KmsKeyId')
-        #     target_key_aliases = [k for k in key_aliases
-        #         if k.get('TargetKeyId') and kms_key_id
-        #         and k.get('TargetKeyId') in kms_key_id]
-        #     for kms_alias in target_key_aliases:
-        #         resource['Alias'] = kms_alias
-        #         break
-
-        # key_dict = None
-
-        # for r in resources:
-        # kms_key_id = r.get('KmsKeyId')
-        key_alias_dict = {r.get('KmsKeyId'): a for r in resources for a in key_aliases
-            if r.get('KmsKeyId') and a.get('TargetKeyId')
-            if a.get('TargetKeyId') in r.get('KmsKeyId')}
+        key_aliases_dict = {a['TargetKeyId']: a for a in key_aliases}
 
         matched = []
         for r in resources:
-            r['KmsAlias'] = key_alias_dict.get(r.get('KmsKeyId'))
-            if self.match(r['KmsAlias']):
-                matched.append(r)
-
+            if r.get('KmsKeyId'):
+                r['KeyAlias'] = key_aliases_dict.get(r.get('KmsKeyId').split("key/", 1)[-1])
+                if self.match(r.get('KeyAlias')):
+                    matched.append(r)
         return matched
