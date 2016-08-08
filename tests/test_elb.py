@@ -165,3 +165,20 @@ class SSLPolicyTest(BaseTest):
             ]},
             session_factory=None)
         self.fail("validtion error should have been thrown")
+
+
+class TestDefaultVpc(BaseTest):
+
+    def test_elb_default_vpc(self):
+        session_factory = self.replay_flight_data('test_elb_default_vpc')
+        p = self.load_policy(
+            {'name': 'elb-default-filters',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'test-load-balancer')

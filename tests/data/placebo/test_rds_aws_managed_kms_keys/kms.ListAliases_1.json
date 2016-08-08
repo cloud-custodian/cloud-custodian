@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Truncated": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "6ced1cc1-54f8-11e6-abc3-27fbd89a0a2d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6ced1cc1-54f8-11e6-abc3-27fbd89a0a2d", 
+                "content-length": "731", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Thu, 28 Jul 2016 19:21:03 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Aliases": [
+            {
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/BlockStoreKeyWest", 
+                "AliasName": "alias/BlockStoreKeyWest", 
+                "TargetKeyId": "d21dba12-ec3d-4115-a600-5779ae051580"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/aws/ebs", 
+                "AliasName": "alias/aws/ebs", 
+                "TargetKeyId": "68425528-9938-4a15-90f2-f1755263b836"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/aws/rds", 
+                "AliasName": "alias/aws/rds", 
+                "TargetKeyId": "1ec621db-4406-4cb9-8e85-812386071791"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/aws/redshift", 
+                "AliasName": "alias/aws/redshift", 
+                "TargetKeyId": "dd09e3af-48eb-484f-b783-0801786e6239"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/aws/s3", 
+                "AliasName": "alias/aws/s3"
+            }
+        ]
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "ad07db84-2f2b-49ee-b4eb-beeacf0909f1", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 01 Aug 2016 15:02:21 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2c", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 10, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 6, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 24, 
+                            "minute": 35
+                        }, 
+                        "InstanceId": "i-0bfe468063b02d018", 
+                        "VolumeId": "vol-37e189b7", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/sda1"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-37e189b7", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-47713105", 
+                "CreateTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 6, 
+                    "microsecond": 901000, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 35
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2a", 
+                "Attachments": [], 
+                "Encrypted": true, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-cc3fc645", 
+                "State": "available", 
+                "Iops": 100, 
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d21dba12-ec3d-4115-a600-5779ae051580", 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 34, 
+                    "microsecond": 906000, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 13
+                }, 
+                "Size": 5
+            }, 
+            {
+                "AvailabilityZone": "us-west-2a", 
+                "Attachments": [], 
+                "Encrypted": true, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-14a3cd9d", 
+                "State": "available", 
+                "Iops": 100, 
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836", 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 52, 
+                    "microsecond": 906000, 
+                    "year": 2016, 
+                    "day": 29, 
+                    "minute": 40
+                }, 
+                "Size": 1
+            }
+        ]
+    }
+}

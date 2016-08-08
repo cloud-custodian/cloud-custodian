@@ -13,7 +13,7 @@
 # limitations under the License.
 import logging
 
-from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -63,6 +63,26 @@ class Key(KeyBase, QueryResourceManager):
         dimension = None
 
     resource_type = Meta
+
+@Key.filter_registry.register('key-rotation-status')
+class KeyRotationStatus(ValueFilter):
+
+    schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _key_rotation_status(resource):
+            client = local_session(self.manager.session_factory).client('kms')
+            resource['KeyRotationEnabled'] = client.get_key_rotation_status(
+                KeyId=resource['KeyId'])
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'KeyRotationEnabled' not in r]
+            self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
+            list(w.map(_key_rotation_status, query_resources))
+
+        return [r for r in resources if self.match(r['KeyRotationEnabled'])]
 
 
 @Key.filter_registry.register('cross-account')
@@ -114,3 +134,19 @@ class GrantCount(Filter):
             Scope=key['AliasName'][6:])
 
         return key
+
+class ResourceKmsKeyAlias(ValueFilter):
+
+    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    def get_matching_aliases(self, resources, event=None):
+
+        key_aliases = KeyAlias(self.manager.ctx, {}).resources()
+        key_aliases_dict = {a['TargetKeyId']: a for a in key_aliases}
+
+        matched = []
+        for r in resources:
+            if r.get('KmsKeyId'):
+                r['KeyAlias'] = key_aliases_dict.get(r.get('KmsKeyId').split("key/", 1)[-1])
+                if self.match(r.get('KeyAlias')):
+                    matched.append(r)
+        return matched

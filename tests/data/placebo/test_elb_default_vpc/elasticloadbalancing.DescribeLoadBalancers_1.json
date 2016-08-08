@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-15452171", 
+                    "subnet-5fb47507", 
+                    "subnet-63c97615"
+                ], 
+                "CanonicalHostedZoneNameID": "Z1H1FL5HABSF5", 
+                "VPCId": "vpc-4a9ff72e", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 80, 
+                            "LoadBalancerPort": 80, 
+                            "Protocol": "HTTP", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": []
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 10, 
+                    "Interval": 30, 
+                    "Target": "HTTP:80/index.html", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "BackendServerDescriptions": [], 
+                "Instances": [], 
+                "DNSName": "internal-test-load-balancer-1163315268.us-west-2.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-f9cc4d9f"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": []
+                }, 
+                "LoadBalancerName": "test-load-balancer", 
+                "CreatedTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 17, 
+                    "microsecond": 690000, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "AvailabilityZones": [
+                    "us-west-2a", 
+                    "us-west-2b", 
+                    "us-west-2c"
+                ], 
+                "Scheme": "internal", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196", 
+                    "GroupName": "default"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "89e981a6-54ee-11e6-ac9c-9fa66c3b797d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "89e981a6-54ee-11e6-ac9c-9fa66c3b797d", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2175", 
+                "content-type": "text/xml", 
+                "date": "Thu, 28 Jul 2016 18:10:17 GMT"
+            }
+        }
+    }
+}
