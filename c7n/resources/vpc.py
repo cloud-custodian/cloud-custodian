@@ -18,11 +18,37 @@ from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
+from c7n.filters import ValueFilter, Filter, FilterRegistry
+from c7n.utils import local_session, type_schema
+
 
 @resources.register('vpc')
 class Vpc(QueryResourceManager):
 
     resource_type = 'aws.ec2.vpc'
+
+
+
+@Vpc.filter_registry.register('subnets')
+class SubnetsOfVpc(ValueFilter):
+
+    schema = type_schema('subnets', rinherit=ValueFilter.schema)
+
+    def __init__(self, *args, **kw):
+        super(SubnetsOfVpc, self).__init__(*args, **kw)
+        self.data['key'] = 'Subnets'
+
+    def process(self, resources, event=None):
+
+        subnets = Subnet(self.manager.ctx, {}).resources()
+
+        matched = []
+        for r in resources:
+            r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
+            if self.match(r):
+                matched.append(r)
+
+        return matched
 
 
 @resources.register('subnet')

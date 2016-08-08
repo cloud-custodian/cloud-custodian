@@ -43,7 +43,7 @@ class SnapshotCopyTest(BaseTest):
         # skips, and so does the test
         if factory().region_name == 'us-east-1':
             return
-    
+
         self.assertEqual(len(resources), 1)
         client = factory(region="us-east-1").client('ec2')
         tags = client.describe_tags(
@@ -140,3 +140,20 @@ class EncryptExtantVolumesTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['Encrypted'], False)
+
+class TestKmsAlias(BaseTest):
+
+    def test_ebs_kms_alias(self):
+        session_factory = self.replay_flight_data('test_ebs_aws_managed_kms_keys')
+        p = self.load_policy(
+            {'name': 'ebs-aws-managed-kms-keys-filters',
+             'resource': 'ebs',
+             'filters': [
+                 {'type': 'kms-alias', 'key': 'AliasName',
+                  'value': '^(alias/aws/)', 'op': 'regex'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VolumeId'], 'vol-14a3cd9d')
