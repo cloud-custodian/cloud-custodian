@@ -20,7 +20,7 @@ import logging
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import Filter, FilterRegistry, FilterValidationError
+from c7n.filters import Filter, FilterRegistry, FilterValidationError, DefaultVpcBase
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -353,3 +353,14 @@ class HealthCheckProtocolMismatch(Filter):
         protocols = [listener['Listener']['InstanceProtocol']
                      for listener in listener_descriptions]
         return health_check_protocol in protocols
+
+
+@filters.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an elb database is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, elb):
+        return elb.get('VPCId') and self.match(elb.get('VPCId')) or False

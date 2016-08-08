@@ -34,7 +34,7 @@ class TestRedshift(BaseTest):
                  'key': 'require_ssl',
                  'value': False}]},
             session_factory=factory)
-                             
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -51,6 +51,15 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        
-        
-            
+    def test_redshift_default_vpc(self):
+        session_factory = self.replay_flight_data('test_redshift_default_vpc')
+        p = self.load_policy(
+            {'name': 'redshift-default-filters',
+             'resource': 'redshift',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
