@@ -122,7 +122,7 @@ class IAMSummary(ValueFilter):
     Example iam summary wrt to matchable fields::
 
       {
-            "UsersQuota": 5000,
+    "UsersQuota": 5000,
             "GroupsPerUserQuota": 10,
             "AttachedPoliciesPerGroupQuota": 10,
             "PoliciesQuota": 1000,
