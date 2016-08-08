@@ -32,7 +32,7 @@ class AccountTests(BaseTest):
             'name': 'trail-enabled',
             'resource': 'account',
             'filters': [
-                {'type': 'cloudtrail-enabled',
+                {'type': 'check-cloudtrail',
                  'multi-region': True,
                  'kms': True,
                  'file-digest': True,
@@ -47,7 +47,7 @@ class AccountTests(BaseTest):
             'name': 'trail-enabled',
             'resource': 'account',
             'filters': [
-                {'type': 'cloudtrail-enabled',
+                {'type': 'check-cloudtrail',
                  'notifies': True}
             ]}, session_factory=session_factory)
         resources = p.run()
@@ -59,7 +59,7 @@ class AccountTests(BaseTest):
             'name': 'config-enabled',
             'resource': 'account',
             'filters': [
-                {'type': 'config-enabled',
+                {'type': 'check-config',
                  'all-resources': True,
                  'running': True}
             ]}, session_factory=session_factory)
@@ -72,7 +72,7 @@ class AccountTests(BaseTest):
             'name': 'config-enabled',
             'resource': 'account',
             'filters': [
-                {'type': 'config-enabled',
+                {'type': 'check-config',
                  'global-resources': True}
             ]}, session_factory=session_factory)
         resources = p.run()
