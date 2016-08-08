@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DeliveryChannels": [
+            {
+                "snsTopicARN": "arn:aws:sns:us-west-2:644160558196:config-topic", 
+                "name": "default", 
+                "s3BucketName": "config-bucket-644160558196"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "885a39a8-5ce1-11e6-9760-e16996ad1b8e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "885a39a8-5ce1-11e6-9760-e16996ad1b8e", 
+                "date": "Sun, 07 Aug 2016 20:57:20 GMT", 
+                "content-length": "149", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
