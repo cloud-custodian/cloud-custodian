@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from json import dumps
 from jsonschema.exceptions import best_match
 
 from c7n.schema import Validator, validate, generate, specific_error
@@ -36,6 +37,12 @@ class SchemaTest(BaseTest):
             Validator.check_schema(schema)
         except Exception:
             self.fail("Invalid schema")
+
+    def test_schema_serialization(self):
+        try:
+            dumps(generate())
+        except:
+            self.fail("Failed to serialize schema")
 
     def test_empty_skeleton(self):
         self.assertEqual(validate({'policies': []}), [])
