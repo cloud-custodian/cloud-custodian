@@ -61,6 +61,48 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    def test_only_ports(self):
+        factory = self.replay_flight_data(
+            'test_security_group_only_ports')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol='tcp',
+            FromPort=60000,
+            ToPort=62000,
+            CidrIp='10.2.0.0/16')
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol='tcp',
+            FromPort=61000,
+            ToPort=61000,
+            CidrIp='10.2.0.0/16')
+        p = self.load_policy({
+            'name': 'sg-find',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'OnlyPorts': [61000]},
+                {'GroupName': 'web-tier'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['MatchedIpPermissions'],
+            [{u'FromPort': 60000,
+              u'IpProtocol': u'tcp',
+              u'IpRanges': [{u'CidrIp': u'10.2.0.0/16'}],
+              u'PrefixListIds': [],
+              u'ToPort': 62000,
+              u'UserIdGroupPairs': []}])
+
     def test_port_within_range(self):
         factory = self.replay_flight_data(
             'test_security_group_port_in_range')
@@ -89,6 +131,15 @@ class SecurityGroupTest(BaseTest):
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupName'], 'web-tier')
+        self.assertEqual(
+            resources[0]['MatchedIpPermissions'],
+            [{u'FromPort': 60000,
+              u'IpProtocol': u'tcp',
+              u'IpRanges': [{u'CidrIp': u'10.2.0.0/16'}],
+              u'PrefixListIds': [],
+              u'ToPort': 62000,
+              u'UserIdGroupPairs': []}])
 
     def test_ingress_remove(self):
         factory = self.replay_flight_data(
@@ -141,6 +192,7 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 
 class VpcTest(BaseTest):
 
