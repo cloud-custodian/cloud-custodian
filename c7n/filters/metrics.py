@@ -163,6 +163,8 @@ class MetricsFilter(Filter):
                 EndTime=self.end,
                 Period=self.period,
                 Dimensions=dimensions)['Datapoints']
+            if len(r['Metrics']) == 0:
+                continue
             if self.op(r['Metrics'][0][self.statistics], self.value):
                 matched.append(r)
         return matched
