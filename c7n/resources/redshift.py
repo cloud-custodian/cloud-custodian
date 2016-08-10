@@ -114,6 +114,6 @@ class Delete(BaseAction):
                 params['SkipFinalClusterSnapshot'] = True
             else:
                 params['FinalClusterSnapshotIdentifier'] = "%s-%s" % (
-                    "%s-%s" % (now.strftime("%Y-%m-%d"),
-                               db['ClusterIdentifier']))
+                    "%s-%s" % (db['ClusterIdentifier'],
+                        now.strftime("%Y-%m-%d")))
             c.delete_cluster(**params)

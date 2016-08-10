@@ -703,7 +703,7 @@ class MarkForOp(Tag):
         op={'enum': ['suspend', 'resume', 'delete']},
         key={'type': 'string'},
         tag={'type': 'string'},
-        message={'type', 'string'},
+        message={'type': 'string'},
         days={'type': 'number', 'minimum': 0})
 
     default_template = (
