@@ -25,11 +25,7 @@ from c7n.credentials import SessionFactory
 from c7n.policy import Policy, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag
-<<<<<<< HEAD
 from c7n import mu, schema, version
-=======
-from c7n import mu, schema, policy, version
->>>>>>> upstream
 
 
 log = logging.getLogger('custodian.commands')

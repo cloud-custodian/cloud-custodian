@@ -31,6 +31,7 @@ class VersionTest(BaseTest):
         cli.main()
         self.assertEqual(out.getvalue().strip(), version.version)
 
+
 class ValidateTest(BaseTest):
 
     def test_validate(self):
