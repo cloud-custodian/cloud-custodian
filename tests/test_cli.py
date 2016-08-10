@@ -32,6 +32,37 @@ class VersionTest(BaseTest):
         self.assertEqual(out.getvalue().strip(), version.version)
 
 
+class ValidateTest(BaseTest):
+
+    def test_validate(self):
+        t = tempfile.NamedTemporaryFile(suffix=".yml")
+        t.write(yaml.dump({'policies': [
+            {'name': 'foo',
+             'resource': 's3',
+             'filters': [
+                 {"tag:custodian_tagging": "not-null"}],
+             'actions': [{
+                 'type': 'unmark',
+                 'tags': ['custodian_cleanup']}]}]},
+                Dumper=yaml.SafeDumper))
+        t.flush()
+        self.addCleanup(t.close)
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir)
+
+        exit_code = []
+
+        def exit(code):
+            exit_code.append(code)
+
+        self.patch(sys, 'exit', exit)
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', '-c', t.name])
+
+        cli.main()
+        self.assertEqual(exit_code, [1])
+
+
 class RunTest(BaseTest):
 
     def test_run(self):
