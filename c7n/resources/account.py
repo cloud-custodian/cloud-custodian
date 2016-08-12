@@ -18,6 +18,7 @@ from c7n.actions import ActionRegistry
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, get_account_id, type_schema
+from c7n.resources.ec2 import EC2
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
@@ -188,7 +189,7 @@ class AccountPasswordPolicy(ValueFilter):
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         if not resources[0].get('password_policy'):
             client = local_session(self.manager.session_factory).client('iam')
             policy = client.get_account_password_policy().get('PasswordPolicy', {})
@@ -196,3 +197,61 @@ class AccountPasswordPolicy(ValueFilter):
         if self.match(resources[0]['password_policy']):
             return resources
         return []
+
+class AccountAttributesFilter(Filter):
+
+    schema = type_schema('account-attributes')
+
+    def get_attribute_count(self, account, attr, client):
+
+        account_attrs = {a['AttributeName']: a for a in client.describe_account_attributes()['AccountAttributes']}
+
+        if not account_attrs.get(attr):
+            return None
+
+        return int(account_attrs[attr]['AttributeValues'][0]['AttributeValue'])
+
+
+@filters.register('eighty-percent-max-instances')
+class AccountMaxInstances(AccountAttributesFilter):
+
+    def __call__(self, account):
+        manager = EC2(self.manager.ctx, {})
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        max_instances = self.get_attribute_count(account, 'max-instances', client)
+        instance_count = len(manager.resources())
+
+        if not max_instances or instance_count*100/max_instances < 80:
+            return False
+
+        return True
+
+@filters.register('eighty-percent-max-elastic-ips')
+class AccountMaxElasticIPs(AccountAttributesFilter):
+
+    def __call__(self, account):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        max_elastic_ips = self.get_attribute_count(account, 'max-elastic-ips', client)
+        elastic_ip_count = len([i for i in client.describe_addresses()['Addresses'] if i['Domain'] == 'standard'])
+
+        if not max_elastic_ips or elastic_ip_count*100/max_elastic_ips < 80:
+            return False
+
+        return True
+
+@filters.register('eighty-percent-max-vpc-elastic-ips')
+class AccountMaxVpcElasticIPs(AccountAttributesFilter):
+
+    def __call__(self, account):
+
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        max_vpc_elastic_ips = self.get_attribute_count(account, 'vpc-max-elastic-ips', client)
+        vpc_elastic_ip_count = len([i for i in client.describe_addresses()['Addresses'] if i['Domain'] == 'vpc'])
+
+        if not max_vpc_elastic_ips or vpc_elastic_ip_count*100/max_vpc_elastic_ips < 80:
+            return False
+
+        return True

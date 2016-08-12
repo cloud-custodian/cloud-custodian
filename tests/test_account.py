@@ -37,8 +37,8 @@ class AccountTests(BaseTest):
                 {'type': 'iam-summary'}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)        
-        
+        self.assertEqual(len(resources), 0)
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data('test_account_trail')
         p = self.load_policy({
@@ -65,7 +65,7 @@ class AccountTests(BaseTest):
             ]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data('test_account_config')
         p = self.load_policy({
@@ -89,5 +89,37 @@ class AccountTests(BaseTest):
                  'global-resources': True}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
-        
+        self.assertEqual(len(resources), 1)
+
+    def test_max_instances(self):
+        session_factory = self.replay_flight_data('test_max_instances')
+        p = self.load_policy({
+            'name': 'max-instances',
+            'resource': 'account',
+            'filters': [
+                {'type': 'eighty-percent-max-instances'}
+            ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_max_elastic_ips(self):
+        session_factory = self.replay_flight_data('test_max_elastic_ips')
+        p = self.load_policy({
+            'name': 'max-elastic-ips',
+            'resource': 'account',
+            'filters': [
+                {'type': 'eighty-percent-max-elastic-ips'}
+            ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_max_vpc_elastic_ips(self):
+        session_factory = self.replay_flight_data('test_max_vpc_elastic_ips')
+        p = self.load_policy({
+            'name': 'max-vpc-elastic-ips',
+            'resource': 'account',
+            'filters': [
+                {'type': 'eighty-percent-max-vpc-elastic-ips'}
+            ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
