@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import unittest
 
 from c7n import utils
@@ -58,3 +57,8 @@ class UtilTest(unittest.TestCase):
                 resource_type='og',
                 separator=':'),
             'arn:aws:rds:us-east-1:123456789012:og:mysql-option-group1')
+
+    def test_snapshot_identifier(self):
+        identifier = utils.snapshot_identifier('bkup', 'abcdef')
+        # e.g. bkup-2016-07-27-abcdef
+        self.assertEqual(len(identifier), 22)

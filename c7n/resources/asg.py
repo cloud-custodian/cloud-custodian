@@ -482,6 +482,8 @@ class Tag(BaseAction):
         msg={'type': 'string'},
         propagate={'type': 'boolean'})
 
+    batch_size = 1
+
     def process(self, asgs):
         error = False
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
@@ -494,7 +496,7 @@ class Tag(BaseAction):
         error = None
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for asg_set in chunks(asgs, 20):
+            for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
                     self.process_asg_set, asg_set, key, value)] = asg_set
             for f in as_completed(futures):

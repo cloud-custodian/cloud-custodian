@@ -40,6 +40,7 @@ def load_resources():
     import kms
     import redshift
     import rds
+    import rdscluster
     import route53
     import s3
     import sns
