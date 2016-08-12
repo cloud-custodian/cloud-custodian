@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshot": {
+            "Engine": "aurora",
+            "SnapshotCreateTime": {
+                "hour": 11,
+                "__class__": "datetime",
+                "month": 12,
+                "second": 35,
+                "microsecond": 118000,
+                "year": 2015,
+                "day": 19,
+                "minute": 6
+            },
+            "VpcId": "vpc-e2470387",
+            "DBClusterIdentifier": "bbb",
+            "MasterUsername": "root",
+            "LicenseModel": "aurora",
+            "Status": "available",
+            "PercentProgress": 100,
+            "DBClusterSnapshotIdentifier": "bbb-final-snapshot",
+            "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1", 
+            "ClusterCreateTime": {
+                "hour": 10,
+                "__class__": "datetime",
+                "month": 12,
+                "second": 52,
+                "microsecond": 866000,
+                "year": 2015,
+                "day": 19,
+                "minute": 38
+            },
+            "StorageEncrypted": true,
+            "AllocatedStorage": 1,
+            "SnapshotType": "manual",
+            "AvailabilityZones": [
+                "us-east-1a",
+                "us-east-1b",
+                "us-east-1e"
+            ],
+            "Port": 0
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "3067ccb0-55b1-11e6-9c9e-3390fb9eb3cf"
+        }
+    }
+}

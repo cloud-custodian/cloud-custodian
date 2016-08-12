@@ -15,14 +15,13 @@ import json
 import logging
 
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter, DefaultVpcBase
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import type_schema, local_session, chunks
+from c7n.utils import type_schema, local_session, chunks, snapshot_identifier
 
 log = logging.getLogger('custodian.redshift')
 
@@ -107,13 +106,11 @@ class Delete(BaseAction):
 
     def process_db_set(self, db_set):
         c = local_session(self.manager.session_factory).client('redshift')
-        now = datetime.now()
         for db in db_set:
             params = {'ClusterIdentifier': db['ClusterIdentifier']}
             if self.skip:
                 params['SkipFinalClusterSnapshot'] = True
             else:
-                params['FinalClusterSnapshotIdentifier'] = "%s-%s" % (
-                    "%s-%s" % (db['ClusterIdentifier'],
-                        now.strftime("%Y-%m-%d")))
+                params['FinalClusterSnapshotIdentifier'] = snapshot_identifier(
+                    'Final', db['ClusterIdentifier'])
             c.delete_cluster(**params)
