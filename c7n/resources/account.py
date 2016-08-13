@@ -217,7 +217,7 @@ class ServiceLimit(Filter):
 
     check_id = 'eW7HH0l7J9'
 
-    check_limit = ('region', 'service', 'limit', 'extant', 'color')
+    check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('support')
@@ -231,14 +231,19 @@ class ServiceLimit(Filter):
             client.refresh_trusted_advisor_check(checkId=self.check_id)
         threshold = self.data.get('threshold')
         exceeded = []
+        services = self.data.get('services')
+
         for resource in checks['flaggedResources']:
             if threshold is None and resource['status'] == 'ok':
                 continue
             limit = dict(zip(self.check_limit, resource['metadata']))
+            if services and limit['service'] not in services:
+                continue
+
             limit['status'] = resource['status']
-            limit['region'] = resource['region']
-            limit['percentage'] = float(limit['extant']) / float(limit['limit']) * 100
-            if threshold and limit['percentage'] < threshold:
+            limit['percentage'] = float(limit['extant'] or 0) / float(
+                limit['limit']) * 100
+            if threshold and limit['percentage'] >= threshold:
                 continue
             exceeded.append(limit)
         if exceeded:
