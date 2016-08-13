@@ -21,12 +21,15 @@ from common import load_data, BaseTest
 from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
+from c7n.resources.iam import UserMfaDevice
 from c7n.executor import MainThreadExecutor
 
 
 class IAMMFAFilter(BaseTest):
 
     def test_iam_mfa_filter(self):
+        self.patch(
+            UserMfaDevice, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_iam_mfa_filter')
         p = self.load_policy({
             'name': 'iam-mfa',
