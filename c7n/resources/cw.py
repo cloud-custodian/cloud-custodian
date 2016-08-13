@@ -13,6 +13,7 @@
 # limitations under the License.
 from datetime import datetime, timedelta
 
+from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -42,6 +43,32 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
 
     resource_type = Meta
+
+
+@LogGroup.action_registry.register('retention')
+class Retention(BaseAction):
+
+    schema = type_schema(
+        'retention', days={'type': 'integer'})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        days = self.data['days']
+        for r in resources:
+            client.put_retention_policy(
+                logGroupName=r['logGroupName'],
+                retentionInDays=days)
+
+
+@LogGroup.action_registry.register('delete')
+class Delete(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        for r in resources:
+            client.delete_log_group(logGroupName=r['logGroupName'])
 
 
 @LogGroup.filter_registry.register('last-write')
