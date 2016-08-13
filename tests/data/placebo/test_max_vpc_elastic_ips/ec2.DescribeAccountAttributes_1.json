@@ -1,0 +1,66 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "24002636-96fe-47ff-9d0f-3b5404dc116f", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 10 Aug 2016 19:16:18 GMT"
+            }
+        }, 
+        "AccountAttributes": [
+            {
+                "AttributeName": "supported-platforms", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "VPC"
+                    }
+                ]
+            }, 
+            {
+                "AttributeName": "vpc-max-security-groups-per-interface", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "5"
+                    }
+                ]
+            }, 
+            {
+                "AttributeName": "max-elastic-ips", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "5"
+                    }
+                ]
+            }, 
+            {
+                "AttributeName": "max-instances", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "20"
+                    }
+                ]
+            }, 
+            {
+                "AttributeName": "vpc-max-elastic-ips", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "5"
+                    }
+                ]
+            }, 
+            {
+                "AttributeName": "default-vpc", 
+                "AttributeValues": [
+                    {
+                        "AttributeValue": "vpc-4a9ff72e"
+                    }
+                ]
+            }
+        ]
+    }
+}
