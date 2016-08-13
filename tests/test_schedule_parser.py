@@ -37,24 +37,30 @@ class ScheduleParserTest(unittest.TestCase):
         self.assertEquals('pst', s['tz'])
 
     def test_parses_bad_days_schedule(self):
-        s = self.parser.parse('off=(m-z,19);on=(m-f,7);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-z,19);on=(m-f,7);tz=pst')
 
-        s = self.parser.parse('off=(m-f,19);on=(m-z,7);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,19);on=(m-z,7);tz=pst')
 
     def test_parses_bad_hours_schedule(self):
-        s = self.parser.parse('off=(m-f,19);on=(m-f,99);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,19);on=(m-f,99);tz=pst')
 
-        s = self.parser.parse('off=(m-f,99);on=(m-z,7);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,99);on=(m-z,7);tz=pst')
 
-        s = self.parser.parse('off=(m-f,19),(x,10);on=(m-f,1);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,19),(x,10);on=(m-f,1);tz=pst')
 
-        s = self.parser.parse('off=(m-f,9);on=(m-z,7),(m,1,2);tz=pst')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,9);on=(m-z,7),(m,1,2);tz=pst')
 
     def test_parses_default_tz(self):
         s = self.parser.parse('off=(m-f,19);on=(m-f,7)')
@@ -87,12 +93,14 @@ class ScheduleParserTest(unittest.TestCase):
         self.assertEquals('pst', s['tz'])
 
     def test_invalid_hour(self):
-        s = self.parser.parse('off=(m-f,asdf);on=(m-f,asdf)')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(m-f,asdf);on=(m-f,asdf)')
 
     def test_invalid_day(self):
-        s = self.parser.parse('off=(asdf,19);on=(asdf,7)')
-        self.assertEquals(None, s)
+        self.assertRaises(ValueError,
+                          self.parser.parse,
+                          'off=(asdf,19);on=(asdf,7)')
 
     def test_valid_hour_range(self):
         self.assertEquals(True, self.parser.is_valid_hour_range(0))
