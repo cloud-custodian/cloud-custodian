@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter, ValueFilter, DefaultVpcBase
+from c7n.filters import (
+    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -23,6 +25,28 @@ from c7n.utils import local_session, type_schema
 class Vpc(QueryResourceManager):
 
     resource_type = 'aws.ec2.vpc'
+
+
+@Vpc.filter_registry.register('subnets')
+class SubnetsOfVpc(ValueFilter):
+
+    schema = type_schema('subnets', rinherit=ValueFilter.schema)
+
+    def __init__(self, *args, **kw):
+        super(SubnetsOfVpc, self).__init__(*args, **kw)
+        self.data['key'] = 'Subnets'
+
+    def process(self, resources, event=None):
+
+        subnets = Subnet(self.manager.ctx, {}).resources()
+
+        matched = []
+        for r in resources:
+            r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
+            if self.match(r):
+                matched.append(r)
+
+        return matched
 
 
 @resources.register('subnet')
@@ -60,20 +84,45 @@ class SGPermission(Filter):
     If a group has any permissions that match all conditions, then it
     matches the filter.
 
-    Permissions that match on the group are annotated onto the group.
+    Permissions that match on the group are annotated onto the group and
+    can subsequently be used by the remove-permission action.
+
+    An example::
 
       - type: ingress
         IpProtocol: -1
         FromPort: 445
+
+    We have specialized handling for matching Ports in ingress/egress
+    permission From/To range::
+
+      - type: ingress
+        Ports: [22, 443, 80]
+
+    As well for assertions that a ingress/egress permission only matches
+    a given set of ports, *note* onlyports is an inverse match, it matches
+    when a permission includes ports outside of the specified set:
+
+      - type: egress
+        OnlyPorts: [22, 443, 80]
+
     """
 
     attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-                'IpRanges', 'PrefixListIds'))
+                 'IpRanges', 'PrefixListIds', 'Ports', 'OnlyPorts'))
+
+    def validate(self):
+        delta = set(self.data.keys()).difference(self.attrs)
+        delta.remove('type')
+        if delta:
+            raise FilterValidationError("Unknown keys %s" % ", ".join(delta))
+        return self
 
     def process(self, resources, event=None):
         self.vfilters = []
         fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
-
+        self.ports = 'Ports' in self.data and self.data['Ports'] or ()
+        self.only_ports = 'OnlyPorts' in self.data and self.data['OnlyPorts'] or ()
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
@@ -87,15 +136,27 @@ class SGPermission(Filter):
 
     def __call__(self, resource):
         matched = []
-        for p in resource[self.ip_permissions_key]:
-            found = True
+        for perm in resource[self.ip_permissions_key]:
+            found = False
             for f in self.vfilters:
-                if not f(p):
-                    found = False
+                if f(perm):
+                    found = True
                     break
+            if 'FromPort' in perm and 'ToPort' in perm:
+                for port in self.ports:
+                    if port >= perm['FromPort'] and port <= perm['ToPort']:
+                        found = True
+                        break
+                only_found = False
+                for port in self.only_ports:
+                    if port == perm['FromPort'] and port == perm['ToPort']:
+                        only_found = True
+                if self.only_ports and not only_found:
+                    found = True
             if not found:
                 continue
-            matched.append(p)
+            matched.append(perm)
+
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
             return True
@@ -109,7 +170,8 @@ class IPPermission(SGPermission):
         'type': 'object',
         #'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['ingress']}
+            'type': {'enum': ['ingress']},
+            'Ports': {'type': 'array', 'items': {'type': 'integer'}}
             },
         'required': ['type']}
 
@@ -130,7 +192,8 @@ class IPPermissionEgress(SGPermission):
 @SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermissions(BaseAction):
 
-    schema = type_schema('remove-permissions')
+    schema = type_schema(
+        'remove-permissions', groups={'type': 'string', 'enum': ['matched', 'all']})
 
     def process(self, resources):
         i_perms = self.data.get('ingress')

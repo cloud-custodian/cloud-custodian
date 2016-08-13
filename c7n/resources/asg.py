@@ -24,7 +24,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -46,6 +46,7 @@ filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
 filters.register('tag-count', TagCountFilter)
 filters.register('marked-for-op', TagActionFilter)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('asg')
@@ -437,7 +438,7 @@ class RemoveTag(BaseAction):
         aliases=('untag', 'unmark'),
         key={'type': 'string'})
 
-    batch_size = 5
+    batch_size = 1
 
     def process(self, asgs):
         error = False
@@ -459,6 +460,7 @@ class RemoveTag(BaseAction):
         if error:
             raise error
 
+    # retry on error code - ResourceInUse
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
@@ -480,6 +482,8 @@ class Tag(BaseAction):
         msg={'type': 'string'},
         propagate={'type': 'boolean'})
 
+    batch_size = 1
+
     def process(self, asgs):
         error = False
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
@@ -492,7 +496,7 @@ class Tag(BaseAction):
         error = None
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for asg_set in chunks(asgs, 20):
+            for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
                     self.process_asg_set, asg_set, key, value)] = asg_set
             for f in as_completed(futures):
@@ -701,7 +705,7 @@ class MarkForOp(Tag):
         op={'enum': ['suspend', 'resume', 'delete']},
         key={'type': 'string'},
         tag={'type': 'string'},
-        message={'type', 'string'},
+        message={'type': 'string'},
         days={'type': 'number', 'minimum': 0})
 
     default_template = (

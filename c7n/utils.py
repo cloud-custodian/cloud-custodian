@@ -20,7 +20,6 @@ import threading
 import time
 
 
-
 # Try to place nice in lambda exec environment
 # where we don't require yaml
 try:
@@ -39,6 +38,15 @@ else:
 
 
 from StringIO import StringIO
+
+
+class Bag(dict):
+
+    def __getattr__(self, k):
+        try:
+            return self[k]
+        except KeyError:
+            raise AttributeError(k)
 
 
 def yaml_load(value):
@@ -214,3 +222,25 @@ def parse_s3(s3_path):
     else:
         key_prefix = s3_path[s3_path.find('/', 5):]
     return s3_path, bucket, key_prefix
+
+
+def generate_arn(
+        service, resource, partition='aws',
+        region=None, account_id=None, resource_type=None, separator='/'):
+    """Generate an Amazon Resource Name.
+    See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
+    """
+    arn = 'arn:%s:%s:%s:%s:' % (
+        partition, service, region if region else '', account_id if account_id else '')
+    if resource_type:
+        arn = arn + '%s%s%s' % (resource_type, separator, resource)
+    else:
+        arn = arn + resource
+    return arn
+
+
+def snapshot_identifier(prefix, db_identifier):
+    """Return an identifier for a snapshot of a database or cluster.
+    """
+    now = datetime.now()
+    return  '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))

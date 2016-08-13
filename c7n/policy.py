@@ -113,8 +113,12 @@ class Policy(object):
         return self.data.get('max-resources')
 
     @property
+    def tags(self):
+        return self.data.get('tags', ())
+
+    @property
     def is_lambda(self):
-        if not 'mode' in self.data:
+        if 'mode' not in self.data:
             return False
         return True
 
@@ -171,6 +175,7 @@ class Policy(object):
                 action.process(resources, event)
             else:
                 action.process(resources)
+        return resources
 
     def provision(self):
         """Provision policy as a lambda function."""

@@ -42,6 +42,19 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_tag_trim(self):
+        session_factory = self.replay_flight_data('test_rds_tag_trim')
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [
+                {'tag:Platform': 'postgres'}],
+            'actions': [
+                {'type': 'tag-trim', 'preserve': ['Name', 'Owner']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_tag_and_remove(self):
         self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_rds_tag_and_remove')
@@ -58,7 +71,7 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        arn = p.resource_manager.arn_generator.generate(
+        arn = p.resource_manager.generate_arn(
             resources[0]['DBInstanceIdentifier'])
 
         tags = client.list_tags_for_resource(ResourceName=arn)
@@ -115,6 +128,20 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_rds_kms_alias(self):
+        session_factory = self.replay_flight_data('test_rds_kms_alias')
+        p = self.load_policy(
+            {'name': 'rds-aws-managed-kms-keys-filters',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'kms-alias', 'key': 'AliasName',
+                  'value': '^(alias/aws/)', 'op': 'regex'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot(self):
@@ -167,6 +194,81 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rds_db_instance_eligible_for_backup(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'funky'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'DBClusterIdentifier': 'C1'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'postgres'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'Engine': 'postgres'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'Engine': 'mysql',
+            'EngineVersion': '5.5.1'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'mysql',
+            'EngineVersion': '5.5.1'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'mysql',
+            'EngineVersion': '5.7.1'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_backup(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'mysql',
+            'EngineVersion': '6.1.1'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_backup(resource))
 
 
 class RDSSnapshotTrimTest(BaseTest):
