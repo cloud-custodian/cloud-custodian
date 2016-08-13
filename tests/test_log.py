@@ -70,7 +70,7 @@ class LogTest(BaseTest):
 
         handler.flush()
         self.assertFalse(handler.transport.buffers)
-        
+
 
 if __name__ == '__main__':
     unittest.main()
