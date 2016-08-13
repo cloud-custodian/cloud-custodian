@@ -14,6 +14,11 @@
 """AWS Account as a custodian resource.
 """
 
+from datetime import datetime, timedelta
+
+from dateutil.parser import parse as parse_date
+from dateutil.tz import tzutc
+
 from c7n.actions import ActionRegistry
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
@@ -188,11 +193,65 @@ class AccountPasswordPolicy(ValueFilter):
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         if not resources[0].get('password_policy'):
             client = local_session(self.manager.session_factory).client('iam')
             policy = client.get_account_password_policy().get('PasswordPolicy', {})
             resources[0]['password_policy'] = policy
         if self.match(resources[0]['password_policy']):
+            return resources
+        return []
+
+
+@filters.register('service-limit')
+class ServiceLimit(Filter):
+    """Check if account's service limits are past a given threshold."""
+
+    schema = type_schema(
+        'service-limit',
+        threshold={'type': 'integer'},
+        refresh_period={'type': 'integer'},
+        limits={'type': 'array', 'items': {'type': 'string'}},
+        services={'type': 'array', 'items': {
+            'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
+                     'RDS', 'EBS', 'SES', 'IAM']}})
+
+    check_id = 'eW7HH0l7J9'
+
+    check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('support')
+        checks = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en')['result']
+
+        resources[0]['ServiceLimits'] = checks
+        delta = timedelta(self.data.get('refresh_period', 1))
+        check_date = parse_date(checks['timestamp'])
+        if datetime.now(tz=tzutc()) - delta > check_date:
+            client.refresh_trusted_advisor_check(checkId=self.check_id)
+        threshold = self.data.get('threshold')
+
+        services = self.data.get('services')
+        limits = self.data.get('limits')
+        exceeded = []
+
+
+        for resource in checks['flaggedResources']:
+            if threshold is None and resource['status'] == 'ok':
+                continue
+            limit = dict(zip(self.check_limit, resource['metadata']))
+            if services and limit['service'] not in services:
+                continue
+            if limits and limit['check'] not in limits:
+                continue
+            limit['status'] = resource['status']
+            limit['percentage'] = float(limit['extant'] or 0) / float(
+                limit['limit']) * 100
+            if threshold and limit['percentage'] < threshold:
+                continue
+            exceeded.append(limit)
+        if exceeded:
+            resources[0]['ServiceLimitsExceeded'] = exceeded
             return resources
         return []
