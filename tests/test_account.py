@@ -37,8 +37,8 @@ class AccountTests(BaseTest):
                 {'type': 'iam-summary'}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)        
-        
+        self.assertEqual(len(resources), 0)
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data('test_account_trail')
         p = self.load_policy({
@@ -65,7 +65,7 @@ class AccountTests(BaseTest):
             ]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data('test_account_config')
         p = self.load_policy({
@@ -89,5 +89,15 @@ class AccountTests(BaseTest):
                  'global-resources': True}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
-        
+        self.assertEqual(len(resources), 1)
+
+    def test_service_limit(self):
+        session_factory = self.record_flight_data('test_account_service_limit')
+        p = self.load_policy({
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'threshold': 0}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

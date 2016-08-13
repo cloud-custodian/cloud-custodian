@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccountAliases": [
+            "custodian-skunk-works"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "39526b6d-6141-11e6-9627-176635388e2a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "39526b6d-6141-11e6-9627-176635388e2a", 
+                "date": "Sat, 13 Aug 2016 10:32:24 GMT", 
+                "content-length": "400", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
