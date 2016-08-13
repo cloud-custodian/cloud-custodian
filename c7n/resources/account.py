@@ -211,6 +211,7 @@ class ServiceLimit(Filter):
         'service-limit',
         threshold={'type': 'integer'},
         refresh_period={'type': 'integer'},
+        limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
             'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
                      'RDS', 'EBS', 'SES', 'IAM']}})
@@ -230,8 +231,11 @@ class ServiceLimit(Filter):
         if datetime.now(tz=tzutc()) - delta > check_date:
             client.refresh_trusted_advisor_check(checkId=self.check_id)
         threshold = self.data.get('threshold')
-        exceeded = []
+
         services = self.data.get('services')
+        limits = self.data.get('limits')
+        exceeded = []
+
 
         for resource in checks['flaggedResources']:
             if threshold is None and resource['status'] == 'ok':
@@ -239,11 +243,12 @@ class ServiceLimit(Filter):
             limit = dict(zip(self.check_limit, resource['metadata']))
             if services and limit['service'] not in services:
                 continue
-
+            if limits and limit['check'] not in limits:
+                continue
             limit['status'] = resource['status']
             limit['percentage'] = float(limit['extant'] or 0) / float(
                 limit['limit']) * 100
-            if threshold and limit['percentage'] >= threshold:
+            if threshold and limit['percentage'] < threshold:
                 continue
             exceeded.append(limit)
         if exceeded:
