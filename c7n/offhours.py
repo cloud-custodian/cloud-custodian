@@ -43,8 +43,6 @@ different policy, they support the same configuration options
    resource's schedule.
  - :opt-out: applies the default schedule to resource which do not specify
    any value. a value of `off` to disable/exclude the resource.
-# - :debug: verbose log output about a resource matching the schedule.
-# - :skew:
 
 The default off hours and on hours are specified per the policy configuration
 along with the opt-in/opt-out behavior. Resources can specify the timezone
@@ -147,11 +145,12 @@ Options
 # note we have to module import for our testing mocks
 import datetime
 import logging
+from os.path import join
 
 from dateutil import zoneinfo
 
 from c7n.filters import Filter, FilterValidationError
-from c7n.utils import type_schema
+from c7n.utils import type_schema, dumps
 
 log = logging.getLogger('custodian.offhours')
 
@@ -163,7 +162,6 @@ class Time(Filter):
         'properties': {
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
-            'skew': {'type': 'integer'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
@@ -194,18 +192,14 @@ class Time(Filter):
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
         self.default_tz = self.data.get('default_tz', self.DEFAULT_TZ)
-        self.skew = self.data.get('skew', 0)
         self.weekends = self.data.get('weekends', True)
         self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
-        self.debug = self.data.get('debug', False)
         self.tag_key = self.data.get('tag', self.DEFAULT_TAG).lower()
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 
-        # If unit testing
-        self.id_key = (
-            manager is None and 'InstanceId' or manager.get_model().id)
+        self.id_key = None
 
         self.opted_out = []
         self.parse_errors = []
@@ -216,20 +210,35 @@ class Time(Filter):
             raise FilterValidationError(
                 "Invalid timezone specified %s" % self.default_tz)
         hour = self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
-        if hour is self.parser.VALID_HOURS:
+        if hour not in self.parser.VALID_HOURS:
             raise FilterValidationError("Invalid hour specified %s" % hour)
         return self
 
     def process(self, resources, event=None):
         resources = super(Time, self).process(resources)
-        self.log.info("disabled count %d", len(self.opted_out))
-        self.log.info("enabled count %d", self.enabled_count)
-        if self.parse_errors:
+        if self.parse_errors and self.manager and self.manager.log_dir:
             self.log.warning("parse errors %d", len(self.parse_errors))
+            with open(join(
+                    self.manager.log_dir, 'parse_errors.json'), 'w') as fh:
+                dumps(self.parse_errors, fh=fh)
+            self.parse_errors = []
+        if self.opted_out and self.manager and self.manager.log_dir:
+            self.log.debug("disabled count %d", len(self.opted_out))
+            with open(join(
+                    self.manager.log_dir, 'opted_out.json'), 'w') as fh:
+                dumps(self.opted_out, fh=fh)
+            self.opted_out = []
         return resources
 
     def __call__(self, i):
         value = self.get_tag_value(i)
+
+        # Sigh delayed init, due to circle dep, process/init would be better but
+        # unit testing is calling this direct.
+        if self.id_key is None:
+            self.id_key = (
+                self.manager is None and 'InstanceId'
+                or self.manager.get_model().id)
 
         # The resource tag is not present, if we're not running in an opt-out
         # mode, we're done.
@@ -241,8 +250,6 @@ class Time(Filter):
         # Resource opt out, track and record
         if 'off' == value:
             self.opted_out.append(i)
-            if self.debug:
-                log.debug('offhours disabled on %s' % i[self.id_key])
             return False
         else:
             self.enabled_count += 1
@@ -281,9 +288,7 @@ class Time(Filter):
         return self.match(now, schedule)
 
     def match(self, now, schedule):
-        if self.time_type is None:
-            return False
-        time = schedule.get(self.time_type)
+        time = schedule.get(self.time_type, ())
         for item in time:
             days, hour = item.get("days"), item.get('hour')
             if now.weekday() in days and now.hour == hour:
@@ -299,13 +304,11 @@ class Time(Filter):
                 found = t['Value']
         if found is False:
             return False
-        value = found.lower()
+        # utf8, or do translate tables via unicode ord mapping
+        value = found.lower().encode('utf8')
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"').translate(None, ' ')
-        if self.debug:
-            log.debug('resource: %s specifies time with value: %s' % (
-                i[self.id_key], value))
         return value
 
     @classmethod
@@ -352,6 +355,7 @@ class OnHour(Time):
             {'hour': self.data.get(
                 "%shour" % self.time_type, self.DEFAULT_HR)}]}
         if self.weekends_only:
+            # turn on monday
             default[self.time_type][0]['days'] = [0]
         elif self.weekends:
             default[self.time_type][0]['days'] = range(5)
@@ -407,12 +411,13 @@ class ScheduleParser(object):
         }
 
     """
-    cache = {}
+
     DAY_MAP = {'m': 0, 't': 1, 'w': 2, 'h': 3, 'f': 4, 's': 5, 'u': 6}
     VALID_HOURS = tuple(range(24))
 
     def __init__(self, default_schedule):
         self.default_schedule = default_schedule
+        self.cache = {}
 
     def parse(self, tag_value):
         # check the cache
@@ -427,7 +432,7 @@ class ScheduleParser(object):
             kv = piece.split('=')
             # components must by key=value
             if not len(kv) == 2:
-                continue
+                return None
             key, value = kv
             if key not in ('on', 'off', 'tz'):
                 return None
@@ -458,24 +463,27 @@ class ScheduleParser(object):
             tokens = e.translate(None, '()').split(',')
             # custom hours must have two parts: (<days>, <hour>)
             if not len(tokens) == 2:
-                # force an all or nothing senario in terms of bad values
                 return None
-            try:
-                hour = int(tokens[1])
-                if hour not in self.VALID_HOURS:
-                    return None
-                parsed.append({
-                    'days': self.expand_day_range(tokens[0]),
-                    'hour': hour
-                    })
-            except (ValueError, KeyError):
+            if not tokens[1].isdigit():
                 return None
+            hour = int(tokens[1])
+            if hour not in self.VALID_HOURS:
+                return None
+            days = self.expand_day_range(tokens[0])
+            if not days:
+                return None
+            parsed.append({'days': days, 'hour': hour})
         return parsed
 
     def expand_day_range(self, days):
-        if len(days) == 1:
-            return [self.DAY_MAP[days[0]]]
-        days = [self.DAY_MAP[d] for d in days.split('-')]
-        if not len(days) == 2:
-            return []
-        return range(min(days), max(days) + 1)
+        # single day specified
+        if days in self.DAY_MAP:
+            return [self.DAY_MAP[days]]
+        day_range = [d for d in map(self.DAY_MAP.get, days.split('-'))
+                     if d is not None]
+        if not len(day_range) == 2:
+            return None
+        # support wrap around days aka friday-monday = 4,5,6,0
+        if day_range[0] > day_range[1]:
+            return range(day_range[0], 7) + range(day_range[1]+1)
+        return range(min(day_range), max(day_range) + 1)
