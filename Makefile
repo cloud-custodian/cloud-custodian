@@ -14,12 +14,12 @@ coverage:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --cover-inclusive tests
 
 ttest:
-	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-timer tests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s --with-timer tests
 lint:
 	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
-	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --processes=-1 tests
+	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests  --processes=-1 tests
 
 ftests:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
