@@ -109,13 +109,13 @@ Here's doing the same with auto scale groups
       - name: asg-offhours-stop
         resource: ec2
         filters:
-           - type: offhour
+           - offhour
         actions:
            - suspend
       - name: asg-onhours-start
         resource: ec2
         filters:
-           - type: onhour
+           - onhour
         actions:
            - resume
 
@@ -143,7 +143,9 @@ Options
            offhour: 20
 
 """
-from datetime import datetime
+
+# note we have to module import for our testing mocks
+import datetime
 import logging
 
 from dateutil import zoneinfo
@@ -202,20 +204,17 @@ class Time(Filter):
         self.parser = ScheduleParser(self.default_schedule)
 
         # If unit testing
-        if self.manager is None:
-            self.id_key = 'InstanceId'
-        else:
-            self.id_key = self.manager.get_model().id
+        self.id_key = (
+            manager is None and 'InstanceId' or manager.get_model().id)
 
         self.opted_out = []
         self.parse_errors = []
         self.enabled_count = 0
 
     def validate(self):
-        tz = zoneinfo.gettz(
-            self.TZ_ALIASES.get(self.default_tz, self.default_tz))
-        if tz is None:
-            raise FilterValidationError("Invalid timezone specified %s" % tz)
+        if self.get_tz(self.default_tz) is None:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.default_tz)
         hour = self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
         if hour is self.parser.VALID_HOURS:
             raise FilterValidationError("Invalid hour specified %s" % hour)
@@ -269,15 +268,16 @@ class Time(Filter):
                 "Invalid schedule on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
-        tz = zoneinfo.gettz(
-            self.TZ_ALIASES.get(schedule['tz'], schedule['tz']))
+
+        tz = self.get_tz(schedule['tz'])
         if not tz:
             log.warning(
                 "Could not resolve tz on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
 
-        now = datetime.now(tz).replace(minute=0, second=0, microsecond=0)
+        now = datetime.datetime.now(tz).replace(
+            minute=0, second=0, microsecond=0)
         return self.match(now, schedule)
 
     def match(self, now, schedule):
@@ -307,6 +307,10 @@ class Time(Filter):
             log.debug('resource: %s specifies time with value: %s' % (
                 i[self.id_key], value))
         return value
+
+    @classmethod
+    def get_tz(cls, tz):
+        return zoneinfo.gettz(cls.TZ_ALIASES.get(tz, tz))
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")
