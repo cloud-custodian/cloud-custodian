@@ -324,7 +324,6 @@ class DefaultVpc(DefaultVpcBase):
 
     schema = type_schema('default-vpc')
 
-
     def __call__(self, ec2):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 

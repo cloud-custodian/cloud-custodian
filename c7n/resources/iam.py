@@ -118,7 +118,6 @@ class UserMfaDevice(ValueFilter):
             self.log.debug("Querying %d users' mfa devices" % len(query_resources))
             list(w.map(_user_mfa_devices, query_resources))
 
-
         matched = []
         for r in resources:
             if self.match(r):

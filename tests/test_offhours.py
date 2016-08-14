@@ -18,7 +18,7 @@ from mock import mock
 
 from .common import BaseTest, instance
 
-from c7n.offhours import OffHour, OnHour
+from c7n.offhours import OffHour, OnHour, ScheduleParser
 
 
 # Per http://blog.xelnor.net/python-mocking-datetime/
@@ -139,9 +139,9 @@ class OffHoursFilterTest(BaseTest):
             i = instance(Tags=[
                 {'Key': 'maid_offhours', 'Value': 'tz=est'}])
             f = OffHour({})
-            p = f.get_tag_parts(i)
-            self.assertEqual(p, (['tz=est'], {'maid_offhours': 'tz=est'}))
-            tz = f.get_local_tz(p[0])
+            p = f.get_tag_value(i)
+            self.assertEqual(p, ('tz=est', {'maid_offhours': 'tz=est'}))
+            tz = f.get_local_tz(p)
             self.assertEqual(str(tz), "tzfile('America/New_York')")
             self.assertEqual(
                 datetime.datetime.now(tz), t)
@@ -228,7 +228,6 @@ class OffHoursFilterTest(BaseTest):
                 results.append(OnHour({})(i))
             self.assertEqual(results, [True, False])
 
-
     def test_custom_bad_tz(self):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
@@ -266,3 +265,36 @@ class OffHoursFilterTest(BaseTest):
                                 'Value': 'off=(m-f,90);on=(m-f,7);tz=et'}])
             #will go to default values, but not work due to default time
             self.assertEqual(OffHour({})(i), False)
+
+
+class ScheduleParserTest(BaseTest):
+
+
+    table = [
+        ('', {'tz': 'et'}),
+        # simple
+        ('off=(m-f,10);on=(m-f,7);tz=et',
+         {'off': [{'days': ['m', 't', 'w', 'h', 'f'], 'hour': 10}],
+          'on': [{'days': ['m', 't', 'w', 'h', 'f'], 'hour': 7}],
+          'tz': 'et'}),
+
+        # doesn't do saturday-monday
+        #("off = [(m-f, 21)]; on=(s-m, 11); tz=pt",
+        # {}),
+        
+        #  off before on
+        ("off=[(m-f,9)];on=(m-s,10);tz=pt",
+         {'off': [{'days': ['m', 't', 'w', 'h', 'f'], 'hour': 9}],
+          'on': [{'days': ['m', 't', 'w', 'h', 'f', 's'], 'hour': 10}],
+          'tz': 'pt'}),
+        ("off=[(m-f, 23)]; on=(m-s, 10); tz=pt",
+         {'off': [{'days': ['m', 't', 'w', 'h', 'f'], 'hour': 23}],
+          'on': [{'days': ['m', 't', 'w', 'h', 'f', 's'], 'hour': 10}],
+          'tz': 'pt'}),
+        ("off=(m-t,19);on=[(m-f,9),(s-u,10)", None)
+        ]
+
+    def test_schedule_parser(self):
+        for value, expected in self.table:
+            self.assertEqual(ScheduleParser().parse(value), expected)
+            

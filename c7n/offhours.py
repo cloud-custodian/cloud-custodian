@@ -12,22 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Offhours support
-================
+Resource Scheduling Offhours
+============================
 
-Turn resources off based on a schedule. There are two usage modes that
-can be configured, opt-in with resources that wish to participate
-specifying a tag value with their configuration for
-offhours. Additionally opt-out where the schedule is set to apply to
-all resources that match the policy filters, resources can specify a
-tag value then to allow opt-out behavior.
+Custodian provides for time based filters, that allow for taking periodic
+action on a resource, with resource schedule customization based on tag values.
+A common use is offhours scheduling for asgs, and instances.
 
-Schedules
-=========
+Features
+========
+
+- Flexible offhours scheduling with opt-in, opt-out selection, and timezone
+  support.
+- Resume during offhours support.
+- Can be combined with other filters to get a particular set (
+  resources with tag, vpc, etc).
+- Can be combined with arbitrary actions
+
+Policy Configuration
+====================
+
+We provide an `onhour` and `offhour` time filter, each should be used in a
+different policy, they support the same configuration options
+
+ - :weekends: default true, whether to leave resources off for the weekend
+ - :weekend-only: default false, whether to turn the resource off only on the
+   weekend
+ - :default_tz: which tz to utilize when evaluating time
+ - :tag: default maid_offhours, which resource tag key to look for the
+   resource's schedule.
+ - :opt-out: applies the default schedule to resource which do not specify
+   any value. a value of `off` to disable/exclude the resource.
+# - :debug: verbose log output about a resource matching the schedule.
+# - :skew:
 
 The default off hours and on hours are specified per the policy configuration
 along with the opt-in/opt-out behavior. Resources can specify the timezone
-that they wish to have this scheduled utilized with.
+that they wish to have this scheduled utilized with::
 
 
 Tag Based Configuration
@@ -122,13 +143,12 @@ Options
            offhour: 20
 
 """
-from c7n.filters import Filter
-
-import datetime
+from datetime import datetime
 import logging
 
 from dateutil import zoneinfo
 
+from c7n.filters import Filter
 from c7n.utils import type_schema
 
 DEFAULT_TAG = "maid_offhours"
@@ -155,13 +175,9 @@ TIME_ALIASES = {
     'y': 'year'
 }
 
-DEFAULT_OFFHOUR = 19
-DEFAULT_ONHOUR = 7
+
 DEFAULT_TZ = 'et'
 
-VALID_DAYS = ['m', 't', 'w', 'h', 'f', 's', 'u']
-VALID_HOURS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-               19, 20, 21, 22, 23)
 
 log = logging.getLogger('custodian.offhours')
 
@@ -182,7 +198,9 @@ class Time(Filter):
             'default_tz': {'type': 'string'},
             'skew': {'type': 'integer'},
             'weekends': {'type': 'boolean'},
+            'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
+            'debug': {'type': 'boolean'},
             }
         }
 
@@ -193,135 +211,105 @@ class Time(Filter):
 
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
+        self.default_tz = self.data.get('default_tz', DEFAULT_TZ)
         self.skew = self.data.get('skew', self.skew)
-        self.weekends = self.data.get('weekends', False)
+        self.weekends = self.data.get('weekends', True)
+        self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
+        self.debug = self.data.get('debug', False)
+        self.tag_key = self.data.get('tag', DEFAULT_TAG).lower()
+        self.default_schedule = self.get_default_schedule()
+        self.parser = ScheduleParser(self.default_schedule)
+
+        self.opted_out = []
+        self.parse_errors = []
+        self.enabled_count = 0
+
+    def process(self, resources, event=None):
+        resources = super(Time, self).process(resources)
+        self.log.info("disabled count %d", len(self.opted_out))
+        self.log.info("enabled count %d", self.enabled_count)
+        if self.parse_errors:
+            self.log.warning("parse errors %d", len(self.parse_errors))
+        return resources
 
     def __call__(self, i):
-        parts, tag_map = self.get_tag_parts(i)
-        if parts is False:
-            if self.opt_out:
-                parts = []
-            else:
+        value = self.get_tag_value(i)
+
+        # The resource tag is not present, if we're not running in an opt-out
+        # mode, we're done.
+        if value is False:
+            if not self.opt_out:
                 return False
-        if 'off' in parts:
-            log.debug('offhours disabled on %s' % resource_id(i))
-            return False
-        return self.process_current_time(i, parts)
+            value = "" # take the defaults
 
-    def process_current_time(self, i, parts):
+        # Resource opt out, track and record
+        if 'off' == value:
+            self.opted_out.append(i)
+            if self.debug:
+                log.debug('offhours disabled on %s' % resource_id(i))
+            return False
+        else:
+            self.enabled_count += 1
+
         try:
-            parsed = ScheduleParser().parse(parts[0])
-        except Exception as e:
-            log.warning("Parsing Error: %s. Using default values" % e)
-            parsed = ScheduleParser().parse("")
+            return self.process_resource_schedule(i, value)
+        except:
+            log.exception(
+                "%s failed to process resource:%s value:%s",
+                self.__class__.__name__, resource_id(i), value)
+            return False
 
-        tz_part = ['tz=%s' % parsed.get('tz')]
-        tz = self.get_local_tz(tz_part)
+    def process_resource_schedule(self, i, value):
+        """Does the resource tag schedule and policy match the current time."""
+        rid = resource_id(i)
+        schedule = self.parser.parse(value)
+        if schedule is None:
+            log.warning(
+                "Invalid schedule on resource:%s value:%s", rid, value)
+            self.parse_errors.append((rid, value))
+            return False
+
+        tz = zoneinfo.gettz(TZ_ALIASES.get(schedule['tz'], schedule['tz']))
         if not tz:
+            log.warning(
+                "Could not resolve tz on resource:%s value:%s", rid, value)
+            self.parse_errors.append((rid, value))
             return False
 
-        now = datetime.datetime.now(tz).replace(
-            minute=0, second=0, microsecond=0)
+        now = datetime.now(tz).replace(minute=0, second=0, microsecond=0)
+        return self.match(i, now, schedule)
 
-        #override get_sentinel_time with get_custom_time if custom downtime
-        #detected
-        if self.is_custom(parsed):
-            return self.get_custom_time(i, now, parsed)
-
-        if not self.weekends and now.weekday() in (5, 6):
-            log.debug("skipping weekends")
+    def match(self, i, now, schedule):
+        if self.time_type is None:
             return False
-
-        sentinel = self.get_sentinel_time(tz)
-
-        log.debug(
-            "resource: %s comparing sentinel: %s to current: %s" % (
-                resource_id(i), sentinel, now))
-
-        if sentinel == now:
-            return True
-        if not self.skew:
-            return False
-        hour = sentinel.hour
-        for i in range(1, self.skew + 1):
-            sentinel = sentinel.replace(hour=hour + i)
-            if sentinel == now:
+        time = schedule.get(self.time_type)
+        for item in time:
+            days, hour = item.get("days"), item.get('hour')
+            if now.weekday() in days and now.hour == hour:
                 return True
         return False
 
-    def get_tag_parts(self, i):
-        # Look for downtime tag, Normalize tag key and tag value
-        tag_key = self.data.get('tag', DEFAULT_TAG).lower()
-        tag_map = {t['Key'].lower(): t['Value'] for t in i.get('Tags', [])}
-        if tag_key not in tag_map:
-            return False, tag_map
-        value = tag_map[tag_key].lower()
-        # Sigh.. some folks seem to be interpreting the docs quote marks as
-        # literal for values.
-        value = value.strip("'").strip('"')
-        parts = filter(None, value.split())
-        log.debug('resource: %s specifies downtime with value: %s' % (
-            resource_id(i), value))
-        return parts, tag_map
-
-    def get_sentinel_time(self, tz):
-        t = datetime.datetime.now(tz)
-        return t.replace(
-            hour=self.data.get('hour', 0),
-            minute=self.data.get('minute', 0),
-            second=0,
-            microsecond=0)
-
-    def get_local_tz(self, parts):
-        tz_spec = None
-        for p in parts:
-            if p.startswith('tz='):
-                tz_spec = p
-                break
-        if tz_spec is None:
-            tz_spec = (
-                self.data.get('default_tz') or
-                self.data.get('default-tz', DEFAULT_TZ))
-        else:
-            _, tz_spec = tz_spec.split('=')
-
-        if tz_spec in TZ_ALIASES:
-            tz_spec = TZ_ALIASES[tz_spec]
-        tz = zoneinfo.gettz(tz_spec)
-        if tz is None:
-            self.log.warning(
-                "filter:offhours unknown tz %s for %s" % (
-                    tz_spec, parts))
-
-            return None
-        return tz
-
-
-    def is_custom(self, parts):
-        return "tz" in parts and "on" in parts and "off" in parts
-
-
-    def get_custom_time(self, i, now, parts):
-        if self.time_type is None:
+    def get_tag_value(self, i):
+        """Get the resource's tag value specifying its schedule."""
+        # Look for the tag, Normalize tag key and tag value
+        found = False
+        for t in i.get('Tags'):
+            if t['Key'].lower() == self.tag_key:
+                found = t['Value']
+        if found is False:
             return False
+        value = found.lower()
+        # Some folks seem to be interpreting the docs quote marks as
+        # literal for values.
+        value = value.strip("'").strip('"').translate(None, ' ')
+        if self.debug:
+            log.debug('resource: %s specifies time with value: %s' % (
+                resource_id(i), value))
+        return value
 
-        time = parts.get(self.time_type)
-        tz = parts.get("tz")
-
-        for item in time:
-            days = item.get("days")
-            hour = item.get("hour")
-            for d in days:
-                log.debug("resource: %s checking custom hours, day=%s "
-                     "hour=%s, and tz=%s" % (resource_id(i), d, hour, tz))
-                if now.weekday() == VALID_DAYS.index(d): #if today
-                    if now.hour == hour:
-                        log.debug("resource: %s matches custom hours with "
-                                  "value now: %s" % (resource_id(i), now))
-                        return True
-        log.debug("No custom hours match found for resource: %s" % resource_id(i))
-        return False
+    def get_default_schedule(self):
+        raise NotImplementedError("use subclass")
 
 
 class OffHour(Time):
@@ -331,9 +319,18 @@ class OffHour(Time):
         offhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
     time_type = "off"
 
-    def get_sentinel_time(self, tz):
-        t = super(OffHour, self).get_sentinel_time(tz)
-        return t.replace(hour=self.data.get('offhour', DEFAULT_OFFHOUR))
+    DEFAULT_HR = 19
+
+    def get_default_schedule(self):
+        default = {'tz': self.default_tz, self.time_type: [
+            {'hours': self.data.get("%shour" % self.time_type, self.DEFAULT_HR)}]}
+        if self.weekends_only:
+            default[self.time_type][0]['days'] = [4]
+        elif self.weekends:
+            default[self.time_type][0]['days'] = range(5)
+        else:
+            default[self.time_type][0]['days'] = range(7)
+        return default
 
 
 class OnHour(Time):
@@ -343,19 +340,25 @@ class OnHour(Time):
         onhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
     time_type = "on"
 
-    def get_sentinel_time(self, tz):
-        t = super(OnHour, self).get_sentinel_time(tz)
-        return t.replace(hour=self.data.get('onhour', DEFAULT_ONHOUR))
+    DEFAULT_HR = 7
+
+    def get_default_schedule(self):
+        default = {'tz': self.default_tz, self.time_type: [
+            {'hours': self.data.get("%shour" % self.time_type, self.DEFAULT_HR)}]}
+        if self.weekends_only:
+            default[self.time_type][0]['days'] = [0]
+        elif self.weekends:
+            default[self.time_type][0]['days'] = range(5)
+        else:
+            default[self.time_type][0]['days'] = range(7)
+        return default
 
 
+class ScheduleParser(object):
+    """Parses tag values for custom on/off hours schedules.
 
-class ScheduleParser:
-    """
-    The ScheduleParser class parses instances/asgs to define a custom off hours
-    schedule via the offhours tag.
-
-    At the minimum the ``on`` and ``off`` tags are required. Each of these must
-    be seperated by a ``;`` in the format described below.
+    At the minimum the ``on`` and ``off`` values are required. Each of
+    these must be seperated by a ``;`` in the format described below.
 
     **Schedule format**::
 
@@ -396,34 +399,46 @@ class ScheduleParser:
           ],
           tz: "pt"
         }
-    """
 
+    """
     cache = {}
+    DAY_MAP = {'m': 0, 't': 1, 'w': 2, 'h': 3, 'f': 4, 's': 5, 'u': 6}
+    VALID_HOURS = tuple(range(24))
+
+    def __init__(self, default_schedule):
+        self.default_schedule = default_schedule
 
     def parse(self, tag_value):
         # check the cache
         if tag_value in self.cache:
             return self.cache[tag_value]
+
         schedule = {}
+
         # parse schedule components
         pieces = tag_value.split(';')
         for piece in pieces:
             kv = piece.split('=')
-            # components must by key-value
+            # components must by key=value
             if not len(kv) == 2:
                 continue
-            key = kv[0].strip()
-            value = kv[1].strip()
-            if key == 'on' or key == 'off':
-                # parse custom on/off hours
+            key, value = kv
+            if key not in ('on', 'off', 'tz'):
+                return None
+            if key != 'tz':
                 value = self.parse_custom_hours(value)
+            if value is None:
+                return None
             schedule[key] = value
+
         # add default timezone, if none supplied or blank
-        if schedule.get('tz') is None  or not schedule.get('tz'):
-            schedule['tz'] = DEFAULT_TZ
+        if not schedule.get('tz'):
+            schedule['tz'] = self.default_schedule['tz']
+
         # validate
         if not self.is_valid(schedule):
-            schedule = None
+            schedule = self.default_schedule
+
         # cache
         self.cache[tag_value] = schedule
         return schedule
@@ -435,69 +450,51 @@ class ScheduleParser:
             hour = hour.translate(None, '()').split(',')
             # custom hours must have two parts: (<days>, <hour>)
             if not len(hour) == 2:
-                #force an all or nothing senario in terms of bad values
-                return []
+                # force an all or nothing senario in terms of bad values
+                return None
             try:
                 hour[1] = int(hour[1])
                 if not self.is_valid_hour_range(hour[1]):
-                    raise ValueError("The specified hour is invalid")
+                    #raise ValueError("The specified hour is invalid")
+                    return None
                 parsed.append({
                     'days': self.expand_day_range(hour[0]),
                     'hour': hour[1]
                     })
-            except ValueError:
-                #force an all or nothing senario in terms of bad values
-                raise
+            except (ValueError, KeyError):
+                return None
         return parsed
 
     def expand_day_range(self, days):
         if len(days) == 1:
-            if not self.is_valid_day(days):
-                raise ValueError("The specified day is invalid")
-            return [days]
-
-        days = days.split('-')
+            return [self.DAY_MAP[days[0]]]
+        days = [self.DAY_MAP[d] for d in days.split('-')]
         if not len(days) == 2:
             return []
-
-        if not self.is_valid_day(days[0]) or not self.is_valid_day(days[1]):
-            raise ValueError("The specificed day is invalid")
-        # return a slice of valid days
-        return VALID_DAYS[VALID_DAYS.index(days[0]):VALID_DAYS.index(days[1])+1]
+        return range(min(days), max(days) + 1)
 
     def is_valid(self, schedule):
         # off and on are both required if either is present
         if 'off' in schedule and 'on' not in schedule:
-            raise ValueError("On tag is missing or malformed")
+            return False
+            #raise ValueError("On tag is missing or malformed")
         elif 'on' in schedule and 'off' not in schedule:
-            raise ValueError("Off tag is missing or malformed")
+            #raise ValueError("Off tag is missing or malformed")
+            return False
         # validate custom on/off hours
         if 'off' in schedule and 'on' in schedule:
             if not self.is_valid_hours(schedule['off']):
-                raise ValueError("The specificed Off hour value is invalid")
+                #raise ValueError("The specificed On hour value is invalid")
+                return False
             if not self.is_valid_hours(schedule['on']):
-                raise ValueError("The specificed On hour value is invalid")
+                #raise ValueError("The specificed On hour value is invalid")
+                return False
         return True
 
     def is_valid_hours(self, hours):
         if len(hours) <= 0:
             return False
         for hour in hours:
-            if not self.is_valid_hour(hour):
+            if hour not in self.VALID_HOURS:
                 return False
         return True
-
-    def is_valid_hour(self, hour):
-        if len(hour['days']) <= 0:
-            return False
-        return True
-
-    def is_valid_hour_range(self, hour):
-        if hour in VALID_HOURS:
-            return True
-        return False
-
-    def is_valid_day(self, day):
-        if day in VALID_DAYS:
-            return True
-        return False
