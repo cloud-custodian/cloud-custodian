@@ -292,9 +292,22 @@ class ScheduleParserTest(BaseTest):
           'on': [{'days': [0, 1, 2, 3, 4, 5], 'hour': 10}],
           'tz': 'pt'}),
         #("off=(m-t,19);on=[(m-f,9),(s-u,10)", None)
+        ('off=(m-f,19);on=(m-f,7);tz=pst',
+         {'off': [{'days': [0, 1, 2, 3, 4], 'hour': 19}],
+          'on': [{'days': [0, 1, 2, 3, 4], 'hour': 7}],
+          'tz': 'pst'}),
+        ('off=(1-2,m);on=(m-f,10);tz=est', None),
+        ('on=[(m,9),(t,10),(w,7)];off=(u-m,19)',
+         {'on': [{'days': [0], 'hour': 9},
+                 {'days': [1], 'hour': 10},
+                 {'days': [2], 'hour': 7}],
+          'off': [{'days': [0, 1, 2, 3, 4, 5, 6], 'hour': 19}],
+          'tz': 'et'}),
         ]
 
+
     def test_schedule_parser(self):
+        self.maxDiff = None
         for value, expected in self.table:
             self.assertEqual(
                 ScheduleParser({'tz': 'et'}).parse(value), expected)
