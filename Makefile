@@ -19,7 +19,7 @@ lint:
 	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
-	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v tests
+	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --processes=-1 tests
 
 ftests:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
