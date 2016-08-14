@@ -717,12 +717,11 @@
         }, 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "23a8795e-6145-11e6-9507-7b0d74654962", 
+            "RequestId": "a84b2a86-6221-11e6-bd81-9fda53595c4c", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "23a8795e-6145-11e6-9507-7b0d74654962", 
-                "date": "Sat, 13 Aug 2016 11:00:26 GMT", 
+                "x-amzn-requestid": "a84b2a86-6221-11e6-bd81-9fda53595c4c", 
+                "date": "Sun, 14 Aug 2016 13:18:57 GMT", 
                 "content-length": "9763", 
-                "x-amzn-actiontrace": "amzn1.tr.23a8790e-6145-11e6-84df-0a5b6ed60000.0..Vue6VR", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
