@@ -54,11 +54,22 @@ def _elb_tags(elbs, session_factory, executor_factory):
     def process_tags(elb_set):
         client = local_session(session_factory).client('elb')
         elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
-        try:
-            results = client.describe_tags(LoadBalancerNames=elb_map.keys())
-        except ClientError as e:
-            log.exception("Exception Processing ELB: %s", e)
-            raise
+
+        while True:
+            try:
+                results = client.describe_tags(
+                    LoadBalancerNames=elb_map.keys())
+                break
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'LoadBalancerNotFound':
+                    raise
+                msg = e.response['Error']['Message']
+                _, lb_name = msg.strip().rsplit(' ', 1)
+                elb_map.pop(lb_name)
+                if not elb_map:
+                    results = {'TagDescriptions': []}
+                    break
+                continue
         for tag_desc in results['TagDescriptions']:
             elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
 

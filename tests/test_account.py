@@ -37,8 +37,8 @@ class AccountTests(BaseTest):
                 {'type': 'iam-summary'}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)        
-        
+        self.assertEqual(len(resources), 0)
+
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data('test_account_trail')
         p = self.load_policy({
@@ -65,7 +65,7 @@ class AccountTests(BaseTest):
             ]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data('test_account_config')
         p = self.load_policy({
@@ -89,5 +89,70 @@ class AccountTests(BaseTest):
                  'global-resources': True}
             ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
-        
+        self.assertEqual(len(resources), 1)
+
+    def test_service_limit(self):
+        session_factory = self.replay_flight_data('test_account_service_limit')
+        p = self.load_policy({
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'threshold': 0}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['ServiceLimitsExceeded']), 50)
+
+    def test_service_limit_specific_check(self):
+        session_factory = self.replay_flight_data('test_account_service_limit')
+        p = self.load_policy({
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'limits': ['DB security groups'],
+                'threshold': 1.0
+            }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            set([l['service'] for l in resources[0]['ServiceLimitsExceeded']]),
+            set(['RDS']))
+        self.assertEqual(
+            set([l['region'] for l in resources[0]['ServiceLimitsExceeded']]),
+            set(['us-east-1', 'us-west-2', 'us-west-1']))
+        self.assertEqual(
+            set([l['check'] for l in resources[0]['ServiceLimitsExceeded']]),
+            set(['DB security groups']))
+        self.assertEqual(len(resources[0]['ServiceLimitsExceeded']), 3)
+
+    def test_service_limit_specific_service(self):
+        session_factory = self.replay_flight_data('test_account_service_limit')
+        p = self.load_policy({
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit', 'services': ['IAM'], 'threshold': 1.0
+            }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            set([l['service'] for l in resources[0]['ServiceLimitsExceeded']]),
+            set(['IAM']))
+        self.assertEqual(len(resources[0]['ServiceLimitsExceeded']), 2)
+
+    def test_service_limit_no_threshold(self):
+        # only warns when the default threshold goes to warning or above
+        session_factory = self.replay_flight_data('test_account_service_limit')
+        p = self.load_policy({
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+

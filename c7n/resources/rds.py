@@ -72,10 +72,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, type_schema, get_account_id, chunks, generate_arn)
+    local_session, type_schema, get_account_id,
+    chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
-
-from datetime import datetime
 
 from skew.resources.aws import rds
 
@@ -317,17 +316,14 @@ class Delete(BaseAction):
 
         # Concurrency feels like over kill here.
         client = local_session(self.manager.session_factory).client('rds')
-        now = datetime.now()
         for rdb in resources:
             params = dict(
                 DBInstanceIdentifier=rdb['DBInstanceIdentifier'])
             if self.skip:
                 params['SkipFinalSnapshot'] = True
             else:
-                params['FinalDBSnapshotIdentifier'] = "%s-%s" % (
-                        rdb['DBInstanceIdentifier'],
-                        now.strftime("%Y-%m-%d")
-                        )
+                params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
+                    'Final', rdb['DBInstanceIdentifier'])
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
@@ -365,9 +361,9 @@ class Snapshot(BaseAction):
 
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
-            DBSnapshotIdentifier="Backup-%s-%s" % (
-                resource['DBInstanceIdentifier'],
-                resource['Engine']),
+            DBSnapshotIdentifier=snapshot_identifier(
+                'Backup',
+                resource['DBInstanceIdentifier']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
 
 
