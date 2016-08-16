@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 
+from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
