@@ -57,7 +57,7 @@ from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import Tag
-from c7n.utils import chunks, local_session, set_annotation, type_schema
+from c7n.utils import chunks, local_session, set_annotation, type_schema, DateTimeEncoder
 
 """
 TODO:
@@ -514,7 +514,7 @@ class BucketScanLog(object):
         self.count += len(keys)
         if self.fh is None:
             return
-        self.fh.write(json.dumps(keys))
+        self.fh.write(json.dumps(keys, cls=DateTimeEncoder))
         self.fh.write(",\n")
 
 
@@ -1041,3 +1041,74 @@ class BucketTag(Tag):
                 self.log.exception(
                     "Error while tagging bucket %s err: %s" % (
                         r['Name'], e))
+
+
+@actions.register('delete')
+class DeleteBucket(ScanBucket):
+
+    schema = type_schema('delete', empty={'type': 'boolean'})
+
+    def process(self, buckets):
+        if self.data.get('empty'):
+            self.empty_buckets(buckets)
+        with self.executor_factory(max_workers=3) as w:
+            results = w.map(self.delete_bucket, buckets)
+            return filter(None, list(results))
+
+    def delete_bucket(self, b):
+        s3 = bucket_client(self.manager.session_factory(), b)
+        try:
+            self._run_api(
+                s3.delete_bucket,
+                Bucket=b['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'BucketNotEmpty':
+                self.log.error(
+                    "Error while deleting bucket %s, bucket not empty" % (
+                        b['Name']))
+            else:
+                raise e
+
+    def empty_buckets(self, buckets):
+        t = time.time()
+        results = super(DeleteBucket, self).process(buckets)
+        run_time = time.time() - t
+        remediated_count = object_count = 0
+
+        for r in results:
+            object_count += r['Count']
+            self.manager.ctx.metrics.put_metric(
+                "Total Keys", object_count, "Count", Scope=r['Bucket'],
+                buffer=True)
+
+        self.manager.ctx.metrics.put_metric(
+            "Total Keys", object_count, "Count", Scope="Account",
+            buffer=True
+        )
+        self.manager.ctx.metrics.flush()
+
+        log.info(
+            ("EmptyBucket Complete keys:%d "
+             "rate:%0.2f/s time:%0.2fs"),
+            object_count,
+            float(object_count) / run_time,
+            run_time)
+        return results
+
+    def process_chunk(self, batch, bucket):
+        s3 = bucket_client(
+            local_session(self.manager.session_factory), bucket)
+        b = bucket['Name']
+
+        objects = []
+        for key in batch:
+            obj = {'Key': key['Key']}
+            if 'VersionId' in key:
+                obj['VersionId'] = key['VersionId']
+            objects.append(obj)
+
+        delete = {'Objects': objects}
+        response = s3.delete_objects(Bucket=b, Delete=delete)
+
+        results = response['Deleted']
+        return results
