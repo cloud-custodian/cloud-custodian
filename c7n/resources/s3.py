@@ -57,7 +57,7 @@ from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import Tag
-from c7n.utils import chunks, local_session, set_annotation, type_schema, DateTimeEncoder
+from c7n.utils import chunks, local_session, set_annotation, type_schema, dumps
 
 """
 TODO:
@@ -78,7 +78,7 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 class S3(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
-        dimension = 'BucketName'
+        dimension = 'Name'
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -514,7 +514,7 @@ class BucketScanLog(object):
         self.count += len(keys)
         if self.fh is None:
             return
-        self.fh.write(json.dumps(keys, cls=DateTimeEncoder))
+        self.fh.write(dumps(keys))
         self.fh.write(",\n")
 
 
@@ -578,6 +578,7 @@ class ScanBucket(BucketActionBase):
         return results
 
     def process_bucket(self, b):
+        import pdb; pdb.set_trace()
         log.info(
             "Scanning bucket:%s visitor:%s style:%s" % (
                 b['Name'], self.__class__.__name__, self.get_bucket_style(b)))
@@ -1058,9 +1059,7 @@ class DeleteBucket(ScanBucket):
     def delete_bucket(self, b):
         s3 = bucket_client(self.manager.session_factory(), b)
         try:
-            self._run_api(
-                s3.delete_bucket,
-                Bucket=b['Name'])
+            self._run_api(s3.delete_bucket, Bucket=b['Name'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'BucketNotEmpty':
                 self.log.error(
@@ -1073,7 +1072,7 @@ class DeleteBucket(ScanBucket):
         t = time.time()
         results = super(DeleteBucket, self).process(buckets)
         run_time = time.time() - t
-        remediated_count = object_count = 0
+        object_count = 0
 
         for r in results:
             object_count += r['Count']
@@ -1082,33 +1081,29 @@ class DeleteBucket(ScanBucket):
                 buffer=True)
 
         self.manager.ctx.metrics.put_metric(
-            "Total Keys", object_count, "Count", Scope="Account",
-            buffer=True
-        )
+            "Total Keys", object_count, "Count", Scope="Account", buffer=True)
         self.manager.ctx.metrics.flush()
-
+    
         log.info(
-            ("EmptyBucket Complete keys:%d "
-             "rate:%0.2f/s time:%0.2fs"),
-            object_count,
-            float(object_count) / run_time,
-            run_time)
+            ("EmptyBucket Complete keys:%d rate:%0.2f/s time:%0.2fs"),
+            object_count, float(object_count) / run_time, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
-        s3 = bucket_client(
-            local_session(self.manager.session_factory), bucket)
-        b = bucket['Name']
-
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         objects = []
         for key in batch:
             obj = {'Key': key['Key']}
             if 'VersionId' in key:
                 obj['VersionId'] = key['VersionId']
             objects.append(obj)
+        results = s3.delete_objects(
+            Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
+        if self.get_bucket_style(bucket) != 'versioned':
+            return results
 
-        delete = {'Objects': objects}
-        response = s3.delete_objects(Bucket=b, Delete=delete)
+        import pdb; pdb.set_trace()
+        for r in results:
+            pass
 
-        results = response['Deleted']
-        return results
+
