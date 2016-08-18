@@ -43,6 +43,7 @@ class Snapshot(QueryResourceManager):
     resource_type = "aws.ec2.snapshot"
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
+    tags.register_tags(filter_registry, action_registry)
 
 
 @Snapshot.filter_registry.register('age')
@@ -208,7 +209,7 @@ class AttachedInstanceFilter(ValueFilter):
             InstanceIds=instance_ids)
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
-        return {i['InstanceId']: i for i in instances}
+        return {i['InstanceId']: i for i in instances}       
 
 
 @filters.register('kms-alias')
@@ -217,8 +218,6 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
 
-
-@actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.
 
