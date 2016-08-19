@@ -218,6 +218,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
 
+@actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.
 
