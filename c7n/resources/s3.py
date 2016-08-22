@@ -53,7 +53,8 @@ import ssl
 
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
+from c7n.filters import (
+    FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import Tag
@@ -77,8 +78,10 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(QueryResourceManager):
 
+    #resource_type = "aws.s3.bucket"
+
     class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
-        dimension = 'Name'
+        dimension = 'BucketName'
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -173,6 +176,19 @@ def bucket_client(session, b, kms=False):
     else:
         config = Config(read_timeout=200)
     return session.client('s3', region_name=region, config=config)
+
+
+@filters.register('metrics')
+class S3Metrics(MetricsFilter):
+    """S3 CW Metrics need special handling for attribute/dimension
+    mismatch, and additional required dimension.
+    """
+    def get_dimensions(self, resource):
+        return [
+            {'Name': 'BucketName',
+             'Value': resource['Name']},
+            {'Name': 'StorageType',
+             'Value': 'AllStorageTypes'}]
 
 
 @filters.register('cross-account')
@@ -1082,7 +1098,7 @@ class DeleteBucket(ScanBucket):
         self.manager.ctx.metrics.put_metric(
             "Total Keys", object_count, "Count", Scope="Account", buffer=True)
         self.manager.ctx.metrics.flush()
-    
+
         log.info(
             ("EmptyBucket Complete keys:%d rate:%0.2f/s time:%0.2fs"),
             object_count, float(object_count) / run_time, run_time)
