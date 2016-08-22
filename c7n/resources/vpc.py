@@ -105,7 +105,6 @@ class SGPermission(Filter):
 
       - type: egress
         OnlyPorts: [22, 443, 80]
-
     """
 
     attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',

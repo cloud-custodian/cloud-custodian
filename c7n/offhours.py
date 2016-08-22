@@ -299,7 +299,7 @@ class Time(Filter):
         """Get the resource's tag value specifying its schedule."""
         # Look for the tag, Normalize tag key and tag value
         found = False
-        for t in i.get('Tags'):
+        for t in i.get('Tags', ()):
             if t['Key'].lower() == self.tag_key:
                 found = t['Value']
         if found is False:
