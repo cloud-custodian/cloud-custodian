@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 58
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "4rhu6vQTC96wD50mAmBV86piUmq8rBvqUVE6UcaUEGsB84mQhexwLT5cjI3Fm0KOEdQYM1Ot2oo=", 
+            "RequestId": "CF98C71888A4FBE5", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "4rhu6vQTC96wD50mAmBV86piUmq8rBvqUVE6UcaUEGsB84mQhexwLT5cjI3Fm0KOEdQYM1Ot2oo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CF98C71888A4FBE5", 
+                "date": "Wed, 17 Aug 2016 11:01:17 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -86,15 +86,15 @@ def generateBucketContents(s3, bucket, contents=None):
             ContentType='text/plain')
 
 
-class BucketDelete(BaseTest):        
-
+class BucketDelete(BaseTest):
 
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
             s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
-        self.patch(s3, 'S3_AUGMENT_TABLE', ('get_bucket_versioning', 'Versioning', None, None)])
-        session_factory = self.record_flight_data('test_s3_delete_versioned_bucket')
+        self.patch(s3, 'S3_AUGMENT_TABLE',
+                   [('get_bucket_versioning', 'Versioning', None, None)])
+        session_factory = self.replay_flight_data('test_s3_delete_versioned_bucket')
         session = session_factory()
         client = session.client('s3')
         s3_resource = session.resource('s3')
@@ -103,7 +103,6 @@ class BucketDelete(BaseTest):
         client.put_bucket_versioning(
             Bucket=bname,
             VersioningConfiguration={'Status': 'Enabled'})
-        #self.addCleanup(destroyVersionedBucket, client, bname)
         generateBucketContents(s3_resource, bname)
         # Generate some versions
         generateBucketContents(s3_resource, bname)
@@ -119,7 +118,7 @@ class BucketDelete(BaseTest):
         self.assertEqual(len(resources), 1)
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
-        
+
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -146,7 +145,7 @@ class BucketDelete(BaseTest):
 
 
 class BucketTag(BaseTest):
-        
+
     def test_tag_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(

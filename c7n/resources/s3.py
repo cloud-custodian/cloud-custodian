@@ -578,7 +578,6 @@ class ScanBucket(BucketActionBase):
         return results
 
     def process_bucket(self, b):
-        import pdb; pdb.set_trace()
         log.info(
             "Scanning bucket:%s visitor:%s style:%s" % (
                 b['Name'], self.__class__.__name__, self.get_bucket_style(b)))
@@ -1047,7 +1046,7 @@ class BucketTag(Tag):
 @actions.register('delete')
 class DeleteBucket(ScanBucket):
 
-    schema = type_schema('delete', empty={'type': 'boolean'})
+    schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
 
     def process(self, buckets):
         if self.data.get('empty'):
@@ -1101,9 +1100,4 @@ class DeleteBucket(ScanBucket):
             Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
         if self.get_bucket_style(bucket) != 'versioned':
             return results
-
-        import pdb; pdb.set_trace()
-        for r in results:
-            pass
-
 

@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "Name": "custodian-byebye"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "fJs5zyoDvfn9ddaT/tbdia3A5S1xex4tsX6z2EtfNJWjHjIsL5hqucO++s0gI+Wnq7ZcIm8ho9o=", 
+            "RequestId": "5590239E6CBB386E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "fJs5zyoDvfn9ddaT/tbdia3A5S1xex4tsX6z2EtfNJWjHjIsL5hqucO++s0gI+Wnq7ZcIm8ho9o=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "5590239E6CBB386E", 
+                "date": "Mon, 22 Aug 2016 09:23:59 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

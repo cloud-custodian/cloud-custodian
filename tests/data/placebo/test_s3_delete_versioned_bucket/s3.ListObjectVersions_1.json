@@ -1,0 +1,158 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-byebye", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "Ts8Ce0twRLLUGYU5+FzOKNnuGxRc2u2CT6ktc3Ut/0/uqt0b4+oQUItoEdht5XWrAT8/6gqDOBY=", 
+            "RequestId": "0DC8C409770BF244", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Ts8Ce0twRLLUGYU5+FzOKNnuGxRc2u2CT6ktc3Ut/0/uqt0b4+oQUItoEdht5XWrAT8/6gqDOBY=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "0DC8C409770BF244", 
+                "date": "Mon, 22 Aug 2016 09:24:04 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Versions": [
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": "zvJqTgq7pIvMtzIV1QPrq6W3MZECH5Tk", 
+                "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/10", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": true, 
+                "Size": 3
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": "CHj4.wRO9gtGzmRhjvpyiHVuWfBNiuIe", 
+                "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/10", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": false, 
+                "Size": 3
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": "qtzJA2kh_fKhIczyCVpFcFuJIAd_dJBF", 
+                "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/11", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": true, 
+                "Size": 4
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": ".sUZ3UDvWoXIMptgqUbK_LBwKoR_b.Bw", 
+                "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "AWSLogs/2015/10/11", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": false, 
+                "Size": 4
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": "bWSk9sTsHU_04nr.XaKziLhq60_lM6bU", 
+                "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "home.txt", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": true, 
+                "Size": 5
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 23
+                }, 
+                "VersionId": "Ee5fddSUGW8JlSwsCNi4q9NtPXJYTNQp", 
+                "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "home.txt", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "IsLatest": false, 
+                "Size": 5
+            }
+        ], 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "KeyMarker": "", 
+        "IsTruncated": false, 
+        "VersionIdMarker": ""
+    }
+}
