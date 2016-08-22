@@ -86,6 +86,64 @@ def generateBucketContents(s3, bucket, contents=None):
             ContentType='text/plain')
 
 
+class BucketDelete(BaseTest):
+
+    def test_delete_versioned_bucket(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE',
+                   [('get_bucket_versioning', 'Versioning', None, None)])
+        session_factory = self.replay_flight_data('test_s3_delete_versioned_bucket')
+        session = session_factory()
+        client = session.client('s3')
+        s3_resource = session.resource('s3')
+        bname = 'custodian-byebye'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_versioning(
+            Bucket=bname,
+            VersioningConfiguration={'Status': 'Enabled'})
+        generateBucketContents(s3_resource, bname)
+        # Generate some versions
+        generateBucketContents(s3_resource, bname)
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [{'type': 'delete', 'empty': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertFalse(bname in buckets)
+
+    def test_delete_bucket(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_delete_bucket')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-byebye'
+        client.create_bucket(Bucket=bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [{'type': 'delete', 'empty': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertFalse(bname in buckets)
+
+
 class BucketTag(BaseTest):
 
     def test_tag_bucket(self):

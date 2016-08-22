@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 17, 
+                    "minute": 1
+                }, 
+                "Name": "custodian-byebye"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 58
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "eAD9WgrJM7fl79yR471TZYVqVIKBZWVCuR+igRDZksqZ63J+g6Ys4XzJPlq+UpR5wU/uA8ocYCo=", 
+            "RequestId": "71726E3427CE35A5", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "eAD9WgrJM7fl79yR471TZYVqVIKBZWVCuR+igRDZksqZ63J+g6Ys4XzJPlq+UpR5wU/uA8ocYCo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "71726E3427CE35A5", 
+                "date": "Wed, 17 Aug 2016 11:01:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
