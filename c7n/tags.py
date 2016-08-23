@@ -85,7 +85,7 @@ class TagTrim(Action):
                 - downtime
                 - custodian_status
     """
-    max_tag_count = 10
+    max_tag_count = 50
 
     schema = utils.type_schema(
         'tag-trim',
