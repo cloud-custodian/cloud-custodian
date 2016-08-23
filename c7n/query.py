@@ -112,8 +112,6 @@ class QueryMeta(type):
             if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
 
-            if not getattr(m, 'service', None):
-                import pdb; pdb.set_trace()
             if m.service == 'ec2' and getattr(m, 'taggable', True):
                 register_tags(
                     attrs['filter_registry'], attrs['action_registry'])
