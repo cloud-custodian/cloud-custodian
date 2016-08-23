@@ -86,15 +86,35 @@ def generateBucketContents(s3, bucket, contents=None):
             ContentType='text/plain')
 
 
+class BucketMetrics(BaseTest):
+
+    def test_metrics(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_metrics')
+        p = self.load_policy({
+            'name': 's3-obj-count',
+            'resource': 's3',
+            'filters': [
+
+                {'type': 'metrics',
+                 'value': 10000,
+                 'name': 'NumberOfObjects',
+                 'op': 'greater-than'}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'custodian-skunk-trails')
+
+
 class BucketDelete(BaseTest):
 
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        self.patch(
-            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
                    [('get_bucket_versioning', 'Versioning', None, None)])
-        session_factory = self.replay_flight_data('test_s3_delete_versioned_bucket')
+        session_factory = self.replay_flight_data(
+            'test_s3_delete_versioned_bucket')
         session = session_factory()
         client = session.client('s3')
         s3_resource = session.resource('s3')

@@ -108,7 +108,7 @@ class QueryMeta(type):
 
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])
-            if m.dimension:
+            if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
