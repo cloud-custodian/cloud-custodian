@@ -95,7 +95,7 @@ class RDSClusterSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
-    def test_rdscluster_simple_filter(self):
+    def test_rdscluster_snapshot_simple_filter(self):
         session_factory = self.replay_flight_data('test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-simple-filter',
@@ -108,12 +108,12 @@ class RDSClusterSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_rdscluster_snapshot_trim(self):
+    def test_rdscluster_snapshot_age_filter(self):
         factory = self.replay_flight_data('test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-age-filter',
             'resource': 'rds-cluster-snapshot',
-            'filters': [{'age': 7}]},
+            'filters': [{'type': 'age', 'days': 7}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)

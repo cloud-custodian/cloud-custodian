@@ -271,7 +271,17 @@ class RDSTest(BaseTest):
         self.assertTrue(rds._db_instance_eligible_for_backup(resource))
 
 
-class RDSSnapshotTrimTest(BaseTest):
+class RDSSnapshotTest(BaseTest):
+
+    def test_rds_snapshot_age_filter(self):
+        factory = self.replay_flight_data('test_rds_snapshot_age_filter')
+        p = self.load_policy({
+            'name': 'rds-snapshot-age-filter',
+            'resource': 'rds-snapshot',
+            'filters': [{'type': 'age', 'days': 7}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot_trim(self):
         factory = self.replay_flight_data('test_rds_snapshot_delete')
