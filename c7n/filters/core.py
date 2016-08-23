@@ -306,7 +306,7 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value):
-        if self.vtype == 'normalize':
+        if self.vtype == 'normalize' and isinstance(value, basestring):
             return sentinel, value.strip().lower()
         elif self.vtype == 'integer':
             try:
@@ -340,6 +340,7 @@ class ValueFilter(Filter):
                 value = parse(value)
 
             return sentinel, value
+        return sentinel, value
 
 
 class AgeFilter(Filter):
