@@ -180,7 +180,7 @@ class TagActionFilter(Filter):
 
     def validate(self):
         op = self.data.get('op')
-        if op not in self.manager.action_registry.keys():
+        if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError("Invalid marked-for-op op:%s" % op)
         return self
 
@@ -387,7 +387,7 @@ class TagDelayedAction(Action):
 
     def validate(self):
         op = self.data.get('op')
-        if op not in self.manager.action_registry.keys():
+        if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
                 "mark-for-op specifies invalid op:%s" % op)
         return self
