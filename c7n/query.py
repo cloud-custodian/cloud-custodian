@@ -29,6 +29,7 @@ from skew.resources import find_resource_class
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.tags import register_tags
 from c7n.utils import local_session
 from c7n.manager import ResourceManager
 
@@ -110,6 +111,10 @@ class QueryMeta(type):
             m = ResourceQuery.resolve(attrs['resource_type'])
             if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
+
+            if m.service == 'ec2' and getattr(m, 'taggable', True):
+                register_tags(
+                    attrs['filter_registry'], attrs['action_registry'])
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 

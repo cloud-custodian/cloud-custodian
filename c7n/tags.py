@@ -26,7 +26,7 @@ from dateutil.parser import parse
 from dateutil.tz import tzutc
 
 from c7n.actions import BaseAction as Action
-from c7n.filters import Filter, OPERATORS
+from c7n.filters import Filter, OPERATORS, FilterValidationError
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
@@ -85,7 +85,7 @@ class TagTrim(Action):
                 - downtime
                 - custodian_status
     """
-    max_tag_count = 10
+    max_tag_count = 50
 
     schema = utils.type_schema(
         'tag-trim',
@@ -174,9 +174,15 @@ class TagActionFilter(Filter):
         'marked-for-op',
         tag={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
-        op={'enum': ACTIONS})
+        op={'type': 'string'})
 
     current_date = None
+
+    def validate(self):
+        op = self.data.get('op')
+        if self.manager and op not in self.manager.action_registry.keys():
+            raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+        return self
 
     def __call__(self, i):
         tag = self.data.get('tag', DEFAULT_TAG)
@@ -373,11 +379,18 @@ class TagDelayedAction(Action):
         tag={'type': 'string'},
         msg={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
-        op={'enum': ACTIONS})
+        op={'type': 'string'})
 
     batch_size = 200
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
+
+    def validate(self):
+        op = self.data.get('op')
+        if self.manager and op not in self.manager.action_registry.keys():
+            raise FilterValidationError(
+                "mark-for-op specifies invalid op:%s" % op)
+        return self
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
