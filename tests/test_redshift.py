@@ -16,7 +16,7 @@ from common import BaseTest
 
 class TestRedshift(BaseTest):
 
-    def test_query(self):
+    def test_redshift_query(self):
         factory = self.replay_flight_data('test_redshift_query')
         p = self.load_policy({
             'name': 'redshift-query',
@@ -24,7 +24,7 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(resources, [])
 
-    def test_parameter(self):
+    def test_redshift_parameter(self):
         factory = self.replay_flight_data('test_redshift_parameter')
         p = self.load_policy({
             'name': 'redshift-ssl',
@@ -38,7 +38,7 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_delete(self):
+    def test_redshift_delete(self):
         factory = self.replay_flight_data('test_redshift_delete')
         p = self.load_policy({
             'name': 'redshift-ssl',
@@ -63,3 +63,76 @@ class TestRedshift(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_redshift_retention(self):
+        session_factory = self.replay_flight_data('test_redshift_retention')
+        p = self.load_policy({
+            'name': 'redshift-retention',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'value',
+                 'key': 'ClusterIdentifier',
+                 'value': 'aaa'}],
+            'actions': [{'type': 'retention', 'days': 21}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_redshift_snapshot(self):
+        factory = self.replay_flight_data('test_redshift_snapshot')
+        p = self.load_policy({
+            'name': 'redshift-snapshot',
+            'resource': 'redshift',
+            'filters': [
+                {'ClusterIdentifier': 'aaa'}],
+            'actions': [
+                {'type': 'snapshot'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestRedshiftSnapshot(BaseTest):
+
+    def test_redshift_snapshot_simple(self):
+        session_factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-simple',
+            'resource': 'redshift-snapshot'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_redshift_snapshot_simple_filter(self):
+        session_factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-simple-filter',
+            'resource': 'redshift-snapshot',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Encrypted',
+                 'value': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    # Comment out until https://github.com/capitalone/cloud-custodian/pull/374 is merged.
+    # def test_redshift_snapshot_age_filter(self):
+    #     factory = self.replay_flight_data('test_redshift_snapshot_simple')
+    #     p = self.load_policy({
+    #         'name': 'redshift-snapshot-age-filter',
+    #         'resource': 'redshift-snapshot',
+    #         'filters': [{'type': 'age', 'days': 7}]},
+    #         session_factory=factory)
+    #     resources = p.run()
+    #     self.assertEqual(len(resources), 2)
+
+    def test_redshift_snapshot_delete(self):
+        factory = self.replay_flight_data('test_redshift_snapshot_delete')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-delete',
+            'resource': 'redshift-snapshot',
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
