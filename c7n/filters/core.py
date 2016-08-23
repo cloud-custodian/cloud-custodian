@@ -243,7 +243,7 @@ class ValueFilter(Filter):
         if 'op' in self.data:
             if not self.data['op'] in OPERATORS:
                 raise FilterValidationError(
-                    "Invalid operator in value filter %s" %  self.data)
+                    "Invalid operator in value filter %s" % self.data)
             if self.data['op'] == 'regex':
                 # Sanity check that we can compile
                 try:
@@ -363,6 +363,8 @@ class AgeFilter(Filter):
         v = i[self.date_attribute]
         if not isinstance(v, datetime):
             v = parse(v)
+        if not v.tzinfo:
+            v = v.replace(tzinfo=tzutc())
         return v
 
     def __call__(self, i):
