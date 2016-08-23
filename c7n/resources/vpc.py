@@ -194,7 +194,7 @@ class RemovePermissions(BaseAction):
     schema = type_schema(
         'remove-permissions',
         ingress={'type': 'string', 'enum': ['matched', 'all']},
-        egress={'type', 'string', 'enum': ['matched', 'all']})
+        egress={'type': 'string', 'enum': ['matched', 'all']})
 
     def process(self, resources):
         i_perms = self.data.get('ingress', 'matched')
