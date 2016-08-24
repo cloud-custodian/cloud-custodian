@@ -65,7 +65,7 @@ class SecurityGroup(QueryResourceManager):
 
 @SecurityGroup.filter_registry.register('unused')
 class UnusedSecurityGroup(Filter):
-    """Filter to just security groups that are not used.
+    """Filter to just vpc security groups that are not used.
 
     We scan all extant enis in the vpc to get a baseline set of groups
     in use. Then augment with those referenced by launch configs, and
@@ -73,29 +73,27 @@ class UnusedSecurityGroup(Filter):
     given moment. We also find any security group with references from
     other security group either within the vpc or across peered
     connections.
+
+    Note this filter does not support classic security groups atm.
     """
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
         used = self.scan_groups()
-        unused = [r for r in resources if r['GroupId'] not in used]
-        return self.filter_peered_refs(unused)
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        return unused and self.filter_peered_refs(unused) or []
 
     def filter_peered_refs(self, resources):
         # Check that groups are not referenced across accounts
         client = local_session(self.manager.session_factory).client('ec2')
         peered_ids = set()
-        for r in resources:
-            try:
-                for sg_ref in client.describe_security_group_references(
-                        GroupId=[r['GroupId']])['SecurityGroupReferenceSet']:
-                    peered_ids.add(sg_ref['GroupId'])
-            except ClientError as e:
-                if e.response['Error']['Code'] == "InvalidGroup.NotFound":
-                    self.log.info(
-                        "sg peered refs reports %s not found", r['GroupId'])
-                    continue
-                raise
+        for sg_ref in client.describe_security_group_references(
+                GroupId=[r['GroupId'] for r in resources]
+        )['SecurityGroupReferenceSet']:
+            peered_ids.add(sg_ref['GroupId'])
         self.log.info(
             "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
@@ -116,24 +114,6 @@ class UnusedSecurityGroup(Filter):
                 kind, len(sg_ids), len(new_refs), len(used))
 
         return used
-#
-# these don't provide additional coverage but implemented as proof
-#
-#    def get_elb_sgs(self):
-#        sg_ids = set()
-#        from c7n.resources.elb import ELB
-#        for lb in ELB(self.manager.ctx, {}).resources():
-#            for sg in lb.get('SecurityGroups', ()):
-#                sg_ids.add(sg)
-#        return sg_ids
-#
-#    def get_rds_sgs(self):
-#        sg_ids = set()
-#        from c7n.resources.rds import RDS
-#        for rds in RDS(self.manager.ctx, {}).resources():
-#            for sg in rds.get('VpcSecurityGroups', ()):
-#                sg_ids.add(sg['VpcSecurityGroupId'])
-#        return sg_ids
 
     def get_launch_config_sgs(self):
         # Note assuming we also have launch config garbage collection
