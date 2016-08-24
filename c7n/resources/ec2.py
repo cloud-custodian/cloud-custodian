@@ -27,14 +27,13 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
-from c7n import tags, utils
-from c7n.utils import type_schema, local_session
+from c7n import utils
+from c7n.utils import type_schema
 
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-tags.register_tags(filters, actions)
 actions.register('auto-tag-user', AutoTagUser)
 
 
