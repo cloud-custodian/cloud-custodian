@@ -18,7 +18,7 @@ from c7n.actions import BaseAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
@@ -449,7 +449,8 @@ class NetworkAcl(QueryResourceManager):
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
-    resource_type = 'aws.ec2.address'
+    class resource_type(ResourceQuery.resolve('aws.ec2.address')):
+        taggable = False
 
 
 @resources.register('customer-gateway')
@@ -474,7 +475,9 @@ class InternetGateway(QueryResourceManager):
 
     resource_type = Meta
 
+
 @resources.register('key-pair')
 class KeyPair(QueryResourceManager):
 
-    resource_type = 'aws.ec2.key-pair'
+    class resource_type(ResourceQuery.resolve('aws.ec2.key-pair')):
+        taggable = False
