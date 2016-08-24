@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
@@ -59,6 +61,97 @@ class Subnet(QueryResourceManager):
 class SecurityGroup(QueryResourceManager):
 
     resource_type = 'aws.ec2.security-group'
+
+
+@SecurityGroup.filter_registry.register('unused')
+class UnusedSecurityGroup(Filter):
+    """Filter to just vpc security groups that are not used.
+
+    We scan all extant enis in the vpc to get a baseline set of groups
+    in use. Then augment with those referenced by launch configs, and
+    lambdas as they may not have extant resources in the vpc at a
+    given moment. We also find any security group with references from
+    other security group either within the vpc or across peered
+    connections.
+
+    Note this filter does not support classic security groups atm.
+    """
+    schema = type_schema('unused')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        return unused and self.filter_peered_refs(unused) or []
+
+    def filter_peered_refs(self, resources):
+        # Check that groups are not referenced across accounts
+        client = local_session(self.manager.session_factory).client('ec2')
+        peered_ids = set()
+        for sg_ref in client.describe_security_group_references(
+                GroupId=[r['GroupId'] for r in resources]
+        )['SecurityGroupReferenceSet']:
+            peered_ids.add(sg_ref['GroupId'])
+        self.log.info(
+            "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
+        return [r for r in resources if r['GroupId'] not in peered_ids]
+
+    def scan_groups(self):
+        used = set()
+        for kind, scanner in (
+                ("nics", self.get_eni_sgs),
+                ("sg-perm-refs", self.get_sg_refs),
+                ('lambdas', self.get_lambda_sgs),
+                ("launch-configs", self.get_launch_config_sgs),
+        ):
+            sg_ids = scanner()
+            new_refs = sg_ids.difference(used)
+            used = used.union(sg_ids)
+            self.log.info(
+                "%s using %d sgs, new refs %s total %s",
+                kind, len(sg_ids), len(new_refs), len(used))
+
+        return used
+
+    def get_launch_config_sgs(self):
+        # Note assuming we also have launch config garbage collection
+        # enabled.
+        sg_ids = set()
+        from c7n.resources.asg import LaunchConfig
+        for cfg in LaunchConfig(self.manager.ctx, {}).resources():
+            for g in cfg['SecurityGroups']:
+                sg_ids.add(g)
+            for g in cfg['ClassicLinkVPCSecurityGroups']:
+                sg_ids.add(g)
+        return sg_ids
+
+    def get_lambda_sgs(self):
+        sg_ids = set()
+        from c7n.resources.awslambda import AWSLambda
+        for func in AWSLambda(self.manager.ctx, {}).resources():
+            if 'VpcConfig' not in func:
+                continue
+            for g in func['VpcConfig']['SecurityGroupIds']:
+                sg_ids.add(g)
+        return sg_ids
+
+    def get_eni_sgs(self):
+        sg_ids = set()
+        for nic in NetworkInterface(self.manager.ctx, {}).resources():
+            for g in nic['Groups']:
+                sg_ids.add(g['GroupId'])
+        return sg_ids
+
+    def get_sg_refs(self):
+        sg_ids = set()
+        for sg in SecurityGroup(self.manager.ctx, {}).resources():
+            for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
+                for p in sg.get(perm_type, []):
+                    for g in p.get('UserIdGroupPairs', ()):
+                        sg_ids.add(g['GroupId'])
+        return sg_ids
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
