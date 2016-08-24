@@ -521,8 +521,12 @@ class Tag(BaseAction):
         tags= [dict(Key=key, ResourceType='auto-scaling-group', Value=value,
                     PropagateAtLaunch=propagate,
                     ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        client.create_or_update_tags(Tags=tags)
-
+        try:
+            client.create_or_update_tags(Tags=tags)
+        except ClientError as e:
+            # Catch already deleted ASG
+            if e.response['Error']['Code'] == 'ValidationError':
+                return
 
 @actions.register('propagate-tags')
 class PropagateTags(BaseAction):
