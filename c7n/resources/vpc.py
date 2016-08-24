@@ -16,7 +16,7 @@ from c7n.actions import BaseAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
@@ -192,11 +192,13 @@ class IPPermissionEgress(SGPermission):
 class RemovePermissions(BaseAction):
 
     schema = type_schema(
-        'remove-permissions', groups={'type': 'string', 'enum': ['matched', 'all']})
+        'remove-permissions',
+        ingress={'type': 'string', 'enum': ['matched', 'all']},
+        egress={'type': 'string', 'enum': ['matched', 'all']})
 
     def process(self, resources):
-        i_perms = self.data.get('ingress')
-        e_perms = self.data.get('egress')
+        i_perms = self.data.get('ingress', 'matched')
+        e_perms = self.data.get('egress', 'matched')
 
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
@@ -239,7 +241,7 @@ class NetworkInterface(QueryResourceManager):
 @NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnet(ValueFilter):
 
-    schema = type_schema('subnet', rinherits=ValueFilter.schema)
+    schema = type_schema('subnet', rinherit=ValueFilter.schema)
     annotate = False
 
     def process(self, resources, event=None):
@@ -257,7 +259,7 @@ class InterfaceSubnet(ValueFilter):
 class InterfaceGroup(ValueFilter):
 
     annotate = False
-    schema = type_schema('group', rinherits=ValueFilter.schema)
+    schema = type_schema('group', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
         groups = set()
@@ -302,7 +304,7 @@ class InterfaceRemoveGroups(BaseAction):
            'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
-        target_group_ids = self.data.get('groups')
+        target_group_ids = self.data.get('groups', 'matched')
         isolation_group = self.data.get('isolation-group')
 
         client = local_session(self.manager.session_factory).client('ec2')
@@ -354,7 +356,8 @@ class NetworkAcl(QueryResourceManager):
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
-    resource_type = 'aws.ec2.address'
+    class resource_type(ResourceQuery.resolve('aws.ec2.address')):
+        taggable = False
 
 
 @resources.register('customer-gateway')
@@ -379,7 +382,9 @@ class InternetGateway(QueryResourceManager):
 
     resource_type = Meta
 
+
 @resources.register('key-pair')
 class KeyPair(QueryResourceManager):
 
-    resource_type = 'aws.ec2.key-pair'
+    class resource_type(ResourceQuery.resolve('aws.ec2.key-pair')):
+        taggable = False
