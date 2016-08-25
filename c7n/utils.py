@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from botocore.exceptions import ClientError
 from datetime import datetime
 
 import copy
 import json
 import itertools
+import random
 import threading
 import time
 
@@ -244,3 +246,41 @@ def snapshot_identifier(prefix, db_identifier):
     """
     now = datetime.now()
     return  '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
+
+
+def get_retry(codes=(), max_attempts=8):
+    """Retry a boto3 api call on transient errors.
+
+    https://www.awsarchitectureblog.com/2015/03/backoff.html
+    https://en.wikipedia.org/wiki/Exponential_backoff
+
+    :param codes: A sequence of retryable error codes
+
+    returns a function for invoking aws client calls that
+    retries on retryable error codes.
+    """
+    max_delay = 2 ** max_attempts
+
+    def _retry(func, *args, **kw):
+        for idx, delay in enumerate(backoff_delays(1, max_delay, jitter=True)):
+            try:
+                return func(*args, **kw)
+            except ClientError as e:
+                if e.response['Error']['Code'] not in codes:
+                    raise
+                elif idx == max_attempts - 1:
+                    raise
+            time.sleep(delay)
+    return _retry
+
+
+def backoff_delays(start, stop, factor=2.0, jitter=False):
+    """Geometric backoff sequence w/ jitter
+    """
+    cur = start
+    while cur <= stop:
+        if jitter:
+            yield cur - (cur * random.random())
+        else:
+            yield cur
+        cur = cur * factor

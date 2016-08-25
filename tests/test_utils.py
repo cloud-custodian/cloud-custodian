@@ -12,8 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import unittest
-
+import time
+from botocore.exceptions import ClientError
 from c7n import utils
+
+from common import BaseTest
+
+
+class Backoff(BaseTest):
+
+    def test_retry_passthrough(self):
+        def func(): return 42
+        retry = utils.get_retry((), 5)
+        self.assertEqual(retry(func), 42)
+
+    def test_retry_errors(self):
+        self.patch(time, 'sleep', lambda x: x)
+        self.count = 0
+
+        def func():
+            self.count += 1
+            raise ClientError({'Error': {'Code': 42}}, 'something')
+
+        retry = utils.get_retry((42,), 5)
+
+        try:
+            retry(func)
+        except ClientError:
+            self.assertEqual(self.count, 5)
+        else:
+            self.fail("should have raised")
+
+    def test_delays(self):
+        self.assertEqual(
+            list(utils.backoff_delays(1, 256)),
+            [1, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0])
+
+    def test_delays_jitter(self):
+        for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
+            maxv = 2 ** idx
+            self.assertTrue(i > 0)
+            self.assertTrue(i < maxv)
 
 
 class UtilTest(unittest.TestCase):

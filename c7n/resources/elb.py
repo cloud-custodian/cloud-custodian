@@ -24,7 +24,7 @@ from c7n.filters import Filter, FilterRegistry, FilterValidationError, DefaultVp
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, get_retry
 
 log = logging.getLogger('custodian.elb')
 
@@ -42,14 +42,15 @@ class ELB(QueryResourceManager):
     resource_type = "aws.elb.loadbalancer"
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(get_retry(('Throttling',)))
 
     def augment(self, resources):
         _elb_tags(
-            resources, self.session_factory, self.executor_factory)
+            resources, self.session_factory, self.executor_factory, self.retry)
         return resources
 
 
-def _elb_tags(elbs, session_factory, executor_factory):
+def _elb_tags(elbs, session_factory, executor_factory, retry):
 
     def process_tags(elb_set):
         client = local_session(session_factory).client('elb')
@@ -57,7 +58,8 @@ def _elb_tags(elbs, session_factory, executor_factory):
 
         while True:
             try:
-                results = client.describe_tags(
+                results = retry(
+                    client.describe_tags,
                     LoadBalancerNames=elb_map.keys())
                 break
             except ClientError as e:
