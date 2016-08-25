@@ -24,7 +24,6 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
-from c7n import tags
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
 
@@ -33,8 +32,6 @@ log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
-
-tags.register_tags(filters, actions)
 
 
 @resources.register('ebs-snapshot')

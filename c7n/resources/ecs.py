@@ -20,7 +20,7 @@ from c7n.manager import resources
 class ECSCluster(QueryResourceManager):
 
     class Meta(object):
-        services = 'ecs'
+        service = 'ecs'
         enum_spec = ('describe_clusters', 'clusters', None)
         name = "clusterName"
         id = "clusterArn"

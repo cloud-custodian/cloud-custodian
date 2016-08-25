@@ -420,6 +420,8 @@ class VpcIdFilter(ValueFilter):
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
 
+    max_tag_count = 10
+
     def process_tag_removal(self, resource, candidates):
         client = local_session(
             self.manager.session_factory).client('autoscaling')
