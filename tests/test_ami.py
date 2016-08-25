@@ -29,5 +29,3 @@ class TestAMI(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
-        

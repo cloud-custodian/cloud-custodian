@@ -123,6 +123,7 @@ class QueryResourceManager(ResourceManager):
     __metaclass__ = QueryMeta
 
     resource_type = ""
+    retry = None
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -146,7 +147,10 @@ class QueryResourceManager(ResourceManager):
         if query is None:
             query = {}
 
-        resources = self.query.filter(self.resource_type, **query)
+        if self.retry:
+            resources = self.retry(self.query.filter, self.resource_type, **query)
+        else:
+            resources = self.query.filter(self.resource_type, **query)
         resources = self.augment(resources)
         self._cache.save(key, resources)
         return self.filter_resources(resources)

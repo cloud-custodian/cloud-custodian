@@ -74,6 +74,17 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    def test_unused(self):
+        factory = self.replay_flight_data(
+            'test_security_group_unused')
+        p = self.load_policy({
+            'name': 'sg-unused',
+            'resource': 'security-group',
+            'filters': ['unused'],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_only_ports(self):
         factory = self.replay_flight_data(
             'test_security_group_only_ports')
