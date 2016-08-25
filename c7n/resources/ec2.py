@@ -28,7 +28,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
 from c7n import tags, utils
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, get_retry
 
 
 filters = FilterRegistry('ec2.filters')
@@ -44,6 +44,8 @@ class EC2(QueryResourceManager):
     resource_type = "aws.ec2.instance"
     filter_registry = filters
     action_registry = actions
+
+    retry = staticmethod(get_retry(('RequestLimitExceeded',)))
 
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
@@ -108,7 +110,8 @@ class EC2(QueryResourceManager):
 
         # Okay go and do the tag lookup
         client = utils.local_session(self.session_factory).client('ec2')
-        tag_set = client.describe_tags(
+        tag_set = self.retry(
+            client.describe_tags,
             Filters=[{'Name': 'resource-type',
                       'Values': ['instance']}])['Tags']
         resource_tags = {}
