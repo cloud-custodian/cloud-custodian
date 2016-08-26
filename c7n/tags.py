@@ -30,9 +30,6 @@ from c7n.filters import Filter, OPERATORS, FilterValidationError
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
-ACTIONS = [
-    'suspend', 'resume', 'terminate', 'stop', 'start',
-    'delete', 'deletion']
 
 
 def register_tags(filters, actions):

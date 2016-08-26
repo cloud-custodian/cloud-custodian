@@ -109,9 +109,10 @@ class QueryMeta(type):
 
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])
+            # Generic cloud watch metrics support
             if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
-
+            # Generic ec2 resource tag support
             if m.service == 'ec2' and getattr(m, 'taggable', True):
                 register_tags(
                     attrs['filter_registry'], attrs['action_registry'])
@@ -134,21 +135,25 @@ class QueryResourceManager(ResourceManager):
 
     def resources(self, query=None):
         key = {'region': self.config.region,
-               'resource': str(self.resource_type),
+               'resource': str(self.__class__.__name__),
                'q': query}
 
         if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    self.resource_type, len(resources)))
+                    "%s.%s" % (
+                        self.__class__.__module__,
+                        self.__class__.__name__),
+                    len(resources)))
                 return self.filter_resources(resources)
 
         if query is None:
             query = {}
 
         if self.retry:
-            resources = self.retry(self.query.filter, self.resource_type, **query)
+            resources = self.retry(
+                self.query.filter, self.resource_type, **query)
         else:
             resources = self.query.filter(self.resource_type, **query)
         resources = self.augment(resources)
