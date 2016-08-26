@@ -25,12 +25,15 @@ def load_resources():
     import awslambda
     import cache
     import cfn
+    import cloudfront
     import cw
     import dynamodb
     import ebs
     import ec2
     import ecr
     import ecs
+    import efs
+    import elasticsearch
     import elb
     import emr
     import firehose

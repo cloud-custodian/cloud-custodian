@@ -94,7 +94,7 @@ class UnusedSecurityGroup(Filter):
                 GroupId=[r['GroupId'] for r in resources]
         )['SecurityGroupReferenceSet']:
             peered_ids.add(sg_ref['GroupId'])
-        self.log.info(
+        self.log.debug(
             "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
 
@@ -109,7 +109,7 @@ class UnusedSecurityGroup(Filter):
             sg_ids = scanner()
             new_refs = sg_ids.difference(used)
             used = used.union(sg_ids)
-            self.log.info(
+            self.log.debug(
                 "%s using %d sgs, new refs %s total %s",
                 kind, len(sg_ids), len(new_refs), len(used))
 

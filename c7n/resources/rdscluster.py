@@ -54,15 +54,26 @@ class RDSCluster(QueryResourceManager):
 class Delete(BaseAction):
 
     schema = type_schema(
-        'delete', **{'skip-snapshot': {'type': 'boolean'}})
+        'delete', **{'skip-snapshot': {'type': 'boolean'},
+                     'delete-instances': {'type': 'boolean'}})
 
-    def process(self, resources):
-        self.skip = self.data.get('skip-snapshot', False)
+    def process(self, clusters):
+        skip = self.data.get('skip-snapshot', False)
+        delete_instances = self.data.get('delete-instances', True)
         client = local_session(self.manager.session_factory).client('rds')
 
-        for cluster in resources:
+        for cluster in clusters:
+            if delete_instances:
+                for instance in cluster.get('DBClusterMembers', []):
+                    client.delete_db_instance(
+                        DBInstanceIdentifier=instance['DBInstanceIdentifier'],
+                        SkipFinalSnapshot=True)
+                    self.log.info(
+                        'Deleted RDS instance: %s',
+                        instance['DBInstanceIdentifier'])
+
             params = {'DBClusterIdentifier': cluster['DBClusterIdentifier']}
-            if self.skip:
+            if skip:
                 params['SkipFinalSnapshot'] = True
             else:
                 params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
@@ -70,11 +81,16 @@ class Delete(BaseAction):
             try:
                 client.delete_db_cluster(**params)
             except ClientError as e:
-                if e.response['Error']['Code'] in ['InvalidDBClusterStateFault']:
+                if e.response['Error']['Code'] == 'InvalidDBClusterStateFault':
+                    self.log.info(
+                        'RDS cluster in invalid state: %s',
+                        cluster['DBClusterIdentifier'])
                     continue
                 raise
 
-            self.log.info('Deleted RDS cluster: %s' % cluster['DBClusterIdentifier'])
+            self.log.info(
+                'Deleted RDS cluster: %s',
+                cluster['DBClusterIdentifier'])
 
 
 @actions.register('retention')
@@ -87,36 +103,36 @@ class RetentionWindow(BaseAction):
         'retention',
         **{'days': {'type': 'number'}})
 
-    def process(self, resources):
+    def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
             futures = []
-            for resource in resources:
+            for cluster in clusters:
                 futures.append(w.submit(
                     self.process_snapshot_retention,
-                    resource))
+                    cluster))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception setting RDS cluster retention  \n %s" % (
-                                f.exception()))
+                            "Exception setting RDS cluster retention  \n %s",
+                            f.exception())
 
-    def process_snapshot_retention(self, resource):
-        current_retention = int(resource.get('BackupRetentionPeriod', 0))
+    def process_snapshot_retention(self, cluster):
+        current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
 
         if current_retention < new_retention:
             self.set_retention_window(
-                resource,
+                cluster,
                 max(current_retention, new_retention))
-            return resource
+            return cluster
 
-    def set_retention_window(self, resource, retention):
+    def set_retention_window(self, cluster, retention):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_cluster(
-            DBClusterIdentifier=resource['DBClusterIdentifier'],
+            DBClusterIdentifier=cluster['DBClusterIdentifier'],
             BackupRetentionPeriod=retention,
-            PreferredBackupWindow=resource['PreferredBackupWindow'],
-            PreferredMaintenanceWindow=resource['PreferredMaintenanceWindow'])
+            PreferredBackupWindow=cluster['PreferredBackupWindow'],
+            PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
 
 
 @actions.register('snapshot')
@@ -124,27 +140,27 @@ class Snapshot(BaseAction):
 
     schema = type_schema('snapshot')
 
-    def process(self, resources):
+    def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
             futures = []
-            for resource in resources:
+            for cluster in clusters:
                 futures.append(w.submit(
                     self.process_cluster_snapshot,
-                    resource))
+                    cluster))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception creating RDS cluster snapshot  \n %s" % (
-                                f.exception()))
-        return resources
+                            "Exception creating RDS cluster snapshot  \n %s",
+                            f.exception())
+        return clusters
 
-    def process_cluster_snapshot(self, resource):
+    def process_cluster_snapshot(self, cluster):
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_cluster_snapshot(
             DBClusterSnapshotIdentifier=snapshot_identifier(
                 'Backup',
-                resource['DBClusterIdentifier']),
-            DBClusterIdentifier=resource['DBClusterIdentifier'])
+                cluster['DBClusterIdentifier']),
+            DBClusterIdentifier=cluster['DBClusterIdentifier'])
 
 
 @resources.register('rds-cluster-snapshot')
@@ -156,7 +172,8 @@ class RDSClusterSnapshot(QueryResourceManager):
 
         service = 'rds'
         type = 'rds-cluster-snapshot'
-        enum_spec = ('describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
+        enum_spec = (
+            'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
         filter_name = None
         filter_type = None
@@ -192,15 +209,12 @@ class RDSClusterSnapshotDelete(BaseAction):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception deleting snapshot set \n %s" % (
-                                f.exception()))
+                            "Exception deleting snapshot set \n %s",
+                            f.exception())
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):
         c = local_session(self.manager.session_factory).client('rds')
         for s in snapshots_set:
-            try:
-                c.delete_db_cluster_snapshot(
-                    DBClusterSnapshotIdentifier=s['DBClusterSnapshotIdentifier'])
-            except ClientError as e:
-                raise
+            c.delete_db_cluster_snapshot(
+                DBClusterSnapshotIdentifier=s['DBClusterSnapshotIdentifier'])

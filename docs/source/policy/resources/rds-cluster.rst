@@ -12,8 +12,9 @@ Actions
 -------
 
 ``delete``
-  Delete DB cluster.
+  Delete DB cluster and optionally associated DB instances.
   You can specify if you want to ``skip-snapshot``, default is False
+  You can specify if you want to ``delete-instances``, default is False
 
 ``snapshot``
   Create a manual DB cluster snapshot
