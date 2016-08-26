@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshot": {
+            "MasterUsername": "user1",
+            "OwnerAccount": "54321",
+            "CurrentBackupRateInMegaBytesPerSecond": 7.4212,
+            "ActualIncrementalBackupSizeInMegaBytes": 4.0,
+            "NumberOfNodes": 1,
+            "Status": "deleted",
+            "VpcId": "vpc-54321",
+            "ClusterVersion": "1.0",
+            "Tags": [],
+            "EstimatedSecondsToCompletion": 0,
+            "TotalBackupSizeInMegaBytes": 12.0,
+            "DBName": "dev",
+            "BackupProgressInMegaBytes": 4.0,
+            "ClusterCreateTime": {
+                "hour": 13,
+                "__class__": "datetime",
+                "month": 8,
+                "second": 26,
+                "microsecond": 191000,
+                "year": 2016,
+                "day": 23,
+                "minute": 11
+            },
+            "EncryptedWithHSM": false,
+            "ClusterIdentifier": "aaa",
+            "SnapshotCreateTime": {
+                "hour": 18,
+                "__class__": "datetime", 
+                "month": 8,
+                "second": 24,
+                "microsecond": 21000,
+                "year": 2016,
+                "day": 23,
+                "minute": 38
+            },
+            "AvailabilityZone": "us-east-1b",
+            "NodeType": "dc1.large",
+            "Encrypted": true,
+            "ElapsedTimeInSeconds": 0,
+            "KmsKeyId": "arn:aws:kms:us-east-1:54321:key/k1",
+            "SnapshotType": "manual",
+            "Port": 5439,
+            "SnapshotIdentifier": "aaa-1"
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "64669fee-6961-11e6-88a8-bde2627b50d4"
+        }
+    }
+}
