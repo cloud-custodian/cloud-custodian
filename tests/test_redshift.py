@@ -116,16 +116,15 @@ class TestRedshiftSnapshot(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    # Comment out until https://github.com/capitalone/cloud-custodian/pull/374 is merged.
-    # def test_redshift_snapshot_age_filter(self):
-    #     factory = self.replay_flight_data('test_redshift_snapshot_simple')
-    #     p = self.load_policy({
-    #         'name': 'redshift-snapshot-age-filter',
-    #         'resource': 'redshift-snapshot',
-    #         'filters': [{'type': 'age', 'days': 7}]},
-    #         session_factory=factory)
-    #     resources = p.run()
-    #     self.assertEqual(len(resources), 2)
+    def test_redshift_snapshot_age_filter(self):
+        factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-age-filter',
+            'resource': 'redshift-snapshot',
+            'filters': [{'type': 'age', 'days': 7}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
     def test_redshift_snapshot_delete(self):
         factory = self.replay_flight_data('test_redshift_snapshot_delete')
