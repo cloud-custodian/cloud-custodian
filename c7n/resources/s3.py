@@ -1046,17 +1046,11 @@ class BucketTag(Tag):
             # all the tag marshalling back and forth is a bit gross :-(
             new_tags = {t['Key']: t['Value'] for t in tags}
             for t in r.get('Tags', ()):
-                if t['Key'] not in new_tags:
+                if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
                     new_tags[t['Key']] = t['Value']
             tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            try:
-                client.put_bucket_tagging(
+            client.put_bucket_tagging(
                     Bucket=r['Name'], Tagging={'TagSet': tag_set})
-            except ClientError as e:
-                raise
-                self.log.exception(
-                    "Error while tagging bucket %s err: %s" % (
-                        r['Name'], e))
 
 
 @actions.register('delete')

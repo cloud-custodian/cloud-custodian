@@ -87,9 +87,6 @@ class ResourceQuery(object):
         else:
             client_filter = True
 
-        session = local_session(self.session_factory)
-        client = session.client(m.service)
-
         resources = self.filter(resource_type, **params)
         if client_filter:
             resources = [r for r in resources if r[m.id] in identity]
