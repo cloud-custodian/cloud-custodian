@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleState": "ACTIVE", 
+                "ConfigRuleName": "custodian-sg-modified", 
+                "ConfigRuleArn": "arn:aws:config:us-west-2:619193117841:config-rule/config-rule-bmj8tp", 
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA", 
+                    "SourceIdentifier": "arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified", 
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config", 
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                }, 
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::SecurityGroup"
+                    ]
+                }, 
+                "ConfigRuleId": "config-rule-bmj8tp"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "9e964f1e-5d56-11e6-add8-7f4f80cc2c66", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9e964f1e-5d56-11e6-add8-7f4f80cc2c66", 
+                "date": "Mon, 08 Aug 2016 10:55:28 GMT", 
+                "content-length": "498", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
