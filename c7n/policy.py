@@ -289,7 +289,7 @@ class LambdaMode(PolicyExecutionMode):
                 manager = LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                PolicyLambda(self), 'current', 
+                PolicyLambda(self.policy), 'current',
                 role=self.policy.options.assume_role)
 
 
@@ -315,11 +315,55 @@ class ASGInstanceState(LambdaMode):
 
 
 class ConfigRuleMode(LambdaMode):
-    """a lambda policy that executes as a config service rule."""
+    """a lambda policy that executes as a config service rule.
+        http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
+    """
+
+    cfg_event = None
+
+    def resolve_resources(self, event):
+        return [utils.camelResource(
+            self.cfg_event['configurationItem']['configuration'])]
 
     def run(self, event, lambda_context):
-        invoking_event = json.loads(event['invokingEvent'])
-        pass
+        self.cfg_event = json.loads(event['invokingEvent'])
+        cfg_item = self.cfg_event['configurationItem']
+        evaluation = None
+        # TODO config resource type matches policy check
+        if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
+                "ResourceDeleted",
+                "ResourceNotRecorded",
+                "ResourceDeletedNotRecorded"):
+            evaluation = {
+                'annotation': 'The rule does not apply.',
+                'compliance_type': 'NOT_APPLICABLE'}
+
+        if evaluation is None:
+            resources = super(ConfigRuleMode, self).run(event, lambda_context)
+            match = self.policy.data['mode'].get('match-compliant', False)
+            if (match and resources) or (not match and not resources):
+                evaluation = {
+                    'compliance_type': 'COMPLIANT',
+                    'annotation': 'The resource is compliant with this rule.'}
+            else:
+                evaluation = {
+                    'compliance_type': 'NOT_COMPLIANT',
+                    'annotation': 'The resources is not compliant.'
+                }
+
+        client = utils.local_session(
+            self.policy.session_factory).client('config')
+        client.put_evaluations(
+            Evaluations=[{
+                'ComplianceResourceType': cfg_item['resourceType'],
+                'ComplianceResourceId': cfg_item['resourceId'],
+                'ComplianceType': evaluation['compliance_type'],
+                'Annotation': evaluation['annotation'],
+                # TODO ? if not applicable use current timestamp
+                'OrderingTimestamp': cfg_item[
+                    'configurationItemCaptureTime']}],
+            ResultToken=event.get('resultToken', 'No token found.'))
+        return resources
 
 
 class Policy(object):
@@ -373,7 +417,7 @@ class Policy(object):
 
     @property
     def is_lambda(self):
-        if not 'mode' in self.data:
+        if 'mode' not in self.data:
             return False
         return True
 

@@ -182,6 +182,7 @@ def generate(resource_types=()):
                         'cloudtrail',
                         'ec2-instance-state',
                         'asg-instance-state',
+                        'config-rule',
                         'periodic'
                     ]},
                 'events': {'type': 'array', 'items': {

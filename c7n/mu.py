@@ -375,7 +375,7 @@ class LambdaManager(object):
                 FunctionVersion=func_version)
         else:
             if (exists['FunctionVersion'] == func_version and
-                exists['Name'] == alias):
+                    exists['Name'] == alias):
                 return exists['AliasArn']
             log.debug('Updating custodian lambda alias %s', alias)
             alias_result = self.client.update_alias(
@@ -679,7 +679,6 @@ class CloudWatchEventSource(object):
             ', '.join(map(str, self.data.get('events', []))))
 
     def resolve_cloudtrail_payload(self, payload):
-        ids = []
         sources = self.data.get('sources', [])
         events = []
         for e in self.data.get('events'):
@@ -1005,6 +1004,9 @@ class ConfigRule(object):
         self.session = session_factory()
         self.client = self.session.client('config')
 
+    def __repr__(self):
+        return "<ConfigRule>"
+
     def get_rule_params(self, func):
         # config does not support versions/aliases on lambda funcs
         func_arn = func.arn
@@ -1013,6 +1015,7 @@ class ConfigRule(object):
 
         params = dict(
             ConfigRuleName=func.name,
+            Description=func.description,
             Source={
                 'Owner': 'CUSTOM_LAMBDA',
                 'SourceIdentifier': func_arn,
@@ -1045,10 +1048,11 @@ class ConfigRule(object):
         # doesn't seem like we have anything mutable at the moment,
         # since we restrict params, maybe reusing the same policy name
         # with a different resource type.
-
-        # Future config items for delta, ResourceId, TagKey, TagValue
-        if rule['Scope']['ComplianceResourceTypes'] != params[
-                'Scope']['ComplianceResourceTypes']:
+        if rule['Scope'] != params['Scope']:
+            return True
+        if rule['Source'] != params['Source']:
+            return True
+        if rule.get('Description', '') != rule.get('Description', ''):
             return True
         return False
 
@@ -1057,9 +1061,12 @@ class ConfigRule(object):
         params = self.get_rule_params(func)
 
         if rule and self.delta(rule, params):
+            log.debug("Updating config rule for %s" % self)
             rule.update(params)
             return self.client.put_config_rule(ConfigRule=rule)
-
+        elif rule:
+            log.debug("Config rule up to date")
+            return
         try:
             self.session.client('lambda').add_permission(
                 FunctionName=func.name,
@@ -1070,7 +1077,9 @@ class ConfigRule(object):
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceConflictException':
                 raise
-        self.client.put_config_rule(ConfigRule=params)
+
+        log.debug("Adding config rule for %s" % func.name)
+        return self.client.put_config_rule(ConfigRule=params)
 
     def remove(self, func):
         rule = self.get(func.name)
