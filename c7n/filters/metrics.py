@@ -144,6 +144,10 @@ class MetricsFilter(Filter):
                 matched.extend(f.result())
         return matched
 
+    def get_dimensions(self, resource):
+        return [{'Name': self.model.dimension,
+                 'Value': resource[self.model.dimension]}]
+
     def process_resource_set(self, resource_set):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -152,9 +156,7 @@ class MetricsFilter(Filter):
         for r in resource_set:
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
-            dimensions = [
-                {'Name': self.model.dimension,
-                 'Value': r[self.model.dimension]}]
+            dimensions = self.get_dimensions(r)
             r['Metrics'] = client.get_metric_statistics(
                 Namespace=self.namespace,
                 MetricName=self.metric,
@@ -163,6 +165,8 @@ class MetricsFilter(Filter):
                 EndTime=self.end,
                 Period=self.period,
                 Dimensions=dimensions)['Datapoints']
+            if len(r['Metrics']) == 0:
+                continue
             if self.op(r['Metrics'][0][self.statistics], self.value):
                 matched.append(r)
         return matched

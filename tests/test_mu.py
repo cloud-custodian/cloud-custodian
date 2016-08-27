@@ -35,7 +35,7 @@ class PolicyLambdaProvision(BaseTest):
             self.assertEqual(v, result[k])
 
     def test_config_rule(self):
-        session_factory = self.record_flight_data('test_config_rule')
+        session_factory = self.replay_flight_data('test_config_rule')
         session = session_factory()
         p = Policy({
             'resource': 'security-group',
@@ -45,6 +45,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, 'Dev', role=self.role)
+        self.assertEqual(result['FunctionName'], 'custodian-sg-modified')
         self.addCleanup(mgr.remove, pl)
 
     def test_cwl_subscriber(self):

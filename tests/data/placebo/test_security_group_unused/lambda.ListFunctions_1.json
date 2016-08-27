@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "Ys1Syk2A7u/lMTJwQbjxeUNZ+A4o8nw4COQIQfdTXAE=", 
+                "FunctionName": "ec2-instance-type", 
+                "MemorySize": 128, 
+                "CodeSize": 1257, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:ec2-instance-type", 
+                "Handler": "index.handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 10, 
+                "LastModified": "2016-08-08T10:34:32.668+0000", 
+                "Runtime": "nodejs4.3", 
+                "Description": "An AWS Config rule that is triggered by configuration changes to EC2 instances. Checks instance types."
+            }, 
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "8341HwPhM/J5h8xbCM/io4DV55d16S5CFc7V/x13Fow=", 
+                "FunctionName": "process_resources", 
+                "VpcConfig": {
+                    "SubnetIds": [], 
+                    "SecurityGroupIds": []
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 240, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:process_resources", 
+                "Handler": "lambda_function.process_resources", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 5, 
+                "LastModified": "2016-06-26T12:13:51.420+0000", 
+                "Runtime": "python2.7", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "05fb680e-6a0d-11e6-ad0d-d593f1ef780f", 
+            "HTTPHeaders": {
+                "date": "Wed, 24 Aug 2016 15:11:24 GMT", 
+                "x-amzn-requestid": "05fb680e-6a0d-11e6-ad0d-d593f1ef780f", 
+                "content-length": "1184", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

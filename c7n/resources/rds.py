@@ -41,23 +41,6 @@ Find rds instances that are not encrypted
            value: true
            op: ne
 
-
-Todo/Notes
-----------
-- Tag api for rds is highly inconsistent
-  compared to every other aws api, it
-  requires full arns. The api never exposes
-  arn. We should use a policy attribute
-  for arn, that can dereference from assume
-  role, instance profile role, iam user (GetUser),
-  or for sts assume role users we need to
-  require cli params for this resource type.
-
-- aurora databases also generate clusters
-  that are listed separately and return
-  different metadata using the cluster api
-
-
 """
 import functools
 import logging
@@ -67,14 +50,14 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, type_schema, get_account_id, chunks, generate_arn)
-
-from datetime import datetime
+    local_session, type_schema, get_account_id,
+    get_retry, chunks, generate_arn, snapshot_identifier)
+from c7n.resources.kms import ResourceKmsKeyAlias
 
 from skew.resources.aws import rds
 
@@ -99,6 +82,7 @@ class RDS(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
     _generate_arn = _account_id = None
+    retry = staticmethod(get_retry(('Throttled',)))
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
@@ -122,12 +106,12 @@ class RDS(QueryResourceManager):
         filter(None, _rds_tags(
             self.get_model(),
             resources, self.session_factory, self.executor_factory,
-            self.generate_arn))
+            self.generate_arn, self.retry))
         return resources
 
 
 def _rds_tags(
-        model, dbs, session_factory, executor_factory, generate_arn):
+        model, dbs, session_factory, executor_factory, generate_arn, retry):
     """Augment rds instances with their respective tags."""
 
     def process_tags(db):
@@ -135,7 +119,7 @@ def _rds_tags(
         arn = generate_arn(db[model.id])
         tag_list = None
         try:
-            tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
+            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBInstanceNotFound']:
                 log.warning("Exception getting rds tags  \n %s" % (e))
@@ -180,6 +164,7 @@ def _db_instance_eligible_for_backup(resource):
             return False
     return True
 
+
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -208,6 +193,13 @@ class DefaultVpc(Filter):
                 return []
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
+
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ResourceKmsKeyAlias):
+
+    def process(self, resources, event=None):
+        return self.get_matching_aliases(resources)
 
 
 @actions.register('mark-for-op')
@@ -308,17 +300,14 @@ class Delete(BaseAction):
 
         # Concurrency feels like over kill here.
         client = local_session(self.manager.session_factory).client('rds')
-        now = datetime.now()
         for rdb in resources:
             params = dict(
                 DBInstanceIdentifier=rdb['DBInstanceIdentifier'])
             if self.skip:
                 params['SkipFinalSnapshot'] = True
             else:
-                params['FinalDBSnapshotIdentifier'] = "%s-%s" % (
-                        rdb['DBInstanceIdentifier'],
-                        now.strftime("%Y-%m-%d")
-                        )
+                params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
+                    'Final', rdb['DBInstanceIdentifier'])
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
@@ -356,9 +345,9 @@ class Snapshot(BaseAction):
 
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_snapshot(
-            DBSnapshotIdentifier="Backup-%s-%s" % (
-                resource['DBInstanceIdentifier'],
-                resource['Engine']),
+            DBSnapshotIdentifier=snapshot_identifier(
+                'Backup',
+                resource['DBInstanceIdentifier']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
 
 

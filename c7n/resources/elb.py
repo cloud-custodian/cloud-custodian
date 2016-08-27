@@ -20,11 +20,11 @@ import logging
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import Filter, FilterRegistry, FilterValidationError
+from c7n.filters import Filter, FilterRegistry, FilterValidationError, DefaultVpcBase
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, get_retry
 
 log = logging.getLogger('custodian.elb')
 
@@ -42,23 +42,36 @@ class ELB(QueryResourceManager):
     resource_type = "aws.elb.loadbalancer"
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(get_retry(('Throttling',)))
 
     def augment(self, resources):
         _elb_tags(
-            resources, self.session_factory, self.executor_factory)
+            resources, self.session_factory, self.executor_factory, self.retry)
         return resources
 
 
-def _elb_tags(elbs, session_factory, executor_factory):
+def _elb_tags(elbs, session_factory, executor_factory, retry):
 
     def process_tags(elb_set):
         client = local_session(session_factory).client('elb')
         elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
-        try:
-            results = client.describe_tags(LoadBalancerNames=elb_map.keys())
-        except ClientError as e:
-            log.exception("Exception Processing ELB: %s", e)
-            raise
+
+        while True:
+            try:
+                results = retry(
+                    client.describe_tags,
+                    LoadBalancerNames=elb_map.keys())
+                break
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'LoadBalancerNotFound':
+                    raise
+                msg = e.response['Error']['Message']
+                _, lb_name = msg.strip().rsplit(' ', 1)
+                elb_map.pop(lb_name)
+                if not elb_map:
+                    results = {'TagDescriptions': []}
+                    break
+                continue
         for tag_desc in results['TagDescriptions']:
             elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
 
@@ -353,3 +366,14 @@ class HealthCheckProtocolMismatch(Filter):
         protocols = [listener['Listener']['InstanceProtocol']
                      for listener in listener_descriptions]
         return health_check_protocol in protocols
+
+
+@filters.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an elb database is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, elb):
+        return elb.get('VPCId') and self.match(elb.get('VPCId')) or False

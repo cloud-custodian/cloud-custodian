@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "ladyjane", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "KGQjDOgkJTF+bhNCBo5V/jwZa1I/N0cjjdCUxpA9n6TH9RgSEhqUzSiEoGk5GcfOjbYP4GcDAd8=", 
+            "RequestId": "858809E231CE685B", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "KGQjDOgkJTF+bhNCBo5V/jwZa1I/N0cjjdCUxpA9n6TH9RgSEhqUzSiEoGk5GcfOjbYP4GcDAd8=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "858809E231CE685B", 
+                "date": "Mon, 22 Aug 2016 11:46:37 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

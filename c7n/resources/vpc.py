@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
-from c7n.filters import Filter, ValueFilter, DefaultVpcBase
-from c7n.query import QueryResourceManager
+from c7n.filters import (
+    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
@@ -23,6 +27,28 @@ from c7n.utils import local_session, type_schema
 class Vpc(QueryResourceManager):
 
     resource_type = 'aws.ec2.vpc'
+
+
+@Vpc.filter_registry.register('subnets')
+class SubnetsOfVpc(ValueFilter):
+
+    schema = type_schema('subnets', rinherit=ValueFilter.schema)
+
+    def __init__(self, *args, **kw):
+        super(SubnetsOfVpc, self).__init__(*args, **kw)
+        self.data['key'] = 'Subnets'
+
+    def process(self, resources, event=None):
+
+        subnets = Subnet(self.manager.ctx, {}).resources()
+
+        matched = []
+        for r in resources:
+            r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
+            if self.match(r):
+                matched.append(r)
+
+        return matched
 
 
 @resources.register('subnet')
@@ -35,6 +61,97 @@ class Subnet(QueryResourceManager):
 class SecurityGroup(QueryResourceManager):
 
     resource_type = 'aws.ec2.security-group'
+
+
+@SecurityGroup.filter_registry.register('unused')
+class UnusedSecurityGroup(Filter):
+    """Filter to just vpc security groups that are not used.
+
+    We scan all extant enis in the vpc to get a baseline set of groups
+    in use. Then augment with those referenced by launch configs, and
+    lambdas as they may not have extant resources in the vpc at a
+    given moment. We also find any security group with references from
+    other security group either within the vpc or across peered
+    connections.
+
+    Note this filter does not support classic security groups atm.
+    """
+    schema = type_schema('unused')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        return unused and self.filter_peered_refs(unused) or []
+
+    def filter_peered_refs(self, resources):
+        # Check that groups are not referenced across accounts
+        client = local_session(self.manager.session_factory).client('ec2')
+        peered_ids = set()
+        for sg_ref in client.describe_security_group_references(
+                GroupId=[r['GroupId'] for r in resources]
+        )['SecurityGroupReferenceSet']:
+            peered_ids.add(sg_ref['GroupId'])
+        self.log.debug(
+            "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
+        return [r for r in resources if r['GroupId'] not in peered_ids]
+
+    def scan_groups(self):
+        used = set()
+        for kind, scanner in (
+                ("nics", self.get_eni_sgs),
+                ("sg-perm-refs", self.get_sg_refs),
+                ('lambdas', self.get_lambda_sgs),
+                ("launch-configs", self.get_launch_config_sgs),
+        ):
+            sg_ids = scanner()
+            new_refs = sg_ids.difference(used)
+            used = used.union(sg_ids)
+            self.log.debug(
+                "%s using %d sgs, new refs %s total %s",
+                kind, len(sg_ids), len(new_refs), len(used))
+
+        return used
+
+    def get_launch_config_sgs(self):
+        # Note assuming we also have launch config garbage collection
+        # enabled.
+        sg_ids = set()
+        from c7n.resources.asg import LaunchConfig
+        for cfg in LaunchConfig(self.manager.ctx, {}).resources():
+            for g in cfg['SecurityGroups']:
+                sg_ids.add(g)
+            for g in cfg['ClassicLinkVPCSecurityGroups']:
+                sg_ids.add(g)
+        return sg_ids
+
+    def get_lambda_sgs(self):
+        sg_ids = set()
+        from c7n.resources.awslambda import AWSLambda
+        for func in AWSLambda(self.manager.ctx, {}).resources():
+            if 'VpcConfig' not in func:
+                continue
+            for g in func['VpcConfig']['SecurityGroupIds']:
+                sg_ids.add(g)
+        return sg_ids
+
+    def get_eni_sgs(self):
+        sg_ids = set()
+        for nic in NetworkInterface(self.manager.ctx, {}).resources():
+            for g in nic['Groups']:
+                sg_ids.add(g['GroupId'])
+        return sg_ids
+
+    def get_sg_refs(self):
+        sg_ids = set()
+        for sg in SecurityGroup(self.manager.ctx, {}).resources():
+            for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
+                for p in sg.get(perm_type, []):
+                    for g in p.get('UserIdGroupPairs', ()):
+                        sg_ids.add(g['GroupId'])
+        return sg_ids
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
@@ -60,20 +177,44 @@ class SGPermission(Filter):
     If a group has any permissions that match all conditions, then it
     matches the filter.
 
-    Permissions that match on the group are annotated onto the group.
+    Permissions that match on the group are annotated onto the group and
+    can subsequently be used by the remove-permission action.
+
+    An example::
 
       - type: ingress
         IpProtocol: -1
         FromPort: 445
+
+    We have specialized handling for matching Ports in ingress/egress
+    permission From/To range::
+
+      - type: ingress
+        Ports: [22, 443, 80]
+
+    As well for assertions that a ingress/egress permission only matches
+    a given set of ports, *note* onlyports is an inverse match, it matches
+    when a permission includes ports outside of the specified set:
+
+      - type: egress
+        OnlyPorts: [22, 443, 80]
     """
 
     attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-                'IpRanges', 'PrefixListIds'))
+                 'IpRanges', 'PrefixListIds', 'Ports', 'OnlyPorts'))
+
+    def validate(self):
+        delta = set(self.data.keys()).difference(self.attrs)
+        delta.remove('type')
+        if delta:
+            raise FilterValidationError("Unknown keys %s" % ", ".join(delta))
+        return self
 
     def process(self, resources, event=None):
         self.vfilters = []
         fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
-
+        self.ports = 'Ports' in self.data and self.data['Ports'] or ()
+        self.only_ports = 'OnlyPorts' in self.data and self.data['OnlyPorts'] or ()
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
@@ -87,15 +228,27 @@ class SGPermission(Filter):
 
     def __call__(self, resource):
         matched = []
-        for p in resource[self.ip_permissions_key]:
-            found = True
+        for perm in resource[self.ip_permissions_key]:
+            found = False
             for f in self.vfilters:
-                if not f(p):
-                    found = False
+                if f(perm):
+                    found = True
                     break
+            if 'FromPort' in perm and 'ToPort' in perm:
+                for port in self.ports:
+                    if port >= perm['FromPort'] and port <= perm['ToPort']:
+                        found = True
+                        break
+                only_found = False
+                for port in self.only_ports:
+                    if port == perm['FromPort'] and port == perm['ToPort']:
+                        only_found = True
+                if self.only_ports and not only_found:
+                    found = True
             if not found:
                 continue
-            matched.append(p)
+            matched.append(perm)
+
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
             return True
@@ -109,7 +262,8 @@ class IPPermission(SGPermission):
         'type': 'object',
         #'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['ingress']}
+            'type': {'enum': ['ingress']},
+            'Ports': {'type': 'array', 'items': {'type': 'integer'}}
             },
         'required': ['type']}
 
@@ -130,11 +284,14 @@ class IPPermissionEgress(SGPermission):
 @SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermissions(BaseAction):
 
-    schema = type_schema('remove-permissions')
+    schema = type_schema(
+        'remove-permissions',
+        ingress={'type': 'string', 'enum': ['matched', 'all']},
+        egress={'type': 'string', 'enum': ['matched', 'all']})
 
     def process(self, resources):
-        i_perms = self.data.get('ingress')
-        e_perms = self.data.get('egress')
+        i_perms = self.data.get('ingress', 'matched')
+        e_perms = self.data.get('egress', 'matched')
 
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
@@ -177,7 +334,7 @@ class NetworkInterface(QueryResourceManager):
 @NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnet(ValueFilter):
 
-    schema = type_schema('subnet', rinherits=ValueFilter.schema)
+    schema = type_schema('subnet', rinherit=ValueFilter.schema)
     annotate = False
 
     def process(self, resources, event=None):
@@ -195,7 +352,7 @@ class InterfaceSubnet(ValueFilter):
 class InterfaceGroup(ValueFilter):
 
     annotate = False
-    schema = type_schema('group', rinherits=ValueFilter.schema)
+    schema = type_schema('group', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
         groups = set()
@@ -240,7 +397,7 @@ class InterfaceRemoveGroups(BaseAction):
            'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
-        target_group_ids = self.data.get('groups')
+        target_group_ids = self.data.get('groups', 'matched')
         isolation_group = self.data.get('isolation-group')
 
         client = local_session(self.manager.session_factory).client('ec2')
@@ -292,7 +449,8 @@ class NetworkAcl(QueryResourceManager):
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
-    resource_type = 'aws.ec2.address'
+    class resource_type(ResourceQuery.resolve('aws.ec2.address')):
+        taggable = False
 
 
 @resources.register('customer-gateway')
@@ -317,7 +475,9 @@ class InternetGateway(QueryResourceManager):
 
     resource_type = Meta
 
+
 @resources.register('key-pair')
 class KeyPair(QueryResourceManager):
 
-    resource_type = 'aws.ec2.key-pair'
+    class resource_type(ResourceQuery.resolve('aws.ec2.key-pair')):
+        taggable = False

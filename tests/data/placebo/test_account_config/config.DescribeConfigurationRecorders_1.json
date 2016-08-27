@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ConfigurationRecorders": [
+            {
+                "recordingGroup": {
+                    "allSupported": true, 
+                    "resourceTypes": [], 
+                    "includeGlobalResourceTypes": false
+                }, 
+                "roleARN": "arn:aws:iam::644160558196:role/service-role/config-role-us-west-2", 
+                "name": "default"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "80dc31dc-5ce1-11e6-b73a-5735261886d2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "80dc31dc-5ce1-11e6-b73a-5735261886d2", 
+                "date": "Sun, 07 Aug 2016 20:57:07 GMT", 
+                "content-length": "218", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

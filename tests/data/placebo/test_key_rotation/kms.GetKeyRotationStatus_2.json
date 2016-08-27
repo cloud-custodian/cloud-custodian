@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyRotationEnabled": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "4dd8143e-5506-11e6-b2ab-0b7ca1157ccf", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4dd8143e-5506-11e6-b2ab-0b7ca1157ccf", 
+                "content-length": "28", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Thu, 28 Jul 2016 21:00:24 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

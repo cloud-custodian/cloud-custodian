@@ -53,11 +53,12 @@ import ssl
 
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, CrossAccountAccessFilter
+from c7n.filters import (
+    FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import Tag
-from c7n.utils import chunks, local_session, set_annotation, type_schema
+from c7n.utils import chunks, local_session, set_annotation, type_schema, dumps
 
 """
 TODO:
@@ -76,6 +77,8 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
 @resources.register('s3')
 class S3(QueryResourceManager):
+
+    #resource_type = "aws.s3.bucket"
 
     class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
         dimension = 'BucketName'
@@ -169,10 +172,23 @@ def bucket_client(session, b, kms=False):
         region = location['LocationConstraint'] or 'us-east-1'
     if kms:
         # Need v4 signature for aws:kms crypto
-        config = Config(signature_version='s3v4')
+        config = Config(signature_version='s3v4', read_timeout=200)
     else:
-        config = None
+        config = Config(read_timeout=200)
     return session.client('s3', region_name=region, config=config)
+
+
+@filters.register('metrics')
+class S3Metrics(MetricsFilter):
+    """S3 CW Metrics need special handling for attribute/dimension
+    mismatch, and additional required dimension.
+    """
+    def get_dimensions(self, resource):
+        return [
+            {'Name': 'BucketName',
+             'Value': resource['Name']},
+            {'Name': 'StorageType',
+             'Value': 'AllStorageTypes'}]
 
 
 @filters.register('cross-account')
@@ -514,7 +530,7 @@ class BucketScanLog(object):
         self.count += len(keys)
         if self.fh is None:
             return
-        self.fh.write(json.dumps(keys))
+        self.fh.write(dumps(keys))
         self.fh.write(",\n")
 
 
@@ -1030,14 +1046,68 @@ class BucketTag(Tag):
             # all the tag marshalling back and forth is a bit gross :-(
             new_tags = {t['Key']: t['Value'] for t in tags}
             for t in r.get('Tags', ()):
-                if t['Key'] not in new_tags:
+                if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
                     new_tags[t['Key']] = t['Value']
             tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            try:
-                client.put_bucket_tagging(
+            client.put_bucket_tagging(
                     Bucket=r['Name'], Tagging={'TagSet': tag_set})
-            except ClientError as e:
-                raise
-                self.log.exception(
-                    "Error while tagging bucket %s err: %s" % (
-                        r['Name'], e))
+
+
+@actions.register('delete')
+class DeleteBucket(ScanBucket):
+
+    schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
+
+    def process(self, buckets):
+        if self.data.get('empty'):
+            self.empty_buckets(buckets)
+        with self.executor_factory(max_workers=3) as w:
+            results = w.map(self.delete_bucket, buckets)
+            return filter(None, list(results))
+
+    def delete_bucket(self, b):
+        s3 = bucket_client(self.manager.session_factory(), b)
+        try:
+            self._run_api(s3.delete_bucket, Bucket=b['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'BucketNotEmpty':
+                self.log.error(
+                    "Error while deleting bucket %s, bucket not empty" % (
+                        b['Name']))
+            else:
+                raise e
+
+    def empty_buckets(self, buckets):
+        t = time.time()
+        results = super(DeleteBucket, self).process(buckets)
+        run_time = time.time() - t
+        object_count = 0
+
+        for r in results:
+            object_count += r['Count']
+            self.manager.ctx.metrics.put_metric(
+                "Total Keys", object_count, "Count", Scope=r['Bucket'],
+                buffer=True)
+
+        self.manager.ctx.metrics.put_metric(
+            "Total Keys", object_count, "Count", Scope="Account", buffer=True)
+        self.manager.ctx.metrics.flush()
+
+        log.info(
+            ("EmptyBucket Complete keys:%d rate:%0.2f/s time:%0.2fs"),
+            object_count, float(object_count) / run_time, run_time)
+        return results
+
+    def process_chunk(self, batch, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        objects = []
+        for key in batch:
+            obj = {'Key': key['Key']}
+            if 'VersionId' in key:
+                obj['VersionId'] = key['VersionId']
+            objects.append(obj)
+        results = s3.delete_objects(
+            Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
+        if self.get_bucket_style(bucket) != 'versioned':
+            return results
+

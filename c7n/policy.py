@@ -94,26 +94,24 @@ class PolicyExecutionMode(object):
     def get_logs(self, start, end, period):
         """Retrieve logs for the policy"""
         raise NotImplementedError("not yet")
-        
+
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
-        # Avoiding runtime lambda dep, premature optimization?
-        from c7n.mu import PolicyLambda, LambdaManager
         values = {}
-
         default_dimensions = {
-            'Policy': self.name, 'ResType': self.resource_type,
+            'Policy': self.policy.name, 'ResType': self.policy.resource_type,
             'Scope': 'Policy'}
 
         metrics = list(self.POLICY_METRICS)
 
         # Support action, and filter custom metrics
         for el in itertools.chain(
-                self.resource_manager.actions, self.resource_manager.filters):
+                self.policy.resource_manager.actions,
+                self.policy.resource_manager.filters):
             if el.metrics:
                 metrics.extend(el.metrics)
 
-        session = utils.local_session(self.session_factory)
+        session = utils.local_session(self.policy.session_factory)
         client = session.client('cloudwatch')
 
         for m in metrics:
@@ -163,7 +161,9 @@ class PullMode(PolicyExecutionMode):
             rt = time.time() - s
             self.policy.log.info(
                 "policy: %s resource:%s has count:%d time:%0.2f" % (
-                    self.policy.name, self.policy.resource_type, len(resources), rt))
+                    self.policy.name,
+                    self.policy.resource_type,
+                    len(resources), rt))
             self.policy.ctx.metrics.put_metric(
                 "ResourceCount", len(resources), "Count", Scope="Policy")
             self.policy.ctx.metrics.put_metric(
@@ -189,9 +189,13 @@ class PullMode(PolicyExecutionMode):
                 s = time.time()
                 results = a.process(resources)
                 self.policy.log.info(
-                    "policy: %s action: %s resources: %d execution_time: %0.2f" % (
-                        self.policy.name, a.name, len(resources), time.time()-s))
-                self.policy._write_file("action-%s" % a.name, utils.dumps(results))
+                    "policy: %s action: %s"
+                    " resources: %d"
+                    " execution_time: %0.2f" % (
+                        self.policy.name, a.name,
+                        len(resources), time.time()-s))
+                self.policy._write_file(
+                    "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
@@ -211,7 +215,7 @@ class LambdaMode(PolicyExecutionMode):
             super(LambdaMode, self).get_metrics(start, end, period))
         return values
 
-    def resolve_resources(self, event, mode):
+    def resolve_resources(self, event):
         mode = self.policy.data.get('mode', {})
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
@@ -245,23 +249,25 @@ class LambdaMode(PolicyExecutionMode):
             resources, event)
 
         if 'debug' in event:
-            self.log.info("Filtered resources %d" % len(resources))
+            self.policy.log.info("Filtered resources %d" % len(resources))
 
         if not resources:
-            self.log.info("policy: %s resources: %s no resources matched" % (
-                self.name, self.resource_type))
+            self.policy.log.info(
+                "policy: %s resources: %s no resources matched" % (
+                    self.policy.name, self.policy.resource_type))
             return
 
-        self.ctx.metrics.put_metric(
+        self.policy.ctx.metrics.put_metric(
             'ResourceCount', len(resources), 'Count', Scope="Policy",
             buffer=False)
 
         if 'debug' in event:
-            self.log.info("Invoking actions %s", self.resource_manager.actions)
-        for action in self.resource_manager.actions:
-            self.log.info(
+            self.policy.log.info(
+                "Invoking actions %s", self.policy.resource_manager.actions)
+        for action in self.policy.resource_manager.actions:
+            self.policy.log.info(
                 "policy: %s invoking action: %s resources: %d",
-                self.name, action.name, len(resources))
+                self.policy.name, action.name, len(resources))
             if isinstance(action, EventAction):
                 action.process(resources, event)
             else:
@@ -272,18 +278,19 @@ class LambdaMode(PolicyExecutionMode):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
 
-        with self.ctx:
-            self.log.info(
-                "Provisioning policy lambda %s", self.name)
+        with self.policy.ctx:
+            self.policy.log.info(
+                "Provisioning policy lambda %s", self.policy.name)
             try:
-                manager = LambdaManager(self.session_factory)
+                manager = LambdaManager(self.policy.session_factory)
             except ClientError:
                 # For cli usage by normal users, don't assume the role just use
                 # it for the lambda
                 manager = LambdaManager(
-                    lambda assume=False: self.session_factory(assume))
+                    lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                PolicyLambda(self), 'current', role=self.options.assume_role)
+                PolicyLambda(self), 'current', 
+                role=self.policy.options.assume_role)
 
 
 class PeriodicMode(LambdaMode, PullMode):
@@ -318,8 +325,9 @@ class ConfigRuleMode(LambdaMode):
 class Policy(object):
 
     EXEC_MODE_MAP = {
+        'pull': PullMode,
         'periodic': PeriodicMode,
-        'cloud-trail': CloudTrailMode,
+        'cloudtrail': CloudTrailMode,
         'ec2-instance-state': EC2InstanceState,
         'asg-instance-state': ASGInstanceState,
         'config-rule': ConfigRuleMode}

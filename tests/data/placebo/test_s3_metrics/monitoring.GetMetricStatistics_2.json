@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 46
+                }, 
+                "Average": 20499.928571428572, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "14f67745-685e-11e6-ba64-214a82fe15c2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "14f67745-685e-11e6-ba64-214a82fe15c2", 
+                "date": "Mon, 22 Aug 2016 11:46:36 GMT", 
+                "content-length": "511", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Label": "NumberOfObjects"
+    }
+}
