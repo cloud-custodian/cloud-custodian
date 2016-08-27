@@ -50,7 +50,25 @@ class RDSClusterTest(BaseTest):
                 {'type': 'value',
                  'key': 'DBClusterIdentifier',
                  'value': 'bbb'}],
-            'actions': ['delete']},
+            'actions': [
+                {'type': 'delete',
+                 'delete-instances': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rdscluster_delete_with_instances(self):
+        session_factory = self.replay_flight_data('test_rdscluster_delete_with_instances')
+        p = self.load_policy({
+            'name': 'rdscluster-delete',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'value',
+                 'key': 'DBClusterIdentifier',
+                 'value': 'bbb'}],
+            'actions': [
+                {'type': 'delete',
+                 'delete-instances': True}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

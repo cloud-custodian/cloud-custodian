@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBCluster": {
+            "MasterUsername": "u1",
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active",
+                    "VpcSecurityGroupId": "sg-1"
+                }
+            ],
+            "Status": "deleting",
+            "LatestRestorableTime": {
+                "hour": 14,
+                "__class__": "datetime",
+                "month": 7,
+                "second": 47,
+                "microsecond": 674000,
+                "year": 2016,
+                "day": 27,
+                "minute": 37
+            },
+            "PreferredBackupWindow": "08:28-08:58",
+            "DBSubnetGroup": "dbsubnetgroup1",
+            "AllocatedStorage": 1,
+            "BackupRetentionPeriod": 1,
+            "PreferredMaintenanceWindow": "wed:04:07-wed:04:37",
+            "Engine": "aurora",
+            "Endpoint": "cccc.cluster-abc.us-east-1.rds.amazonaws.com",
+            "EarliestRestorableTime": {
+                "hour": 14,
+                "__class__": "datetime",
+                "month": 7,
+                "second": 47,
+                "microsecond": 674000,
+                "year": 2016,
+                "day": 27,
+                "minute": 37
+            },
+            "EngineVersion": "5.6.10a",
+            "DBClusterIdentifier": "cccc",
+            "DbClusterResourceId": "cluster-ABCD",
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true,
+                    "DBClusterParameterGroupStatus": "in-sync",
+                    "PromotionTier": 0,
+                    "DBInstanceIdentifier": "test-cluster-1"
+                }
+            ],
+            "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+            "StorageEncrypted": true,
+            "DatabaseName": "mydb",
+            "DBClusterParameterGroup": "default.aurora5.6",
+            "AvailabilityZones": [
+                "us-east-1a",
+                "us-east-1b",
+                "us-east-1e"
+            ],
+            "Port": 3306
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "86256d71-5408-11e6-9e2b-195660273320"
+        }
+    }
+}
