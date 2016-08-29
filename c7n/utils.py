@@ -20,6 +20,7 @@ import itertools
 import random
 import threading
 import time
+import ipaddress
 
 
 # Try to place nice in lambda exec environment
@@ -288,3 +289,27 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
         else:
             yield cur
         cur = cur * factor
+
+
+def parse_cidrs(permissions):
+    """Process cidr ranges"""
+    cidr = []
+
+    ip_ranges = 'IpRanges' in permissions and permissions['IpRanges'] or []
+
+    # not sure how best to handle. Want list, can also get dict. Don't want anything else
+    # if not isinstance(ip_range, list):
+    #     ip_range = [ip_range]
+
+    for r in ip_ranges:
+        v = None
+        try:
+            v = ipaddress.ip_network(unicode(r.get('CidrIp'))).prefixlen
+        except (ipaddress.AddressValueError, ValueError) as e:
+            # do i want to raise this or just skip like i was?
+            raise ValueError('Invalid IP Network provided. Incoming obj: {}\tError: {}'.format(ip_ranges, e))
+            # v = 0
+        # if v > 0:
+        if v:
+            cidr.append(v)
+    return cidr

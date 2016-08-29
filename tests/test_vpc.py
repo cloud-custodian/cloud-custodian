@@ -217,6 +217,55 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_cidr_size_egress(self):
+
+        factory = self.replay_flight_data(
+            'test_cidr_size_egress')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="wide-egress",
+            VpcId=vpc_id,
+            Description="unnecessarily large egress CIDR rule")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_egress(
+            GroupId=sg_id,
+            IpPermissions = [{
+                'IpProtocol': 'tcp',
+                'FromPort': 443,
+                'ToPort': 443,
+                'IpRanges':[
+                    {
+                        'CidrIp': '10.42.0.0/16'
+                    },
+                    {
+                        'CidrIp': '10.42.1.0/24'
+                    }]
+            }])
+        p = self.load_policy({
+            'name': 'wide-egress',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'egress',
+                 'IpRanges': {
+                     'value': 24,
+                     'op': 'lt',
+                     'value-type': 'cidr'
+                 }},
+                 {'GroupName': 'wide-egress'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['MatchedIpPermissionsEgress'],
+            [{u'FromPort': 443,
+              u'IpProtocol': u'tcp',
+              u'IpRanges': [{u'CidrIp': u'10.42.0.0/16'},{u'CidrIp': u'10.42.1.0/24'}],
+              u'PrefixListIds': [],
+              u'ToPort': 443,
+              u'UserIdGroupPairs': []}])
+
 
 class VpcTest(BaseTest):
 
