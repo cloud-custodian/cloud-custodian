@@ -61,7 +61,8 @@ def validate(options):
             try:
                 Policy(p, null_config, Bag())
             except Exception as e:
-                log.error("Policy: %s is invalid" % p.get('name', 'unknown'))
+                log.error("Policy: %s is invalid: %s" % (
+                    p.get('name', 'unknown'), e))
                 sys.exit(1)
                 return
         log.info("Config valid")
