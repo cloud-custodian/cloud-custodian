@@ -218,7 +218,8 @@ class SGPermission(Filter):
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
-                fv['key'] = f
+                if 'key' not in fv:
+                    fv['key'] = f
             else:
                 fv = {f: fv}
             vf = ValueFilter(fv)

@@ -82,10 +82,6 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
 
-    schema = type_schema(
-        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
-        ops={'enum': ['delete', 'set-ssl-listener-policy']})
-
     batch_size = 1
 
     def process_resource_set(self, resource_set, tags):
