@@ -82,20 +82,31 @@ class UtilTest(unittest.TestCase):
             utils.generate_arn('s3', 'my_bucket'),
             'arn:aws:s3:::my_bucket')
         self.assertEqual(
-            utils.generate_arn('cloudformation',
+            utils.generate_arn(
+                'cloudformation',
                 'MyProductionStack/abc9dbf0-43c2-11e3-a6e8-50fa526be49c',
                 region='us-east-1',
                 account_id='123456789012',
                 resource_type='stack'),
-            'arn:aws:cloudformation:us-east-1:123456789012:stack/MyProductionStack/abc9dbf0-43c2-11e3-a6e8-50fa526be49c')
+            'arn:aws:cloudformation:us-east-1:123456789012:'
+            'stack/MyProductionStack/abc9dbf0-43c2-11e3-a6e8-50fa526be49c')
         self.assertEqual(
-            utils.generate_arn('rds',
+            utils.generate_arn(
+                'rds',
                 'mysql-option-group1',
                 region='us-east-1',
                 account_id='123456789012',
                 resource_type='og',
                 separator=':'),
             'arn:aws:rds:us-east-1:123456789012:og:mysql-option-group1')
+
+    def testCamelCase(self):
+        d = {'zebraMoon': [{'instanceId': 123}, 'moon'],
+             'color': {'yellow': 1, 'green': 2}}
+        self.assertEqual(
+            utils.camelResource(d),
+            {'ZebraMoon': [{'InstanceId': 123}, 'moon'],
+             'Color': {'Yellow': 1, 'Green': 2}})
 
     def test_snapshot_identifier(self):
         identifier = utils.snapshot_identifier('bkup', 'abcdef')

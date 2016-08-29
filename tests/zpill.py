@@ -181,9 +181,7 @@ class PillTest(unittest.TestCase):
                 return new_session
             return session
 
-        # return session factory
         return factory
-        return lambda region=None, assume=None: session
 
     def replay_flight_data(self, test_case, zdata=False):
         if not zdata:

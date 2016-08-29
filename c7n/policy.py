@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import fnmatch
 import itertools
 import logging
@@ -75,7 +76,305 @@ class PolicyCollection(object):
         return policy_name in [p['name'] for p in self.data['policies']]
 
 
+class PolicyExecutionMode(object):
+    """Policy execution semantics"""
+
+    POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+
+    def __init__(self, policy):
+        self.policy = policy
+
+    def run(self):
+        """Run the actual policy."""
+        raise NotImplementedError("subclass responsibility")
+
+    def provision(self):
+        """Provision any resources needed for the policy."""
+
+    def get_logs(self, start, end, period):
+        """Retrieve logs for the policy"""
+        raise NotImplementedError("not yet")
+
+    def get_metrics(self, start, end, period):
+        """Retrieve any associated metrics for the policy."""
+        values = {}
+        default_dimensions = {
+            'Policy': self.policy.name, 'ResType': self.policy.resource_type,
+            'Scope': 'Policy'}
+
+        metrics = list(self.POLICY_METRICS)
+
+        # Support action, and filter custom metrics
+        for el in itertools.chain(
+                self.policy.resource_manager.actions,
+                self.policy.resource_manager.filters):
+            if el.metrics:
+                metrics.extend(el.metrics)
+
+        session = utils.local_session(self.policy.session_factory)
+        client = session.client('cloudwatch')
+
+        for m in metrics:
+            if isinstance(m, basestring):
+                dimensions = default_dimensions
+            else:
+                m, m_dimensions = m
+                dimensions = dict(default_dimensions)
+                dimensions.update(m_dimensions)
+            results = client.get_metric_statistics(
+                Namespace=DEFAULT_NAMESPACE,
+                Dimensions=[
+                    {'Name': k, 'Value': v} for k, v
+                    in dimensions.items()],
+                Statistics=['Sum', 'Average'],
+                StartTime=start,
+                EndTime=end,
+                Period=period,
+                MetricName=m)
+            values[m] = results['Datapoints']
+        return values
+
+
+class PullMode(PolicyExecutionMode):
+    """Pull mode execution of a policy.
+
+    Queries resources from cloud provider for filtering and actions.
+    """
+
+    def run(self, *args, **kw):
+        if self.policy.region and (
+                self.policy.region != self.policy.options.region):
+            self.policy.log.info(
+                "Skipping policy %s target-region: %s current-region: %s",
+                self.policy.name, self.policy.region,
+                self.policy.options.region)
+            return
+
+        with self.policy.ctx:
+            self.policy.log.info(
+                "Running policy %s resource: %s region:%s",
+                self.policy.name, self.policy.resource_type,
+                self.policy.options.region)
+
+            s = time.time()
+            resources = self.policy.resource_manager.resources()
+            rt = time.time() - s
+            self.policy.log.info(
+                "policy: %s resource:%s has count:%d time:%0.2f" % (
+                    self.policy.name,
+                    self.policy.resource_type,
+                    len(resources), rt))
+            self.policy.ctx.metrics.put_metric(
+                "ResourceCount", len(resources), "Count", Scope="Policy")
+            self.policy.ctx.metrics.put_metric(
+                "ResourceTime", rt, "Seconds", Scope="Policy")
+            self.policy._write_file(
+                'resources.json', utils.dumps(resources, indent=2))
+
+            if not resources:
+                return []
+            elif (self.policy.max_resources is not None and
+                  len(resources) > self.policy.max_resources):
+                msg = "policy %s matched %d resources max resources %s" % (
+                    self.policy.name, len(resources), self.policy.max_resources)
+                self.policy.log.warning(msg)
+                raise RuntimeError(msg)
+
+            if self.policy.options.dryrun:
+                self.policy.log.debug("dryrun: skipping actions")
+                return resources
+
+            at = time.time()
+            for a in self.policy.resource_manager.actions:
+                s = time.time()
+                results = a.process(resources)
+                self.policy.log.info(
+                    "policy: %s action: %s"
+                    " resources: %d"
+                    " execution_time: %0.2f" % (
+                        self.policy.name, a.name,
+                        len(resources), time.time()-s))
+                self.policy._write_file(
+                    "action-%s" % a.name, utils.dumps(results))
+            self.policy.ctx.metrics.put_metric(
+                "ActionTime", time.time() - at, "Seconds", Scope="Policy")
+            return resources
+
+
+class LambdaMode(PolicyExecutionMode):
+    """A policy that runs/executes in lambda."""
+
+    POLICY_METRICS = ('ResourceCount',)
+
+    def get_metrics(self, start, end, period):
+        from c7n.mu import LambdaManager, PolicyLambda
+        manager = LambdaManager(self.policy.session_factory)
+        values = manager.metrics(
+            [PolicyLambda(self.policy)], start, end, period)[0]
+        values.update(
+            super(LambdaMode, self).get_metrics(start, end, period))
+        return values
+
+    def resolve_resources(self, event):
+        mode = self.policy.data.get('mode', {})
+        resource_ids = CloudWatchEvents.get_ids(event, mode)
+        if resource_ids is None:
+            raise ValueError("Unknown push event mode %s" % self.data)
+
+        self.policy.log.info('Found resource ids: %s' % resource_ids)
+        if not resource_ids:
+            self.policy.log.warning("Could not find resource ids")
+            return []
+
+        resources = self.policy.resource_manager.get_resources(resource_ids)
+        if 'debug' in event:
+            self.policy.log.info("Resources %s", resources)
+        return resources
+
+    def run(self, event, lambda_context):
+        """Run policy in push mode against given event.
+
+        Lambda automatically generates cloud watch logs, and metrics
+        for us, albeit with some deficienies, metrics no longer count
+        against valid resources matches, but against execution.
+        Fortunately we already have replacements.
+
+        TODO: better customization around execution context outputs
+        TODO: support centralized lambda exec across accounts.
+        """
+        resources = self.resolve_resources(event)
+        if not resources:
+            return resources
+        resources = self.policy.resource_manager.filter_resources(
+            resources, event)
+
+        if 'debug' in event:
+            self.policy.log.info("Filtered resources %d" % len(resources))
+
+        if not resources:
+            self.policy.log.info(
+                "policy: %s resources: %s no resources matched" % (
+                    self.policy.name, self.policy.resource_type))
+            return
+
+        self.policy.ctx.metrics.put_metric(
+            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            buffer=False)
+
+        if 'debug' in event:
+            self.policy.log.info(
+                "Invoking actions %s", self.policy.resource_manager.actions)
+        for action in self.policy.resource_manager.actions:
+            self.policy.log.info(
+                "policy: %s invoking action: %s resources: %d",
+                self.policy.name, action.name, len(resources))
+            if isinstance(action, EventAction):
+                action.process(resources, event)
+            else:
+                action.process(resources)
+        return resources
+
+    def provision(self):
+        # Avoiding runtime lambda dep, premature optimization?
+        from c7n.mu import PolicyLambda, LambdaManager
+
+        with self.policy.ctx:
+            self.policy.log.info(
+                "Provisioning policy lambda %s", self.policy.name)
+            try:
+                manager = LambdaManager(self.policy.session_factory)
+            except ClientError:
+                # For cli usage by normal users, don't assume the role just use
+                # it for the lambda
+                manager = LambdaManager(
+                    lambda assume=False: self.policy.session_factory(assume))
+            return manager.publish(
+                PolicyLambda(self.policy), 'current',
+                role=self.policy.options.assume_role)
+
+
+class PeriodicMode(LambdaMode, PullMode):
+    """A policy that runs in pull mode within lambda."""
+
+    POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+
+    def run(self):
+        return PullMode.run(self)
+
+
+class CloudTrailMode(LambdaMode):
+    """A lambda policy using cloudwatch events rules on cloudtrail api logs."""
+
+
+class EC2InstanceState(LambdaMode):
+    """a lambda policy that executes on ec2 instance state changes."""
+
+
+class ASGInstanceState(LambdaMode):
+    """a lambda policy that executes on an asg's ec2 instance state changes."""
+
+
+class ConfigRuleMode(LambdaMode):
+    """a lambda policy that executes as a config service rule.
+        http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
+    """
+
+    cfg_event = None
+
+    def resolve_resources(self, event):
+        return [utils.camelResource(
+            self.cfg_event['configurationItem']['configuration'])]
+
+    def run(self, event, lambda_context):
+        self.cfg_event = json.loads(event['invokingEvent'])
+        cfg_item = self.cfg_event['configurationItem']
+        evaluation = None
+        # TODO config resource type matches policy check
+        if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
+                "ResourceDeleted",
+                "ResourceNotRecorded",
+                "ResourceDeletedNotRecorded"):
+            evaluation = {
+                'annotation': 'The rule does not apply.',
+                'compliance_type': 'NOT_APPLICABLE'}
+
+        if evaluation is None:
+            resources = super(ConfigRuleMode, self).run(event, lambda_context)
+            match = self.policy.data['mode'].get('match-compliant', False)
+            if (match and resources) or (not match and not resources):
+                evaluation = {
+                    'compliance_type': 'COMPLIANT',
+                    'annotation': 'The resource is compliant with this rule.'}
+            else:
+                evaluation = {
+                    'compliance_type': 'NOT_COMPLIANT',
+                    'annotation': 'The resources is not compliant.'
+                }
+
+        client = utils.local_session(
+            self.policy.session_factory).client('config')
+        client.put_evaluations(
+            Evaluations=[{
+                'ComplianceResourceType': cfg_item['resourceType'],
+                'ComplianceResourceId': cfg_item['resourceId'],
+                'ComplianceType': evaluation['compliance_type'],
+                'Annotation': evaluation['annotation'],
+                # TODO ? if not applicable use current timestamp
+                'OrderingTimestamp': cfg_item[
+                    'configurationItemCaptureTime']}],
+            ResultToken=event.get('resultToken', 'No token found.'))
+        return resources
+
+
 class Policy(object):
+
+    EXEC_MODE_MAP = {
+        'pull': PullMode,
+        'periodic': PeriodicMode,
+        'cloudtrail': CloudTrailMode,
+        'ec2-instance-state': EC2InstanceState,
+        'asg-instance-state': ASGInstanceState,
+        'config-rule': ConfigRuleMode}
 
     log = logging.getLogger('custodian.policy')
 
@@ -112,9 +411,9 @@ class Policy(object):
     def max_resources(self):
         return self.data.get('max-resources')
 
-    @property
-    def tags(self):
-        return self.data.get('tags', ())
+    def get_execution_mode(self):
+        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
+        return self.EXEC_MODE_MAP[exec_mode_type](self)
 
     @property
     def is_lambda(self):
@@ -123,186 +422,38 @@ class Policy(object):
         return True
 
     def push(self, event, lambda_ctx):
-        """Run policy in push mode against given event.
-
-        Lambda automatically generates cloud watch logs, and metrics
-        for us, albeit with some deficienies, metrics no longer count
-        against valid resources matches, but against execution.
-        Fortunately we already have replacements.
-
-        TODO: better customization around execution context outputs
-        TODO: support centralized lambda exec across accounts.
-        """
-        mode = self.data.get('mode', {})
-        mode_type = mode.get('type')
-
-        if mode_type == 'periodic':
-            return self.poll()
-
-        resource_ids = CloudWatchEvents.get_ids(event, mode)
-        if resource_ids is None:
-            raise ValueError("Unknown push event mode %s" % self.data)
-
-        self.log.info('Found resource ids: %s' % resource_ids)
-        if not resource_ids:
-            self.log.warning("Could not find resource ids")
-            return
-
-        resources = self.resource_manager.get_resources(resource_ids)
-        if 'debug' in event:
-            self.log.info("Resources %s", resources)
-
-        resources = self.resource_manager.filter_resources(resources, event)
-        if 'debug' in event:
-            self.log.info("Filtered resources %d" % len(resources))
-
-        if not resources:
-            self.log.info("policy: %s resources: %s no resources matched" % (
-                self.name, self.resource_type))
-            return
-
-        self.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
-
-        if 'debug' in event:
-            self.log.info("Invoking actions %s", self.resource_manager.actions)
-        for action in self.resource_manager.actions:
-            self.log.info(
-                "policy: %s invoking action: %s resources: %d",
-                self.name, action.name, len(resources))
-            if isinstance(action, EventAction):
-                action.process(resources, event)
-            else:
-                action.process(resources)
-        return resources
+        mode = self.get_execution_mode()
+        return mode.run(event, lambda_ctx)
 
     def provision(self):
         """Provision policy as a lambda function."""
-        # Avoiding runtime lambda dep, premature optimization?
-        from c7n.mu import PolicyLambda, LambdaManager
-
-        with self.ctx:
-            self.log.info(
-                "Provisioning policy lambda %s", self.name)
-            try:
-                manager = LambdaManager(self.session_factory)
-            except ClientError:
-                # For cli usage by normal users, don't assume the role just use
-                # it for the lambda
-                manager = LambdaManager(
-                    lambda assume=False: self.session_factory(assume))
-            return manager.publish(
-                PolicyLambda(self), 'current', role=self.options.assume_role)
+        mode = self.get_execution_mode()
+        return mode.provision()
 
     def poll(self):
         """Query resources and apply policy."""
-        if self.region and self.region != self.options.region:
-            self.log.info(
-                "Skipping policy %s target-region: %s current-region: %s",
-                self.name, self.region, self.options.region)
-            return
-
-        with self.ctx:
-            self.log.info("Running policy %s resource: %s region:%s",
-                          self.name, self.resource_type, self.options.region)
-            s = time.time()
-            resources = self.resource_manager.resources()
-            rt = time.time() - s
-            self.log.info(
-                "policy: %s resource:%s has count:%d time:%0.2f" % (
-                    self.name, self.resource_type, len(resources), rt))
-            self.ctx.metrics.put_metric(
-                "ResourceCount", len(resources), "Count", Scope="Policy")
-            self.ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            self._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            if not resources:
-                return []
-            elif (self.max_resources is not None and
-                  len(resources) > self.max_resources):
-                msg = "policy %s matched %d resources max resources %s" % (
-                    self.name, len(resources), self.max_resources)
-                self.log.warning(msg)
-                raise RuntimeError(msg)
-
-            if self.options.dryrun:
-                self.log.debug("dryrun: skipping actions")
-                return resources
-
-            at = time.time()
-            for a in self.resource_manager.actions:
-                s = time.time()
-                results = a.process(resources)
-                self.log.info(
-                    "policy: %s action: %s resources: %d execution_time: %0.2f" % (
-                        self.name, a.name, len(resources), time.time()-s))
-                self._write_file("action-%s" % a.name, utils.dumps(results))
-            self.ctx.metrics.put_metric(
-                "ActionTime", time.time() - at, "Seconds", Scope="Policy")
-            return resources
+        mode = self.get_execution_mode()
+        return mode.run()
 
     def get_metrics(self, start, end, period):
-        # Avoiding runtime lambda dep, premature optimization?
-        from c7n.mu import PolicyLambda, LambdaManager
-
-        values = {}
-        # Pickup lambda specific metrics (errors, invocations, durations)
-        if self.is_lambda:
-            manager = LambdaManager(self.session_factory)
-            values = manager.metrics(
-                [PolicyLambda(self)], start, end, period)[0]
-            metrics = ['ResourceCount']
-        else:
-            metrics = ['ResourceCount', 'ResourceTime', 'ActionTime']
-
-        default_dimensions = {
-            'Policy': self.name, 'ResType': self.resource_type,
-            'Scope': 'Policy'}
-
-        # Support action, and filter custom metrics
-        for el in itertools.chain(
-                self.resource_manager.actions, self.resource_manager.filters):
-            if el.metrics:
-                metrics.extend(el.metrics)
-
-        session = utils.local_session(self.session_factory)
-        client = session.client('cloudwatch')
-
-        for m in metrics:
-            if isinstance(m, basestring):
-                dimensions = default_dimensions
-            else:
-                m, m_dimensions = m
-                dimensions = dict(default_dimensions)
-                dimensions.update(m_dimensions)
-            results = client.get_metric_statistics(
-                Namespace=DEFAULT_NAMESPACE,
-                Dimensions=[
-                    {'Name': k, 'Value': v} for k, v
-                    in dimensions.items()],
-                Statistics=['Sum', 'Average'],
-                StartTime=start,
-                EndTime=end,
-                Period=period,
-                MetricName=m)
-            values[m] = results['Datapoints']
-        return values
+        mode = self.get_execution_mode()
+        return mode.get_metrics(start, end, period)
 
     def __call__(self):
         """Run policy in default mode"""
-        if self.is_lambda and not self.options.dryrun:
-            return self.provision()
+        mode = self.get_execution_mode()
+        if self.options.dryrun:
+            return PullMode(self).run()
+        elif isinstance(mode, LambdaMode):
+            return mode.provision()
         else:
-            return self.poll()
+            return mode.run()
 
     run = __call__
 
-    def _write_file(self, rel_p, value):
+    def _write_file(self, rel_path, value):
         with open(
-                os.path.join(self.ctx.log_dir, rel_p), 'w') as fh:
+                os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
     def get_resource_manager(self):
