@@ -13,8 +13,8 @@ log = logging.getLogger('resources')
 def load_policies(options):
     policies = []
     for f in options.config_files:
-        for collection in policy_load(options, f):
-            policies.extend(collection.filter(options.policy_filter))
+        collection = policy_load(options, f)
+        policies.extend(collection.filter(options.policy_filter))
     return policies
 
 
@@ -40,11 +40,8 @@ def resources_gc_prefix(options, policy_collection):
             remove.append(f)
 
     for n in remove:
-        log.info("Removing %s" % n['FunctionName'])
-
-    for func in remove:
         events = []
-        result = client.get_policy(FunctionName=func['FunctionName'])
+        result = client.get_policy(FunctionName=n['FunctionName'])
         if 'Policy' not in result:
             pass
         else:
@@ -52,7 +49,7 @@ def resources_gc_prefix(options, policy_collection):
             for s in p['Statement']:
                 principal = s.get('Principal')
                 if not isinstance(principal, dict):
-                    log.info("Skipping function %s" % func['FunctionName'])
+                    log.info("Skipping function %s" % n['FunctionName'])
                     continue
                 if principal == {'Service': 'events.amazonaws.com'}:
                     events.append(
@@ -67,12 +64,13 @@ def resources_gc_prefix(options, policy_collection):
             'description': n['Description'],
             'runtime': n['Runtime'],
             'events': events}, None)
-        log.info("Removing %s" % f)
 
+        log.info("Removing %s" % n['FunctionName'])
         if options.dryrun:
-            log.info("Dryrun skipping")
+            log.info("Dryrun skipping removal")
             continue
         manager.remove(f)
+        log.info("Removed %s" % n['FunctionName'])
 
 
 def setup_parser():
@@ -104,10 +102,10 @@ def main():
         level=logging.DEBUG,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
-
+    logging.getLogger('c7n.cache').setLevel(logging.WARNING)
     resources.load_resources()
 
-    policies = load_policies(options.config_files)
+    policies = load_policies(options)
     resources_gc_prefix(options, policies)
 
 
