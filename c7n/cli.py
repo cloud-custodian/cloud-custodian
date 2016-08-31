@@ -119,6 +119,7 @@ def main():
         level=level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
+    logging.getLogger('s3transfer').setLevel(logging.ERROR)
 
     try:
         resources.load_resources()

@@ -33,7 +33,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import Time, OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
-from c7n.utils import local_session, query_instances, type_schema, chunks
+from c7n.utils import (
+    local_session, query_instances, type_schema, chunks, get_retry)
 
 log = logging.getLogger('custodian.asg')
 
@@ -55,6 +56,8 @@ class ASG(QueryResourceManager):
     resource_type = "aws.autoscaling.autoScalingGroup"
     filter_registry = filters
     action_registry = actions
+
+    retry = staticmethod(get_retry(('ResourceInUse', 'Throttling',)))
 
 
 class LaunchConfigFilterBase(object):
@@ -417,6 +420,8 @@ class VpcIdFilter(ValueFilter):
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
 
+    max_tag_count = 10
+
     def process_tag_removal(self, resource, candidates):
         client = local_session(
             self.manager.session_factory).client('autoscaling')
@@ -460,13 +465,12 @@ class RemoveTag(BaseAction):
         if error:
             raise error
 
-    # retry on error code - ResourceInUse
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
         tags= [dict(Key=key, ResourceType='auto-scaling-group',
                     ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        client.delete_tags(Tags=tags)
+        self.manager.retry(client.delete_tags, Tags=tags)
 
 
 @actions.register('tag')
@@ -482,6 +486,8 @@ class Tag(BaseAction):
         msg={'type': 'string'},
         propagate={'type': 'boolean'})
 
+    batch_size = 1
+
     def process(self, asgs):
         error = False
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
@@ -494,7 +500,7 @@ class Tag(BaseAction):
         error = None
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for asg_set in chunks(asgs, 20):
+            for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
                     self.process_asg_set, asg_set, key, value)] = asg_set
             for f in as_completed(futures):
@@ -517,7 +523,7 @@ class Tag(BaseAction):
         tags= [dict(Key=key, ResourceType='auto-scaling-group', Value=value,
                     PropagateAtLaunch=propagate,
                     ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        client.create_or_update_tags(Tags=tags)
+        self.manager.retry(client.create_or_update_tags, Tags=tags)
 
 
 @actions.register('propagate-tags')
@@ -703,7 +709,7 @@ class MarkForOp(Tag):
         op={'enum': ['suspend', 'resume', 'delete']},
         key={'type': 'string'},
         tag={'type': 'string'},
-        message={'type', 'string'},
+        message={'type': 'string'},
         days={'type': 'number', 'minimum': 0})
 
     default_template = (
@@ -751,7 +757,7 @@ class Suspend(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        asg_client.suspend_processes(
+        self.manager.retry(asg_client.suspend_processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
         ec2_client = session.client('ec2')
         try:

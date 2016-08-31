@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBCluster": {
+            "Status": "available",
+            "Engine": "aurora",
+            "Endpoint": "bbb.cluster-cqjpbflwiy1j.us-east-1.rds.amazonaws.com",
+            "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+            "DBClusterIdentifier": "bbb",
+            "MasterUsername": "user1",
+            "EarliestRestorableTime": {
+                "hour": 8,
+                "__class__": "datetime",
+                "month": 7,
+                "second": 20,
+                "microsecond": 487000,
+                "year": 2016,
+                "day": 13,
+                "minute": 2
+            },
+            "DbClusterResourceId": "cluster-ABCD",
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true,
+                    "DBClusterParameterGroupStatus": "in-sync",
+                    "PromotionTier": 1,
+                    "DBInstanceIdentifier": "bbb-poolmember-1"
+                },
+                {
+                    "IsClusterWriter": false,
+                    "DBClusterParameterGroupStatus": "in-sync",
+                    "PromotionTier": 1,
+                    "DBInstanceIdentifier": "bbb-rds-poolmember-2"
+                }
+            ],
+            "Port": 3306,
+            "PreferredBackupWindow": "08:00-09:00",
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active",
+                    "VpcSecurityGroupId": "sg-1"
+                }
+            ],
+            "DBSubnetGroup": "default-vpc-1",
+            "StorageEncrypted": true,
+            "AllocatedStorage": 1,
+            "EngineVersion": "5.6.10a",
+            "DBClusterParameterGroup": "default.aurora5.6",
+            "BackupRetentionPeriod": 7,
+            "AvailabilityZones": [
+                "us-east-1a",
+                "us-east-1b",
+                "us-east-1c"
+            ],
+            "LatestRestorableTime": {
+                "hour": 17,
+                "__class__": "datetime",
+                "month": 7,
+                "second": 58,
+                "microsecond": 224000,
+                "year": 2016,
+                "day": 27,
+                "minute": 45
+            },
+            "PreferredMaintenanceWindow": "sun:07:00-sun:08:00"
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "80fcc8a7-5422-11e6-a8c7-d5084096b716"
+        }
+    }
+}

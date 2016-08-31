@@ -1,0 +1,115 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-13de8f75"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-dc0452b8", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-13de8f75"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-f9cc4d9f"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-4a9ff72e", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-f9cc4d9f"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 5432, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "108.56.194.116/32"
+                            }
+                        ], 
+                        "ToPort": 5432, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard", 
+                "VpcId": "vpc-4a9ff72e", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-f6a42890"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "16ff449b-ac35-4e07-84b8-6ad2f725fc7d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 24 Aug 2016 15:11:23 GMT"
+            }
+        }
+    }
+}

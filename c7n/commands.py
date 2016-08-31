@@ -22,8 +22,10 @@ import time
 import yaml
 
 from c7n.credentials import SessionFactory
+from c7n.policy import Policy, load as policy_load
 from c7n.reports import report as do_report
-from c7n import mu, schema, policy, version
+from c7n.utils import Bag
+from c7n import mu, schema, version
 
 
 log = logging.getLogger('custodian.commands')
@@ -33,7 +35,7 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
-        collection = policy.load(options, options.config)
+        collection = policy_load(options, options.config)
         policies = collection.filter(options.policy_filter)
         return f(options, policies)
 
@@ -51,8 +53,18 @@ def validate(options):
         if format in ('json',):
             data = json.load(fh)
 
+
     errors = schema.validate(data)
     if not errors:
+        null_config = Bag(log_group=None, cache=None, assume_role="na")
+        for p in data.get('policies', ()):
+            try:
+                Policy(p, null_config, Bag())
+            except Exception as e:
+                log.error("Policy: %s is invalid: %s" % (
+                    p.get('name', 'unknown'), e))
+                sys.exit(1)
+                return
         log.info("Config valid")
         return
 
@@ -121,7 +133,8 @@ def resources(options):
 
     manager.metrics(funcs, start, end, period=60*30)
     if options.all:
-        print(yaml.dump(funcs, Dumper=yaml.SafeDumper, default_flow_style=False))
+        print(yaml.dump(
+            funcs, Dumper=yaml.SafeDumper, default_flow_style=False))
 
 
 def cmd_version(options):

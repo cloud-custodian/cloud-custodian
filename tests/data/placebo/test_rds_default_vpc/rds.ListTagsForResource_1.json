@@ -3,7 +3,13 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "05ed869f-14b4-11e6-8a8a-818f5dbf2293"
+            "RequestId": "3e25871a-54fb-11e6-a370-ebf6a26b45e5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3e25871a-54fb-11e6-a370-ebf6a26b45e5", 
+                "date": "Thu, 28 Jul 2016 19:41:13 GMT", 
+                "content-length": "394", 
+                "content-type": "text/xml"
+            }
         }, 
         "TagList": [
             {

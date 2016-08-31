@@ -182,6 +182,7 @@ def generate(resource_types=()):
                         'cloudtrail',
                         'ec2-instance-state',
                         'asg-instance-state',
+                        'config-rule',
                         'periodic'
                     ]},
                 'events': {'type': 'array', 'items': {
@@ -321,4 +322,9 @@ if __name__ == '__main__':
     load_resources()
     # dump our schema
     # $ python -m c7n.schema
-    print(json.dumps(generate(), indent=2))
+    try:
+        print(json.dumps(generate(), indent=2))
+    except:
+        import traceback, pdb, sys
+        traceback.print_exc()
+        pdb.post_mortem(sys.exc_info()[-1])

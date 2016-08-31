@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from botocore.exceptions import ClientError
 from datetime import datetime
 
 import copy
 import json
 import itertools
+import random
 import threading
 import time
-
 
 
 # Try to place nice in lambda exec environment
@@ -39,6 +40,15 @@ else:
 
 
 from StringIO import StringIO
+
+
+class Bag(dict):
+
+    def __getattr__(self, k):
+        try:
+            return self[k]
+        except KeyError:
+            raise AttributeError(k)
 
 
 def yaml_load(value):
@@ -136,12 +146,16 @@ def camelResource(obj):
 
     always return TitleCase, this function turns the former to the later
     """
-
+    if not isinstance(obj, dict):
+        return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
-        obj[k.title()] = v
+        obj["%s%s" % (k[0].upper(), k[1:])] = v
         if isinstance(v, dict):
             camelResource(v)
+        elif isinstance(v, list):
+            map(camelResource, v)
+    return obj
 
 
 def get_account_id(session):
@@ -229,3 +243,48 @@ def generate_arn(
     else:
         arn = arn + resource
     return arn
+
+
+def snapshot_identifier(prefix, db_identifier):
+    """Return an identifier for a snapshot of a database or cluster.
+    """
+    now = datetime.now()
+    return  '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
+
+
+def get_retry(codes=(), max_attempts=8):
+    """Retry a boto3 api call on transient errors.
+
+    https://www.awsarchitectureblog.com/2015/03/backoff.html
+    https://en.wikipedia.org/wiki/Exponential_backoff
+
+    :param codes: A sequence of retryable error codes
+
+    returns a function for invoking aws client calls that
+    retries on retryable error codes.
+    """
+    max_delay = 2 ** max_attempts
+
+    def _retry(func, *args, **kw):
+        for idx, delay in enumerate(backoff_delays(1, max_delay, jitter=True)):
+            try:
+                return func(*args, **kw)
+            except ClientError as e:
+                if e.response['Error']['Code'] not in codes:
+                    raise
+                elif idx == max_attempts - 1:
+                    raise
+            time.sleep(delay)
+    return _retry
+
+
+def backoff_delays(start, stop, factor=2.0, jitter=False):
+    """Geometric backoff sequence w/ jitter
+    """
+    cur = start
+    while cur <= stop:
+        if jitter:
+            yield cur - (cur * random.random())
+        else:
+            yield cur
+        cur = cur * factor

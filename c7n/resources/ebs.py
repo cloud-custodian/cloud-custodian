@@ -22,8 +22,8 @@ from c7n.filters import (
     FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
+from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
-from c7n import tags
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
 
@@ -32,8 +32,6 @@ log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
-
-tags.register_tags(filters, actions)
 
 
 @resources.register('ebs-snapshot')
@@ -208,6 +206,13 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
+
+
+@filters.register('kms-alias')
+class KmsKeyAlias(ResourceKmsKeyAlias):
+
+    def process(self, resources, event=None):
+        return self.get_matching_aliases(resources)
 
 
 @actions.register('copy-instance-tags')

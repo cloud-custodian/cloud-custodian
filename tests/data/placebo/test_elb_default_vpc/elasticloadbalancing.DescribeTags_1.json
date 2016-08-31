@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "8a4cfe71-54ee-11e6-ac7c-fdb609872f74", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8a4cfe71-54ee-11e6-ac7c-fdb609872f74", 
+                "date": "Thu, 28 Jul 2016 18:10:18 GMT", 
+                "content-length": "423", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "Tags": [], 
+                "LoadBalancerName": "test-load-balancer"
+            }
+        ]
+    }
+}
