@@ -3,14 +3,21 @@ import json
 import os
 import logging
 
-from c7n.commands import policy_command
 from c7n.credentials import SessionFactory
+from c7n.policy import load as policy_load
 from c7n import mu, resources
 
 log = logging.getLogger('resources')
 
 
-@policy_command
+def load_policies(options):
+    policies = []
+    for f in options.config_files:
+        for collection in policy_load(options, f):
+            policies.extend(collection.filter(options.policy_filter))
+    return policies
+
+
 def resources_gc_prefix(options, policy_collection):
     """Garbage collect old custodian policies based on prefix.
 
@@ -70,7 +77,9 @@ def resources_gc_prefix(options, policy_collection):
 
 def setup_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', required=True)
+    parser.add_argument(
+        '-c', '--config',
+        required=True, dest="config_files", action="append")
     parser.add_argument(
         '-r', '--region', default=os.environ.get(
             'AWS_DEFAULT_REGION', 'us-east-1'))
@@ -97,7 +106,9 @@ def main():
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
     resources.load_resources()
-    resources_gc_prefix(options)
+
+    policies = load_policies(options.config_files)
+    resources_gc_prefix(options, policies)
 
 
 
