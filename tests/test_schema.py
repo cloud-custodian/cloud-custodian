@@ -85,7 +85,7 @@ class SchemaTest(BaseTest):
             "'type': 'ebs'" in error.message)
 
     @mock.patch('c7n.schema.specific_error')
-    def test_handle_specific_error_fail(self, mock_schema):
+    def test_handle_specific_error_fail(self, mock_specific_error):
         from jsonschema.exceptions import ValidationError
         data = {
                 'policies': [{'name': 'test',
@@ -95,7 +95,7 @@ class SchemaTest(BaseTest):
                      'invalid': []}
                     }]
             }
-        mock_schema.side_effect = ValueError('The specific error crapped out hard')
+        mock_specific_error.side_effect = ValueError('The specific error crapped out hard')
         resp = validate(data)
         # if it is 2, then we know we got the exception from specific_error
         self.assertEqual(len(resp), 2)
