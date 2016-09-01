@@ -130,7 +130,8 @@ class TagTrim(Action):
     def process_tag_removal(self, resource, tags):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        client.delete_tags(
+        self.manager.retry(
+            client.delete_tags,
             Tags=[{'Key': c} for c in tags],
             Resources=[resource[self.id_key]],
             DryRun=self.manager.config.dryrun)
@@ -194,7 +195,7 @@ class TagActionFilter(Filter):
 
         if v is None:
             return False
-        if not ':' in v or not '@' in v:
+        if ':' not in v or '@' not in v:
             return False
 
         msg, tgt = v.rsplit(':', 1)
@@ -303,7 +304,9 @@ class Tag(Action):
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        client.create_tags(
+
+        self.manager.retry(
+            client.create_tags,
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
@@ -346,7 +349,8 @@ class RemoveTag(Action):
     def process_resource_set(self, vol_set, tag_keys):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        client.delete_tags(
+        return self.manager.retry(
+            client.delete_tags,
             Resources=[v[self.id_key] for v in vol_set],
             Tags=[{'Key': k for k in tag_keys}],
             DryRun=self.manager.config.dryrun)
@@ -426,7 +430,8 @@ class TagDelayedAction(Action):
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(self.manager.session_factory).client('ec2')
-        client.create_tags(
+        return self.manager.retry(
+            client.create_tags,
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
