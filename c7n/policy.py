@@ -46,7 +46,7 @@ def load(options, path, format='yaml', validate=True):
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise errors[0]
+            raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
     return PolicyCollection(data, options)
 
 
