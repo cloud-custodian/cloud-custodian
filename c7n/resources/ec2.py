@@ -28,7 +28,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
 
-from c7n import tags, utils
+from c7n import utils
 from c7n.utils import type_schema, get_retry
 
 

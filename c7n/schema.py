@@ -55,7 +55,9 @@ def validate(data):
                     ", ".join(dupes)))]
         return []
     try:
-        return [specific_error(errors[0])]
+        resp = specific_error(errors[0])
+        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        return [resp, name]
     except Exception:
         logging.exception(
             "specific_error failed, traceback, followed by fallback")
