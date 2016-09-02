@@ -450,9 +450,8 @@ class EncryptionRequiredPolicy(BucketActionBase):
                     "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
 
         statements = p.get('Statement', [])
-        found = False
         for s in list(statements):
-            if s['Sid'] == encryption_sid:
+            if s.get('Sid', '') == encryption_sid:
                 log.debug("Bucket:%s Found extant encrypt policy", b['Name'])
                 if s != encryption_statement:
                     log.info(

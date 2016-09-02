@@ -846,7 +846,8 @@ class Resume(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        asg_client.resume_processes(
+        self.manager.retry(
+            asg_client.resume_processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
 
 
