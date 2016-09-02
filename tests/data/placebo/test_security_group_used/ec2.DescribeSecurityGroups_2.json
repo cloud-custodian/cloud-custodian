@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "108.56.181.242/32"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-6c7fa917"
+            }, 
+            {
+                "IpPermissionsEgress": [], 
+                "Description": "launch-wizard-1 created 2016-08-23T18:37:34.124-04:00", 
+                "IpPermissions": [], 
+                "GroupName": "launch-wizard-1", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-eb0da091"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "e31bad79-168d-4209-b014-f034605b020a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 02 Sep 2016 00:52:44 GMT"
+            }
+        }
+    }
+}
