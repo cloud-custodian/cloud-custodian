@@ -209,7 +209,7 @@ class ServiceLimit(Filter):
 
     schema = type_schema(
         'service-limit',
-        threshold={'type': 'integer'},
+        threshold={'type': 'number'},
         refresh_period={'type': 'integer'},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
