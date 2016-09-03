@@ -34,7 +34,6 @@ from jsonschema.exceptions import best_match
 
 from c7n.manager import resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
-from c7n.offhours import Time as TimeFilter
 
 
 def validate(data, schema=None):
@@ -131,7 +130,6 @@ def generate(resource_types=()):
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
-            'time': TimeFilter.schema,
             'age': AgeFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {

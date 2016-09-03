@@ -22,7 +22,7 @@ from mock import mock
 from .common import BaseTest, instance
 
 from c7n.filters import FilterValidationError
-from c7n.offhours import OffHour, OnHour, ScheduleParser, Time
+from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
 
 
 # Per http://blog.xelnor.net/python-mocking-datetime/

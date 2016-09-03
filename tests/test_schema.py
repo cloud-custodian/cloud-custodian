@@ -229,7 +229,7 @@ class SchemaTest(BaseTest):
                      {'type': 'offhour',
                       'tag': 'maid_downtime',
                       'default_tz': 'et',
-                      'hour': 19}]
+                      'offhour': 19}]
                  }]
             }
         schema = generate(['ec2'])
