@@ -60,4 +60,4 @@ class ImageAgeFilter(AgeFilter):
     schema = type_schema(
         'image-age',
         op={'type': 'string', 'enum': OPERATORS.keys()},
-        days={'type': 'integer', 'minimum': 0})
+        days={'type': 'number', 'minimum': 0})

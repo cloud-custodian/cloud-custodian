@@ -37,9 +37,10 @@ from c7n.filters import ValueFilter, EventFilter, AgeFilter
 from c7n.offhours import Time as TimeFilter
 
 
-def validate(data):
-    schema = generate()
-    Validator.check_schema(schema)
+def validate(data, schema=None):
+    if schema is None:
+        schema = generate()
+        Validator.check_schema(schema)
     validator = Validator(schema)
 
     errors = list(validator.iter_errors(data))

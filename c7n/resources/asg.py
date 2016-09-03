@@ -798,7 +798,7 @@ class Suspend(BaseAction):
 class Resume(BaseAction):
     """Resume a suspended autoscale group and its instances
     """
-    schema = type_schema('resume', delay={'type': 'integer'})
+    schema = type_schema('resume', delay={'type': 'number'})
 
     def process(self, asgs):
         original_count = len(asgs)

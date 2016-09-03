@@ -101,7 +101,7 @@ class RDSTest(BaseTest):
             'filters': [
                 {'tag:Platform': 'postgres'}],
             'actions': [
-                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': -1,
+                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': 1,
                  'op': 'delete'}]},
             session_factory=session_factory)
         resources = p.run()
