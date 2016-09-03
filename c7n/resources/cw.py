@@ -1,5 +1,19 @@
+# Copyright 2016 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from datetime import datetime, timedelta
 
+from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -29,6 +43,32 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
 
     resource_type = Meta
+
+
+@LogGroup.action_registry.register('retention')
+class Retention(BaseAction):
+
+    schema = type_schema(
+        'retention', days={'type': 'integer'})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        days = self.data['days']
+        for r in resources:
+            client.put_retention_policy(
+                logGroupName=r['logGroupName'],
+                retentionInDays=days)
+
+
+@LogGroup.action_registry.register('delete')
+class Delete(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        for r in resources:
+            client.delete_log_group(logGroupName=r['logGroupName'])
 
 
 @LogGroup.filter_registry.register('last-write')

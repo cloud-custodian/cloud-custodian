@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "8b30839d-3ed4-11e6-8a34-8feafdf2d35d"
+        },
+        "TagDescriptions": [
+            {
+                "Tags": [
+                  {
+                      "Value": "V",
+                      "Key": "K"
+                  }
+                ],
+                "LoadBalancerName": "abc-elb"
+            }
+        ]
+    }
+}

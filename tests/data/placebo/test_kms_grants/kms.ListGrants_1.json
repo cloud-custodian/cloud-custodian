@@ -4,7 +4,15 @@
         "Grants": [], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "cde1843d-14ba-11e6-b9ec-29e00c208932"
+            "RequestId": "a9facd84-3bc9-11e6-b784-9b47c0c20767", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a9facd84-3bc9-11e6-b784-9b47c0c20767", 
+                "content-length": "31", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:13:20 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }, 
         "Truncated": false
     }

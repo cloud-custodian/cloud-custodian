@@ -4,30 +4,47 @@
         "Truncated": false, 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "cd8d7110-14ba-11e6-b14a-fdc0de8fb048"
+            "RequestId": "a93448ed-3bc9-11e6-9d1e-75ed6a83a25c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a93448ed-3bc9-11e6-9d1e-75ed6a83a25c", 
+                "content-length": "854", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:13:19 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }, 
         "Aliases": [
             {
-                "AliasArn": "arn:aws:kms:us-west-2:619193117841:alias/aws/ebs", 
-                "AliasName": "alias/aws/ebs", 
-                "TargetKeyId": "cd020f05-4b58-4ed5-822f-4bcd0a7fe63d"
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/aws/ebs", 
+                "AliasName": "alias/aws/ebs"
             }, 
             {
-                "AliasArn": "arn:aws:kms:us-west-2:619193117841:alias/aws/rds", 
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/aws/rds", 
                 "AliasName": "alias/aws/rds"
             }, 
             {
-                "AliasArn": "arn:aws:kms:us-west-2:619193117841:alias/aws/redshift", 
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/aws/redshift", 
                 "AliasName": "alias/aws/redshift"
             }, 
             {
-                "AliasArn": "arn:aws:kms:us-west-2:619193117841:alias/aws/s3", 
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/aws/s3", 
                 "AliasName": "alias/aws/s3"
             }, 
             {
-                "AliasArn": "arn:aws:kms:us-west-2:619193117841:alias/ebs/crypto", 
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/ebs/crypto", 
                 "AliasName": "alias/ebs/crypto", 
-                "TargetKeyId": "00d9c89e-13ee-4758-9167-41de13b5bb68"
+                "TargetKeyId": "1c052186-6435-4a64-a4a0-bf3d395059b3"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/rds/crypto", 
+                "AliasName": "alias/rds/crypto", 
+                "TargetKeyId": "d2e0bc50-854c-4c36-9736-1d25b10141ec"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:619193117841:alias/testing", 
+                "AliasName": "alias/testing", 
+                "TargetKeyId": "61f5789f-d32e-47bb-bf70-d5c5ea18ef97"
             }
         ]
     }

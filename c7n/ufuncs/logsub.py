@@ -14,6 +14,7 @@
 """Ops feedback via log subscription
 """
 import boto3
+from botocore.vendored import requests
 
 import base64
 from datetime import datetime
@@ -69,6 +70,11 @@ def process_log_event(event, context):
         "",
         "Log Contents",
         ""]
+
+    # We may get things delivered from log sub that are not in log events
+    for evt in data['logEvents']:
+        if evt not in events:
+            events.append(evt)
 
     for evt in events:
         message.append(message_event(evt))

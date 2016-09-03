@@ -1,0 +1,45 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Deleted": [
+            {
+                "VersionId": "CHj4.wRO9gtGzmRhjvpyiHVuWfBNiuIe", 
+                "Key": "AWSLogs/2015/10/10"
+            }, 
+            {
+                "VersionId": "qtzJA2kh_fKhIczyCVpFcFuJIAd_dJBF", 
+                "Key": "AWSLogs/2015/10/11"
+            }, 
+            {
+                "VersionId": "bWSk9sTsHU_04nr.XaKziLhq60_lM6bU", 
+                "Key": "home.txt"
+            }, 
+            {
+                "VersionId": "zvJqTgq7pIvMtzIV1QPrq6W3MZECH5Tk", 
+                "Key": "AWSLogs/2015/10/10"
+            }, 
+            {
+                "VersionId": ".sUZ3UDvWoXIMptgqUbK_LBwKoR_b.Bw", 
+                "Key": "AWSLogs/2015/10/11"
+            }, 
+            {
+                "VersionId": "Ee5fddSUGW8JlSwsCNi4q9NtPXJYTNQp", 
+                "Key": "home.txt"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "ZAsOydi3XqBLWErZnPwOf1UhYA+aHR6xVcUivbF3DJergwk0IzFHKMFbsRGQqqVLK16LkRWsVjE=", 
+            "RequestId": "E654F81BD6746449", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ZAsOydi3XqBLWErZnPwOf1UhYA+aHR6xVcUivbF3DJergwk0IzFHKMFbsRGQqqVLK16LkRWsVjE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "connection": "close", 
+                "x-amz-request-id": "E654F81BD6746449", 
+                "date": "Mon, 22 Aug 2016 09:24:04 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

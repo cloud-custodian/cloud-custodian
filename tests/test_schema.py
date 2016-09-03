@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import mock
+from json import dumps
 from jsonschema.exceptions import best_match
 
 from c7n.schema import Validator, validate, generate, specific_error
@@ -36,6 +38,12 @@ class SchemaTest(BaseTest):
             Validator.check_schema(schema)
         except Exception:
             self.fail("Invalid schema")
+
+    def test_schema_serialization(self):
+        try:
+            dumps(generate())
+        except:
+            self.fail("Failed to serialize schema")
 
     def test_empty_skeleton(self):
         self.assertEqual(validate({'policies': []}), [])
@@ -75,6 +83,25 @@ class SchemaTest(BaseTest):
             "'skipped_devices': []" in error.message)
         self.assertTrue(
             "'type': 'ebs'" in error.message)
+
+    @mock.patch('c7n.schema.specific_error')
+    def test_handle_specific_error_fail(self, mock_specific_error):
+        from jsonschema.exceptions import ValidationError
+        data = {
+                'policies': [{'name': 'test',
+                 'resource': 'ec2',
+                 'filters': {
+                     'type': 'ebs',
+                     'invalid': []}
+                    }]
+            }
+        mock_specific_error.side_effect = ValueError('The specific error crapped out hard')
+        resp = validate(data)
+        # if it is 2, then we know we got the exception from specific_error
+        self.assertEqual(len(resp), 2)
+        self.assertIsInstance(resp[0], ValidationError)
+        self.assertIsInstance(resp[1], ValidationError)
+
 
     def test_vars_and_tags(self):
         data = {

@@ -14,11 +14,10 @@
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
-from c7n.tags import register_tags
 from c7n.utils import local_session, type_schema
 
 
@@ -28,14 +27,13 @@ log = logging.getLogger('custodian.ami')
 filters = FilterRegistry('ami.filters')
 actions = ActionRegistry('ami.actions')
 
-register_tags(filters, actions, 'AmiId')
-
 
 @resources.register('ami')
 class AMI(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve('aws.ec2.image')):
         date = 'CreationDate'
+        taggable = True
 
     filter_registry = filters
     action_registry = actions
@@ -60,4 +58,6 @@ class ImageAgeFilter(AgeFilter):
 
     date_attribute = "CreationDate"
     schema = type_schema(
-        'image-age', days={'type': 'integer', 'minimum': 0})
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number', 'minimum': 0})

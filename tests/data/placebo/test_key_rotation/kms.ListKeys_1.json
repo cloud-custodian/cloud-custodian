@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Keys": [
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/1ec621db-4406-4cb9-8e85-812386071791", 
+                "KeyId": "1ec621db-4406-4cb9-8e85-812386071791"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/33533ee7-293a-4af1-9fe3-19059e725612", 
+                "KeyId": "33533ee7-293a-4af1-9fe3-19059e725612"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836", 
+                "KeyId": "68425528-9938-4a15-90f2-f1755263b836"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/77025106-bbe2-4fb5-9578-8a31eec97e58", 
+                "KeyId": "77025106-bbe2-4fb5-9578-8a31eec97e58"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73", 
+                "KeyId": "9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/d21dba12-ec3d-4115-a600-5779ae051580", 
+                "KeyId": "d21dba12-ec3d-4115-a600-5779ae051580"
+            }, 
+            {
+                "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/dd09e3af-48eb-484f-b783-0801786e6239", 
+                "KeyId": "dd09e3af-48eb-484f-b783-0801786e6239"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "4c8359dc-5506-11e6-bddd-536c889adda7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4c8359dc-5506-11e6-bddd-536c889adda7", 
+                "content-length": "980", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Thu, 28 Jul 2016 21:00:22 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Truncated": false
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "1c37cfbf-49d3-4e50-8e94-1548c4ae1d83"
+        },
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "VolumeId": "vol-1",
+                "State": "completed",
+                "VolumeSize": 10,
+                "Progress": "100%",
+                "StartTime": {
+                    "hour": 15,
+                    "__class__": "datetime",
+                    "month": 5,
+                    "second": 50,
+                    "microsecond": 0,
+                    "year": 2012,
+                    "day": 31,
+                    "minute": 29
+                },
+                "SnapshotId": "snap-1",
+                "OwnerId": "123"
+            }
+        ]
+    }
+}

@@ -23,7 +23,7 @@ from c7n.mu import (
     CloudWatchLogSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config
+from .common import BaseTest, Config, event_data
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -33,6 +33,32 @@ class PolicyLambdaProvision(BaseTest):
     def assert_items(self, result, expected):
         for k, v in expected.items():
             self.assertEqual(v, result[k])
+
+    def test_config_rule_provision(self):
+        session_factory = self.replay_flight_data('test_config_rule')
+        p = Policy({
+            'resource': 'security-group',
+            'name': 'sg-modified',
+            'mode': {'type': 'config-rule'},
+        }, Config.empty())
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        result = mgr.publish(pl, 'Dev', role=self.role)
+        self.assertEqual(result['FunctionName'], 'custodian-sg-modified')
+        self.addCleanup(mgr.remove, pl)
+
+    def test_config_rule_evaluation(self):
+        session_factory = self.replay_flight_data('test_config_rule_evaluate')
+        p = self.load_policy({
+            'resource': 'ec2',
+            'name': 'ec2-modified',
+            'mode': {'type': 'config-rule'},
+            'filters': [{'InstanceId': 'i-094bc87c84d56c589'}]
+            }, session_factory=session_factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-config-rule-instance.json')
+        resources = mode.run(event, None)
+        self.assertEqual(len(resources), 1)
 
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, 'iam_delay', 0.01)

@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "ApproximateNumberOfMessagesNotVisible": "0", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Foo\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:SendMessage\",\"Resource\":\"arn:aws:sqs:us-west-2:644160558196:c7n-cross-check\"}]}", 
+            "MessageRetentionPeriod": "345600", 
+            "ApproximateNumberOfMessagesDelayed": "0", 
+            "MaximumMessageSize": "262144", 
+            "CreatedTimestamp": "1466956937", 
+            "ApproximateNumberOfMessages": "0", 
+            "ReceiveMessageWaitTimeSeconds": "0", 
+            "DelaySeconds": "0", 
+            "VisibilityTimeout": "30", 
+            "LastModifiedTimestamp": "1466956937", 
+            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:c7n-cross-check"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "0f30bed6-0889-521d-8698-f13ff643d8ea"
+        }
+    }
+}

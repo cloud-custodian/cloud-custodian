@@ -79,7 +79,7 @@ class ELBTagTest(BaseTest):
             'filters': [{"LoadBalancerName": 'CloudCustodian'}],
             'actions': [{
                 'type': 'mark-for-op', 'op': 'delete',
-                'tag': 'custodian_next', 'days': -1}]},
+                'tag': 'custodian_next', 'days': 1}]},
             session_factory=session_factory)
         resources = policy.run()
 
@@ -152,7 +152,7 @@ class SSLPolicyTest(BaseTest):
             'filters': [
                 {'type': 'ssl-policy'}
             ]},
-            session_factory=None)
+            session_factory=None, validate=False)
         self.fail("validtion error should have been thrown")
 
     @raises(FilterValidationError)
@@ -163,5 +163,22 @@ class SSLPolicyTest(BaseTest):
             'filters': [
                 {'type': 'ssl-policy', 'blacklist': 'single-value'}
             ]},
-            session_factory=None)
+            session_factory=None, validate=False)
         self.fail("validtion error should have been thrown")
+
+
+class TestDefaultVpc(BaseTest):
+
+    def test_elb_default_vpc(self):
+        session_factory = self.replay_flight_data('test_elb_default_vpc')
+        p = self.load_policy(
+            {'name': 'elb-default-filters',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'test-load-balancer')

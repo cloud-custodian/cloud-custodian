@@ -15,9 +15,100 @@ import unittest
 
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
-from c7n import tags
+from c7n import tags, utils
 
 from .common import BaseTest
+
+
+class TestTagAugmentation(BaseTest):
+
+    def test_tag_augment_empty(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_augment_tag_empty')
+        # recording was modified to be sans tags
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-tags',
+            'resource': 'ec2'},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_tag_augment(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_augment_tags')
+        # recording was modified to be sans tags
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-tags',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Env': 'Production'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestMetricFilter(BaseTest):
+
+    def test_metric_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_metric')
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-utilization',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'days': 3,
+                 'value': 1.5}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestTagTrim(BaseTest):
+
+    def test_ec2_tag_trim(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_tag_trim')
+        ec2 = session_factory().client('ec2')
+        start_tags = {
+            t['Key']: t['Value'] for t in
+            ec2.describe_tags(
+                Filters=[{'Name': 'resource-id',
+                          'Values': ['i-fdb01920']}])['Tags']}
+        policy = self.load_policy({
+            'name': 'ec2-tag-trim',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'tag-count', 'count': 10}],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 1,
+                 'preserve': [
+                     'Name',
+                     'Env',
+                     'Account',
+                     'Platform',
+                     'Classification',
+                     'Planet'
+                     ]}
+                ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        end_tags = {
+            t['Key']: t['Value'] for t in
+            ec2.describe_tags(
+                Filters=[{'Name': 'resource-id',
+                          'Values': ['i-fdb01920']}])['Tags']}
+
+        self.assertEqual(len(start_tags)-1, len(end_tags))
+        self.assertTrue('Containers' in start_tags)
+        self.assertFalse('Containers' in end_tags)
 
 
 class TestVolumeFilter(BaseTest):
@@ -51,6 +142,66 @@ class TestVolumeFilter(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 0)
+
+
+class TestResizeInstance(BaseTest):
+
+    def test_ec2_resize(self):
+        # preconditions - three instances (2 m4.4xlarge, 1 m4.1xlarge)
+        # one of the instances stopped
+        session_factory = self.replay_flight_data('test_ec2_resize')
+        policy = self.load_policy({
+            'name': 'ec2-resize',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'value',
+                 'key': 'State.Name',
+                 'value': ['running', 'stopped'],
+                 'op': 'in'},
+                {'type': 'value',
+                 'key': 'InstanceType',
+                 'value': ['m4.2xlarge', 'm4.4xlarge'],
+                 'op': 'in'},
+                ],
+            'actions': [
+                {'type': 'resize',
+                 'restart': True,
+                 'default': 'm4.large',
+                 'type-map': {
+                     'm4.4xlarge': 'm4.2xlarge'}}]
+            }, session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
+        stopped, running = [], []
+        for i in resources:
+            if i['State']['Name'] == 'running':
+                running.append(i['InstanceId'])
+            if i['State']['Name'] == 'stopped':
+                stopped.append(i['InstanceId'])
+
+        instances = utils.query_instances(
+            session_factory(),
+            InstanceIds=[r['InstanceId'] for r in resources])
+
+        cur_stopped, cur_running = [], []
+        for i in instances:
+            if i['State']['Name'] == 'running':
+                cur_running.append(i['InstanceId'])
+            if i['State']['Name'] == 'stopped':
+                cur_stopped.append(i['InstanceId'])
+
+        cur_running.sort()
+        running.sort()
+
+        self.assertEqual(cur_stopped, stopped)
+        self.assertEqual(cur_running, running)
+        instance_types = [i['InstanceType'] for i in instances]
+        instance_types.sort()
+        self.assertEqual(
+            instance_types,
+            list(sorted(['m4.large', 'm4.2xlarge', 'm4.2xlarge'])))
 
 
 class TestImageAgeFilter(BaseTest):
@@ -190,6 +341,25 @@ class TestEC2QueryFilter(unittest.TestCase):
             ValueError,
             QueryFilter.parse,
             [{'tag:ASV': None}])
+
+
+class TestDefaultVpc(BaseTest):
+
+    def test_ec2_default_vpc(self):
+        session_factory = self.replay_flight_data('test_ec2_default_vpc')
+        p = self.load_policy(
+            {'name': 'ec2-default-filters',
+             'resource': 'ec2',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        # import pdb; pdb.set_trace()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')
 
 
 class TestActions(unittest.TestCase):

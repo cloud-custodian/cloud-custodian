@@ -1,0 +1,13 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RequestId": "a365cde5-3bbb-11e6-ad1d-8b933b0a8029"
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:644160558196:function:c7n-cross-check", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

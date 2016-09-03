@@ -1,0 +1,17 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Condition\":{\"StringEquals\":{\"AWS:SourceAccount\":\"619193117841\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"config.amazonaws.com\"},\"Sid\":\"custodian-sg-modified\"}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "9e0cac05-5d56-11e6-b767-41e6cbef0b2e", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Aug 2016 10:55:27 GMT", 
+                "x-amzn-requestid": "9e0cac05-5d56-11e6-b767-41e6cbef0b2e", 
+                "content-length": "324", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

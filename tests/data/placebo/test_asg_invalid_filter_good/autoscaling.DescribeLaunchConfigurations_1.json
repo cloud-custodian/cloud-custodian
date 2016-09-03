@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "",
+                "IamInstanceProfile": "IIP",
+                "EbsOptimized": false,
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-west-2:123:launchConfiguration:a0a6956b-d82c-4f44-a6be-ccca88788bc2:launchConfigurationName/abc-lc",
+                "InstanceMonitoring": {
+                    "Enabled": true
+                },
+                "ClassicLinkVPCSecurityGroups": [],
+                "CreatedTime": {
+                    "hour": 18,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 44,
+                    "microsecond": 890000,
+                    "year": 2016,
+                    "day": 5,
+                    "minute": 57
+                },
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "VolumeSize": 50,
+                            "VolumeType": "standard"
+                        }
+                    }
+                ],
+                "KeyName": "k1",
+                "SecurityGroups": [
+                    "sg-1"
+                ],
+                "LaunchConfigurationName": "abc-lc",
+                "KernelId": "",
+                "RamdiskId": "",
+                "ImageId": "ami-1",
+                "InstanceType": "m3.medium"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "2e2b3067-3ed4-11e6-967f-b52c408b2489"
+        }
+    }
+}

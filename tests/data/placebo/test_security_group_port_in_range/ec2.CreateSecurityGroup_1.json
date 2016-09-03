@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "GroupId": "sg-46684020", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5056697f-1eb0-4bda-8c17-359c623c9510", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 07 Aug 2016 23:59:16 GMT"
+            }
+        }
+    }
+}

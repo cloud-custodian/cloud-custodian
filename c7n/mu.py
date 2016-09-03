@@ -375,7 +375,7 @@ class LambdaManager(object):
                 FunctionVersion=func_version)
         else:
             if (exists['FunctionVersion'] == func_version and
-                exists['Name'] == alias):
+                    exists['Name'] == alias):
                 return exists['AliasArn']
             log.debug('Updating custodian lambda alias %s', alias)
             alias_result = self.client.update_alias(
@@ -392,11 +392,11 @@ class LambdaManager(object):
             self.client.get_function, **params)
 
 
-def resource_exists(op, *args, **kw):
+def resource_exists(op, NotFound="ResourceNotFoundException", *args, **kw):
     try:
         return op(*args, **kw)
     except ClientError, e:
-        if e.response['Error']['Code'] == "ResourceNotFoundException":
+        if e.response['Error']['Code'] == NotFound:
             return False
         raise
 
@@ -570,8 +570,13 @@ class PolicyLambda(AbstractLambdaFunction):
 
     def get_events(self, session_factory):
         events = []
-        events.append(CloudWatchEventSource(
-            self.policy.data['mode'], session_factory))
+        if self.policy.data['mode']['type'] == 'config-rule':
+            events.append(
+                ConfigRule(self.policy.data['mode'], session_factory))
+        else:
+            events.append(
+                CloudWatchEventSource(
+                    self.policy.data['mode'], session_factory))
         return events
 
     def get_archive(self):
@@ -641,8 +646,6 @@ class CloudWatchEventSource(object):
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
 
     def __init__(self, data, session_factory, prefix="custodian-"):
-        import time
-        t = time.time()
         self.session_factory = session_factory
         self.session = session_factory()
         self.client = self.session.client('events')
@@ -676,7 +679,6 @@ class CloudWatchEventSource(object):
             ', '.join(map(str, self.data.get('events', []))))
 
     def resolve_cloudtrail_payload(self, payload):
-        ids = []
         sources = self.data.get('sources', [])
         events = []
         for e in self.data.get('events'):
@@ -957,3 +959,135 @@ class CloudWatchLogSubscription(object):
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
+
+
+class ConfigRule(object):
+    """Use a lambda as a custom config rule.
+
+    """
+
+    RESOURCE_TYPE_MAP = {
+        # Networking
+        #'': 'AWS::EC2::VPNGateway',
+        #'': 'AWS::EC2::VPNConnection',
+        'vpc': 'AWS::EC2::VPC',
+        'subnet': 'AWS::EC2::Subnet',
+        'route-table': 'AWS::EC2::RouteTable',
+        'network-acl': 'AWS::EC2::NetworkAcl',
+        'internet-gateway': 'AWS::EC2::InternetGateway',
+        'customer-gateway': 'AWS::EC2::CustomerGateway',
+        # RDS
+        'rds': 'AWS::RDS::DBInstance',
+        'rds-snapshot': 'AWS::RDS::DBSnapshot',
+        #'': 'AWS::RDS::DBSubnetGroup',
+        #'': 'AWS::RDS::DBSecurityGroup'
+        #
+        # IAM
+        'iam-policy': 'AWS::IAM::Policy',
+        'iam-role': 'AWS::IAM::Role',
+        'iam-group': 'AWS::IAM::Group',
+        'iam-user': 'AWS::IAM::User',
+        # EC2
+        'security-group': 'AWS::EC2::SecurityGroup',
+        'eni': 'AWS::EC2::NetworkInterface',
+        'ec2': 'AWS::EC2::Instance',
+        'network-addr': 'AWS::EC2::EIP',
+        #'': 'AWS::EC2::Host',
+        'ebs': 'AWS::EC2::Volume',
+        # Happy Trails, Prospector
+        #'': 'AWS::CloudTrail::Trail',
+        'acm-certificate': 'AWS::ACM::Certificate'}
+
+    def __init__(self, data, session_factory):
+        self.data = data
+        self.session_factory = session_factory
+        self.session = session_factory()
+        self.client = self.session.client('config')
+
+    def __repr__(self):
+        return "<ConfigRule>"
+
+    def get_rule_params(self, func):
+        # config does not support versions/aliases on lambda funcs
+        func_arn = func.arn
+        if func_arn.count(':') > 6:
+            func_arn, version = func_arn.rsplit(':', 1)
+
+        params = dict(
+            ConfigRuleName=func.name,
+            Description=func.description,
+            Source={
+                'Owner': 'CUSTOM_LAMBDA',
+                'SourceIdentifier': func_arn,
+                'SourceDetails': [{
+                    'EventSource': 'aws.config',
+                    'MessageType': 'ConfigurationItemChangeNotification'}]
+                }
+            )
+
+        if isinstance(func, PolicyLambda):
+            params['Scope'] = {
+                'ComplianceResourceTypes': [self.RESOURCE_TYPE_MAP[
+                    func.policy.resource_type]]}
+        else:
+            params['Scope']['ComplianceResourceTypes'] = self.data.get(
+                'resource-types', ())
+        return params
+
+    def get(self, rule_name):
+        rules = resource_exists(
+            self.client.describe_config_rules,
+            ConfigRuleNames=[rule_name],
+            NotFound="NoSuchConfigRuleException")
+        if not rules:
+            return rules
+        return rules['ConfigRules'][0]
+
+    @staticmethod
+    def delta(rule, params):
+        # doesn't seem like we have anything mutable at the moment,
+        # since we restrict params, maybe reusing the same policy name
+        # with a different resource type.
+        if rule['Scope'] != params['Scope']:
+            return True
+        if rule['Source'] != params['Source']:
+            return True
+        if rule.get('Description', '') != rule.get('Description', ''):
+            return True
+        return False
+
+    def add(self, func):
+        rule = self.get(func.name)
+        params = self.get_rule_params(func)
+
+        if rule and self.delta(rule, params):
+            log.debug("Updating config rule for %s" % self)
+            rule.update(params)
+            return self.client.put_config_rule(ConfigRule=rule)
+        elif rule:
+            log.debug("Config rule up to date")
+            return
+        try:
+            self.session.client('lambda').add_permission(
+                FunctionName=func.name,
+                StatementId=func.name,
+                SourceAccount=func.arn.split(':')[4],
+                Action='lambda:InvokeFunction',
+                Principal='config.amazonaws.com')
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceConflictException':
+                raise
+
+        log.debug("Adding config rule for %s" % func.name)
+        return self.client.put_config_rule(ConfigRule=params)
+
+    def remove(self, func):
+        rule = self.get(func.name)
+        if not rule:
+            return
+        try:
+            self.client.delete_config_rule(
+                ConfigRuleName=func.name)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise

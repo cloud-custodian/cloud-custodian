@@ -20,6 +20,7 @@ import tempfile
 import yaml
 
 from c7n import policy
+from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
@@ -33,6 +34,10 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 
 load_resources()
 
+C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
+if C7N_VALIDATE:
+    C7N_SCHEMA = generate()
+
 
 class BaseTest(PillTest):
 
@@ -42,16 +47,23 @@ class BaseTest(PillTest):
 
     def get_context(self, config=None, session_factory=None, policy=None):
         if config is None:
-            self.context_output_dir = self.mkdtemp()
+            self.context_output_dir = tempfile.mkdtemp()
             self.addCleanup(shutil.rmtree, self.context_output_dir)
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
             session_factory,
-            policy or Bag({'name':'test-policy'}),
+            policy or Bag({'name': 'test-policy'}),
             config)
         return ctx
 
-    def load_policy(self, data, config=None, session_factory=None):
+    def load_policy(
+            self, data, config=None, session_factory=None,
+            validate=C7N_VALIDATE):
+        if validate:
+            errors = schema_validate({'policies': [data]}, C7N_SCHEMA)
+            if errors:
+                self.fail("Loaded policy is not valid %s" % errors[0])
+
         config = config or {}
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir)
@@ -152,10 +164,12 @@ class Config(Bag):
         return cls(d)
 
 
-class Instance(Bag): pass
+class Instance(Bag):
+    pass
 
 
-class Reservation(Bag): pass
+class Reservation(Bag):
+    pass
 
 
 class Client(object):

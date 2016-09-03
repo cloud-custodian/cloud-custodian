@@ -13,8 +13,7 @@
 # limitations under the License.
 import logging
 
-from c7n.filters import Filter
-
+from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -22,8 +21,20 @@ from c7n.utils import local_session, type_schema
 log = logging.getLogger('custodian.kms')
 
 
+class KeyBase(object):
+
+    def augment(self, resources):
+        client = local_session(
+            self.session_factory).client('kms')
+        for r in resources:
+            key_id = r.get('AliasArn') or r.get('KeyArn')
+            info = client.describe_key(KeyId=key_id)['KeyMetadata']
+            r.update(info)
+        return resources
+
+
 @resources.register('kms')
-class KeyAlias(QueryResourceManager):
+class KeyAlias(KeyBase, QueryResourceManager):
 
     class Meta(object):
         service = 'kms'
@@ -31,6 +42,7 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
+        dimension = None
 
     resource_type = Meta
 
@@ -39,7 +51,7 @@ class KeyAlias(QueryResourceManager):
 
 
 @resources.register('kms-key')
-class Key(QueryResourceManager):
+class Key(KeyBase, QueryResourceManager):
 
     class Meta(object):
         service = 'kms'
@@ -47,8 +59,51 @@ class Key(QueryResourceManager):
         enum_spec = ('list_keys', 'Keys', None)
         name = "KeyId"
         id = "KeyArn"
+        dimension = None
 
     resource_type = Meta
+
+@Key.filter_registry.register('key-rotation-status')
+class KeyRotationStatus(ValueFilter):
+
+    schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _key_rotation_status(resource):
+            client = local_session(self.manager.session_factory).client('kms')
+            resource['KeyRotationEnabled'] = client.get_key_rotation_status(
+                KeyId=resource['KeyId'])
+
+        with self.executor_factory(max_workers=2) as w:
+            query_resources = [
+                r for r in resources if 'KeyRotationEnabled' not in r]
+            self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
+            list(w.map(_key_rotation_status, query_resources))
+
+        return [r for r in resources if self.match(r['KeyRotationEnabled'])]
+
+
+@Key.filter_registry.register('cross-account')
+@KeyAlias.filter_registry.register('cross-account')
+class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
+
+    def process(self, resources, event=None):
+        def _augment(r):
+            client = local_session(
+                self.manager.session_factory).client('kms')
+            key_id = r.get('TargetKeyId', r.get('KeyId'))
+            assert key_id, "Invalid key resources %s" % r
+            r['Policy'] = client.get_key_policy(
+                KeyId=key_id, PolicyName='default')['Policy']
+            return r
+
+        self.log.debug("fetching policy for %d kms keys" % len(resources))
+        with self.executor_factory(max_workers=1) as w:
+            resources = filter(None, w.map(_augment, resources))
+
+        return super(KMSCrossAccountAccessFilter, self).process(
+            resources, event)
 
 
 @KeyAlias.filter_registry.register('grant-count')
@@ -78,3 +133,19 @@ class GrantCount(Filter):
             Scope=key['AliasName'][6:])
 
         return key
+
+class ResourceKmsKeyAlias(ValueFilter):
+
+    schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    def get_matching_aliases(self, resources, event=None):
+
+        key_aliases = KeyAlias(self.manager.ctx, {}).resources()
+        key_aliases_dict = {a['TargetKeyId']: a for a in key_aliases}
+
+        matched = []
+        for r in resources:
+            if r.get('KmsKeyId'):
+                r['KeyAlias'] = key_aliases_dict.get(r.get('KmsKeyId').split("key/", 1)[-1])
+                if self.match(r.get('KeyAlias')):
+                    matched.append(r)
+        return matched

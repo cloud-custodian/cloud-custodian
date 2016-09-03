@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policy": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Foo\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"glacier:UploadArchive\",\"Resource\":\"arn:aws:glacier:us-west-2:644160558196:vaults/c7n-cross-check\"}]}"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "MPlQZtBanV9iRNvzviWxaWut7ozCm2ODG_466HQRRFHKa4c"
+        }
+    }
+}

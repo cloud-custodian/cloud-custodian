@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400, 
+            "RequestId": "9dcce3dd-5d56-11e6-b73a-5735261886d2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9dcce3dd-5d56-11e6-b73a-5735261886d2", 
+                "date": "Mon, 08 Aug 2016 10:55:27 GMT", 
+                "content-length": "159", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "The ConfigRule 'custodian-sg-modified' provided in the request is invalid. Please check the configRule name.", 
+            "Code": "NoSuchConfigRuleException"
+        }
+    }
+}

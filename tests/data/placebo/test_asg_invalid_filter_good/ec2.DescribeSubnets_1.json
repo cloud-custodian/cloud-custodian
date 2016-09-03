@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "VpcId": "vpc-1",
+                "Tags": [],
+                "CidrBlock": "1.2.3.4/5",
+                "MapPublicIpOnLaunch": false,
+                "DefaultForAz": false,
+                "State": "available",
+                "AvailabilityZone": "us-west-2a",
+                "SubnetId": "subnet-1",
+                "AvailableIpAddressCount": 26
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "359e2df1-9925-479e-894d-b281431c25ed"
+        }
+    }
+}

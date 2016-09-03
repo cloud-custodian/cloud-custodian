@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"Lulu\",\n  \"Statement\" : [ {\n    \"Sid\" : \"Enable IAM User Permissions\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:root\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Enable Cross Account\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:Encrypt\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "79a36c8d-3bc8-11e6-8108-35814eb14879", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "79a36c8d-3bc8-11e6-8108-35814eb14879", 
+                "content-length": "484", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:04:50 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

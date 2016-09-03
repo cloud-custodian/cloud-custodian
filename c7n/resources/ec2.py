@@ -11,28 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import operator
+import random
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.offhours import OffHour, OnHour
-from c7n import tags, utils
-from c7n.utils import type_schema
+
+from c7n import utils
+from c7n.utils import type_schema, get_retry
 
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-tags.register_tags(filters, actions, 'InstanceId')
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('ec2')
@@ -41,6 +44,8 @@ class EC2(QueryResourceManager):
     resource_type = "aws.ec2.instance"
     filter_registry = filters
     action_registry = actions
+
+    retry = staticmethod(get_retry(('RequestLimitExceeded',)))
 
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
@@ -69,6 +74,57 @@ class EC2(QueryResourceManager):
                 qf.append(qd)
         return qf
 
+    def augment(self, resources):
+        """EC2 API and AWOL Tags
+
+        While ec2 api generally returns tags when doing describe_x on for
+        various resources, it may also silently fail to do so unless a tag
+        is used as a filter.
+
+        See footnote on http://goo.gl/YozD9Q for official documentation.
+
+        Apriori we may be using custodian to ensure tags (including
+        name), so there isn't a good default to ensure that we will
+        always get tags from describe_ calls.
+        """
+
+        # First if we're in event based lambda go ahead and skip this,
+        # tags can't be trusted in  ec2 instances anyways.
+        if not resources or self.data.get('mode', {}).get('type', '') in (
+                'cloudtrail', 'ec2-instance-state'):
+            return resources
+
+        # AWOL detector, so we don't make extraneous api calls.
+        resource_count = len(resources)
+        search_count = min(int(resource_count % 0.05) + 1, 5)
+        if search_count > resource_count:
+            search_count = resource_count
+        found = False
+        for r in random.sample(resources, search_count):
+            if 'Tags' in r:
+                found = True
+                break
+
+        if found:
+            return resources
+
+        # Okay go and do the tag lookup
+        client = utils.local_session(self.session_factory).client('ec2')
+        tag_set = self.retry(
+            client.describe_tags,
+            Filters=[{'Name': 'resource-type',
+                      'Values': ['instance']}])['Tags']
+        resource_tags = {}
+        for t in tag_set:
+            t.pop('ResourceType')
+            rid = t.pop('ResourceId')
+            resource_tags.setdefault(rid, []).append(t)
+
+        m = self.get_model()
+        for r in resources:
+            r['Tags'] = resource_tags.get(r[m.id], ())
+        return resources
+
 
 class StateTransitionFilter(object):
     """Filter instances by state.
@@ -82,10 +138,11 @@ class StateTransitionFilter(object):
     """
     valid_origin_states = ()
 
-    def filter_instance_state(self, instances):
+    def filter_instance_state(self, instances, states=None):
+        states = states or self.valid_origin_states
         orig_length = len(instances)
         results = [i for i in instances
-                   if i['State']['Name'] in self.valid_origin_states]
+                   if i['State']['Name'] in states]
         self.log.info("%s %d of %d instances" % (
             self.__class__.__name__, len(results), orig_length))
         return results
@@ -148,7 +205,10 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     date_attribute = "CreationDate"
 
-    schema = type_schema('image-age', days={'type': 'number'})
+    schema = type_schema(
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
@@ -228,7 +288,10 @@ class UpTimeFilter(AgeFilter):
 
     date_attribute = "LaunchTime"
 
-    schema = type_schema('instance-uptime', days={'type': 'number'})
+    schema = type_schema(
+        'instance-uptime',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
 
 @filters.register('instance-age')
@@ -237,7 +300,10 @@ class InstanceAgeFilter(AgeFilter):
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
 
-    schema = type_schema('instance-age', days={'type': 'number'})
+    schema = type_schema(
+        'instance-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
@@ -252,6 +318,17 @@ class InstanceAgeFilter(AgeFilter):
         # Lexographical sort on date
         ebs_vols = sorted(ebs_vols, key=self.ebs_key_func)
         return ebs_vols[0]['AttachTime']
+
+
+@filters.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an ec2 database is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, ec2):
+        return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
 @actions.register('start')
@@ -271,6 +348,74 @@ class Start(BaseAction, StateTransitionFilter):
             client.start_instances,
             InstanceIds=[i['InstanceId'] for i in instances],
             DryRun=self.manager.config.dryrun)
+
+
+@actions.register('resize')
+class Resize(BaseAction, StateTransitionFilter):
+    """Change an instance's size.
+
+    An instance can only be resized when its stopped, this action
+    can optionally restart an instance if needed to effect the instance
+    type change. Instances are always left in the run state they were
+    found in.
+
+    There are a few caveats to be aware of, instance resizing
+    needs to maintain compatibility for architecture, virtualization type
+    hvm/pv, and ebs optimization at minimum.
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+    """
+    valid_origin_states = ('running', 'stopped')
+
+    def process(self, resources):
+        stopped_instances = self.filter_instance_state(
+            resources, ('stopped',))
+        running_instances = self.filter_instance_state(
+            resources, ('running',))
+
+        if self.data.get('restart') and running_instances:
+            Stop({'terminate-ephemeral': False},
+                 self.manager).process(running_instances)
+            client = utils.local_session(
+                self.manager.session_factory).client('ec2')
+            waiter = client.get_waiter('instance_stopped')
+            try:
+                waiter.wait(
+                    InstanceIds=[r['InstanceId'] for r in running_instances])
+            except ClientError as e:
+                self.log.exception(
+                    "Exception stopping instances for resize:\n %s" % e)
+
+        for instance_set in utils.chunks(itertools.chain(
+                stopped_instances, running_instances), 20):
+            self.process_resource_set(instance_set)
+
+        if self.data.get('restart') and running_instances:
+            client.start_instances(
+                InstanceIds=[i['InstanceId'] for i in running_instances])
+        return list(itertools.chain(stopped_instances, running_instances))
+
+    def process_resource_set(self, instance_set):
+        type_map = self.data.get('type-map')
+        default_type = self.data.get('default')
+
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        for i in instance_set:
+            self.log.debug(
+                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
+            new_type = type_map.get(i['InstanceType'], default_type)
+            if new_type == i['InstanceType']:
+                continue
+            try:
+                client.modify_instance_attribute(
+                    InstanceId=i['InstanceId'],
+                    InstanceType={'Value': new_type})
+            except ClientError as e:
+                self.log.exception(
+                    "Exception resizing instance:%s new:%s old:%s \n %s" % (
+                        i['InstanceId'], new_type, i['InstanceType'], e))
 
 
 @actions.register('stop')
@@ -305,10 +450,10 @@ class Stop(BaseAction, StateTransitionFilter):
                 client.terminate_instances,
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
-
             self._run_instances_op(
                 client.stop_instances,
                 [i['InstanceId'] for i in persistent])
+        return instances
 
     def _run_instances_op(self, op, instance_ids):
         while True:
@@ -323,6 +468,7 @@ class Stop(BaseAction, StateTransitionFilter):
                         return
                     continue
                 raise
+
 
 @actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):
@@ -359,12 +505,17 @@ class Terminate(BaseAction, StateTransitionFilter):
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
-            self._run_api(
-                client.modify_instance_attribute,
-                InstanceId=i['InstanceId'],
-                Attribute='disableApiTermination',
-                Value='false',
-                DryRun=self.manager.config.dryrun)
+            try:
+                self._run_api(
+                    client.modify_instance_attribute,
+                    InstanceId=i['InstanceId'],
+                    Attribute='disableApiTermination',
+                    Value='false',
+                    DryRun=self.manager.config.dryrun)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    return
+                raise
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
@@ -404,7 +555,7 @@ class Snapshot(BaseAction):
                     Description=description)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
-                    log.warning(
+                    self.log.warning(
                         "action:%s volume:%s is incorrect state" % (
                             self.__class__.__name__.lower(),
                             volume_id))
@@ -414,7 +565,8 @@ class Snapshot(BaseAction):
             tags = [
                 {'Key': 'Name', 'Value': volume_id},
                 {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                {'Key': 'DeviceName', 'Value': block_device['DeviceName']}
+                {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
+                {'Key': 'custodian_snapshot', 'Value': ''}
             ]
 
             copy_keys = self.data.get('copy-tags', [])
@@ -425,7 +577,7 @@ class Snapshot(BaseAction):
                         copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 10:
-                log.warning(
+                self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
                         volume_id))
