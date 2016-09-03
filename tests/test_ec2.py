@@ -72,6 +72,7 @@ class TestMetricFilter(BaseTest):
 class TestTagTrim(BaseTest):
 
     def test_ec2_tag_trim(self):
+        self.patch(tags.TagTrim, 'max_tag_count', 10)
         session_factory = self.replay_flight_data(
             'test_ec2_tag_trim')
         ec2 = session_factory().client('ec2')

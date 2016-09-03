@@ -88,7 +88,6 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
-        self.register('delay', Delay)
 
     def parse(self, data, manager):
         results = []
@@ -201,24 +200,6 @@ class And(Filter):
         return resources
 
 
-class Delay(Filter):
-    # Use of delay in a policy is highly suspect as its indicative
-    # of workaround races instead of deterministic behavior.
-
-    schema = {'type': 'object', 'additionalProperties': False,
-              'required': ['type', 'seconds'],
-              'properties': {
-                  'type': {'enum': ['delay']},
-                  'seconds': {'type': 'integer'}}}
-
-    def process(self, resources, event=None):
-        if not event:
-            return
-        seconds = self.data.get('seconds')
-        if seconds:
-            time.sleep(seconds)
-
-
 class ValueFilter(Filter):
     """Generic value filter using jmespath
     """
@@ -311,6 +292,8 @@ class ValueFilter(Filter):
         # Value match
         if r is None and v == 'absent':
             return True
+        elif r is not None and v == 'present':
+            return True
         elif v == 'not-null' and r:
             return True
         elif self.op:
@@ -323,6 +306,7 @@ class ValueFilter(Filter):
     def process_value_type(self, sentinel, value):
         if self.vtype == 'normalize' and isinstance(value, basestring):
             return sentinel, value.strip().lower()
+
         elif self.vtype == 'integer':
             try:
                 value = int(value.strip())
@@ -333,13 +317,14 @@ class ValueFilter(Filter):
                 return sentinel, len(value)
             except TypeError:
                 return sentinel, 0
+        elif self.vtype == 'swap':
+            return value, sentinel
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime):
                 sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
 
             if not isinstance(value, datetime):
                 value = parse(value)
-
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.

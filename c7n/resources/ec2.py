@@ -23,10 +23,10 @@ from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
+from c7n.filters.offhours import OffHour, OnHour
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.offhours import OffHour, OnHour
 
 from c7n import utils
 from c7n.utils import type_schema, get_retry
@@ -246,7 +246,6 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 class InstanceOffHour(OffHour, StateTransitionFilter):
 
     valid_origin_states = ('running',)
-    schema = type_schema('offhour', inherits=['#/definitions/filters/time'])
 
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
@@ -257,8 +256,6 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 class InstanceOnHour(OnHour, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
-
-    schema = type_schema('onhour', inherits=['#/definitions/filters/time'])
 
     def process(self, resources, event=None):
         return super(InstanceOnHour, self).process(

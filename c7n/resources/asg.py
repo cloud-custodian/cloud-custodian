@@ -28,10 +28,10 @@ from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
+from c7n.filters.offhours import OffHour, OnHour
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.offhours import OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, query_instances, type_schema, chunks, get_retry)
