@@ -137,9 +137,9 @@ class Filter(object):
 
     log = logging.getLogger('custodian.filters')
 
-    schema = {'type': 'object'}
-
     metrics = ()
+
+    schema = {'type': 'object'}
 
     def __init__(self, data, manager=None):
         self.data = data
@@ -164,14 +164,28 @@ class Or(Filter):
         super(Or, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
+        self.manager = manager
 
-    # TODO support resource set processing with or (will need identity
-    # metadata per resource type), ala tags set_id or query metamodel branch
-    def __call__(self, i):
+    def process(self, resources, event=None):
+        if self.manager:
+            return self.process_set(resources, event)
+        return super(Or, self).process(resources, event)
+
+    def __call__(self, r):
+        """Fallback for older unit tests that don't utilize a query manager"""
         for f in self.filters:
-            if f(i):
+            if f(r):
                 return True
         return False
+
+    def process_set(self, resources, event):
+        resource_type = self.manager.query.resolve(self.manager.resource_type)
+        resource_map = {r[resource_type.id]: r for r in resources}
+        results = set()
+        for f in self.filters:
+            results = results.union([
+                r[resource_type.id] for r in f.process(resources, event)])
+        return [resource_map[r_id] for r_id in results]
 
 
 class And(Filter):
@@ -181,14 +195,15 @@ class And(Filter):
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
 
-    def __call__(self, i):
+    def process(self, resources, events=None):
         for f in self.filters:
-            if not f(i):
-                return False
-        return True
+            resources = f.process(resources, events)
+        return resources
 
 
 class Delay(Filter):
+    # Use of delay in a policy is highly suspect as its indicative
+    # of workaround races instead of deterministic behavior.
 
     schema = {'type': 'object', 'additionalProperties': False,
               'required': ['type', 'seconds'],
@@ -279,7 +294,7 @@ class ValueFilter(Filter):
                 if t.get('Key') == tk:
                     r = t.get('Value')
                     break
-        elif not '.' in self.k and not '[' in self.k and not '(' in self.k:
+        elif '.' not in self.k and '[' not in self.k and '(' not in self.k:
             r = i.get(self.k)
         elif self.expr:
             r = self.expr.search(i)
@@ -310,9 +325,9 @@ class ValueFilter(Filter):
             return sentinel, value.strip().lower()
         elif self.vtype == 'integer':
             try:
-                v = int(value.strip())
+                value = int(value.strip())
             except ValueError:
-                v = 0
+                value = 0
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)
@@ -394,3 +409,4 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
+

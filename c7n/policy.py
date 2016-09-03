@@ -452,8 +452,7 @@ class Policy(object):
     run = __call__
 
     def _write_file(self, rel_path, value):
-        with open(
-                os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
+        with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
     def get_resource_manager(self):
