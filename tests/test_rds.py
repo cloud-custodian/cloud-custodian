@@ -15,6 +15,7 @@ from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rds
+from c7n import tags
 
 
 class RDSTest(BaseTest):
@@ -43,6 +44,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_tag_trim(self):
+        self.patch(tags.TagTrim, 'max_tag_count', 1)
         session_factory = self.replay_flight_data('test_rds_tag_trim')
         p = self.load_policy({
             'name': 'rds-tags',
