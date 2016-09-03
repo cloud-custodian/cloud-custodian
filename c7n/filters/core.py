@@ -167,6 +167,18 @@ class Or(Filter):
         self.manager = manager
 
     def process(self, resources, event=None):
+        if self.manager:
+            return self.process_set(resources, event)
+        return super(Or, self).process(resources, event)
+
+    def __call__(self, r):
+        """Fallback for older unit tests that don't utilize a query manager"""
+        for f in self.filters:
+            if f(r):
+                return True
+        return False
+
+    def process_set(self, resources, event):
         resource_type = self.manager.query.resolve(self.manager.resource_type)
         resource_map = {r[resource_type.id]: r for r in resources}
         results = set()
@@ -190,6 +202,8 @@ class And(Filter):
 
 
 class Delay(Filter):
+    # Use of delay in a policy is highly suspect as its indicative
+    # of workaround races instead of deterministic behavior.
 
     schema = {'type': 'object', 'additionalProperties': False,
               'required': ['type', 'seconds'],
@@ -280,7 +294,7 @@ class ValueFilter(Filter):
                 if t.get('Key') == tk:
                     r = t.get('Value')
                     break
-        elif not '.' in self.k and not '[' in self.k and not '(' in self.k:
+        elif '.' not in self.k and '[' not in self.k and '(' not in self.k:
             r = i.get(self.k)
         elif self.expr:
             r = self.expr.search(i)
@@ -311,9 +325,9 @@ class ValueFilter(Filter):
             return sentinel, value.strip().lower()
         elif self.vtype == 'integer':
             try:
-                v = int(value.strip())
+                value = int(value.strip())
             except ValueError:
-                v = 0
+                value = 0
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)

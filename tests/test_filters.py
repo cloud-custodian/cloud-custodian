@@ -58,12 +58,13 @@ class TestOrFilter(unittest.TestCase):
             'or': [
                 {'Architecture': 'x86_64'},
                 {'Architecture': 'armv8'}]})
+        results = [instance(Architecture='x86_64')]
         self.assertEqual(
-            f.process([instance(Architecture='x86_64')]),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
             f.process([instance(Architecture='amd64')]),
-            False)
+            [])
 
 
 class TestAndFilter(unittest.TestCase):
@@ -73,23 +74,21 @@ class TestAndFilter(unittest.TestCase):
             'and': [
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
+        results = [instance(Architecture='x86_64', Color='green')]
         self.assertEqual(
-            f.process([
-                instance(
-                    Architecture='x86_64',
-                    Color='green')]),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
             f.process([
                 instance(
                     Architecture='x86_64',
                     Color='blue')]),
-            False)
+            [])
         self.assertEqual(
             f.process([
                 instance(
                     Architecture='x86_64')]),
-            False)
+            [])
 
 
 class TestGlobValue(unittest.TestCase):
@@ -167,14 +166,13 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(three_months), False)
         self.assertFilter(fdata, i(two_months), False)
         self.assertFilter(fdata, i(one_month), True)
-        self.assertFilter(fdata, i(now), True)        
-        
+        self.assertFilter(fdata, i(now), True)
+
     def test_expiration(self):
 
         now = datetime.now(tz=tz.tzutc())
         three_months = now + timedelta(90)
         two_months = now + timedelta(60)
-        one_month = now + timedelta(30)
 
         def i(d):
             return instance(LaunchTime=d)
@@ -188,7 +186,7 @@ class TestValueTypes(BaseFilterTest):
 
         self.assertFilter(fdata, i(three_months), False)
         self.assertFilter(fdata, i(two_months), True)
-        self.assertFilter(fdata, i(now), True)        
+        self.assertFilter(fdata, i(now), True)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -247,7 +245,6 @@ class TestMarkedForAction(BaseFilterTest):
                 {"Key": "maid_status",
                  "Value": "not compliant: %s@%s" % (
                     action, d.strftime("%Y/%m/%d"))}])
-
 
         for ii, v in [
                 (i(yesterday), True),
@@ -339,7 +336,10 @@ class TestInstanceValue(BaseFilterTest):
 
     def test_complex_value_filter(self):
         self.assertFilter(
-            {"key": "length(BlockDeviceMappings[?Ebs.DeleteOnTermination == `true`].Ebs.DeleteOnTermination)",
+            {"key": (
+                "length(BlockDeviceMappings"
+                "[?Ebs.DeleteOnTermination == `true`]"
+                ".Ebs.DeleteOnTermination)"),
              "value": 0,
              "type": "value",
              "op": "gt"},
