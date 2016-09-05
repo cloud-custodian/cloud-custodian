@@ -35,6 +35,7 @@ import json
 import logging
 
 from c7n.filters import Filter
+from c7n.resolver import ValuesFrom
 from c7n.utils import get_account_id, local_session, type_schema
 
 
@@ -43,7 +44,9 @@ class CrossAccountAccessFilter(Filter):
     """
 
     schema = type_schema(
-        'cross-account', whitelist={'type': 'array', 'items': {'type': 'string'}})
+        'cross-account',
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
 
@@ -54,6 +57,9 @@ class CrossAccountAccessFilter(Filter):
     def get_accounts(self):
         owner_id = get_account_id(local_session(self.manager.session_factory))
         accounts = set(self.data.get('whitelist', ()))
+        if 'whitelist_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_from'], self.manager)
+            accounts = accounts.union(values.get_values())
         accounts.add(owner_id)
         return accounts
 
