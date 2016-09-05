@@ -96,9 +96,7 @@ class UrlValueTest(BaseTest):
     def test_csv_expr(self):
         out = StringIO()
         writer = csv.writer(out)
-        writer.writerows([
-            range(5) for r in range(5)
-        ])
+        writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
             {'url': 'sun.csv', 'expr': '[*][2]'}, out.getvalue())
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
@@ -106,9 +104,16 @@ class UrlValueTest(BaseTest):
     def test_csv_column(self):
         out = StringIO()
         writer = csv.writer(out)
-        writer.writerows([
-            range(5) for r in range(5)
-        ])
+        writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
             {'url': 'sun.csv', 'expr': 1}, out.getvalue())
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
+
+    def test_csv_raw(self):
+        out = StringIO()
+        writer = csv.writer(out)
+        writer.writerows([range(3, 4) for r in range(5)])
+        values = self.get_values_from({'url': 'sun.csv'}, out.getvalue())
+        self.assertEqual(
+            values.get_values(),
+            [['3'], ['3'], ['3'], ['3'], ['3']])

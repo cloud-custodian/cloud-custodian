@@ -66,6 +66,18 @@ class ValuesFrom(object):
     """
     supported_formats = ('json', 'txt', 'csv')
 
+    # intent is that callers embed this schema
+    schema = {
+        'type': 'object',
+        'additionalProperties': 'False',
+        'required': ['url'],
+        'properties': {
+            'url': {'type': 'string'},
+            'format': {'enum': ['csv', 'json', 'txt']},
+            'expr': {'type': 'string'}
+        }
+    }
+
     def __init__(self, data, manager):
         self.data = data
         self.manager = manager
