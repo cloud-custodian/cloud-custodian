@@ -42,6 +42,7 @@ class SubnetsOfVpc(ValueFilter):
 
         subnets = Subnet(self.manager.ctx, {}).resources()
 
+
         matched = []
         for r in resources:
             r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
@@ -245,8 +246,13 @@ class SGPermission(Filter):
 
     def process_cidrs(self, perm):
         found = False
+        cidr_sizes = []
         if 'IpRanges' in perm and 'IpRanges' in self.data:
-            cidr_sizes = parse_cidrs(perm)
+            ip_ranges = perm.get('IpRanges', [])
+            # for statement in perm:
+            for ip_range in ip_ranges:
+                cidr_sizes.append(parse_cidrs(ip_range))
+
             if cidr_sizes:
                 found = True
         return found

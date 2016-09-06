@@ -257,9 +257,14 @@ class SecurityGroupTest(BaseTest):
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0].get('MatchedIpPermissionsEgress',[])), 2)
         self.assertEqual(
             resources[0]['MatchedIpPermissionsEgress'],
-            [{u'FromPort': 443,
+            [{u'IpProtocol': u'-1',
+              u'IpRanges': [{u'CidrIp': u'0.0.0.0/0'}],
+              u'PrefixListIds': [],
+              u'UserIdGroupPairs': []},
+             {u'FromPort': 443,
               u'IpProtocol': u'tcp',
               u'IpRanges': [{u'CidrIp': u'10.42.0.0/16'},{u'CidrIp': u'10.42.1.0/24'}],
               u'PrefixListIds': [],

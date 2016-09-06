@@ -220,7 +220,7 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size', 'cidr']},
+                'age', 'integer', 'expiration', 'normalize', 'size', 'cidr_size']},
             'default': {'type': 'object'},
             'value': {'oneOf': [
                 {'type': 'array'},
@@ -330,8 +330,9 @@ class ValueFilter(Filter):
             # comparisons is intuitively wrong.
             return value, sentinel
 
-        elif self.vtype == 'cidr':
-            v = parse_cidrs(value)
+        elif self.vtype == 'cidr_size':
+            for i in value:
+                v = parse_cidrs(i)
             return sentinel, v
 
         # Allows for expiration filtering, for events in the future as opposed
