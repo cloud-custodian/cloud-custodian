@@ -34,12 +34,12 @@ from jsonschema.exceptions import best_match
 
 from c7n.manager import resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
-from c7n.offhours import Time as TimeFilter
 
 
-def validate(data):
-    schema = generate()
-    Validator.check_schema(schema)
+def validate(data, schema=None):
+    if schema is None:
+        schema = generate()
+        Validator.check_schema(schema)
     validator = Validator(schema)
 
     errors = list(validator.iter_errors(data))
@@ -55,7 +55,9 @@ def validate(data):
                     ", ".join(dupes)))]
         return []
     try:
-        return [specific_error(errors[0])]
+        resp = specific_error(errors[0])
+        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        return [resp, name]
     except Exception:
         logging.exception(
             "specific_error failed, traceback, followed by fallback")
@@ -128,7 +130,6 @@ def generate(resource_types=()):
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
-            'time': TimeFilter.schema,
             'age': AgeFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {

@@ -28,10 +28,10 @@ from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
+from c7n.filters.offhours import OffHour, OnHour
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.offhours import Time, OffHour, OnHour
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, query_instances, type_schema, chunks, get_retry)
@@ -41,8 +41,6 @@ log = logging.getLogger('custodian.asg')
 filters = FilterRegistry('asg.filters')
 actions = ActionRegistry('asg.actions')
 
-
-filters.register('time', Time)
 filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
 filters.register('tag-count', TagCountFilter)
@@ -78,11 +76,7 @@ class LaunchConfigFilterBase(object):
         for a in skip:
             asgs.remove(a)
 
-        session = local_session(self.manager.session_factory)
-        client = session.client('autoscaling')
-
         self.configs = {}
-
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
@@ -114,25 +108,7 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
         return self.match(cfg)
 
 
-@filters.register('invalid')
-class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
-    """Filter autoscale groups to find those that are structurally invalid.
-
-    Structurally invalid means that the auto scale group will not be able
-    to launch an instance succesfully as the configuration has
-
-    - invalid subnets
-    - invalid security groups
-    - invalid key pair name
-    - invalid launch config volume snapshots
-    - invalid amis
-    - invalid health check elb (slower)
-
-    Internally this tries to reuse other resource managers for better
-    cache utilization.
-
-    """
-    schema = type_schema('invalid')
+class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def validate(self):
         if self.manager.data.get('mode'):
@@ -141,7 +117,7 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
         return self
 
     def initialize(self, asgs):
-        super(InvalidConfigFilter, self).initialize(asgs)
+        super(ConfigValidFilter, self).initialize(asgs)
         self.subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
@@ -181,14 +157,14 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
-        return super(InvalidConfigFilter, self).process(asgs, event)
+        return super(ConfigValidFilter, self).process(asgs, event)
 
-    def __call__(self, asg):
+    def get_asg_errors(self, asg):
         errors = []
         subnets = asg.get('VPCZoneIdentifier', '').split(',')
 
         for s in subnets:
-            if not s in self.subnets:
+            if s not in self.subnets:
                 errors.append(('invalid-subnet', s))
 
         for elb in asg['LoadBalancerNames']:
@@ -222,6 +198,46 @@ class InvalidConfigFilter(Filter, LaunchConfigFilterBase):
             if bd['SnapshotId'] not in self.snapshots:
                 errors.append(('invalid-snapshot', cfg['SnapshotId']))
 
+        return errors
+
+
+@filters.register('valid')
+class ValidConfigFilter(ConfigValidFilter):
+    """Filters autoscale groups to find those that are structurally valid.
+
+    This operates as the inverse of the invalid filter for multi-step workflows.
+
+    See details on the invalid filter for a list of checks made.
+    """
+
+    schema = type_schema('valid')
+
+    def __call__(self, asg):
+        errors = self.get_asg_errors(asg)
+        return not bool(errors)
+
+
+@filters.register('invalid')
+class InvalidConfigFilter(ConfigValidFilter):
+    """Filter autoscale groups to find those that are structurally invalid.
+
+    Structurally invalid means that the auto scale group will not be able
+    to launch an instance succesfully as the configuration has
+
+    - invalid subnets
+    - invalid security groups
+    - invalid key pair name
+    - invalid launch config volume snapshots
+    - invalid amis
+    - invalid health check elb (slower)
+
+    Internally this tries to reuse other resource managers for better
+    cache utilization.
+    """
+    schema = type_schema('invalid')
+
+    def __call__(self, asg):
+        errors = self.get_asg_errors(asg)
         if errors:
             asg['Invalid'] = errors
             return True
@@ -250,7 +266,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             return False
         unencrypted = []
         if (not self.data.get('exclude_image')
-               and cfg['ImageId'] in self.unencrypted_images):
+                and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
         if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
             unencrypted.append('LaunchConfig')
@@ -468,8 +484,9 @@ class RemoveTag(BaseAction):
     def process_asg_set(self, asgs, key):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
-        tags= [dict(Key=key, ResourceType='auto-scaling-group',
-                    ResourceId=a['AutoScalingGroupName']) for a in asgs]
+        tags = [dict(
+            Key=key, ResourceType='auto-scaling-group',
+            ResourceId=a['AutoScalingGroupName']) for a in asgs]
         self.manager.retry(client.delete_tags, Tags=tags)
 
 
@@ -489,7 +506,6 @@ class Tag(BaseAction):
     batch_size = 1
 
     def process(self, asgs):
-        error = False
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
@@ -520,9 +536,10 @@ class Tag(BaseAction):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
         propagate = self.data.get('propagate_launch', True)
-        tags= [dict(Key=key, ResourceType='auto-scaling-group', Value=value,
-                    PropagateAtLaunch=propagate,
-                    ResourceId=a['AutoScalingGroupName']) for a in asgs]
+        tags = [
+            dict(Key=key, ResourceType='auto-scaling-group', Value=value,
+                 PropagateAtLaunch=propagate,
+                 ResourceId=a['AutoScalingGroupName']) for a in asgs]
         self.manager.retry(client.create_or_update_tags, Tags=tags)
 
 
@@ -757,7 +774,8 @@ class Suspend(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        self.manager.retry(asg_client.suspend_processes,
+        self.manager.retry(
+            asg_client.suspend_processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
         ec2_client = session.client('ec2')
         try:
@@ -780,7 +798,7 @@ class Suspend(BaseAction):
 class Resume(BaseAction):
     """Resume a suspended autoscale group and its instances
     """
-    schema = type_schema('resume', delay={'type': 'integer'})
+    schema = type_schema('resume', delay={'type': 'number'})
 
     def process(self, asgs):
         original_count = len(asgs)
@@ -828,7 +846,8 @@ class Resume(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        asg_client.resume_processes(
+        self.manager.retry(
+            asg_client.resume_processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
 
 

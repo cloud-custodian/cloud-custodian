@@ -3,14 +3,21 @@ import json
 import os
 import logging
 
-from c7n.commands import policy_command
 from c7n.credentials import SessionFactory
+from c7n.policy import load as policy_load
 from c7n import mu, resources
 
 log = logging.getLogger('resources')
 
 
-@policy_command
+def load_policies(options):
+    policies = []
+    for f in options.config_files:
+        collection = policy_load(options, f)
+        policies.extend(collection.filter(options.policy_filter))
+    return policies
+
+
 def resources_gc_prefix(options, policy_collection):
     """Garbage collect old custodian policies based on prefix.
 
@@ -33,11 +40,8 @@ def resources_gc_prefix(options, policy_collection):
             remove.append(f)
 
     for n in remove:
-        log.info("Removing %s" % n['FunctionName'])
-
-    for func in remove:
         events = []
-        result = client.get_policy(FunctionName=func['FunctionName'])
+        result = client.get_policy(FunctionName=n['FunctionName'])
         if 'Policy' not in result:
             pass
         else:
@@ -45,7 +49,7 @@ def resources_gc_prefix(options, policy_collection):
             for s in p['Statement']:
                 principal = s.get('Principal')
                 if not isinstance(principal, dict):
-                    log.info("Skipping function %s" % func['FunctionName'])
+                    log.info("Skipping function %s" % n['FunctionName'])
                     continue
                 if principal == {'Service': 'events.amazonaws.com'}:
                     events.append(
@@ -60,17 +64,20 @@ def resources_gc_prefix(options, policy_collection):
             'description': n['Description'],
             'runtime': n['Runtime'],
             'events': events}, None)
-        log.info("Removing %s" % f)
 
+        log.info("Removing %s" % n['FunctionName'])
         if options.dryrun:
-            log.info("Dryrun skipping")
+            log.info("Dryrun skipping removal")
             continue
         manager.remove(f)
+        log.info("Removed %s" % n['FunctionName'])
 
 
 def setup_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', required=True)
+    parser.add_argument(
+        '-c', '--config',
+        required=True, dest="config_files", action="append")
     parser.add_argument(
         '-r', '--region', default=os.environ.get(
             'AWS_DEFAULT_REGION', 'us-east-1'))
@@ -95,9 +102,11 @@ def main():
         level=logging.DEBUG,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
-
+    logging.getLogger('c7n.cache').setLevel(logging.WARNING)
     resources.load_resources()
-    resources_gc_prefix(options)
+
+    policies = load_policies(options)
+    resources_gc_prefix(options, policies)
 
 
 

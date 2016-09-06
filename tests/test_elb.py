@@ -79,7 +79,7 @@ class ELBTagTest(BaseTest):
             'filters': [{"LoadBalancerName": 'CloudCustodian'}],
             'actions': [{
                 'type': 'mark-for-op', 'op': 'delete',
-                'tag': 'custodian_next', 'days': -1}]},
+                'tag': 'custodian_next', 'days': 1}]},
             session_factory=session_factory)
         resources = policy.run()
 
@@ -152,7 +152,7 @@ class SSLPolicyTest(BaseTest):
             'filters': [
                 {'type': 'ssl-policy'}
             ]},
-            session_factory=None)
+            session_factory=None, validate=False)
         self.fail("validtion error should have been thrown")
 
     @raises(FilterValidationError)
@@ -163,7 +163,7 @@ class SSLPolicyTest(BaseTest):
             'filters': [
                 {'type': 'ssl-policy', 'blacklist': 'single-value'}
             ]},
-            session_factory=None)
+            session_factory=None, validate=False)
         self.fail("validtion error should have been thrown")
 
 
