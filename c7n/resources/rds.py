@@ -50,7 +50,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS, ValueFilter
+from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
@@ -206,14 +206,9 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 class TagDelayedAction(tags.TagDelayedAction):
 
     schema = type_schema(
-        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
-        ops={'enum': ['delete', 'snapshot']})
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
 
     batch_size = 5
-
-    def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        return super(TagDelayedAction, self).process(resources)
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('rds')
@@ -230,9 +225,7 @@ class AutoPatch(BaseAction):
         minor={'type': 'boolean'}, window={'type': 'string'})
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('rds')
-
+        client = local_session(self.manager.session_factory).client('rds')
         params = {'AutoMinorVersionUpgrade': self.data.get('minor', True)}
         if self.data.get('window'):
             params['PreferredMaintenanceWindow'] = self.data['minor']
@@ -251,8 +244,7 @@ class Tag(tags.Tag):
     batch_size = 5
 
     def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+        client = local_session(self.manager.session_factory).client('rds')
         for r in resources:
             arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
@@ -266,8 +258,7 @@ class RemoveTag(tags.RemoveTag):
     batch_size = 5
 
     def process_resource_set(self, resources, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+        client = local_session(self.manager.session_factory).client('rds')
         for r in resources:
             arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.remove_tags_from_resource(
@@ -277,9 +268,10 @@ class RemoveTag(tags.RemoveTag):
 @actions.register('tag-trim')
 class TagTrim(tags.TagTrim):
 
+    max_tag_count = 10
+
     def process_tag_removal(self, resource, candidates):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+        client = local_session(self.manager.session_factory).client('rds')
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
