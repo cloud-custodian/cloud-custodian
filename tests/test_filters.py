@@ -58,12 +58,13 @@ class TestOrFilter(unittest.TestCase):
             'or': [
                 {'Architecture': 'x86_64'},
                 {'Architecture': 'armv8'}]})
+        results = [instance(Architecture='x86_64')]
         self.assertEqual(
-            f(instance(Architecture='x86_64')),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
-            f(instance(Architecture='amd64')),
-            False)
+            f.process([instance(Architecture='amd64')]),
+            [])
 
 
 class TestAndFilter(unittest.TestCase):
@@ -73,20 +74,21 @@ class TestAndFilter(unittest.TestCase):
             'and': [
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
+        results = [instance(Architecture='x86_64', Color='green')]
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='green')),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='blue')),
-            False)
+            f.process([
+                instance(
+                    Architecture='x86_64',
+                    Color='blue')]),
+            [])
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64')),
-            False)
+            f.process([
+                instance(
+                    Architecture='x86_64')]),
+            [])
 
 
 class TestGlobValue(unittest.TestCase):
@@ -145,6 +147,51 @@ class TestRegexValue(unittest.TestCase):
 
 class TestValueTypes(BaseFilterTest):
 
+    def test_normalize(self):
+        fdata = {
+            'type': 'value',
+            'key': 'tag:Name',
+            'value_type': 'normalize',
+            'value': 'compilelambda'
+        }
+        self.assertFilter(fdata, instance(), True)
+
+    def test_size(self):
+        fdata = {
+            'type': 'value',
+            'key': 'SecurityGroups[].GroupId',
+            'value_type': 'size',
+            'value': 2
+        }
+        self.assertFilter(fdata, instance(), True)
+
+    def test_integer(self):
+        fdata = {
+            'type': 'value',
+            'key': 'tag:Count',
+            'op': 'greater-than',
+            'value_type': 'integer',
+            'value': 0}
+
+        def i(d):
+            return instance(Tags=[{"Key": "Count", "Value": d}])
+
+        self.assertFilter(fdata, i('42'), True)
+        self.assertFilter(fdata, i('abc'), False)
+
+        fdata['op'] = 'equal'
+        self.assertFilter(fdata, i('abc'), True)
+
+    def test_swap(self):
+        fdata = {
+            'type': 'value',
+            'key': 'SecurityGroups[].GroupId',
+            'value_type': 'swap',
+            'op': 'in',
+            'value': 'sg-47b76f22'
+        }
+        self.assertFilter(fdata, instance(), True)
+
     def test_age(self):
         now = datetime.now(tz=tz.tzutc())
         three_months = now - timedelta(90)
@@ -164,14 +211,14 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(three_months), False)
         self.assertFilter(fdata, i(two_months), False)
         self.assertFilter(fdata, i(one_month), True)
-        self.assertFilter(fdata, i(now), True)        
-        
+        self.assertFilter(fdata, i(now), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
+
     def test_expiration(self):
 
         now = datetime.now(tz=tz.tzutc())
         three_months = now + timedelta(90)
         two_months = now + timedelta(60)
-        one_month = now + timedelta(30)
 
         def i(d):
             return instance(LaunchTime=d)
@@ -185,7 +232,8 @@ class TestValueTypes(BaseFilterTest):
 
         self.assertFilter(fdata, i(three_months), False)
         self.assertFilter(fdata, i(two_months), True)
-        self.assertFilter(fdata, i(now), True)        
+        self.assertFilter(fdata, i(now), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -245,7 +293,6 @@ class TestMarkedForAction(BaseFilterTest):
                  "Value": "not compliant: %s@%s" % (
                     action, d.strftime("%Y/%m/%d"))}])
 
-
         for ii, v in [
                 (i(yesterday), True),
                 (i(now), True),
@@ -304,6 +351,15 @@ class TestInstanceValue(BaseFilterTest):
         self.assertEqual(
             annotation(i, base_filters.ANNOTATION_KEY), ['tag:ASV'])
 
+    def test_present(self):
+        i = instance(Tags=[
+            {'Key': 'ASV', 'Value': ''}])
+        self.assertFilter(
+            {'type': 'value',
+             'key': 'tag:ASV',
+             'value': 'present'},
+            i, True)
+
     def test_jmespath(self):
         self.assertFilter(
             {'Placement.AvailabilityZone': 'us-west-2c'},
@@ -336,7 +392,10 @@ class TestInstanceValue(BaseFilterTest):
 
     def test_complex_value_filter(self):
         self.assertFilter(
-            {"key": "length(BlockDeviceMappings[?Ebs.DeleteOnTermination == `true`].Ebs.DeleteOnTermination)",
+            {"key": (
+                "length(BlockDeviceMappings"
+                "[?Ebs.DeleteOnTermination == `true`]"
+                ".Ebs.DeleteOnTermination)"),
              "value": 0,
              "type": "value",
              "op": "gt"},

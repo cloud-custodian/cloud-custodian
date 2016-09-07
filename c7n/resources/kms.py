@@ -47,8 +47,7 @@ class KeyAlias(KeyBase, QueryResourceManager):
     resource_type = Meta
 
     def augment(self, resources):
-        resources = [r for r in resources if 'TargetKeyId' in r]
-        return super(KeyAlias, self).augment(resources)
+        return [r for r in resources if 'TargetKeyId' in r]
 
 
 @resources.register('kms-key')

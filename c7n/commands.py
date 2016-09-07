@@ -121,21 +121,5 @@ def logs(options, policies):
             e['message'])
 
 
-def resources(options):
-    import yaml
-    session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
-    manager = mu.LambdaManager(session_factory)
-    funcs = list(manager.list_functions('custodian-'))
-
-    end = datetime.utcnow()
-    start = end - timedelta(1/24.0)
-
-    manager.metrics(funcs, start, end, period=60*30)
-    if options.all:
-        print(yaml.dump(
-            funcs, Dumper=yaml.SafeDumper, default_flow_style=False))
-
-
 def cmd_version(options):
     print(version.version)

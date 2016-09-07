@@ -94,7 +94,6 @@ class TestPolicy(BaseTest):
             'mode': {
                 'type': 'ec2-instance-state',
                 'events': ['running']},
-            'role': "arn:aws:iam::619193117841:role/CustodianDemoRole",
             'filters': [
                 {"tag:custodian_status": 'absent'},
                 {'or': [

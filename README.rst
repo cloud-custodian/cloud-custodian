@@ -41,15 +41,15 @@ as a simple cron job on a server to execute against large existing fleets.
 Features
 ########
 
-- Comprehensive support for aws services and resources (~50), along with
-  65 unique actions and 75 filters to build policies with.
+- Comprehensive support for aws services and resources (~60), along with
+  ~160 actions and ~180 filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
-- Automatically provisions lambda functions and cloud watch event targets for
+- Automatically provisions lambda functions, config rules, and cloud watch event targets for
   real-time policies.
 - Cloudwatch metrics outputs on resources that matched a policy
 - Structured outputs into s3 of which resources matched a policy.
-- Utilizes a cache utilization, to minimize api calls.
+- Intelligent cache usage to minimize api calls.
 - Battle-tested, In production on against some very large aws accounts.
 - Supports cross account usage via STS role assumption.
 - Supports integration with custom/user supplied lambdas as actions.

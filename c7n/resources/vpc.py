@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore.exceptions import ClientError
-
 from c7n.actions import BaseAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
@@ -63,30 +61,11 @@ class SecurityGroup(QueryResourceManager):
     resource_type = 'aws.ec2.security-group'
 
 
-@SecurityGroup.filter_registry.register('unused')
-class UnusedSecurityGroup(Filter):
-    """Filter to just vpc security groups that are not used.
-
-    We scan all extant enis in the vpc to get a baseline set of groups
-    in use. Then augment with those referenced by launch configs, and
-    lambdas as they may not have extant resources in the vpc at a
-    given moment. We also find any security group with references from
-    other security group either within the vpc or across peered
-    connections.
-
-    Note this filter does not support classic security groups atm.
-    """
-    schema = type_schema('unused')
-
-    def process(self, resources, event=None):
-        used = self.scan_groups()
-        unused = [
-            r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
-        return unused and self.filter_peered_refs(unused) or []
+class SGUsage(Filter):
 
     def filter_peered_refs(self, resources):
+        if not resources:
+            return resources
         # Check that groups are not referenced across accounts
         client = local_session(self.manager.session_factory).client('ec2')
         peered_ids = set()
@@ -152,6 +131,49 @@ class UnusedSecurityGroup(Filter):
                     for g in p.get('UserIdGroupPairs', ()):
                         sg_ids.add(g['GroupId'])
         return sg_ids
+
+
+@SecurityGroup.filter_registry.register('unused')
+class UnusedSecurityGroup(SGUsage):
+    """Filter to just vpc security groups that are not used.
+
+    We scan all extant enis in the vpc to get a baseline set of groups
+    in use. Then augment with those referenced by launch configs, and
+    lambdas as they may not have extant resources in the vpc at a
+    given moment. We also find any security group with references from
+    other security group either within the vpc or across peered
+    connections.
+
+    Note this filter does not support classic security groups atm.
+    """
+    schema = type_schema('unused')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        return unused and self.filter_peered_refs(unused) or []
+
+
+@SecurityGroup.filter_registry.register('used')
+class UsedSecurityGroup(SGUsage):
+    """Filter to security groups that are used.
+
+    This operates as a complement to the unused filter for multi-step
+    workflows.
+    """
+    schema = type_schema('used')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        unused = set(self.filter_peered_refs(unused))
+        return [r for r in resources if r['GroupId'] not in unused]
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
