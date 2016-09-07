@@ -20,7 +20,6 @@ import fnmatch
 import logging
 import operator
 import re
-import time
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -28,6 +27,7 @@ import jmespath
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
+from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema
 
 
@@ -218,6 +218,7 @@ class ValueFilter(Filter):
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size']},
             'default': {'type': 'object'},
+            'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
@@ -233,7 +234,7 @@ class ValueFilter(Filter):
         if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if 'value' not in self.data:
+        if 'value' not in self.data and 'value_from' not in self.data:
             raise FilterValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
@@ -261,7 +262,11 @@ class ValueFilter(Filter):
         elif self.v is None:
             self.k = self.data.get('key')
             self.op = self.data.get('op')
-            self.v = self.data.get('value')
+            if 'value_from' in self.data:
+                values = ValuesFrom(self.data['value_from'], self.manager)
+                self.v = values.get_values()
+            else:
+                self.v = self.data.get('value')
             self.vtype = self.data.get('value_type')
 
         if i is None:
