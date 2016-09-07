@@ -411,6 +411,10 @@ class Policy(object):
     def max_resources(self):
         return self.data.get('max-resources')
 
+    @property
+    def tags(self):
+        return self.data.get('tags', ())
+
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
         return self.EXEC_MODE_MAP[exec_mode_type](self)
