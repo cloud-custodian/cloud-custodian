@@ -101,11 +101,11 @@ class Delete(BaseAction):
             for db_set in chunks(clusters, size=5):
                 futures.append(
                     w.submit(self.process_db_set, db_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting redshift set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting redshift set \n %s",
+                        f.exception())
 
     def process_db_set(self, db_set):
         skip = self.data.get('skip-snapshot', False)
@@ -135,11 +135,11 @@ class RetentionWindow(BaseAction):
                 futures.append(w.submit(
                     self.process_snapshot_retention,
                     cluster))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception setting Redshift retention  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting Redshift retention  \n %s",
+                        f.exception())
 
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get(self.date_attribute, 0))
@@ -170,11 +170,11 @@ class Snapshot(BaseAction):
                 futures.append(w.submit(
                     self.process_cluster_snapshot,
                     cluster))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception creating Redshift snapshot  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception creating Redshift snapshot  \n %s",
+                        f.exception())
         return clusters
 
     def process_cluster_snapshot(self, cluster):
@@ -228,11 +228,11 @@ class RedshiftSnapshotDelete(BaseAction):
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
                     w.submit(self.process_snapshot_set, snapshot_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting snapshot set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s",
+                        f.exception())
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):

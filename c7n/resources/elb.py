@@ -299,12 +299,12 @@ class SSLPolicyFilter(Filter):
                 futures.append(
                     w.submit(self.process_elb_policy_set, elb_policy_set))
 
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception processing elb policies \n %s" % (
-                                f.exception()))
-                        continue
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception processing elb policies \n %s" % (
+                            f.exception()))
+                    continue
                 for elb_policies in f.result():
                     active_policy_attribute_tuples.append(elb_policies)
 

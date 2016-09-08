@@ -363,11 +363,11 @@ class Snapshot(BaseAction):
                 futures.append(w.submit(
                     self.process_rds_snapshot,
                     db))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception creating rds snapshot  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception creating rds snapshot  \n %s",
+                        f.exception())
         return dbs
 
     def process_rds_snapshot(self, resource):
@@ -397,11 +397,11 @@ class RetentionWindow(BaseAction):
                 futures.append(w.submit(
                     self.process_snapshot_retention,
                     db))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception setting rds retention  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting rds retention  \n %s",
+                        f.exception())
         return dbs
 
     def process_snapshot_retention(self, resource):
@@ -469,11 +469,11 @@ class RDSSnapshotDelete(BaseAction):
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
                     w.submit(self.process_snapshot_set, snapshot_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting snapshot set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s",
+                        f.exception())
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):
