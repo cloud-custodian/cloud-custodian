@@ -18,7 +18,7 @@ from c7n.filters import (
 
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, parse_cidrs
 
 
 @resources.register('vpc')
@@ -39,6 +39,7 @@ class SubnetsOfVpc(ValueFilter):
     def process(self, resources, event=None):
 
         subnets = Subnet(self.manager.ctx, {}).resources()
+
 
         matched = []
         for r in resources:
@@ -237,17 +238,46 @@ class SGPermission(Filter):
         fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
         self.only_ports = 'OnlyPorts' in self.data and self.data['OnlyPorts'] or ()
+        self.max_cidr_size = 'IpRanges' in self.data and self.data['IpRanges']['value'] or ()
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
-                if 'key' not in fv:
-                    fv['key'] = f
+                fv['key'] = f
             else:
                 fv = {f: fv}
             vf = ValueFilter(fv)
             vf.annotate = False
             self.vfilters.append(vf)
         return super(SGPermission, self).process(resources, event)
+
+    def process_ports(self, perm):
+        found = False
+        if 'FromPort' in perm and 'ToPort' in perm:
+            for port in self.ports:
+                if port >= perm['FromPort'] and port <= perm['ToPort']:
+                    found = True
+                    break
+            only_found = False
+            for port in self.only_ports:
+                if port == perm['FromPort'] and port == perm['ToPort']:
+                    only_found = True
+            if self.only_ports and not only_found:
+                found = True
+
+        return found
+
+    def process_cidrs(self, perm):
+        found = False
+        cidr_sizes = []
+        if 'IpRanges' in perm and 'IpRanges' in self.data:
+            ip_ranges = perm.get('IpRanges', [])
+            # for statement in perm:
+            for ip_range in ip_ranges:
+                cidr_sizes.append(parse_cidrs(ip_range))
+
+            if cidr_sizes:
+                found = True
+        return found
 
     def __call__(self, resource):
         matched = []
@@ -257,17 +287,11 @@ class SGPermission(Filter):
                 if f(perm):
                     found = True
                     break
-            if 'FromPort' in perm and 'ToPort' in perm:
-                for port in self.ports:
-                    if port >= perm['FromPort'] and port <= perm['ToPort']:
-                        found = True
-                        break
-                only_found = False
-                for port in self.only_ports:
-                    if port == perm['FromPort'] and port == perm['ToPort']:
-                        only_found = True
-                if self.only_ports and not only_found:
-                    found = True
+            if not found:
+                found = self.process_ports(perm)
+            if not found:
+                found = self.process_cidrs(perm)
+
             if not found:
                 continue
             matched.append(perm)

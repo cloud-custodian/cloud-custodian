@@ -28,7 +28,7 @@ import jmespath
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema
+from c7n.utils import set_annotation, type_schema, parse_cidrs
 
 
 class FilterValidationError(Exception): pass
@@ -216,7 +216,7 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size']},
+                'age', 'integer', 'expiration', 'normalize', 'size', 'cidr_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -334,6 +334,11 @@ class ValueFilter(Filter):
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
             return value, sentinel
+
+        elif self.vtype == 'cidr_size':
+            for i in value:
+                v = parse_cidrs(i)
+            return sentinel, v
 
         # Allows for expiration filtering, for events in the future as opposed
         # to events in the past which age filtering allows for.
