@@ -25,6 +25,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n import tags
 from c7n.utils import (
     local_session, get_account_id, generate_arn,
     get_retry, chunks, snapshot_identifier, type_schema)
@@ -33,7 +34,7 @@ log = logging.getLogger('custodian.elasticache')
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
-
+filters.register('marked-for-op', tags.TagActionFilter) 
 
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
@@ -71,6 +72,34 @@ class ElastiCacheCluster(QueryResourceManager):
         return clusters
 
 
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+    
+    batch_size = 1
+    
+    def process_resource_set(self, clusters, tags):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('remove-tag')
+@actions.register('unmark')
+class RemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, clusters, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
+            
+            
 @actions.register('delete')
 class DeleteElastiCacheCluster(BaseAction):
 
