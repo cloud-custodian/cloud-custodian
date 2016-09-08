@@ -24,11 +24,12 @@ import re
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
+import ipaddress
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema
+from c7n.utils import set_annotation, type_schema, parse_cidr
 
 
 class FilterValidationError(Exception): pass
@@ -216,7 +217,8 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size']},
+                'age', 'integer', 'expiration', 'normalize', 'size',
+                'cidr', 'cidr_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -334,6 +336,18 @@ class ValueFilter(Filter):
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
             return value, sentinel
+        elif self.vtype == 'cidr':
+            s = parse_cidr(sentinel)
+            v = parse_cidr(value)
+            if (isinstance(s, ipaddress._BaseAddress)
+                    and isinstance(v, ipaddress._BaseNetwork)):
+                return v, s
+            return s, v
+        elif self.vtype == 'cidr_size':
+            cidr = parse_cidr(value)
+            if cidr:
+                return sentinel, cidr.prefixlen
+            return sentinel, 0
 
         # Allows for expiration filtering, for events in the future as opposed
         # to events in the past which age filtering allows for.

@@ -20,6 +20,7 @@ import itertools
 import random
 import threading
 import time
+import ipaddress
 
 
 # Try to place nice in lambda exec environment
@@ -288,3 +289,15 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
         else:
             yield cur
         cur = cur * factor
+
+
+def parse_cidr(value):
+    """Process cidr ranges."""
+    klass = ipaddress.ip_network
+    if '/' not in value:
+        klass = ipaddress.ip_address
+    try:
+        v = klass(unicode(value))
+    except (ipaddress.AddressValueError, ValueError):
+        v = None
+    return v

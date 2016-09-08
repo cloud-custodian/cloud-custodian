@@ -3,3 +3,4 @@ botocore>=1.4.34
 PyYAML==3.11
 jsonschema==2.5.1
 skew==0.16.1
+ipaddress==1.0.16
