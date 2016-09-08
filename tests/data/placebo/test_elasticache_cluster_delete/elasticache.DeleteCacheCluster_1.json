@@ -1,0 +1,55 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CacheCluster": {
+            "Engine": "memcached", 
+            "CacheParameterGroup": {
+                "CacheNodeIdsToReboot": [], 
+                "CacheParameterGroupName": "default.memcached1.4", 
+                "ParameterApplyStatus": "in-sync"
+            }, 
+            "CacheClusterId": "memcached-cluster-1", 
+            "PreferredAvailabilityZone": "us-west-2a", 
+            "ConfigurationEndpoint": {
+                "Port": 11211, 
+                "Address": "memcached-cluster-1.i2seyy.cfg.usw2.cache.amazonaws.com"
+            }, 
+            "CacheSecurityGroups": [], 
+            "CacheClusterCreateTime": {
+                "hour": 14, 
+                "__class__": "datetime", 
+                "month": 9, 
+                "second": 28, 
+                "microsecond": 888000, 
+                "year": 2016, 
+                "day": 7, 
+                "minute": 41
+            }, 
+            "AutoMinorVersionUpgrade": true, 
+            "CacheClusterStatus": "deleting", 
+            "NumCacheNodes": 2, 
+            "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+            "SecurityGroups": [
+                {
+                    "Status": "active", 
+                    "SecurityGroupId": "sg-f9cc4d9f"
+                }
+            ], 
+            "CacheSubnetGroupName": "elasticache-subnet-group-1", 
+            "EngineVersion": "1.4.24", 
+            "PendingModifiedValues": {}, 
+            "PreferredMaintenanceWindow": "wed:02:04-wed:04:04", 
+            "CacheNodeType": "cache.t2.micro"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "2ae5e5cb-7528-11e6-ab08-8559232b3224", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2ae5e5cb-7528-11e6-ab08-8559232b3224", 
+                "date": "Wed, 07 Sep 2016 18:23:26 GMT", 
+                "content-length": "1739", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -76,11 +76,11 @@ class SnapshotDelete(BaseAction):
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
                     w.submit(self.process_snapshot_set, snapshot_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting snapshot set \n %s" % (
-                                f.exception()))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s" % (
+                            f.exception()))
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):
@@ -241,11 +241,11 @@ class CopyInstanceTags(BaseAction):
                 futures.append(
                     w.submit(self.process_volume_set, volume_set))
 
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception copying instance tags \n %s" % (
-                                f.exception()))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception copying instance tags \n %s" % (
+                            f.exception()))
 
     def process_volume_set(self, volume_set):
         instance_vol_map = {}
