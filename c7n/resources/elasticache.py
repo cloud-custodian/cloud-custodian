@@ -35,6 +35,7 @@ log = logging.getLogger('custodian.elasticache')
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
+#registered marked-for-op filter
 filters.register('marked-for-op', tags.TagActionFilter) 
 
 @resources.register('cache-cluster')
@@ -72,7 +73,7 @@ class ElastiCacheCluster(QueryResourceManager):
             self.generate_arn, self.retry))
         return clusters
 
-
+# added mark-for-op
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     
@@ -84,7 +85,7 @@ class TagDelayedAction(tags.TagDelayedAction):
             arn = self.manager.generate_arn(cluster['CacheClusterId'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
-
+# added unmark
 @actions.register('remove-tag')
 @actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
@@ -118,7 +119,7 @@ class DeleteElastiCacheCluster(BaseAction):
                 replication_groups_to_delete.add(cluster['ReplicationGroupId'])
             else:
                 clusters_to_delete.append(cluster)
-
+        # added if statement to handle differences in parameters if snapshot is skipped
         for cluster in clusters_to_delete:
             params = {'CacheClusterId': cluster['CacheClusterId']}
             if _cluster_eligible_for_snapshot(cluster) and not skip:
@@ -128,7 +129,6 @@ class DeleteElastiCacheCluster(BaseAction):
             else:
                 self.log.info("Skipping final snapshot of %s" %cluster['CacheClusterId'])
             client.delete_cache_cluster(**params)
-
             self.log.info(
                 'Deleted ElastiCache cluster: %s',
                 cluster['CacheClusterId'])
@@ -272,6 +272,7 @@ def _elasticache_cluster_tags(
     def process_tags(cluster):
         client = local_session(session_factory).client('elasticache')
         arn = generator(cluster[model.id])
+        # added if statement to ensure snapshot is available in order to list tags
         if cluster['CacheClusterStatus'] == 'available':
             tag_list = retry(
                 client.list_tags_for_resource,
@@ -288,6 +289,7 @@ def _elasticache_snapshot_tags(
     """ Augment ElastiCache snapshots with their respective tags
     """
 
+    # added if statement to ensure snapshot is available in order to list tags
     def process_tags(snapshot):
         client = local_session(session_factory).client('elasticache')
         arn = generator(snapshot[model.id])
@@ -303,7 +305,8 @@ def _elasticache_snapshot_tags(
 
 
 def _cluster_eligible_for_snapshot(cluster):
-    
+    # added regex search to filter unsupported cachenode types
     return (
         cluster['Engine'] != 'memcached' and not 
-        re.match("[cache.t]\s\S", cluster['CacheNodeType']))
+        re.search('cache.t', cluster['CacheNodeType'])
+        )
