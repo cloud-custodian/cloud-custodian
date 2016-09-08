@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CacheSubnetGroups": [
+            {
+                "VpcId": "vpc-4a9ff72e", 
+                "CacheSubnetGroupDescription": "An ElastiCache subnet group", 
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-5fb47507", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2c"
+                        }
+                    }, 
+                    {
+                        "SubnetIdentifier": "subnet-15452171", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2a"
+                        }
+                    }, 
+                    {
+                        "SubnetIdentifier": "subnet-63c97615", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2b"
+                        }
+                    }
+                ], 
+                "CacheSubnetGroupName": "elasticache-subnet-group-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "bcd53202-750a-11e6-bcfa-055709a7c18d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bcd53202-750a-11e6-bcfa-055709a7c18d", 
+                "date": "Wed, 07 Sep 2016 14:52:45 GMT", 
+                "content-length": "1309", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
