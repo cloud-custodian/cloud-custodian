@@ -259,16 +259,16 @@ class SecurityGroupTest(BaseTest):
             'resource': 'security-group',
             'filters': [
                 {'type': 'egress',
-                 'IpRanges': {
+                 'Cidr': {
                      'value': 24,
                      'op': 'lt',
-                     'value-type': 'cidr'
-                 }},
-                 {'GroupName': 'wide-egress'}]
+                     'value_type': 'cidr_size'}},
+                {'GroupName': 'wide-egress'}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0].get('MatchedIpPermissionsEgress',[])), 2)
+        self.assertEqual(
+            len(resources[0].get('MatchedIpPermissionsEgress', [])), 2)
         self.assertEqual(
             resources[0]['MatchedIpPermissionsEgress'],
             [{u'IpProtocol': u'-1',
@@ -277,7 +277,9 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []},
              {u'FromPort': 443,
               u'IpProtocol': u'tcp',
-              u'IpRanges': [{u'CidrIp': u'10.42.0.0/16'},{u'CidrIp': u'10.42.1.0/24'}],
+              u'IpRanges': [
+                  {u'CidrIp': u'10.42.0.0/16'},
+                  {u'CidrIp': u'10.42.1.0/24'}],
               u'PrefixListIds': [],
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])

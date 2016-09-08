@@ -18,7 +18,7 @@ from c7n.filters import (
 
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema, parse_cidrs
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('vpc')
@@ -39,7 +39,6 @@ class SubnetsOfVpc(ValueFilter):
     def process(self, resources, event=None):
 
         subnets = Subnet(self.manager.ctx, {}).resources()
-
 
         matched = []
         for r in resources:
@@ -221,10 +220,19 @@ class SGPermission(Filter):
 
       - type: egress
         OnlyPorts: [22, 443, 80]
+
+      - type: egress
+        IpRanges:
+          - value_type: cidr
+          - op: in
+          - value: x.y.z
     """
 
-    attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-                 'IpRanges', 'PrefixListIds', 'Ports', 'OnlyPorts'))
+    perm_attrs = set((
+        'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
+        'IpRanges', 'PrefixListIds'))
+    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts'))
+    attrs = perm_attrs.union(filter_attrs)
 
     def validate(self):
         delta = set(self.data.keys()).difference(self.attrs)
@@ -235,10 +243,10 @@ class SGPermission(Filter):
 
     def process(self, resources, event=None):
         self.vfilters = []
-        fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
+        fattrs = list(sorted(self.perm_attrs.intersection(self.data.keys())))
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
-        self.only_ports = 'OnlyPorts' in self.data and self.data['OnlyPorts'] or ()
-        self.max_cidr_size = 'IpRanges' in self.data and self.data['IpRanges']['value'] or ()
+        self.only_ports = (
+            'OnlyPorts' in self.data and self.data['OnlyPorts'] or ())
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
@@ -263,20 +271,19 @@ class SGPermission(Filter):
                     only_found = True
             if self.only_ports and not only_found:
                 found = True
-
         return found
 
     def process_cidrs(self, perm):
         found = False
-        cidr_sizes = []
-        if 'IpRanges' in perm and 'IpRanges' in self.data:
-            ip_ranges = perm.get('IpRanges', [])
-            # for statement in perm:
-            for ip_range in ip_ranges:
-                cidr_sizes.append(parse_cidrs(ip_range))
-
-            if cidr_sizes:
-                found = True
+        if 'IpRanges' in perm and 'Cidr' in self.data:
+            match_range = self.data['Cidr']
+            match_range['key'] = 'CidrIp'
+            vf = ValueFilter(match_range)
+            vf.annotate = False
+            for ip_range in perm.get('IpRanges', []):
+                found = vf(ip_range)
+                if found:
+                    break
         return found
 
     def __call__(self, resource):
