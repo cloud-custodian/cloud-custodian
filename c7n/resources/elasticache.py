@@ -14,6 +14,7 @@
 
 import functools
 import logging
+import re
 
 from datetime import datetime
 
@@ -123,6 +124,9 @@ class DeleteElastiCacheCluster(BaseAction):
             if _cluster_eligible_for_snapshot(cluster) and not skip:
                 params['FinalSnapshotIdentifier'] = snapshot_identifier(
                     'Final', cluster['CacheClusterId'])
+                self.log.info("Taking final snapshot of %s" %cluster['CacheClusterId'])
+            else:
+                self.log.info("Skipping final snapshot of %s" %cluster['CacheClusterId'])
             client.delete_cache_cluster(**params)
 
             self.log.info(
@@ -268,11 +272,12 @@ def _elasticache_cluster_tags(
     def process_tags(cluster):
         client = local_session(session_factory).client('elasticache')
         arn = generator(cluster[model.id])
-        tag_list = retry(
-            client.list_tags_for_resource,
-            ResourceName=arn)['TagList']
-        cluster['Tags'] = tag_list or []
-        return cluster
+        if cluster['CacheClusterStatus'] == 'available':
+            tag_list = retry(
+                client.list_tags_for_resource,
+                ResourceName=arn)['TagList']
+            cluster['Tags'] = tag_list or []
+            return cluster
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, clusters))
@@ -286,15 +291,19 @@ def _elasticache_snapshot_tags(
     def process_tags(snapshot):
         client = local_session(session_factory).client('elasticache')
         arn = generator(snapshot[model.id])
-        tag_list = retry(
-            client.list_tags_for_resource,
-            ResourceName=arn)['TagList']
-        snapshot['Tags'] = tag_list or []
-        return snapshot
+        if snapshot['SnapshotStatus'] == 'available':
+            tag_list = retry(
+                client.list_tags_for_resource,
+                ResourceName=arn)['TagList']
+            snapshot['Tags'] = tag_list or []
+            return snapshot
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, snapshots))
 
 
 def _cluster_eligible_for_snapshot(cluster):
-    return cluster['Engine'] != 'memcached'
+    
+    return (
+        cluster['Engine'] != 'memcached' and not 
+        re.match("[cache.t]\s\S", cluster['CacheNodeType']))
