@@ -24,6 +24,7 @@ import re
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
+import ipaddress
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
@@ -336,7 +337,12 @@ class ValueFilter(Filter):
             # comparisons is intuitively wrong.
             return value, sentinel
         elif self.vtype == 'cidr':
-            return parse_cidr(sentinel), parse_cidr(value)
+            s = parse_cidr(sentinel)
+            v = parse_cidr(value)
+            if (isinstance(s, ipaddress._BaseAddress)
+                    and isinstance(v, ipaddress._BaseNetwork)):
+                return v, s
+            return s, v
         elif self.vtype == 'cidr_size':
             cidr = parse_cidr(value)
             if cidr:

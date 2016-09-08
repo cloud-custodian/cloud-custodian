@@ -293,8 +293,11 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
+    klass = ipaddress.ip_network
+    if '/' not in value:
+        klass = ipaddress.ip_address
     try:
-        v = ipaddress.ip_network(unicode(value))
+        v = klass(unicode(value))
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v

@@ -228,10 +228,44 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_cidr_size_egress(self):
+    def test_cidr_ingress(self):
+        factory = self.replay_flight_data('test_security_group_cidr_ingress')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="allow-https-ingress",
+            VpcId=vpc_id,
+            Description="inbound access")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpPermissions=[{
+                'IpProtocol': 'tcp',
+                'FromPort': 443,
+                'ToPort': 443,
+                'IpRanges': [
+                    {
+                        'CidrIp': '10.42.1.0/24'
+                    }]
+            }])
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {
+                     'value': '10.42.1.239',
+                     'op': 'in',
+                     'value_type': 'cidr'}}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            len(resources[0].get('MatchedIpPermissions', [])), 1)
 
-        factory = self.replay_flight_data(
-            'test_cidr_size_egress')
+    def test_cidr_size_egress(self):
+        factory = self.replay_flight_data('test_security_group_cidr_size')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -240,20 +274,20 @@ class SecurityGroupTest(BaseTest):
             VpcId=vpc_id,
             Description="unnecessarily large egress CIDR rule")['GroupId']
         self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.revoke_security_group_egress(
+            GroupId=sg_id,
+            IpPermissions=[
+                {'IpProtocol': '-1',
+                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}])
         client.authorize_security_group_egress(
             GroupId=sg_id,
-            IpPermissions = [{
+            IpPermissions=[{
                 'IpProtocol': 'tcp',
                 'FromPort': 443,
                 'ToPort': 443,
-                'IpRanges':[
-                    {
-                        'CidrIp': '10.42.0.0/16'
-                    },
-                    {
-                        'CidrIp': '10.42.1.0/24'
-                    }]
-            }])
+                'IpRanges': [
+                    {'CidrIp': '10.42.0.0/16'},
+                    {'CidrIp': '10.42.1.0/24'}]}])
         p = self.load_policy({
             'name': 'wide-egress',
             'resource': 'security-group',
@@ -268,14 +302,10 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            len(resources[0].get('MatchedIpPermissionsEgress', [])), 2)
+            len(resources[0].get('MatchedIpPermissionsEgress', [])), 1)
         self.assertEqual(
             resources[0]['MatchedIpPermissionsEgress'],
-            [{u'IpProtocol': u'-1',
-              u'IpRanges': [{u'CidrIp': u'0.0.0.0/0'}],
-              u'PrefixListIds': [],
-              u'UserIdGroupPairs': []},
-             {u'FromPort': 443,
+            [{u'FromPort': 443,
               u'IpProtocol': u'tcp',
               u'IpRanges': [
                   {u'CidrIp': u'10.42.0.0/16'},
