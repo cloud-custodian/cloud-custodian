@@ -272,6 +272,60 @@ class RDSTest(BaseTest):
         }
         self.assertTrue(rds._db_instance_eligible_for_backup(resource))
 
+    def test_rds_db_instance_eligible_for_final_snapshot(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'creating'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'failed'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'incompatible-restore'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'incompatible-network'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'mysql',
+            'EngineVersion': '5.7.1'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': '',
+            'Engine': 'mysql',
+            'EngineVersion': '5.7.1'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
+
 
 class RDSSnapshotTest(BaseTest):
 
