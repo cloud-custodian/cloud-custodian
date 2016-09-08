@@ -6,7 +6,7 @@ Usage
 Offhours
 --------
 
-.. automodule:: c7n.offhours
+.. automodule:: c7n.filters.offhours
 
 
 Outputs
