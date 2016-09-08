@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagSet": [
+            {
+                "Value": "mark-test",
+                "Key": "testtag"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HostId": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=",
+            "RequestId": "9539606CDBE88F96",
+            "HTTPHeaders": {
+                "x-amz-id-2": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=",
+                "date": "Thu, 08 Sep 2016 22:38:54 GMT",
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "9539606CDBE88F96",
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
