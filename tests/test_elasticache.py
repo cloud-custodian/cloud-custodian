@@ -39,6 +39,37 @@ class TestElastiCacheCluster(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_elasticache_cluster_mark(self):
+        session_factory = self.replay_flight_data('test_elasticache_cluster_mark')
+        p = self.load_policy({
+            'name': 'elasticache-cluster-mark',
+            'resource': 'cache-cluster',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'memcached'}],
+            'actions': [
+                {'type': 'mark-for-op', 'days': 30,
+                'op': 'delete'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+    def test_elasticache_cluster_unmark(self):
+        session_factory = self.replay_flight_data('test_elasticache_cluster_unmark')
+        p = self.load_policy({
+            'name': 'elasticache-cluster-unmark',
+            'resource': 'cache-cluster',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'memcached'}],
+            'actions': [
+                {'type': 'unmark'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
     def test_elasticache_cluster_delete(self):
         session_factory = self.replay_flight_data('test_elasticache_cluster_delete')
         p = self.load_policy({
