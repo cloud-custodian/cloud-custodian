@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from tests.common import BaseTest
-
-
+                        
 class TestElastiCacheCluster(BaseTest):
 
     def test_elasticache_cluster_simple(self):
@@ -38,6 +37,20 @@ class TestElastiCacheCluster(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        
+    def test_elasticache_cluster_available(self):
+        session_factory = self.replay_flight_data('test_elasticache_cluster_available')
+        p = self.load_policy({
+            'name': 'elasticache-cluster-available',
+            'resource': 'cache-cluster',
+            'filters': [
+                {'type': 'value',
+                 'key': 'CacheClusterStatus',
+                 'value': 'available'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['CacheClusterStatus'], "available")
 
     def test_elasticache_cluster_mark(self):
         session_factory = self.replay_flight_data('test_elasticache_cluster_mark')
