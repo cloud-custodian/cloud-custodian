@@ -125,9 +125,9 @@ class DeleteElastiCacheCluster(BaseAction):
             if _cluster_eligible_for_snapshot(cluster) and not skip:
                 params['FinalSnapshotIdentifier'] = snapshot_identifier(
                     'Final', cluster['CacheClusterId'])
-                self.log.info("Taking final snapshot of %s" %cluster['CacheClusterId'])
+                self.log.debug("Taking final snapshot of %s" %cluster['CacheClusterId'])
             else:
-                self.log.info("Skipping final snapshot of %s" %cluster['CacheClusterId'])
+                self.log.debug("Skipping final snapshot of %s" %cluster['CacheClusterId'])
             client.delete_cache_cluster(**params)
             self.log.info(
                 'Deleted ElastiCache cluster: %s',
@@ -273,12 +273,13 @@ def _elasticache_cluster_tags(
         client = local_session(session_factory).client('elasticache')
         arn = generator(cluster[model.id])
         # added if statement to ensure snapshot is available in order to list tags
-        if cluster['CacheClusterStatus'] == 'available':
-            tag_list = retry(
-                client.list_tags_for_resource,
-                ResourceName=arn)['TagList']
-            cluster['Tags'] = tag_list or []
-            return cluster
+        if not cluster['CacheClusterStatus'] == 'available':
+            return
+        tag_list = retry(
+            client.list_tags_for_resource,
+            ResourceName=arn)['TagList']
+        cluster['Tags'] = tag_list or []
+        return cluster
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, clusters))
@@ -293,12 +294,13 @@ def _elasticache_snapshot_tags(
     def process_tags(snapshot):
         client = local_session(session_factory).client('elasticache')
         arn = generator(snapshot[model.id])
-        if snapshot['SnapshotStatus'] == 'available':
-            tag_list = retry(
-                client.list_tags_for_resource,
-                ResourceName=arn)['TagList']
-            snapshot['Tags'] = tag_list or []
-            return snapshot
+        if not snapshot['SnapshotStatus'] == 'available':
+            return
+        tag_list = retry(
+            client.list_tags_for_resource,
+            ResourceName=arn)['TagList']
+        snapshot['Tags'] = tag_list or []
+        return snapshot
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, snapshots))
