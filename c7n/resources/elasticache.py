@@ -75,33 +75,7 @@ class ElastiCacheCluster(QueryResourceManager):
             self.generate_arn, self.retry))
         return clusters
 
-# added mark-for-op
-@actions.register('mark-for-op')
-class TagDelayedAction(tags.TagDelayedAction):
-    
-    batch_size = 1
-    
-    def process_resource_set(self, clusters, tags):
-        client = local_session(self.manager.session_factory).client('elasticache')
-        for cluster in clusters:
-            arn = self.manager.generate_arn(cluster['CacheClusterId'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
-# added unmark
-@actions.register('remove-tag')
-@actions.register('unmark')
-class RemoveTag(tags.RemoveTag):
-
-    concurrency = 2
-    batch_size = 5
-
-    def process_resource_set(self, clusters, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('elasticache')
-        for cluster in clusters:
-            arn = self.manager.generate_arn(cluster['CacheClusterId'])
-            client.remove_tags_from_resource(
-                ResourceName=arn, TagKeys=tag_keys)
             
             
 @actions.register('delete')
@@ -189,6 +163,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
     resource_type = 'aws.elasticache.snapshot'
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
+    filter_registry.register('marked-for-op', tags.TagActionFilter) 
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -265,6 +240,33 @@ class DeleteElastiCacheSnapshot(BaseAction):
         for s in snapshots_set:
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
+# added mark-for-op
+@ElastiCacheSnapshot.action_registry.register('mark-for-op')
+class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
+    
+    batch_size = 1
+    
+    def process_resource_set(self, snapshots, tags):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for snapshot in snapshots:
+            arn = self.manager.generate_arn(snapshot['SnapshotName'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+# added unmark
+@ElastiCacheSnapshot.action_registry.register('remove-tag')
+@ElastiCacheSnapshot.action_registry.register('unmark')
+class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, snapshots, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        for snapshot in snapshots:
+            arn = self.manager.generate_arn(snapshot['SnapshotName'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
 
 def _elasticache_cluster_tags(
         model, clusters, session_factory, executor_factory, generator, retry):
