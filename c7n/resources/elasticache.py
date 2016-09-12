@@ -14,6 +14,7 @@
 
 import functools
 import logging
+import re
 
 from datetime import datetime
 
@@ -25,6 +26,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n import tags
 from c7n.utils import (
     local_session, get_account_id, generate_arn,
     get_retry, chunks, snapshot_identifier, type_schema)
@@ -33,7 +35,10 @@ log = logging.getLogger('custodian.elasticache')
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
+#registered marked-for-op filter
+filters.register('marked-for-op', tags.TagActionFilter) 
 
+TTYPE = re.compile('cache.t')
 
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
@@ -71,6 +76,34 @@ class ElastiCacheCluster(QueryResourceManager):
         return clusters
 
 
+# added mark-for-op
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+    
+    batch_size = 1
+    
+    def process_resource_set(self, clusters, tags):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+# added unmark
+@actions.register('remove-tag')
+@actions.register('unmark')
+class RemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, clusters, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)            
+            
 @actions.register('delete')
 class DeleteElastiCacheCluster(BaseAction):
 
@@ -88,14 +121,16 @@ class DeleteElastiCacheCluster(BaseAction):
                 replication_groups_to_delete.add(cluster['ReplicationGroupId'])
             else:
                 clusters_to_delete.append(cluster)
-
+        # added if statement to handle differences in parameters if snapshot is skipped
         for cluster in clusters_to_delete:
             params = {'CacheClusterId': cluster['CacheClusterId']}
             if _cluster_eligible_for_snapshot(cluster) and not skip:
                 params['FinalSnapshotIdentifier'] = snapshot_identifier(
                     'Final', cluster['CacheClusterId'])
+                self.log.debug("Taking final snapshot of %s" %cluster['CacheClusterId'])
+            else:
+                self.log.debug("Skipping final snapshot of %s" %cluster['CacheClusterId'])
             client.delete_cache_cluster(**params)
-
             self.log.info(
                 'Deleted ElastiCache cluster: %s',
                 cluster['CacheClusterId'])
@@ -154,6 +189,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
     resource_type = 'aws.elasticache.snapshot'
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
+    filter_registry.register('marked-for-op', tags.TagActionFilter) 
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -230,6 +266,33 @@ class DeleteElastiCacheSnapshot(BaseAction):
         for s in snapshots_set:
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
+# added mark-for-op
+@ElastiCacheSnapshot.action_registry.register('mark-for-op')
+class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
+    
+    batch_size = 1
+    
+    def process_resource_set(self, snapshots, tags):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for snapshot in snapshots:
+            arn = self.manager.generate_arn(snapshot['SnapshotName'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+# added unmark
+@ElastiCacheSnapshot.action_registry.register('remove-tag')
+@ElastiCacheSnapshot.action_registry.register('unmark')
+class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, snapshots, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        for snapshot in snapshots:
+            arn = self.manager.generate_arn(snapshot['SnapshotName'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
 
 def _elasticache_cluster_tags(
         model, clusters, session_factory, executor_factory, generator, retry):
@@ -239,6 +302,9 @@ def _elasticache_cluster_tags(
     def process_tags(cluster):
         client = local_session(session_factory).client('elasticache')
         arn = generator(cluster[model.id])
+        # added if statement to ensure snapshot is available in order to list tags
+        if not cluster['CacheClusterStatus'] == 'available':
+            return
         tag_list = retry(
             client.list_tags_for_resource,
             ResourceName=arn)['TagList']
@@ -254,9 +320,12 @@ def _elasticache_snapshot_tags(
     """ Augment ElastiCache snapshots with their respective tags
     """
 
+    # added if statement to ensure snapshot is available in order to list tags
     def process_tags(snapshot):
         client = local_session(session_factory).client('elasticache')
         arn = generator(snapshot[model.id])
+        if not snapshot['SnapshotStatus'] == 'available':
+            return
         tag_list = retry(
             client.list_tags_for_resource,
             ResourceName=arn)['TagList']
@@ -268,4 +337,8 @@ def _elasticache_snapshot_tags(
 
 
 def _cluster_eligible_for_snapshot(cluster):
-    return cluster['Engine'] != 'memcached'
+    # added regex search to filter unsupported cachenode types
+    return (
+        cluster['Engine'] != 'memcached' and not 
+        TTYPE.match(cluster['CacheNodeType'])
+        )

@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "deab54a0-7512-11e6-8c33-e95c27c07d8a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "deab54a0-7512-11e6-8c33-e95c27c07d8a", 
+                "date": "Wed, 07 Sep 2016 15:50:58 GMT", 
+                "content-length": "461", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "V1", 
+                "Key": "K1"
+            }, 
+            {
+                "Value": "V2", 
+                "Key": "K2"
+            }
+        ]
+    }
+}
