@@ -179,6 +179,31 @@ def bucket_client(session, b, kms=False):
     return session.client('s3', region_name=region, config=config)
 
 
+def add_bucket_tags(session_factory, buckets, tags):
+    client = local_session(session_factory).client('s3')
+    for bucket in buckets:
+        # all the tag marshalling back and forth is a bit gross :-(
+        new_tags = {t['Key']: t['Value'] for t in tags}
+        for t in bucket.get('Tags', ()):
+            if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
+                new_tags[t['Key']] = t['Value']
+        tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+        client.put_bucket_tagging(
+            Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+
+
+def remove_bucket_tags(session_factory, buckets, excludedtags):
+    client = local_session(session_factory).client('s3')
+    for bucket in buckets:
+        new_tags = {t['Key']: t['Value'] for t in bucket.get('Tags', ())}
+        for k in excludedtags:
+            if k in new_tags:
+                new_tags.pop(k, None)
+        tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+        client.put_bucket_tagging(
+            Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+
+
 @filters.register('metrics')
 class S3Metrics(MetricsFilter):
     """S3 CW Metrics need special handling for attribute/dimension
@@ -1041,16 +1066,7 @@ class DeleteGlobalGrants(BucketActionBase):
 class BucketTag(Tag):
 
     def process_resource_set(self, resource_set, tags):
-        client = local_session(self.manager.session_factory).client('s3')
-        for r in resource_set:
-            # all the tag marshalling back and forth is a bit gross :-(
-            new_tags = {t['Key']: t['Value'] for t in tags}
-            for t in r.get('Tags', ()):
-                if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
-                    new_tags[t['Key']] = t['Value']
-            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            client.put_bucket_tagging(
-                    Bucket=r['Name'], Tagging={'TagSet': tag_set})
+        add_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
 @actions.register('mark-for-op')
@@ -1060,15 +1076,7 @@ class MarkBucketForOp(TagDelayedAction):
         'mark-for-op', rinherit=TagDelayedAction.schema)
 
     def process_resource_set(self, resource_set, tags):
-        client = local_session(self.manager.session_factory).client('s3')
-        for r in resource_set:
-            new_tags = {t['Key']: t['Value'] for t in tags}
-            for t in r.get('Tags', ()):
-                if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
-                    new_tags[t['Key']] = t['Value']
-            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            client.put_bucket_tagging(
-                    Bucket=r['Name'], Tagging={'TagSet': tag_set})
+        add_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
 @actions.register('unmark')
@@ -1078,15 +1086,7 @@ class RemoveBucketTag(RemoveTag):
         'remove-tag', aliases=('unmark'), key={'type': 'string'})
 
     def process_resource_set(self, resource_set, tags):
-        client = local_session(self.manager.session_factory).client('s3')
-        for r in resource_set:
-            new_tags = {t['Key']: t['Value'] for t in r.get('Tags', ())}
-            for k in tags:
-                if k in new_tags:
-                    new_tags.pop(k, None)
-            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            client.put_bucket_tagging(
-                Bucket=r['Name'], Tagging={'TagSet': tag_set})
+        remove_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
 @actions.register('delete')
