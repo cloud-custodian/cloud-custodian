@@ -76,7 +76,33 @@ class ElastiCacheCluster(QueryResourceManager):
         return clusters
 
 
-            
+# added mark-for-op
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+    
+    batch_size = 1
+    
+    def process_resource_set(self, clusters, tags):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+# added unmark
+@actions.register('remove-tag')
+@actions.register('unmark')
+class RemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, clusters, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        for cluster in clusters:
+            arn = self.manager.generate_arn(cluster['CacheClusterId'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)            
             
 @actions.register('delete')
 class DeleteElastiCacheCluster(BaseAction):
