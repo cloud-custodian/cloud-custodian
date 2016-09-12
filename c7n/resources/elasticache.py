@@ -38,6 +38,8 @@ actions = ActionRegistry('elasticache.actions')
 #registered marked-for-op filter
 filters.register('marked-for-op', tags.TagActionFilter) 
 
+ttype = re.compile('cache.t')
+
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
 
@@ -310,5 +312,5 @@ def _cluster_eligible_for_snapshot(cluster):
     # added regex search to filter unsupported cachenode types
     return (
         cluster['Engine'] != 'memcached' and not 
-        re.search('cache.t', cluster['CacheNodeType'])
+        ttype.match(cluster['CacheNodeType'])
         )
