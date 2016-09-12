@@ -19,6 +19,10 @@
             {
                 "Value": "V2", 
                 "Key": "K2"
+            }, 
+            {
+                "Value": "maid_status", 
+                "Key": "Resource does not meet policy: delete@2002/02/02"
             }
         ]
     }

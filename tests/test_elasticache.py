@@ -54,6 +54,7 @@ class TestElastiCacheCluster(BaseTest):
 
     def test_elasticache_cluster_mark(self):
         session_factory = self.replay_flight_data('test_elasticache_cluster_mark')
+        client = session_factory().client('elasticache')
         p = self.load_policy({
             'name': 'elasticache-cluster-mark',
             'resource': 'cache-cluster',
@@ -67,9 +68,17 @@ class TestElastiCacheCluster(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['CacheClusterId'])
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('maid_status' in tag_map)
         
     def test_elasticache_cluster_unmark(self):
         session_factory = self.replay_flight_data('test_elasticache_cluster_unmark')
+        client = session_factory().client('elasticache')
+        
         p = self.load_policy({
             'name': 'elasticache-cluster-unmark',
             'resource': 'cache-cluster',
@@ -81,7 +90,11 @@ class TestElastiCacheCluster(BaseTest):
                 {'type': 'unmark'}]},
             session_factory=session_factory)
         resources = p.run()
+        arn = p.resource_manager.generate_arn(
+            resources[0]['CacheClusterId'])
         self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        self.assertFalse('maid_status' in tags)
         
     def test_elasticache_cluster_delete(self):
         session_factory = self.replay_flight_data('test_elasticache_cluster_delete')
