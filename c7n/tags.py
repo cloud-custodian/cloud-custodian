@@ -346,12 +346,12 @@ class RemoveTag(Action):
                             ", ".join([r[self.id_key] for r in resource_set]),
                             f.exception()))
 
-    def process_resource_set(self, vol_set, tag_keys):
+    def process_resource_set(self, resource_set, tag_keys):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         return self.manager.retry(
             client.delete_tags,
-            Resources=[v[self.id_key] for v in vol_set],
+            Resources=[r[self.id_key] for r in resource_set],
             Tags=[{'Key': k for k in tag_keys}],
             DryRun=self.manager.config.dryrun)
 

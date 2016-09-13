@@ -237,15 +237,11 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 class TagDelayedAction(tags.TagDelayedAction):
 
     schema = type_schema(
-        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
-        ops={'enum': ['delete', 'snapshot']})
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
 
     batch_size = 5
 
-    def process(self, dbs):
-        return super(TagDelayedAction, self).process(dbs)
-
-    def process_resource_set(self, dbs, ts):
+    def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
             arn = self.manager.generate_arn(db['DBInstanceIdentifier'])
@@ -259,9 +255,8 @@ class AutoPatch(BaseAction):
         'auto-patch',
         minor={'type': 'boolean'}, window={'type': 'string'})
 
-    def process(self, dbs):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
 
         params = {'AutoMinorVersionUpgrade': self.data.get('minor', True)}
         if self.data.get('window'):
@@ -280,12 +275,11 @@ class Tag(tags.Tag):
     concurrency = 2
     batch_size = 5
 
-    def process_resource_set(self, dbs, ts):
-        client = local_session(
-            self.manager.session_factory).client('rds')
-        for db in dbs:
-            arn = self.manager.generate_arn(db['DBInstanceIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
 @actions.register('remove-tag')
@@ -295,11 +289,10 @@ class RemoveTag(tags.RemoveTag):
     concurrency = 2
     batch_size = 5
 
-    def process_resource_set(self, dbs, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('rds')
-        for db in dbs:
-            arn = self.manager.generate_arn(db['DBInstanceIdentifier'])
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            arn = self.manager.generate_arn(r['DBInstanceIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
 
@@ -307,9 +300,10 @@ class RemoveTag(tags.RemoveTag):
 @actions.register('tag-trim')
 class TagTrim(tags.TagTrim):
 
+    max_tag_count = 10
+
     def process_tag_removal(self, resource, candidates):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+        client = local_session(self.manager.session_factory).client('rds')
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
