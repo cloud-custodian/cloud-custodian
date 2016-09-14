@@ -27,6 +27,7 @@ from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
 from c7n import utils
+from c7n.version import version
 
 from c7n.resources import load_resources
 
@@ -152,9 +153,10 @@ class PullMode(PolicyExecutionMode):
 
         with self.policy.ctx:
             self.policy.log.info(
-                "Running policy %s resource: %s region:%s",
+                "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region)
+                self.policy.options.region,
+                version)
 
             s = time.time()
             resources = self.policy.resource_manager.resources()

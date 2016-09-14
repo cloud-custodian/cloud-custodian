@@ -30,7 +30,7 @@ from skew.resources import find_resource_class
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.tags import register_tags
-from c7n.utils import local_session
+from c7n.utils import local_session, get_retry
 from c7n.manager import ResourceManager
 
 
@@ -109,10 +109,15 @@ class QueryMeta(type):
             # Generic cloud watch metrics support
             if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
-            # Generic ec2 resource tag support
-            if m.service == 'ec2' and getattr(m, 'taggable', True):
-                register_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+            # EC2 Service boilerplate ...
+            if m.service == 'ec2':
+                # Generic ec2 retry
+                attrs['retry'] = staticmethod(get_retry((
+                    'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
+                # Generic ec2 resource tag support
+                if  getattr(m, 'taggable', True):
+                    register_tags(
+                        attrs['filter_registry'], attrs['action_registry'])
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
