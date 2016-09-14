@@ -29,7 +29,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 from c7n import utils
-from c7n.utils import type_schema, get_retry
+from c7n.utils import type_schema
 
 
 filters = FilterRegistry('ec2.filters')
