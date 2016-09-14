@@ -45,8 +45,6 @@ class EC2(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
 
-    retry = staticmethod(get_retry(('RequestLimitExceeded',)))
-
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
