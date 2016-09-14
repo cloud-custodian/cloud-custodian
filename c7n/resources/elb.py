@@ -20,7 +20,8 @@ import logging
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import Filter, FilterRegistry, FilterValidationError, DefaultVpcBase
+from c7n.filters import (
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -183,6 +184,43 @@ def is_ssl(b):
         if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
             return True
     return False
+
+
+@filters.register('instance')
+class Instance(ValueFilter):
+
+    schema = type_schema(
+        'instance', rinherit=ValueFilter.schema)
+
+    annotate = False
+
+    def process(self, resources, event=None):
+        instances = []
+        for r in resources:
+            instances.extend([i['InstanceId'] for i in r['Instances']])
+        instances = set(instances)
+        from c7n.resources.ec2 import EC2
+        manager = EC2(self.manager.ctx, {})
+
+        self.elb_instances = {}
+        for i in manager.resources():
+            if i['InstanceId'] in instances:
+                self.elb_instances[i['InstanceId']] = i
+        return super(Instance, self).process(resources, event)
+
+    def __call__(self, elb):
+        matched = []
+        for i in elb['Instances']:
+            instance = self.elb_instances[i['InstanceId']]
+            if not instance.get('IamInstanceProfile'):
+                print instance['InstanceId']
+                #import pdb; pdb.set_trace()
+            if self.match(instance):
+                matched.append(instance)
+        if not matched:
+            return False
+        elb['MatchedInstances'] = matched
+        return True
 
 
 @filters.register('is-ssl')

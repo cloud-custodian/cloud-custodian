@@ -218,7 +218,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size']},
+                'cidr', 'cidr_size', 'swap']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -286,9 +286,13 @@ class ValueFilter(Filter):
             r = i.get(self.k)
         elif self.expr:
             r = self.expr.search(i)
+
         else:
             self.expr = jmespath.compile(self.k)
             r = self.expr.search(i)
+
+        if self.op in ('in', 'not-in') and r is None:
+            r = ()
 
         # value type conversion
         if self.vtype is not None:
