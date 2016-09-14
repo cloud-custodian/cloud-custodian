@@ -57,7 +57,7 @@ from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
-from c7n.tags import Tag
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import chunks, local_session, set_annotation, type_schema, dumps
 
 """
@@ -70,6 +70,7 @@ log = logging.getLogger('custodian.s3')
 
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
+filters.register('marked-for-op', TagActionFilter)
 actions.register('auto-tag-user', AutoTagUser)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
@@ -176,6 +177,22 @@ def bucket_client(session, b, kms=False):
     else:
         config = Config(read_timeout=200)
     return session.client('s3', region_name=region, config=config)
+
+
+def modify_bucket_tags(session_factory, buckets, add_tags, remove_tags):
+    client = local_session(session_factory).client('s3')
+    for bucket in buckets:
+        # all the tag marshalling back and forth is a bit gross :-(
+        new_tags = {t['Key']: t['Value'] for t in add_tags}
+        for t in bucket.get('Tags', ()):
+            if (t['Key'] not in new_tags and
+                    not t['Key'].startswith('aws') and
+                    t['Key'] not in remove_tags):
+
+                new_tags[t['Key']] = t['Value']
+        tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+        client.put_bucket_tagging(
+            Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
 
 
 @filters.register('metrics')
@@ -1040,16 +1057,27 @@ class DeleteGlobalGrants(BucketActionBase):
 class BucketTag(Tag):
 
     def process_resource_set(self, resource_set, tags):
-        client = local_session(self.manager.session_factory).client('s3')
-        for r in resource_set:
-            # all the tag marshalling back and forth is a bit gross :-(
-            new_tags = {t['Key']: t['Value'] for t in tags}
-            for t in r.get('Tags', ()):
-                if t['Key'] not in new_tags and not t['Key'].startswith('aws'):
-                    new_tags[t['Key']] = t['Value']
-            tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-            client.put_bucket_tagging(
-                    Bucket=r['Name'], Tagging={'TagSet': tag_set})
+        modify_bucket_tags(self.manager.session_factory, resource_set, tags, {})
+
+
+@actions.register('mark-for-op')
+class MarkBucketForOp(TagDelayedAction):
+
+    schema = type_schema(
+        'mark-for-op', rinherit=TagDelayedAction.schema)
+
+    def process_resource_set(self, resource_set, tags):
+        modify_bucket_tags(self.manager.session_factory, resource_set, tags, {})
+
+
+@actions.register('unmark')
+class RemoveBucketTag(RemoveTag):
+
+    schema = type_schema(
+        'remove-tag', aliases=('unmark'), key={'type': 'string'})
+
+    def process_resource_set(self, resource_set, tags):
+        modify_bucket_tags(self.manager.session_factory, resource_set, {}, tags)
 
 
 @actions.register('delete')
@@ -1058,7 +1086,7 @@ class DeleteBucket(ScanBucket):
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
 
     def process(self, buckets):
-        if self.data.get('empty'):
+        if self.data.get('remove-contents', True):
             self.empty_buckets(buckets)
         with self.executor_factory(max_workers=3) as w:
             results = w.map(self.delete_bucket, buckets)
@@ -1109,4 +1137,3 @@ class DeleteBucket(ScanBucket):
             Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
         if self.get_bucket_style(bucket) != 'versioned':
             return results
-

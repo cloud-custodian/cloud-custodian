@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagSet": [
+            {
+                "Value": "CMDBEnvironment",
+                "Key": "ENVTEST"
+            },
+            {
+                "Value": "ASV",
+                "Key": "ASVTEST"
+            },
+            {
+                "Value": "OwnerContact",
+                "Key": "AutomatedTester"
+            },
+            {
+                "Value": "mark-test",
+                "Key": "testtag"
+            },
+            {
+                "Value": "Resource does not meet policy: delete@YYYY/MM/DD",
+                "Key": "maid_status"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HostId": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
+            "RequestId": "086E85625A85B53D",
+            "HTTPHeaders": {
+                "x-amz-id-2": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
+                "date": "Thu, 08 Sep 2016 22:38:55 GMT",
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "086E85625A85B53D",
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

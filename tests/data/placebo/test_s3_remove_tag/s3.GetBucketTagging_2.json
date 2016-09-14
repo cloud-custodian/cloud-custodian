@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TagSet": [
+            {
+                "Value": "CMDBEnvironment", 
+                "Key": "ENVTEST"
+            }, 
+            {
+                "Value": "ASV", 
+                "Key": "ASVTEST"
+            }, 
+            {
+                "Value": "OwnerContact", 
+                "Key": "AutomatedTester"
+            }, 
+            {
+                "Value": "mark-test", 
+                "Key": "testtag"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "QCm3Q5WAJ2SK2dI+LH6ZPXP78a5eRV1wFvYk/nkEzL8GGB/tbcfOGyUOe6CYGI+tV5Li1lcifoQ=", 
+            "RequestId": "02B2960D2D420739", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "QCm3Q5WAJ2SK2dI+LH6ZPXP78a5eRV1wFvYk/nkEzL8GGB/tbcfOGyUOe6CYGI+tV5Li1lcifoQ=", 
+                "date": "Thu, 08 Sep 2016 22:38:53 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "02B2960D2D420739", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
