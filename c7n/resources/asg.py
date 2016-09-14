@@ -122,8 +122,8 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
-        self.images = self.get_images()
         self.snapshots = self.get_snapshots()
+        self.images = self.get_images()
 
     def get_subnets(self):
         from c7n.resources.vpc import Subnet
@@ -148,7 +148,22 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def get_images(self):
         from c7n.resources.ami import AMI
         manager = AMI(self.manager.ctx, {})
-        return set([i['ImageId'] for i in manager.resources()])
+        images = set()
+        # Verify image snapshot validity, i've been told by a TAM this
+        # is a possibility, but haven't seen evidence of it, since
+        # snapshots are strongly ref'd by amis, but its negible cost
+        # to verify.
+        for a in manager.resources():
+            found = True
+            for bd in a.get('BlockDeviceMappings', ()):
+                if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
+                    continue
+                if bd['Ebs']['SnapshotId'] not in self.snapshots:
+                    found = False
+                    break
+            if found:
+                images.add(a['ImageId'])
+        return images
 
     def get_snapshots(self):
         from c7n.resources.ebs import Snapshot
@@ -205,7 +220,8 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 class ValidConfigFilter(ConfigValidFilter):
     """Filters autoscale groups to find those that are structurally valid.
 
-    This operates as the inverse of the invalid filter for multi-step workflows.
+    This operates as the inverse of the invalid filter for multi-step
+    workflows.
 
     See details on the invalid filter for a list of checks made.
     """
@@ -447,6 +463,49 @@ class GroupTagTrim(TagTrim):
                 dict(Key=t, ResourceType='auto-scaling-group',
                      ResourceId=resource['AutoScalingGroupName']))
         client.delete_tags(Tags=tags)
+
+
+@filters.register('capacity-delta')
+class CapacityDelta(Filter):
+
+    schema = type_schema('size-delta')
+
+    def process(self, asgs, event=None):
+        return [a for a in asgs
+                if len(a['Instances']) < a['DesiredCapacity'] or
+                len(a['Instances']) < a['MinSize']]
+
+
+@actions.register('resize')
+class Resize(BaseAction):
+
+    schema = type_schema(
+        'resize',
+        #min_size={'type': 'string'},
+        #max_size={'type': 'string'},
+        desired_size={'type': 'string'},
+        required=('desired_size',))
+
+    def validate(self):
+        if self.data['desired_size'] != 'current':
+            raise FilterValidationError(
+                "only resizing desired/min to current capacity is supported")
+        return self
+
+    def process(self, asgs):
+        client = local_session(self.manager.session_factory).client(
+            'autoscaling')
+        for a in asgs:
+            current_size = len(a['Instances'])
+            min_size = a['MinSize']
+            desired = a['DesiredCapacity']
+            log.debug('desired %d to %s, min %d to %d',
+                      desired, current_size, min_size, current_size)
+            self.manager.retry(
+                client.update_auto_scaling_group,
+                AutoScalingGroupName=a['AutoScalingGroupName'],
+                DesiredCapacity=min((current_size, desired)),
+                MinSize=min((current_size, min_size)))
 
 
 @actions.register('remove-tag')

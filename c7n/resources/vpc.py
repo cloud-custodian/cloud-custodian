@@ -275,6 +275,7 @@ class SGPermission(Filter):
 
     def process_cidrs(self, perm):
         found = False
+
         if 'IpRanges' in perm and 'Cidr' in self.data:
             match_range = self.data['Cidr']
             match_range['key'] = 'CidrIp'

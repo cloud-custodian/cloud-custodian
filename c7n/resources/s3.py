@@ -179,7 +179,7 @@ def bucket_client(session, b, kms=False):
     return session.client('s3', region_name=region, config=config)
 
 
-def modify_bucket_tags(session_factory, buckets, add_tags, remove_tags):
+def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
     client = local_session(session_factory).client('s3')
     for bucket in buckets:
         # all the tag marshalling back and forth is a bit gross :-(
@@ -1057,7 +1057,7 @@ class DeleteGlobalGrants(BucketActionBase):
 class BucketTag(Tag):
 
     def process_resource_set(self, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, tags, {})
+        modify_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
 @actions.register('mark-for-op')
@@ -1067,7 +1067,7 @@ class MarkBucketForOp(TagDelayedAction):
         'mark-for-op', rinherit=TagDelayedAction.schema)
 
     def process_resource_set(self, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, tags, {})
+        modify_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
 @actions.register('unmark')
@@ -1077,7 +1077,8 @@ class RemoveBucketTag(RemoveTag):
         'remove-tag', aliases=('unmark'), key={'type': 'string'})
 
     def process_resource_set(self, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, {}, tags)
+        modify_bucket_tags(
+            self.manager.session_factory, resource_set, remove_tags=tags)
 
 
 @actions.register('delete')
