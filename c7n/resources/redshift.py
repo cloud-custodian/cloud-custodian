@@ -292,6 +292,9 @@ class RedshiftSnapshot(QueryResourceManager):
     
     filter_registry = FilterRegistry('redshift-snapshot.filters')
     action_registry = ActionRegistry('redshift-snapshot.actions')
+   
+    filter_registry.register('marked-for-op', tags.TagActionFilter)
+    
     _generate_arn = _account_id = None
 
     @property
@@ -366,7 +369,6 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
             arn = self.manager.generate_arn(r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
-            self.log.info('arn: %s' %arn)
             client.create_tags(ResourceName=arn, Tags=tags)
 
 
