@@ -181,3 +181,48 @@ class TestRedshiftSnapshot(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        
+    def test_redshift_snapshot_mark(self):
+        factory = self.replay_flight_data('test_redshift_snapshot_mark')
+        client = factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-mark',
+            'resource': 'redshift-snapshot',
+            'filters': [
+                {'type': 'value',
+                 'key': 'SnapshotIdentifier',
+                 'value': 'c7n-snapshot'}],
+            'actions': [
+                {'type': 'mark-for-op', 'days': 30,
+                'op': 'delete'}]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['SnapshotIdentifier'])
+        tags = client.describe_tags(ResourceName=arn)['TaggedResources']
+        tag_map = {t['Tag']['Key'] for t in tags}
+        self.assertTrue('maid_status' in tag_map)
+    
+    def test_redshift_snapshot_unmark(self):
+        factory = self.replay_flight_data('test_redshift_snapshot_unmark')
+        client = factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-snapshot-unmark',
+            'resource': 'redshift-snapshot',
+            'filters': [
+                {'type': 'value',
+                 'key': 'SnapshotIdentifier',
+                 'value': 'c7n-snapshot'}],
+            'actions': [
+                {'type': 'unmark'}]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['SnapshotIdentifier'])
+        tags = client.describe_tags(ResourceName=arn)['TaggedResources']
+        tag_map = {t['Tag']['Key'] for t in tags}
+        self.assertFalse('maid_status' in tag_map)
