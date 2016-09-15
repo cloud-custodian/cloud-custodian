@@ -15,6 +15,7 @@ from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rds
+from c7n import tags
 
 
 class RDSTest(BaseTest):
@@ -43,6 +44,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_tag_trim(self):
+        self.patch(tags.TagTrim, 'max_tag_count', 1)
         session_factory = self.replay_flight_data('test_rds_tag_trim')
         p = self.load_policy({
             'name': 'rds-tags',
@@ -101,7 +103,7 @@ class RDSTest(BaseTest):
             'filters': [
                 {'tag:Platform': 'postgres'}],
             'actions': [
-                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': -1,
+                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': 1,
                  'op': 'delete'}]},
             session_factory=session_factory)
         resources = p.run()
@@ -269,6 +271,60 @@ class RDSTest(BaseTest):
             'EngineVersion': '6.1.1'
         }
         self.assertTrue(rds._db_instance_eligible_for_backup(resource))
+
+    def test_rds_db_instance_eligible_for_final_snapshot(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'creating'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'failed'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'incompatible-restore'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'incompatible-network'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'R1',
+            'Engine': 'mysql',
+            'EngineVersion': '5.7.1'
+        }
+        self.assertFalse(rds._db_instance_eligible_for_final_snapshot(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': '',
+            'Engine': 'mysql',
+            'EngineVersion': '5.7.1'
+        }
+        self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
 
 
 class RDSSnapshotTest(BaseTest):

@@ -72,6 +72,7 @@ class TestMetricFilter(BaseTest):
 class TestTagTrim(BaseTest):
 
     def test_ec2_tag_trim(self):
+        self.patch(tags.TagTrim, 'max_tag_count', 10)
         session_factory = self.replay_flight_data(
             'test_ec2_tag_trim')
         ec2 = session_factory().client('ec2')
@@ -288,6 +289,25 @@ class TestStop(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+class TestOr(BaseTest):
+
+    def test_ec2_or_condition(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_stop')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {"or": [
+                    {"tag:Name": "CompileLambda"},
+                    {"tag:Name": "Spinnaker"}]}]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r['InstanceId'] for r in resources]),
+            [u'i-13413bd7', u'i-1aebf7c0'])
 
 
 class TestSnapshot(BaseTest):

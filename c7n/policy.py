@@ -27,6 +27,7 @@ from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
 from c7n import utils
+from c7n.version import version
 
 from c7n.resources import load_resources
 
@@ -46,7 +47,7 @@ def load(options, path, format='yaml', validate=True):
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise errors[0]
+            raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
     return PolicyCollection(data, options)
 
 
@@ -152,9 +153,10 @@ class PullMode(PolicyExecutionMode):
 
         with self.policy.ctx:
             self.policy.log.info(
-                "Running policy %s resource: %s region:%s",
+                "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region)
+                self.policy.options.region,
+                version)
 
             s = time.time()
             resources = self.policy.resource_manager.resources()
@@ -411,6 +413,10 @@ class Policy(object):
     def max_resources(self):
         return self.data.get('max-resources')
 
+    @property
+    def tags(self):
+        return self.data.get('tags', ())
+
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
         return self.EXEC_MODE_MAP[exec_mode_type](self)
@@ -452,8 +458,7 @@ class Policy(object):
     run = __call__
 
     def _write_file(self, rel_path, value):
-        with open(
-                os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
+        with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
     def get_resource_manager(self):

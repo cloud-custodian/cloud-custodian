@@ -22,7 +22,7 @@ from mock import mock
 from .common import BaseTest, instance
 
 from c7n.filters import FilterValidationError
-from c7n.offhours import OffHour, OnHour, ScheduleParser, Time
+from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
 
 
 # Per http://blog.xelnor.net/python-mocking-datetime/
@@ -63,7 +63,6 @@ class OffHoursFilterTest(BaseTest):
         session_factory = self.replay_flight_data('test_offhours_records')
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2016, month=8, day=14, hour=19, minute=00)
-        results = []
 
         with mock_datetime_now(t, datetime):
             p = self.load_policy({
@@ -72,7 +71,7 @@ class OffHoursFilterTest(BaseTest):
                 'filters': [
                     {'State.Name': 'running'},
                     {'type': 'offhour',
-                     'hour': 19,
+                     'offhour': 19,
                      'tag': 'custodian_downtime',
                      'default_tz': 'est',
                      'weekends': False}]

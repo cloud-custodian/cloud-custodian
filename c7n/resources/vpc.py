@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore.exceptions import ClientError
-
 from c7n.actions import BaseAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
@@ -63,30 +61,11 @@ class SecurityGroup(QueryResourceManager):
     resource_type = 'aws.ec2.security-group'
 
 
-@SecurityGroup.filter_registry.register('unused')
-class UnusedSecurityGroup(Filter):
-    """Filter to just vpc security groups that are not used.
-
-    We scan all extant enis in the vpc to get a baseline set of groups
-    in use. Then augment with those referenced by launch configs, and
-    lambdas as they may not have extant resources in the vpc at a
-    given moment. We also find any security group with references from
-    other security group either within the vpc or across peered
-    connections.
-
-    Note this filter does not support classic security groups atm.
-    """
-    schema = type_schema('unused')
-
-    def process(self, resources, event=None):
-        used = self.scan_groups()
-        unused = [
-            r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
-        return unused and self.filter_peered_refs(unused) or []
+class SGUsage(Filter):
 
     def filter_peered_refs(self, resources):
+        if not resources:
+            return resources
         # Check that groups are not referenced across accounts
         client = local_session(self.manager.session_factory).client('ec2')
         peered_ids = set()
@@ -154,6 +133,49 @@ class UnusedSecurityGroup(Filter):
         return sg_ids
 
 
+@SecurityGroup.filter_registry.register('unused')
+class UnusedSecurityGroup(SGUsage):
+    """Filter to just vpc security groups that are not used.
+
+    We scan all extant enis in the vpc to get a baseline set of groups
+    in use. Then augment with those referenced by launch configs, and
+    lambdas as they may not have extant resources in the vpc at a
+    given moment. We also find any security group with references from
+    other security group either within the vpc or across peered
+    connections.
+
+    Note this filter does not support classic security groups atm.
+    """
+    schema = type_schema('unused')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        return unused and self.filter_peered_refs(unused) or []
+
+
+@SecurityGroup.filter_registry.register('used')
+class UsedSecurityGroup(SGUsage):
+    """Filter to security groups that are used.
+
+    This operates as a complement to the unused filter for multi-step
+    workflows.
+    """
+    schema = type_schema('used')
+
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used
+            and 'VpcId' in r]
+        unused = set(self.filter_peered_refs(unused))
+        return [r for r in resources if r['GroupId'] not in unused]
+
+
 @SecurityGroup.filter_registry.register('default-vpc')
 class SGDefaultVpc(DefaultVpcBase):
 
@@ -198,10 +220,19 @@ class SGPermission(Filter):
 
       - type: egress
         OnlyPorts: [22, 443, 80]
+
+      - type: egress
+        IpRanges:
+          - value_type: cidr
+          - op: in
+          - value: x.y.z
     """
 
-    attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-                 'IpRanges', 'PrefixListIds', 'Ports', 'OnlyPorts'))
+    perm_attrs = set((
+        'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
+        'IpRanges', 'PrefixListIds'))
+    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts'))
+    attrs = perm_attrs.union(filter_attrs)
 
     def validate(self):
         delta = set(self.data.keys()).difference(self.attrs)
@@ -212,20 +243,49 @@ class SGPermission(Filter):
 
     def process(self, resources, event=None):
         self.vfilters = []
-        fattrs = list(sorted(self.attrs.intersection(self.data.keys())))
+        fattrs = list(sorted(self.perm_attrs.intersection(self.data.keys())))
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
-        self.only_ports = 'OnlyPorts' in self.data and self.data['OnlyPorts'] or ()
+        self.only_ports = (
+            'OnlyPorts' in self.data and self.data['OnlyPorts'] or ())
         for f in fattrs:
             fv = self.data.get(f)
             if isinstance(fv, dict):
-                if 'key' not in fv:
-                    fv['key'] = f
+                fv['key'] = f
             else:
                 fv = {f: fv}
             vf = ValueFilter(fv)
             vf.annotate = False
             self.vfilters.append(vf)
         return super(SGPermission, self).process(resources, event)
+
+    def process_ports(self, perm):
+        found = False
+        if 'FromPort' in perm and 'ToPort' in perm:
+            for port in self.ports:
+                if port >= perm['FromPort'] and port <= perm['ToPort']:
+                    found = True
+                    break
+            only_found = False
+            for port in self.only_ports:
+                if port == perm['FromPort'] and port == perm['ToPort']:
+                    only_found = True
+            if self.only_ports and not only_found:
+                found = True
+        return found
+
+    def process_cidrs(self, perm):
+        found = False
+
+        if 'IpRanges' in perm and 'Cidr' in self.data:
+            match_range = self.data['Cidr']
+            match_range['key'] = 'CidrIp'
+            vf = ValueFilter(match_range)
+            vf.annotate = False
+            for ip_range in perm.get('IpRanges', []):
+                found = vf(ip_range)
+                if found:
+                    break
+        return found
 
     def __call__(self, resource):
         matched = []
@@ -235,17 +295,11 @@ class SGPermission(Filter):
                 if f(perm):
                     found = True
                     break
-            if 'FromPort' in perm and 'ToPort' in perm:
-                for port in self.ports:
-                    if port >= perm['FromPort'] and port <= perm['ToPort']:
-                        found = True
-                        break
-                only_found = False
-                for port in self.only_ports:
-                    if port == perm['FromPort'] and port == perm['ToPort']:
-                        only_found = True
-                if self.only_ports and not only_found:
-                    found = True
+            if not found:
+                found = self.process_ports(perm)
+            if not found:
+                found = self.process_cidrs(perm)
+
             if not found:
                 continue
             matched.append(perm)

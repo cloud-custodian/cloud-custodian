@@ -110,11 +110,11 @@ class RetentionWindow(BaseAction):
                 futures.append(w.submit(
                     self.process_snapshot_retention,
                     cluster))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception setting RDS cluster retention  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting RDS cluster retention  \n %s",
+                        f.exception())
 
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
@@ -147,11 +147,11 @@ class Snapshot(BaseAction):
                 futures.append(w.submit(
                     self.process_cluster_snapshot,
                     cluster))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception creating RDS cluster snapshot  \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception creating RDS cluster snapshot  \n %s",
+                        f.exception())
         return clusters
 
     def process_cluster_snapshot(self, cluster):
@@ -206,11 +206,11 @@ class RDSClusterSnapshotDelete(BaseAction):
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
                     w.submit(self.process_snapshot_set, snapshot_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting snapshot set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s",
+                        f.exception())
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):

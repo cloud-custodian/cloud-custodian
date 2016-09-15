@@ -20,15 +20,16 @@ import fnmatch
 import logging
 import operator
 import re
-import time
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
+import ipaddress
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
-from c7n.utils import set_annotation, type_schema
+from c7n.resolver import ValuesFrom
+from c7n.utils import set_annotation, type_schema, parse_cidr
 
 
 class FilterValidationError(Exception): pass
@@ -88,7 +89,6 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
-        self.register('delay', Delay)
 
     def parse(self, data, manager):
         results = []
@@ -137,9 +137,9 @@ class Filter(object):
 
     log = logging.getLogger('custodian.filters')
 
-    schema = {'type': 'object'}
-
     metrics = ()
+
+    schema = {'type': 'object'}
 
     def __init__(self, data, manager=None):
         self.data = data
@@ -164,14 +164,28 @@ class Or(Filter):
         super(Or, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
+        self.manager = manager
 
-    # TODO support resource set processing with or (will need identity
-    # metadata per resource type), ala tags set_id or query metamodel branch
-    def __call__(self, i):
+    def process(self, resources, event=None):
+        if self.manager:
+            return self.process_set(resources, event)
+        return super(Or, self).process(resources, event)
+
+    def __call__(self, r):
+        """Fallback for older unit tests that don't utilize a query manager"""
         for f in self.filters:
-            if f(i):
+            if f(r):
                 return True
         return False
+
+    def process_set(self, resources, event):
+        resource_type = self.manager.query.resolve(self.manager.resource_type)
+        resource_map = {r[resource_type.id]: r for r in resources}
+        results = set()
+        for f in self.filters:
+            results = results.union([
+                r[resource_type.id] for r in f.process(resources, event)])
+        return [resource_map[r_id] for r_id in results]
 
 
 class And(Filter):
@@ -181,27 +195,10 @@ class And(Filter):
         self.registry = registry
         self.filters = registry.parse(self.data.values()[0], manager)
 
-    def __call__(self, i):
+    def process(self, resources, events=None):
         for f in self.filters:
-            if not f(i):
-                return False
-        return True
-
-
-class Delay(Filter):
-
-    schema = {'type': 'object', 'additionalProperties': False,
-              'required': ['type', 'seconds'],
-              'properties': {
-                  'type': {'enum': ['delay']},
-                  'seconds': {'type': 'integer'}}}
-
-    def process(self, resources, event=None):
-        if not event:
-            return
-        seconds = self.data.get('seconds')
-        if seconds:
-            time.sleep(seconds)
+            resources = f.process(resources, events)
+        return resources
 
 
 class ValueFilter(Filter):
@@ -220,8 +217,10 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size']},
+                'age', 'integer', 'expiration', 'normalize', 'size',
+                'cidr', 'cidr_size', 'swap']},
             'default': {'type': 'object'},
+            'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
                 {'type': 'array'},
                 {'type': 'string'},
@@ -237,7 +236,7 @@ class ValueFilter(Filter):
         if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if 'value' not in self.data:
+        if 'value' not in self.data and 'value_from' not in self.data:
             raise FilterValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
@@ -265,7 +264,11 @@ class ValueFilter(Filter):
         elif self.v is None:
             self.k = self.data.get('key')
             self.op = self.data.get('op')
-            self.v = self.data.get('value')
+            if 'value_from' in self.data:
+                values = ValuesFrom(self.data['value_from'], self.manager)
+                self.v = values.get_values()
+            else:
+                self.v = self.data.get('value')
             self.vtype = self.data.get('value_type')
 
         if i is None:
@@ -279,13 +282,17 @@ class ValueFilter(Filter):
                 if t.get('Key') == tk:
                     r = t.get('Value')
                     break
-        elif not '.' in self.k and not '[' in self.k and not '(' in self.k:
+        elif '.' not in self.k and '[' not in self.k and '(' not in self.k:
             r = i.get(self.k)
         elif self.expr:
             r = self.expr.search(i)
+
         else:
             self.expr = jmespath.compile(self.k)
             r = self.expr.search(i)
+
+        if self.op in ('in', 'not-in') and r is None:
+            r = ()
 
         # value type conversion
         if self.vtype is not None:
@@ -295,6 +302,8 @@ class ValueFilter(Filter):
 
         # Value match
         if r is None and v == 'absent':
+            return True
+        elif r is not None and v == 'present':
             return True
         elif v == 'not-null' and r:
             return True
@@ -308,27 +317,41 @@ class ValueFilter(Filter):
     def process_value_type(self, sentinel, value):
         if self.vtype == 'normalize' and isinstance(value, basestring):
             return sentinel, value.strip().lower()
+
         elif self.vtype == 'integer':
             try:
-                v = int(value.strip())
+                value = int(value.strip())
             except ValueError:
-                v = 0
+                value = 0
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)
             except TypeError:
                 return sentinel, 0
+        elif self.vtype == 'swap':
+            return value, sentinel
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime):
                 sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
 
             if not isinstance(value, datetime):
                 value = parse(value)
-
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
             return value, sentinel
+        elif self.vtype == 'cidr':
+            s = parse_cidr(sentinel)
+            v = parse_cidr(value)
+            if (isinstance(s, ipaddress._BaseAddress)
+                    and isinstance(v, ipaddress._BaseNetwork)):
+                return v, s
+            return s, v
+        elif self.vtype == 'cidr_size':
+            cidr = parse_cidr(value)
+            if cidr:
+                return sentinel, cidr.prefixlen
+            return sentinel, 0
 
         # Allows for expiration filtering, for events in the future as opposed
         # to events in the past which age filtering allows for.
@@ -394,3 +417,4 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
+
