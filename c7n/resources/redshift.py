@@ -1,20 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @ocampocj
- Watch 1
-  Star 0
-  Fork 73 kapilt/cloud-custodian
-forked from capitalone/cloud-custodian
- Code  Pull requests 0  Projects 0  Wiki  Pulse  Graphs
-Branch: redshift-tags Find file Copy pathcloud-custodian/c7n/resources/redshift.py
-0e79fc5  13 days ago
-@kapilt kapilt note need to re-record unit tests
-4 contributors @kapilt @ewbankkit @jimmyraywv @gwh59
-RawBlameHistory     343 lines (268 sloc)  11.5 KB
 # Copyright 2016 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -357,5 +340,3 @@ class RedshiftSnapshotDelete(BaseAction):
             c.delete_cluster_snapshot(
                 SnapshotIdentifier=s['SnapshotIdentifier'],
                 SnapshotClusterIdentifier=s['ClusterIdentifier'])
-Contact GitHub API Training Shop Blog About
-© 2016 GitHub, Inc. Terms Privacy Security Status Help
