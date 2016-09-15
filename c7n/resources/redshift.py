@@ -33,7 +33,7 @@ log = logging.getLogger('custodian.redshift')
 
 filters = FilterRegistry('redshift.filters')
 actions = ActionRegistry('redshift.actions')
-
+filters.register('marked-for-op', tags.TagActionFilter)
 
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
@@ -260,7 +260,7 @@ class Tag(tags.Tag):
             arn = self.manager.generate_arn(r['ClusterIdentifer'])
             client.create_tags(ResourceName=arn, Tags=tags)
 
-
+@actions.register('unmark')
 @actions.register('remove-tag')
 class RemoveTag(tags.RemoveTag):
 
@@ -289,6 +289,26 @@ class TagTrim(tags.TagTrim):
 class RedshiftSnapshot(QueryResourceManager):
     """Resource manager for Redshift snapshots.
     """
+    
+    filter_registry = FilterRegistry('redshift-snapshot.filters')
+    action_registry = ActionRegistry('redshift-snapshot.actions')
+    _generate_arn = _account_id = None
+
+    @property
+    def account_id(self):
+        if self._account_id is None:
+            session = local_session(self.session_factory)
+            self._account_id = get_account_id(session)
+        return self._account_id
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'redshift', region=self.config.region,
+                account_id=self.account_id, resource_type='snapshot',
+                separator=':')
+        return self._generate_arn
 
     class Meta(object):
 
@@ -302,10 +322,6 @@ class RedshiftSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
 
     resource_type = Meta
-
-    filter_registry = FilterRegistry('redshift-snapshot.filters')
-    action_registry = ActionRegistry('redshift-snapshot.actions')
-
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):
@@ -340,3 +356,41 @@ class RedshiftSnapshotDelete(BaseAction):
             c.delete_cluster_snapshot(
                 SnapshotIdentifier=s['SnapshotIdentifier'],
                 SnapshotClusterIdentifier=s['ClusterIdentifier'])
+            
+@RedshiftSnapshot.action_registry.register('mark-for-op')
+class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
+
+    schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('redshift')
+        for r in resources:
+            arn = self.manager.generate_arn(r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
+            self.log.info('arn: %s' %arn)
+            client.create_tags(ResourceName=arn, Tags=tags)
+
+
+@RedshiftSnapshot.action_registry.register('tag')
+class RedshiftSnapshotTag(tags.Tag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('redshift')
+        for r in resources:
+            arn = self.manager.generate_arn(r['SnapshotIdentifer'])
+            client.create_tags(ResourceName=arn, Tags=tags)
+
+@RedshiftSnapshot.action_registry.register('unmark')
+@RedshiftSnapshot.action_registry.register('remove-tag')
+class RedshiftSnapshotRemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(self.manager.session_factory).client('redshift')
+        for r in resources:
+            arn = self.manager.generate_arn(r['SnapshotIdentifier'])
+            client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
