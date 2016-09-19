@@ -151,11 +151,11 @@ class Delete(BaseAction):
             for db_set in chunks(clusters, size=5):
                 futures.append(
                     w.submit(self.process_db_set, db_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting redshift set \n %s",
-                            f.exception())
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting redshift set \n %s",
+                        f.exception())
 
     def process_db_set(self, db_set):
         skip = self.data.get('skip-snapshot', False)
