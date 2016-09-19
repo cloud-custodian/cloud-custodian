@@ -356,6 +356,8 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     snaps.setdefault(
                         bd['Ebs']['SnapshotId'].strip(), []).append(cid)
                 elif not bd['Ebs'].get('Encrypted'):
+                    if image is None:
+                        continue
                     unencrypted_configs.add(cid)
         if not snaps:
             return unencrypted_configs
