@@ -61,12 +61,12 @@ class Redshift(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
-    def augment(self, resources):
+    def augment(self, clusters):
         filter(None, _redshift_tags(
             self.get_model(),
-            resources, self.session_factory, self.executor_factory,
+            clusters, self.session_factory, self.executor_factory,
             self.generate_arn, self.retry))
-
+        return clusters
 
 def _redshift_tags(
         model, dbs, session_factory, executor_factory, generate_arn, retry):
