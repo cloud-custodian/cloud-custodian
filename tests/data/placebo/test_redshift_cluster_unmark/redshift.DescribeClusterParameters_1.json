@@ -3,7 +3,14 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "4258a59a-3a4c-11e6-b0d9-a31a376a0445"
+            "RequestId": "ed88f30f-7e74-11e6-a5fe-61fdd408b98b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ed88f30f-7e74-11e6-a5fe-61fdd408b98b", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4120", 
+                "content-type": "text/xml", 
+                "date": "Mon, 19 Sep 2016 14:25:34 GMT"
+            }
         }, 
         "Parameters": [
             {

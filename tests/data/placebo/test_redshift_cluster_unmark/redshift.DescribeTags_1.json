@@ -4,20 +4,20 @@
         "TaggedResources": [
             {
                 "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:c7n-test", 
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:c7n", 
                 "Tag": {
-                    "Value": "testvalue", 
-                    "Key": "testkey"
+                    "Value": "", 
+                    "Key": "testKey"
                 }
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "3b1d77a3-7a83-11e6-b777-5b4dd822c65e", 
+            "RequestId": "3aa9f95b-7e75-11e6-af9b-793ba9d7f410", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3b1d77a3-7a83-11e6-b777-5b4dd822c65e", 
-                "date": "Wed, 14 Sep 2016 13:57:53 GMT", 
-                "content-length": "907", 
+                "x-amzn-requestid": "3aa9f95b-7e75-11e6-af9b-793ba9d7f410", 
+                "date": "Mon, 19 Sep 2016 14:27:43 GMT", 
+                "content-length": "558", 
                 "content-type": "text/xml"
             }
         }

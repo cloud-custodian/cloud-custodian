@@ -48,7 +48,7 @@ class TestRedshift(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'ClusterIdentifier',
-                 'value': 'c7n-test'}],
+                 'value': 'c7n'}],
             'actions': [
                 {'type': 'mark-for-op', 'days': 30,
                 'op': 'delete'}]},
@@ -71,7 +71,7 @@ class TestRedshift(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'ClusterIdentifier',
-                 'value': 'c7n-test'}],
+                 'value': 'c7n'}],
             'actions': [
                 {'type': 'unmark'}]},
             session_factory=factory)

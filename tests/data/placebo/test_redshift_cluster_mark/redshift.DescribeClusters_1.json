@@ -3,18 +3,18 @@
     "data": {
         "Clusters": [
             {
-                "PubliclyAccessible": false, 
-                "MasterUsername": "dataset", 
+                "PubliclyAccessible": true, 
+                "MasterUsername": "c7n", 
                 "VpcSecurityGroups": [
                     {
                         "Status": "active", 
-                        "VpcSecurityGroupId": "sg-f9cc4d9f"
+                        "VpcSecurityGroupId": "sg-6c7fa917"
                     }
                 ], 
-                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClwn8rl6jnMMfqsWpa1GZf1ZN0RvCBr/BpE7VCqxUdCC1Vs+ENNRsiHVx1RqVnocIjOIFZX8goXTg4jwBT1X/zeKXbIUILCBeKP1EJzdFTEudl16fIwQP6Udta0IdtbQuK6Tn5GNVmYv7wt10qYmPze+6/8qJZXi8+GIjhEUyvT491Xcf+8p5tjYIPzyZw9nD3yosvnAqCwk7cR4IWnwwumWBQxgzXy+iPYEabNuIhLL/viZUV0A8+JEG8WFw1cxI42CvKUZ2tV0OZYdjMb7asFo6f16sOq/MjfgSS+UOiIG3vGXfzfJGGjERlIbamk11Di0axYt4qxMRaQtljDVfF Amazon-Redshift\n", 
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjJwT2k8srZjIvJgAo8dk6VVNo+UxJZB6lO3s1qlougC4HLrHOkVY76wUbRqx5cKDh3ygLW/KkehHCMrHneEencynLCA6B+NVsKFderAdmivllp6V+iYcozcq+dC4dVRAB2MD2p23Fgaez+zdmBnrF9Q4h4+gxKYNakJDD4XdSXpuEBM8IwQ5eAXyknS1OAPkmjYF6qRBA3xcuXIsg5cr0sU7sxMHyl/QINSITKYwswW2um1W8yb/vUGyNad29qHjIAxt/OgPxPwCN78gj0PYMnYt+AJYBkny7J0Kdz820BggoHOnIEeG9uFUW7+xHJuP5bR1r97C7JELixk6E0ecz Amazon-Redshift\n", 
                 "NumberOfNodes": 1, 
                 "PendingModifiedValues": {}, 
-                "VpcId": "vpc-4a9ff72e", 
+                "VpcId": "vpc-d2d616b5", 
                 "ClusterVersion": "1.0", 
                 "Tags": [], 
                 "AutomatedSnapshotRetentionPeriod": 1, 
@@ -24,42 +24,51 @@
                         "ParameterApplyStatus": "in-sync"
                     }
                 ], 
-                "DBName": "dataset", 
-                "PreferredMaintenanceWindow": "tue:09:00-tue:09:30", 
+                "DBName": "c7n", 
+                "PreferredMaintenanceWindow": "thu:05:00-thu:05:30", 
                 "Endpoint": {
-                    "Port": 5439
+                    "Port": 5439, 
+                    "Address": "c7n.clalcef7utom.us-east-1.redshift.amazonaws.com"
                 }, 
                 "IamRoles": [], 
                 "AllowVersionUpgrade": true, 
                 "ClusterCreateTime": {
-                    "hour": 20, 
+                    "hour": 13, 
                     "__class__": "datetime", 
-                    "month": 6, 
-                    "second": 59, 
-                    "microsecond": 228000, 
+                    "month": 9, 
+                    "second": 57, 
+                    "microsecond": 317000, 
                     "year": 2016, 
-                    "day": 24, 
-                    "minute": 28
+                    "day": 19, 
+                    "minute": 58
                 }, 
                 "ClusterSubnetGroupName": "default", 
                 "ClusterSecurityGroups": [], 
-                "ClusterIdentifier": "c7n-test", 
+                "ClusterIdentifier": "c7n", 
                 "ClusterNodes": [
                     {
-                        "NodeRole": "SHARED"
+                        "NodeRole": "SHARED", 
+                        "PrivateIPAddress": "172.31.14.96", 
+                        "PublicIPAddress": "52.45.180.192"
                     }
                 ], 
-                "AvailabilityZone": "us-west-2c", 
+                "AvailabilityZone": "us-east-1a", 
                 "NodeType": "dc1.large", 
-                "Encrypted": true, 
-                "ClusterRevisionNumber": "1062", 
-                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/dd09e3af-48eb-484f-b783-0801786e6239", 
-                "ClusterStatus": "deleting"
+                "Encrypted": false, 
+                "ClusterRevisionNumber": "1096", 
+                "ClusterStatus": "available"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "41c25976-3a4c-11e6-a867-27e007912cb6"
+            "RequestId": "96b55149-7e74-11e6-a5fe-61fdd408b98b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "96b55149-7e74-11e6-a5fe-61fdd408b98b", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2721", 
+                "content-type": "text/xml", 
+                "date": "Mon, 19 Sep 2016 14:23:08 GMT"
+            }
         }
     }
 }
