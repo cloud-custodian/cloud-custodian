@@ -265,7 +265,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     Checks both the ami snapshots and the launch configuration.
     """
-    schema = type_schema('encrypted', exclude_image={'type': 'boolean'})
+    schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     images = unencrypted_configs = unencrypted_images = None
 
     def process(self, asgs, event=None):
