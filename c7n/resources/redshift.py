@@ -61,7 +61,7 @@ class Redshift(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
-    def TODO_RERECORD_TESTS_augment(self, resources):
+    def augment(self, resources):
         filter(None, _redshift_tags(
             self.get_model(),
             resources, self.session_factory, self.executor_factory,
