@@ -1102,6 +1102,10 @@ class DeleteBucket(ScanBucket):
                 self.log.error(
                     "Error while deleting bucket %s, bucket not empty" % (
                         b['Name']))
+            elif e.response['Error']['Code'] == 'AccessDenied':
+                self.log.error(
+                    "Error while deleting bucket %s, access denied" % (
+                        b['Name']))
             else:
                 raise e
 
@@ -1122,8 +1126,8 @@ class DeleteBucket(ScanBucket):
         self.manager.ctx.metrics.flush()
 
         log.info(
-            ("EmptyBucket Complete keys:%d rate:%0.2f/s time:%0.2fs"),
-            object_count, float(object_count) / run_time, run_time)
+            ("EmptyBucket bucket:%s Complete keys:%d rate:%0.2f/s time:%0.2fs"),
+            r['Bucket'], object_count, float(object_count) / run_time, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
