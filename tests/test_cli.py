@@ -42,7 +42,7 @@ class ValidateTest(BaseTest):
              'filters': [
                  {"tag:custodian_tagging": "not-null"}],
              'actions': [{
-                 'type': 'unmark',
+                 'type': 'untag',
                  'tags': ['custodian_cleanup']}]}]},
                 Dumper=yaml.SafeDumper))
         t.flush()

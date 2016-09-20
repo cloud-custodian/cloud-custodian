@@ -29,7 +29,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 from c7n import utils
-from c7n.utils import type_schema, get_retry
+from c7n.utils import type_schema
 
 
 filters = FilterRegistry('ec2.filters')
@@ -44,8 +44,6 @@ class EC2(QueryResourceManager):
     resource_type = "aws.ec2.instance"
     filter_registry = filters
     action_registry = actions
-
-    retry = staticmethod(get_retry(('RequestLimitExceeded',)))
 
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
