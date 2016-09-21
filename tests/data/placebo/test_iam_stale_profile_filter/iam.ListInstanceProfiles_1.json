@@ -1,0 +1,70 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1a914789-8026-11e6-95e4-e18e5bcabb34", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1a914789-8026-11e6-95e4-e18e5bcabb34", 
+                "date": "Wed, 21 Sep 2016 18:06:21 GMT", 
+                "content-length": "1366", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "InstanceProfiles": [
+            {
+                "InstanceProfileId": "AIPAJRBY22UQ6P77GLSAG", 
+                "Roles": [], 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 6
+                }, 
+                "InstanceProfileName": "TestProfile0", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/TestProfile0"
+            }, 
+            {
+                "InstanceProfileId": "AIPAJ6CK4BP3PJ5A7NMPO", 
+                "Roles": [], 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 6
+                }, 
+                "InstanceProfileName": "TestProfile1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/TestProfile1"
+            }, 
+            {
+                "InstanceProfileId": "AIPAJ456EGRSLDOHWIQOK", 
+                "Roles": [], 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 6
+                }, 
+                "InstanceProfileName": "TestProfile2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/TestProfile2"
+            }
+        ]
+    }
+}
