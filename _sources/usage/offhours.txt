@@ -1,3 +1,0 @@
-
-
-.. automodule:: maid.offhours

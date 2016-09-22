@@ -1,0 +1,32 @@
+.. _s3:
+
+Simple Storage Service (S3)
+===========================
+
+Filters
+-------
+
+- Standard Value Filter (see :ref:`filters`)
+
+``global-grants``
+  Check bucket acls for global grants
+
+``missing-policy-statement``
+  Find buckets missing a set of named policy statements
+
+Actions
+-------
+
+``encrypt-keys``
+  Scan all keys in a bucket and optionally encrypt them in place
+
+``encryption-policy``
+  Attach an encryption required policy to a bucket, this will break
+  applications that are not using encryption, including AWS log
+  delivery
+
+``delete-global-grants``
+  Delete global grants from bucket ACLs
+
+``no-op``
+  No operation

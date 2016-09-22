@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Cloud Custodian Documentation &mdash; Cloud Custodian 1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/c1_labs.png"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Cloud Custodian 1.0 documentation" href="#"/>
+        <link rel="next" title="Overview" href="overview/index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Cloud Custodian
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart/index.html">Quickstart</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usecases/index.html">Use Cases</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="policy/index.html">Policy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">Cloud Custodian</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Cloud Custodian Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cloud-custodian-documentation">
+<h1>Cloud Custodian Documentation<a class="headerlink" href="#cloud-custodian-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Cloud Custodian is a tool that unifies the dozens of tools and scripts most organizations use for managing their AWS accounts into one open source tool. It&#8217;s a stateless rules engine for policy definition and enforcement, with metrics and detailed reporting for AWS.</p>
+<p>Organizations can use Custodian to manage their AWS environments by ensuring compliance to security policies, tag policies, garbage collection of unused resources, and cost management via off-hours resource management, all from the same place. Custodian policies are written in simple YAML configuration files that specify given resource types and are constructed from a vocabulary of filters and actions.</p>
+<p>Navigate below and get started with Cloud Custodian!</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/capabilities.html">Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/roadmap.html">Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/comparisons.html">Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/comparisons.html#janitor-monkey">Janitor Monkey</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/comparisons.html#security-monkey">Security Monkey</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart/index.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart/developer.html">Developer Install</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#requirements">Requirements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="quickstart/developer.html#on-linux">On Linux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="quickstart/developer.html#on-mac">On Mac</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#installing">Installing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#running-tests">Running tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart/deployment.html">Deployment</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="sample-use-cases">
+<h2>Sample Use Cases<a class="headerlink" href="#sample-use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usecases/index.html">Use Cases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/amicomp.html">AMI - Stop EC2 using Unapproved AMIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/asgoffhours.html">ASG - Offhours Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ebsgarbagecollect.html">EBS - Garbage Collect Unattached Volumes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ebsunencrypted.html">EBS - Delete Unencrypted</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ec2offhours.html">EC2 - Offhours Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ec2oldinstances.html">EC2 - Old Instance Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/elbsslblacklist.html">ELB - SSL Blacklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/elbsslwhitelist.html">ELB - SSL Whitelist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/rdspublicunencrypted.html">RDS - Terminate Unencrypted Public Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3bucketencrypt.html">S3 - Encryption Bucket Policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3encryption.html">S3 - Encrypt All Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3globalgrants.html">S3 - Global Grants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/tagcompliance.html">Tag Compliance Across Resources (EC2, ASG, ELB, S3, etc)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="policy">
+<h2>Policy<a class="headerlink" href="#policy" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="policy/index.html">Policy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="policy/index.html#sample-policy">Sample Policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy/index.html#terms">Terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy/index.html#real-time-policies">Real-time Policies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="policy/lambda.html">Lambda Support</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#cloudwatch-events">CloudWatch Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#cloud-custodian-integration">Cloud Custodian Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/mu.html">Mu - Lambda Lifecycle Management</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="policy/index.html#filters">Filters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="policy/filters.html">Value Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="policy/filters.html#jmespath-filter">JMESPath Filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="policy/usage.html">Usage</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/usage.html#module-c7n.filters.offhours">Offhours</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#resource-scheduling-offhours">Resource Scheduling Offhours</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#features">Features</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#policy-configuration">Policy Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#tag-based-configuration">Tag Based Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#policy-examples">Policy examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#options">Options</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="policy/usage.html#outputs">Outputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#metrics">Metrics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#cloudwatch-logs">CloudWatch Logs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#s3-logs-records">S3 Logs &amp; Records</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="policy/index.html#resources-and-actions">Resources and Actions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/ami.html">Amazon Machine Images (AMI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ami.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ami.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/asg.html">Auto Scaling Groups (ASG)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/asg.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/asg.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/cache-cluster.html">ElastiCache Clusters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-cluster.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-cluster.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/cache-snapshot.html">ElastiCache Cluster Snapshots</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-snapshot.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-snapshot.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/cfn.html">CloudFormation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cfn.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/cfn.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/ebs.html">Elastic Block Store Volumes (EBS Volumes)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/ebs-snapshot.html">Elastic Block Store Snapshots (EBS Snapshots)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs-snapshot.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs-snapshot.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/ec2.html">Elastic Cloud Compute (EC2)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#query">Query</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/elb.html">Elastic Load Balancers (ELB)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/elb.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/elb.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/kms.html">Key Management Service (KMS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/kms.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/kms.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds.html">Relational Database Service (RDS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-cluster.html">Relational Database Service DB Clusters (RDS DB Clusters)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html">Relational Database Service DB Cluster Snapshots (RDS DB Cluster Snapshots)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-snapshot.html">Relational Database Service DB Snapshots (RDS DB Snapshots)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-snapshot.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-snapshot.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/redshift.html">Redshift</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/redshift.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/redshift.html#actions">Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="policy/resources/s3.html">Simple Storage Service (S3)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/s3.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="policy/resources/s3.html#actions">Actions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+</ul>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="overview/index.html" class="btn btn-neutral float-right" title="Overview" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Capital One Services, LLC.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

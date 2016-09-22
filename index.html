@@ -1,408 +1,256 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Cloud Custodian Documentation &mdash; Cloud Custodian 1.0 documentation</title>
-  
+<html lang="en">
 
-  
-  
-    <link rel="shortcut icon" href="_static/c1_labs.png"/>
-  
+<head ">
 
-  
+    <meta charset="utf-8 ">
+    <meta http-equiv="X-UA-Compatible " content="IE=edge ">
+    <meta name="viewport " content="width=device-width, initial-scale=1 ">
+    <meta name="description " content="Cloud Custodian ">
+    <meta name="author " content="Capital One ">
 
-  
-  
-    
+    <title>Cloud Custodian</title>
 
-  
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css " rel="stylesheet ">
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
+    <!-- Custom CSS -->
+    <link href="css/landing-page.css " rel="stylesheet ">
 
-  
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css " rel="stylesheet " type="text/css ">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic " rel="stylesheet " type="text/css ">
 
-  
-    <link rel="top" title="Cloud Custodian 1.0 documentation" href="#"/>
-        <link rel="next" title="Overview" href="overview/index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js "></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js "></script>
+    <![endif]-->
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body>
 
-  <div class="wy-grid-for-nav">
-
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="#" class="icon icon-home"> Cloud Custodian
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                1.0
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav " role="navigation ">
+        <div class="container topnav ">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header ">
+                <button type="button " class="navbar-toggle " data-toggle="collapse " data-target="#bs-example-navbar-collapse-1 ">
+                    <span class="sr-only ">Toggle navigation</span>
+                    <span class="icon-bar "></span>
+                    <span class="icon-bar "></span>
+                    <span class="icon-bar "></span>
+                </button>
+                <a class="navbar-brand topnav " href="# ">Cloud Custodian</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse " id="bs-example-navbar-collapse-1 ">
+                <ul class="nav navbar-nav navbar-right ">
+                    <li>
+                        <a href="docs/index.html">Docs</a>
+                    </li>
+                    <li>
+                        <a href="https://pypi.python.org/pypi/c7n ">Install</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/capitalone/cloud-custodian ">GitHub</a>
+                    </li>
+                    <li>
+                        <a href="https://gitter.im/capitalone/cloud-custodian ">Community</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
         </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="quickstart/index.html">Quickstart</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="usecases/index.html">Use Cases</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="policy/index.html">Policy</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
+        <!-- /.container -->
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">Cloud Custodian</a>
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          
-
- 
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
-      
-    <li>Cloud Custodian Documentation</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-        
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <div class="section" id="cloud-custodian-documentation">
-<h1>Cloud Custodian Documentation<a class="headerlink" href="#cloud-custodian-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Cloud Custodian is a tool that unifies the dozens of tools and scripts most organizations use for managing their AWS accounts into one open source tool. It&#8217;s a stateless rules engine for policy definition and enforcement, with metrics and detailed reporting for AWS.</p>
-<p>Organizations can use Custodian to manage their AWS environments by ensuring compliance to security policies, tag policies, garbage collection of unused resources, and cost management via off-hours resource management, all from the same place. Custodian policies are written in simple YAML configuration files that specify given resource types and are constructed from a vocabulary of filters and actions.</p>
-<p>Navigate below and get started with Cloud Custodian!</p>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/capabilities.html">Capabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/roadmap.html">Roadmap</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/comparisons.html">Comparisons</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/comparisons.html#janitor-monkey">Janitor Monkey</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/comparisons.html#security-monkey">Security Monkey</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="quickstart/index.html">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart/developer.html">Developer Install</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#requirements">Requirements</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="quickstart/developer.html#on-linux">On Linux</a></li>
-<li class="toctree-l4"><a class="reference internal" href="quickstart/developer.html#on-mac">On Mac</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#installing">Installing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="quickstart/developer.html#running-tests">Running tests</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart/deployment.html">Deployment</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="sample-use-cases">
-<h2>Sample Use Cases<a class="headerlink" href="#sample-use-cases" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="usecases/index.html">Use Cases</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/amicomp.html">AMI - Stop EC2 using Unapproved AMIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/asgoffhours.html">ASG - Offhours Support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ebsgarbagecollect.html">EBS - Garbage Collect Unattached Volumes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ebsunencrypted.html">EBS - Delete Unencrypted</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ec2offhours.html">EC2 - Offhours Support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/ec2oldinstances.html">EC2 - Old Instance Report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/elbsslblacklist.html">ELB - SSL Blacklist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/elbsslwhitelist.html">ELB - SSL Whitelist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/rdspublicunencrypted.html">RDS - Terminate Unencrypted Public Instances</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3bucketencrypt.html">S3 - Encryption Bucket Policy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3encryption.html">S3 - Encrypt All Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/s3globalgrants.html">S3 - Global Grants</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usecases/usecases/tagcompliance.html">Tag Compliance Across Resources (EC2, ASG, ELB, S3, etc)</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="policy">
-<h2>Policy<a class="headerlink" href="#policy" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="policy/index.html">Policy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="policy/index.html#sample-policy">Sample Policy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="policy/index.html#terms">Terms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="policy/index.html#real-time-policies">Real-time Policies</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="policy/lambda.html">Lambda Support</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#cloudwatch-events">CloudWatch Events</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#cloud-custodian-integration">Cloud Custodian Integration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/lambda.html#configuration">Configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/mu.html">Mu - Lambda Lifecycle Management</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="policy/index.html#filters">Filters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="policy/filters.html">Value Filters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="policy/filters.html#jmespath-filter">JMESPath Filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="policy/usage.html">Usage</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/usage.html#module-c7n.filters.offhours">Offhours</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#resource-scheduling-offhours">Resource Scheduling Offhours</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#features">Features</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#policy-configuration">Policy Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#tag-based-configuration">Tag Based Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#policy-examples">Policy examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#options">Options</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="policy/usage.html#outputs">Outputs</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#metrics">Metrics</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#cloudwatch-logs">CloudWatch Logs</a></li>
-<li class="toctree-l5"><a class="reference internal" href="policy/usage.html#s3-logs-records">S3 Logs &amp; Records</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="policy/index.html#resources-and-actions">Resources and Actions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/ami.html">Amazon Machine Images (AMI)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ami.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ami.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/asg.html">Auto Scaling Groups (ASG)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/asg.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/asg.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/cache-cluster.html">ElastiCache Clusters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-cluster.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-cluster.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/cache-snapshot.html">ElastiCache Cluster Snapshots</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-snapshot.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cache-snapshot.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/cfn.html">CloudFormation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cfn.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/cfn.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/ebs.html">Elastic Block Store Volumes (EBS Volumes)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/ebs-snapshot.html">Elastic Block Store Snapshots (EBS Snapshots)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs-snapshot.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ebs-snapshot.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/ec2.html">Elastic Cloud Compute (EC2)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#query">Query</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/ec2.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/elb.html">Elastic Load Balancers (ELB)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/elb.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/elb.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/kms.html">Key Management Service (KMS)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/kms.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/kms.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds.html">Relational Database Service (RDS)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-cluster.html">Relational Database Service DB Clusters (RDS DB Clusters)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html">Relational Database Service DB Cluster Snapshots (RDS DB Cluster Snapshots)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-cluster-snapshot.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/rds-snapshot.html">Relational Database Service DB Snapshots (RDS DB Snapshots)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-snapshot.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/rds-snapshot.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/redshift.html">Redshift</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/redshift.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/redshift.html#actions">Actions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="policy/resources/s3.html">Simple Storage Service (S3)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/s3.html#filters">Filters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="policy/resources/s3.html#actions">Actions</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-</ul>
-</div>
-
-
-           </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="overview/index.html" class="btn btn-neutral float-right" title="Overview" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016, Capital One Services, LLC.
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
+    <!-- Header -->
+    <a name="about "></a>
+    <div class="intro-header ">
+        <div class="container ">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <div class="intro-message ">
+                        <hr class="intro-divider ">
+                        <ul class="list-inline intro-social-buttons ">
+                            <li>
+                                <a href="https://capitalone.io/cloud-custodian/ " class="btn btn-default btn-lg "><i class="fa fa-book fa-fw "></i> <span class="network-name ">Docs</span></a>
+                            </li>
+                            <li>
+                                <a href="https://pypi.python.org/pypi/c7n " class="btn btn-default btn-lg "><i class="fa fa-cloud-download fa-fw "></i> <span class="network-name ">Install</span></a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/capitalone/cloud-custodian " class="btn btn-default btn-lg "><i class="fa fa-github fa-fw "></i> <span class="network-name ">Github</span></a>
+                            </li>
+                            <li>
+                                <a href="https://gitter.im/capitalone/cloud-custodian " class="btn btn-default btn-lg "><i class="fa fa-comments-o fa-fw "></i> <span class="network-name ">Gitter</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
         </div>
-      </div>
+        <!-- /.container -->
 
-    </section>
+    </div>
+    <!-- /.intro-header -->
+<!-- Page Content -->
 
-  </div>
+<a name="services "></a>
+<div class="content-section-a " style="background-color: #f6f6f6; ">
+
+    <div class="container ">
+        <div class="row ">
+            <div class="col-md-6 col-md-offset-3 text-justify ">
+                <h1 class="text-center ">Rules Engine for the Cloud</h1>
+                <p class="lead ">Cloud Custodian enables users to be well managed in the cloud. The simple YAML DSL allows you to easily define rules to enable a well managed cloud infrastructure, that's both secure and cost optimized. It consolidates many of the adhoc scripts organizations have into a lightweight and flexible tool, with unified metrics and reporting.</p>
+            </div>
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+</div>
+
+<!-- /.content-section-1 -->
+<div class="content-section-b " style="background-color: #ffffff; ">
+    <div class="containers">
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-1">
+                <i class="callout-icon fa fa-lock " aria-hidden="true "></i>
+            </div>
+            <div class="col-lg-5">
+                <h2 class="section-heading ">Real-time Compliance and Security Policies</h2>
+                <p class="lead ">Cloud Custodian is open source and free for everyone to use.</p>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-1 -->
+
+<!-- /.content-section-2 -->
+<div class="content-section-b " style="background-color: #ffffff; ">
+    <div class="containers">
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-5">
+                <h2 class="section-heading ">Cost Management</h2>
+                <p class="lead ">Setup off-hours to save you money, by turning-off resources when they're not being used. Garbage collect unused resources by looking into utilization metrics.</p>
+            </div>
+            <div class="col-lg-2">
+                <i class="callout-icon fa fa-clock-o " aria-hidden="true "></i>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-2 -->
+
+<!-- /.content-section-3 -->
+<div class="content-section-b " style="background-color: #ffffff; ">
+    <div class="containers">
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-1">
+                <i class="callout-icon fa fa-terminal " aria-hidden="true "></i>
+            </div>
+            <div class="col-lg-5">
+                <h2 class="section-heading ">Run Anywhere</h2>
+                <p class="lead ">Custodian can be run locally, on an instance, or Servlerless in AWS Lambda.</p>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-3 -->
+
+<!-- /.content-section-4 -->
+<div class="content-section-b " style="background-color: #ffffff; ">
+    <div class="containers">
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-5">
+                <h2 class="section-heading ">Open Source</h2>
+                <p class="lead ">Cloud Custodian is open source and free for everyone to use.</p>
+
+            </div>
+            <div class="col-lg-2">
+                <i class="callout-icon fa fa-code " aria-hidden="true "></i>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-4 -->
+
+<!-- /.content-section-5 -->
+<div class="content-section-b " style="background-color: #ffffff; ">
+    <div class="containers">
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-1">
+                <i class="callout-icon fa fa-magic " aria-hidden="true "></i>
+            </div>
+            <div class="col-lg-5">
+                <h2 class="section-heading ">Imagination is the limit</h2>
+                <p class="lead ">Use Custodian to build complex workflows or simple queries, your only limitation is your imagination.</p>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-5 -->
+																																		 
+    <a name="contact "></a>
+    <div class="banner " style="background-color: #2c3943; ">
+        <div class="container " >
+            <div class="row ">
+                <div>
+                    <div class="text-center ">
+                        <h1>Getting Started</h1>
+                    </div>
+                    <ul class="list-inline text-center ">
+                        <li>
+                            <a href=https://pypi.python.org/pypi/c7n class="btn btn-default btn-lg "><i class="fa fa-cloud-download fa-fw "></i> <span class="network-name ">Download</span></a>
+                        </li>
+                        <li>
+                            <a href="http://www.capitalone.io/cloud-custodian/quickstart/index.html " class="btn btn-default btn-lg "><i class="fa fa-file-text-o fa-fw "></i> <span class="network-name ">Quickstart Guide</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-10 col-md-offset-1 text-center ">
+                    <p>&nbsp;</p>
+                       <h4>Using <a href="https://www.python.org/downloads/ ">Python 2.7</a> install Custodian using <a href="https://pip.pypa.io/en/stable/installing/ ">pip</a></h4>
+                      <pre><code>pip install c7n</code></pre>
+                </div>
+            </div>
   
 
+        </div>
+        <!-- /.container -->
 
-  
+    </div>
+    <!-- /.banner -->
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    <!-- Footer -->
+    <footer style="background-color: #1a2730 ">
+        <div class="container ">
+            <div class="row ">
+                <div class="col-lg-12 ">
+                    <p class="copyright text-muted small ">Copyright &copy; 2016 Capital One</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-  
+    <!-- jQuery -->
+    <script src="js/jquery.js "></script>
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
-      });
-  </script>
-   
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js "></script>
 
 </body>
+
 </html>
