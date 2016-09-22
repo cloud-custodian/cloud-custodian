@@ -53,31 +53,35 @@ class SnapshotAge(AgeFilter):
     date_attribute = 'StartTime'
 
 
-@Snapshot.filter_registry.register('ami-snapshot')
-class SnapshotAmiSnapshot(Filter):
+@Snapshot.filter_registry.register('filter-ami-snapshot')
+class SnapshotFilterAmiSnapshot(Filter):
     
-    schema = type_schema(
-        'ami-snapshot', **{'ami-snapshot': {'type': 'boolean'}})
-
+    schema = type_schema('filter-ami-snapshot', value={'type': 'boolean'})
+    
     def get_ami_snapshots(self):
-        ami = []
         c = local_session(self.manager.session_factory).client('ec2')
+        a = []
         for i in c.describe_images(Owners=['self'])['Images']:
             for dev in i.get('BlockDeviceMappings'):
                 if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                    ami.append(dev['Ebs']['SnapshotId'])
-        return ami
+                    a.append(dev['Ebs']['SnapshotId'])
+        return a
     
     def process(self, snapshots, event=None):
+        matches = []
         ami = self.get_ami_snapshots()
-        for s in snapshots:
-            if s['SnapshotId'] in ami:
-                if self.data.get('ami-snapshot', True):
-                    self.log.info('AMISNAP! %s' %s['SnapshotId'])
-                    #return 
-      
-
-                    
+        if self.data.get('value', True):
+            for snap in snapshots:            
+                if snap['SnapshotId'] not in ami:
+                    self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
+                    matches.append(snap)
+        else:
+            for snap in snapshots:
+                if snap['SnapshotId'] in ami:
+                    self.log.debug('Ami-snapshot: %s' %snap['SnapshotId'])
+                    matches.append(snap)
+        return matches
+             
                     
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
