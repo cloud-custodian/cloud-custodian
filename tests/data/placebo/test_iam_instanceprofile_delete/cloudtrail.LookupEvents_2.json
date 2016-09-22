@@ -3,19 +3,19 @@
     "data": {
         "Events": [
             {
-                "EventId": "9a8f16c7-e489-44b1-b4ce-04932a0241ec", 
+                "EventId": "71a85383-4168-4e23-b341-07fb8c703637", 
                 "Username": "joshuaroot", 
                 "EventTime": {
-                    "hour": 14, 
+                    "hour": 12, 
                     "__class__": "datetime", 
                     "month": 9, 
-                    "second": 25, 
+                    "second": 22, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 21, 
-                    "minute": 6
+                    "day": 22, 
+                    "minute": 47
                 }, 
-                "CloudTrailEvent": "{\"eventVersion\":\"1.02\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDAJM67KUVNOIMGUCZO4\",\"arn\":\"arn:aws:iam::644160558196:user/joshuaroot\",\"accountId\":\"644160558196\",\"accessKeyId\":\"AKIAJ6QYY7CQQ3KXHE5A\",\"userName\":\"joshuaroot\"},\"eventTime\":\"2016-09-21T18:06:25Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteInstanceProfile\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"199.244.214.109\",\"userAgent\":\"Boto3/1.4.0 Python/2.7.11 Darwin/15.6.0 Botocore/1.4.55\",\"requestParameters\":{\"instanceProfileName\":\"TestProfile1\"},\"responseElements\":null,\"requestID\":\"1c603bcd-8026-11e6-87f6-5b9d68fa9a92\",\"eventID\":\"9a8f16c7-e489-44b1-b4ce-04932a0241ec\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"644160558196\"}", 
+                "CloudTrailEvent": "{\"eventVersion\":\"1.02\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDAJM67KUVNOIMGUCZO4\",\"arn\":\"arn:aws:iam::644160558196:user/joshuaroot\",\"accountId\":\"644160558196\",\"accessKeyId\":\"AKIAJ6QYY7CQQ3KXHE5A\",\"userName\":\"joshuaroot\"},\"eventTime\":\"2016-09-22T16:47:22Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteInstanceProfile\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"199.244.214.109\",\"userAgent\":\"Boto3/1.4.0 Python/2.7.11 Darwin/15.6.0 Botocore/1.4.55\",\"requestParameters\":{\"instanceProfileName\":\"TestProfile1\"},\"responseElements\":null,\"requestID\":\"3b95f193-80e4-11e6-bb30-1531a866ac28\",\"eventID\":\"71a85383-4168-4e23-b341-07fb8c703637\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"644160558196\"}", 
                 "EventName": "DeleteInstanceProfile", 
                 "Resources": [
                     {
@@ -23,46 +23,16 @@
                         "ResourceName": "TestProfile1"
                     }
                 ]
-            }, 
-            {
-                "EventId": "e123e6f6-93c8-49be-8c38-755d13d2afab", 
-                "Username": "joshuaroot", 
-                "EventTime": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 22, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 21, 
-                    "minute": 6
-                }, 
-                "CloudTrailEvent": "{\"eventVersion\":\"1.02\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDAJM67KUVNOIMGUCZO4\",\"arn\":\"arn:aws:iam::644160558196:user/joshuaroot\",\"accountId\":\"644160558196\",\"accessKeyId\":\"AKIAJ6QYY7CQQ3KXHE5A\",\"userName\":\"joshuaroot\"},\"eventTime\":\"2016-09-21T18:06:22Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateInstanceProfile\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"199.244.214.109\",\"userAgent\":\"Boto3/1.4.0 Python/2.7.11 Darwin/15.6.0 Botocore/1.4.55\",\"requestParameters\":{\"instanceProfileName\":\"TestProfile1\",\"path\":\"/\"},\"responseElements\":{\"instanceProfile\":{\"instanceProfileId\":\"AIPAJ6CK4BP3PJ5A7NMPO\",\"arn\":\"arn:aws:iam::644160558196:instance-profile/TestProfile1\",\"roles\":[],\"path\":\"/\",\"instanceProfileName\":\"TestProfile1\",\"createDate\":\"Sep 21, 2016 6:06:22 PM\"}},\"requestID\":\"1a5bb961-8026-11e6-87f6-5b9d68fa9a92\",\"eventID\":\"e123e6f6-93c8-49be-8c38-755d13d2afab\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"644160558196\"}", 
-                "EventName": "CreateInstanceProfile", 
-                "Resources": [
-                    {
-                        "ResourceType": "AWS::IAM::InstanceProfile", 
-                        "ResourceName": "arn:aws:iam::644160558196:instance-profile/TestProfile1"
-                    }, 
-                    {
-                        "ResourceType": "AWS::IAM::InstanceProfile", 
-                        "ResourceName": "TestProfile1"
-                    }, 
-                    {
-                        "ResourceType": "AWS::IAM::InstanceProfile", 
-                        "ResourceName": "AIPAJ6CK4BP3PJ5A7NMPO"
-                    }
-                ]
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 2, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c2b994b3-802b-11e6-adf4-79fa825b3635", 
+            "RequestId": "9fe379fb-80e5-11e6-b9ab-954521d65b1b", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c2b994b3-802b-11e6-adf4-79fa825b3635", 
-                "date": "Wed, 21 Sep 2016 18:46:51 GMT", 
-                "content-length": "2550", 
+                "x-amzn-requestid": "9fe379fb-80e5-11e6-b9ab-954521d65b1b", 
+                "date": "Thu, 22 Sep 2016 16:57:20 GMT", 
+                "content-length": "24332", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

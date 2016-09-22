@@ -107,6 +107,11 @@ class DeleteStaleProfiles(BaseAction):
 
     def process_profile(self, resource):
         client = local_session(self.manager.session_factory).client('iam')
+        roles = resource['Roles']
+        for role in roles:
+            client.remove_role_from_instance_profile(
+                InstanceProfileName=resource['InstanceProfileName'],
+                RoleName=role['RoleName'])
         client.delete_instance_profile(
             InstanceProfileName=resource['InstanceProfileName'])
 
