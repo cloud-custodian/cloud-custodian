@@ -15,6 +15,7 @@
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
@@ -39,6 +40,80 @@ class Role(QueryResourceManager):
 class User(QueryResourceManager):
 
     resource_type = 'aws.iam.user'
+
+
+@resources.register('iam-policy')
+class Policy(QueryResourceManager):
+
+    resource_type = 'aws.iam.policy'
+
+
+@resources.register('iam-profile')
+class InstanceProfile(QueryResourceManager):
+
+    resource_type = 'aws.iam.instance-profile'
+
+
+@resources.register('iam-certificate')
+class ServerCertificate(QueryResourceManager):
+
+    resource_type = 'aws.iam.server-certificate'
+
+
+@InstanceProfile.filter_registry.register('stale')
+class StaleInstanceProfiles(ValueFilter):
+
+    schema = type_schema('stale', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+
+        def _get_last_event(resource):
+            client = local_session(
+                self.manager.session_factory).client('cloudtrail')
+            events = client.lookup_events(
+                LookupAttributes=[{
+                    'AttributeKey': 'ResourceName',
+                    'AttributeValue': resource['InstanceProfileName']}]
+            )['Events']
+            if len(events) == 0:
+                resource['LastEvent'] = datetime.now() - timedelta(days=365)
+                return resource
+
+        self.log.debug("Querying %d instance profiles" % len(resources))
+        results = []
+        for r in resources:
+            if _get_last_event(r):
+                results.append(r)
+        return results
+
+
+@InstanceProfile.action_registry.register('delete')
+class DeleteStaleProfiles(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        self.log.info("Deleting %d instance profiles", len(resources))
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resources:
+                futures.append(
+                    w.submit(self.process_profile, r))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting snapshot set \n %s" % (
+                            f.exception()))
+
+    def process_profile(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        roles = resource['Roles']
+        for role in roles:
+            client.remove_role_from_instance_profile(
+                InstanceProfileName=resource['InstanceProfileName'],
+                RoleName=role['RoleName'])
+        client.delete_instance_profile(
+            InstanceProfileName=resource['InstanceProfileName'])
 
 
 @User.filter_registry.register('policy')
@@ -139,7 +214,7 @@ class UserRemoveAccessKey(BaseAction):
         disable = self.data.get('disable')
 
         if age:
-            threshold_date = datetime(tz=tzutc()) - timedelta(age)
+            threshold_date = datetime().now(tz=tzutc()) - timedelta(age)
 
         for r in resources:
             if 'AccessKeys' not in r:
@@ -159,21 +234,3 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
-
-
-@resources.register('iam-policy')
-class Policy(QueryResourceManager):
-
-    resource_type = 'aws.iam.policy'
-
-
-@resources.register('iam-profile')
-class InstanceProfile(QueryResourceManager):
-
-    resource_type = 'aws.iam.instance-profile'
-
-
-@resources.register('iam-certificate')
-class ServerCerficate(QueryResourceManager):
-
-    resource_type = 'aws.iam.server-certificate'

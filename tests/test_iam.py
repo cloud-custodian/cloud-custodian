@@ -21,7 +21,8 @@ from common import load_data, BaseTest
 from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
-from c7n.resources.iam import UserMfaDevice
+from c7n.resources.iam import (UserMfaDevice, StaleInstanceProfiles,
+                               DeleteStaleProfiles)
 from c7n.executor import MainThreadExecutor
 
 
@@ -39,6 +40,36 @@ class IAMMFAFilter(BaseTest):
                  'value': []}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class IAMSTaleProfileFilter(BaseTest):
+
+    def test_stale_profile_filter(self):
+        session_factory = self.replay_flight_data('test_iam_stale_profile_filter')
+
+        self.patch(
+            StaleInstanceProfiles, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-stale-profile',
+            'resource': 'iam-profile',
+            'filters': ['stale']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+
+class IAMStaleProfileDelete(BaseTest):
+
+    def test_stale_profile_delete(self):
+        session_factory = self.replay_flight_data('test_iam_instanceprofile_delete')
+        self.patch(
+            DeleteStaleProfiles, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-stale-profile',
+            'resource': 'iam-profile',
+            'filters': ['stale'],
+            'actions': ['delete']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class KMSCrossAccount(BaseTest):
@@ -186,7 +217,7 @@ class ECRCrossAccount(BaseTest):
         session_factory = self.replay_flight_data('test_cross_account_ecr')
         client = session_factory().client('ecr')
         repo_name = 'c7n/cross-check'
-        
+
         repo = client.create_repository(repositoryName=repo_name)['repository']
         self.addCleanup(client.delete_repository, repositoryName=repo_name)
 
