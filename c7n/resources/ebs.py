@@ -69,11 +69,12 @@ class SnapshotAmiSnapshot(Filter):
         return ami
     
     def process(self, snapshots, event=None):
+        ami = self.get_ami_snapshots()
         for s in snapshots:
-            if s['SnapshotId'] in self.get_ami_snapshots():
+            if s['SnapshotId'] in ami:
                 if self.data.get('ami-snapshot', True):
                     self.log.info('AMISNAP! %s' %s['SnapshotId'])
-                    return 
+                    #return 
       
 
                     
