@@ -1244,6 +1244,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                     <span class="s2">&quot;Error while deleting bucket </span><span class="si">%s</span><span class="s2">, bucket not empty&quot;</span> <span class="o">%</span> <span class="p">(</span>
                         <span class="n">b</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;Error&#39;</span><span class="p">][</span><span class="s1">&#39;Code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AccessDenied&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Error while deleting bucket </span><span class="si">%s</span><span class="s2">, access denied&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">b</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">e</span></div>
 
@@ -1264,8 +1268,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="p">(</span><span class="s2">&quot;EmptyBucket Complete keys:</span><span class="si">%d</span><span class="s2"> rate:</span><span class="si">%0.2f</span><span class="s2">/s time:</span><span class="si">%0.2f</span><span class="s2">s&quot;</span><span class="p">),</span>
-            <span class="n">object_count</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">object_count</span><span class="p">)</span> <span class="o">/</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">run_time</span><span class="p">)</span>
+            <span class="p">(</span><span class="s2">&quot;EmptyBucket bucket:</span><span class="si">%s</span><span class="s2"> Complete keys:</span><span class="si">%d</span><span class="s2"> rate:</span><span class="si">%0.2f</span><span class="s2">/s time:</span><span class="si">%0.2f</span><span class="s2">s&quot;</span><span class="p">),</span>
+            <span class="n">r</span><span class="p">[</span><span class="s1">&#39;Bucket&#39;</span><span class="p">],</span> <span class="n">object_count</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">object_count</span><span class="p">)</span> <span class="o">/</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">run_time</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="DeleteBucket.process_chunk"><a class="viewcode-back" href="../../../generated/c7n.resources.html#c7n.resources.s3.DeleteBucket.process_chunk">[docs]</a>    <span class="k">def</span> <span class="nf">process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">bucket</span><span class="p">):</span>

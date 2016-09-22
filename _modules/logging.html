@@ -605,7 +605,15 @@
         <span class="n">record</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">getMessage</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">usesTime</span><span class="p">():</span>
             <span class="n">record</span><span class="o">.</span><span class="n">asctime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatTime</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datefmt</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fmt</span> <span class="o">%</span> <span class="n">record</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fmt</span> <span class="o">%</span> <span class="n">record</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Issue 25664. The logger name may be Unicode. Try again ...</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">record</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fmt</span> <span class="o">%</span> <span class="n">record</span><span class="o">.</span><span class="n">__dict__</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
         <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">exc_info</span><span class="p">:</span>
             <span class="c1"># Cache the traceback text to avoid converting it multiple times</span>
             <span class="c1"># (it&#39;s constant anyway)</span>
