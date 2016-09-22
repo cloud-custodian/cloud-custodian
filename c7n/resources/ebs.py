@@ -18,7 +18,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
+    Filter, FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
     FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
@@ -26,6 +26,7 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
+
 
 
 log = logging.getLogger('custodian.ebs')
@@ -52,6 +53,31 @@ class SnapshotAge(AgeFilter):
     date_attribute = 'StartTime'
 
 
+@Snapshot.filter_registry.register('ami-snapshot')
+class SnapshotAmiSnapshot(Filter):
+    
+    schema = type_schema(
+        'ami-snapshot', **{'ami-snapshot': {'type': 'boolean'}})
+
+    def get_ami_snapshots(self):
+        ami = []
+        c = local_session(self.manager.session_factory).client('ec2')
+        for i in c.describe_images(Owners=['self'])['Images']:
+            for dev in i.get('BlockDeviceMappings'):
+                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                    ami.append(dev['Ebs']['SnapshotId'])
+        return ami
+    
+    def process(self, snapshots, event=None):
+        for s in snapshots:
+            if s['SnapshotId'] in self.get_ami_snapshots():
+                if self.data.get('ami-snapshot', True):
+                    self.log.info('AMISNAP! %s' %s['SnapshotId'])
+                    return 
+      
+
+                    
+                    
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
 
