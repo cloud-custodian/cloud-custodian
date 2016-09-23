@@ -61,6 +61,13 @@ class SnapshotAmiSnapshot(Filter):
     
     schema = type_schema('ami-snapshot', value={'type': 'boolean'})
     
+    def validate(self):
+        self.log.info('value: %s' %self.data.get('value'))
+        if self.data.get('value' != True or False):
+            raise FilterValidationError(
+                "invalid config: expected boolean value")
+        return self
+    
     #get all snapshots tied to an AMI
     def get_ami_snapshots(self):
         c = local_session(self.manager.session_factory).client('ec2')
