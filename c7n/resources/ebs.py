@@ -28,7 +28,6 @@ from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
 
 
-
 log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
