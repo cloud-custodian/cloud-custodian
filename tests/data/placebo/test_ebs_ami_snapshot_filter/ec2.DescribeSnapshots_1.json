@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "2664c79c-1a08-425a-943b-84e948b69ac5", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 23 Sep 2016 13:18:24 GMT"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Created by CreateImage(i-0320ee8d00d94a548) for ami-19f48f0e from vol-3d1773e8", 
+                "Encrypted": false, 
+                "VolumeId": "vol-3d1773e8", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 5
+                }, 
+                "SnapshotId": "snap-6d0e54dc", 
+                "OwnerId": "644160558196"
+            }
+        ]
+    }
+}

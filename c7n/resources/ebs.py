@@ -53,31 +53,36 @@ class SnapshotAge(AgeFilter):
     date_attribute = 'StartTime'
 
 
-@Snapshot.filter_registry.register('filter-ami-snapshot')
-class SnapshotFilterAmiSnapshot(Filter):
+####This filter will either return resources that are NOT AMI snapshots (value=False)
+####OR
+####it will return ONLY those that are AMI snapshots (value=True)
+@Snapshot.filter_registry.register('ami-snapshot')
+class SnapshotAmiSnapshot(Filter):
     
-    schema = type_schema('filter-ami-snapshot', value={'type': 'boolean'})
+    schema = type_schema('ami-snapshot', value={'type': 'boolean'})
     
+    #get all snapshots tied to an AMI
     def get_ami_snapshots(self):
         c = local_session(self.manager.session_factory).client('ec2')
-        a = []
+        amis = []
         for i in c.describe_images(Owners=['self'])['Images']:
             for dev in i.get('BlockDeviceMappings'):
                 if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                    a.append(dev['Ebs']['SnapshotId'])
-        return a
+                    amis.append(dev['Ebs']['SnapshotId'])
+        return amis
     
+    #filter resources against the list of ami snapshots
     def process(self, snapshots, event=None):
         matches = []
         ami = self.get_ami_snapshots()
         if self.data.get('value', True):
             for snap in snapshots:            
-                if snap['SnapshotId'] not in ami:
+                if snap['SnapshotId'] in ami:
                     self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
                     matches.append(snap)
         else:
             for snap in snapshots:
-                if snap['SnapshotId'] in ami:
+                if snap['SnapshotId'] not in ami:
                     self.log.debug('Ami-snapshot: %s' %snap['SnapshotId'])
                     matches.append(snap)
         return matches
