@@ -61,7 +61,6 @@ class SnapshotAmiSnapshot(Filter):
     schema = type_schema('ami-snapshot', value={'type': 'boolean'})
     
     def validate(self):
-        self.log.info('value: %s' %self.data.get('value'))
         if self.data.get('value' != True or False):
             raise FilterValidationError(
                 "invalid config: expected boolean value")
@@ -84,12 +83,12 @@ class SnapshotAmiSnapshot(Filter):
         if self.data.get('value', True):
             for snap in snapshots:            
                 if snap['SnapshotId'] in ami:
-                    self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
+                    self.log.debug('ami-snapshot: %s' %snap['SnapshotId'])
                     matches.append(snap)
         else:
             for snap in snapshots:
                 if snap['SnapshotId'] not in ami:
-                    self.log.debug('Ami-snapshot: %s' %snap['SnapshotId'])
+                    self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
                     matches.append(snap)
         return matches
              

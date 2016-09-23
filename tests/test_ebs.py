@@ -59,37 +59,30 @@ class SnapshotAmiSnapshotTest(BaseTest):
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
         # DEFAULT_REGION needs to be set to west for recording
         factory = self.replay_flight_data('test_ebs_ami_snapshot_filter')
-        # The first case returns any NON-AMI snapshots
+        
+        #first case should return only resources that are ami snapshots
         p = self.load_policy({
             'name': 'ami-snap-filter',
             'resource': 'ebs-snapshot',
             'filters': [
-                {'ami-snapshot': 'False'}],
+                {'type': 'ami-snapshot',
+                 'value': True}],
             }, session_factory=factory)
         resources = p.run()
-        # If test region is target region aka us-east-1, then the action
-        # skips, and so does the test
-        if factory().region_name == 'us-east-1':
-            return
-        self.assertEqual(len(resources), 2)
-        client = factory(region="us-east-1").client('ec2')
+        self.assertEqual(len(resources), 1)
         
-        # This second case returns any AMI snapshots
+        #second case should return resources that are NOT ami snapshots
         policy = self.load_policy({
-            'name': 'ami-snap-filter',
+            'name': 'non-ami-snap-filter',
             'resource': 'ebs-snapshot',
             'filters': [
-                {'ami-snapshot': 'True'}],
+                {'type': 'ami-snapshot',
+                 'value': False}],
             }, session_factory=factory)
         resources = policy.run()
-        # If test region is target region aka us-east-1, then the action
-        # skips, and so does the test
-        if factory().region_name == 'us-east-1':
-            return
-        self.assertEqual(len(resources), 1)
-        client = factory(region="us-east-1").client('ec2')
-        
+        self.assertEqual(len(resources), 2)
 
+        
 class SnapshotTrimTest(BaseTest):
 
     def test_snapshot_trim(self):
