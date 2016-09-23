@@ -99,13 +99,18 @@ class SnapshotDelete(BaseAction):
          # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
-        if self.data.get('skip-ami-snapshots', True):
-            # Auto filter ami referenced snapshots, build map
-            c = local_session(self.manager.session_factory).client('ec2')
-            for i in c.describe_images(Owners=['self'])['Images']:
-                for dev in i.get('BlockDeviceMappings'):
-                    if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                        snaps.add(dev['Ebs']['SnapshotId'])
+        
+        #=======================================================================
+        # ###### commenting out skip-ami-snapshots action filtering
+        # if self.data.get('skip-ami-snapshots', True):
+        #      # Auto filter ami referenced snapshots, build map
+        #      c = local_session(self.manager.session_factory).client('ec2')
+        #      for i in c.describe_images(Owners=['self'])['Images']:
+        #          for dev in i.get('BlockDeviceMappings'):
+        #              if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+        #                  snaps.add(dev['Ebs']['SnapshotId'])
+        #=======================================================================
+        
         log.info("Deleting %d snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
