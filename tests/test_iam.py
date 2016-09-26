@@ -21,8 +21,11 @@ from common import load_data, BaseTest
 from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
-from c7n.resources.iam import (UserMfaDevice, StaleInstanceProfiles,
-                               DeleteStaleProfiles)
+from c7n.resources.iam import (UserMfaDevice,
+                               AttachedInstanceProfiles, UnattachedInstanceProfiles,
+                               IamAttachedPolicies,IamUnattachedPolicies,
+                               InUseInstanceProfiles, UnusedInstanceProfiles,
+                               InUseIamRole, UnusedIamRole)
 from c7n.executor import MainThreadExecutor
 
 
@@ -42,34 +45,115 @@ class IAMMFAFilter(BaseTest):
         self.assertEqual(len(resources), 2)
 
 
-class IAMSTaleProfileFilter(BaseTest):
+class IamRoleFilterInUse(BaseTest):
 
-    def test_stale_profile_filter(self):
-        session_factory = self.replay_flight_data('test_iam_stale_profile_filter')
-
-        self.patch(
-            StaleInstanceProfiles, 'executor_factory', MainThreadExecutor)
+    def test_iam_role_inuse(self):
+        session_factory = self.replay_flight_data('test_iam_role_inuse')
+        self.patch(InUseIamRole, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
-            'name': 'iam-stale-profile',
-            'resource': 'iam-profile',
-            'filters': ['stale']}, session_factory=session_factory)
+            'name': 'iam-inuse-role',
+            'resource': 'iam-role',
+            'filters': ['inuse']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+def IamRoleFilterUnused(BaseTest):
+
+    def test_iam_role_unused(self):
+        session_factory = self.replay_flight_data('test_iam_role_unused')
+        self.patch(UnusedIamRole, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-inuse-role',
+            'resource': 'iam-role',
+            'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
 
-class IAMStaleProfileDelete(BaseTest):
+class IamInstanceProfileFilterInUse(BaseTest):
 
-    def test_stale_profile_delete(self):
-        session_factory = self.replay_flight_data('test_iam_instanceprofile_delete')
+    def test_iam_instance_profile_inuse(self):
+        session_factory = self.replay_flight_data('test_iam_instance_profile_inuse')
         self.patch(
-            DeleteStaleProfiles, 'executor_factory', MainThreadExecutor)
+            InUseInstanceProfiles, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
-            'name': 'iam-stale-profile',
+            'name': 'iam-inuse-profiles',
             'resource': 'iam-profile',
-            'filters': ['stale'],
-            'actions': ['delete']}, session_factory=session_factory)
+            'filters': ['inuse']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class IamInstanceProfileFilterUnused(BaseTest):
+
+    def test_iam_instance_profile_unused(self):
+        session_factory = self.replay_flight_data('test_iam_instance_profile_unused')
+        self.patch(
+            UnusedInstanceProfiles, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-unused-profiles',
+            'resource': 'iam-profile',
+            'filters': ['unused']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class IamInstanceProfileAttached(BaseTest):
+
+    def test_iam_instance_profile_attached(self):
+        session_factory = self.replay_flight_data('test_iam_instance_profile_attached')
+
+        self.patch(
+            AttachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-attached-profile',
+            'resource': 'iam-profile',
+            'filters': ['attached']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+
+class IamInstanceProfileUnattached(BaseTest):
+
+    def test_iam_instance_profile_unattached(self):
+        session_factory = self.replay_flight_data('test_iam_instance_profile_unattached')
+        self.patch(
+            UnattachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-unattached-profiles',
+            'resource': 'iam-policy',
+            'filters': ['unattached']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 203)
+
+
+class IamPolicyFilterAttached(BaseTest):
+
+    def test_iam_attached_policies(self):
+        session_factory = self.replay_flight_data('test_iam_policy_attached')
+        self.patch(
+            IamAttachedPolicies, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-attached-profiles',
+            'resource': 'iam-policy',
+            'filters': ['attached']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 6)
+
+
+class IamPolicyFilterUnattached(BaseTest):
+
+    def test_iam_unattached_policies(self):
+        session_factory = self.replay_flight_data('test_iam_policy_unattached')
+        self.patch(
+            IamUnattachedPolicies, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-attached-profiles',
+            'resource': 'iam-policy',
+            'filters': ['unattached']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 203)
 
 
 class KMSCrossAccount(BaseTest):

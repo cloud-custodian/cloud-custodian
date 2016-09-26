@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "clusters": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5ff20d08-842a-11e6-a369-e1f4a8b56634", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5ff20d08-842a-11e6-a369-e1f4a8b56634", 
+                "content-length": "108", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Mon, 26 Sep 2016 20:47:01 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "failures": [
+            {
+                "reason": "MISSING", 
+                "arn": "arn:aws:ecs:us-east-1:644160558196:cluster/default"
+            }
+        ]
+    }
+}

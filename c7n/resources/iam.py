@@ -15,10 +15,9 @@
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
-from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -38,82 +37,241 @@ class Role(QueryResourceManager):
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
-
     resource_type = 'aws.iam.user'
 
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
-
     resource_type = 'aws.iam.policy'
 
 
 @resources.register('iam-profile')
 class InstanceProfile(QueryResourceManager):
-
     resource_type = 'aws.iam.instance-profile'
 
 
 @resources.register('iam-certificate')
 class ServerCertificate(QueryResourceManager):
-
     resource_type = 'aws.iam.server-certificate'
 
 
-@InstanceProfile.filter_registry.register('stale')
-class StaleInstanceProfiles(ValueFilter):
+class IamRoleUsage(Filter):
 
-    schema = type_schema('stale', rinherit=ValueFilter.schema)
+    def get_service_roles(self):
+        results = []
+        for result in self.scan_lambda_roles():
+            if result not in results:
+                results.append(result)
+        for result in self.scan_ecs_roles():
+            if result not in results:
+                results.append(result)
+        for result in self.scan_asg_roles(True):
+            if result not in results:
+                results.append(result)
+        for result in self.scan_ec2_roles(True):
+            if result not in results:
+                results.append(result)
+        return results
+
+    def get_instance_profiles(self):
+        results = []
+        for result in self.scan_asg_roles(False):
+            if result not in results:
+                results.append(result)
+        for result in self.scan_ec2_roles(False):
+            if result not in results:
+                results.append(result)
+        return results
+
+    def get_profile_role_arn(self, resource):
+        results = []
+        client = local_session(self.manager.session_factory).client('iam')
+        for iprofile in client.list_instance_profiles()['InstanceProfiles']:
+            if iprofile['Arn'] == resource:
+                profile = client.get_instance_profile(
+                    InstanceProfileName=iprofile['InstanceProfileName'])
+                if 'Roles' not in profile:
+                    return []
+                for role in profile['Roles']:
+                    results.append(role['Arn'])
+        return results
+
+    def scan_lambda_roles(self):
+        results = []
+        client = local_session(self.manager.session_factory).client('lambda')
+        fxs = client.list_functions()['Functions']
+        for fx in fxs:
+            if 'Role' not in fx:
+                continue
+            results.append(fx['Role'])
+        return results
+
+    def scan_ecs_roles(self):
+        results = []
+        client = local_session(self.manager.session_factory).client('ecs')
+        for cluster in client.describe_clusters()['clusters']:
+            svcs = client.list_services(cluster=cluster)['serviceArns']
+            for svc in client.describe_services(cluster=cluster,services=svcs)['services']:
+                if 'roleArn' not in svc:
+                    continue
+                results.append(svc['roleArn'])
+        return results
+
+    def scan_asg_roles(self, rolearn):
+        results = []
+        client = local_session(self.manager.session_factory).client('autoscaling')
+        asgs = client.describe_launch_configurations()['LaunchConfigurations']
+        for asg in asgs:
+            if 'IamInstanceProfile' not in asg:
+                continue
+            if rolearn:
+                for arn in self.get_profile_role_arn(asg['IamInstanceProfile']):
+                    results.append(arn)
+            else:
+                results.append(asg['IamInstanceProfile'])
+        return results
+
+    def scan_ec2_roles(self, rolearn):
+        results = []
+        client = local_session(self.manager.session_factory).client('ec2')
+        instances = client.describe_instances()['Reservations']
+        for instance in instances:
+            for ec2 in instance['Instances']:
+                if 'IamInstanceProfile' not in ec2:
+                    continue
+                if rolearn:
+                    for arn in self.get_profile_role_arn(ec2['IamInstanceProfile']['Arn']):
+                        results.append(arn)
+                else:
+                    results.append(ec2['IamInstanceProfile']['Arn'])
+        return results
+
+
+###################
+#    IAM Roles    #
+###################
+
+
+@Role.filter_registry.register('inuse')
+class InUseIamRole(IamRoleUsage):
+
+    schema = type_schema('inuse')
 
     def process(self, resources, event=None):
-
-        def _get_last_event(resource):
-            client = local_session(
-                self.manager.session_factory).client('cloudtrail')
-            events = client.lookup_events(
-                LookupAttributes=[{
-                    'AttributeKey': 'ResourceName',
-                    'AttributeValue': resource['InstanceProfileName']}]
-            )['Events']
-            if len(events) == 0:
-                resource['LastEvent'] = datetime.now() - timedelta(days=365)
-                return resource
-
-        self.log.debug("Querying %d instance profiles" % len(resources))
+        roles = self.get_service_roles()
         results = []
         for r in resources:
-            if _get_last_event(r):
+            if r['Arn'] in roles:
                 results.append(r)
         return results
 
 
-@InstanceProfile.action_registry.register('delete')
-class DeleteStaleProfiles(BaseAction):
+@Role.filter_registry.register('unused')
+class UnusedIamRole(IamRoleUsage):
 
-    schema = type_schema('delete')
+    schema = type_schema('unused')
 
-    def process(self, resources):
-        self.log.info("Deleting %d instance profiles", len(resources))
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for r in resources:
-                futures.append(
-                    w.submit(self.process_profile, r))
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception deleting snapshot set \n %s" % (
-                            f.exception()))
+    def process(self, resources, event=None):
+        roles = self.get_service_roles()
+        results = []
+        for r in resources:
+            if r['Arn'] not in roles:
+                results.append(r)
+        return results
 
-    def process_profile(self, resource):
-        client = local_session(self.manager.session_factory).client('iam')
-        roles = resource['Roles']
-        for role in roles:
-            client.remove_role_from_instance_profile(
-                InstanceProfileName=resource['InstanceProfileName'],
-                RoleName=role['RoleName'])
-        client.delete_instance_profile(
-            InstanceProfileName=resource['InstanceProfileName'])
+
+######################
+#    IAM Policies    #
+######################
+
+
+@Policy.filter_registry.register('attached')
+class IamAttachedPolicies(ValueFilter):
+
+    schema = type_schema('attached')
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if r['AttachmentCount'] > 0:
+                results.append(r)
+        return results
+
+
+@Policy.filter_registry.register('unattached')
+class IamUnattachedPolicies(ValueFilter):
+
+    schema = type_schema('unattached')
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if r['AttachmentCount'] == 0:
+                results.append(r)
+        return results
+
+###############################
+#    IAM Instance Profiles    #
+###############################
+
+
+@InstanceProfile.filter_registry.register('inuse')
+class InUseInstanceProfiles(IamRoleUsage):
+
+    schema = type_schema('inuse')
+
+    def process(self, resources, event=None):
+        results = []
+        profiles = self.get_instance_profiles()
+        for r in resources:
+            if r['Arn'] in profiles:
+                results.append(r)
+        return results
+
+
+@InstanceProfile.filter_registry.register('unused')
+class UnusedInstanceProfiles(IamRoleUsage):
+
+    schema = type_schema('unused')
+
+    def process(self, resources, event=None):
+        results = []
+        profiles = self.get_instance_profiles()
+        for r in resources:
+            if r['Arn'] not in profiles:
+                results.append(r)
+        return results
+
+
+@InstanceProfile.filter_registry.register('attached')
+class AttachedInstanceProfiles(ValueFilter):
+
+    schema = type_schema('attached')
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            print len(r['Roles'])
+            if len(r['Roles']) != 0:
+                results.append(r)
+        self.log.info("%d of %d instance profiles in use." % (
+            len(results), len(resources)))
+        return results
+
+
+@InstanceProfile.filter_registry.register('unattached')
+class UnattachedInstanceProfiles(ValueFilter):
+
+    schema = type_schema('unattached')
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if len(r['Roles']) == 0:
+                results.append(r)
+        self.log.info("%d of %d instance profiles not in use." % (
+            len(results), len(resources)))
+        return results
 
 
 @User.filter_registry.register('policy')
