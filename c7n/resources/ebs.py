@@ -69,12 +69,12 @@ class SnapshotAmiSnapshot(Filter):
     #get all snapshots tied to an AMI
     def get_ami_snapshots(self):
         c = local_session(self.manager.session_factory).client('ec2')
-        amis = []
+        ami_snaps = []
         for i in c.describe_images(Owners=['self'])['Images']:
             for dev in i.get('BlockDeviceMappings'):
                 if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                    amis.append(dev['Ebs']['SnapshotId'])
-        return amis
+                    ami_snaps.append(dev['Ebs']['SnapshotId'])
+        return ami_snaps
     
     #filter resources against the list of ami snapshots
     def process(self, snapshots, event=None):
