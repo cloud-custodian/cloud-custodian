@@ -58,7 +58,7 @@ class IamRoleFilterInUse(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-def IamRoleFilterUnused(BaseTest):
+class IamRoleFilterUnused(BaseTest):
 
     def test_iam_role_unused(self):
         session_factory = self.replay_flight_data('test_iam_role_unused')
@@ -68,7 +68,7 @@ def IamRoleFilterUnused(BaseTest):
             'resource': 'iam-role',
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 6)
 
 
 class IamInstanceProfileFilterInUse(BaseTest):
