@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import operator
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -62,19 +63,15 @@ def _filter_ami_snapshots(self, snapshots):
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
                 ami_snaps.append(dev['Ebs']['SnapshotId'])
-    
     matches = []
     if self.data.get('value', True):
         for snap in snapshots:          
             if snap['SnapshotId'] not in ami_snaps:
                 self.log.debug('ami-snapshot: %s' %snap['SnapshotId'])
                 matches.append(snap)
+        return matches
     else:
-        for snap in snapshots:
-            if snap['SnapshotId'] in ami_snaps:
-                self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
-                matches.append(snap)
-    return matches
+        return snapshots
 
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
@@ -104,11 +101,11 @@ class SnapshotDelete(BaseAction):
          # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
+        pre = len(snapshots)
+        snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
+        post = len(snapshots)
+        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots" %(post, pre-post))
         
-        if self.data.get('skip-ami-snapshots', True):
-            snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
-        
-        log.info("Deleting %d non-ami snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):

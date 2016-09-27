@@ -69,7 +69,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
                  'value': False}],
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
         
         #second case should return resources that are NOT ami snapshots
         policy = self.load_policy({
