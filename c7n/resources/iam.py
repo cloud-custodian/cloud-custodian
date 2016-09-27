@@ -65,45 +65,32 @@ class IamRoleUsage(Filter):
         for result in self.scan_ecs_roles():
             if result not in results:
                 results.append(result)
-        for result in self.scan_asg_roles(True):
+        for result in self.scan_asg_roles():
             if result not in results:
                 results.append(result)
-        for result in self.scan_ec2_roles(True):
+        for result in self.scan_ec2_roles():
             if result not in results:
                 results.append(result)
         return results
 
     def get_instance_profiles(self):
         results = []
-        for result in self.scan_asg_roles(False):
+        for result in self.scan_asg_roles():
             if result not in results:
                 results.append(result)
-        for result in self.scan_ec2_roles(False):
+        for result in self.scan_ec2_roles():
             if result not in results:
                 results.append(result)
-        return results
-
-    def get_profile_role_arn(self, resource):
-        results = []
-        client = local_session(self.manager.session_factory).client('iam')
-        for iprofile in client.list_instance_profiles()['InstanceProfiles']:
-            if iprofile['Arn'] == resource:
-                profile = client.get_instance_profile(
-                    InstanceProfileName=iprofile['InstanceProfileName'])
-                if 'Roles' not in profile:
-                    return []
-                for role in profile['Roles']:
-                    results.append(role['Arn'])
         return results
 
     def scan_lambda_roles(self):
         results = []
-        client = local_session(self.manager.session_factory).client('lambda')
-        fxs = client.list_functions()['Functions']
-        for fx in fxs:
-            if 'Role' not in fx:
+        from c7n.resources.awslambda import AWSLambda
+        manager = AWSLambda(self.manager.ctx, {})
+        for l in manager.resources():
+            if 'Role' not in l:
                 continue
-            results.append(fx['Role'])
+            results.append(l['Role'])
         return results
 
     def scan_ecs_roles(self):
@@ -117,33 +104,30 @@ class IamRoleUsage(Filter):
                 results.append(svc['roleArn'])
         return results
 
-    def scan_asg_roles(self, rolearn):
-        results = []
-        client = local_session(self.manager.session_factory).client('autoscaling')
-        asgs = client.describe_launch_configurations()['LaunchConfigurations']
-        for asg in asgs:
-            if 'IamInstanceProfile' not in asg:
-                continue
-            if rolearn:
-                for arn in self.get_profile_role_arn(asg['IamInstanceProfile']):
-                    results.append(arn)
-            else:
-                results.append(asg['IamInstanceProfile'])
-        return results
+    def scan_asg_roles(self):
+        from c7n.resources.asg import LaunchConfig
+        manager = LaunchConfig(self.manager.ctx, {
+            'resource': 'launch-config'})
 
-    def scan_ec2_roles(self, rolearn):
         results = []
-        client = local_session(self.manager.session_factory).client('ec2')
-        instances = client.describe_instances()['Reservations']
-        for instance in instances:
-            for ec2 in instance['Instances']:
-                if 'IamInstanceProfile' not in ec2:
+        for g in manager.resources():
+            if 'IamInstanceProfile' in g:
+                results.append(g['IamInstanceProfile'])
+        return results
+        #return set([p['IamInstanceProfile'] for p in manager.resources()])
+
+    def scan_ec2_roles(self):
+        from c7n.resources.ec2 import EC2
+        manager = EC2(self.manager.ctx, {})
+
+        results = []
+        for e in manager.resources():
+            if 'Instances' not in e:
+                continue
+            for i in e['Instances']:
+                if 'IamInstanceProfile' not in i:
                     continue
-                if rolearn:
-                    for arn in self.get_profile_role_arn(ec2['IamInstanceProfile']['Arn']):
-                        results.append(arn)
-                else:
-                    results.append(ec2['IamInstanceProfile']['Arn'])
+                results.append(i['IamInstanceProfile']['Arn'])
         return results
 
 
@@ -152,16 +136,18 @@ class IamRoleUsage(Filter):
 ###################
 
 
-@Role.filter_registry.register('inuse')
-class InUseIamRole(IamRoleUsage):
+@Role.filter_registry.register('used')
+class UsedIamRole(IamRoleUsage):
 
-    schema = type_schema('inuse')
+    schema = type_schema('used')
 
     def process(self, resources, event=None):
         roles = self.get_service_roles()
         results = []
         for r in resources:
             if r['Arn'] in roles:
+                results.append(r)
+            elif r['RoleName'] in roles:
                 results.append(r)
         return results
 
@@ -177,6 +163,8 @@ class UnusedIamRole(IamRoleUsage):
         for r in resources:
             if r['Arn'] not in roles:
                 results.append(r)
+            elif r['RoleName'] not in roles:
+                results.append(r)
         return results
 
 
@@ -185,10 +173,10 @@ class UnusedIamRole(IamRoleUsage):
 ######################
 
 
-@Policy.filter_registry.register('attached')
-class IamAttachedPolicies(ValueFilter):
+@Policy.filter_registry.register('used')
+class UsedIamPolicies(Filter):
 
-    schema = type_schema('attached')
+    schema = type_schema('used')
 
     def process(self, resources, event=None):
         results = []
@@ -198,10 +186,10 @@ class IamAttachedPolicies(ValueFilter):
         return results
 
 
-@Policy.filter_registry.register('unattached')
-class IamUnattachedPolicies(ValueFilter):
+@Policy.filter_registry.register('unused')
+class UnusedIamPolicies(Filter):
 
-    schema = type_schema('unattached')
+    schema = type_schema('unused')
 
     def process(self, resources, event=None):
         results = []
@@ -215,16 +203,18 @@ class IamUnattachedPolicies(ValueFilter):
 ###############################
 
 
-@InstanceProfile.filter_registry.register('inuse')
-class InUseInstanceProfiles(IamRoleUsage):
+@InstanceProfile.filter_registry.register('used')
+class UsedInstanceProfiles(IamRoleUsage):
 
-    schema = type_schema('inuse')
+    schema = type_schema('used')
 
     def process(self, resources, event=None):
         results = []
         profiles = self.get_instance_profiles()
         for r in resources:
             if r['Arn'] in profiles:
+                results.append(r)
+            if r['InstanceProfileName'] in profiles:
                 results.append(r)
         return results
 
@@ -244,23 +234,22 @@ class UnusedInstanceProfiles(IamRoleUsage):
 
 
 @InstanceProfile.filter_registry.register('attached')
-class AttachedInstanceProfiles(ValueFilter):
+class AttachedInstanceProfiles(Filter):
 
     schema = type_schema('attached')
 
     def process(self, resources, event=None):
         results = []
         for r in resources:
-            print len(r['Roles'])
             if len(r['Roles']) != 0:
                 results.append(r)
-        self.log.info("%d of %d instance profiles in use." % (
+        self.log.info("%d of %d instance profiles attached to a role." % (
             len(results), len(resources)))
         return results
 
 
 @InstanceProfile.filter_registry.register('unattached')
-class UnattachedInstanceProfiles(ValueFilter):
+class UnattachedInstanceProfiles(Filter):
 
     schema = type_schema('unattached')
 
@@ -269,15 +258,15 @@ class UnattachedInstanceProfiles(ValueFilter):
         for r in resources:
             if len(r['Roles']) == 0:
                 results.append(r)
-        self.log.info("%d of %d instance profiles not in use." % (
+        self.log.info("%d of %d instance profiles not attached to a role." % (
             len(results), len(resources)))
         return results
 
 
 @User.filter_registry.register('policy')
-class UserAttachedPolicy(ValueFilter):
+class UserAttachedPolicy(Filter):
 
-    schema = type_schema('policy', rinherit=ValueFilter.schema)
+    schema = type_schema('policy')
 
     def process(self, resources, event=None):
 
