@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import operator
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -28,7 +27,6 @@ from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
 from logging import Manager
-from turtle import config_dict
 
 
 log = logging.getLogger('custodian.ebs')
