@@ -26,7 +26,6 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
-from logging import Manager
 
 
 log = logging.getLogger('custodian.ebs')
@@ -55,22 +54,20 @@ class SnapshotAge(AgeFilter):
 
 def _filter_ami_snapshots(self, snapshots):
 # gets a listing of all AMI snapshots and compares resources to the list
-    c = local_session(self.manager.session_factory).client('ec2')
     ami_snaps = []
+    c = local_session(self.manager.session_factory).client('ec2')   
     for i in c.describe_images(Owners=['self'])['Images']:
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
                 ami_snaps.append(dev['Ebs']['SnapshotId'])
     matches = []
-    if self.data.get('value', True):
-        for snap in snapshots:          
-            if snap['SnapshotId'] not in ami_snaps:
-                self.log.debug('ami-snapshot: %s' %snap['SnapshotId'])
-                matches.append(snap)
-        return matches
-    else:
+    if not self.data.get('value', True):
         return snapshots
-
+    for snap in snapshots:
+        if snap['SnapshotId'] not in ami_snaps:
+            matches.append(snap)
+    return matches
+        
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
@@ -78,7 +75,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
     
     def validate(self):
-        if self.data.get('value' != True or False):
+        if self.data.get('skip-ami-snapshots', not True or False):
             raise FilterValidationError(
                 "invalid config: expected boolean value")
         return self
@@ -93,7 +90,7 @@ class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-    
+
     def process(self, snapshots):
         self.image_snapshots = snaps = set()
          # Be careful re image snapshots, we do this by default
