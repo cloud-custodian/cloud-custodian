@@ -65,8 +65,8 @@ class SnapshotAmiSnapshotTest(BaseTest):
             'name': 'ami-snap-filter',
             'resource': 'ebs-snapshot',
             'filters': [
-                {'type': 'ami-snapshot',
-                 'value': True}],
+                {'type': 'skip-ami-snapshots',
+                 'value': False}],
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -76,8 +76,8 @@ class SnapshotAmiSnapshotTest(BaseTest):
             'name': 'non-ami-snap-filter',
             'resource': 'ebs-snapshot',
             'filters': [
-                {'type': 'ami-snapshot',
-                 'value': False}],
+                {'type': 'skip-ami-snapshots',
+                 'value': True}],
             }, session_factory=factory)
         resources = policy.run()
         self.assertEqual(len(resources), 2)

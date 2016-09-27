@@ -26,6 +26,7 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
+from logging import Manager
 
 
 log = logging.getLogger('custodian.ebs')
@@ -50,15 +51,37 @@ class SnapshotAge(AgeFilter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()})
     date_attribute = 'StartTime'
-
-
-####This filter will either return resources that are NOT AMI snapshots (value=False)
-####OR
-####it will return ONLY those that are AMI snapshots (value=True)
-@Snapshot.filter_registry.register('ami-snapshot')
-class SnapshotAmiSnapshot(Filter):
     
-    schema = type_schema('ami-snapshot', value={'type': 'boolean'})
+
+def _filter_ami_snapshots(self, snapshots):
+
+    #get all snapshots tied to an AMI
+    c = local_session(self.manager.session_factory).client('ec2')
+    ami_snaps = []
+    for i in c.describe_images(Owners=['self'])['Images']:
+        for dev in i.get('BlockDeviceMappings'):
+            if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                ami_snaps.append(dev['Ebs']['SnapshotId'])
+     
+    #filter resources against the list of ami snapshots
+    matches = []
+    if self.data.get('value', True):
+        for snap in snapshots:          
+            if snap['SnapshotId'] not in ami_snaps:
+                self.log.debug('ami-snapshot: %s' %snap['SnapshotId'])
+                matches.append(snap)
+    else:
+        for snap in snapshots:
+            if snap['SnapshotId'] in ami_snaps:
+                self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
+                matches.append(snap)
+    return matches
+
+
+@Snapshot.filter_registry.register('skip-ami-snapshots')
+class SnapshotSkipAmiSnapshots(Filter):
+    
+    schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
     
     def validate(self):
         if self.data.get('value' != True or False):
@@ -66,57 +89,26 @@ class SnapshotAmiSnapshot(Filter):
                 "invalid config: expected boolean value")
         return self
     
-    #get all snapshots tied to an AMI
-    def get_ami_snapshots(self):
-        c = local_session(self.manager.session_factory).client('ec2')
-        ami_snaps = []
-        for i in c.describe_images(Owners=['self'])['Images']:
-            for dev in i.get('BlockDeviceMappings'):
-                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                    ami_snaps.append(dev['Ebs']['SnapshotId'])
-        return ami_snaps
-    
-    #filter resources against the list of ami snapshots
     def process(self, snapshots, event=None):
-        matches = []
-        ami = self.get_ami_snapshots()
-        if self.data.get('value', True):
-            for snap in snapshots:            
-                if snap['SnapshotId'] in ami:
-                    self.log.debug('ami-snapshot: %s' %snap['SnapshotId'])
-                    matches.append(snap)
-        else:
-            for snap in snapshots:
-                if snap['SnapshotId'] not in ami:
-                    self.log.debug('Non-ami-snapshot: %s' %snap['SnapshotId'])
-                    matches.append(snap)
-        return matches
-             
-                    
+        resources = _filter_ami_snapshots(self, snapshots)
+        return resources
+    
+    
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-
+    
     def process(self, snapshots):
         self.image_snapshots = snaps = set()
          # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
+        if self.data.get('skip-ami-snapshots', True):
+            snapshots = _filter_ami_snapshots(self, snapshots)
         
-        #=======================================================================
-        # ###### commenting out skip-ami-snapshots action filtering
-        # if self.data.get('skip-ami-snapshots', True):
-        #      # Auto filter ami referenced snapshots, build map
-        #      c = local_session(self.manager.session_factory).client('ec2')
-        #      for i in c.describe_images(Owners=['self'])['Images']:
-        #          for dev in i.get('BlockDeviceMappings'):
-        #              if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-        #                  snaps.add(dev['Ebs']['SnapshotId'])
-        #=======================================================================
-        
-        log.info("Deleting %d snapshots", len(snapshots))
+        log.info("Deleting %d non-ami snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
