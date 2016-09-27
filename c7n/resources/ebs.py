@@ -27,6 +27,7 @@ from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
 from logging import Manager
+from turtle import config_dict
 
 
 log = logging.getLogger('custodian.ebs')
@@ -54,16 +55,14 @@ class SnapshotAge(AgeFilter):
     
 
 def _filter_ami_snapshots(self, snapshots):
-
-    #get all snapshots tied to an AMI
+# gets a listing of all AMI snapshots and compares resources to the list
     c = local_session(self.manager.session_factory).client('ec2')
     ami_snaps = []
     for i in c.describe_images(Owners=['self'])['Images']:
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
                 ami_snaps.append(dev['Ebs']['SnapshotId'])
-     
-    #filter resources against the list of ami snapshots
+    
     matches = []
     if self.data.get('value', True):
         for snap in snapshots:          
@@ -105,8 +104,9 @@ class SnapshotDelete(BaseAction):
          # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
+        
         if self.data.get('skip-ami-snapshots', True):
-            snapshots = _filter_ami_snapshots(self, snapshots)
+            snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
         
         log.info("Deleting %d non-ami snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
