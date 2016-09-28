@@ -26,7 +26,7 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
-
+from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
 
@@ -53,10 +53,20 @@ class SnapshotAge(AgeFilter):
     
 
 def _filter_ami_snapshots(self, snapshots):
-# gets a listing of all AMI snapshots and compares resources to the list
-    ami_snaps = []
-    c = local_session(self.manager.session_factory).client('ec2')   
-    for i in c.describe_images(Owners=['self'])['Images']:
+    c = local_session(self.manager.session_factory).client('ec2')
+    amis = self.manager._cache.get(
+        {'region': self.manager.config.region,
+         'resource': 'ami'})
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    if amis is None:
+        # This will populate the cache.
+        ami_manager = AMI(self.manager.ctx, {})
+        amis = ami_manager.resources()
+        ami_snaps = []
+        data = c.describe_images(Owners=['self'])['Images']
+    else:
+        data = amis    
+    for i in data:
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
                 ami_snaps.append(dev['Ebs']['SnapshotId'])
