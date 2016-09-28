@@ -22,9 +22,11 @@ from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (UserMfaDevice,
-                               AttachedInstanceProfiles, UnattachedInstanceProfiles,
+                               AttachedInstanceProfiles,
+                               UnattachedInstanceProfiles,
                                UsedIamPolicies, UnusedIamPolicies,
-                               UsedInstanceProfiles, UnusedInstanceProfiles,
+                               UsedInstanceProfiles,
+                               UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole)
 from c7n.executor import MainThreadExecutor
 
@@ -56,7 +58,6 @@ class IamRoleFilterInUse(BaseTest):
             'resource': 'iam-role',
             'filters': ['used']}, session_factory=session_factory)
         resources = p.run()
-
         self.assertEqual(len(resources), 2)
 
 
@@ -77,7 +78,8 @@ class IamRoleFilterUnused(BaseTest):
 class IamInstanceProfileFilterInUse(BaseTest):
 
     def test_iam_instance_profile_inuse(self):
-        session_factory = self.replay_flight_data('test_iam_instance_profile_inuse')
+        session_factory = self.replay_flight_data(
+            'test_iam_instance_profile_inuse')
         self.patch(
             UsedInstanceProfiles, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -91,7 +93,8 @@ class IamInstanceProfileFilterInUse(BaseTest):
 class IamInstanceProfileFilterUnused(BaseTest):
 
     def test_iam_instance_profile_unused(self):
-        session_factory = self.replay_flight_data('test_iam_instance_profile_unused')
+        session_factory = self.replay_flight_data(
+            'test_iam_instance_profile_unused')
         self.patch(
             UnusedInstanceProfiles, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -133,7 +136,8 @@ class IamPolicyFilterUnattached(BaseTest):
 class IamInstanceProfileAttached(BaseTest):
 
     def test_iam_instance_profile_attached(self):
-        session_factory = self.replay_flight_data('test_iam_instance_profile_attached')
+        session_factory = self.replay_flight_data(
+            'test_iam_instance_profile_attached')
 
         self.patch(
             AttachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
@@ -148,7 +152,8 @@ class IamInstanceProfileAttached(BaseTest):
 class IamInstanceProfileUnattached(BaseTest):
 
     def test_iam_instance_profile_unattached(self):
-        session_factory = self.replay_flight_data('test_iam_instance_profile_unattached')
+        session_factory = self.replay_flight_data(
+            'test_iam_instance_profile_unattached')
         self.patch(
             UnattachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({

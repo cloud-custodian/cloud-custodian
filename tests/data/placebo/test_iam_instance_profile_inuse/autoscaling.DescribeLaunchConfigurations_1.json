@@ -6,20 +6,20 @@
                 "UserData": "", 
                 "IamInstanceProfile": "root_joshua", 
                 "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:b400be77-3ccc-4cb1-ae2a-9f52a00d94ed:launchConfigurationName/Test-ASG-001", 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:dbfc8105-7296-4f35-ba2b-827745bddcfc:launchConfigurationName/Test-ASG-LaunchConfig-001", 
                 "InstanceMonitoring": {
                     "Enabled": false
                 }, 
                 "ClassicLinkVPCSecurityGroups": [], 
                 "CreatedTime": {
-                    "hour": 16, 
+                    "hour": 15, 
                     "__class__": "datetime", 
                     "month": 9, 
-                    "second": 19, 
-                    "microsecond": 825000, 
+                    "second": 4, 
+                    "microsecond": 874000, 
                     "year": 2016, 
-                    "day": 27, 
-                    "minute": 19
+                    "day": 28, 
+                    "minute": 12
                 }, 
                 "BlockDeviceMappings": [
                     {
@@ -33,31 +33,31 @@
                 ], 
                 "KeyName": "", 
                 "SecurityGroups": [
-                    "sg-6c7fa917"
+                    "sg-119cd66b"
                 ], 
-                "LaunchConfigurationName": "Test-ASG-001", 
+                "LaunchConfigurationName": "Test-ASG-LaunchConfig-001", 
                 "KernelId": "", 
                 "RamdiskId": "", 
-                "ImageId": "ami-6869aa05", 
+                "ImageId": "ami-c481fad3", 
                 "InstanceType": "t2.micro"
             }, 
             {
                 "UserData": "", 
                 "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:98077f50-089f-4455-b54b-b88674f5a641:launchConfigurationName/Test-ASG-002", 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:5686013c-a053-479c-aca4-37aff67679d4:launchConfigurationName/Test-ASG-LaunchConfig-002", 
                 "InstanceMonitoring": {
                     "Enabled": false
                 }, 
                 "ClassicLinkVPCSecurityGroups": [], 
                 "CreatedTime": {
-                    "hour": 16, 
+                    "hour": 15, 
                     "__class__": "datetime", 
                     "month": 9, 
-                    "second": 32, 
-                    "microsecond": 356000, 
+                    "second": 39, 
+                    "microsecond": 239000, 
                     "year": 2016, 
-                    "day": 27, 
-                    "minute": 21
+                    "day": 28, 
+                    "minute": 13
                 }, 
                 "BlockDeviceMappings": [
                     {
@@ -73,23 +73,23 @@
                 "SecurityGroups": [
                     "sg-6c7fa917"
                 ], 
-                "LaunchConfigurationName": "Test-ASG-002", 
+                "LaunchConfigurationName": "Test-ASG-LaunchConfig-002", 
                 "KernelId": "", 
                 "RamdiskId": "", 
-                "ImageId": "ami-6869aa05", 
+                "ImageId": "ami-c481fad3", 
                 "InstanceType": "t2.micro"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "01a5690e-84ea-11e6-9275-d178dd0a254d", 
+            "RequestId": "28aff86b-858e-11e6-ba2b-a751265c3c1e", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "01a5690e-84ea-11e6-9275-d178dd0a254d", 
+                "x-amzn-requestid": "28aff86b-858e-11e6-ba2b-a751265c3c1e", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2678", 
+                "content-length": "2730", 
                 "content-type": "text/xml", 
-                "date": "Tue, 27 Sep 2016 19:38:46 GMT"
+                "date": "Wed, 28 Sep 2016 15:13:49 GMT"
             }
         }
     }

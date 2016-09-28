@@ -84,14 +84,9 @@ class IamRoleUsage(Filter):
         return results
 
     def scan_lambda_roles(self):
-        results = []
         from c7n.resources.awslambda import AWSLambda
         manager = AWSLambda(self.manager.ctx, {})
-        for l in manager.resources():
-            if 'Role' not in l:
-                continue
-            results.append(l['Role'])
-        return results
+        return [r['Role'] for r in manager.resources() if 'Role' in r]
 
     def scan_ecs_roles(self):
         results = []
@@ -109,12 +104,8 @@ class IamRoleUsage(Filter):
         from c7n.resources.asg import LaunchConfig
         manager = LaunchConfig(self.manager.ctx, {
             'resource': 'launch-config'})
-
-        results = []
-        for g in manager.resources():
-            if 'IamInstanceProfile' in g:
-                results.append(g['IamInstanceProfile'])
-        return results
+        return [r['IamInstanceProfile'] for r in manager.resources()
+                if 'IamInstanceProfile' in r]
 
     def scan_ec2_roles(self):
         from c7n.resources.ec2 import EC2
@@ -145,9 +136,7 @@ class UsedIamRole(IamRoleUsage):
         roles = self.service_role_usage()
         results = []
         for r in resources:
-            if r['Arn'] in roles:
-                results.append(r)
-            elif r['RoleName'] in roles:
+            if r['Arn'] in roles or r['RoleName'] in roles:
                 results.append(r)
         self.log.info("%d of %d iam roles currently used." % (
             len(results), len(resources)))
@@ -163,9 +152,7 @@ class UnusedIamRole(IamRoleUsage):
         roles = self.service_role_usage()
         results = []
         for r in resources:
-            if r['Arn'] not in roles:
-                results.append(r)
-            elif r['RoleName'] not in roles:
+            if r['Arn'] not in roles or r['RoleName'] not in roles:
                 results.append(r)
         self.log.info("%d of %d iam roles not currently used." % (
             len(results), len(resources)))
@@ -183,14 +170,7 @@ class UsedIamPolicies(Filter):
     schema = type_schema('used')
 
     def process(self, resources, event=None):
-        results = []
-        for r in resources:
-            if r['AttachmentCount'] > 0:
-                results.append(r)
-        self.log.info(
-            "%d of %d iam policies currently in use." % (
-                len(results), len(resources)))
-        return results
+        return [r for r in resources if r['AttachmentCount'] > 0]
 
 
 @Policy.filter_registry.register('unused')
@@ -199,14 +179,8 @@ class UnusedIamPolicies(Filter):
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
-        results = []
-        for r in resources:
-            if r['AttachmentCount'] == 0:
-                results.append(r)
-        self.log.info(
-            "%d of %d iam policies not currently in use." % (
-                len(results), len(resources)))
-        return results
+        return [r for r in resources if r['AttachmentCount'] == 0]
+
 
 ###############################
 #    IAM Instance Profiles    #
@@ -222,9 +196,7 @@ class UsedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if r['Arn'] in profiles:
-                results.append(r)
-            if r['InstanceProfileName'] in profiles:
+            if r['Arn'] in profiles or r['InstanceProfileName'] in profiles:
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently in use." % (
@@ -241,7 +213,8 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if r['Arn'] not in profiles:
+            if (r['Arn'] not in profiles or
+                        r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (
@@ -279,6 +252,11 @@ class UnattachedInstanceProfiles(Filter):
             "%d of %d instance profiles not attached to a role." % (
                 len(results), len(resources)))
         return results
+
+
+###################
+#    IAM Users    #
+###################
 
 
 @User.filter_registry.register('policy')
