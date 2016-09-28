@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "c7n-test-ami", 
+                "Hypervisor": "xen", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-0bec971c", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-4090d8aa", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/c7n-test-ami", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2016-09-23T14:33:38.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Description": "c7n-test-ami"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "93fab014-c070-49fd-b8b5-8bd488abf2d9", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 23 Sep 2016 15:25:41 GMT"
+            }
+        }
+    }
+}
