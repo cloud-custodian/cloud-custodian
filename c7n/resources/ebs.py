@@ -53,7 +53,8 @@ class SnapshotAge(AgeFilter):
     
 
 def _filter_ami_snapshots(self, snapshots):
-    c = local_session(self.manager.session_factory).client('ec2')
+    if not self.data.get('value', True):
+        return snapshots
     #try using cache first to get a listing of all AMI snapshots and compares resources to the list
     #This will populate the cache.
     ami_manager = AMI(self.manager.ctx, {})
@@ -64,8 +65,6 @@ def _filter_ami_snapshots(self, snapshots):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
                 ami_snaps.append(dev['Ebs']['SnapshotId'])            
     matches = []
-    if not self.data.get('value', True):
-        return snapshots
     for snap in snapshots:
         if snap['SnapshotId'] not in ami_snaps:
             matches.append(snap)
