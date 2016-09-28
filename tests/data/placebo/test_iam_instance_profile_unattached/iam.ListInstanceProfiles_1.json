@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "27ca2910-84eb-11e6-b82a-45f985f17976", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "27ca2910-84eb-11e6-b82a-45f985f17976", 
+                "date": "Tue, 27 Sep 2016 19:46:59 GMT", 
+                "content-length": "2155", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "InstanceProfiles": [
+            {
+                "InstanceProfileId": "AIPAJR4ZAYIIYLZTJU6RG", 
+                "Roles": [],
+                "CreateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 56
+                }, 
+                "InstanceProfileName": "mandeep", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/mandeep"
+            }, 
+            {
+                "InstanceProfileId": "AIPAJBGQEL7545WR7UQ52", 
+                "Roles": [
+                    {
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                        "RoleId": "AROAIYSSSIEWDYBRVPH2A", 
+                        "CreateDate": {
+                            "hour": 18, 
+                            "__class__": "datetime", 
+                            "month": 9, 
+                            "second": 46, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 26, 
+                            "minute": 25
+                        }, 
+                        "RoleName": "root_joshua", 
+                        "Path": "/", 
+                        "Arn": "arn:aws:iam::644160558196:role/root_joshua"
+                    }
+                ], 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 25
+                }, 
+                "InstanceProfileName": "root_joshua", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/root_joshua"
+            }
+        ]
+    }
+}
