@@ -54,22 +54,15 @@ class SnapshotAge(AgeFilter):
 
 def _filter_ami_snapshots(self, snapshots):
     c = local_session(self.manager.session_factory).client('ec2')
-    amis = self.manager._cache.get(
-        {'region': self.manager.config.region,
-         'resource': 'ami'})
-    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    if amis is None:
-        # This will populate the cache.
-        ami_manager = AMI(self.manager.ctx, {})
-        amis = ami_manager.resources()
-        ami_snaps = []
-        data = c.describe_images(Owners=['self'])['Images']
-    else:
-        data = amis    
-    for i in data:
+    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    #This will populate the cache.
+    ami_manager = AMI(self.manager.ctx, {})
+    amis = ami_manager.resources()
+    ami_snaps = []
+    for i in amis:
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                ami_snaps.append(dev['Ebs']['SnapshotId'])
+                ami_snaps.append(dev['Ebs']['SnapshotId'])            
     matches = []
     if not self.data.get('value', True):
         return snapshots
