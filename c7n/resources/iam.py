@@ -57,7 +57,7 @@ class ServerCertificate(QueryResourceManager):
 
 class IamRoleUsage(Filter):
 
-    def get_service_roles(self):
+    def service_role_usage(self):
         results = []
         for result in self.scan_lambda_roles():
             if result not in results:
@@ -73,7 +73,7 @@ class IamRoleUsage(Filter):
                 results.append(result)
         return results
 
-    def get_instance_profiles(self):
+    def instance_profile_usage(self):
         results = []
         for result in self.scan_asg_roles():
             if result not in results:
@@ -98,7 +98,8 @@ class IamRoleUsage(Filter):
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
             svcs = client.list_services(cluster=cluster)['serviceArns']
-            for svc in client.describe_services(cluster=cluster,services=svcs)['services']:
+            for svc in client.describe_services(
+                    cluster=cluster, services=svcs)['services']:
                 if 'roleArn' not in svc:
                     continue
                 results.append(svc['roleArn'])
@@ -114,7 +115,6 @@ class IamRoleUsage(Filter):
             if 'IamInstanceProfile' in g:
                 results.append(g['IamInstanceProfile'])
         return results
-        #return set([p['IamInstanceProfile'] for p in manager.resources()])
 
     def scan_ec2_roles(self):
         from c7n.resources.ec2 import EC2
@@ -142,13 +142,15 @@ class UsedIamRole(IamRoleUsage):
     schema = type_schema('used')
 
     def process(self, resources, event=None):
-        roles = self.get_service_roles()
+        roles = self.service_role_usage()
         results = []
         for r in resources:
             if r['Arn'] in roles:
                 results.append(r)
             elif r['RoleName'] in roles:
                 results.append(r)
+        self.log.info("%d of %d iam roles currently used." % (
+            len(results), len(resources)))
         return results
 
 
@@ -158,13 +160,15 @@ class UnusedIamRole(IamRoleUsage):
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
-        roles = self.get_service_roles()
+        roles = self.service_role_usage()
         results = []
         for r in resources:
             if r['Arn'] not in roles:
                 results.append(r)
             elif r['RoleName'] not in roles:
                 results.append(r)
+        self.log.info("%d of %d iam roles not currently used." % (
+            len(results), len(resources)))
         return results
 
 
@@ -183,6 +187,9 @@ class UsedIamPolicies(Filter):
         for r in resources:
             if r['AttachmentCount'] > 0:
                 results.append(r)
+        self.log.info(
+            "%d of %d iam policies currently in use." % (
+                len(results), len(resources)))
         return results
 
 
@@ -196,6 +203,9 @@ class UnusedIamPolicies(Filter):
         for r in resources:
             if r['AttachmentCount'] == 0:
                 results.append(r)
+        self.log.info(
+            "%d of %d iam policies not currently in use." % (
+                len(results), len(resources)))
         return results
 
 ###############################
@@ -210,12 +220,15 @@ class UsedInstanceProfiles(IamRoleUsage):
 
     def process(self, resources, event=None):
         results = []
-        profiles = self.get_instance_profiles()
+        profiles = self.instance_profile_usage()
         for r in resources:
             if r['Arn'] in profiles:
                 results.append(r)
             if r['InstanceProfileName'] in profiles:
                 results.append(r)
+        self.log.info(
+            "%d of %d instance profiles currently in use." % (
+                len(results), len(resources)))
         return results
 
 
@@ -226,10 +239,13 @@ class UnusedInstanceProfiles(IamRoleUsage):
 
     def process(self, resources, event=None):
         results = []
-        profiles = self.get_instance_profiles()
+        profiles = self.instance_profile_usage()
         for r in resources:
             if r['Arn'] not in profiles:
                 results.append(r)
+        self.log.info(
+            "%d of %d instance profiles currently not in use." % (
+                len(results), len(resources)))
         return results
 
 
@@ -243,8 +259,9 @@ class AttachedInstanceProfiles(Filter):
         for r in resources:
             if len(r['Roles']) != 0:
                 results.append(r)
-        self.log.info("%d of %d instance profiles attached to a role." % (
-            len(results), len(resources)))
+        self.log.info(
+            "%d of %d instance profiles attached to a role." % (
+                len(results), len(resources)))
         return results
 
 
@@ -258,8 +275,9 @@ class UnattachedInstanceProfiles(Filter):
         for r in resources:
             if len(r['Roles']) == 0:
                 results.append(r)
-        self.log.info("%d of %d instance profiles not attached to a role." % (
-            len(results), len(resources)))
+        self.log.info(
+            "%d of %d instance profiles not attached to a role." % (
+                len(results), len(resources)))
         return results
 
 
@@ -278,7 +296,8 @@ class UserAttachedPolicy(Filter):
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
                 r for r in resources if 'AttachedPolicies' not in r]
-            self.log.debug("Querying %d users policies" % len(query_resources))
+            self.log.debug(
+                "Querying %d users policies" % len(query_resources))
             list(w.map(_user_policies, query_resources))
 
         matched = []
@@ -305,7 +324,8 @@ class UserAccessKey(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
                 r for r in resources if 'AccessKeys' not in r]
-            self.log.debug("Querying %d users' api keys" % len(query_resources))
+            self.log.debug(
+                "Querying %d users' api keys" % len(query_resources))
             list(w.map(_user_keys, query_resources))
 
         matched = []
@@ -337,7 +357,8 @@ class UserMfaDevice(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
                 r for r in resources if 'MFADevices' not in r]
-            self.log.debug("Querying %d users' mfa devices" % len(query_resources))
+            self.log.debug(
+                "Querying %d users' mfa devices" % len(query_resources))
             list(w.map(_user_mfa_devices, query_resources))
 
         matched = []
