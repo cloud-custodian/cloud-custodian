@@ -18,7 +18,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
+    Filter, FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
     FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
@@ -26,7 +26,7 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
     local_session, set_annotation, query_instances, chunks, type_schema)
-
+from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
 
@@ -50,8 +50,43 @@ class SnapshotAge(AgeFilter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()})
     date_attribute = 'StartTime'
+    
 
+def _filter_ami_snapshots(self, snapshots):
+    if not self.data.get('value', True):
+        return snapshots
+    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    #This will populate the cache.
+    ami_manager = AMI(self.manager.ctx, {})
+    amis = ami_manager.resources()
+    ami_snaps = []
+    for i in amis:
+        for dev in i.get('BlockDeviceMappings'):
+            if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                ami_snaps.append(dev['Ebs']['SnapshotId'])            
+    matches = []
+    for snap in snapshots:
+        if snap['SnapshotId'] not in ami_snaps:
+            matches.append(snap)
+    return matches
+        
 
+@Snapshot.filter_registry.register('skip-ami-snapshots')
+class SnapshotSkipAmiSnapshots(Filter):
+    
+    schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
+    
+    def validate(self):
+        if self.data.get('skip-ami-snapshots', not True or False):
+            raise FilterValidationError(
+                "invalid config: expected boolean value")
+        return self
+    
+    def process(self, snapshots, event=None):
+        resources = _filter_ami_snapshots(self, snapshots)
+        return resources
+    
+    
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
 
@@ -63,14 +98,11 @@ class SnapshotDelete(BaseAction):
          # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
-        if self.data.get('skip-ami-snapshots', True):
-            # Auto filter ami referenced snapshots, build map
-            c = local_session(self.manager.session_factory).client('ec2')
-            for i in c.describe_images(Owners=['self'])['Images']:
-                for dev in i.get('BlockDeviceMappings'):
-                    if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                        snaps.add(dev['Ebs']['SnapshotId'])
-        log.info("Deleting %d snapshots", len(snapshots))
+        pre = len(snapshots)
+        snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
+        post = len(snapshots)
+        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots" %(post, pre-post))
+        
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):

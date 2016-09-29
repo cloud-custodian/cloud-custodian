@@ -1,0 +1,105 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "cf6eaa6c-eda1-4bc7-8e85-8dd64875a6b8", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 23 Sep 2016 15:25:41 GMT"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Nance", 
+                "Tags": [
+                    {
+                        "Value": "Toasty", 
+                        "Key": "Platforum"
+                    }, 
+                    {
+                        "Value": "RoadKill", 
+                        "Key": "ASV"
+                    }, 
+                    {
+                        "Value": "BlockBiddy", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": true, 
+                "VolumeId": "vol-b29d6a93", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/82645407-2faa-4d93-be71-7d6a8d59a5fc", 
+                "State": "completed", 
+                "VolumeSize": 5, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 28, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 3
+                }, 
+                "SnapshotId": "snap-7fc4f06d", 
+                "OwnerId": "644160558196"
+            }, 
+            {
+                "Description": "Created by CreateImage(i-0320ee8d00d94a548) for ami-0bec971c from vol-3d1773e8", 
+                "Tags": [
+                    {
+                        "Value": "c7n-test", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-3d1773e8", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 33
+                }, 
+                "SnapshotId": "snap-4090d8aa", 
+                "OwnerId": "644160558196"
+            }, 
+            {
+                "Description": "c7n-test-snapshot", 
+                "Tags": [
+                    {
+                        "Value": "c7n-test-snapshot", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-3d1773e8", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "Progress": "100%", 
+                "StartTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 33
+                }, 
+                "SnapshotId": "snap-ab987f23", 
+                "OwnerId": "644160558196"
+            }
+        ]
+    }
+}
