@@ -25,13 +25,11 @@ from c7n.utils import local_session, type_schema
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
-
     resource_type = 'aws.iam.group'
 
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-
     resource_type = 'aws.iam.role'
 
 
@@ -58,29 +56,17 @@ class ServerCertificate(QueryResourceManager):
 class IamRoleUsage(Filter):
 
     def service_role_usage(self):
-        results = []
-        for result in self.scan_lambda_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ecs_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_asg_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ec2_roles():
-            if result not in results:
-                results.append(result)
+        results = set()
+        results.update(self.scan_lambda_roles())
+        results.update(self.scan_ecs_roles())
+        results.update(self.scan_asg_roles())
+        results.update(self.scan_ec2_roles())
         return results
 
     def instance_profile_usage(self):
-        results = []
-        for result in self.scan_asg_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ec2_roles():
-            if result not in results:
-                results.append(result)
+        results = set()
+        results.update(self.scan_asg_roles())
+        results.update(self.scan_ec2_roles())
         return results
 
     def scan_lambda_roles(self):
@@ -157,6 +143,34 @@ class UnusedIamRole(IamRoleUsage):
         self.log.info("%d of %d iam roles not currently used." % (
             len(results), len(resources)))
         return results
+
+
+@Role.filter_registry.register('inline-policy-used')
+class IamRoleInlinePolicyUsed(Filter):
+
+    schema = type_schema('inline-policy-used')
+
+    def _inline_policies(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.list_role_policies(
+            RoleName=resource['RoleName'])['PolicyNames'])
+
+    def process(self, resources, event=None):
+        return [r for r in resources if self._inline_policies(r) > 0]
+
+
+@Role.filter_registry.register('inline-policy-unused')
+class IamRoleInlinePolicyUnused(Filter):
+    schema = type_schema('inline-policy-unused')
+
+    def _inline_policies(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.list_role_policies(
+            RoleName=resource['RoleName'])['PolicyNames'])
+
+    def process(self, resources, event=None):
+        return [r for r in resources if self._inline_policies(r) == 0]
+
 
 
 ######################
@@ -380,3 +394,62 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
+
+
+#################
+#   IAM Groups  #
+#################
+
+
+@Group.filter_registry.register('used')
+class IamGroupWithUsers(Filter):
+
+    schema = type_schema('used')
+
+    def _user_count(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.get_group(GroupName=resource['GroupName'])['Users'])
+
+    def process(self, resources, events=None):
+        return [r for r in resources if self._user_count(r) > 0]
+
+
+@Group.filter_registry.register('unused')
+class IamGroupWithoutUsers(Filter):
+
+    schema = type_schema('unused')
+
+    def _user_count(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.get_group(GroupName=resource['GroupName'])['Users'])
+
+    def process(self, resources, events=None):
+        return [r for r in resources if self._user_count(r) == 0]
+
+
+@Group.filter_registry.register('inline-policy-used')
+class IamGroupInlinePolicyUnused(Filter):
+
+    schema = type_schema('inline-policy-used')
+
+    def _inline_policies(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.list_group_policies(
+            GroupName=resource['GroupName'])['PolicyNames'])
+
+    def process(self, resources, events=None):
+        return [r for r in resources if self._inline_policies(r) > 0]
+
+
+@Group.filter_registry.register('inline-policy-unused')
+class IamGroupInlinePolicyUsed(Filter):
+
+    schema = type_schema('inline-policy-unused')
+
+    def _inline_policies(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        return len(client.list_group_policies(
+            GroupName=resource['GroupName'])['PolicyNames'])
+
+    def process(self, resources, events=None):
+        return [r for r in resources if self._inline_policies(r) == 0]

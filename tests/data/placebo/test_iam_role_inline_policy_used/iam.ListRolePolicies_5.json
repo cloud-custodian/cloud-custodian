@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PolicyNames": [
+            "oneClick_lambda_basic_execution_1466943062384"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9fefcbc4-8596-11e6-8e5f-8be775b3b69a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9fefcbc4-8596-11e6-8e5f-8be775b3b69a", 
+                "date": "Wed, 28 Sep 2016 16:14:25 GMT", 
+                "content-length": "410", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
