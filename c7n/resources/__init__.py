@@ -21,6 +21,7 @@ def load_resources():
     import c7n.resources.ami
     import c7n.resources.acm
     import c7n.resources.apigw
+    import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
     import c7n.resources.cfn
