@@ -53,6 +53,36 @@ class SnapshotCopyTest(BaseTest):
         self.assertEqual(tags['ASV'], 'RoadKill')
 
 
+class SnapshotAmiSnapshotTest(BaseTest):
+
+    def test_snapshot_ami_snapshot_filter(self):
+        self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
+        # DEFAULT_REGION needs to be set to west for recording
+        factory = self.replay_flight_data('test_ebs_ami_snapshot_filter')
+        
+        #first case should return only resources that are ami snapshots
+        p = self.load_policy({
+            'name': 'ami-snap-filter',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'type': 'skip-ami-snapshots',
+                 'value': False}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        
+        #second case should return resources that are NOT ami snapshots
+        policy = self.load_policy({
+            'name': 'non-ami-snap-filter',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'type': 'skip-ami-snapshots',
+                 'value': True}],
+            }, session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        
 class SnapshotTrimTest(BaseTest):
 
     def test_snapshot_trim(self):
