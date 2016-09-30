@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "31ada85c-693b-11e6-bea2-6fbdbf1461bf"
+        },
+        "Snapshots": [
+            {
+                "EstimatedSecondsToCompletion": 0,
+                "OwnerAccount": "12345",
+                "CurrentBackupRateInMegaBytesPerSecond": 5.005,
+                "ActualIncrementalBackupSizeInMegaBytes": 5.0,
+                "NumberOfNodes": 1,
+                "Status": "available",
+                "VpcId": "vpc-12345",
+                "ClusterVersion": "1.0",
+                "Tags": [],
+                "MasterUsername": "user1",
+                "TotalBackupSizeInMegaBytes": 12.0,
+                "DBName": "dev",
+                "BackupProgressInMegaBytes": 5.0,
+                "ClusterCreateTime": {
+                    "hour": 14,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 45,
+                    "microsecond": 642000,
+                    "year": 2016,
+                    "day": 20,
+                    "minute": 10
+                },
+                "RestorableNodeTypes": [
+                    "dc1.large"
+                ],
+                "EncryptedWithHSM": false,
+                "ClusterIdentifier": "xxx",
+                "SnapshotCreateTime": {
+                    "hour": 20,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 46,
+                    "microsecond": 372000,
+                    "year": 2016,
+                    "day": 20,
+                    "minute": 41
+                },
+                "AvailabilityZone": "us-east-1a",
+                "NodeType": "dc1.large",
+                "Encrypted": false,
+                "ElapsedTimeInSeconds": 0,
+                "SnapshotType": "manual",
+                "Port": 5439,
+                "SnapshotIdentifier": "xxx-1"
+            },
+            {
+                "MasterUsername": "user2",
+                "OwnerAccount": "54321",
+                "CurrentBackupRateInMegaBytesPerSecond": 7.1839,
+                "ActualIncrementalBackupSizeInMegaBytes": 5.0,
+                "NumberOfNodes": 1,
+                "Status": "available",
+                "VpcId": "vpc-54321",
+                "ClusterVersion": "1.0",
+                "Tags": [],
+                "EstimatedSecondsToCompletion": 0,
+                "TotalBackupSizeInMegaBytes": 12.0,
+                "DBName": "dev",
+                "BackupProgressInMegaBytes": 5.0,
+                "ClusterCreateTime": {
+                    "hour": 13,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 26,
+                    "microsecond": 191000,
+                    "year": 2016,
+                    "day": 13,
+                    "minute": 11
+                },
+                "RestorableNodeTypes": [
+                    "dc1.large"
+                ],
+                "EncryptedWithHSM": false,
+                "ClusterIdentifier": "yyy",
+                "SnapshotCreateTime": {
+                    "hour": 13,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 32,
+                    "microsecond": 603000,
+                    "year": 2016,
+                    "day": 13,
+                    "minute": 21
+                },
+                "AvailabilityZone": "us-east-1b",
+                "NodeType": "dc1.large",
+                "Encrypted": true,
+                "ElapsedTimeInSeconds": 0,
+                "KmsKeyId": "arn:aws:kms:us-east-1:54321:key/k1",
+                "SnapshotType": "manual",
+                "Port": 5439,
+                "SnapshotIdentifier": "c7n-snapshot"
+            }
+        ]
+    }
+}
