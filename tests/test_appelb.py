@@ -13,12 +13,12 @@
 # limitations under the License.
 from .common import BaseTest
 from c7n.executor import MainThreadExecutor
-from c7n.resources.elbv2 import ELBV2
+from c7n.resources.appelb import AppELB
 
 class AppELBTest(BaseTest):
 
     def test_appelb_simple(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-simple',
@@ -28,7 +28,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_appelb_simple_filter(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-simple-filter',
@@ -42,7 +42,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appelb_tags_filter(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-tags-filter',
@@ -61,7 +61,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_appelb_is_ssl_filter(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-is-ssl-filter',
@@ -72,7 +72,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_appelb_default_vpc_filter(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-default-vpc-filter',
@@ -83,7 +83,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_appelb_add_tag(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_add_tag')
         p = self.load_policy({
             'name': 'appelb-add-tag',
@@ -100,7 +100,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appelb_remove_tag(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_remove_tag')
         p = self.load_policy({
             'name': 'appelb-remove-tag',
@@ -117,7 +117,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appelb_mark_for_delete(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_mark_for_delete')
         p = self.load_policy({
             'name': 'appelb-mark-for-delete',
@@ -135,7 +135,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appelb_delete(self):
-        self.patch(ELBV2, 'executor_factory', MainThreadExecutor)
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_delete')
         p = self.load_policy({
             'name': 'appelb-delete',
