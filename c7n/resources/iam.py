@@ -424,7 +424,7 @@ class IamGroupInlinePolicy(Filter):
         True: Filter all groups that have an inline-policy attached
         False: Filter all groups that do not have an inline-policy attached
     """
-    schema = type_schema('inline-policy-used', value={'type': 'boolean'})
+    schema = type_schema('has-inline-policy', value={'type': 'boolean'})
 
     def _inline_policies(self, client, resource):
         return len(client.list_group_policies(
