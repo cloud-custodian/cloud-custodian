@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "ON+chrGiGWzSQ7aKTowqe/GuLSB8q+Z4md9gcjUyzGI=", 
+                "FunctionName": "custodian-ec2-compliance", 
+                "MemorySize": 512, 
+                "CodeSize": 491641, 
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-compliance", 
+                "Handler": "custodian_policy.run", 
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+                "Timeout": 60, 
+                "LastModified": "2016-08-27T16:20:15.856+0000", 
+                "Runtime": "python2.7", 
+                "Description": "a policy to stop all others"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "019f00be-84ea-11e6-af99-75fd5454cb56", 
+            "HTTPHeaders": {
+                "date": "Tue, 27 Sep 2016 19:38:46 GMT", 
+                "x-amzn-requestid": "019f00be-84ea-11e6-af99-75fd5454cb56", 
+                "content-length": "565", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

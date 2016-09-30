@@ -1,0 +1,96 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "root_joshua", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:dbfc8105-7296-4f35-ba2b-827745bddcfc:launchConfigurationName/Test-ASG-LaunchConfig-001", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 4, 
+                    "microsecond": 874000, 
+                    "year": 2016, 
+                    "day": 28, 
+                    "minute": 12
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-119cd66b"
+                ], 
+                "LaunchConfigurationName": "Test-ASG-LaunchConfig-001", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-c481fad3", 
+                "InstanceType": "t2.micro"
+            }, 
+            {
+                "UserData": "", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:5686013c-a053-479c-aca4-37aff67679d4:launchConfigurationName/Test-ASG-LaunchConfig-002", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 39, 
+                    "microsecond": 239000, 
+                    "year": 2016, 
+                    "day": 28, 
+                    "minute": 13
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ], 
+                "LaunchConfigurationName": "Test-ASG-LaunchConfig-002", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-c481fad3", 
+                "InstanceType": "t2.micro"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "28aff86b-858e-11e6-ba2b-a751265c3c1e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "28aff86b-858e-11e6-ba2b-a751265c3c1e", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2730", 
+                "content-type": "text/xml", 
+                "date": "Wed, 28 Sep 2016 15:13:49 GMT"
+            }
+        }
+    }
+}
