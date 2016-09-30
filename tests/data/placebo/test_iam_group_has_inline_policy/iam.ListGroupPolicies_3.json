@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PolicyNames": [
+            "Access-Key-and-Read-Only-Access"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0cd11e59-8730-11e6-84b0-915b8144b3f5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0cd11e59-8730-11e6-84b0-915b8144b3f5", 
+                "date": "Fri, 30 Sep 2016 17:05:12 GMT", 
+                "content-length": "400", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
