@@ -32,17 +32,17 @@ h6 {
 
 .intro-header {
     padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
-    padding-bottom: 10px;
+    padding-bottom: 50px;
     text-align: center;
     color: #ffffff;
-    background: url(../img/banner.jpg) no-repeat center center;
-    background-size: 800px;
+    background: url(../img/documentation-hero.svg) no-repeat center center;
+    background-size: 4000px;
 }
-/*
+
 .intro-message {
     position: relative;
-    padding-top: 20%;
-    padding-bottom: 20%;
+    padding-top: 10%;
+    padding-bottom: 10%;
 }
 
 .intro-message > h1 {
@@ -56,10 +56,10 @@ h6 {
 .intro-message > h3 {
     text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
 }
-*/
+
 
 .intro-divider {
-	  padding-top: 380px;
+	  padding-top: 0px;
     width: 400px;
     border-top: 1px solid #f8f8f8;
     border-bottom: 1px solid rgba(0,0,0,0.2);
@@ -120,8 +120,8 @@ h6 {
 }
 
 .banner {
-    padding-top: 60px;
-    padding-bottom: 100px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     color: #f8f8f8;
     background: url(../img/banner-bg.jpg) no-repeat center center;
     background-size: cover;
