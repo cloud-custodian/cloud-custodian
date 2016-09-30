@@ -39,6 +39,23 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         
+    def test_redshift_simple_tag_filter(self):
+        factory = self.replay_flight_data('test_redshift_tag_filter')
+        client = factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-tag-filter',
+            'resource': 'redshift',
+            'filters': [
+                {'tag:maid_status': 'not-null'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['ClusterIdentifier'])
+        tags = client.describe_tags(ResourceName=arn)['TaggedResources']
+        tag_map = {t['Tag']['Key'] for t in tags}
+        self.assertTrue('maid_status' in tag_map)
+        
     def test_redshift_cluster_mark(self):
         factory = self.replay_flight_data('test_redshift_cluster_mark')
         client = factory().client('redshift')

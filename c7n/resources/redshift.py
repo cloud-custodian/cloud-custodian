@@ -61,32 +61,6 @@ class Redshift(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
-    def augment(self, clusters):
-        filter(None, _redshift_tags(
-            self.get_model(),
-            clusters, self.session_factory, self.executor_factory,
-            self.generate_arn, self.retry))
-        return clusters
-
-def _redshift_tags(
-        model, dbs, session_factory, executor_factory, generate_arn, retry):
-
-    def process_tags(db):
-        client = local_session(session_factory).client(model.service)
-        arn = generate_arn(db[model.id])
-        tag_list = None
-        try:
-            tag_list = retry(client.describe_tags, ResourceName=arn)
-        except ClientError as e:
-            if e.response['Error']['Code'] not in ['ClusterNotFound']:
-                log.warning("Exception getting rds tags  \n %s" % (e))
-            return None
-        db['Tags'] = tag_list or []
-        return db
-
-    with executor_factory(max_workers=2) as w:
-        return list(w.map(process_tags, dbs))
-
 
 @filters.register('default-vpc')
 class DefaultVpc(DefaultVpcBase):
