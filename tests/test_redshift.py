@@ -55,7 +55,6 @@ class TestRedshift(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertTrue('maid_status' in tag_map)
-        self.assertTrue('maid_status' is not None)
         
     def test_redshift_cluster_mark(self):
         factory = self.replay_flight_data('test_redshift_cluster_mark')

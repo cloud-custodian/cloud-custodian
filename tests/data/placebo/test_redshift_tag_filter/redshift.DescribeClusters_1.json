@@ -67,6 +67,67 @@
                 "Encrypted": false, 
                 "ClusterRevisionNumber": "1101", 
                 "ClusterStatus": "available"
+            },{
+                "PubliclyAccessible": false, 
+                "MasterUsername": "c7n2", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-57e3ae2d"
+                    }
+                ], 
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCR/9iU0jlcKmOgs+yplVOoqXHx3xlKe5BDyNuK0a744jjEBmJYJXzpbaUBYmczGpH69WVTek5avMWJ+Piv3FHLEfaRIh4/1Fjulketqm0Dt4Ty905J6p+wr7oWQYBnAAxW1jHpAvZsk5bAIz1KmspwcWEu5Jmq5U0ytvOvMUgH2/rN7iQ8VGD2U22rJQrk/rxpyozYl1p2sLLLudTKlTQrYERpnqAArg0D8k6DRmdXHXu2EcWUonN0CfhcRSrJKf8QqYq1kcvG1Qsq1QDTCHuN/5YcLsTTxlgQ/G69/LewLUJWTrb5Ob2G0pIYtJcHB/+uSl3LK31zXle9RudMX+bb Amazon-Redshift\n", 
+                "NumberOfNodes": 1, 
+                "PendingModifiedValues": {}, 
+                "VpcId": "vpc-d2d616b5", 
+                "ClusterVersion": "1.0", 
+                "Tags": [
+                    {
+                        "Value": "test_value2", 
+                        "Key": "test_key2"
+                    }
+                ], 
+                "AutomatedSnapshotRetentionPeriod": 1, 
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "default.redshift-1.0", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "DBName": "c7n2", 
+                "PreferredMaintenanceWindow": "wed:07:00-wed:07:30", 
+                "Endpoint": {
+                    "Port": 5439, 
+                    "Address": "c7n-test2.clalcef7utom.us-east-1.redshift.amazonaws.com"
+                }, 
+                "IamRoles": [], 
+                "AllowVersionUpgrade": true, 
+                "ClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 54, 
+                    "microsecond": 567000, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 6
+                }, 
+                "ClusterSubnetGroupName": "default", 
+                "EnhancedVpcRouting": false, 
+                "ClusterSecurityGroups": [], 
+                "ClusterIdentifier": "c7n-test2", 
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED", 
+                        "PrivateIPAddress": "172.31.6.78", 
+                        "PublicIPAddress": "52.54.246.32"
+                    }
+                ], 
+                "AvailabilityZone": "us-east-1a", 
+                "NodeType": "dc1.large", 
+                "Encrypted": false, 
+                "ClusterRevisionNumber": "1101", 
+                "ClusterStatus": "available"
             }
         ], 
         "ResponseMetadata": {
