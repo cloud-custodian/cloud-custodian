@@ -27,6 +27,7 @@ class Certificate(QueryResourceManager):
         name = 'DomainName'
         date = 'CreatedAt'
         dimension = None
+        config_type = "AWS::ACM::Certificate"
 
     resource_type = Meta
 
@@ -34,7 +35,8 @@ class Certificate(QueryResourceManager):
 
         def _augment(r):
             client = local_session(self.session_factory).client('acm')
-            attrs = client.describe_certificate(CertificateArn=r)['Certificate']
+            attrs = client.describe_certificate(
+                CertificateArn=r)['Certificate']
             r.update(attrs)
             return r
 

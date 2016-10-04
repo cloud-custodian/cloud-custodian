@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from botocore.exceptions import ClientError
+
+from c7n.actions import BaseAction as Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.utils import local_session
 
 
 @resources.register('kinesis')
@@ -21,3 +25,33 @@ class KinesisStream(QueryResourceManager):
 
     resource_type = "aws.kinesis.stream"
 
+
+@resources.register('firehose')
+class DeliveryStream(QueryResourceManager):
+
+    resource_type = "aws.firehose.deliverystream"
+
+
+@resources.register('analytics')
+class AnalyticsApp(QueryResourceManager):
+
+    class resource_type(object):
+        service = "kinesisanalytics"
+        enum_spec = ('list_applications', 'ApplicationSummaries', None)
+        name = "ApplicationName"
+        id = "ApplicationARN"
+        dimension = None
+
+    def augment(self, resources):
+        client = local_session(
+            self.session_factory).client('kinesisanalytics')
+        results = []
+        for r in resources:
+            try:
+                info = client.describe_application(
+                    ApplicationName=r['ApplicationName'])['ApplicationDetail']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFound':
+                    continue
+            r.update(info)
+        return resources

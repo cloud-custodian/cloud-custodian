@@ -24,16 +24,17 @@ from c7n.utils import local_session, type_schema
 @resources.register('vpc')
 class Vpc(QueryResourceManager):
 
-    resource_type = 'aws.ec2.vpc'
+    class resource_type(ResourceQuery.resolve('aws.ec2.vpc')):
+        config_type = 'AWS::EC2::VPC'
 
 
 @Vpc.filter_registry.register('subnets')
-class SubnetsOfVpc(ValueFilter):
+class VpcSubnets(ValueFilter):
 
     schema = type_schema('subnets', rinherit=ValueFilter.schema)
 
     def __init__(self, *args, **kw):
-        super(SubnetsOfVpc, self).__init__(*args, **kw)
+        super(VpcSubnets, self).__init__(*args, **kw)
         self.data['key'] = 'Subnets'
 
     def process(self, resources, event=None):
@@ -52,13 +53,15 @@ class SubnetsOfVpc(ValueFilter):
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
 
-    resource_type = 'aws.ec2.subnet'
+    class resource_type(ResourceQuery.resolve('aws.ec2.subnet')):
+        config_type = 'AWS::EC2::Subnet'
 
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
 
-    resource_type = 'aws.ec2.security-group'
+    class resource_type(ResourceQuery.resolve('aws.ec2.security-group')):
+        config_type = "AWS::EC2::SecurityGroup"
 
 
 class SGUsage(Filter):
@@ -382,6 +385,7 @@ class NetworkInterface(QueryResourceManager):
         filter_type = 'list'
         dimension = None
         date = None
+        config_type = "AWS::EC2::NetworkInterface"
 
     resource_type = Meta
 
@@ -486,7 +490,8 @@ class InterfaceRemoveGroups(BaseAction):
 @resources.register('route-table')
 class RouteTable(QueryResourceManager):
 
-    resource_type = 'aws.ec2.route-table'
+    class resource_type(ResourceQuery.resolve('aws.ec2.route-table')):
+        config_type = "AWS::EC2::RouteTable"
 
 
 @resources.register('peering-connection')
@@ -498,26 +503,29 @@ class PeeringConnection(QueryResourceManager):
 @resources.register('network-acl')
 class NetworkAcl(QueryResourceManager):
 
-    resource_type = 'aws.ec2.network-acl'
+    class resource_type(ResourceQuery.resolve('aws.ec2.network-acl')):
+        config_type = "AWS::EC2::NetworkAcl"
 
 
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve('aws.ec2.address')):
+        config_type = "AWS::EC2::EIP"
         taggable = False
 
 
 @resources.register('customer-gateway')
 class CustomerGateway(QueryResourceManager):
 
-    resource_type = 'aws.ec2.customer-gateway'
+    class resource_type(ResourceQuery.resolve('aws.ec2.customer-gateway')):
+        config_type = "AWS::EC2::CustomerGateway"
 
 
 @resources.register('internet-gateway')
 class InternetGateway(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'ec2'
         type = 'internet-gateway'
@@ -527,8 +535,37 @@ class InternetGateway(QueryResourceManager):
         filter_type = 'list'
         dimension = None
         date = None
+        config_type = "AWS::EC2::InternetGateway"
 
-    resource_type = Meta
+
+@resources.register('vpn-connection')
+class VPNConnection(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc-connection'
+        enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
+        name = id = 'VpnConnectionId'
+        filter_name = 'VpnConnectionIds'
+        filter_type = 'list'
+        dimension = None
+        date = None
+        config_type = 'AWS::EC2::VPNConnection'
+
+
+@resources.register('vpn-gateway')
+class VPNGateway(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc-gateway'
+        enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
+        name = id = 'VpnGatewayId'
+        filter_name = 'VpnGatewayIds'
+        filter_type = 'list'
+        dimension = None
+        date = None
+        config_type = 'AWS::EC2::VPNGateway'
 
 
 @resources.register('key-pair')
