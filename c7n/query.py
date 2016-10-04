@@ -72,6 +72,7 @@ class ResourceQuery(object):
 
     def get(self, resource_type, identity):
         """Get resources by identities
+
         """
         m = self.resolve(resource_type)
         params = {}
