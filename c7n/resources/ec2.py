@@ -124,13 +124,6 @@ class EC2(QueryResourceManager):
         return resources
 
 
-class InstanceVolumesFilter(object):
-    """Filter instances with volumes attached"""
-
-    def filter_instances_with_volumes(self, instances):
-        return [r for r in instances if len(r['BlockDeviceMappings']) > 0]
-
-
 class StateTransitionFilter(object):
     """Filter instances by state.
 
@@ -334,11 +327,14 @@ class DefaultVpc(DefaultVpcBase):
 
 
 @actions.register('start')
-class Start(BaseAction, StateTransitionFilter, InstanceVolumesFilter):
+class Start(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
 
     schema = type_schema('start')
+
+    def filter_instances_with_volumes(self, instances):
+        return [r for r in instances if len(r['BlockDeviceMappings']) > 0]
 
     def process(self, instances):
         instances = self.filter_instance_state(
