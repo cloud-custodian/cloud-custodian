@@ -121,6 +121,11 @@ class LambdaInvoke(EventAction):
     We try to utilize async invocation by default, this imposes
     some greater size limits of 128kb which means we batch
     invoke.
+
+    Example::
+
+     - type: invoke-lambda
+       function: my-function
     """
 
     schema = utils.type_schema(
@@ -136,7 +141,7 @@ class LambdaInvoke(EventAction):
             self.manager.session_factory).client('lambda')
 
         params = dict(FunctionName=self.data['function'])
-        if self.data.get('qualfiier'):
+        if self.data.get('qualifier'):
             params['Qualifier'] = self.data['Qualifier']
 
         if self.data.get('async', True):
