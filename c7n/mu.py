@@ -966,38 +966,6 @@ class ConfigRule(object):
 
     """
 
-    RESOURCE_TYPE_MAP = {
-        # Networking
-        #'': 'AWS::EC2::VPNGateway',
-        #'': 'AWS::EC2::VPNConnection',
-        'vpc': 'AWS::EC2::VPC',
-        'subnet': 'AWS::EC2::Subnet',
-        'route-table': 'AWS::EC2::RouteTable',
-        'network-acl': 'AWS::EC2::NetworkAcl',
-        'internet-gateway': 'AWS::EC2::InternetGateway',
-        'customer-gateway': 'AWS::EC2::CustomerGateway',
-        # RDS
-        'rds': 'AWS::RDS::DBInstance',
-        'rds-snapshot': 'AWS::RDS::DBSnapshot',
-        #'': 'AWS::RDS::DBSubnetGroup',
-        #'': 'AWS::RDS::DBSecurityGroup'
-        #
-        # IAM
-        'iam-policy': 'AWS::IAM::Policy',
-        'iam-role': 'AWS::IAM::Role',
-        'iam-group': 'AWS::IAM::Group',
-        'iam-user': 'AWS::IAM::User',
-        # EC2
-        'security-group': 'AWS::EC2::SecurityGroup',
-        'eni': 'AWS::EC2::NetworkInterface',
-        'ec2': 'AWS::EC2::Instance',
-        'network-addr': 'AWS::EC2::EIP',
-        #'': 'AWS::EC2::Host',
-        'ebs': 'AWS::EC2::Volume',
-        # Happy Trails, Prospector
-        #'': 'AWS::CloudTrail::Trail',
-        'acm-certificate': 'AWS::ACM::Certificate'}
-
     def __init__(self, data, session_factory):
         self.data = data
         self.session_factory = session_factory
@@ -1026,9 +994,10 @@ class ConfigRule(object):
             )
 
         if isinstance(func, PolicyLambda):
+            manager = func.policy.get_resource_manager()
+            config_type = manager.get_model().config_type
             params['Scope'] = {
-                'ComplianceResourceTypes': [self.RESOURCE_TYPE_MAP[
-                    func.policy.resource_type]]}
+                'ComplianceResourceTypes': [config_type]}
         else:
             params['Scope']['ComplianceResourceTypes'] = self.data.get(
                 'resource-types', ())

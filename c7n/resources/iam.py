@@ -19,30 +19,37 @@ from dateutil.tz import tzutc
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
 
-    resource_type = 'aws.iam.group'
+    class resource_type(ResourceQuery.resolve('aws.iam.group')):
+        config_type = "AWS::IAM::Group"
 
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
 
-    resource_type = 'aws.iam.role'
+    class resource_type(ResourceQuery.resolve('aws.iam.role')):
+        config_type = "AWS::IAM::Role"
 
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
-    resource_type = 'aws.iam.user'
+
+    class resource_type(ResourceQuery.resolve('aws.iam.user')):
+        config_type = "AWS::IAM::User"
 
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
-    resource_type = 'aws.iam.policy'
+
+    class resource_type(ResourceQuery.resolve('aws.iam.policy')):
+        config_type = "AWS::IAM::Policy"
+
 
 
 @resources.register('iam-profile')
