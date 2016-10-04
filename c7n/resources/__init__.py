@@ -21,6 +21,7 @@ def load_resources():
     import c7n.resources.ami
     import c7n.resources.acm
     import c7n.resources.apigw
+    import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
     import c7n.resources.cfn
@@ -36,7 +37,6 @@ def load_resources():
     import c7n.resources.elasticsearch
     import c7n.resources.elb
     import c7n.resources.emr
-    import c7n.resources.firehose
     import c7n.resources.glacier
     import c7n.resources.iam
     import c7n.resources.kinesis
@@ -49,3 +49,7 @@ def load_resources():
     import c7n.resources.sns
     import c7n.resources.sqs
     import c7n.resources.vpc
+
+    # Load external plugins (private sdks etc)
+    from c7n.manager import resources
+    resources.load_plugins()

@@ -78,6 +78,7 @@ class RDS(QueryResourceManager):
 
     class resource_type(rds.DBInstance.Meta):
         filter_name = 'DBInstanceIdentifier'
+        config_type = 'AWS::RDS::DBInstance'
 
     filter_registry = filters
     action_registry = actions
@@ -427,12 +428,32 @@ class RetentionWindow(BaseAction):
             CopyTagsToSnapshot=copy_tags)
 
 
+@resources.register('rds-subscription')
+class RDSSubscription(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'rds'
+        type = 'rds-subscription'
+        enum_spec = (
+            'describe_event_subscriptions', 'EventSubscriptionsList', None)
+        name = id = "EventSubscriptionArn"
+        date = "SubscriptionCreateTime"
+        config_type = "AWS::DB::EventSubscription"
+        dimension = None
+        # SubscriptionName isn't part of describe events results?! all the
+        # other subscription apis.
+        #filter_name = 'SubscriptionName'
+        #filter_type = 'scalar'
+        filter_name = None
+        filter_type = None
+
+
 @resources.register('rds-snapshot')
 class RDSSnapshot(QueryResourceManager):
     """Resource manager for RDS DB snapshots.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'rds'
         type = 'rds-snapshot'
@@ -442,8 +463,7 @@ class RDSSnapshot(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'SnapshotCreateTime'
-
-    resource_type = Meta
+        config_type = "AWS::RDS::DBSnapshot"
 
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
@@ -479,8 +499,6 @@ class RDSSnapshotDelete(BaseAction):
     def process_snapshot_set(self, snapshots_set):
         c = local_session(self.manager.session_factory).client('rds')
         for s in snapshots_set:
-            try:
-                c.delete_db_snapshot(
-                    DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
-            except ClientError:
-                raise
+            c.delete_db_snapshot(
+                DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+

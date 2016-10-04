@@ -26,7 +26,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -41,7 +41,9 @@ actions.register('auto-tag-user', AutoTagUser)
 @resources.register('ec2')
 class EC2(QueryResourceManager):
 
-    resource_type = "aws.ec2.instance"
+    class resource_type(ResourceQuery.resolve("aws.ec2.instance")):
+        config_type = "AWS::EC2::Instance"
+
     filter_registry = filters
     action_registry = actions
 

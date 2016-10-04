@@ -204,6 +204,7 @@ class EBS(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve("aws.ec2.volume")):
         default_namespace = 'AWS/EBS'
+        config_type = "AWS::EC::Volume"
 
     filter_registry = filters
     action_registry = actions
