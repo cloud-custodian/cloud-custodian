@@ -93,6 +93,7 @@ class MetricsFilter(Filter):
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
+        'elbv2': 'AWS/ApplicationELB',
         'emr': 'AWS/EMR',
         'es': 'AWS/ES',
         'events': 'AWS/Events',
