@@ -38,9 +38,9 @@ class ResourceQueryTest(BaseTest):
     def test_query_model_get(self):
         session_factory = self.replay_flight_data('test_query_model')
         q = ResourceQuery(session_factory)
-        resources = q.filter(InternetGateway.Meta)
+        resources = q.filter(InternetGateway.resource_type)
         self.assertEqual(len(resources), 3)
-        resources = q.get(InternetGateway.Meta, ['igw-3d9e3d56'])
+        resources = q.get(InternetGateway.resource_type, ['igw-3d9e3d56'])
         self.assertEqual(len(resources), 1)
 
 

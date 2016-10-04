@@ -42,7 +42,6 @@ class AnalyticsApp(QueryResourceManager):
         id = "ApplicationARN"
         dimension = None
 
-
     def augment(self, resources):
         client = local_session(
             self.session_factory).client('kinesisanalytics')
