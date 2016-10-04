@@ -375,6 +375,33 @@ class RemovePolicyStatement(BucketActionBase):
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
+@actions.register('toggle-versioning')
+class ToggleVersioning(BucketActionBase):
+
+    schema = type_schema(
+        'enable-versioning',
+        enabled={'type': 'boolean'})
+    # mfa delete enablement looks like it needs the serial and a current
+    # token.
+    def process(self, resources):
+        enabled = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resources:
+            if 'Versioning' not in r or not r['Versioning']:
+                r['Versioning'] = {'Status': 'Suspended'}
+            if enabled and (
+                    r['Versioning']['Status'] == 'Suspended'):
+                client.put_bucket_versioning(
+                    Bucket=r['Name'],
+                    VersioningConfiguration={
+                        'Status': 'Enabled'})
+                continue
+            if not enabled and r['Versioning']['Status'] == 'Enabled':
+                client.put_bucket_versioning(
+                    Bucket=r['Name'],
+                    VersioningConfiguration={'Status': 'Suspended'})
+
+
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     schema = type_schema(

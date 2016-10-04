@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/superduper-and-magic", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "PdqazOCSuwE+Yp9EwqKc/thzRM0QNlgredV2QUs9PZo81mmEdTf80nfRCNTu8HZZ4fCBMZx16Kg=", 
+            "RequestId": "CCFBEAC13B8054A7", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "PdqazOCSuwE+Yp9EwqKc/thzRM0QNlgredV2QUs9PZo81mmEdTf80nfRCNTu8HZZ4fCBMZx16Kg=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "CCFBEAC13B8054A7", 
+                "location": "/superduper-and-magic", 
+                "date": "Tue, 04 Oct 2016 15:25:34 GMT"
+            }
+        }
+    }
+}
