@@ -225,7 +225,21 @@ class IamInlinePolicyUsage(BaseTest):
                 'type': 'has-inline-policy',
                 'value': True}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
+
+    def test_iam_group_has_inline_policy2(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_has_inline_policy')
+        self.patch(
+            IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-with-inline-policy',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-inline-policy'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
     def test_iam_group_no_inline_policy(self):
         session_factory = self.replay_flight_data(
@@ -239,7 +253,7 @@ class IamInlinePolicyUsage(BaseTest):
                 'type': 'has-inline-policy',
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
 
 class KMSCrossAccount(BaseTest):
