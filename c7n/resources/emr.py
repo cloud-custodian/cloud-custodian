@@ -18,6 +18,10 @@ from c7n.query import QueryResourceManager
 @resources.register('emr-cluster')
 class EMRCluster(QueryResourceManager):
 
+    def __init__(self, ctx, data):
+        super(EMRCluster, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
+
     class Meta(object):
         service = 'emr'
         type = 'emr-cluster'
@@ -27,12 +31,89 @@ class EMRCluster(QueryResourceManager):
         dimension = 'ClusterId'
 
     resource_type = Meta
-        
+
+    def resources(self, query=None):
+        q = self.consolidate_query_filter()
+        if q is not None:
+            query = query or {}
+            for i in xrange(len(q)):
+                query[q[i]['Name']] = q[i]['Values']
+        return super(EMRCluster, self).resources(query=query)
+
+    def consolidate_query_filter(self):
+        result = []
+        names = set()
+        # allow same name to be specified multiple times and append the queries
+        # under the same name
+        for q in self.queries:
+            query_filter = q.query()
+            if query_filter['Name'] in names:
+                for filt in result:
+                    if query_filter['Name'] == filt['Name']:
+                        filt['Values'].extend(query_filter['Values'])
+            else:
+                names.add(query_filter['Name'])
+                result.append(query_filter)
+        return result
+
     def augment(self, resources):
         # remap for cwmetrics
         for r in resources:
             r['ClusterId'] = r['Id']
         return resources
-        
 
-        
+
+# Valid EMR Query Filters
+EMR_VALID_FILTERS = {
+    'ClusterStates': (
+        'terminated',
+        'bootstrapping',
+        'running',
+        'waiting',
+        'terminating',
+        'terminated',
+        'terminated_with_errors')}
+
+
+class QueryFilter(object):
+
+    @classmethod
+    def parse(cls, data):
+        results = []
+        for d in data:
+            if not isinstance(d, dict):
+                raise ValueError(
+                    "EMR Query Filter Invalid structure %s" % d)
+            results.append(cls(d).validate())
+        return results
+
+    def __init__(self, data):
+        self.data = data
+        self.key = None
+        self.value = None
+
+    def validate(self):
+        if not len(self.data.keys()) == 1:
+            raise ValueError(
+                "EMR Query Filter Invalid %s" % self.data)
+        self.key = self.data.keys()[0]
+        self.value = self.data.values()[0]
+
+        if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
+                'tag:'):
+            raise ValueError(
+                "EMR Query Filter invalid filter name %s" % (self.data))
+
+        if self.value is None:
+            raise ValueError(
+                "EMR Query Filters must have a value, use tag-key"
+                " w/ tag name as value for tag present checks"
+                " %s" % self.data)
+        return self
+
+    def query(self):
+        value = self.value
+        if isinstance(self.value, basestring):
+            value = [self.value]
+
+        return {'Name': self.key, 'Values': value}
