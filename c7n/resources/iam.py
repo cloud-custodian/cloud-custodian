@@ -170,7 +170,7 @@ class IamRoleInlinePolicy(Filter):
 
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
-        if self.data.get('value') or self.data.get('value') is None:
+        if self.data.get('value', True):
             return [r for r in resources if self._inline_policies(c, r) > 0]
         return [r for r in resources if self._inline_policies(c, r) == 0]
 
@@ -419,10 +419,9 @@ class IamGroupUsers(Filter):
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')
         value = self.data.get('value')
-        if self.data.get('value') or self.data.get('value') is None:
+        if self.data.get('value', True):
             return [r for r in resources if self._user_count(c, r) > 0]
         return [r for r in resources if self._user_count(c, r) == 0]
-
 
 
 @Group.filter_registry.register('has-inline-policy')
@@ -441,6 +440,6 @@ class IamGroupInlinePolicy(Filter):
 
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')
-        if self.data.get('value') or self.data.get('value') is None:
-            return [r for r in resources if self._inline_policies(c, r) == 0]
-        return [r for r in resources if self._inline_policies(c, r) > 0]
+        if self.data.get('value', True):
+            return [r for r in resources if self._inline_policies(c, r) > 0]
+        return [r for r in resources if self._inline_policies(c, r) == 0]
