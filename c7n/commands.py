@@ -25,7 +25,9 @@ from c7n.credentials import SessionFactory
 from c7n.policy import Policy, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag
-from c7n import mu, schema, version
+from c7n.schema import schema_summary, resource_vocabulary
+from c7n.schema import validate as schema_validate
+from c7n import mu, version, resources
 
 
 log = logging.getLogger('custodian.commands')
@@ -54,8 +56,7 @@ def validate(options):
         if format in ('json',):
             data = json.load(fh)
 
-
-    errors = schema.validate(data)
+    errors = schema_validate(data)
     if not errors:
         null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
         for p in data.get('policies', ()):
@@ -120,6 +121,18 @@ def logs(options, policies):
             time.strftime(
                 "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
             e['message'])
+
+
+def schema(options):
+    """ Output information about the resources, actions and filters
+        available
+    """
+    resources.load_resources()
+    result = resource_vocabulary()
+    if options.summarize:
+        schema_summary(result)
+    else:
+        print(yaml.safe_dump(result, default_flow_style=False))
 
 
 def cmd_version(options):

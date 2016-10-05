@@ -318,6 +318,49 @@ def process_resource(type_name, resource_type, resource_defs):
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
+def resource_vocabulary():
+    vocabulary = {}
+    for type_name, resource_type in resources.items():
+        actions = []
+        action_classes = set()
+        for action_name, klass in reversed(
+                resource_type.action_registry.items()):
+            # Dedup aliases
+            if klass in action_classes:
+                continue
+            actions.append(action_name)
+
+        filters = []
+        filter_classes = set()
+        for filter_name, klass in reversed(
+                resource_type.filter_registry.items()):
+            # Dedup aliases
+            if klass in filter_classes:
+                continue
+            filters.append(filter_name)
+
+        vocabulary[type_name] = {
+            'filters': filters, 'actions': actions}
+    return vocabulary
+
+
+def schema_summary(vocabulary):
+    print "resource count: %d" % len(vocabulary)
+    action_count = filter_count = 0
+
+    common_actions = set(['notify', 'invoke-lambda'])
+    common_filters = set(['value', 'and', 'or', 'event'])
+
+    for rv in vocabulary.values():
+        action_count += len(
+            set(rv.get('actions', ())).difference(common_actions))
+        filter_count += len(
+            set(rv.get('filters', ())).difference(common_filters))
+    print "unique actions: %d" % action_count
+    print "common actions: %d" % len(common_actions)
+    print "unique filters: %d" % filter_count
+    print "common filters: %s" % len(common_filters)
+
 if __name__ == '__main__':
     from c7n.resources import load_resources
     load_resources()
