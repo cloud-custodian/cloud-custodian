@@ -299,8 +299,7 @@ class TestStart(BaseTest):
         policy = self.load_policy({
             'name': 'ec2-test-start',
             'resource': 'ec2',
-            'filters': [
-                {'tag:Testing': 'not-null'}],
+            'filters': [],
             'actions': [
                 {'type': 'start'}]},
             session_factory=session_factory)

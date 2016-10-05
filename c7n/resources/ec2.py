@@ -335,12 +335,12 @@ class Start(BaseAction, StateTransitionFilter):
 
     schema = type_schema('start')
 
-    def filter_instances_with_volumes(self, instances):
-        return [r for r in instances if len(r['BlockDeviceMappings']) > 0]
+    def _filter_ec2_with_volumes(self, instances):
+        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
 
     def process(self, instances):
-        instances = self.filter_instance_state(
-            self.filter_instances_with_volumes(instances))
+        instances = self._filter_ec2_with_volumes(
+            self.filter_instance_state(instances))
         if not len(instances):
             return
         client = utils.local_session(
