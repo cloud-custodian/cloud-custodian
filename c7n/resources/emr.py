@@ -12,11 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from c7n.manager import resources
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.query import QueryResourceManager
+from c7n import utils
+from c7n.utils import (
+    local_session, type_schema, get_account_id,
+    get_retry, chunks, generate_arn, snapshot_identifier)
+
+actions = ActionRegistry('emr-cluster.actions')
 
 
 @resources.register('emr-cluster')
 class EMRCluster(QueryResourceManager):
+
+    action_registry = actions
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
@@ -61,6 +70,26 @@ class EMRCluster(QueryResourceManager):
         for r in resources:
             r['ClusterId'] = r['Id']
         return resources
+
+
+@actions.register('terminate')
+class Terminate(BaseAction):
+
+    schema = type_schema('terminate')
+
+    def process(self, emrs):
+
+        client = local_session(self.manager.session_factory).client('emr')
+        cluster_ids = []
+        for emr in emrs:
+            cluster_ids.append(emr['ClusterId'])
+        try:
+            client.terminate_job_flows(JobFlowIds=cluster_ids)
+        except ClientError as e:
+            raise
+
+        self.log.info("Deleted emrs: %s", cluster_ids)
+        return emrs
 
 
 # Valid EMR Query Filters
