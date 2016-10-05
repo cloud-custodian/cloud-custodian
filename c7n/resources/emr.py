@@ -19,10 +19,10 @@ from c7n.utils import (
     local_session, type_schema, get_account_id,
     get_retry, chunks, generate_arn, snapshot_identifier)
 
-actions = ActionRegistry('emr-cluster.actions')
+actions = ActionRegistry('emr.actions')
 
 
-@resources.register('emr-cluster')
+@resources.register('emr')
 class EMRCluster(QueryResourceManager):
 
     action_registry = actions
@@ -33,7 +33,7 @@ class EMRCluster(QueryResourceManager):
 
     class Meta(object):
         service = 'emr'
-        type = 'emr-cluster'
+        type = 'emr'
         enum_spec = ('list_clusters', 'Clusters', None)
         name = 'Name'
         id = 'Id'

@@ -14,7 +14,7 @@
 import unittest
 
 from c7n.resources import emr
-from c7n.resources.emr import QueryFilter
+from c7n.resources.emr import actions, QueryFilter
 from c7n import tags, utils
 
 from .common import BaseTest
@@ -45,3 +45,12 @@ class TestEMRQueryFilter(unittest.TestCase):
             ValueError,
             QueryFilter.parse,
             [{'foo': 'bar'}])
+
+
+class TestActions(unittest.TestCase):
+
+    def test_action_construction(self):
+
+        self.assertIsInstance(
+            actions.factory('terminate', None),
+            emr.Terminate)
