@@ -14,6 +14,7 @@
 import itertools
 import operator
 import random
+import re
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
@@ -124,6 +125,18 @@ class EC2(QueryResourceManager):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
+
+
+class StateTransitionAge(AgeFilter):
+    """Age an instance has been in the given state.
+    """
+    RE_PARSE_AGE = re.compile("\(.*?\)")
+
+    def get_resource_date(self, i):
+        v = i.get('StateTransitionReason')
+        if v is None:
+            return v
+        return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
 
 
 class StateTransitionFilter(object):
