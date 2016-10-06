@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
+
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.query import QueryResourceManager
@@ -94,6 +96,8 @@ class Terminate(BaseAction):
 
 # Valid EMR Query Filters
 EMR_VALID_FILTERS = {
+    'CreatedAfter': datetime,
+    'CreatedBefore': datetime,
     'ClusterStates': (
         'terminated',
         'bootstrapping',
