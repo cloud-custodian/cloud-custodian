@@ -86,8 +86,12 @@ def setup_parser():
 
     validate = subs.add_parser('validate')
     validate.set_defaults(command=commands.validate)
-    validate.add_argument("-c", "--config", required=True,
-                          help="Policy Configuration File")
+    validate.add_argument(
+        "-c", "--config",
+        help="Policy Configuration File (old; use configs instead)"
+    )
+    validate.add_argument("configs", nargs='*',
+                          help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
                           help="Verbose Logging")
     validate.add_argument("--debug", action="store_true",

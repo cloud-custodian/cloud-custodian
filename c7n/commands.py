@@ -45,35 +45,44 @@ def policy_command(f):
 
 
 def validate(options):
-    if not os.path.exists(options.config):
-        raise ValueError("Invalid path for config %r" % options.config)
+    if options.config is not None:
+        # support the old -c option
+        options.configs.append(options.config)
+    if len(options.configs) < 1:
+        # no configs to test
+        # We don't have the parser object, so fake ArgumentParser.error
+        print('custodian validate: error: no config files specified')
+        sys.exit(2)
+    for config_file in options.configs:
+        if not os.path.exists(config_file):
+            raise ValueError("Invalid path for config %r" % config_file)
 
-    options.dryrun = True
-    format = options.config.rsplit('.', 1)[-1]
-    with open(options.config) as fh:
-        if format in ('yml', 'yaml'):
-            data = yaml.safe_load(fh.read())
-        if format in ('json',):
-            data = json.load(fh)
+        options.dryrun = True
+        format = config_file.rsplit('.', 1)[-1]
+        with open(config_file) as fh:
+            if format in ('yml', 'yaml'):
+                data = yaml.safe_load(fh.read())
+            if format in ('json',):
+                data = json.load(fh)
 
-    errors = schema_validate(data)
-    if not errors:
-        null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
-        for p in data.get('policies', ()):
-            try:
-                Policy(p, null_config, Bag())
-            except Exception as e:
-                log.error("Policy: %s is invalid: %s" % (
-                    p.get('name', 'unknown'), e))
-                sys.exit(1)
-                return
-        log.info("Config valid")
-        return
+        errors = schema_validate(data)
+        if not errors:
+            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            for p in data.get('policies', ()):
+                try:
+                    Policy(p, null_config, Bag())
+                except Exception as e:
+                    log.error("Policy: %s is invalid: %s" % (
+                        p.get('name', 'unknown'), e))
+                    sys.exit(1)
+                    return
+            log.info("Config valid")
+            continue
 
-    log.error("Invalid configuration")
-    for e in errors:
-        log.error(" %s" % e)
-    sys.exit(1)
+        log.error("Invalid configuration")
+        for e in errors:
+            log.error(" %s" % e)
+        sys.exit(1)
 
 
 @policy_command
