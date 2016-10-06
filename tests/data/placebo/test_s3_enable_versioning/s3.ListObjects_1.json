@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "superduper-and-magic", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "fUsdT/iWmuWweHjDDrlrtgr6GdcstKkNpSVX+9FCqejfk7uatecHmZGXbGbMxc5DE6848Tv3k8w=", 
+            "RequestId": "1993DA7A522A2210", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "fUsdT/iWmuWweHjDDrlrtgr6GdcstKkNpSVX+9FCqejfk7uatecHmZGXbGbMxc5DE6848Tv3k8w=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "1993DA7A522A2210", 
+                "date": "Tue, 04 Oct 2016 15:26:06 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}
