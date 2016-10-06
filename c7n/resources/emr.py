@@ -47,7 +47,7 @@ class EMRCluster(QueryResourceManager):
         q = self.consolidate_query_filter()
         if q is not None:
             query = query or {}
-            for i in xrange(len(q)):
+            for i in range(0, len(q)):
                 query[q[i]['Name']] = q[i]['Values']
         return super(EMRCluster, self).resources(query=query)
 
