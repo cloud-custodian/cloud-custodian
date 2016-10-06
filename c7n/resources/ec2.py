@@ -130,6 +130,7 @@ class EC2(QueryResourceManager):
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
     """
+
     RE_PARSE_AGE = re.compile("\(.*?\)")
 
     def get_resource_date(self, i):

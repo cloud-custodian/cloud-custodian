@@ -217,12 +217,13 @@ class Notify(EventAction):
             }
         }
     }
+    batch_size = 250
 
     def process(self, resources, event=None):
         aliases = self.manager.session_factory().client(
             'iam').list_account_aliases().get('AccountAliases', ())
         account_name = aliases and aliases[0] or ''
-        for batch in utils.chunks(resources, 500):
+        for batch in utils.chunks(resources, self.batch_size):
             message = {'resources': batch,
                        'event': event,
                        'account': account_name,

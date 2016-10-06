@@ -27,12 +27,9 @@ class EMRCluster(QueryResourceManager):
         dimension = 'ClusterId'
 
     resource_type = Meta
-        
+
     def augment(self, resources):
         # remap for cwmetrics
         for r in resources:
             r['ClusterId'] = r['Id']
         return resources
-        
-
-        
