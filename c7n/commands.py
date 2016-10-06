@@ -53,6 +53,7 @@ def validate(options):
         # We don't have the parser object, so fake ArgumentParser.error
         print('custodian validate: error: no config files specified')
         sys.exit(2)
+    used_policy_names = set()
     for config_file in options.configs:
         if not os.path.exists(config_file):
             raise ValueError("Invalid path for config %r" % config_file)
@@ -66,6 +67,15 @@ def validate(options):
                 data = json.load(fh)
 
         errors = schema_validate(data)
+        conf_policy_names = {p['name'] for p in data.get('policies', ())}
+        dupes = conf_policy_names & used_policy_names
+        if len(dupes) >= 1:
+            errors.append(ValueError(
+                "Only one policy with a given name allowed, duplicates: %s" % (
+                    ", ".join(dupes)
+                )
+            ))
+        used_policy_names = used_policy_names | conf_policy_names
         if not errors:
             null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
