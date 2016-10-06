@@ -19,30 +19,37 @@ from dateutil.tz import tzutc
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
 
-    resource_type = 'aws.iam.group'
+    class resource_type(ResourceQuery.resolve('aws.iam.group')):
+        config_type = "AWS::IAM::Group"
 
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
 
-    resource_type = 'aws.iam.role'
+    class resource_type(ResourceQuery.resolve('aws.iam.role')):
+        config_type = "AWS::IAM::Role"
 
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
-    resource_type = 'aws.iam.user'
+
+    class resource_type(ResourceQuery.resolve('aws.iam.user')):
+        config_type = "AWS::IAM::User"
 
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
-    resource_type = 'aws.iam.policy'
+
+    class resource_type(ResourceQuery.resolve('aws.iam.policy')):
+        config_type = "AWS::IAM::Policy"
+
 
 
 @resources.register('iam-profile')
@@ -58,29 +65,17 @@ class ServerCertificate(QueryResourceManager):
 class IamRoleUsage(Filter):
 
     def service_role_usage(self):
-        results = []
-        for result in self.scan_lambda_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ecs_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_asg_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ec2_roles():
-            if result not in results:
-                results.append(result)
+        results = set()
+        results.update(self.scan_lambda_roles())
+        results.update(self.scan_ecs_roles())
+        results.update(self.scan_asg_roles())
+        results.update(self.scan_ec2_roles())
         return results
 
     def instance_profile_usage(self):
-        results = []
-        for result in self.scan_asg_roles():
-            if result not in results:
-                results.append(result)
-        for result in self.scan_ec2_roles():
-            if result not in results:
-                results.append(result)
+        results = set()
+        results.update(self.scan_asg_roles())
+        results.update(self.scan_ec2_roles())
         return results
 
     def scan_lambda_roles(self):
@@ -157,6 +152,27 @@ class UnusedIamRole(IamRoleUsage):
         self.log.info("%d of %d iam roles not currently used." % (
             len(results), len(resources)))
         return results
+
+
+@Role.filter_registry.register('has-inline-policy')
+class IamRoleInlinePolicy(Filter):
+    """
+        Filter IAM roles that have an inline-policy attached
+
+        True: Filter roles that have an inline-policy
+        False: Filter roles that do not have an inline-policy
+    """
+    schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+
+    def _inline_policies(self, client, resource):
+        return len(client.list_role_policies(
+            RoleName=resource['RoleName'])['PolicyNames'])
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value', True):
+            return [r for r in resources if self._inline_policies(c, r) > 0]
+        return [r for r in resources if self._inline_policies(c, r) == 0]
 
 
 ######################
@@ -380,3 +396,50 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
+
+
+#################
+#   IAM Groups  #
+#################
+
+
+@Group.filter_registry.register('has-users')
+class IamGroupUsers(Filter):
+    """
+        Filter IAM groups that have users attached based on True/False value:
+
+        True: Filter all IAM groups with users assigned to it
+        False: Filter all IAM groups without any users assigned to it
+    """
+    schema = type_schema('has-users', value={'type': 'boolean'})
+
+    def _user_count(self, client, resource):
+        return len(client.get_group(GroupName=resource['GroupName'])['Users'])
+
+    def process(self, resources, events=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        value = self.data.get('value')
+        if self.data.get('value', True):
+            return [r for r in resources if self._user_count(c, r) > 0]
+        return [r for r in resources if self._user_count(c, r) == 0]
+
+
+@Group.filter_registry.register('has-inline-policy')
+class IamGroupInlinePolicy(Filter):
+    """
+        Filter IAM groups that have an inline-policy based on boolean value:
+
+        True: Filter all groups that have an inline-policy attached
+        False: Filter all groups that do not have an inline-policy attached
+    """
+    schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+
+    def _inline_policies(self, client, resource):
+        return len(client.list_group_policies(
+            GroupName=resource['GroupName'])['PolicyNames'])
+
+    def process(self, resources, events=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value', True):
+            return [r for r in resources if self._inline_policies(c, r) > 0]
+        return [r for r in resources if self._inline_policies(c, r) == 0]

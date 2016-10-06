@@ -232,7 +232,6 @@ class Time(Filter):
 
     def __call__(self, i):
         value = self.get_tag_value(i)
-
         # Sigh delayed init, due to circle dep, process/init would be better but
         # unit testing is calling this direct.
         if self.id_key is None:

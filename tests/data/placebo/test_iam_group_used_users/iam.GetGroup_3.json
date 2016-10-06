@@ -1,0 +1,171 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Group": {
+            "Path": "/", 
+            "CreateDate": {
+                "hour": 17, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 17, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 30, 
+                "minute": 40
+            }, 
+            "GroupId": "AGPAJFZERGKIHQNHHTMXY", 
+            "Arn": "arn:aws:iam::644160558196:group/powerusers", 
+            "GroupName": "powerusers"
+        }, 
+        "Users": [
+            {
+                "UserName": "jeff", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAIDQXAUMHSBC7HWWBI", 
+                "Arn": "arn:aws:iam::644160558196:user/jeff"
+            }, 
+            {
+                "UserName": "ryanwolfe", 
+                "PasswordLastUsed": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 32
+                }, 
+                "UserId": "AIDAILCCU2DTMX52QKXSQ", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/ryanwolfe"
+            }, 
+            {
+                "UserName": "andrewalexander", 
+                "PasswordLastUsed": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 47
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAINLXB4P6J26AKFUC6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/andrewalexander"
+            }, 
+            {
+                "UserName": "christopherbritz", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAIQHIXZKJHZJN33JJY", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherbritz"
+            }, 
+            {
+                "UserName": "christopherocampo", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 47, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 2
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJOWQFESQNYYH3RURU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherocampo"
+            }, 
+            {
+                "UserName": "stevenjo", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 20, 
+                    "minute": 22
+                }, 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 38
+                }, 
+                "UserId": "AIDAJTDYNP2J64DPXXTNC", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/stevenjo"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "72f816ca-8730-11e6-95e4-e18e5bcabb34", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "72f816ca-8730-11e6-95e4-e18e5bcabb34", 
+                "date": "Fri, 30 Sep 2016 17:08:03 GMT", 
+                "content-length": "2360", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

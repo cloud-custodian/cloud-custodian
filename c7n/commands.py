@@ -46,6 +46,7 @@ def validate(options):
     if not os.path.exists(options.config):
         raise ValueError("Invalid path for config %r" % options.config)
 
+    options.dryrun = True
     format = options.config.rsplit('.', 1)[-1]
     with open(options.config) as fh:
         if format in ('yml', 'yaml'):
