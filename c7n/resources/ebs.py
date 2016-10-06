@@ -307,7 +307,7 @@ class CopyInstanceTags(BaseAction):
                 continue
             # Can't add more tags than the resource supports could try
             # to delete extant ones inline, else trim-tags action.
-            if len(copy_tags) > 10:
+            if len(copy_tags) > 40:
                 log.warning(
                     "action:%s volume:%s instance:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
@@ -315,7 +315,8 @@ class CopyInstanceTags(BaseAction):
                 continue
 
             try:
-                client.create_tags(
+                self.manager.retry(
+                    client.create_tags,
                     Resources=[v['VolumeId']],
                     Tags=copy_tags,
                     DryRun=self.manager.config.dryrun)

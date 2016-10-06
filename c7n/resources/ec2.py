@@ -587,7 +587,7 @@ class Snapshot(BaseAction):
                     if t['Key'] in copy_keys:
                         copy_tags.append(t)
 
-            if len(copy_tags) + len(tags) > 10:
+            if len(copy_tags) + len(tags) > 40:
                 self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
