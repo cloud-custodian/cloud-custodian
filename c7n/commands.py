@@ -76,10 +76,10 @@ def validate(options):
                         p.get('name', 'unknown'), e))
                     sys.exit(1)
                     return
-            log.info("Config valid")
+            log.info("Configuration valid: {}".format(config_file))
             continue
 
-        log.error("Invalid configuration")
+        log.error("Configuration invalid: {}".format(config_file))
         for e in errors:
             log.error(" %s" % e)
         sys.exit(1)
