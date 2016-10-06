@@ -127,6 +127,7 @@ class EC2(QueryResourceManager):
         return resources
 
 
+@filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
     """
