@@ -290,6 +290,7 @@ class TestStop(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+
 class TestOr(BaseTest):
 
     def test_ec2_or_condition(self):

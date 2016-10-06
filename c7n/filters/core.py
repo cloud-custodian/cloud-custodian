@@ -401,6 +401,8 @@ class AgeFilter(Filter):
             n = datetime.now(tz=tzutc())
             self.threshold_date = n - timedelta(days)
         v = self.get_resource_date(i)
+        if v is None:
+            return False
         op = OPERATORS[self.data.get('op', 'greater-than')]
         return op(self.threshold_date, v)
 
