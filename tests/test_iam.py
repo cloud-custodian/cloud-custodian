@@ -27,7 +27,9 @@ from c7n.resources.iam import (UserMfaDevice,
                                UsedIamPolicies, UnusedIamPolicies,
                                UsedInstanceProfiles,
                                UnusedInstanceProfiles,
-                               UsedIamRole, UnusedIamRole)
+                               UsedIamRole, UnusedIamRole,
+                               IamGroupUsers,
+                               IamRoleInlinePolicy, IamGroupInlinePolicy)
 from c7n.executor import MainThreadExecutor
 
 
@@ -47,7 +49,7 @@ class IAMMFAFilter(BaseTest):
         self.assertEqual(len(resources), 2)
 
 
-class IamRoleFilterInUse(BaseTest):
+class IamRoleFilterUsage(BaseTest):
 
     def test_iam_role_inuse(self):
         session_factory = self.replay_flight_data('test_iam_role_inuse')
@@ -59,9 +61,6 @@ class IamRoleFilterInUse(BaseTest):
             'filters': ['used']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-
-class IamRoleFilterUnused(BaseTest):
 
     def test_iam_role_unused(self):
         session_factory = self.replay_flight_data('test_iam_role_unused')
@@ -75,7 +74,7 @@ class IamRoleFilterUnused(BaseTest):
         self.assertEqual(len(resources), 7)
 
 
-class IamInstanceProfileFilterInUse(BaseTest):
+class IamInstanceProfileFilterUsage(BaseTest):
 
     def test_iam_instance_profile_inuse(self):
         session_factory = self.replay_flight_data(
@@ -89,9 +88,6 @@ class IamInstanceProfileFilterInUse(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-
-class IamInstanceProfileFilterUnused(BaseTest):
-
     def test_iam_instance_profile_unused(self):
         session_factory = self.replay_flight_data(
             'test_iam_instance_profile_unused')
@@ -103,37 +99,6 @@ class IamInstanceProfileFilterUnused(BaseTest):
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-
-class IamPolicyFilterAttached(BaseTest):
-
-    def test_iam_attached_policies(self):
-        session_factory = self.replay_flight_data('test_iam_policy_attached')
-        self.patch(
-            UsedIamPolicies, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-attached-profiles',
-            'resource': 'iam-policy',
-            'filters': ['used']}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 6)
-
-
-class IamPolicyFilterUnattached(BaseTest):
-
-    def test_iam_unattached_policies(self):
-        session_factory = self.replay_flight_data('test_iam_policy_unattached')
-        self.patch(
-            UnusedIamPolicies, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-attached-profiles',
-            'resource': 'iam-policy',
-            'filters': ['unused']}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 203)
-
-
-class IamInstanceProfileAttached(BaseTest):
 
     def test_iam_instance_profile_attached(self):
         session_factory = self.replay_flight_data(
@@ -148,9 +113,6 @@ class IamInstanceProfileAttached(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
-
-class IamInstanceProfileUnattached(BaseTest):
-
     def test_iam_instance_profile_unattached(self):
         session_factory = self.replay_flight_data(
             'test_iam_instance_profile_unattached')
@@ -162,6 +124,136 @@ class IamInstanceProfileUnattached(BaseTest):
             'filters': ['unattached']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class IamPolicyFilterUsage(BaseTest):
+
+    def test_iam_attached_policies(self):
+        session_factory = self.replay_flight_data('test_iam_policy_attached')
+        self.patch(
+            UsedIamPolicies, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-attached-profiles',
+            'resource': 'iam-policy',
+            'filters': ['used']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 6)
+
+    def test_iam_unattached_policies(self):
+        session_factory = self.replay_flight_data('test_iam_policy_unattached')
+        self.patch(
+            UnusedIamPolicies, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-attached-profiles',
+            'resource': 'iam-policy',
+            'filters': ['unused']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 203)
+
+
+class IamGroupFilterUsage(BaseTest):
+
+    def test_iam_group_used_users(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_used_users')
+        self.patch(
+            IamGroupUsers, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-used',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-users',
+                'value': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_iam_group_unused_users(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_unused_users')
+        self.patch(
+            IamGroupUsers, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-unused',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-users',
+                'value': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class IamInlinePolicyUsage(BaseTest):
+
+    def test_iam_role_has_inline_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_has_inline_policy')
+        self.patch(
+            IamRoleInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-with-inline-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'has-inline-policy',
+                 'value': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_role_no_inline_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_no_inline_policy')
+        self.patch(
+            IamRoleInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-without-inline-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'has-inline-policy',
+                 'value': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 6)
+
+    def test_iam_group_has_inline_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_has_inline_policy')
+        self.patch(
+            IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-with-inline-policy',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-inline-policy',
+                'value': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_group_has_inline_policy2(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_has_inline_policy')
+        self.patch(
+            IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-with-inline-policy',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-inline-policy'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_group_no_inline_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_group_no_inline_policy')
+        self.patch(
+            IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-group-without-inline-policy',
+            'resource': 'iam-group',
+            'filters': [{
+                'type': 'has-inline-policy',
+                'value': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
 
 class KMSCrossAccount(BaseTest):
