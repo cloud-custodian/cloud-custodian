@@ -52,6 +52,19 @@ class Deregister(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
         client.deregister_image(ImageId=image['ImageId'])
 
+@actions.register('remove-launch-permissions')
+class RemoveLaunchPermissions(BaseAction):
+
+    schema = type_schema('remove-launch-permissions')
+
+    def process(self, images):
+        with self.executor_factory(max_workers=10) as w:
+            list(w.map(self.process_image, images))
+
+    def process_image(self, image):
+        client = local_session(self.manager.session_factory).client('ec2')
+        client.reset_image_attribute(ImageId=image['ImageId'],Attribute="launchPermission")
+
 
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
