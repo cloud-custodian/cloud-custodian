@@ -30,12 +30,15 @@ tag policies and cost management via garbage collection of unused resources
 and off-hours resource management for examples.
 
 Custodian policies are written in simple YAML configuration files that
-enable specify policies on a resource type (ec2, asg, redshift, etc) 
+enable specify policies on a resource type (ec2, asg, redshift, etc)
 and are constructed from a vocabulary of filters and actions.
 
 It integrates with lambda and cloudwatch events to provide for
 realtime enforcement of policies with builtin provisioning of the lambdas, or
 as a simple cron job on a server to execute against large existing fleets.
+
+“Engineering the Next Generation of Cloud Governance” by @drewfirment
+https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60#.5cuxnz2eh
 
 
 Features
