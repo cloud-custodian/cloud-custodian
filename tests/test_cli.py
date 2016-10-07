@@ -132,3 +132,24 @@ class RunTest(BaseTest):
 
         cli.main()
         self.assertEqual(exit_code, [0])
+
+
+class SchemaTest(BaseTest):
+
+    def test_schema(self):
+        exit_code = []
+
+        def exit(code):
+            exit_code.append(code)
+
+        self.patch(sys, 'exit', exit)
+        # no options
+        self.patch(sys, 'argv', ['custodian', 'schema'])
+
+        cli.main()
+        self.assertEqual(exit_code, [])
+        # summarize option
+        self.patch(sys, 'argv', ['custodian', 'schema', '--summarize'])
+
+        cli.main()
+        self.assertEqual(exit_code, [])
