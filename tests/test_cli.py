@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import shutil
 import sys
 import tempfile
@@ -35,18 +36,23 @@ class VersionTest(BaseTest):
 class ValidateTest(BaseTest):
 
     def test_validate(self):
+        invalid_policies = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 's3',
+                'filters': [{"tag:custodian_tagging": "not-null"}],
+                'actions': [{'type': 'untag', 'tags': ['custodian_cleanup']}],
+            }]
+        }
         t = tempfile.NamedTemporaryFile(suffix=".yml")
-        t.write(yaml.dump({'policies': [
-            {'name': 'foo',
-             'resource': 's3',
-             'filters': [
-                 {"tag:custodian_tagging": "not-null"}],
-             'actions': [{
-                 'type': 'untag',
-                 'tags': ['custodian_cleanup']}]}]},
-                Dumper=yaml.SafeDumper))
+        t.write(yaml.dump(invalid_policies, Dumper=yaml.SafeDumper))
         t.flush()
         self.addCleanup(t.close)
+        j = tempfile.NamedTemporaryFile(suffix=".json")
+        json.dump(invalid_policies, j)
+        j.flush()
+        self.addCleanup(j.close)
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir)
 
@@ -56,11 +62,52 @@ class ValidateTest(BaseTest):
             exit_code.append(code)
 
         self.patch(sys, 'exit', exit)
+        # YAML validation
         self.patch(sys, 'argv', [
-            'custodian', 'validate', '-c', t.name])
-
+            'custodian', 'validate', t.name])
         cli.main()
-        self.assertEqual(exit_code, [1])
+        # JSON validation
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', j.name])
+        cli.main()
+        # no config files given
+        self.patch(sys, 'argv', [
+            'custodian', 'validate'])
+        cli.main()
+        self.assertEqual(exit_code, [1, 1, 2])
+
+        # nonexistent file given
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', 'fake.yaml'])
+        self.assertRaises(ValueError, cli.main)
+
+        valid_policies = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 's3',
+                'filters': [{"tag:custodian_tagging": "not-null"}],
+                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+            }]
+        }
+        v = tempfile.NamedTemporaryFile(suffix=".yml")
+        v.write(yaml.dump(valid_policies, Dumper=yaml.SafeDumper))
+        v.flush()
+        self.addCleanup(v.close)
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', v.name])
+        cli.main()
+        self.assertEqual(exit_code, [1, 1, 2])
+        # legacy -c option
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', '-c', v.name])
+        cli.main()
+        self.assertEqual(exit_code, [1, 1, 2])
+        # duplicate policy names
+        self.patch(sys, 'argv', [
+            'custodian', 'validate', v.name, v.name])
+        cli.main()
+        self.assertEqual(exit_code, [1, 1, 2, 1])
 
 
 class RunTest(BaseTest):
