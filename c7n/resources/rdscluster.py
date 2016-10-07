@@ -72,22 +72,6 @@ class Delete(BaseAction):
                         'Deleted RDS instance: %s',
                         instance['DBInstanceIdentifier'])
 
-            params = {'DBClusterIdentifier': cluster['DBClusterIdentifier']}
-            if skip:
-                params['SkipFinalSnapshot'] = True
-            else:
-                params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
-                    'Final', cluster['DBClusterIdentifier'])
-            try:
-                client.delete_db_cluster(**params)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'InvalidDBClusterStateFault':
-                    self.log.info(
-                        'RDS cluster in invalid state: %s',
-                        cluster['DBClusterIdentifier'])
-                    continue
-                raise
-
             self.log.info(
                 'Deleted RDS cluster: %s',
                 cluster['DBClusterIdentifier'])
@@ -243,8 +227,8 @@ class RDSClusterSnapshotRestore(BaseAction):
             else:
                 log.info('USING PARAMS PROVIDED IN POLICY')
 
-            print 'USING SNAPSHOT FOR CLUSTER::', latest_snapshot['DBClusterIdentifier']
-            print 'USING SNAPSHOT::', latest_snapshot['DBClusterSnapshotIdentifier']
+            log.debug('USING SNAPSHOT FOR CLUSTER::', latest_snapshot['DBClusterIdentifier'])
+            log.debug('USING SNAPSHOT::', latest_snapshot['DBClusterSnapshotIdentifier'])
 
             params = {'DBClusterIdentifier': latest_snapshot['DBClusterIdentifier'],
                       'SnapshotIdentifier': latest_snapshot['DBClusterSnapshotIdentifier'],
@@ -289,8 +273,6 @@ class RDSClusterSnapshotRestore(BaseAction):
                 x.append(curr_obj)
                 prev_obj = curr_obj
 
-        print x
-
         return x
 
     def create_db_instances_within_cluster(self, snapshot):
@@ -299,7 +281,7 @@ class RDSClusterSnapshotRestore(BaseAction):
         num_of_instances = db_instances.get('number', 1)
         db_identifier = db_instances.get('identifier', self.get_default_identifier(snapshot['DBClusterIdentifier']))
         db_size = db_instances.get('size', 'db.r3.large')
-        post_fix = db_instances.get('post-fix', 'dev')
+        id_suffix = db_instances.get('id-suffix', 'dev')
 
         if db_identifier is None:
             raise ClientError('MUST PROVIDE A db_identifier IN YOUR POLICY: Please delete cluster before trying again')
@@ -308,12 +290,12 @@ class RDSClusterSnapshotRestore(BaseAction):
         if num_of_instances is None:
             self.log_default_value('number:: number of db instances which is: %s', num_of_instances)
 
-        for instance in xrange(0, num_of_instances):
+        for instance in range(0, num_of_instances):
 
             if instance == 0:
-                new_db_identifier = db_identifier + '-' + post_fix
+                new_db_identifier = db_identifier + '-' + id_suffix
             else:
-                new_db_identifier = db_identifier + '-' + post_fix + '-' + str(instance)
+                new_db_identifier = db_identifier + '-' + id_suffix + '-' + str(instance)
 
             params = {'DBClusterIdentifier': snapshot['DBClusterIdentifier'],
                       'Engine': snapshot['Engine'],
@@ -326,6 +308,8 @@ class RDSClusterSnapshotRestore(BaseAction):
             try:
                 client.create_db_instance(**params)
             except ClientError as e:
+                self.delete_cluster_on_failure(snapshot['DBClusterIdentifier'])
+
                 raise
 
     """
@@ -333,7 +317,10 @@ class RDSClusterSnapshotRestore(BaseAction):
     from within this function
     """
     def delete_cluster_on_failure(self, cluster):
-        Delete(cluster)
+        action = Delete({'skip-snapshot': False, 'delete-instances': True}, manager(self.manager.ctx, {}))
+
+        RDSCluster()
+
 
     @staticmethod
     def get_default_identifier(cluster_identifier):
@@ -349,3 +336,4 @@ class RDSClusterSnapshotRestore(BaseAction):
     def log_default_value(policy_type):
         log.info('USING DEFAULT VALUE FOR: %s', policy_type)
 
+class APIUtils:

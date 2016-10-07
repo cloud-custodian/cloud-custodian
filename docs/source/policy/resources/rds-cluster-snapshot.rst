@@ -43,7 +43,7 @@ Sample Policy for ``restore`` action
             db-instances:
               identifier:
                 test-restore
-              post-fix:
+              id-suffix:
                 'qa'
               number:
                 2
@@ -85,9 +85,9 @@ Default Values
         REQUIRED
         what you want to call your db prefixed.  i.e. - test-restore will be used for name
 
-    ``post-fix``
-        REQUIRED
+    ``id-suffix``
         the post fixed value after the identifier
+        default: dev
 
     ``number``
         number of database instances to create.  With each additional database instance the database name will increment
@@ -96,6 +96,7 @@ Default Values
 
     ``size``
         the size of the instances you will use for your databases
+        default: db.r3.large
 
 
 
