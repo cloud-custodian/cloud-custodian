@@ -153,3 +153,78 @@ class SchemaTest(BaseTest):
 
         cli.main()
         self.assertEqual(exit_code, [])
+
+
+class LogTest(BaseTest):
+
+    def test_log(self):
+        valid_policies = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 'lambda',
+                'filters': [{'value': 'not-null'}],
+                'actions': [{
+                    'type': 'invoke-lambda',
+                    'function': 'test_function',
+                }],
+                'mode': {
+                    'type': 'cloudtrail',
+                    'events': ['RunInstances'],
+                },
+            }]
+        }
+        t = tempfile.NamedTemporaryFile(suffix=".yml")
+        t.write(yaml.dump(valid_policies, Dumper=yaml.SafeDumper))
+        t.flush()
+        self.addCleanup(t.close)
+
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir)
+        exit_code = []
+
+        def exit(code):
+            exit_code.append(code)
+
+        self.patch(sys, 'exit', exit)
+        self.patch(
+            sys,
+            'argv',
+            ['custodian', 'logs', '-c', t.name, '-s', temp_dir]
+        )
+
+        cli.main()
+        self.assertEqual(exit_code, [])
+
+        # empty file
+        e = tempfile.NamedTemporaryFile(suffix=".yml")
+        e.write(yaml.dump({'policies': []}, Dumper=yaml.SafeDumper))
+        e.flush()
+        self.addCleanup(e.close)
+        self.patch(
+            sys,
+            'argv',
+            ['custodian', 'logs', '-c', e.name, '-s', temp_dir]
+        )
+        self.assertRaises(AssertionError, cli.main)
+
+        # non-lambda
+        pols = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 's3',
+                'filters': [{"tag:custodian_tagging": "not-null"}],
+                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+            }]
+        }
+        nl = tempfile.NamedTemporaryFile(suffix=".yml")
+        nl.write(yaml.dump(pols, Dumper=yaml.SafeDumper))
+        nl.flush()
+        self.addCleanup(nl.close)
+        self.patch(
+            sys,
+            'argv',
+            ['custodian', 'logs', '-c', nl.name, '-s', temp_dir]
+        )
+        cli.main()
