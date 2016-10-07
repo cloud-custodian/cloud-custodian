@@ -205,6 +205,24 @@ def copy_instance_tags(session, oldid, newid):
         return
 
 
+def copy_tags(session, oldid, newid):
+    try:
+        c = session.client('ec2')
+        tags = c.describe_tags(
+            Filters=[{
+                'Name': 'resource-id',
+                'Values': [oldid]}])['Tags']
+        tags = [t for t in oval.tags if 'aws:' not in t['Key']]
+        tags.append({
+            'Key': 'RecoveryDate',
+            'Value': datetime.now().strftime('%m/%d/%Y')})
+        c.create_tags(
+            Resources=[newid],
+            Tags=tags)
+    except:
+        return False
+
+
 def rebuild_instance(dryrun, session, ami, instanceid, keypair, sgs, type,
             subnet, snapshots, role, userdata):
 
@@ -222,6 +240,11 @@ def rebuild_instance(dryrun, session, ami, instanceid, keypair, sgs, type,
             IamInstanceProfile={'Name': role},
             UserData=userdata)['Instances'][0]
         copy_instance_tags(session, instanceid, instance['InstanceId'])
+
+        if instanceid:
+            copy_tags(session, instanceid, instance['InstanceId'])
+        else:
+            copy_tags(session, snapshots[0], instance['InstanceId'])
 
         c.get_waiter('instance_running').wait(
             DryRun=dryrun, InstanceIds=[instance['InstanceId']])
@@ -246,6 +269,7 @@ def main():
         session = Session(profile_name=args.profile, region_name=args.region)
     elif args.accesskey and args.secretkey:
         session = boto3.Session(
+        session = Session(
             aws_access_key_id=args.accesskey,
             aws_secret_access_key=args.secretkey,
             region_name=args.region)
