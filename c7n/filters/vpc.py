@@ -16,17 +16,6 @@ from .core import Filter, ValueFilter
 from c7n.utils import local_session, type_schema
 
 
-class Subnet(ValueFilter):
-
-    ResourceGroupIdsExpression = "VpcSecurityGroups"
-
-    def get_subnet_ids(self, resource):
-        pass
-
-    def process(self, resources, event=None):
-        pass
-
-
 class SecurityGroup(ValueFilter):
 
     schema = type_schema(
@@ -34,14 +23,13 @@ class SecurityGroup(ValueFilter):
         match_resource={'type': 'boolean'},
         operator={'enum': ['and', 'or']})
 
-    # RDS DB Instance VpcSecurityGroups
     ResourceGroupIdsExpression = None
 
     def validate(self):
-        if not self.ResourceGroupIdsExpression:
+        if self.ResourceGroupIdsExpression is None:
             raise ValueError(
                 "Security Group filter missing group id expression")
-        return self
+        return super(SecurityGroup, self).validate()
 
     def get_group_ids(self, resources):
         all_groups = set(jmespath.search(
@@ -56,15 +44,16 @@ class SecurityGroup(ValueFilter):
                 if g['GroupId'] in group_ids}
 
     def process_resource(self, resource, groups):
-        group_ids = jmespath.search(self.ResourceGroupIdsExpression, resource)
+        group_ids = self.get_group_ids([resource])
         model = self.manager.get_model()
 
-        reducer = self.data.get('operator', 'or') == 'any' and any or all
+        op = self.data.get('operator', 'or')
         found = []
 
         value = None
-        if self.data.get('match_resource'):
-            pass
+        if self.data.get('match_resource') is True:
+            self.data['value'] = self.get_resource_value(
+                self.data['key'], resource)
 
         for gid in group_ids:
             group = groups.get(gid, None)
@@ -78,7 +67,12 @@ class SecurityGroup(ValueFilter):
                 found.append(gid)
 
         resource['c7n.security-groups'] = found
-        return reducer(found)
+
+        if op == 'or' and found:
+            return True
+        elif op == 'and' and len(found) == len(group_ids):
+            return True
+        return False
 
     def process(self, resources, event=None):
         groups = self.get_groups(resources)

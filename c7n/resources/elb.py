@@ -22,6 +22,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+import c7n.filters as net_filters
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
