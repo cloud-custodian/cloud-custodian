@@ -497,7 +497,10 @@ class RouteTable(QueryResourceManager):
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
-    resource_type = 'aws.ec2.vpc-peering-connection'
+    class resource_type(ResourceQuery.resolve(
+            'aws.ec2.vpc-peering-connection')):
+        enum_spec = ('describe_vpc_peering_connections',
+                     'VpcPeeringConnections', None)
 
 
 @resources.register('network-acl')
