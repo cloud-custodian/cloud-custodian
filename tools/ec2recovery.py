@@ -192,6 +192,19 @@ def restore_volume(dryrun, session, instanceid, snapshots):
     waiter.wait(DryRun=dryrun, InstanceIds=[instanceid])
 
 
+def copy_instance_tags(session, oldid, newid):
+    try:
+        r = session.resource('ec2')
+        oldec2 = r.Instance(oldid)
+        tags = [t for t in oldec2.tags if 'aws:' not in t['Key']]
+        tags.append({
+            'Key': 'RecoveryDate',
+            'Value': datetime.now().strftime('%m/%d/%Y')})
+        r.Instance(newid).create_tags(Tags=tags)
+    except:
+        return
+
+
 def copy_tags(session, oldid, newid):
     try:
         c = session.client('ec2')
@@ -226,6 +239,7 @@ def rebuild_instance(dryrun, session, ami, instanceid, keypair, sgs, type,
             SubnetId=subnet,
             IamInstanceProfile={'Name': role},
             UserData=userdata)['Instances'][0]
+        copy_instance_tags(session, instanceid, instance['InstanceId'])
 
         if instanceid:
             copy_tags(session, instanceid, instance['InstanceId'])
@@ -254,6 +268,7 @@ def main():
     if args.profile:
         session = Session(profile_name=args.profile, region_name=args.region)
     elif args.accesskey and args.secretkey:
+        session = boto3.Session(
         session = Session(
             aws_access_key_id=args.accesskey,
             aws_secret_access_key=args.secretkey,
