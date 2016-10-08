@@ -291,7 +291,7 @@ class ValueFilter(Filter):
         if i is None:
             return False
 
-        # Value extract
+        # value extract
         r = self.get_resource_value(self.k, i)
 
         if self.op in ('in', 'not-in') and r is None:
@@ -312,9 +312,13 @@ class ValueFilter(Filter):
             return True
         elif self.op:
             op = OPERATORS[self.op]
-            return op(r, v)
+            try:
+                return op(r, v)
+            except TypeError:
+                return False
         elif r == self.v:
             return True
+
         return False
 
     def process_value_type(self, sentinel, value):
@@ -338,7 +342,12 @@ class ValueFilter(Filter):
                 sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
 
             if not isinstance(value, datetime):
-                value = parse(value)
+                # EMR bug when testing ages in EMR. This is due to
+                # EMR not having more functionality.
+                try:
+                    value = parse(value)
+                except AttributeError:
+                    value = 0
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
