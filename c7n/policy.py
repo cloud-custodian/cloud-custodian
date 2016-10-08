@@ -349,7 +349,7 @@ class ConfigRuleMode(LambdaMode):
                     'annotation': 'The resource is compliant with this rule.'}
             else:
                 evaluation = {
-                    'compliance_type': 'NOT_COMPLIANT',
+                    'compliance_type': 'NON_COMPLIANT',
                     'annotation': 'The resources is not compliant.'
                 }
 
