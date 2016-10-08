@@ -346,11 +346,13 @@ class ConfigRuleMode(LambdaMode):
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',
-                    'annotation': 'The resource is compliant with this rule.'}
+                    'annotation': 'The resource is compliant with policy:%s.' % (
+                        self.policy.name)}
             else:
                 evaluation = {
-                    'compliance_type': 'NOT_COMPLIANT',
-                    'annotation': 'The resources is not compliant.'
+                    'compliance_type': 'NON_COMPLIANT',
+                    'annotation': 'Resource is not compliant with policy:%s' % (
+                        self.policy.name)
                 }
 
         client = utils.local_session(
