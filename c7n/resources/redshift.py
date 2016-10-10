@@ -36,6 +36,7 @@ filters = FilterRegistry('redshift.filters')
 actions = ActionRegistry('redshift.actions')
 filters.register('marked-for-op', tags.TagActionFilter)
 
+
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
 
@@ -76,8 +77,10 @@ class DefaultVpc(DefaultVpcBase):
 
 
 @filters.register('security-group')
-class SecurityGroup(net_filters.SecurityGroup):
-    ResourceGroupIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @filters.register('param')

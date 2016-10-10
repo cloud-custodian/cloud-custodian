@@ -103,9 +103,10 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
 
 
 @filters.register('security-group')
-class SecurityGroup(net_filters.SecurityGroup):
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    ResourceGroupIdsExpression = "SecurityGroups[]"
+    RelatedIdsExpression = "SecurityGroups[]"
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @actions.register('mark-for-op')

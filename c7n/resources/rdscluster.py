@@ -52,8 +52,10 @@ class RDSCluster(QueryResourceManager):
 
 
 @filters.register('security-group')
-class SecurityGroup(net_filters.SecurityGroup):
-    ResourceGroupIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @actions.register('delete')

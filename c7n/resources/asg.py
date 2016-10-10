@@ -92,11 +92,13 @@ class LaunchConfigFilterBase(object):
 
 
 @filters.register('security-group')
-class SecurityGroup(net_filters.SecurityGroup, LaunchConfigFilterBase):
+class SecurityGroupFilter(
+        net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
 
-    ResourceGroupIdsExpression = ""
+    RelatedIdsExpression = ""
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
-    def get_group_ids(self, resources):
+    def get_related_ids(self, resources):
         group_ids = []
         for asg in resources:
             cfg = self.configs.get(asg['LaunchConfigurationName'])
@@ -105,7 +107,7 @@ class SecurityGroup(net_filters.SecurityGroup, LaunchConfigFilterBase):
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
-        return super(SecurityGroup, self).process(asgs, event)
+        return super(SecurityGroupFilter, self).process(asgs, event)
 
 
 @filters.register('launch-config')

@@ -11,72 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import jmespath
-from .core import Filter, ValueFilter
+
 from c7n.utils import local_session, type_schema
 
+from .core import Filter, ValueFilter
+from .related import RelatedResourceFilter
 
-class SecurityGroup(ValueFilter):
+
+class SecurityGroupFilter(RelatedResourceFilter):
 
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
         match_resource={'type': 'boolean'},
         operator={'enum': ['and', 'or']})
 
-    ResourceGroupIdsExpression = None
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+    AnnotationKey = "matched-security-groups"
 
-    def validate(self):
-        if self.ResourceGroupIdsExpression is None:
-            raise ValueError(
-                "Security Group filter missing group id expression")
-        return super(SecurityGroup, self).validate()
 
-    def get_group_ids(self, resources):
-        all_groups = set(jmespath.search(
-            "[].%s" % self.ResourceGroupIdsExpression, resources))
-        return all_groups
+class SubnetFilter(RelatedResourceFilter):
 
-    def get_groups(self, resources):
-        from c7n.resources.vpc import SecurityGroup
-        manager = SecurityGroup(self.manager.ctx, {})
-        group_ids = self.get_group_ids(resources)
-        return {g['GroupId']: g for g in manager.resources()
-                if g['GroupId'] in group_ids}
+    schema = type_schema(
+        'subnet', rinherit=ValueFilter.schema,
+        match_resource={'type': 'boolean'},
+        operator={'enum': ['and', 'or']})
 
-    def process_resource(self, resource, groups):
-        group_ids = self.get_group_ids([resource])
-        model = self.manager.get_model()
-
-        op = self.data.get('operator', 'or')
-        found = []
-
-        value = None
-        if self.data.get('match_resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
-
-        for gid in group_ids:
-            group = groups.get(gid, None)
-            if group is None:
-                self.log.warning(
-                    "Resource %s:%s references non existant group: %s",
-                    model.type, resource[model.id], gid)
-                continue
-
-            if self.match(group):
-                found.append(gid)
-
-        resource['c7n.security-groups'] = found
-
-        if op == 'or' and found:
-            return True
-        elif op == 'and' and len(found) == len(group_ids):
-            return True
-        return False
-
-    def process(self, resources, event=None):
-        groups = self.get_groups(resources)
-        return [r for r in resources if self.process_resource(r, groups)]
+    RelatedResource = "c7n.resources.vpc.Subnet"
+    AnnotationKey = "matched-subnets"    
 
 
 class DefaultVpcBase(Filter):

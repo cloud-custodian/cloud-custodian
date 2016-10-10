@@ -128,8 +128,10 @@ class EC2(QueryResourceManager):
 
 
 @filters.register('security-group')
-class SecurityGroupFilter(net_filters.SecurityGroup):
-    ResourceGroupIdsExpression = "SecurityGroups[].GroupId"
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 class StateTransitionFilter(object):
