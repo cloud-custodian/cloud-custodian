@@ -17,7 +17,7 @@ Application Load Balancers
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, DefaultVpcBase
+from c7n.filters import Filter, FilterRegistry, DefaultVpcBase, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -61,19 +61,6 @@ class AppELB(QueryResourceManager):
             albs, self.session_factory, self.executor_factory, self.retry)
 
         return albs
-
-
-def _describe_appelb_target_groups(albs, session_factory, executor_factory, retry):
-    def _process_target_groups(alb):
-        client = local_session(session_factory).client('elbv2')
-
-        results = retry(
-            client.describe_target_groups,
-            LoadBalancerArn=alb['LoadBalancerArn'])
-        alb['TargetGroups'] = results['TargetGroups']
-
-    with executor_factory(max_workers=2) as w:
-        list(w.map(_process_target_groups, albs))
 
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
@@ -166,33 +153,119 @@ class AppELBDeleteAction(BaseAction):
 
 
 class AppELBListenerFilter(Filter):
-    """ Base class for filters that query listeners.
+    """ Base class for filters that query LB listeners.
     """
-    def describe_appelb_listeners(self, albs):
+    def initialize(self, albs):
         def _process_listeners(alb):
-            client = local_session(self.manager.session_factory).client('elbv2')
-            results = client.describe_listeners(
-                LoadBalancerArn=alb['LoadBalancerArn'])
-            alb['Listeners'] = results['Listeners']
+            if 'Listeners' not in alb:
+                client = local_session(
+                    self.manager.session_factory).client('elbv2')
+                results = client.describe_listeners(
+                    LoadBalancerArn=alb['LoadBalancerArn'])
+                alb['Listeners'] = results['Listeners']
 
         with self.manager.executor_factory(max_workers=2) as w:
             list(w.map(_process_listeners, albs))
 
 
-@filters.register('is-ssl')
-class AppELBIsSSLFilter(AppELBListenerFilter):
+class AppELBAttributeFilter(Filter):
+    """ Base class for filters that query LB attributes.
+    """
+    def initialize(self, albs):
+        def _process_attributes(alb):
+            if 'Attributes' not in alb:
+                client = local_session(
+                    self.manager.session_factory).client('elbv2')
+                results = client.describe_load_balancer_attributes(
+                    LoadBalancerArn=alb['LoadBalancerArn'])
+                alb['Attributes'] = results['Attributes']
 
-    schema = type_schema('is-ssl')
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_process_attributes, albs))
+
+
+class AppELBTargetGroupFilter(Filter):
+    """ Base class for filters that query LB target groups.
+    """
+    def initialize(self, albs):
+        def _process_target_groups(alb):
+            if 'TargetGroups' not in alb:
+                client = local_session(
+                    self.manager.session_factory).client('elbv2')
+                results = client.describe_target_groups(
+                    LoadBalancerArn=alb['LoadBalancerArn'])
+                alb['TargetGroups'] = results['TargetGroups']
+
+                for target_group in alb['TargetGroups']:
+                    result = client.describe_target_health(
+                        TargetGroupArn=target_group['TargetGroupArn'])
+                    target_group['TargetHealthDescriptions'] = result[
+                        'TargetHealthDescriptions']
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_process_target_groups, albs))
+
+
+@filters.register('is-https')
+class AppELBIsHTTPSFilter(AppELBListenerFilter):
+    """
+    """
+
+    schema = type_schema('is-https')
 
     def process(self, albs, event=None):
-        def _is_ssl(alb):
+        def _is_https(alb):
             for listener in alb.get('Listeners', []):
                 if listener['Protocol'] == 'HTTPS':
                     return True
             return False
 
-        self.describe_appelb_listeners(albs)
-        return [alb for alb in albs if _is_ssl(alb)]
+        self.initialize(albs)
+        return [alb for alb in albs if _is_https(alb)]
+
+
+@filters.register('healthcheck-protocol-mismatch')
+class AppELBHealthCheckProtocolMismatchFilter(AppELBTargetGroupFilter):
+    """
+    """
+
+    schema = type_schema('healthcheck-protocol-mismatch')
+
+    def process(self, albs, event=None):
+        def _healthcheck_protocol_mismatch(alb):
+            for target_group in alb['TargetGroups']:
+                if (target_group['Protocol'] !=
+                        target_group['HealthCheckProtocol']):
+                    return True
+
+            return False
+
+        self.initialize(albs)
+        return [alb for alb in albs if _healthcheck_protocol_mismatch(alb)]
+
+
+@filters.register('instance-count')
+class AppELBInstanceCountFilter(AppELBTargetGroupFilter):
+    """
+    """
+
+    schema = type_schema(
+        'instance-count',
+        count={'type': 'integer', 'minimum': 0},
+        op={'enum': OPERATORS.keys()})
+
+    def process(self, albs, event=None):
+        def _instance_count(alb, count, op):
+            instance_count = 0
+            for target_group in alb['TargetGroups']:
+                instance_count += len(target_group['TargetHealthDescriptions'])
+            return op(instance_count, count)
+
+        self.initialize(albs)
+        count = self.data.get('count', 0)
+        op_name = self.data.get('op', 'eq')
+        op = OPERATORS.get(op_name)
+        return [alb for alb in albs if _instance_count(alb, count, op)]
 
 
 @filters.register('default-vpc')
@@ -201,4 +274,37 @@ class AppELBDefaultVpcFilter(DefaultVpcBase):
     schema = type_schema('default-vpc')
 
     def __call__(self, alb):
-        return alb.get('VPCId') and self.match(alb.get('VPCId')) or False
+        return alb.get('VpcId') and self.match(alb.get('VpcId')) or False
+
+
+@resources.register('app-elb-target-group')
+class AppELBTargetGroup(QueryResourceManager):
+    """Resource manager for v2 ELB target groups.
+    """
+
+    class Meta(object):
+
+        service = 'elbv2'
+        type = 'app-elb-target-group'
+        enum_spec = ('describe_target_groups', 'TargetGroups', None)
+        name = 'TargetGroupName'
+        id = 'TargetGroupArn'
+        filter_name = None
+        filter_type = None
+        dimension = None
+        date = None
+
+    resource_type = Meta
+    filter_registry = FilterRegistry('app-elb-target-group.filters')
+    action_registry = ActionRegistry('app-elb-target-group.actions')
+    retry = staticmethod(get_retry(('Throttling',)))
+
+
+@AppELBTargetGroup.filter_registry.register('default-vpc')
+class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+
+    schema = type_schema('default-vpc')
+
+    def __call__(self, target_group):
+        return (target_group.get('VpcId') and
+                self.match(target_group.get('VpcId')) or False)
