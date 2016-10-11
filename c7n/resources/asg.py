@@ -190,6 +190,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             'LaunchConfigurationName', asg['AutoScalingGroupName'])
 
         cfg = self.configs.get(cfg_id)
+
         if cfg is None:
             errors.append(('invalid-config', cfg_id))
             self.log.debug(
@@ -208,11 +209,10 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             errors.append(('invalid-image', cfg['ImageId']))
 
         for bd in cfg['BlockDeviceMappings']:
-            if 'SnapshotId' not in bd:
+            if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
-            if bd['SnapshotId'] not in self.snapshots:
-                errors.append(('invalid-snapshot', cfg['SnapshotId']))
-
+            if bd['Ebs']['SnapshotId'] not in self.snapshots:
+                errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
 
 
