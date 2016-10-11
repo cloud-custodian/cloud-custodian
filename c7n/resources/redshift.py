@@ -141,7 +141,14 @@ class Delete(BaseAction):
             else:
                 params['FinalClusterSnapshotIdentifier'] = snapshot_identifier(
                     'Final', db['ClusterIdentifier'])
-            c.delete_cluster(**params)
+            try:
+                c.delete_cluster(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] == "InvalidClusterState":
+                    self.log.warning(
+                        "Cannot delete cluster when not in 'Available' state: %s" %db['ClusterIdentifier'])
+                    continue
+                raise
 
 
 @actions.register('retention')
