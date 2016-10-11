@@ -274,3 +274,37 @@ class ReportTest(BaseTest):
             ['custodian', 'logs', '-c', e.name, '-s', temp_dir]
         )
         self.assertRaises(AssertionError, cli.main)
+
+
+class RunTest(BaseTest):
+
+    def test_run(self):
+        valid_policies = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 's3',
+                'filters': [{"tag:custodian_tagging": "not-null"}],
+                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+            }]
+        }
+        v = tempfile.NamedTemporaryFile(suffix=".yml")
+        v.write(yaml.dump(valid_policies, Dumper=yaml.SafeDumper))
+        v.flush()
+        self.addCleanup(v.close)
+
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir)
+        exit_code = []
+
+        def exit(code):
+            exit_code.append(code)
+
+        self.patch(sys, 'exit', exit)
+        self.patch(
+            sys,
+            'argv',
+            ['custodian', 'run', '-c', v.name, '-s', temp_dir]
+        )
+        cli.main()
+        self.assertEqual(exit_code, [0])
