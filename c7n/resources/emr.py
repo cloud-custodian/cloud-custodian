@@ -150,3 +150,4 @@ class QueryFilter(object):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+

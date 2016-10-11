@@ -841,8 +841,9 @@ class Suspend(BaseAction):
             instance_ids = [i['InstanceId'] for i in asg['Instances']]
             if not instance_ids:
                 return
-            ec2_client.stop_instances(
-                InstanceIds=instance_ids)
+            retry = get_retry((
+                'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+            retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
                     'InvalidInstanceID.NotFound',
