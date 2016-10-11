@@ -145,7 +145,8 @@ class Delete(BaseAction):
                 c.delete_cluster(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidClusterState":
-                    self.log.warning("Exception deleting cluster: %s" %e.response['Error']['Code'])
+                    self.log.warning(
+                        "Cannot delete cluster when not in 'Available' state: %s" %db['ClusterIdentifier'])
                     continue
                 raise
 
