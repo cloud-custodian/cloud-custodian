@@ -101,6 +101,56 @@ class BaseAction(object):
             raise
 
 
+class ModifyGroupsAction(BaseAction):
+    """Common actions for modifying security groups on a resource
+    
+    Can target either physical groups as a list of group ids or
+    symbolic groups like 'matched' or 'all'. 'matched' uses
+    the annotations of the 'group' interface filter.
+    
+    Note an interface always gets at least one security group, so
+    we also allow specification of an isolation/quarantine group
+    that can be specified if there would otherwise be no groups.
+    """
+
+    schema = utils.type_schema(
+        'remove-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def get_groups(self, resources):
+        target_group_ids = self.data.get('groups', 'matched')
+        isolation_group = self.data.get('isolation-group')
+        return_groups = []
+
+        for r in resources:
+            rgroups = [g['GroupId'] for g in r['Groups']]
+            if target_group_ids == 'matched':
+                group_ids = r.get('MatchedSecurityGroups', ())
+            elif target_group_ids == 'all':
+                group_ids = rgroups
+            elif isinstance(target_group_ids, list):
+                group_ids = target_group_ids
+            else:
+                continue
+
+            if not group_ids:
+                continue
+
+            for g in group_ids:
+                if g in rgroups:
+                    rgroups.remove(g)
+
+            if not rgroups:
+                rgroups.append(isolation_group)
+            
+            return_groups.append(rgroups)  
+        
+        return return_groups
+
+
 class EventAction(BaseAction):
     """Actions which receive lambda event if present
     """

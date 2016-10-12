@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ModifyGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 
@@ -436,7 +436,7 @@ class InterfaceGroup(ValueFilter):
 
 
 @NetworkInterface.action_registry.register('remove-groups')
-class InterfaceRemoveGroups(BaseAction):
+class InterfaceRemoveGroups(ModifyGroupsAction):
     """Remove security groups from an interface.
 
     Can target either physical groups as a list of group ids or
@@ -456,35 +456,12 @@ class InterfaceRemoveGroups(BaseAction):
            'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
-        target_group_ids = self.data.get('groups', 'matched')
-        isolation_group = self.data.get('isolation-group')
-
         client = local_session(self.manager.session_factory).client('ec2')
-
-        for r in resources:
-            rgroups = [g['GroupId'] for g in r['Groups']]
-            if target_group_ids == 'matched':
-                group_ids = r.get('MatchedSecurityGroups', ())
-            elif target_group_ids == 'all':
-                group_ids = rgroups
-            elif isinstance(target_group_ids, list):
-                group_ids = target_group_ids
-            else:
-                continue
-
-            if not group_ids:
-                continue
-
-            for g in group_ids:
-                if g in rgroups:
-                    rgroups.remove(g)
-
-            if not rgroups:
-                rgroups.append(isolation_group)
-
+        groups = super(InterfaceRemoveGroups, self).get_groups(resources)
+        for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
-                Groups=rgroups)
+                Groups=groups[idx])
 
 
 @resources.register('route-table')
