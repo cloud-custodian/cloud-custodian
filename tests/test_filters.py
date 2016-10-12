@@ -19,7 +19,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from .common import instance, event_data
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -58,12 +58,13 @@ class TestOrFilter(unittest.TestCase):
             'or': [
                 {'Architecture': 'x86_64'},
                 {'Architecture': 'armv8'}]})
+        results = [instance(Architecture='x86_64')]
         self.assertEqual(
-            f(instance(Architecture='x86_64')),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
-            f(instance(Architecture='amd64')),
-            False)
+            f.process([instance(Architecture='amd64')]),
+            [])
 
 
 class TestAndFilter(unittest.TestCase):
@@ -73,23 +74,24 @@ class TestAndFilter(unittest.TestCase):
             'and': [
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
+        results = [instance(Architecture='x86_64', Color='green')]
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='green')),
-            True)
+            f.process(results),
+            results)
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64',
-                Color='blue')),
-            False)
+            f.process([
+                instance(
+                    Architecture='x86_64',
+                    Color='blue')]),
+            [])
         self.assertEqual(
-            f(instance(
-                Architecture='x86_64')),
-            False)
+            f.process([
+                instance(
+                    Architecture='x86_64')]),
+            [])
 
-        
-class TestGlobValue(unittest.TestCase):        
+
+class TestGlobValue(unittest.TestCase):
 
     def test_regex_match(self):
         f = filters.factory(
@@ -107,8 +109,8 @@ class TestGlobValue(unittest.TestCase):
                 Architecture='x86_64',
                 Color='blue')),
             False)
-    
-    
+
+
 class TestRegexValue(unittest.TestCase):
 
     def test_regex_validate(self):
@@ -141,6 +143,97 @@ class TestRegexValue(unittest.TestCase):
             f(instance(
                 Architecture='x86_64')),
             False)
+
+
+class TestValueTypes(BaseFilterTest):
+
+    def test_normalize(self):
+        fdata = {
+            'type': 'value',
+            'key': 'tag:Name',
+            'value_type': 'normalize',
+            'value': 'compilelambda'
+        }
+        self.assertFilter(fdata, instance(), True)
+
+    def test_size(self):
+        fdata = {
+            'type': 'value',
+            'key': 'SecurityGroups[].GroupId',
+            'value_type': 'size',
+            'value': 2
+        }
+        self.assertFilter(fdata, instance(), True)
+
+    def test_integer(self):
+        fdata = {
+            'type': 'value',
+            'key': 'tag:Count',
+            'op': 'greater-than',
+            'value_type': 'integer',
+            'value': 0}
+
+        def i(d):
+            return instance(Tags=[{"Key": "Count", "Value": d}])
+
+        self.assertFilter(fdata, i('42'), True)
+        self.assertFilter(fdata, i('abc'), False)
+
+        fdata['op'] = 'equal'
+        self.assertFilter(fdata, i('abc'), True)
+
+    def test_swap(self):
+        fdata = {
+            'type': 'value',
+            'key': 'SecurityGroups[].GroupId',
+            'value_type': 'swap',
+            'op': 'in',
+            'value': 'sg-47b76f22'
+        }
+        self.assertFilter(fdata, instance(), True)
+
+    def test_age(self):
+        now = datetime.now(tz=tz.tzutc())
+        three_months = now - timedelta(90)
+        two_months = now - timedelta(60)
+        one_month = now - timedelta(30)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        fdata = {
+            'type': 'value',
+            'key': 'LaunchTime',
+            'op': 'less-than',
+            'value_type': 'age',
+            'value': 32}
+
+        self.assertFilter(fdata, i(three_months), False)
+        self.assertFilter(fdata, i(two_months), False)
+        self.assertFilter(fdata, i(one_month), True)
+        self.assertFilter(fdata, i(now), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
+
+    def test_expiration(self):
+
+        now = datetime.now(tz=tz.tzutc())
+        three_months = now + timedelta(90)
+        two_months = now + timedelta(60)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        fdata = {
+            'type': 'value',
+            'key': 'LaunchTime',
+            'op': 'less-than',
+            'value_type': 'expiration',
+            'value': 61}
+
+        self.assertFilter(fdata, i(three_months), False)
+        self.assertFilter(fdata, i(two_months), True)
+        self.assertFilter(fdata, i(now), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -200,7 +293,6 @@ class TestMarkedForAction(BaseFilterTest):
                  "Value": "not compliant: %s@%s" % (
                     action, d.strftime("%Y/%m/%d"))}])
 
-
         for ii, v in [
                 (i(yesterday), True),
                 (i(now), True),
@@ -213,14 +305,23 @@ class TestMarkedForAction(BaseFilterTest):
 class EventFilterTest(BaseFilterTest):
 
     def test_event_filter(self):
+        b = Bag(data={'mode': []})
         event = event_data('event-instance-state.json')
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
-        self.assertTrue(filters.factory(f).process(
+        self.assertTrue(filters.factory(f, b).process(
             [instance()], event))
 
-        
+    def test_event_no_mode(self):
+        b = Bag(data={'resource': 'something'})
+        f = {'type': 'event',
+             'key': 'detail.state',
+             'value': 'pending'}
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, b)
+
+
 class TestInstanceValue(BaseFilterTest):
 
     def test_filter_tag_count(self):
@@ -249,6 +350,15 @@ class TestInstanceValue(BaseFilterTest):
             {'tag:ASV': 'absent'}, i, True)
         self.assertEqual(
             annotation(i, base_filters.ANNOTATION_KEY), ['tag:ASV'])
+
+    def test_present(self):
+        i = instance(Tags=[
+            {'Key': 'ASV', 'Value': ''}])
+        self.assertFilter(
+            {'type': 'value',
+             'key': 'tag:ASV',
+             'value': 'present'},
+            i, True)
 
     def test_jmespath(self):
         self.assertFilter(
@@ -282,7 +392,10 @@ class TestInstanceValue(BaseFilterTest):
 
     def test_complex_value_filter(self):
         self.assertFilter(
-            {"key": "length(BlockDeviceMappings[?Ebs.DeleteOnTermination == `true`].Ebs.DeleteOnTermination)",
+            {"key": (
+                "length(BlockDeviceMappings"
+                "[?Ebs.DeleteOnTermination == `true`]"
+                ".Ebs.DeleteOnTermination)"),
              "value": 0,
              "type": "value",
              "op": "gt"},
@@ -296,6 +409,180 @@ class TestInstanceValue(BaseFilterTest):
              "type": "value"},
             instance(),
             True)
+
+
+class TestEqualValue(unittest.TestCase):
+
+    def test_eq(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'eq'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            True)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            False)
+
+    def test_equal(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'equal'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            True)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            False)
+
+
+class TestNotEqualValue(unittest.TestCase):
+
+    def test_ne(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'ne'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            False)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            True)
+
+    def test_not_equal(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Color',
+             'value': 'green',
+             'op': 'not-equal'})
+        self.assertEqual(
+            f(instance(Color='green')),
+            False)
+        self.assertEqual(
+            f(instance(Color='blue')),
+            True)
+
+
+class TestGreaterThanValue(unittest.TestCase):
+
+    def test_gt(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'gt'})
+        self.assertEqual(
+            f(instance(Number=11)),
+            True)
+        self.assertEqual(
+            f(instance(Number=9)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+    def test_greater_than(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'greater-than'})
+        self.assertEqual(
+            f(instance(Number=11)),
+            True)
+        self.assertEqual(
+            f(instance(Number=9)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+
+class TestLessThanValue(unittest.TestCase):
+
+    def test_lt(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'lt'})
+        self.assertEqual(
+            f(instance(Number=9)),
+            True)
+        self.assertEqual(
+            f(instance(Number=11)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+    def test_less_than(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Number',
+             'value': 10,
+             'op': 'less-than'})
+        self.assertEqual(
+            f(instance(Number=9)),
+            True)
+        self.assertEqual(
+            f(instance(Number=11)),
+            False)
+        self.assertEqual(
+            f(instance(Number=10)),
+            False)
+
+
+class TestInList(unittest.TestCase):
+
+    def test_in(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'in'})
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            False)
+
+
+class TestNotInList(unittest.TestCase):
+
+    def test_ni(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'ni'})
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            False)
+
+    def test_not_in(self):
+        f = filters.factory(
+            {'type': 'value',
+             'key': 'Thing',
+             'value': ['Foo', 'Bar', 'Quux'],
+             'op': 'not-in'})
+        self.assertEqual(
+            f(instance(Thing='Baz')),
+            True)
+        self.assertEqual(
+            f(instance(Thing='Foo')),
+            False)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-largef-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "cGRs5UPufO3J0nEXBru/sudkTKBGg18VJMEwEFfxlP52rLTkWKcLOFm2gpn+sMDOYubz120aFP0=", 
+            "RequestId": "714322397B1AA6C0"
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 9
+                }, 
+                "ETag": "\"2c7ab85a893283e98c931e9511add182\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "hello", 
+                "Owner": {
+                    "DisplayName": "k_vertigo", 
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                }, 
+                "Size": 16777216
+            }
+        ]
+    }
+}

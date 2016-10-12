@@ -1,0 +1,165 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Group": {
+            "Path": "/", 
+            "CreateDate": {
+                "hour": 19, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 21, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 16, 
+                "minute": 4
+            }, 
+            "GroupId": "AGPAIUD5E7IQWXH4GKXKY", 
+            "Arn": "arn:aws:iam::644160558196:group/Admins", 
+            "GroupName": "Admins"
+        }, 
+        "Users": [
+            {
+                "UserName": "mandeep", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 14
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAIRGKK45UIXHXNN2SI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/mandeep"
+            }, 
+            {
+                "UserName": "davidromanowski", 
+                "PasswordLastUsed": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 28, 
+                    "minute": 5
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJ2H7ZU2DNQQS3UIOY", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/davidromanowski"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 17, 
+                    "minute": 2
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kapil"
+            }, 
+            {
+                "UserName": "kit", 
+                "PasswordLastUsed": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 33
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAJKVAHLRG2G6PHIBAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kit"
+            }, 
+            {
+                "UserName": "joshuaroot", 
+                "PasswordLastUsed": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 49
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 26
+                }, 
+                "UserId": "AIDAJM67KUVNOIMGUCZO4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/joshuaroot"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "71b228d0-8730-11e6-95e4-e18e5bcabb34", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "71b228d0-8730-11e6-95e4-e18e5bcabb34", 
+                "date": "Fri, 30 Sep 2016 17:08:01 GMT", 
+                "content-length": "2124", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

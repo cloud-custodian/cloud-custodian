@@ -2,13 +2,19 @@ S3 - Global Grants
 ==================
 
 Scan buckets that allow for global access in their
-acls and report them and the acl permissions granted.
+ACLs and report them and the ACL permissions granted.
 
 
 .. code-block:: yaml
 
    policies:
-   
-     - name: s3-insecure-grants
-       action: global-grants
-       resource: s3
+
+   - name: s3-global-access
+     resource: s3
+     filters:
+       - type: global-grants
+     actions:
+       - type: delete-global-grants
+         grantees:
+           - "http://acs.amazonaws.com/groups/global/AllUsers"
+           - "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"

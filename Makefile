@@ -10,16 +10,19 @@ develop:
 	source bin/activate && python setup.py develop
 
 coverage:
-	./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover tests
+	rm -Rf .coverage
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --cover-inclusive tests
 
+ttest:
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s --with-timer tests
 lint:
-	flake8 janitor --ignore=W293,W291,W503,W391
+	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
-	./bin/nosetests -s -v tests
+	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests  --processes=-1 tests
 
 ftests:
-	./bin/nosetests -s -v ftests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
 
 depcache:
 	mkdir -p deps
@@ -35,7 +38,7 @@ sphinx:
 
 ghpages:
 	git checkout gh-pages && \
-	cp -r docs/build/html/* . && \
+	cp -r docs/build/html/* ./docs/ && \
 	git add -u && \
 	git add -A && \
 	git commit -m "Updated generated Sphinx documentation"

@@ -14,26 +14,37 @@
 
 import argparse
 import logging
+import os
+import pdb
+import sys
+import traceback
 
-# policy initializes a lot of stuff on load
-from c7n import policy, commands
+
+from c7n import commands, resources
 
 
 def _default_options(p):
-    p.add_argument("-r", "--region", default="us-east-1",
-                   help="AWS Region to target (Default: us-east-1)")
-    p.add_argument("--profile", default=None,
-                   help="AWS Account Config File Profile to utilize")
+    p.add_argument(
+        "-r", "--region",
+        default=os.environ.get('AWS_DEFAULT_REGION', "us-east-1"),
+        help="AWS Region to target (Default: us-east-1)")
+    p.add_argument(
+        "--profile", default=os.environ.get('AWS_PROFILE'),
+        help="AWS Account Config File Profile to utilize")
     p.add_argument("--assume", default=None, dest="assume_role",
                    help="Role to assume")
     p.add_argument("-c", "--config", required=True,
                    help="Policy Configuration File")
-    p.add_argument("-l", "--log-group", default=None,
-                   help="Cloudwatch Log Group to send policy logs")    
-    p.add_argument("-p", "--policies", default=None,
+    p.add_argument("-p", "--policies", default=None, dest='policy_filter',
                    help="Only execute named/matched policies")
+    p.add_argument("-t", "--resource", default=None, dest='resource_type',
+                   help="Only execute policies with the given resource type")
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Verbose Logging")
+    p.add_argument(
+        "-l", "--log-group", default=None,
+        help="Cloudwatch Log Group to send policy logs")
+
     p.add_argument("--debug", action="store_true",
                    help="Dev Debug")
     p.add_argument("-s", "--output-dir", required=True,
@@ -42,13 +53,13 @@ def _default_options(p):
     p.add_argument("--cache-period", default=60, type=int,
                    help="Cache validity in seconds (Default 60)")
 
-    
+
 def _dryrun_option(p):
     p.add_argument(
         "-d", "--dryrun", action="store_true",
         help="Don't change infrastructure but verify access.")
 
-    
+
 def setup_parser():
     parser = argparse.ArgumentParser()
     subs = parser.add_subparsers()
@@ -57,19 +68,21 @@ def setup_parser():
     report.set_defaults(command=commands.report)
     _default_options(report)
     report.add_argument(
-        '--days', type=int,
+        '--days', type=float, default=1,
         help="Number of days of history to consider")
     report.add_argument(
         '--raw', type=argparse.FileType('wb'),
         help="Store raw json of collected records to given file path")
 
-    identify = subs.add_parser("identify")
-    identify.set_defaults(command=commands.identify)
-    _default_options(identify)
-
     logs = subs.add_parser('logs')
     logs.set_defaults(command=commands.logs)
     _default_options(logs)
+
+    version = subs.add_parser('version')
+    version.set_defaults(command=commands.cmd_version)
+    version.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Verbose Logging")
 
     validate = subs.add_parser('validate')
     validate.set_defaults(command=commands.validate)
@@ -79,7 +92,12 @@ def setup_parser():
                           help="Verbose Logging")
     validate.add_argument("--debug", action="store_true",
                           help="Dev Debug")
-    
+
+    #resources = subs.add_parser('resources')
+    #resources.set_defaults(command=commands.resources)
+    #_default_options(resources)
+    #resources.add_argument('--all', default=True, action="store_false")
+
     run = subs.add_parser("run")
     run.set_defaults(command=commands.run)
     _default_options(run)
@@ -87,8 +105,8 @@ def setup_parser():
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
-        help="Emit CloudWatch Metrics (default false)")    
-    
+        help="Emit Metrics")
+
     return parser
 
 
@@ -101,19 +119,14 @@ def main():
         level=level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
+    logging.getLogger('s3transfer').setLevel(logging.ERROR)
 
-    config = policy.load(options, options.config)
     try:
-        options.command(options, config)
+        resources.load_resources()
+        options.command(options)
     except Exception:
         if not options.debug:
             raise
-        import traceback
-        import pdb
-        import sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
-    
 
-if __name__ == '__main__':
-    main()

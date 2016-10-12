@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VaultList": [
+            {
+                "SizeInBytes": 0, 
+                "VaultARN": "arn:aws:glacier:us-west-2:644160558196:vaults/c7n-cross-check", 
+                "CreationDate": "2016-06-26T16:48:47.469Z", 
+                "VaultName": "c7n-cross-check", 
+                "NumberOfArchives": 0
+            }, 
+            {
+                "SizeInBytes": 0, 
+                "VaultARN": "arn:aws:glacier:us-west-2:644160558196:vaults/testing", 
+                "CreationDate": "2016-06-26T16:44:42.351Z", 
+                "VaultName": "testing", 
+                "NumberOfArchives": 0
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "LV2q-BkQsj8bZhvgHll6kgOEx6-5XQIMfAwzO8Iqx-dKHuc"
+        }
+    }
+}

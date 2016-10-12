@@ -1,0 +1,10 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:logs:us-east-1:619193117841:log-group:custodian-test-log-sub:*\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-east-1.amazonaws.com\"},\"Sid\":\"ustodian-test-log-sub\"}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 201, 
+            "RequestId": "d499f9d7-2e2f-11e6-8611-a99b5bab2c0c"
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Status": "Suspended", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "uAaEI/7+Fr8r7MIOSqTr7yMgR/6ThvNcDyUVzDdNL+tImGWUIzX4tP2cG7K1URpPU82f4GwibNk=", 
+            "RequestId": "DEF02330FE839CC4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "uAaEI/7+Fr8r7MIOSqTr7yMgR/6ThvNcDyUVzDdNL+tImGWUIzX4tP2cG7K1URpPU82f4GwibNk=", 
+                "date": "Tue, 04 Oct 2016 15:26:06 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DEF02330FE839CC4", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

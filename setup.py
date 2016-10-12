@@ -1,11 +1,16 @@
+import os
 from setuptools import setup, find_packages
+
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 setup(
     name="c7n",
-    version='0.8.2',
+    version='0.8.19.4',
     description="Cloud Custodian - Policy Rules Engine",
-    long_description_markdown_filename='README.md',
+    long_description=read('README.rst'),
     classifiers=[
       "Topic :: System :: Systems Administration",
       "Topic :: System :: Distributed Computing"
@@ -16,6 +21,6 @@ setup(
     entry_points={
         'console_scripts': [
             'custodian = c7n.cli:main']},
-    requires=["boto3", "pyyaml"],
+    install_requires=["boto3", "pyyaml", "jsonschema", "skew", "ipaddress"],
 )
 

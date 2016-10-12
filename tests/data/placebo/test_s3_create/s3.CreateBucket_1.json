@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-create-bucket-v4", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "xfc7tsVfULyWxVT+hVrXXY5S8BtrvHpYBD/GdkbwC/j15DdyJLLxIwTiv8SCIf0cI7XIQrpwd5A=", 
+            "RequestId": "8E7499360503B0C7"
+        }
+    }
+}

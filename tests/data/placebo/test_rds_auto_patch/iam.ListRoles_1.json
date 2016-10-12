@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "01041d4e-3bcd-11e6-ba67-69f7766ec929", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "01041d4e-3bcd-11e6-ba67-69f7766ec929", 
+                "date": "Sun, 26 Jun 2016 18:37:14 GMT", 
+                "content-length": "849", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false, 
+        "Roles": [
+            {
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "RoleId": "AROAIDZBE5CMRCNENDQD2", 
+                "CreateDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 11
+                }, 
+                "RoleName": "lambda_basic_execution", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:role/lambda_basic_execution"
+            }
+        ]
+    }
+}

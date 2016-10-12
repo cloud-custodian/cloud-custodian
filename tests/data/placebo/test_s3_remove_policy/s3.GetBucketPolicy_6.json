@@ -1,0 +1,15 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "HostId": "YJFu11kVG9CPN903hYvL+9MtFZnZ+QBX5YHXNz8CrhaQijcpFmLPQnFs3gsr+D77eGFHK+hESDU=", 
+            "RequestId": "DAAA970F4AE41E30"
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "custodian-policy-test"
+        }
+    }
+}

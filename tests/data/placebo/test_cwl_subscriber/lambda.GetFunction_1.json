@@ -1,0 +1,13 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RequestId": "d3f5a33b-2e2f-11e6-af79-2ba5dc27d5cd"
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

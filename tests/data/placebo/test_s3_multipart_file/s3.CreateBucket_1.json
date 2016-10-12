@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-largef-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "6NgASW1O6Ovp3zKTRPnvN+76p21jq/O2siWN+qBPDr6oUct7lwjHl1q9XUzHcpXeSnyhCdE9JP4=", 
+            "RequestId": "6FF5042A1B33EEDE"
+        }
+    }
+}

@@ -28,6 +28,7 @@ from botocore.exceptions import ClientError
 
 import itertools
 import logging
+from operator import itemgetter
 import threading
 import time
 
@@ -35,14 +36,16 @@ try:
     import Queue
 except ImportError:
     import queue as Queue
-    
+
 
 FLUSH_MARKER = object()
 SHUTDOWN_MARKER = object()
 
+EMPTY = Queue.Empty
+
 
 class Error(object):
-    
+
     AlreadyAccepted = "DataAlreadyAcceptedException"
     InvalidToken = "InvalidSequenceTokenException"
     ResourceExists = "ResourceAlreadyExistsException"
@@ -51,7 +54,7 @@ class Error(object):
     def code(e):
         return e.response.get('Error', {}).get('Code')
 
-    
+
 class CloudWatchLogHandler(logging.Handler):
     """Python Log Handler to Send to Cloud Watch Logs
 
@@ -61,7 +64,7 @@ class CloudWatchLogHandler(logging.Handler):
     batch_size = 20
     batch_interval = 40
     batch_min_buffer = 10
-    
+
     def __init__(self, log_group=__name__, log_stream=None,
                  session_factory=None):
         super(CloudWatchLogHandler, self).__init__()
@@ -82,21 +85,20 @@ class CloudWatchLogHandler(logging.Handler):
         try:
             self.session_factory().client(
                 'logs').create_log_group(logGroupName=self.log_group)
-                
         except ClientError as e:
             if Error.code(e) != Error.ResourceExists:
                 raise
-        
+
     # Begin logging.Handler API
-    
     def emit(self, message):
         """Send logs"""
         # We're sending messages asynchronously, bubble to caller when
         # we've detected an error on the message. This isn't great,
-        # but options once we've gone async are limited.
+        # but options once we've gone async without a deferred/promise
+        # aren't great.
         if self.transport and self.transport.error:
             raise self.transport.error
-        
+
         # Sanity safety, people do like to recurse by attaching to
         # root log :-(
         if message.name.startswith('boto'):
@@ -108,9 +110,9 @@ class CloudWatchLogHandler(logging.Handler):
         self.buf.append(msg)
         self.flush_buffers(
             (message.created - self.last_seen >= self.batch_interval))
-            
+
         self.last_seen = message.created
-    
+
     def flush(self):
         """Ensure all logging output has been flushed."""
         if self.shutdown:
@@ -118,11 +120,11 @@ class CloudWatchLogHandler(logging.Handler):
         self.flush_buffers(force=True)
         self.queue.put(FLUSH_MARKER)
         self.queue.join()
-        
+
     def close(self):
         if self.shutdown:
             return
-        self.shutdown = True        
+        self.shutdown = True
         self.queue.put(SHUTDOWN_MARKER)
         self.queue.join()
         for t in self.threads:
@@ -130,14 +132,14 @@ class CloudWatchLogHandler(logging.Handler):
         self.threads = []
 
     # End logging.Handler API
-            
+
     def format_message(self, msg):
         """format message."""
         return {'timestamp': int(msg.created * 1000),
                 'message': self.format(msg),
                 'stream': self.log_stream or msg.name,
                 'group': self.log_group}
-    
+
     def start_transports(self):
         """start thread transports."""
         self.transport = Transport(
@@ -153,7 +155,7 @@ class CloudWatchLogHandler(logging.Handler):
             return
         self.queue.put(self.buf)
         self.buf = []
-    
+
 
 class Transport(object):
 
@@ -188,8 +190,9 @@ class Transport(object):
                 return
             self.sequences[stream] = None
         params = dict(
-            logGroupName=group, logStreamName=stream, 
-            logEvents=messages)
+            logGroupName=group, logStreamName=stream,
+            logEvents=sorted(
+                messages, key=itemgetter('timestamp'), reverse=False))
         if self.sequences[stream]:
             params['sequenceToken'] = self.sequences[stream]
         try:
@@ -202,16 +205,18 @@ class Transport(object):
             self.error = e
             return
         self.sequences[stream] = response['nextSequenceToken']
-        
+
     def loop(self):
         def keyed(datum):
             return "%s=%s" % (
                 datum.pop('group'), datum.pop('stream'))
-        
+
         while True:
             try:
                 datum = self.queue.get(block=True, timeout=self.batch_interval)
-            except Queue.Empty:
+            except EMPTY:
+                if Queue is None:
+                    return
                 datum = None
             if datum is None:
                 # Timeout reached, flush
@@ -226,5 +231,3 @@ class Transport(object):
                 for k, group in itertools.groupby(datum, keyed):
                     self.buffers.setdefault(k, []).extend(group)
             self.queue.task_done()
-
-    

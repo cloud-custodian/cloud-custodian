@@ -12,10 +12,10 @@ EC2 - Old Instance Report
      filters:
        - type: instance-age
          days: 60
-   
-   
+
+
      # Use Case: Report all AMIs that are 120+ days or older
-   
+
      - name: ancient-images-report
        resource: ami
        comment: |
@@ -26,14 +26,14 @@ EC2 - Old Instance Report
 
 
 Instance Age Filter
-  The instance age filter allows for filtering the set of ec2 instances by
-  their LaunchTime, ie. all instances older than 60 or 90 days. The default
+  The instance age filter allows for filtering the set of EC2 instances by
+  their LaunchTime, i.e. all instances older than 60 or 90 days. The default
   date value is 60 days if otherwise unspecified.
   Configuring a specific value for instance-age to report all instances older
   than 90 days.
-  
+
   .. code-block:: yaml
-  
+
      policies:
        - name: old-instances
          resource: ec2

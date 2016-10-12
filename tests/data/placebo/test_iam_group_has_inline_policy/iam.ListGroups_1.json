@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "dedaca2e-8b00-11e6-8e5f-8be775b3b69a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "dedaca2e-8b00-11e6-8e5f-8be775b3b69a", 
+                "date": "Wed, 05 Oct 2016 13:37:33 GMT", 
+                "content-length": "1078", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false, 
+        "Groups": [
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 4
+                }, 
+                "GroupId": "AGPAIUD5E7IQWXH4GKXKY", 
+                "Arn": "arn:aws:iam::644160558196:group/Admins", 
+                "GroupName": "Admins"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 50
+                }, 
+                "GroupId": "AGPAJ3JSAVUI2UFFUIOHA", 
+                "Arn": "arn:aws:iam::644160558196:group/c7n-test", 
+                "GroupName": "c7n-test"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 40
+                }, 
+                "GroupId": "AGPAJFZERGKIHQNHHTMXY", 
+                "Arn": "arn:aws:iam::644160558196:group/powerusers", 
+                "GroupName": "powerusers"
+            }
+        ]
+    }
+}

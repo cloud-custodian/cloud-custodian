@@ -12,6 +12,8 @@ pip-selfcheck.json
 cover/
 .coverage
 tmp/
-.idea
 docs/source/generated/
 docs/build/
+cache/
+policies/
+local/

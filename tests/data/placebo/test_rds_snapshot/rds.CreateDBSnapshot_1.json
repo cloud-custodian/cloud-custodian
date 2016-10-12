@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBSnapshot": {
+            "Engine": "postgres", 
+            "Status": "creating", 
+            "AvailabilityZone": "us-west-2a", 
+            "PercentProgress": 0, 
+            "MasterUsername": "superduper", 
+            "Encrypted": false, 
+            "LicenseModel": "postgresql-license", 
+            "StorageType": "gp2", 
+            "VpcId": "vpc-399e3d52", 
+            "DBSnapshotIdentifier": "backup-oneness-postgres", 
+            "InstanceCreateTime": {
+                "hour": 0, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 10, 
+                "microsecond": 155000, 
+                "year": 2016, 
+                "day": 8, 
+                "minute": 22
+            }, 
+            "OptionGroupName": "default:postgres-9-4", 
+            "AllocatedStorage": 5, 
+            "EngineVersion": "9.4.7", 
+            "SnapshotType": "manual", 
+            "Port": 5432, 
+            "DBInstanceIdentifier": "oneness"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b4d300a-14b5-11e6-aea6-37b8a0fa4a31"
+        }
+    }
+}

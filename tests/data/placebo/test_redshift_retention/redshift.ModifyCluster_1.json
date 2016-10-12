@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "Cluster":             {
+                        "PubliclyAccessible": false,
+                        "MasterUsername": "admin",
+                        "VpcSecurityGroups": [
+                            {
+                                "Status": "active",
+                                "VpcSecurityGroupId": "sg-54321"
+                            }
+                        ],
+                        "ClusterPublicKey": "ssh-rsa DCBA Amazon-Redshift\n",
+                        "NumberOfNodes": 1,
+                        "PendingModifiedValues": {},
+                        "VpcId": "vpc-54321",
+                        "ClusterVersion": "1.0",
+                        "Tags": [
+                            {
+                                "Value": "V9",
+                                "Key": "K9"
+                            },
+                            {
+                                "Value": "V8",
+                                "Key": "K8"
+                            },
+                            {
+                                "Value": "V7",
+                                "Key": "K7"
+                            }
+                        ],
+                        "AutomatedSnapshotRetentionPeriod": 21,
+                        "ClusterParameterGroups": [
+                            {
+                                "ParameterGroupName": "default.redshift-1.0",
+                                "ParameterApplyStatus": "in-sync"
+                            }
+                        ],
+                        "DBName": "dev",
+                        "PreferredMaintenanceWindow": "thu:03:00-thu:03:30",
+                        "Endpoint": {
+                            "Port": 5439,
+                            "Address": "aaa.ccc.us-east-1.redshift.amazonaws.com"
+                        },
+                        "IamRoles": [],
+                        "AllowVersionUpgrade": true,
+                        "ClusterCreateTime": {
+                            "hour": 13,
+                            "__class__": "datetime",
+                            "month": 8,
+                            "second": 26,
+                            "microsecond": 191000,
+                            "year": 2016,
+                            "day": 23,
+                            "minute": 11
+                        },
+                        "ClusterSubnetGroupName": "a-subnet-group",
+                        "ClusterSecurityGroups": [],
+                        "ClusterIdentifier": "aaa",
+                        "ClusterNodes": [
+                            {
+                                "NodeRole": "SHARED",
+                                "PrivateIPAddress": "10.2.2.2",
+                                "PublicIPAddress": "2.2.2.2"
+                            }
+                        ],
+                        "AvailabilityZone": "us-east-1b",
+                        "NodeType": "dc1.large",
+                        "Encrypted": true,
+                        "ClusterRevisionNumber": "1088",
+                        "KmsKeyId": "arn:aws:kms:us-east-1:54321:key/k2",
+                        "ClusterStatus": "available"
+                    },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "c1234a50-6934-11e6-bd92-af313dc1b009"
+        }
+    }
+}

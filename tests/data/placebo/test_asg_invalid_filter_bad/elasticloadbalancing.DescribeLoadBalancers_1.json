@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-1"
+                ],
+                "CanonicalHostedZoneNameID": "CHZNID",
+                "VPCId": "vpc-1",
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 80,
+                            "LoadBalancerPort": 80,
+                            "Protocol": "HTTP",
+                            "InstanceProtocol": "HTTP"
+                        },
+                        "PolicyNames": []
+                    }
+                ],
+                "HealthCheck": {
+                    "HealthyThreshold": 2,
+                    "Interval": 30,
+                    "Target": "TCP:80",
+                    "Timeout": 5,
+                    "UnhealthyThreshold": 6
+                },
+                "BackendServerDescriptions": [],
+                "Instances": [
+                    {
+                        "InstanceId": "i-1"
+                    },
+                    {
+                        "InstanceId": "i-2"
+                    },
+                    {
+                        "InstanceId": "i-3"
+                    }
+                ],
+                "DNSName": "abc.us-west-2.elb.amazonaws.com",
+                "SecurityGroups": [
+                    "sg-1"
+                ],
+                "Policies": {
+                    "LBCookieStickinessPolicies": [],
+                    "AppCookieStickinessPolicies": [],
+                    "OtherPolicies": [
+                        "ELBSecurityPolicy-2015-05"
+                    ]
+                },
+                "LoadBalancerName": "abc-elb",
+                "CreatedTime": {
+                    "hour": 18,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 21,
+                    "microsecond": 610000,
+                    "year": 2016,
+                    "day": 5,
+                    "minute": 44
+                },
+                "AvailabilityZones": [
+                    "us-west-2a",
+                    "us-west-2b",
+                    "us-west-2c"
+                ],
+                "Scheme": "internal",
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "123",
+                    "GroupName": "GGG"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "79f2de1e-3ed3-11e6-a775-f76e0e070837"
+        }
+    }
+}

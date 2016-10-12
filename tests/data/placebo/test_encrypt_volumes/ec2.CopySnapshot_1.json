@@ -1,0 +1,10 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SnapshotId": "snap-ee6f74be", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "f1cfcfcf-5e3f-4a8a-ae4a-43faad61eda4"
+        }
+    }
+}

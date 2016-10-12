@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-create-bucket-v4", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "kOtoYN5XNVD7EhgkWWgOl6GVm+gVTR6yk8IIr7r/GeVYt9odtUZyaePHEiZ5QYeU2WasGmFcHnk=", 
+            "RequestId": "8829756D3B66011E"
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

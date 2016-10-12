@@ -1,0 +1,15 @@
+{
+    "status_code": 202, 
+    "data": {
+        "Payload": {
+            "body": "", 
+            "__module__": "botocore.response", 
+            "__class__": "StreamingBody"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 202, 
+            "RequestId": "7a4fe4b1-3b99-11e6-93ad-b5f1d74933fb"
+        }, 
+        "StatusCode": 202
+    }
+}

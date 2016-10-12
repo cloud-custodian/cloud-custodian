@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "cd73f1e9-14b6-11e6-bf10-e7d51b83a4d4"
+        }, 
+        "TagList": [
+            {
+                "Value": "test", 
+                "Key": "Target"
+            }, 
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }
+        ]
+    }
+}

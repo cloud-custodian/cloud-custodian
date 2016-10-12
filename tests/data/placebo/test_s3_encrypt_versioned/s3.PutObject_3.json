@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VersionId": "55Hl427wzJjxlAUMXt3r4dmRDyggTRgq", 
+        "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "tp2m4bBt+2KbhLSV2u04tMoC9SGyIykqfXLtx4760Q+jlcGgX1UK1F2PiJd1Fafj4V796GHyDpU=", 
+            "RequestId": "334B3B470EE94B36"
+        }
+    }
+}

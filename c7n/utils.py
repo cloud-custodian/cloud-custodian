@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from botocore.exceptions import ClientError
 from datetime import datetime
 
 import copy
 import json
 import itertools
+import random
 import threading
 import time
-
+import ipaddress
 
 
 # Try to place nice in lambda exec environment
@@ -39,6 +41,15 @@ else:
 
 
 from StringIO import StringIO
+
+
+class Bag(dict):
+
+    def __getattr__(self, k):
+        try:
+            return self[k]
+        except KeyError:
+            raise AttributeError(k)
 
 
 def yaml_load(value):
@@ -109,7 +120,7 @@ def type_schema(
         s = {'allOf': [{'$ref': i} for i in inherits]}
         s['allOf'].append(extended)
     return s
-        
+
 
 class DateTimeEncoder(json.JSONEncoder):
 
@@ -118,7 +129,7 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-    
+
 def chunks(iterable, size=50):
     """Break an iterable into lists of size"""
     batch = []
@@ -129,6 +140,28 @@ def chunks(iterable, size=50):
             batch = []
     if batch:
         yield batch
+
+
+def camelResource(obj):
+    """Some sources from apis return lowerCased where as describe calls
+
+    always return TitleCase, this function turns the former to the later
+    """
+    if not isinstance(obj, dict):
+        return obj
+    for k in list(obj.keys()):
+        v = obj.pop(k)
+        obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if isinstance(v, dict):
+            camelResource(v)
+        elif isinstance(v, list):
+            map(camelResource, v)
+    return obj
+
+
+def get_account_id(session):
+    iam = session.client('iam')
+    return iam.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]
 
 
 def query_instances(session, client=None, **query):
@@ -142,7 +175,6 @@ def query_instances(session, client=None, **query):
         *[r["Instances"] for r in itertools.chain(
             *[pp['Reservations'] for pp in results])]))
 
-        
 CONN_CACHE = threading.local()
 
 
@@ -164,7 +196,7 @@ def annotation(i, k):
 
 
 def set_annotation(i, k, v):
-    """ 
+    """
     >>> x = {}
     >>> set_annotation(x, 'marker', 'a')
     >>> annotation(x, 'marker')
@@ -175,7 +207,7 @@ def set_annotation(i, k, v):
 
     if not isinstance(v, list):
         v = [v]
-        
+
     if k in i:
         ev = i.get(k)
         if isinstance(ev, list):
@@ -196,4 +228,76 @@ def parse_s3(s3_path):
         key_prefix = ""
     else:
         key_prefix = s3_path[s3_path.find('/', 5):]
-    return s3_path, bucket, key_prefix        
+    return s3_path, bucket, key_prefix
+
+
+def generate_arn(
+        service, resource, partition='aws',
+        region=None, account_id=None, resource_type=None, separator='/'):
+    """Generate an Amazon Resource Name.
+    See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
+    """
+    arn = 'arn:%s:%s:%s:%s:' % (
+        partition, service, region if region else '', account_id if account_id else '')
+    if resource_type:
+        arn = arn + '%s%s%s' % (resource_type, separator, resource)
+    else:
+        arn = arn + resource
+    return arn
+
+
+def snapshot_identifier(prefix, db_identifier):
+    """Return an identifier for a snapshot of a database or cluster.
+    """
+    now = datetime.now()
+    return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
+
+
+def get_retry(codes=(), max_attempts=8):
+    """Retry a boto3 api call on transient errors.
+
+    https://www.awsarchitectureblog.com/2015/03/backoff.html
+    https://en.wikipedia.org/wiki/Exponential_backoff
+
+    :param codes: A sequence of retryable error codes
+
+    returns a function for invoking aws client calls that
+    retries on retryable error codes.
+    """
+    max_delay = 2 ** max_attempts
+
+    def _retry(func, *args, **kw):
+        for idx, delay in enumerate(backoff_delays(1, max_delay, jitter=True)):
+            try:
+                return func(*args, **kw)
+            except ClientError as e:
+                if e.response['Error']['Code'] not in codes:
+                    raise
+                elif idx == max_attempts - 1:
+                    raise
+            time.sleep(delay)
+    return _retry
+
+
+def backoff_delays(start, stop, factor=2.0, jitter=False):
+    """Geometric backoff sequence w/ jitter
+    """
+    cur = start
+    while cur <= stop:
+        if jitter:
+            yield cur - (cur * random.random())
+        else:
+            yield cur
+        cur = cur * factor
+
+
+def parse_cidr(value):
+    """Process cidr ranges."""
+    klass = ipaddress.ip_network
+    if '/' not in value:
+        klass = ipaddress.ip_address
+    try:
+        v = klass(unicode(value))
+    except (ipaddress.AddressValueError, ValueError):
+        v = None
+    return v

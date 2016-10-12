@@ -1,0 +1,18 @@
+.. _ebs-snapshot:
+
+Elastic Block Store Snapshots (EBS Snapshots)
+=============================================
+
+Filters
+-------
+
+- Standard Value Filter (see :ref:`filters`)
+
+``age``
+  Based on ``StartTime`` of the snapshot, the time stamp when the snapshot was initiated, in days
+
+Actions
+-------
+
+``delete``
+  Delete EBS Snapshot based on ``skip-ami-snapshots``

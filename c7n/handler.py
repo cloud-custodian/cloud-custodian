@@ -18,10 +18,9 @@ Mostly this serves to load up the policy and dispatch
 an event.
 """
 
-from cStringIO import StringIO
-
 import logging
-import json
+import os
+import uuid
 
 from c7n.policy import load
 from c7n.utils import format_event
@@ -32,7 +31,7 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
 
-# TODO move me / we should load config options directly from policy config   
+# TODO move me / we should load config options directly from policy config
 class Config(dict):
 
     def __getattr__(self, k):
@@ -40,33 +39,36 @@ class Config(dict):
             return self[k]
         except KeyError:
             raise AttributeError(k)
-        
+
     @classmethod
     def empty(cls, **kw):
         d = {}
         d.update({
-            'region': "us-east-1",
+            'region': os.environ.get('AWS_DEFAULT_REGION'),
             'cache': '',
             'profile': None,
             'assume_role': None,
             'log_group': None,
-            'metrics_enabled': False,
-            'output_dir': '/tmp/',
+            'metrics_enabled': True,
+            'output_dir': '/tmp/' + str(uuid.uuid4()),
             'cache_period': 0,
             'dryrun': False})
         d.update(kw)
+        if not os.path.exists(d['output_dir']):
+            os.mkdir(d['output_dir'])
         return cls(d)
 
 
 def dispatch_event(event, context):
-    log.info("Processing event\n %s", format_event(event))
+    event['debug'] = True
+    if event['debug']:
+        log.info("Processing event\n %s", format_event(event))
 
     error = event.get('detail', {}).get('errorCode')
     if error:
         log.debug("Skipping failed operation: %s" % error)
         return
 
-    event['debug'] = True
     policies = load(Config.empty(), 'config.json', format='json')
     for p in policies:
         p.push(event, context)

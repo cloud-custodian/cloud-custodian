@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "KeyId": "68425528-9938-4a15-90f2-f1755263b836", 
+            "Description": "Default master key that protects my EBS volumes when no other key is defined", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 6, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 6, 
+                "microsecond": 317000, 
+                "year": 2016, 
+                "day": 27, 
+                "minute": 13
+            }, 
+            "Arn": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836", 
+            "AWSAccountId": "644160558196"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "4d190a4b-5506-11e6-8f68-5b596c7d84d9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4d190a4b-5506-11e6-8f68-5b596c7d84d9", 
+                "content-length": "368", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Thu, 28 Jul 2016 21:00:23 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

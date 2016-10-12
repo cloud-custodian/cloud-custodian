@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
 
@@ -28,18 +28,11 @@ actions = ActionRegistry('cfn.actions')
 
 
 @resources.register('cfn')
-class CloudFormation(ResourceManager):
+class CloudFormation(QueryResourceManager):
 
+    resource_type = "aws.cloudformation.stack"
     action_registry = actions
     filter_registry = filters
-
-    def resources(self):
-        c = self.session_factory().client('cloudformation')
-        self.log.info("Querying cloudformation")
-        p = c.get_paginator('describe_stacks')
-        results = p.paginate()
-        stacks = list(itertools.chain(*[rp['Stacks'] for rp in results]))
-        return self.filter_resources(stacks)
 
 
 @actions.register('delete')

@@ -1,0 +1,211 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstances": [
+            {
+                "PubliclyAccessible": false, 
+                "MasterUsername": "custodian", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "postgresql-license", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-0a08e365"
+                    }
+                ], 
+                "InstanceCreateTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 22, 
+                    "microsecond": 993000, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 43
+                }, 
+                "CopyTagsToSnapshot": true, 
+                "OptionGroupMemberships": [
+                    {
+                        "Status": "in-sync", 
+                        "OptionGroupName": "default:postgres-9-4"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "Engine": "postgres", 
+                "MultiAZ": false, 
+                "LatestRestorableTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 4, 
+                    "minute": 22
+                }, 
+                "DBSecurityGroups": [], 
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.postgres9.4", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "AutoMinorVersionUpgrade": true, 
+                "PreferredBackupWindow": "08:35-09:05", 
+                "DBSubnetGroup": {
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-389e3d53", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-3e9e3d55", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-3f9e3d54", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            }
+                        }
+                    ], 
+                    "DBSubnetGroupName": "default", 
+                    "VpcId": "vpc-399e3d52", 
+                    "DBSubnetGroupDescription": "default", 
+                    "SubnetGroupStatus": "Complete"
+                }, 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 5, 
+                "BackupRetentionPeriod": 7, 
+                "PreferredMaintenanceWindow": "thu:10:25-thu:10:55", 
+                "Endpoint": {
+                    "Port": 5432, 
+                    "Address": "custodiantest.cj9uic5xuiu0.us-west-2.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "EngineVersion": "9.4.7", 
+                "AvailabilityZone": "us-west-2b", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-V57KXLXSG4MTCQYEUXJF3D4LLE", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "KmsKeyId": "arn:aws:kms:us-west-2:619193117841:key/43811d5f-db1f-448d-b61d-04c5bf49b9d8", 
+                "StorageEncrypted": true, 
+                "DBInstanceClass": "db.m3.medium", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "custodiantest"
+            }, 
+            {
+                "PubliclyAccessible": true, 
+                "MasterUsername": "mydbuser", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "postgresql-license", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-47b76f22"
+                    }
+                ], 
+                "InstanceCreateTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 26, 
+                    "microsecond": 556000, 
+                    "year": 2016, 
+                    "day": 4, 
+                    "minute": 0
+                }, 
+                "CopyTagsToSnapshot": false, 
+                "OptionGroupMemberships": [
+                    {
+                        "Status": "in-sync", 
+                        "OptionGroupName": "default:postgres-9-4"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "Engine": "postgres", 
+                "MultiAZ": false, 
+                "LatestRestorableTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 4, 
+                    "minute": 22
+                }, 
+                "DBSecurityGroups": [], 
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.postgres9.4", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "AutoMinorVersionUpgrade": true, 
+                "PreferredBackupWindow": "13:21-13:51", 
+                "DBSubnetGroup": {
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-389e3d53", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-3e9e3d55", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-3f9e3d54", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            }
+                        }
+                    ], 
+                    "DBSubnetGroupName": "default", 
+                    "VpcId": "vpc-399e3d52", 
+                    "DBSubnetGroupDescription": "default", 
+                    "SubnetGroupStatus": "Complete"
+                }, 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 5, 
+                "BackupRetentionPeriod": 7, 
+                "DBName": "mydb", 
+                "PreferredMaintenanceWindow": "sat:00:00-sat:00:30", 
+                "Endpoint": {
+                    "Port": 5432, 
+                    "Address": "mydb.cj9uic5xuiu0.us-west-2.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "EngineVersion": "9.4.7", 
+                "AvailabilityZone": "us-west-2b", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-2LN3NMYRPZWYSYRIUESRCVU6CQ", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "StorageEncrypted": false, 
+                "DBInstanceClass": "db.m3.medium", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "mydb"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "895b150b-2a8a-11e6-98b3-9ff05509b4da"
+        }
+    }
+}

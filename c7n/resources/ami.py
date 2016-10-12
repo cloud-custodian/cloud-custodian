@@ -14,9 +14,10 @@
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
+from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import local_session, type_schema
 
 
@@ -28,17 +29,14 @@ actions = ActionRegistry('ami.actions')
 
 
 @resources.register('ami')
-class AMI(ResourceManager):
+class AMI(QueryResourceManager):
+
+    class resource_type(ResourceQuery.resolve('aws.ec2.image')):
+        date = 'CreationDate'
+        taggable = True
 
     filter_registry = filters
     action_registry = actions
-
-    def resources(self):
-        c = self.session_factory().client('ec2')
-        query = self.resource_query()  # FIXME: Not used
-        self.log.info("Querying images")
-        images = c.describe_images(Owners=['self'], Filters=query)['Images']
-        return self.filter_resources(images)
 
 
 @actions.register('deregister')
@@ -54,10 +52,25 @@ class Deregister(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
         client.deregister_image(ImageId=image['ImageId'])
 
-        
-@filters.register('image-age')        
+@actions.register('remove-launch-permissions')
+class RemoveLaunchPermissions(BaseAction):
+
+    schema = type_schema('remove-launch-permissions')
+
+    def process(self, images):
+        with self.executor_factory(max_workers=10) as w:
+            list(w.map(self.process_image, images))
+
+    def process_image(self, image):
+        client = local_session(self.manager.session_factory).client('ec2')
+        client.reset_image_attribute(ImageId=image['ImageId'],Attribute="launchPermission")
+
+
+@filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
 
     date_attribute = "CreationDate"
     schema = type_schema(
-        'image-age', days={'type': 'integer', 'minimum': 0})
+        'image-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number', 'minimum': 0})

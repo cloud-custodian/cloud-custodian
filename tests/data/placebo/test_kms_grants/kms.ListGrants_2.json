@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Grants": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "aa1f6ca0-3bc9-11e6-96f6-4172fdb672c4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "aa1f6ca0-3bc9-11e6-96f6-4172fdb672c4", 
+                "content-length": "31", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:13:21 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Truncated": false
+    }
+}

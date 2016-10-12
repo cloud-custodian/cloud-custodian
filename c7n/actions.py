@@ -23,6 +23,7 @@ from botocore.exceptions import ClientError
 from c7n.registry import PluginRegistry
 from c7n.executor import ThreadPoolExecutor
 from c7n import utils
+from c7n.version import version as VERSION
 
 
 class ActionRegistry(PluginRegistry):
@@ -30,6 +31,7 @@ class ActionRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
+        self.register('invoke-lambda', LambdaInvoke)
 
     def parse(self, data, manager):
         results = []
@@ -55,11 +57,12 @@ class ActionRegistry(PluginRegistry):
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
-    
+
 class BaseAction(object):
 
     permissions = ()
-    
+    metrics = ()
+
     log = logging.getLogger("custodian.actions")
 
     executor_factory = ThreadPoolExecutor
@@ -73,18 +76,18 @@ class BaseAction(object):
 
     def validate(self):
         return self
-    
+
     @property
     def name(self):
         return self.__class__.__name__.lower()
-    
+
     def process(self, resources):
         raise NotImplemented(
             "Base action class does not implement behavior")
 
     def get_permissions(self):
         return self.permissions
-    
+
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
@@ -98,7 +101,69 @@ class BaseAction(object):
             raise
 
 
-class Notify(BaseAction):
+class EventAction(BaseAction):
+    """Actions which receive lambda event if present
+    """
+
+
+class LambdaInvoke(EventAction):
+    """ Invoke an arbitrary lambda
+
+    serialized invocation parameters
+
+     - resources / collection of resources
+     - policy / policy that is invoke the lambda
+     - action / action that is invoking the lambda
+     - event / cloud trail event if any
+     - version / version of custodian invoking the lambda
+
+    We automatically batch into sets of 250 for invocation,
+    We try to utilize async invocation by default, this imposes
+    some greater size limits of 128kb which means we batch
+    invoke.
+
+    Example::
+
+     - type: invoke-lambda
+       function: my-function
+    """
+
+    schema = utils.type_schema(
+        'invoke-lambda',
+        function={'type': 'string'},
+        async={'type': 'boolean'},
+        qualifier={'type': 'string'},
+        batch_size={'type': 'integer'},
+        required=('function',))
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('lambda')
+
+        params = dict(FunctionName=self.data['function'])
+        if self.data.get('qualifier'):
+            params['Qualifier'] = self.data['Qualifier']
+
+        if self.data.get('async', True):
+            params['InvocationType'] = 'Event'
+
+        payload = {
+            'version': VERSION,
+            'event': event,
+            'action': self.data,
+            'policy': self.manager.data}
+
+        results = []
+        for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
+            payload['resources'] = resource_set
+            params['Payload'] = utils.dumps(payload)
+            result = client.invoke(**params)
+            result['Payload'] = result['Payload'].read()
+            results.append(result)
+        return results
+
+
+class Notify(EventAction):
     """
     Flexible notifications require quite a bit of implementation support
     on pluggable transports, templates, address resolution, variable
@@ -130,13 +195,16 @@ class Notify(BaseAction):
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
-    
+
     schema = {
         'type': 'object',
         'required': ['type', 'transport', 'to'],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'cc': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_manager': {'type': 'boolean'},
+            'from': {'type': 'string'},
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
             'transport': {
@@ -149,21 +217,30 @@ class Notify(BaseAction):
             }
         }
     }
+    batch_size = 250
 
     def process(self, resources, event=None):
-        message = {'resources': resources,
-                   'event': event,
-                   'action': self.data,
-                   'policy': self.manager.data}
-        self.send_data_message(message)
+        aliases = self.manager.session_factory().client(
+            'iam').list_account_aliases().get('AccountAliases', ())
+        account_name = aliases and aliases[0] or ''
+        for batch in utils.chunks(resources, self.batch_size):
+            message = {'resources': batch,
+                       'event': event,
+                       'account': account_name,
+                       'action': self.data,
+                       'policy': self.manager.data}
+            receipt = self.send_data_message(message)
+            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+                receipt, self.manager.data['name'],
+                self.data.get('template', 'default'), len(batch)))
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
-            self.send_sqs(message)
+            return self.send_sqs(message)
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = self.data['transport'].get('region', 'us-east-1')
+        region = queue.split('.', 2)[1]
         client = self.manager.session_factory(region=region).client('sqs')
         attrs = {
             'mtype': {
@@ -171,7 +248,100 @@ class Notify(BaseAction):
                 'StringValue': self.C7N_DATA_MESSAGE,
                 },
             }
-        client.send_message(
+        result = client.send_message(
             QueueUrl=queue,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
             MessageAttributes=attrs)
+        return result['MessageId']
+
+
+class AutoTagUser(EventAction):
+    """Tag a resource with the user who created/modified it.
+
+    policies:
+      - name: ec2-auto-tag-owner
+        resource: ec2
+        filters:
+         - tag:Owner: absent
+        actions:
+         - type: auto-tag-creator
+           tag: OwnerContact
+
+    There's a number of caveats to usage, resources which don't
+    include tagging as part of their api, may have some delay before
+    automation kicks in to create a tag. Real world delay may be several
+    minutes, with worst case into hours[0]. This creates a race condition
+    between auto tagging and automation.
+
+    In practice this window is on the order of a fraction of a second, as
+    we fetch the resource and evaluate the presence of the tag before
+    attempting to tag it.
+
+    References
+     - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
+     - CloudTrail User - http://goo.gl/XQhIG6 q
+    """
+
+    schema = utils.type_schema(
+        'auto-tag',
+        required=['tag'],
+        **{'user-type': {
+            'type': 'array',
+            'items': {'type': 'string',
+                      'enum': [
+                          'IAMUser',
+                          'AssumedRole',
+                          'FederatedUser'
+                      ]}},
+           'update': {'type': 'boolean'},
+           'tag': {'type': 'string'},
+           }
+    )
+
+    def validate(self):
+        if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
+            raise ValueError("Auto tag owner requires an event")
+        if self.manager.action_registry.get('tag') is None:
+            raise ValueError("Resources does not support tagging")
+        return self
+
+    def process(self, resources, event):
+        if event is None:
+            return
+        event = event['detail']
+        utype = event['userIdentity']['type']
+        if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser']):
+            return
+
+        user = None
+        if utype == "IAMUser":
+            user = event['userIdentity']['userName']
+        elif utype == "AssumedRole":
+            user = event['userIdentity']['arn']
+            prefix, user = user.rsplit('/', 1)
+            # instance role
+            if user.startswith('i-'):
+                return
+            # lambda function
+            elif user.startswith('awslambda'):
+                return
+        if user is None:
+            return
+        if not self.data.get('update', False):
+            untagged = []
+            for r in resources:
+                found = False
+                for t in r.get('Tags', ()):
+                    if t['Key'] == self.data['tag']:
+                        found = True
+                        break
+                if not found:
+                    untagged.append(r)
+        else:
+            untagged = resources
+
+        tag_action = self.manager.action_registry.get('tag')
+        tag_action(
+            {'key': self.data['tag'], 'value': user},
+            self.manager).process(untagged)
+        return untagged

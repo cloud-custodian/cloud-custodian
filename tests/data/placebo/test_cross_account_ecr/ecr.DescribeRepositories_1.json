@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "registryId": "644160558196", 
+                "repositoryName": "c7n/cross-check", 
+                "repositoryArn": "arn:aws:ecr:us-west-2:644160558196:repository/c7n/cross-check", 
+                "repositoryUri": "644160558196.dkr.ecr.us-west-2.amazonaws.com/c7n/cross-check"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "c81a596d-3bb8-11e6-934c-bba78a676f9f"
+        }
+    }
+}

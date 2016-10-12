@@ -13,8 +13,10 @@ scalar operators:
 - ``not-null``
 - ``equal`` or ``eq``
 - ``not-equal`` or ``ne``
-- ``greater-than`` or ``gt`` or ``gte``
-- ``less-than`` or ``lt`` or ``lte``
+- ``greater-than`` or ``gt``
+- ``gte`` or ``ge``
+- ``less-than`` or ``lt``
+- ``lte`` or ``le``
 - collection operators against user supplied lists:
     - ``in``
     - ``not-in`` or ``ni``
@@ -38,22 +40,22 @@ JMESPath Filter
      - name: ebs-unmark-attached-deletion
        resource: ebs
        comments: |
-         Unmark any attached ebs volumes that were scheduled for deletion
+         Unmark any attached EBS volumes that were scheduled for deletion
          if they are now attached
        filters:
-         - type: value                     ─┐ The value of the key from the describe 
-           key: "Attachments[0].Device"     ├▶EBS call 
-           value: not-null                 ─┘ 
-         - "tag:maid_status": not-null     ─▶ This filter 
+         - type: value                     ─┐ The value of the key from the describe
+           key: "Attachments[0].Device"     ├▶EBS call
+           value: not-null                 ─┘
+         - "tag:maid_status": not-null     ─▶ This filter
        actions:
          - unmark
 
 
 `EventFilter`
-  Filter against a cloudwatch event json associated to a resource type
+  Filter against a CloudWatch event JSON associated to a resource type
 
   .. code-block:: yaml
-  
+
      - name: no-ec2-public-ips
        resource: ec2
        mode:
@@ -62,8 +64,8 @@ JMESPath Filter
              - RunInstances
        filters:
          - type: event                                                                           ─┐ The key is a JMESPath Query of
-           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"   ├▶the event json from CloudWatch
-           value: true                                                                           ─┘ 
+           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"   ├▶the event JSON from CloudWatch
+           value: true                                                                           ─┘
        actions:
          - type: terminate
            force: true

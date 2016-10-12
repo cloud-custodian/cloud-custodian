@@ -24,17 +24,16 @@ class NotifyTest(BaseTest):
         policy = self.load_policy({
             'name': 'instance-check',
             'resource': 'ec2',
-            'filters': [
-                {'tag:foi': 'testing'}],
+            'filters': [{'tag:Testing': 'Testing123'}],
             'actions': [
                 {'type': 'notify',
                  'transport' : {
                      'type': 'sqs',
-                     'queue': 'https://sqs.us-east-1.amazonaws.com/652117/maid-delivery',
+                     'queue': 'https://sqs.us-west-2.amazonaws.com/619193117841/custodian-messages',
                      }
                  }
                 ]
         }, session_factory=session_factory)
 
         resources = policy.poll()
-        self.assertJmes("[].MatchedFilters", resources, [['tag:foi']])
+        self.assertJmes("[].MatchedFilters", resources, [['tag:Testing']])

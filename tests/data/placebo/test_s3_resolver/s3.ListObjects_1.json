@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-byebye", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "2WCFOeZfILr2FizWUjbMglNUrmS3nKAcKnITUOQY0hkekELeP2XvUQdvkNrj8sumFxUpKWxMxbs=", 
+            "RequestId": "1C767D5E5FCDE5D7", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "2WCFOeZfILr2FizWUjbMglNUrmS3nKAcKnITUOQY0hkekELeP2XvUQdvkNrj8sumFxUpKWxMxbs=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "1C767D5E5FCDE5D7", 
+                "date": "Mon, 05 Sep 2016 17:54:52 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 54
+                }, 
+                "ETag": "\"a7efa1d0ddef5388659563b15ad0799d\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "resource.json", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Size": 27
+            }
+        ]
+    }
+}

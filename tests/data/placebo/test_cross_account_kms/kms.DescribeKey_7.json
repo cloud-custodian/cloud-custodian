@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "KeyId": "9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73", 
+            "Description": "test-cross-account-2", 
+            "Enabled": false, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Disabled", 
+            "CreationDate": {
+                "hour": 13, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 21, 
+                "microsecond": 217000, 
+                "year": 2016, 
+                "day": 26, 
+                "minute": 37
+            }, 
+            "Arn": "arn:aws:kms:us-west-2:644160558196:key/9c1fb1b3-cc8d-429a-b38c-20fc8dd8ce73", 
+            "AWSAccountId": "644160558196"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "79264d1c-3bc8-11e6-89dd-3d48e782f1c4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "79264d1c-3bc8-11e6-89dd-3d48e782f1c4", 
+                "content-length": "314", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 26 Jun 2016 18:04:49 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

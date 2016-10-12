@@ -6,7 +6,7 @@ AMI - Stop EC2 using Unapproved AMIs
    - name: ec2-invalid-ami
      resource: ec2
      comment: |
-       Find all running ec2 instances that are using invalid amis and stop them
+       Find all running EC2 instances that are using invalid AMIs and stop them
      query:
        - instance-state-name: running
      filters:

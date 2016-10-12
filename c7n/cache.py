@@ -27,11 +27,11 @@ log = logging.getLogger('c7n.cache')
 def factory(config):
     if not config:
         return NullCache(None)
-    
+
     if not config.cache or not config.cache_period:
-        log.info("Disabling cache")    
+        log.debug("Disabling cache")
         return NullCache(config)
-    
+
     return FileCacheManager(config)
 
 
@@ -45,11 +45,11 @@ class NullCache(object):
 
     def get(self, key):
         pass
-    
+
     def save(self, key, data):
         pass
-    
-    
+
+
 class FileCacheManager(object):
 
     def __init__(self, config):
@@ -64,18 +64,35 @@ class FileCacheManager(object):
     def get(self, key):
         k = cPickle.dumps(key)
         return self.data.get(k)
-        
+
     def load(self):
+        if self.data:
+            return True
         if os.path.isfile(self.cache_path):
             if (time.time() - os.stat(self.cache_path).st_mtime >
                     self.config.cache_period * 60):
                 return False
             with open(self.cache_path) as fh:
-                self.data = cPickle.load(fh)
-            log.info("Using cache file %s" % self.cache_path)
+                try:
+                    self.data = cPickle.load(fh)
+                except EOFError:
+                    return False
+            log.debug("Using cache file %s" % self.cache_path)
             return True
-        
+
     def save(self, key, data):
-        with open(self.cache_path, 'w') as fh:
-            cPickle.dump({
-                cPickle.dumps(key): data}, fh, protocol=2)
+        try:
+            with open(self.cache_path, 'w') as fh:
+                self.data[cPickle.dumps(key)] = data
+                cPickle.dump(self.data, fh, protocol=2)
+        except Exception as e:
+            log.warning("Could not save cache %s err: %s" % (
+                self.cache_path, e))
+            if not os.path.exists(self.cache_path):
+                directory = os.path.dirname(self.cache_path)
+                log.info('Generating Cache directory: %s.' % directory)
+                try:
+                    os.makedirs(directory)
+                except Exception as e:
+                    log.warning("Could not create directory: %s err: %s" % (
+                        directory, e))

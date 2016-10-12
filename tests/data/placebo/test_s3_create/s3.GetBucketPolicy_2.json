@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"RequireEncryptedPutObject\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-create-bucket-v4/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "1Rq9CYkzRw13z+nNcPXScbwhIwws5pStt1y23ja/ezc1EzMXgLnyURepJV2PFyBGoOM/QYId5yw=", 
+            "RequestId": "476030C476C830D0"
+        }
+    }
+}

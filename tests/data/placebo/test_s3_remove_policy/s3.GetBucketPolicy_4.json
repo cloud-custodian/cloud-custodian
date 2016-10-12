@@ -1,0 +1,11 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs\"},{\"Sid\":\"AWSCloudTrailWrite20131101\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::113285607260:root\",\"arn:aws:iam::086441151436:root\"]},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::hazmat-audit-logs/api/AWSLogs/619193117841/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "INUjiV4ucWJXS588x0+UH3MJw7YOe3l96R7KVtfMVNFCOWdoGjJJQlOBJPj2qSP8zJjxueinJAg=", 
+            "RequestId": "82DBAADFE509936A"
+        }
+    }
+}

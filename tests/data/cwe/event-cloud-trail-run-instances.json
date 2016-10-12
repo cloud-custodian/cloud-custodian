@@ -1,0 +1,275 @@
+{
+    "eventVersion": "1.03",
+    "userIdentity": {
+        "type": "Root",
+        "principalId": "619193117841",
+        "arn": "arn:aws:iam::619193117841:root",
+        "accountId": "619193117841",
+        "invokedBy": "autoscaling.amazonaws.com"
+    },
+    "eventTime": "2016-05-21T16:11:14Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "RunInstances",
+    "awsRegion": "us-west-1",
+    "sourceIPAddress": "autoscaling.amazonaws.com",
+    "userAgent": "autoscaling.amazonaws.com",
+    "requestParameters": {
+        "instancesSet": {
+            "items": [
+                {
+                    "imageId": "ami-06116566",
+                    "minCount": 1,
+                    "maxCount": 2,
+                    "keyName": "PersonalWest"
+                }
+            ]
+        },
+        "groupSet": {
+            "items": [
+                {
+                    "groupId": "sg-bd2d87d9"
+                }
+            ]
+        },
+        "instanceType": "t2.micro",
+        "blockDeviceMapping": {
+            "items": [
+                {
+                    "deviceName": "/dev/sdb",
+                    "ebs": {
+                        "volumeSize": 8,
+                        "deleteOnTermination": true,
+                        "volumeType": "gp2",
+                        "encrypted": false
+                    }
+                },
+                {
+                    "deviceName": "/dev/sda1",
+                    "ebs": {
+                        "volumeSize": 8,
+                        "deleteOnTermination": true,
+                        "volumeType": "gp2"
+                    }
+                },
+                {
+                    "deviceName": "/dev/sdc",
+                    "noDevice": {}
+                }
+            ]
+        },
+        "availabilityZone": "us-west-1c",
+        "monitoring": {
+            "enabled": false
+        },
+        "subnetId": "subnet-5f7a3106",
+        "disableApiTermination": false,
+        "clientToken": "d4673c83-0aaf-4e52-b2a8-99bf7dfbe074_subnet-5f7a3106_2",
+        "iamInstanceProfile": {
+            "name": "BaseIAMRole"
+        }
+    },
+    "responseElements": {
+        "reservationId": "r-05b201b7",
+        "ownerId": "619193117841",
+        "groupSet": {},
+        "instancesSet": {
+            "items": [
+                {
+                    "instanceId": "i-784cdacd",
+                    "imageId": "ami-06116566",
+                    "instanceState": {
+                        "code": 0,
+                        "name": "pending"
+                    },
+                    "privateDnsName": "ip-172-30-2-156.us-west-1.compute.internal",
+                    "keyName": "PersonalWest",
+                    "amiLaunchIndex": 1,
+                    "productCodes": {},
+                    "instanceType": "t2.micro",
+                    "launchTime": 1463847074000,
+                    "placement": {
+                        "availabilityZone": "us-west-1c",
+                        "tenancy": "default"
+                    },
+                    "monitoring": {
+                        "state": "disabled"
+                    },
+                    "subnetId": "subnet-5f7a3106",
+                    "vpcId": "vpc-1b4a1b7e",
+                    "privateIpAddress": "172.30.2.156",
+                    "stateReason": {
+                        "code": "pending",
+                        "message": "pending"
+                    },
+                    "architecture": "x86_64",
+                    "rootDeviceType": "ebs",
+                    "rootDeviceName": "/dev/sda1",
+                    "blockDeviceMapping": {},
+                    "virtualizationType": "hvm",
+                    "hypervisor": "xen",
+                    "clientToken": "d4673c83-0aaf-4e52-b2a8-99bf7dfbe074_subnet-5f7a3106_2",
+                    "interfaceId": "interface-6a08d837",
+                    "groupSet": {
+                        "items": [
+                            {
+                                "groupId": "sg-bd2d87d9",
+                                "groupName": "default"
+                            }
+                        ]
+                    },
+                    "sourceDestCheck": true,
+                    "networkInterfaceSet": {
+                        "items": [
+                            {
+                                "networkInterfaceId": "eni-6a08d837",
+                                "internalInterfaceId": "interface-6a08d837",
+                                "subnetId": "subnet-5f7a3106",
+                                "vpcId": "vpc-1b4a1b7e",
+                                "availabilityZone": "us-west-1c",
+                                "ownerId": "619193117841",
+                                "requesterManaged": false,
+                                "status": "in-use",
+                                "macAddress": "06:e1:54:77:56:c3",
+                                "privateIpAddress": "172.30.2.156",
+                                "sourceDestCheck": true,
+                                "groupSet": {
+                                    "items": [
+                                        {
+                                            "groupId": "sg-bd2d87d9",
+                                            "groupName": "default"
+                                        }
+                                    ]
+                                },
+                                "attachment": {
+                                    "attachmentId": "eni-attach-1cabe8dc",
+                                    "instanceId": "i-784cdacd",
+                                    "instanceOwnerId": "619193117841",
+                                    "deviceIndex": 0,
+                                    "status": "attaching",
+                                    "attachTime": 1463847074000,
+                                    "deleteOnTermination": true
+                                },
+                                "attachableToInstanceBySet": {},
+                                "associableWithElasticIpBySet": {},
+                                "privateIpAddressesSet": {
+                                    "item": [
+                                        {
+                                            "privateIpAddress": "172.30.2.156",
+                                            "primary": true
+                                        }
+                                    ]
+                                },
+                                "tagSet": {}
+                            }
+                        ]
+                    },
+                    "iamInstanceProfile": {
+                        "arn": "arn:aws:iam::619193117841:instance-profile/BaseIAMRole",
+                        "id": "AIPAIRG6ZZNGYJQ3NRJ5W"
+                    },
+                    "ebsOptimized": false
+                },
+                {
+                    "instanceId": "i-7b4cdace",
+                    "imageId": "ami-06116566",
+                    "instanceState": {
+                        "code": 0,
+                        "name": "pending"
+                    },
+                    "privateDnsName": "ip-172-30-2-157.us-west-1.compute.internal",
+                    "keyName": "PersonalWest",
+                    "amiLaunchIndex": 0,
+                    "productCodes": {},
+                    "instanceType": "t2.micro",
+                    "launchTime": 1463847074000,
+                    "placement": {
+                        "availabilityZone": "us-west-1c",
+                        "tenancy": "default"
+                    },
+                    "monitoring": {
+                        "state": "disabled"
+                    },
+                    "subnetId": "subnet-5f7a3106",
+                    "vpcId": "vpc-1b4a1b7e",
+                    "privateIpAddress": "172.30.2.157",
+                    "stateReason": {
+                        "code": "pending",
+                        "message": "pending"
+                    },
+                    "architecture": "x86_64",
+                    "rootDeviceType": "ebs",
+                    "rootDeviceName": "/dev/sda1",
+                    "blockDeviceMapping": {},
+                    "virtualizationType": "hvm",
+                    "hypervisor": "xen",
+                    "clientToken": "d4673c83-0aaf-4e52-b2a8-99bf7dfbe074_subnet-5f7a3106_2",
+                    "interfaceId": "interface-6508d838",
+                    "groupSet": {
+                        "items": [
+                            {
+                                "groupId": "sg-bd2d87d9",
+                                "groupName": "default"
+                            }
+                        ]
+                    },
+                    "sourceDestCheck": true,
+                    "networkInterfaceSet": {
+                        "items": [
+                            {
+                                "networkInterfaceId": "eni-6508d838",
+                                "internalInterfaceId": "interface-6508d838",
+                                "subnetId": "subnet-5f7a3106",
+                                "vpcId": "vpc-1b4a1b7e",
+                                "availabilityZone": "us-west-1c",
+                                "ownerId": "619193117841",
+                                "requesterManaged": false,
+                                "status": "in-use",
+                                "macAddress": "06:bd:28:47:d3:45",
+                                "privateIpAddress": "172.30.2.157",
+                                "sourceDestCheck": true,
+                                "groupSet": {
+                                    "items": [
+                                        {
+                                            "groupId": "sg-bd2d87d9",
+                                            "groupName": "default"
+                                        }
+                                    ]
+                                },
+                                "attachment": {
+                                    "attachmentId": "eni-attach-09abe8c9",
+                                    "instanceId": "i-7b4cdace",
+                                    "instanceOwnerId": "619193117841",
+                                    "deviceIndex": 0,
+                                    "status": "attaching",
+                                    "attachTime": 1463847074000,
+                                    "deleteOnTermination": true
+                                },
+                                "attachableToInstanceBySet": {},
+                                "associableWithElasticIpBySet": {},
+                                "privateIpAddressesSet": {
+                                    "item": [
+                                        {
+                                            "privateIpAddress": "172.30.2.157",
+                                            "primary": true
+                                        }
+                                    ]
+                                },
+                                "tagSet": {}
+                            }
+                        ]
+                    },
+                    "iamInstanceProfile": {
+                        "arn": "arn:aws:iam::619193117841:instance-profile/BaseIAMRole",
+                        "id": "AIPAIRG6ZZNGYJQ3NRJ5W"
+                    },
+                    "ebsOptimized": false
+                }
+            ]
+        },
+        "requesterId": "226008221399"
+    },
+    "requestID": "0114b565-8354-410c-abe0-9a2196e70c9d",
+    "eventID": "6da8b953-741f-4273-be3f-289b92b4d1fc",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "619193117841"
+}

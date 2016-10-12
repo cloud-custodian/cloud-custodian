@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Status": {
+                     "Timeline": {
+                         "EndDateTime": 1470974021.557,
+                         "CreationDateTime": 1470968567.05,
+                         "ReadyDateTime": 1470969211.258
+                     },
+                     "StateChangeReason": {
+                         "Message": "Terminated by user request",
+                         "Code": "USER_REQUEST"
+                     },
+                     "State": "RUNNING"
+                 },
+                 "NormalizedInstanceHours": 608,
+                 "Id": "j-3NQN7RJGFAHHM",
+                 "Name": "df-04509153SE5NGRMNLRBJ_@DBREmrCluster_2016-08-12T01:59:24"
+            }
+        ],
+        "ResponseMetadata": {
+             "HTTPStatusCode": 200,
+             "RequestId": "b4fd9689-0fd7-4921-8143-8a466c90a34b"
+         }
+    }
+}

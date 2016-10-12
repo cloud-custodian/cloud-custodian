@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "LambdaCompiler", 
+                "Hypervisor": "xen", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-d640b2b6", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-facd9a00", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "619193117841/LambdaCompiler", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "619193117841", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2016-05-07T23:23:30.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "5eae3017-4123-4f5a-956d-cd99702e39d2"
+        }
+    }
+}

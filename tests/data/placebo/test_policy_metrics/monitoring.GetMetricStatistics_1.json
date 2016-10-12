@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 0
+                }, 
+                "Average": 23.6, 
+                "Sum": 354.0, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "efba2cd4-314c-11e6-901f-edc6d4f66891"
+        }, 
+        "Label": "ResourceCount"
+    }
+}
