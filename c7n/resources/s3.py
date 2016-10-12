@@ -381,8 +381,8 @@ class ToggleVersioning(BucketActionBase):
     schema = type_schema(
         'enable-versioning',
         enabled={'type': 'boolean'})
-    # mfa delete enablement looks like it needs the serial and a current
-    # token.
+
+    # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
         client = local_session(self.manager.session_factory).client('s3')

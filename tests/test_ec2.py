@@ -290,6 +290,23 @@ class TestStop(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+
+class TestStart(BaseTest):
+
+    def test_ec2_start(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_start')
+        policy = self.load_policy({
+            'name': 'ec2-test-start',
+            'resource': 'ec2',
+            'filters': [],
+            'actions': [
+                {'type': 'start'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+
 class TestOr(BaseTest):
 
     def test_ec2_or_condition(self):

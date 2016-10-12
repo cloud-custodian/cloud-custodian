@@ -116,7 +116,7 @@ class QueryMeta(type):
                 attrs['retry'] = staticmethod(get_retry((
                     'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
-                if  getattr(m, 'taggable', True):
+                if getattr(m, 'taggable', True):
                     register_tags(
                         attrs['filter_registry'], attrs['action_registry'])
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)

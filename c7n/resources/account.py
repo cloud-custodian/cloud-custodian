@@ -42,6 +42,14 @@ class Account(ResourceManager):
               'account_name': client.list_account_aliases(
               ).get('AccountAliases', ('',))[0]}])
 
+    def get_resources(self, resource_ids):
+        session = local_session(self.session_factory)
+        client = session.client('iam')
+        return [
+            {'account_id': get_account_id(session),
+             'account_name': client.list_account_aliases().get(
+                 'AccountAliases', ('',))[0]}]
+
 
 @filters.register('check-cloudtrail')
 class CloudTrailEnabled(Filter):
