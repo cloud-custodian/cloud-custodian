@@ -197,6 +197,101 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_minor_upgrade_flag(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_filter_minor_flag_not_set')
+        p = self.load_policy(
+            {'name': 'no-minor-upgrade-flag-set',
+             'resource': 'rds',
+             'filters': ['no-minor-upgrade-flag']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_minor_upgrade_flag_set_true(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_action_minor_flag_set')
+        p = self.load_policy(
+            {'name': 'set-minor-update-flag',
+             'resource': 'rds',
+             'filters': ['no-minor-upgrade-flag'],
+             'actions': ['set-minor-upgrade-flag']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_minor_upgrade_flag_set_false(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_action_minor_flag_set_false')
+        p = self.load_policy(
+            {'name': 'set-minor-update-flag',
+             'resource': 'rds',
+             'filters': [{
+                 'type': 'no-minor-upgrade-flag',
+                 'value': False}],
+             'actions': [{
+                 'type': 'set-minor-upgrade-flag',
+                 'value': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_upgrade_available(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_filter_upgrade_available')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-available',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'upgrade-available'},
+                 {'tag:custodian_upgrade': 'absent'}
+             ],
+             'actions': [{
+                 'type': 'mark-for-op',
+                 'tag': 'custodian_upgrade',
+                 'days': 1,
+                 'msg': 'Minor engine upgrade available: {op}@{action_date}',
+                 'op': 'upgrade-minor'}],
+             }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_minor_upgrade_match(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_match')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-list',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
+                  'op': 'upgrade-minor'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_minor_upgrade_do(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_do')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-do',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
+                  'op': 'upgrade-minor'}],
+             'actions': ['upgrade-minor']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_upgrade_complete(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_filter_upgrade_complete')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-complete',
+             'resource': 'rds',
+             'filters': [{'tag:custodian_upgrade': 'present'}],
+             'actions': [{'type': 'remove-tag', 'tags': ['custodian_upgrade']}],
+             }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
             'DBInstanceIdentifier': 'ABC'

@@ -1,0 +1,51 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2ed00601-907f-11e6-bd24-779ebd1fe9d3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2ed00601-907f-11e6-bd24-779ebd1fe9d3", 
+                "date": "Wed, 12 Oct 2016 13:24:19 GMT", 
+                "content-length": "1739", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "DBEngineVersions": [
+            {
+                "Engine": "mysql", 
+                "DBParameterGroupFamily": "mysql5.5", 
+                "DBEngineDescription": "MySQL Community Edition", 
+                "EngineVersion": "5.5.41", 
+                "DBEngineVersionDescription": "MySQL 5.5.41", 
+                "ValidUpgradeTarget": [
+                    {
+                        "Engine": "mysql", 
+                        "IsMajorVersionUpgrade": false, 
+                        "AutoUpgrade": false, 
+                        "EngineVersion": "5.5.42"
+                    }, 
+                    {
+                        "Engine": "mysql", 
+                        "IsMajorVersionUpgrade": false, 
+                        "AutoUpgrade": false, 
+                        "EngineVersion": "5.5.46"
+                    }, 
+                    {
+                        "Engine": "mysql", 
+                        "IsMajorVersionUpgrade": true, 
+                        "AutoUpgrade": false, 
+                        "EngineVersion": "5.6.27"
+                    }, 
+                    {
+                        "Engine": "mysql", 
+                        "IsMajorVersionUpgrade": true, 
+                        "AutoUpgrade": false, 
+                        "EngineVersion": "5.6.29"
+                    }
+                ]
+            }
+        ]
+    }
+}
