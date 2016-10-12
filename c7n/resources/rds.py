@@ -239,7 +239,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema,
-        ops={'enum': ['delete', 'snapshot']})
+        ops={'enum': ['delete', 'snapshot', 'upgrade-minor']})
 
     batch_size = 5
 
@@ -272,6 +272,135 @@ class AutoPatch(BaseAction):
             client.modify_db_instance(
                 DBInstanceIdentifier=db['DBInstanceIdentifier'],
                 **params)
+
+
+@filters.register('no-minor-upgrade-flag')
+class NoMinorUpgradeFlag(Filter):
+
+    schema = type_schema('no-minor-upgrade-flag', value={'type', 'boolean'})
+
+    def process(self, resources, event=None):
+        if self.data.get('value', True):
+            return [r for r in resources if not r['AutoMinorVersionUpgrade']]
+        else:
+            return [r for r in resources if r['AutoMinorVersionUpgrade']]
+
+
+@filters.register('upgrade-available')
+class UpgradeAvailable(Filter):
+
+    schema = type_schema('upgrade-available')
+
+    def _list_versions(self, client, resource):
+        from distutils.version import StrictVersion as sv
+        versions = client.describe_db_engine_versions(
+            Engine=resource['Engine'],
+            EngineVersion=resource['EngineVersion'])['DBEngineVersions'][0]
+
+        version = resource['EngineVersion']
+        for v in versions['ValidUpgradeTarget']:
+            if sv(v['EngineVersion']) > sv(version):
+                version = v['EngineVersion']
+        return version
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resources:
+            version = self._list_versions(client, r)
+            if version != r['EngineVersion']:
+                results.append(r)
+        return results
+
+
+@filters.register('upgrade-complete')
+class UpgradeComplete(Filter):
+
+    schema = type_schema('upgrade-complete')
+
+    def _list_versions(self, client, resource):
+        from distutils.version import StrictVersion as sv
+        versions = client.describe_db_engine_versions(
+            Engine=resource['Engine'],
+            EngineVersion=resource['EngineVersion'])['DBEngineVersions'][0]
+
+        version = resource['EngineVersion']
+        for v in versions['ValidUpgradeTarget']:
+            if sv(v['EngineVersion']) > sv(version):
+                version = v['EngineVersion']
+        return version
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resources:
+            version = self._list_versions(client, r)
+            if version == r['EngineVersion']:
+                results.append(r)
+        return results
+
+
+@actions.register('set-minor-upgrade-flag')
+class SetMinorUpgradeFlag(BaseAction):
+
+    type_schema('set-minor-upgrade-flag', value={'type': 'boolean'})
+
+    def _set_flag(self, client, resource):
+        client.modify_db_instance(
+            DBInstanceIdentifier=resource['DBInstanceIdentifier'],
+            AutoMinorVersionUpgrade=self.data.get('value', True))
+
+    def process(self, resources):
+        futures = []
+        client = local_session(self.manager.session_factory).client('rds')
+        with self.executor_factory(max_workers=3) as w:
+            for r in resources:
+                futures.append(w.submit(self._set_flag, client, r))
+        for f in as_completed(futures):
+            if f.exception():
+                self.log.error(
+                    "Exception setting upgrade flag \n %s",f.exception())
+
+
+@actions.register('upgrade-minor')
+class UpgradeMinorRDS(BaseAction):
+
+    schema = {'properties': {
+        'type': {
+            'enum': ['upgrade-minor']}}}
+
+    def _upgrade(self, client, resource):
+        from distutils.version import StrictVersion as sv
+
+        version = resource['EngineVersion']
+        versions = client.describe_db_engine_versions(
+            Engine=resource['Engine'],
+            EngineVersion=version)['DBEngineVersions'][0]
+
+        for v in versions['ValidUpgradeTarget']:
+            if v['IsMajorVersionUpgrade']:
+                continue
+            if sv(v['EngineVersion']) > sv(version):
+                version = v['EngineVersion']
+
+        if version == resource['EngineVersion']:
+            return
+
+        client.modify_db_instance(
+            DBInstanceIdentifier=resource['DBInstanceIdentifier'],
+            EngineVersion=version,
+            ApplyImmediately=True)
+
+    def process(self, resources):
+        futures = []
+        client = local_session(self.manager.session_factory).client('rds')
+        with self.executor_factory(max_workers=3) as w:
+            for r in resources:
+                futures.append(w.submit(self._upgrade, client, r))
+        for f in as_completed(futures):
+            if f.exception():
+                self.log.error(
+                    "Exception applying upgrade \n %s", f.exception())
 
 
 @actions.register('tag')
