@@ -85,7 +85,7 @@ class PolicyExecutionMode(object):
     def __init__(self, policy):
         self.policy = policy
 
-    def run(self):
+    def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
@@ -300,7 +300,7 @@ class PeriodicMode(LambdaMode, PullMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
-    def run(self):
+    def run(self, event, lambda_context):
         return PullMode.run(self)
 
 
@@ -346,11 +346,13 @@ class ConfigRuleMode(LambdaMode):
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',
-                    'annotation': 'The resource is compliant with this rule.'}
+                    'annotation': 'The resource is compliant with policy:%s.' % (
+                        self.policy.name)}
             else:
                 evaluation = {
-                    'compliance_type': 'NOT_COMPLIANT',
-                    'annotation': 'The resources is not compliant.'
+                    'compliance_type': 'NON_COMPLIANT',
+                    'annotation': 'Resource is not compliant with policy:%s' % (
+                        self.policy.name)
                 }
 
         client = utils.local_session(
