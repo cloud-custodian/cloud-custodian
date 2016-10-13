@@ -120,8 +120,9 @@ class ConfigEnabled(Filter):
         resources[0]['config_recorders'] = recorders
         resources[0]['config_channels'] = channels
         if self.data.get('global-resources'):
-            recorders = [r for r in recorders
-                         if r['recordingGroup'].get('includeGlobalResources')]
+            recorders = [
+                r for r in recorders
+                if r['recordingGroup'].get('includeGlobalResourceTypes')]
         if self.data.get('all-resources'):
             recorders = [r for r in recorders
                          if r['recordingGroup'].get('allSupported')]
@@ -182,7 +183,7 @@ class IAMSummary(ValueFilter):
             "UserPolicySizeQuota": 2048
         }
 
-    """
+q    """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
@@ -213,7 +214,44 @@ class AccountPasswordPolicy(ValueFilter):
 
 @filters.register('service-limit')
 class ServiceLimit(Filter):
-    """Check if account's service limits are past a given threshold."""
+    """Check if account's service limits are past a given threshold.
+
+    Supported limits are per trusted advisor, which is variable based
+    on usage in the account and support level enabled on the account.
+
+      - service: AutoScaling limit: Auto Scaling groups
+      - service: AutoScaling limit: Launch configurations
+      - service: EBS limit: Active snapshots
+      - service: EBS limit: Active volumes
+      - service: EBS limit: General Purpose (SSD) volume storage (GiB)
+      - service: EBS limit: Magnetic volume storage (GiB)
+      - service: EBS limit: Provisioned IOPS
+      - service: EBS limit: Provisioned IOPS (SSD) storage (GiB)
+      - service: EC2 limit: Elastic IP addresses (EIPs)
+
+      # Note this is extant for each active instance type in the account
+      # however the total value is against sum of all instance types.
+      # see issue https://github.com/capitalone/cloud-custodian/issues/516
+
+      - service: EC2 limit: On-Demand instances - m3.medium
+
+      - service: EC2 limit: Reserved Instances - purchase limit (monthly)
+      - service: ELB limit: Active load balancers
+      - service: IAM limit: Groups
+      - service: IAM limit: Instance profiles
+      - service: IAM limit: Roles
+      - service: IAM limit: Server certificates
+      - service: IAM limit: Users
+      - service: RDS limit: DB instances
+      - service: RDS limit: DB parameter groups
+      - service: RDS limit: DB security groups
+      - service: RDS limit: DB snapshots per user
+      - service: RDS limit: Storage quota (GB)
+      - service: RDS limit: Internet gateways
+      - service: SES limit: Daily sending quota
+      - service: VPC limit: VPCs
+      - service: VPC limit: VPC Elastic IP addresses (EIPs)
+    """
 
     schema = type_schema(
         'service-limit',
@@ -243,7 +281,6 @@ class ServiceLimit(Filter):
         services = self.data.get('services')
         limits = self.data.get('limits')
         exceeded = []
-
 
         for resource in checks['flaggedResources']:
             if threshold is None and resource['status'] == 'ok':
