@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3ab424f5-a295-11e6-964b-5bce7e88e288", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3ab424f5-a295-11e6-964b-5bce7e88e288", 
+                "date": "Fri, 04 Nov 2016 13:47:29 GMT", 
+                "content-length": "536", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "Minor engine upgrade available: upgrade-minor@2016/11/04", 
+                "Key": "custodian_upgrade"
+            }, 
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }
+        ]
+    }
+}

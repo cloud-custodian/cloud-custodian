@@ -45,7 +45,9 @@ Find rds instances that are not encrypted
 import functools
 import logging
 import re
+import operator
 
+from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -198,6 +200,25 @@ def _db_instance_eligible_for_final_snapshot(resource):
     return True
 
 
+def _list_engines_upgrade_version(client):
+    results = {}
+    engine_versions = client.describe_db_engine_versions()['DBEngineVersions']
+    for v in engine_versions:
+        if not v['Engine'] in results:
+            results[v['Engine']] = {}
+        if not 'ValidUpgradeTarget' in v or len(v['ValidUpgradeTarget']) == 0:
+            continue
+        for t in v['ValidUpgradeTarget']:
+            if t['IsMajorVersionUpgrade']:
+                continue
+            if not v['EngineVersion'] in results[v['Engine']]:
+                results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
+            if LooseVersion(t['EngineVersion']) > LooseVersion(
+                    results[v['Engine']][v['EngineVersion']]):
+                results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
+    return results
+
+
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
@@ -245,8 +266,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 class TagDelayedAction(tags.TagDelayedAction):
 
     schema = type_schema(
-        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
-        ops={'enum': ['delete', 'snapshot']})
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
 
     batch_size = 5
 
@@ -279,6 +299,77 @@ class AutoPatch(BaseAction):
             client.modify_db_instance(
                 DBInstanceIdentifier=db['DBInstanceIdentifier'],
                 **params)
+
+
+@filters.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """ Scan DB instances for available engine upgrades
+
+    This will pull DB instances & check their specific engine for any
+    engine version with higher release numbers than the current one
+
+    This will also annotate the rds instance with 'target_engine' which is
+    the most recent version of the engine available
+
+    """
+
+    schema = type_schema('upgrade-available', value={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        engine_upgrades = _list_engines_upgrade_version(client)
+        for r in resources:
+            upgrades = engine_upgrades[r['Engine']]
+            if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
+                if not self.data.get('value', True):
+                    results.append(r)
+                    continue
+
+            target_upgrade = "0.0.0"
+            for u in upgrades:
+                if u == r['EngineVersion']:
+                    target_upgrade = upgrades[u]
+
+            if target_upgrade == "0.0.0" and not self.data.get('value', True):
+                results.append(r)
+                continue
+
+            upgrade = LooseVersion(
+                r['EngineVersion']) < LooseVersion(target_upgrade)
+            res = (self.data.get('value', True), upgrade)
+            if res == (True, True):
+                r['c7n.rds-minor-engine-upgrade'] = target_upgrade
+                results.append(r)
+        return results
+
+
+@actions.register('upgrade-minor')
+class UpgradeMinorRDS(BaseAction):
+
+    schema = type_schema(
+        'upgrade-minor', immediate={'type': 'boolean'})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        engine_upgrades = _list_engines_upgrade_version(client)
+
+        for r in resources:
+            if 'EngineVersion' in r['PendingModifiedValues']:
+                # Upgrade has already been scheduled
+                continue
+
+            if 'c7n.rds-minor-engine-upgrade' not in r:
+                upgrades = engine_upgrades[r['Engine']]
+                if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
+                    continue
+                target_upgrade = upgrades[r['EngineVersion']]
+                r['c7n.rds-minor-engine-upgrade'] = target_upgrade
+
+            client.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                EngineVersion=r['c7n.rds-minor-engine-upgrade'],
+                ApplyImmediately=self.data.get('immediate', False))
 
 
 @actions.register('tag')
