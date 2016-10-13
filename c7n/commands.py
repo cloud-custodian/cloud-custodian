@@ -57,7 +57,7 @@ def validate(options):
 
     errors = schema.validate(data)
     if not errors:
-        null_config = Bag(log_group=None, cache=None, assume_role="na")
+        null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
         for p in data.get('policies', ()):
             try:
                 Policy(p, null_config, Bag())
