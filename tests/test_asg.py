@@ -52,6 +52,26 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_suspended_process_filter_true(self):
+        factory = self.replay_flight_data('test_asg_suspended_process_true')
+        p = self.load_policy({
+            'name': 'asg-process-filter-true',
+            'resource': 'asg',
+            'filters': ['suspended-processes']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_suspended_process_filter_false(self):
+        factory = self.replay_flight_data('test_asg_suspended_process_false')
+        p = self.load_policy({
+            'name': 'asg-process-filter-false',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'suspended-processes',
+                 'value': False}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data('test_asg_vpc_filter')
         p = self.load_policy({
@@ -240,3 +260,15 @@ class AutoScalingTest(BaseTest):
         s = set([x[0] for x in resources[0]['Invalid']])
         self.assertTrue('invalid-subnet' in s)
         self.assertTrue('invalid-security-group' in s)
+
+    def test_asg_delete_suspended_process(self):
+        factory = self.replay_flight_data('test_asg_delete_suspended_filter')
+        p = self.load_policy({
+            'name': 'asg-delete-suspended-filter',
+            'resource': 'asg',
+            'actions': [{
+                'type': 'delete',
+                'force': True}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
