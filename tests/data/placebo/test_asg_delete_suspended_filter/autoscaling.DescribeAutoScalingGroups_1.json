@@ -1,0 +1,112 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:3694d290-179f-41b6-a56d-cd34da676200:autoScalingGroupName/c7n-asg-ec2", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "c7n-asg-ec2", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-0a6b9bfc5f03311fe", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "c7n-asg-lc"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "c7n-asg-lc", 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 0, 
+                    "microsecond": 865000, 
+                    "year": 2016, 
+                    "day": 13, 
+                    "minute": 58
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }, 
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:f87dd4e7-8828-42be-8b4e-fcea816d4236:autoScalingGroupName/c7n-asg-ec2-suspended", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [
+                    {
+                        "ProcessName": "Terminate", 
+                        "SuspensionReason": "User suspended at 2016-10-14T14:14:18Z"
+                    }
+                ], 
+                "DesiredCapacity": 1, 
+                "Tags": [], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "c7n-asg-ec2-suspended", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1b", 
+                        "InstanceId": "i-026100dc384ebe248", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "c7n-asg-lcCopy"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-efbcccb7", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "c7n-asg-lcCopy", 
+                "CreatedTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 16, 
+                    "microsecond": 851000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 13
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1b"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b4d95b4f-9219-11e6-8ba1-af145835fd44", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b4d95b4f-9219-11e6-8ba1-af145835fd44", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3728", 
+                "content-type": "text/xml", 
+                "date": "Fri, 14 Oct 2016 14:22:57 GMT"
+            }
+        }
+    }
+}

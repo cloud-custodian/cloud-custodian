@@ -90,6 +90,20 @@ class LaunchConfigFilterBase(object):
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
 
+class SuspendedAsgProcessFilter(object):
+    """Filter ASGs that have suspended processes"""
+
+    def _filter_suspended_asg(self, asgs):
+        results = []
+        orig_length = len(asgs)
+        for a in asgs:
+            if len(a['SuspendedProcesses']) == 0:
+                results.append(a)
+        self.log.info("%s %d of %d asgs" % (
+            self.__class__.__name__, len(results), orig_length))
+        return results
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes."""
@@ -214,6 +228,21 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if bd['Ebs']['SnapshotId'] not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
+
+
+@filters.register('suspended-processes')
+class SuspendedProcessFilter(Filter):
+
+    schema = type_schema(
+        'suspended-processes',
+        value={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        if self.data.get('value', True):
+            return [r for r in resources if len(r['SuspendedProcesses']) > 0]
+        else:
+            return [r for r in resources if len(r['SuspendedProcesses']) == 0]
+
 
 
 @filters.register('valid')
@@ -912,11 +941,12 @@ class Resume(BaseAction):
 
 
 @actions.register('delete')
-class Delete(BaseAction):
+class Delete(BaseAction, SuspendedAsgProcessFilter):
 
     schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, asgs):
+        asgs = self._filter_suspended_asg(asgs)
         with self.executor_factory(max_workers=5) as w:
             list(w.map(self.process_asg, asgs))
 
