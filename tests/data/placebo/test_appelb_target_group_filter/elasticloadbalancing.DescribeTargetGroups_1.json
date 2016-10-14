@@ -22,7 +22,8 @@
                 "HealthCheckTimeoutSeconds": 5,
                 "HealthCheckProtocol": "HTTP",
                 "LoadBalancerArns": [
-                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177"
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb"
                 ],
                 "UnhealthyThresholdCount": 2,
                 "HealthyThresholdCount": 5,
@@ -40,8 +41,11 @@
                 "VpcId": "vpc-4a9ff72e",
                 "Protocol": "HTTPS",
                 "HealthCheckTimeoutSeconds": 5,
-                "HealthCheckProtocol": "HTTP",
-                "LoadBalancerArns": [],
+                "HealthCheckProtocol": "HTTPS",
+                "LoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb"
+                ],
                 "UnhealthyThresholdCount": 2,
                 "HealthyThresholdCount": 5,
                 "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-2/9c84115056e192c4",

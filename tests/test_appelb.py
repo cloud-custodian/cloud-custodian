@@ -77,32 +77,51 @@ class AppELBTest(BaseTest):
         p = self.load_policy({
             'name': 'appelb-is-https-filter',
             'resource': 'app-elb',
-            'filters': ['is-https']},
+            'filters': [
+                {'type': 'listener', 'key': "length([?Protocol=='HTTPS'])", 'value': 1, 'op': 'gte'}
+            ]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_appelb_target_group_filter(self):
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appelb_instance_count_non_zero')
+        p = self.load_policy({
+            'name': 'appelb-target-group-filter',
+            'resource': 'app-elb',
+            'filters': [
+                {'type': 'target-group', 'key': "length([?Protocol=='HTTP'])", 'value': 1, 'op': 'eq'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_appelb_instance_count_filter_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_instance_count')
+        session_factory = self.replay_flight_data('test_appelb_instance_count_zero')
         p = self.load_policy({
-            'name': 'appelb-instance-count-filter',
+            'name': 'appelb-instance-count-filter-zero',
             'resource': 'app-elb',
-            'filters': [{'type': 'instance-count', 'count': 0}]},
+            'filters': [
+                {'type': 'target-group', 'key': "max([].length(TargetHealthDescriptions))", 'value': 0, 'op': 'eq'}
+            ]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
     def test_appelb_instance_count_filter_non_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_instance_count')
+        session_factory = self.replay_flight_data('test_appelb_instance_count_non_zero')
         p = self.load_policy({
-            'name': 'appelb-instance-count-filter',
+            'name': 'appelb-instance-count-filter-non-zero',
             'resource': 'app-elb',
-            'filters': [{'type': 'instance-count', 'count': 1, 'op': 'gte'}]},
+            'filters': [
+                {'type': 'target-group', 'key': "max([].length(TargetHealthDescriptions))", 'value': 0, 'op': 'gt'}
+            ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 2)
 
     def test_appelb_add_tag(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)

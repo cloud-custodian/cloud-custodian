@@ -16,8 +16,9 @@ Application Load Balancers
 """
 import logging
 
+from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, DefaultVpcBase, OPERATORS
+from c7n.filters import Filter, FilterRegistry, DefaultVpcBase, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -58,7 +59,8 @@ class AppELB(QueryResourceManager):
 
     def augment(self, albs):
         _describe_appelb_tags(
-            albs, self.session_factory, self.executor_factory, self.retry)
+            albs, self.session_factory,
+            self.executor_factory, self.retry)
 
         return albs
 
@@ -70,7 +72,9 @@ def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
 
         results = retry(client.describe_tags, ResourceArns=alb_map.keys())
         for tag_desc in results['TagDescriptions']:
-            alb_map[tag_desc['ResourceArn']]['Tags'] = tag_desc['Tags']
+            if ('ResourceArn' in tag_desc and
+                    tag_desc['ResourceArn'] in alb_map):
+                alb_map[tag_desc['ResourceArn']]['Tags'] = tag_desc['Tags']
 
     with executor_factory(max_workers=2) as w:
         list(w.map(_process_tags, chunks(albs, 20)))
@@ -152,24 +156,24 @@ class AppELBDeleteAction(BaseAction):
         client.delete_load_balancer(LoadBalancerArn=alb['LoadBalancerArn'])
 
 
-class AppELBListenerFilter(Filter):
-    """ Base class for filters that query LB listeners.
+class AppELBListenerFilterBase(object):
+    """ Mixin base class for filters that query LB listeners.
     """
     def initialize(self, albs):
         def _process_listeners(alb):
-            if 'Listeners' not in alb:
-                client = local_session(
-                    self.manager.session_factory).client('elbv2')
-                results = client.describe_listeners(
-                    LoadBalancerArn=alb['LoadBalancerArn'])
-                alb['Listeners'] = results['Listeners']
+            client = local_session(
+                self.manager.session_factory).client('elbv2')
+            results = client.describe_listeners(
+                LoadBalancerArn=alb['LoadBalancerArn'])
+            self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
 
+        self.listener_map = defaultdict(list)
         with self.manager.executor_factory(max_workers=2) as w:
             list(w.map(_process_listeners, albs))
 
 
-class AppELBAttributeFilter(Filter):
-    """ Base class for filters that query LB attributes.
+class AppELBAttributeFilterBase(object):
+    """ Mixin base class for filters that query LB attributes.
     """
     def initialize(self, albs):
         def _process_attributes(alb):
@@ -184,48 +188,38 @@ class AppELBAttributeFilter(Filter):
             list(w.map(_process_attributes, albs))
 
 
-class AppELBTargetGroupFilter(Filter):
-    """ Base class for filters that query LB target groups.
+class AppELBTargetGroupFilterBase(object):
+    """ Mixin base class for filters that query LB target groups.
     """
     def initialize(self, albs):
-        def _process_target_groups(alb):
-            if 'TargetGroups' not in alb:
-                client = local_session(
-                    self.manager.session_factory).client('elbv2')
-                results = client.describe_target_groups(
-                    LoadBalancerArn=alb['LoadBalancerArn'])
-                alb['TargetGroups'] = results['TargetGroups']
+        self.target_group_map = defaultdict(list)
 
-                for target_group in alb['TargetGroups']:
-                    result = client.describe_target_health(
-                        TargetGroupArn=target_group['TargetGroupArn'])
-                    target_group['TargetHealthDescriptions'] = result[
-                        'TargetHealthDescriptions']
-
-        with self.manager.executor_factory(max_workers=2) as w:
-            list(w.map(_process_target_groups, albs))
+        target_group_manager = AppELBTargetGroup(self.manager.ctx, {})
+        target_groups = target_group_manager.resources()
+        for target_group in target_groups:
+            for load_balancer_arn in target_group['LoadBalancerArns']:
+                self.target_group_map[load_balancer_arn].append(target_group)
 
 
-@filters.register('is-https')
-class AppELBIsHTTPSFilter(AppELBListenerFilter):
+@filters.register('listener')
+class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
     """
     """
 
-    schema = type_schema('is-https')
+    schema = type_schema('listener', rinherit=ValueFilter.schema)
 
     def process(self, albs, event=None):
-        def _is_https(alb):
-            for listener in alb.get('Listeners', []):
-                if listener['Protocol'] == 'HTTPS':
-                    return True
-            return False
-
         self.initialize(albs)
-        return [alb for alb in albs if _is_https(alb)]
+        return super(AppELBListenerFilter, self).process(albs, event)
+
+    def __call__(self, alb):
+        listeners = self.listener_map[alb['LoadBalancerArn']]
+        return self.match(listeners)
 
 
 @filters.register('healthcheck-protocol-mismatch')
-class AppELBHealthCheckProtocolMismatchFilter(AppELBTargetGroupFilter):
+class AppELBHealthCheckProtocolMismatchFilter(Filter,
+                                              AppELBTargetGroupFilterBase):
     """
     """
 
@@ -233,7 +227,7 @@ class AppELBHealthCheckProtocolMismatchFilter(AppELBTargetGroupFilter):
 
     def process(self, albs, event=None):
         def _healthcheck_protocol_mismatch(alb):
-            for target_group in alb['TargetGroups']:
+            for target_group in self.target_group_map[alb['LoadBalancerArn']]:
                 if (target_group['Protocol'] !=
                         target_group['HealthCheckProtocol']):
                     return True
@@ -244,28 +238,20 @@ class AppELBHealthCheckProtocolMismatchFilter(AppELBTargetGroupFilter):
         return [alb for alb in albs if _healthcheck_protocol_mismatch(alb)]
 
 
-@filters.register('instance-count')
-class AppELBInstanceCountFilter(AppELBTargetGroupFilter):
+@filters.register('target-group')
+class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """
     """
 
-    schema = type_schema(
-        'instance-count',
-        count={'type': 'integer', 'minimum': 0},
-        op={'enum': OPERATORS.keys()})
+    schema = type_schema('target-group', rinherit=ValueFilter.schema)
 
     def process(self, albs, event=None):
-        def _instance_count(alb, count, op):
-            instance_count = 0
-            for target_group in alb['TargetGroups']:
-                instance_count += len(target_group['TargetHealthDescriptions'])
-            return op(instance_count, count)
-
         self.initialize(albs)
-        count = self.data.get('count', 0)
-        op_name = self.data.get('op', 'eq')
-        op = OPERATORS.get(op_name)
-        return [alb for alb in albs if _instance_count(alb, count, op)]
+        return super(AppELBTargetGroupFilter, self).process(albs, event)
+
+    def __call__(self, alb):
+        target_groups = self.target_group_map[alb['LoadBalancerArn']]
+        return self.match(target_groups)
 
 
 @filters.register('default-vpc')
@@ -298,6 +284,102 @@ class AppELBTargetGroup(QueryResourceManager):
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')
     retry = staticmethod(get_retry(('Throttling',)))
+
+    filter_registry.register('tag-count', tags.TagCountFilter)
+    filter_registry.register('marked-for-op', tags.TagActionFilter)
+
+    def augment(self, target_groups):
+        def _describe_target_group_health(target_group):
+            client = local_session(self.session_factory).client('elbv2')
+            result = client.describe_target_health(
+                TargetGroupArn=target_group['TargetGroupArn'])
+            target_group['TargetHealthDescriptions'] = result[
+                'TargetHealthDescriptions']
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(_describe_target_group_health, target_groups))
+
+        _describe_target_group_tags(
+            target_groups, self.session_factory,
+            self.executor_factory, self.retry)
+        return target_groups
+
+
+def _describe_target_group_tags(target_groups, session_factory,
+                                executor_factory, retry):
+    def _process_tags(target_group_set):
+        client = local_session(session_factory).client('elbv2')
+        target_group_map = {
+            target_group['TargetGroupArn']:
+                target_group for target_group in target_group_set
+        }
+
+        results = retry(
+            client.describe_tags,
+            ResourceArns=target_group_map.keys())
+        for tag_desc in results['TagDescriptions']:
+            if ('ResourceArn' in tag_desc and
+                    tag_desc['ResourceArn'] in target_group_map):
+                target_group_map[
+                    tag_desc['ResourceArn']
+                ]['Tags'] = tag_desc['Tags']
+
+    with executor_factory(max_workers=2) as w:
+        list(w.map(_process_tags, chunks(target_groups, 20)))
+
+
+def _add_target_group_tags(target_groups, session_factory, ts):
+    client = local_session(session_factory).client('elbv2')
+    client.add_tags(
+        ResourceArns=[
+            target_group['TargetGroupArn'] for target_group in target_groups
+        ],
+        Tags=ts)
+
+
+def _remove_target_group_tags(target_groups, session_factory, tag_keys):
+    client = local_session(session_factory).client('elbv2')
+    client.remove_tags(
+        ResourceArns=[
+            target_group['TargetGroupArn'] for target_group in target_groups
+        ],
+        TagKeys=tag_keys)
+
+
+@AppELBTargetGroup.action_registry.register('mark-for-op')
+class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
+
+    batch_size = 1
+
+    def process_resource_set(self, resource_set, ts):
+        _add_target_group_tags(
+            resource_set,
+            self.manager.session_factory,
+            ts)
+
+
+@AppELBTargetGroup.action_registry.register('tag')
+class AppELBTargetGroupTagAction(tags.Tag):
+
+    batch_size = 1
+
+    def process_resource_set(self, resource_set, ts):
+        _add_target_group_tags(
+            resource_set,
+            self.manager.session_factory,
+            ts)
+
+
+@AppELBTargetGroup.action_registry.register('remove-tag')
+class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
+
+    batch_size = 1
+
+    def process_resource_set(self, resource_set, tag_keys):
+        _remove_target_group_tags(
+            resource_set,
+            self.manager.session_factory,
+            tag_keys)
 
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
