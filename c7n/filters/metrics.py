@@ -75,6 +75,7 @@ class MetricsFilter(Filter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()},
         value={'type': 'number'},
+        period={'type': 'number'},
         required=('value', 'name'))
 
     MAX_QUERY_POINTS = 50850
@@ -158,14 +159,17 @@ class MetricsFilter(Filter):
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
             dimensions = self.get_dimensions(r)
-            r['Metrics'] = client.get_metric_statistics(
-                Namespace=self.namespace,
-                MetricName=self.metric,
-                Statistics=[self.statistics],
-                StartTime=self.start,
-                EndTime=self.end,
-                Period=self.period,
-                Dimensions=dimensions)['Datapoints']
+            collected_metrics = r.setdefault('c7n.metrics', {})
+            key = "%s.%s" % (self.namespace, self.metric)
+            if key not in collected_metrics:
+                collected_metrics[key] = client.get_metric_statistics(
+                    Namespace=self.namespace,
+                    MetricName=self.metric,
+                    Statistics=[self.statistics],
+                    StartTime=self.start,
+                    EndTime=self.end,
+                    Period=self.period,
+                    Dimensions=dimensions)['Datapoints']
             if len(r['Metrics']) == 0:
                 continue
             if self.op(r['Metrics'][0][self.statistics], self.value):
