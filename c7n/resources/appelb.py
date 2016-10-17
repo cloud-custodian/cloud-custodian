@@ -49,6 +49,7 @@ class AppELB(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'CreatedTime'
+        config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
 
     resource_type = Meta
     filter_registry = filters
