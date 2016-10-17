@@ -54,7 +54,7 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'SubnetId',
                  'value': sub_id},
-                {'type': 'group',
+                {'type': 'security-group',
                  'key': 'Description',
                  'value': 'for apps'}
             ],
