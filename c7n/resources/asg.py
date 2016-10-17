@@ -96,7 +96,6 @@ class SecurityGroupFilter(
         net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
 
     RelatedIdsExpression = ""
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
     def get_related_ids(self, resources):
         group_ids = []

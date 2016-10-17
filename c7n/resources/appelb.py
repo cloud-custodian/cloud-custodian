@@ -107,7 +107,12 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "SecurityGroups[]"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
 @actions.register('mark-for-op')

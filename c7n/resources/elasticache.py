@@ -82,7 +82,6 @@ class ElastiCacheCluster(QueryResourceManager):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "SecurityGroups[].SecurityGroupId"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 # added mark-for-op

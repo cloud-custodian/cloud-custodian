@@ -132,14 +132,12 @@ class EC2(QueryResourceManager):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "SecurityGroups[].GroupId"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetId"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 class StateTransitionAge(AgeFilter):

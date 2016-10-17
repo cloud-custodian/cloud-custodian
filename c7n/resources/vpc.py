@@ -396,7 +396,7 @@ class InterfaceSubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
-@NetworkInterface.filter_registry.register('group')
+@NetworkInterface.filter_registry.register('security-group')
 class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "Groups[].GroupId"

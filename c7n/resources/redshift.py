@@ -80,7 +80,10 @@ class DefaultVpc(DefaultVpcBase):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+
+
+# TODO: Subnet Filter, need to deref cluster security group to components, and
+# then filter by cluster zone to get relevant subnets
 
 
 @filters.register('param')

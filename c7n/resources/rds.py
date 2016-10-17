@@ -232,7 +232,6 @@ class DefaultVpc(Filter):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @filters.register('kms-alias')

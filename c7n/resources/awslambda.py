@@ -30,7 +30,12 @@ class AWSLambda(QueryResourceManager):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+
+
+@AWSLambda.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
 @AWSLambda.filter_registry.register('cross-account')

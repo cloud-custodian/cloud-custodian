@@ -191,14 +191,12 @@ def is_ssl(b):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "SecurityGroups[]"
-    RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "Subnets[]"
-    RelatedResource = "c7n.resources.vpc.Subnet"
 
 
 @filters.register('instance')
