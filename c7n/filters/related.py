@@ -30,7 +30,6 @@ class RelatedResourceFilter(ValueFilter):
         if self.RelatedIdsExpression is None:
             raise ValueError(
                 "%s Filter requires resource expression" % name)
-                    
         #if self.AnnotationKey is None:
         #    raise ValueError(
         #        "%s Filter requires annotation key" % name)
@@ -38,7 +37,6 @@ class RelatedResourceFilter(ValueFilter):
         if self.RelatedResource is None:
             raise ValueError(
                 "%s Filter requires resource manager spec" % name)
-                
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
@@ -60,7 +58,7 @@ class RelatedResourceFilter(ValueFilter):
         mod_path, class_name = self.RelatedResource.rsplit('.', 1)
         module = importlib.import_module(mod_path)
         manager_class = getattr(module, class_name)
-        return manager_class(self.manager.ctx, {})        
+        return manager_class(self.manager.ctx, {})
 
     def process_resource(self, resource, related):
         related_ids = self.get_related_ids([resource])
@@ -86,7 +84,7 @@ class RelatedResourceFilter(ValueFilter):
 
         if self.AnnotationKey is None:
             resource['c7n.%s' % self.AnnotationKey] = found
-    
+
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):
@@ -96,4 +94,3 @@ class RelatedResourceFilter(ValueFilter):
     def process(self, resources, event=None):
         related = self.get_related(resources)
         return [r for r in resources if self.process_resource(r, related)]
-                

@@ -134,6 +134,13 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
 
 
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+
+
 class StateTransitionFilter(object):
     """Filter instances by state.
 
