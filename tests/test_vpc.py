@@ -54,7 +54,7 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'SubnetId',
                  'value': sub_id},
-                {'type': 'group',
+                {'type': 'security-group',
                  'key': 'Description',
                  'value': 'for apps'}
             ],
@@ -66,7 +66,7 @@ class NetworkInterfaceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['NetworkInterfaceId'], net_id)
-        self.assertEqual(resources[0]['MatchedSecurityGroups'], [sg_id])
+        self.assertEqual(resources[0]['c7n.matched-security-groups'], [sg_id])
         results = client.describe_network_interfaces(
             NetworkInterfaceIds=[net_id])['NetworkInterfaces']
         self.assertEqual([g['GroupId'] for g in results[0]['Groups']], [qsg_id])

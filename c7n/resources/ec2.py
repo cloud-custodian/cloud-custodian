@@ -25,6 +25,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
@@ -125,6 +126,18 @@ class EC2(QueryResourceManager):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[].GroupId"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
 
 
 class StateTransitionAge(AgeFilter):

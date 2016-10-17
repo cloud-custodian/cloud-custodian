@@ -15,7 +15,7 @@
 from c7n.actions import BaseAction, ModifyGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
-
+import c7n.filters.vpc as net_filters
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -391,48 +391,15 @@ class NetworkInterface(QueryResourceManager):
 
 
 @NetworkInterface.filter_registry.register('subnet')
-class InterfaceSubnet(ValueFilter):
+class InterfaceSubnetFilter(net_filters.SubnetFilter):
 
-    schema = type_schema('subnet', rinherit=ValueFilter.schema)
-    annotate = False
-
-    def process(self, resources, event=None):
-        subnets = set([r['SubnetId'] for r in resources])
-        manager = Subnet(self.manager.ctx, {})
-        self.subnets = {s['SubnetId']: s for s
-                        in manager.get_resources(list(subnets))}
-        return super(InterfaceSubnet, self).process(resources, event)
-
-    def __call__(self, resource):
-        return self.match(self.subnets[resource['SubnetId']])
+    RelatedIdsExpression = "SubnetId"
 
 
-@NetworkInterface.filter_registry.register('group')
-class InterfaceGroup(ValueFilter):
+@NetworkInterface.filter_registry.register('security-group')
+class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    annotate = False
-    schema = type_schema('group', rinherit=ValueFilter.schema)
-
-    def process(self, resources, event=None):
-        groups = set()
-        for r in resources:
-            for g in r['Groups']:
-                groups.add(g['GroupId'])
-        manager = SecurityGroup(self.manager.ctx, {})
-        self.groups = {s['GroupId']: s for s
-                       in manager.resources()}
-        # todo, something odd here
-        #in manager.get_resources(sorted(list(groups)))}
-        return super(InterfaceGroup, self).process(resources, event)
-
-    def __call__(self, resource):
-        matched = []
-        for g in resource.get('Groups', ()):
-            if self.match(self.groups[g['GroupId']]):
-                matched.append(g['GroupId'])
-        if matched:
-            resource['MatchedSecurityGroups'] = matched
-            return True
+    RelatedIdsExpression = "Groups[].GroupId"
 
 
 @NetworkInterface.action_registry.register('remove-groups')
@@ -474,7 +441,10 @@ class RouteTable(QueryResourceManager):
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
-    resource_type = 'aws.ec2.vpc-peering-connection'
+    class resource_type(ResourceQuery.resolve(
+            'aws.ec2.vpc-peering-connection')):
+        enum_spec = ('describe_vpc_peering_connections',
+                     'VpcPeeringConnections', None)
 
 
 @resources.register('network-acl')

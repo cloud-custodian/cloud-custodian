@@ -22,6 +22,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -184,6 +185,18 @@ def is_ssl(b):
         if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
             return True
     return False
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Subnets[]"
 
 
 @filters.register('instance')
