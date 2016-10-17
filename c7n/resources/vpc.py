@@ -15,7 +15,7 @@
 from c7n.actions import BaseAction, ModifyGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
-
+import c7n.filters.vpc as net_filters
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -391,6 +391,18 @@ class NetworkInterface(QueryResourceManager):
 
 
 @NetworkInterface.filter_registry.register('subnet')
+class InterfaceSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
+
+
+@NetworkInterface.filter_registry.register('group')
+class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "Groups[].GroupId"
+
+
+#@NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnet(ValueFilter):
 
     schema = type_schema('subnet', rinherit=ValueFilter.schema)
@@ -407,7 +419,7 @@ class InterfaceSubnet(ValueFilter):
         return self.match(self.subnets[resource['SubnetId']])
 
 
-@NetworkInterface.filter_registry.register('group')
+#@NetworkInterface.filter_registry.register('group')
 class InterfaceGroup(ValueFilter):
 
     annotate = False

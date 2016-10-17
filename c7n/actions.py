@@ -128,7 +128,7 @@ class ModifyGroupsAction(BaseAction):
         for r in resources:
             rgroups = [g['GroupId'] for g in r['Groups']]
             if target_group_ids == 'matched':
-                group_ids = r.get('MatchedSecurityGroups', ())
+                group_ids = r.get('c7n.matched-security-groups', ())
             elif target_group_ids == 'all':
                 group_ids = rgroups
             elif isinstance(target_group_ids, list):
