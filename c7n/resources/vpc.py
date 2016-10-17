@@ -402,51 +402,6 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
-#@NetworkInterface.filter_registry.register('subnet')
-class InterfaceSubnet(ValueFilter):
-
-    schema = type_schema('subnet', rinherit=ValueFilter.schema)
-    annotate = False
-
-    def process(self, resources, event=None):
-        subnets = set([r['SubnetId'] for r in resources])
-        manager = Subnet(self.manager.ctx, {})
-        self.subnets = {s['SubnetId']: s for s
-                        in manager.get_resources(list(subnets))}
-        return super(InterfaceSubnet, self).process(resources, event)
-
-    def __call__(self, resource):
-        return self.match(self.subnets[resource['SubnetId']])
-
-
-#@NetworkInterface.filter_registry.register('group')
-class InterfaceGroup(ValueFilter):
-
-    annotate = False
-    schema = type_schema('group', rinherit=ValueFilter.schema)
-
-    def process(self, resources, event=None):
-        groups = set()
-        for r in resources:
-            for g in r['Groups']:
-                groups.add(g['GroupId'])
-        manager = SecurityGroup(self.manager.ctx, {})
-        self.groups = {s['GroupId']: s for s
-                       in manager.resources()}
-        # todo, something odd here
-        #in manager.get_resources(sorted(list(groups)))}
-        return super(InterfaceGroup, self).process(resources, event)
-
-    def __call__(self, resource):
-        matched = []
-        for g in resource.get('Groups', ()):
-            if self.match(self.groups[g['GroupId']]):
-                matched.append(g['GroupId'])
-        if matched:
-            resource['MatchedSecurityGroups'] = matched
-            return True
-
-
 @NetworkInterface.action_registry.register('remove-groups')
 class InterfaceRemoveGroups(ModifyGroupsAction):
     """Remove security groups from an interface.
