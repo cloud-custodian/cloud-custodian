@@ -54,7 +54,7 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'SubnetId',
                  'value': sub_id},
-                {'type': 'group',
+                {'type': 'security-group',
                  'key': 'Description',
                  'value': 'for apps'}
             ],
@@ -66,7 +66,7 @@ class NetworkInterfaceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['NetworkInterfaceId'], net_id)
-        self.assertEqual(resources[0]['MatchedSecurityGroups'], [sg_id])
+        self.assertEqual(resources[0]['c7n.matched-security-groups'], [sg_id])
         results = client.describe_network_interfaces(
             NetworkInterfaceIds=[net_id])['NetworkInterfaces']
         self.assertEqual([g['GroupId'] for g in results[0]['Groups']], [qsg_id])
@@ -227,6 +227,60 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_only_ports_ingress(self):
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress', 'OnlyPorts': [80]}
+                ]})
+        resources = [
+            {'Description': 'Typical Internet-Facing Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestInternetSG',
+             'IpPermissions': [{'FromPort': 53,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': ['10.0.0.0/8'],
+                                'PrefixListIds': [],
+                                'ToPort': 53,
+                                'UserIdGroupPairs': []}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'InternetSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_ports_ingress(self):
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress', 'Ports': [53]}
+                ]})
+        resources = [
+            {'Description': 'Typical Internet-Facing Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestInternetSG',
+             'IpPermissions': [{'FromPort': 53,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': ['10.0.0.0/8'],
+                                'PrefixListIds': [],
+                                'ToPort': 53,
+                                'UserIdGroupPairs': []}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'InternetSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_cidr_ingress(self):
         factory = self.replay_flight_data('test_security_group_cidr_ingress')

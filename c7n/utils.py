@@ -295,7 +295,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
-    klass = ipaddress.ip_network
+    klass = IPv4Network
     if '/' not in value:
         klass = ipaddress.ip_address
     try:
@@ -303,6 +303,15 @@ def parse_cidr(value):
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v
+
+
+class IPv4Network(ipaddress.IPv4Network):
+
+    # Override for net 2 net containment comparison
+    def __contains__(self, other):
+        if isinstance(other, ipaddress._BaseNetwork):
+            return self.supernet_of(other)
+        return super(IPv4Network, self).__contains__(other)
 
 
 worker_log = logging.getLogger('c7n.worker')
@@ -322,7 +331,7 @@ def worker(f):
             f(*args, **kw)
         except Exception as e:
             worker_log.exception(
-                'Error invoking %s: %s',
+                'Error invoking %s',
                 "%s.%s" % (f.__module__, f.__name__))
     functools.update_wrapper(_f, f)
     return _f
