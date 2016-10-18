@@ -192,15 +192,6 @@ class TestValueTypes(BaseFilterTest):
         }
         self.assertFilter(fdata, instance(), True)
 
-    def test_age_nonexistant(self):
-        fdata = {
-            'type': 'value',
-            'key': 'LaunchTime',
-            'op': 'less-than',
-            'value_type': 'age',
-            'value': 32}
-        self.assertFilter(fdata, i(three_months), False)
-
     def test_age(self):
         now = datetime.now(tz=tz.tzutc())
         three_months = now - timedelta(90)

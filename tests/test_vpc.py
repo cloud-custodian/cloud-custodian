@@ -139,7 +139,7 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []}])
 
     def test_security_group_delete(self):
-        factory = self.record_flight_data(
+        factory = self.replay_flight_data(
             'test_security_group_delete')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
