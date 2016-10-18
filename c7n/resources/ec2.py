@@ -569,6 +569,7 @@ class Snapshot(BaseAction):
                             "Exception creating snapshot set \n %s" % (
                                 f.exception()))
 
+    @utils.worker
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
         for block_device in resource['BlockDeviceMappings']:
