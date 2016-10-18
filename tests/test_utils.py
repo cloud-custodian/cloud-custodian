@@ -58,6 +58,27 @@ class Backoff(BaseTest):
             self.assertTrue(i < maxv)
 
 
+class WorkerDecorator(BaseTest):
+
+    def test_worker(self):
+
+        @utils.worker
+        def rabbit(err=False):
+            """what's up doc"""
+            if err:
+                raise ValueError("more carrots")
+            return 42
+
+        self.assertEqual(rabbit.__doc__, "what's up doc")
+        log_output = self.capture_logging("c7n.worker")
+        rabbit()
+        self.assertEqual(log_output.getvalue(), "")
+        rabbit(True)
+        self.assertTrue(
+            log_output.getvalue().startswith(
+                "Error invoking tests.test_utils.rabbit\nTraceback"))
+
+
 class UtilTest(unittest.TestCase):
 
     def test_ipv4_network(self):
