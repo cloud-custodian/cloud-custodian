@@ -158,6 +158,7 @@ class SchemaTest(BaseTest):
 class LogTest(BaseTest):
 
     def test_log(self):
+        # FIXME this rejects the fake security token used for tests
         valid_policies = {
             'policies':
             [{
