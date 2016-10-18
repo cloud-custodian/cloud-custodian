@@ -530,6 +530,8 @@ class Terminate(BaseAction, StateTransitionFilter):
                 DryRun=self.manager.config.dryrun)
 
     def disable_deletion_protection(self, instances):
+
+        @utils.worker
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')

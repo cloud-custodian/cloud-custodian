@@ -328,10 +328,11 @@ def worker(f):
     """
     def _f(*args, **kw):
         try:
-            f(*args, **kw)
+            return f(*args, **kw)
         except Exception as e:
             worker_log.exception(
                 'Error invoking %s',
                 "%s.%s" % (f.__module__, f.__name__))
+            raise
     functools.update_wrapper(_f, f)
     return _f
