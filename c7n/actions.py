@@ -128,7 +128,7 @@ class ModifyGroupsAction(BaseAction):
         for r in resources:
             rgroups = [g['GroupId'] for g in r['Groups']]
             if target_group_ids == 'matched':
-                group_ids = r.get('MatchedSecurityGroups', ())
+                group_ids = r.get('c7n.matched-security-groups', ())
             elif target_group_ids == 'all':
                 group_ids = rgroups
             elif isinstance(target_group_ids, list):
@@ -278,6 +278,7 @@ class Notify(EventAction):
                        'event': event,
                        'account': account_name,
                        'action': self.data,
+                       'region': self.manager.config.region,
                        'policy': self.manager.data}
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (

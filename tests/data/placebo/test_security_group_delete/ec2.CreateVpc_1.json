@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9a903364-3cc2-4d5e-899a-0fb2d4e1b7d5", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 18 Oct 2016 09:28:08 GMT"
+            }
+        }, 
+        "Vpc": {
+            "VpcId": "vpc-0886866f", 
+            "InstanceTenancy": "default", 
+            "State": "pending", 
+            "DhcpOptionsId": "dopt-24ff1940", 
+            "CidrBlock": "10.4.0.0/16", 
+            "IsDefault": false
+        }
+    }
+}

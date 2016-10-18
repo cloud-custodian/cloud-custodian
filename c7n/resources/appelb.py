@@ -18,6 +18,7 @@ import logging
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, DefaultVpcBase
+import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -100,6 +101,18 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
     client.remove_tags(
         ResourceArns=[alb['LoadBalancerArn'] for alb in albs],
         TagKeys=tag_keys)
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
 @actions.register('mark-for-op')

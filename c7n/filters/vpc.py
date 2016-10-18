@@ -11,8 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .core import Filter
-from c7n.utils import local_session
+
+from c7n.utils import local_session, type_schema
+
+from .core import Filter, ValueFilter
+from .related import RelatedResourceFilter
+
+
+class SecurityGroupFilter(RelatedResourceFilter):
+
+    schema = type_schema(
+        'security-group', rinherit=ValueFilter.schema,
+        match_resource={'type': 'boolean'},
+        operator={'enum': ['and', 'or']})
+
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+    AnnotationKey = "matched-security-groups"
+
+
+class SubnetFilter(RelatedResourceFilter):
+
+    schema = type_schema(
+        'subnet', rinherit=ValueFilter.schema,
+        match_resource={'type': 'boolean'},
+        operator={'enum': ['and', 'or']})
+
+    RelatedResource = "c7n.resources.vpc.Subnet"
+    AnnotationKey = "matched-subnets"    
 
 
 class DefaultVpcBase(Filter):
