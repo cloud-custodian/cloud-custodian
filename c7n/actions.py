@@ -278,6 +278,7 @@ class Notify(EventAction):
                        'event': event,
                        'account': account_name,
                        'action': self.data,
+                       'region': self.manager.config.region,
                        'policy': self.manager.data}
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
