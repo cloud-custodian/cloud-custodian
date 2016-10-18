@@ -33,8 +33,8 @@ class StreamingDistribution(QueryResourceManager):
 
     class resource_type(object):
         service = 'cloudfront'
-        enum_spec = ('list_streaming_distributions', 
-                     'StreamingDistributionList.Items', 
+        enum_spec = ('list_streaming_distributions',
+                     'StreamingDistributionList.Items',
                      None)
         id = 'Id'
         name = 'DomainName'
