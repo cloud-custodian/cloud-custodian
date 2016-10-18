@@ -157,6 +157,9 @@ def assemble_bucket(item):
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
+            # Location == region for all cases but EU per https://goo.gl/iXdpnl
+            if b_location == 'EU':
+                b_location = "eu-west-1"
             if v and v != c_location:
                 c = s.client('s3', region_name=b_location)
             elif c_location != location:
