@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from botocore.exceptions import ClientError
-from datetime import datetime
 
 import copy
+from datetime import datetime
+import functools
 import json
 import itertools
+import logging
 import random
 import threading
 import time
@@ -310,3 +312,27 @@ class IPv4Network(ipaddress.IPv4Network):
         if isinstance(other, ipaddress._BaseNetwork):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
+
+
+worker_log = logging.getLogger('c7n.worker')
+
+
+def worker(f):
+    """Generic wrapper to log uncaught exceptions in a function.
+
+    When we cross concurrent.futures executor boundaries we lose our
+    traceback information, and when doing bulk operations we may tolerate
+    transient failures on a partial subset. However we still want to have
+    full accounting of the error in the logs, in a format that our error
+    collection (cwl subscription) can still pickup.
+    """
+    def _f(*args, **kw):
+        try:
+            return f(*args, **kw)
+        except Exception as e:
+            worker_log.exception(
+                'Error invoking %s',
+                "%s.%s" % (f.__module__, f.__name__))
+            raise
+    functools.update_wrapper(_f, f)
+    return _f
