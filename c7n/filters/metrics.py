@@ -150,7 +150,11 @@ class MetricsFilter(Filter):
             # the statistics/average over those resources.
             dimensions = self.get_dimensions(r)
             collected_metrics = r.setdefault('c7n.metrics', {})
-            key = "%s.%s" % (self.namespace, self.metric)
+            # Note this annotation cache is policy scoped, not across
+            # policies, still the lack of full qualification on the key
+            # means multiple filters within a policy using the same metric
+            # across different periods or dimensions would be problematic.
+            key = "%s.%s.%s" % (self.namespace, self.metric, self.statistics)
             if key not in collected_metrics:
                 collected_metrics[key] = client.get_metric_statistics(
                     Namespace=self.namespace,
