@@ -88,6 +88,7 @@ class LastWriteDays(Filter):
         streams = logs.describe_log_streams(
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
+            descending=True,
             limit=3).get('logStreams')
         group['streams'] = streams
         if not streams:

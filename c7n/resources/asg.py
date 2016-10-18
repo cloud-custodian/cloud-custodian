@@ -29,6 +29,7 @@ from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -88,6 +89,24 @@ class LaunchConfigFilterBase(object):
             configs = config_manager.resources()
         self.configs = {
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(
+        net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = []
+        for asg in resources:
+            cfg = self.configs.get(asg['LaunchConfigurationName'])
+            group_ids.extend(cfg.get('SecurityGroups', ()))
+        return set(group_ids)
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(SecurityGroupFilter, self).process(asgs, event)
 
 
 @filters.register('launch-config')

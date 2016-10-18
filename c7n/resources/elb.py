@@ -22,6 +22,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -186,11 +187,22 @@ def is_ssl(b):
     return False
 
 
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Subnets[]"
+
+
 @filters.register('instance')
 class Instance(ValueFilter):
 
-    schema = type_schema(
-        'instance', rinherit=ValueFilter.schema)
+    schema = type_schema('instance', rinherit=ValueFilter.schema)
 
     annotate = False
 
@@ -212,9 +224,6 @@ class Instance(ValueFilter):
         matched = []
         for i in elb['Instances']:
             instance = self.elb_instances[i['InstanceId']]
-            if not instance.get('IamInstanceProfile'):
-                print instance['InstanceId']
-                #import pdb; pdb.set_trace()
             if self.match(instance):
                 matched.append(instance)
         if not matched:
