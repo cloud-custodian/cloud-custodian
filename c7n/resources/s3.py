@@ -157,6 +157,9 @@ def assemble_bucket(item):
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
+            # Location == region for all cases but EU per https://goo.gl/iXdpnl
+            if b_location == 'EU':
+                b_location = "eu-west-1"
             if v and v != c_location:
                 c = s.client('s3', region_name=b_location)
             elif c_location != location:
@@ -381,8 +384,8 @@ class ToggleVersioning(BucketActionBase):
     schema = type_schema(
         'enable-versioning',
         enabled={'type': 'boolean'})
-    # mfa delete enablement looks like it needs the serial and a current
-    # token.
+
+    # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
         client = local_session(self.manager.session_factory).client('s3')

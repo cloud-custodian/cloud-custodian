@@ -28,6 +28,8 @@ from c7n.utils import local_session, type_schema, chunks
 class MetricsFilter(Filter):
     """Supports cloud watch metrics filters on resources.
 
+    All resources that have cloud watch metrics are supported.
+
     Docs on cloud watch metrics
 
     - GetMetricStatistics - http://goo.gl/w8mMEY
@@ -50,18 +52,6 @@ class MetricsFilter(Filter):
     nor for resources to new to have existed the entire
     period. ie. being stopped for an ec2 intsance wouldn't lower the
     average cpu utilization, nor would
-
-    Todo
-
-      - support offhours considerations (just run at night?)
-      - support additional stats, values
-
-    Use Case / Find Underutilized servers non-inclusive of offhour periods
-
-      If server has no data for period, its omitted.
-
-      So a server that's off reports no metrics for the relevant period.
-
     """
 
     schema = type_schema(
@@ -75,6 +65,7 @@ class MetricsFilter(Filter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()},
         value={'type': 'number'},
+        period={'type': 'number'},
         required=('value', 'name'))
 
     MAX_QUERY_POINTS = 50850
@@ -158,16 +149,23 @@ class MetricsFilter(Filter):
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
             dimensions = self.get_dimensions(r)
-            r['Metrics'] = client.get_metric_statistics(
-                Namespace=self.namespace,
-                MetricName=self.metric,
-                Statistics=[self.statistics],
-                StartTime=self.start,
-                EndTime=self.end,
-                Period=self.period,
-                Dimensions=dimensions)['Datapoints']
-            if len(r['Metrics']) == 0:
+            collected_metrics = r.setdefault('c7n.metrics', {})
+            # Note this annotation cache is policy scoped, not across
+            # policies, still the lack of full qualification on the key
+            # means multiple filters within a policy using the same metric
+            # across different periods or dimensions would be problematic.
+            key = "%s.%s.%s" % (self.namespace, self.metric, self.statistics)
+            if key not in collected_metrics:
+                collected_metrics[key] = client.get_metric_statistics(
+                    Namespace=self.namespace,
+                    MetricName=self.metric,
+                    Statistics=[self.statistics],
+                    StartTime=self.start,
+                    EndTime=self.end,
+                    Period=self.period,
+                    Dimensions=dimensions)['Datapoints']
+            if len(collected_metrics[key]) == 0:
                 continue
-            if self.op(r['Metrics'][0][self.statistics], self.value):
+            if self.op(collected_metrics[key][0][self.statistics], self.value):
                 matched.append(r)
         return matched

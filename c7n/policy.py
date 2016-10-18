@@ -85,7 +85,7 @@ class PolicyExecutionMode(object):
     def __init__(self, policy):
         self.policy = policy
 
-    def run(self):
+    def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
@@ -300,7 +300,7 @@ class PeriodicMode(LambdaMode, PullMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
-    def run(self):
+    def run(self, event, lambda_context):
         return PullMode.run(self)
 
 

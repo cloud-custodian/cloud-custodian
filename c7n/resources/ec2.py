@@ -14,6 +14,7 @@
 import itertools
 import operator
 import random
+import re
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
@@ -24,6 +25,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
@@ -124,6 +126,31 @@ class EC2(QueryResourceManager):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[].GroupId"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
+
+
+class StateTransitionAge(AgeFilter):
+    """Age an instance has been in the given state.
+    """
+
+    RE_PARSE_AGE = re.compile("\(.*?\)")
+
+    def get_resource_date(self, i):
+        v = i.get('StateTransitionReason')
+        if v is None:
+            return v
+        return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
 
 
 class StateTransitionFilter(object):
@@ -503,6 +530,8 @@ class Terminate(BaseAction, StateTransitionFilter):
                 DryRun=self.manager.config.dryrun)
 
     def disable_deletion_protection(self, instances):
+
+        @utils.worker
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
@@ -540,6 +569,7 @@ class Snapshot(BaseAction):
                             "Exception creating snapshot set \n %s" % (
                                 f.exception()))
 
+    @utils.worker
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
         for block_device in resource['BlockDeviceMappings']:
@@ -577,7 +607,7 @@ class Snapshot(BaseAction):
                     if t['Key'] in copy_keys:
                         copy_tags.append(t)
 
-            if len(copy_tags) + len(tags) > 10:
+            if len(copy_tags) + len(tags) > 40:
                 self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
