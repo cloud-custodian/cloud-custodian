@@ -22,10 +22,6 @@ from c7n.utils import dumps
 resources = PluginRegistry('resources')
 
 
-class ValidationError(Exception):
-    pass
-
-
 class ResourceManager(object):
 
     filter_registry = None
@@ -72,8 +68,4 @@ class ResourceManager(object):
     def get_model(self):
         """Returns the resource meta-model.
         """
-        from exceptions import AttributeError
-        try:
-            return self.query.resolve(self.resource_type)
-        except AttributeError as e:
-            raise ValidationError(e.message)
+        return self.query.resolve(self.resource_type)

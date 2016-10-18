@@ -51,6 +51,10 @@ def load(options, path, format='yaml', validate=True):
     return PolicyCollection(data, options)
 
 
+class ValidationError(Exception):
+    pass
+
+
 class PolicyCollection(object):
 
     def __init__(self, data, options):
@@ -290,9 +294,13 @@ class LambdaMode(PolicyExecutionMode):
                 # it for the lambda
                 manager = LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
-            return manager.publish(
-                PolicyLambda(self.policy), 'current',
-                role=self.policy.options.assume_role)
+
+            try:
+                return manager.publish(
+                    PolicyLambda(self.policy), 'current',
+                    role=self.policy.options.assume_role)
+            except AttributeError as e:
+                raise ValidationError(e)
 
 
 class PeriodicMode(LambdaMode, PullMode):
