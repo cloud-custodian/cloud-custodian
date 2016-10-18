@@ -530,6 +530,8 @@ class Terminate(BaseAction, StateTransitionFilter):
                 DryRun=self.manager.config.dryrun)
 
     def disable_deletion_protection(self, instances):
+
+        @utils.worker
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
@@ -567,6 +569,7 @@ class Snapshot(BaseAction):
                             "Exception creating snapshot set \n %s" % (
                                 f.exception()))
 
+    @utils.worker
     def process_volume_set(self, resource):
         c = utils.local_session(self.manager.session_factory).client('ec2')
         for block_device in resource['BlockDeviceMappings']:

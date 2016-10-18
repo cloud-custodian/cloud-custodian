@@ -58,6 +58,46 @@ class Backoff(BaseTest):
             self.assertTrue(i < maxv)
 
 
+class WorkerDecorator(BaseTest):
+
+    def test_method_worker(self):
+
+        class foo(object):
+
+            @utils.worker
+            def bar(self, err=False):
+                """abc"""
+                if err:
+                    raise ValueError("foo")
+                return 42
+
+        i = foo()
+        log_output = self.capture_logging("c7n.worker")
+        self.assertEqual(i.bar(), 42)
+        self.assertRaises(ValueError, i.bar, True)
+        self.assertTrue(
+            log_output.getvalue().startswith(
+                "Error invoking tests.test_utils.bar\nTraceback"))
+
+    def test_function_worker(self):
+        @utils.worker
+        def rabbit(err=False):
+            """what's up doc"""
+            if err:
+                raise ValueError("more carrots")
+            return 42
+
+        self.assertEqual(rabbit.__doc__, "what's up doc")
+        log_output = self.capture_logging("c7n.worker")
+        self.assertEqual(rabbit(), 42)
+        self.assertEqual(log_output.getvalue(), "")
+        self.assertRaises(ValueError, rabbit, True)
+        self.assertTrue(
+            log_output.getvalue().startswith(
+                "Error invoking tests.test_utils.rabbit\nTraceback"))
+        self.assertTrue("more carrots" in log_output.getvalue())
+
+
 class UtilTest(unittest.TestCase):
 
     def test_ipv4_network(self):
