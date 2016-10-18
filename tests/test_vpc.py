@@ -138,6 +138,42 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 62000,
               u'UserIdGroupPairs': []}])
 
+    def test_security_group_delete(self):
+        factory = self.replay_flight_data(
+            'test_security_group_delete')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+
+        def delete_sg():
+            try:
+                client.delete_security_group(GroupId=sg_id)
+            except Exception:
+                pass
+            
+        self.addCleanup(delete_sg)
+
+        p = self.load_policy({
+            'name': 'sg-delete',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': sg_id}],
+            'actions': [
+                'delete']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], sg_id)
+        try:
+            group_info = client.describe_security_groups(GroupIds=[sg_id])
+        except:
+            pass
+        else:
+            self.fail("group not deleted")
+    
     def test_port_within_range(self):
         factory = self.replay_flight_data(
             'test_security_group_port_in_range')

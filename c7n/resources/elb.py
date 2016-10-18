@@ -202,8 +202,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 @filters.register('instance')
 class Instance(ValueFilter):
 
-    schema = type_schema(
-        'instance', rinherit=ValueFilter.schema)
+    schema = type_schema('instance', rinherit=ValueFilter.schema)
 
     annotate = False
 
@@ -225,9 +224,6 @@ class Instance(ValueFilter):
         matched = []
         for i in elb['Instances']:
             instance = self.elb_instances[i['InstanceId']]
-            if not instance.get('IamInstanceProfile'):
-                print instance['InstanceId']
-                #import pdb; pdb.set_trace()
             if self.match(instance):
                 matched.append(instance)
         if not matched:
