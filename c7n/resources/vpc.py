@@ -347,7 +347,7 @@ class Delete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
-            client.delete_security_group(r['SecurityGroupId'])
+            client.delete_security_group(GroupId=r['GroupId'])
 
 
 @SecurityGroup.action_registry.register('remove-permissions')
