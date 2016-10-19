@@ -183,7 +183,7 @@ class IAMSummary(ValueFilter):
             "UserPolicySizeQuota": 2048
         }
 
-q    """
+    """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
