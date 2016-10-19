@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TargetHealthDescriptions": [
+        {
+            "Target": {
+                "Id": "i-123456",
+                "Port": 123
+            },
+            "HealthCheckPort": "99"
+        },
+        {
+            "Target": {
+                "Id": "i-7890",
+                "Port": 456
+            },
+            "HealthCheckPort": "99"
+        }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "837a7741-90aa-11e6-a798-bd90c36cc72a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "837a7741-90aa-11e6-a798-bd90c36cc72a", 
+                "date": "Wed, 12 Oct 2016 18:34:30 GMT", 
+                "content-length": "331", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

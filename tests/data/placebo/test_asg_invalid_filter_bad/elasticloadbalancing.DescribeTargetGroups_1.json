@@ -4,12 +4,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b5a109be-871d-11e6-adc8-49939253181f", 
+            "RequestId": "97235f7e-8fe1-11e6-b7d6-7f12dd163996", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "b5a109be-871d-11e6-adc8-49939253181f", 
-                "date": "Fri, 30 Sep 2016 14:53:54 GMT", 
-                "content-length": "1312", 
-                "content-type": "text/xml"
+                "x-amzn-requestid": "97235f7e-8fe1-11e6-b7d6-7f12dd163996", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2142", 
+                "content-type": "text/xml", 
+                "date": "Tue, 11 Oct 2016 18:36:14 GMT"
             }
         }, 
         "TargetGroups": [
@@ -32,6 +33,24 @@
                 "HealthCheckPort": "traffic-port", 
                 "Port": 80, 
                 "TargetGroupName": "target-group-1"
+            }, 
+            {
+                "HealthCheckPath": "/", 
+                "HealthCheckIntervalSeconds": 30, 
+                "VpcId": "vpc-4a9ff72e", 
+                "Protocol": "HTTPS", 
+                "HealthCheckTimeoutSeconds": 5, 
+                "HealthCheckProtocol": "HTTP", 
+                "LoadBalancerArns": [], 
+                "UnhealthyThresholdCount": 2, 
+                "HealthyThresholdCount": 5, 
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-2/9c84115056e192c4", 
+                "Matcher": {
+                    "HttpCode": "200"
+                }, 
+                "HealthCheckPort": "traffic-port", 
+                "Port": 443, 
+                "TargetGroupName": "target-group-2"
             }
         ]
     }
