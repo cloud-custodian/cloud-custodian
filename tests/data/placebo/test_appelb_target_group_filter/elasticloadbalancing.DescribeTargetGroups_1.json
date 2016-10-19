@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "518920d3-90aa-11e6-a4be-67234b690de3",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "518920d3-90aa-11e6-a4be-67234b690de3",
+                "vary": "Accept-Encoding",
+                "content-length": "2142",
+                "content-type": "text/xml",
+                "date": "Wed, 12 Oct 2016 18:33:06 GMT"
+            }
+        },
+        "TargetGroups": [
+            {
+                "HealthCheckPath": "/",
+                "HealthCheckIntervalSeconds": 30,
+                "VpcId": "vpc-47b2b823",
+                "Protocol": "HTTP",
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthCheckProtocol": "HTTP",
+                "LoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb"
+                ],
+                "UnhealthyThresholdCount": 2,
+                "HealthyThresholdCount": 5,
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-1/f9e509bf6804a101",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "HealthCheckPort": "traffic-port",
+                "Port": 80,
+                "TargetGroupName": "target-group-1"
+            },
+            {
+                "HealthCheckPath": "/",
+                "HealthCheckIntervalSeconds": 30,
+                "VpcId": "vpc-4a9ff72e",
+                "Protocol": "HTTPS",
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthCheckProtocol": "HTTPS",
+                "LoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb"
+                ],
+                "UnhealthyThresholdCount": 2,
+                "HealthyThresholdCount": 5,
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-2/9c84115056e192c4",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "HealthCheckPort": "traffic-port",
+                "Port": 443,
+                "TargetGroupName": "target-group-2"
+            }
+        ]
+    }
+}

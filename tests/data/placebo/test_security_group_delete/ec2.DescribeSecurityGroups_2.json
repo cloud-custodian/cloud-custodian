@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "eed59e5e-61ad-4e53-bc55-d1744bee704e", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Tue, 18 Oct 2016 09:28:09 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The security group 'sg-0e5d4874' does not exist", 
+            "Code": "InvalidGroup.NotFound"
+        }
+    }
+}

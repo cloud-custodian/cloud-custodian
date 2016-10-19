@@ -29,7 +29,7 @@ def _default_options(p):
         default=os.environ.get('AWS_DEFAULT_REGION', "us-east-1"),
         help="AWS Region to target (Default: us-east-1)")
     p.add_argument(
-        "--profile", default=os.environ.get('AWS_PROFILE'),
+        "--profile",
         help="AWS Account Config File Profile to utilize")
     p.add_argument("--assume", default=None, dest="assume_role",
                    help="Role to assume")

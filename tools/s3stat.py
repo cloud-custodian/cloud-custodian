@@ -86,6 +86,11 @@ def main():
         try:
             bucket_region = s3.get_bucket_location(
                 Bucket=b['Name'])['LocationConstraint']
+            if bucket_region is None:
+                bucket_region = "us-east-1"
+            # special case per https://goo.gl/iXdpnl
+            elif bucket_region == "EU":
+                bucket_region = "eu-west-1"
         except ClientError as e:
             # We don't have permission to the bucket, try us-east-1
             bucket_region = "us-east-1"

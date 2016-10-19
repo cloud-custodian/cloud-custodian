@@ -51,6 +51,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
@@ -225,6 +226,12 @@ class DefaultVpc(Filter):
                 return []
             self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
 @filters.register('kms-alias')

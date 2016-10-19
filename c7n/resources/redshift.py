@@ -21,6 +21,7 @@ from concurrent.futures import as_completed
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
+import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -34,6 +35,7 @@ log = logging.getLogger('custodian.redshift')
 filters = FilterRegistry('redshift.filters')
 actions = ActionRegistry('redshift.actions')
 filters.register('marked-for-op', tags.TagActionFilter)
+
 
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
@@ -72,6 +74,16 @@ class DefaultVpc(DefaultVpcBase):
     def __call__(self, redshift):
         return (redshift.get('VpcId') and
                 self.match(redshift.get('VpcId')) or False)
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+
+
+# TODO: Subnet Filter, need to deref cluster security group to components, and
+# then filter by cluster zone to get relevant subnets
 
 
 @filters.register('param')
@@ -240,6 +252,7 @@ class Tag(tags.Tag):
         for r in resources:
             arn = self.manager.generate_arn(r['ClusterIdentifer'])
             client.create_tags(ResourceName=arn, Tags=tags)
+
 
 @actions.register('unmark')
 @actions.register('remove-tag')
