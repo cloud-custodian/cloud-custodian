@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalDecision": "implicitDeny", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:RunInstances", 
+                "MatchedStatements": [], 
+                "EvalResourceName": "*"
+            }, 
+            {
+                "EvalDecision": "implicitDeny", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:TerminateInstances", 
+                "MatchedStatements": [], 
+                "EvalResourceName": "*"
+            }, 
+            {
+                "EvalDecision": "allowed", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:DescribeInstances", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "AmazonEC2ReadOnlyAccess", 
+                        "StartPosition": {
+                            "Column": 17, 
+                            "Line": 3
+                        }, 
+                        "EndPosition": {
+                            "Column": 6, 
+                            "Line": 8
+                        }
+                    }
+                ], 
+                "EvalResourceName": "*"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cadbaf77-9625-11e6-a51c-91acf66e66ea", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cadbaf77-9625-11e6-a51c-91acf66e66ea", 
+                "date": "Wed, 19 Oct 2016 17:59:33 GMT", 
+                "content-length": "1499", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

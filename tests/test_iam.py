@@ -29,7 +29,8 @@ from c7n.resources.iam import (UserMfaDevice,
                                UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole,
                                IamGroupUsers,
-                               IamRoleInlinePolicy, IamGroupInlinePolicy)
+                               IamRoleInlinePolicy, IamGroupInlinePolicy,
+                               SimulatePrincipalPolicy)
 from c7n.executor import MainThreadExecutor
 
 
@@ -175,9 +176,9 @@ class IamGroupFilterUsage(BaseTest):
         p = self.load_policy({
             'name': 'iam-group-unused',
             'resource': 'iam-group',
-            'filters': [{
-                'type': 'has-users',
-                'value': False}]}, session_factory=session_factory)
+            'filters': [
+                {'type': 'has-users','value': False},
+                ]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -254,6 +255,61 @@ class IamInlinePolicyUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_iam_simulate_role_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_simulate_role_policy')
+        self.patch(
+            SimulatePrincipalPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-simulate-role-policy',
+            'resource': 'iam-role',
+            'actions': [{
+                'type': 'simulate-principal',
+                'actions': [
+                    'ec2:RunInstances',
+                    'ec2:TerminateInstances'
+                ]}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 9)
+
+    def test_iam_simulate_user_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_simulate_user_policy')
+        self.patch(
+            SimulatePrincipalPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-simulate-user-policy',
+            'resource': 'iam-user',
+            'actions': [{
+                'type': 'simulate-principal',
+                'actions': [
+                    'ec2:RunInstances',
+                    'ec2:TerminateInstances'
+                ]}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_simulate_group_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_simulate_group_policy')
+        self.patch(
+            SimulatePrincipalPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-simulate-group-policy',
+            'resource': 'iam-group',
+            'actions': [{
+                'type': 'simulate-principal',
+                'actions': [
+                    'ec2:RunInstances',
+                    'ec2:TerminateInstances',
+                    'ec2:DescribeInstances'
+                ]}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
 
 
 class KMSCrossAccount(BaseTest):
