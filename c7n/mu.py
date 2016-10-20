@@ -86,7 +86,7 @@ class PythonPackageArchive(object):
 
     def create(self):
         assert not self._temp_archive_file, "Archive already created"
-        self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
+        self._temp_archive_file = tempfile.NamedTemporaryFile()
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
@@ -144,8 +144,7 @@ class PythonPackageArchive(object):
         return self
 
     def remove(self):
-        # dispose of the temp file for garbag collection
-        os.remove(self._temp_archive_file.name)
+        # dispose of the temp file for garbage collection
         if self._temp_archive_file:
             self._temp_archive_file = None
 
