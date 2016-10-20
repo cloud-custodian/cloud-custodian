@@ -22,7 +22,7 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyGroupsAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -175,6 +175,26 @@ class SnapshotElastiCacheCluster(BaseAction):
                 'Backup',
                 cluster['CacheClusterId']),
             CacheClusterId=cluster['CacheClusterId'])
+
+
+@actions.register('modify-groups')
+class ElasticacheClusterModifyGroups(ModifyGroupsAction):
+    """Modify security groups on an Elasticache cluster"""
+
+    schema = type_schema(
+        'modify-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        groups = super(ElasticacheClusterModifyGroups, self).get_groups(resources)
+        for idx, c in enumerate(clusters):
+            client.modify_cache_cluster(
+                CacheClusterId=c['CacheClusterId'],
+                SecurityGroupIds=groups[idx])
 
 
 @resources.register('cache-subnet-group')

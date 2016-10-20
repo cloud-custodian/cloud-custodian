@@ -435,7 +435,7 @@ class InterfaceGroup(ValueFilter):
             return True
 
 
-@NetworkInterface.action_registry.register('remove-groups')
+@NetworkInterface.action_registry.register('modify-groups')
 class InterfaceRemoveGroups(ModifyGroupsAction):
     """Remove security groups from an interface.
 
@@ -449,7 +449,7 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
     """
 
     schema = type_schema(
-        'remove-groups',
+        'modify-groups',
         **{'groups': {'anyOf': [
             {'type': 'string', 'enum': ['matched', 'all']},
             {'type': 'array', 'items': {'type': 'string'}}]},

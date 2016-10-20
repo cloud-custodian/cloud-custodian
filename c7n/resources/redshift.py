@@ -18,7 +18,7 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyGroupsAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
 
@@ -306,6 +306,26 @@ class RedshiftSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
 
     resource_type = Meta
+
+@actions.register('modify-groups')
+class RedshiftModifyGroups(ModifyGroupsAction):
+    """Modify security groups on an Redshift cluster"""
+
+    schema = type_schema(
+        'modify-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('redshift')
+        groups = super(RedshiftModifyGroups, self).get_groups(resources)
+        for idx, c in enumerate(clusters):
+            client.modify_cache_cluster(
+                ClusterIdentifier=c['ClusterIdentifier'],
+                VpcSecurityGroupIds=groups[idx])
+
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):

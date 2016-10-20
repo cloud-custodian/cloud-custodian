@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
@@ -605,6 +605,29 @@ class Snapshot(BaseAction):
                 Resources=[
                     response['SnapshotId']],
                 Tags=tags)
+                
+
+@actions.register('modify-groups')
+class EC2ModifyGroups(ModifyGroupsAction):
+    """Modify security groups on an instance."""
+
+    schema = type_schema(
+        'modify-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def process(self, instances):
+        if not len(instances):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        groups = super(EC2ModifyGroups, self).get_groups(resources)
+        for idx, i in enumerate(instances):
+            client.modify_instance_attribute(
+                InstanceId=i['InstanceId'],
+                Groups=groups[idx])
 
 
 # Valid EC2 Query Filters

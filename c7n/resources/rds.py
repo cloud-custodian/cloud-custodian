@@ -49,7 +49,7 @@ import re
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -502,3 +502,22 @@ class RDSSnapshotDelete(BaseAction):
             c.delete_db_snapshot(
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
 
+
+@actions.register('modify-groups')
+class RDSModifyGroups(ModifyGroupsAction):
+
+    schema = type_schema(
+        'modify-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        groups = super(RDSModifyGroups, self).get_groups(resources)
+        for idx, r in enumerate(resources):
+            client.modify_db_instance(
+                VpcSecurityGroupIds=db['NetworkInterfaceId'],
+                Groups=groups[idx])
+                
