@@ -29,6 +29,7 @@ from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -90,6 +91,24 @@ class LaunchConfigFilterBase(object):
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
 
+@filters.register('security-group')
+class SecurityGroupFilter(
+        net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = []
+        for asg in resources:
+            cfg = self.configs.get(asg['LaunchConfigurationName'])
+            group_ids.extend(cfg.get('SecurityGroups', ()))
+        return set(group_ids)
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(SecurityGroupFilter, self).process(asgs, event)
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes."""
@@ -122,6 +141,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
+        self.appelb_target_groups = self.get_appelb_target_groups()
         self.snapshots = self.get_snapshots()
         self.images = self.get_images()
 
@@ -144,6 +164,11 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         from c7n.resources.elb import ELB
         manager = ELB(self.manager.ctx, {})
         return set([e['LoadBalancerName'] for e in manager.resources()])
+
+    def get_appelb_target_groups(self):
+        from c7n.resources.appelb import AppELBTargetGroup
+        manager = AppELBTargetGroup(self.manager.ctx, {})
+        return set([a['TargetGroupArn'] for a in manager.resources()])
 
     def get_images(self):
         from c7n.resources.ami import AMI
@@ -185,6 +210,10 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         for elb in asg['LoadBalancerNames']:
             if elb not in self.elbs:
                 errors.append(('invalid-elb', elb))
+
+        for appelb_target_group in asg.get('TargetGroupARNs', []):
+            if appelb_target_group not in self.appelb_target_groups:
+                errors.append(('invalid-appelb-target-group', elb))
 
         cfg_id = asg.get(
             'LaunchConfigurationName', asg['AutoScalingGroupName'])
@@ -481,8 +510,8 @@ class Resize(BaseAction):
 
     schema = type_schema(
         'resize',
-        #min_size={'type': 'string'},
-        #max_size={'type': 'string'},
+        # min_size={'type': 'string'},
+        # max_size={'type': 'string'},
         desired_size={'type': 'string'},
         required=('desired_size',))
 
