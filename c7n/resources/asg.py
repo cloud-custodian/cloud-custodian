@@ -141,6 +141,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
+        self.appelb_target_groups = self.get_appelb_target_groups()
         self.snapshots = self.get_snapshots()
         self.images = self.get_images()
 
@@ -163,6 +164,11 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         from c7n.resources.elb import ELB
         manager = ELB(self.manager.ctx, {})
         return set([e['LoadBalancerName'] for e in manager.resources()])
+
+    def get_appelb_target_groups(self):
+        from c7n.resources.appelb import AppELBTargetGroup
+        manager = AppELBTargetGroup(self.manager.ctx, {})
+        return set([a['TargetGroupArn'] for a in manager.resources()])
 
     def get_images(self):
         from c7n.resources.ami import AMI
@@ -204,6 +210,10 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         for elb in asg['LoadBalancerNames']:
             if elb not in self.elbs:
                 errors.append(('invalid-elb', elb))
+
+        for appelb_target_group in asg.get('TargetGroupARNs', []):
+            if appelb_target_group not in self.appelb_target_groups:
+                errors.append(('invalid-appelb-target-group', elb))
 
         cfg_id = asg.get(
             'LaunchConfigurationName', asg['AutoScalingGroupName'])
@@ -500,8 +510,8 @@ class Resize(BaseAction):
 
     schema = type_schema(
         'resize',
-        #min_size={'type': 'string'},
-        #max_size={'type': 'string'},
+        # min_size={'type': 'string'},
+        # max_size={'type': 'string'},
         desired_size={'type': 'string'},
         required=('desired_size',))
 
