@@ -114,7 +114,7 @@ class ModifyGroupsAction(BaseAction):
     """
 
     schema = utils.type_schema(
-        'remove-groups',
+        'modify-groups',
         **{'groups': {'anyOf': [
             {'type': 'string', 'enum': ['matched', 'all']},
             {'type': 'array', 'items': {'type': 'string'}}]},
