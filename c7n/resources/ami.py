@@ -103,8 +103,8 @@ class ImageUnusedFilter(Filter):
         return results
 
     def process(self, resources, event=None):
-        inuse_amis = self._pull_ec2()
-        inuse_amis = self._pull_asgs(inuse_amis)
+        inuse_amis = self._pull_ec2_images()
+        inuse_amis = self._pull_asg_images(inuse_amis)
         results = []
         for r in resources:
             if self.data.get('value', True):
