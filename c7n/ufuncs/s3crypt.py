@@ -41,7 +41,7 @@ def process_key_event(event, context):
     processor = EncryptExtantKeys(config)
     for record in event.get('Records', []):
         bucket = record['s3']['bucket']['name']
-        key = {'Key': record['s3']['object']['key']}
+        key = {'Key': record['s3']['object']['key'], 'Size': record['s3']['object']['size']}
         version = record['s3']['object'].get('versionId')
         if version is not None:
             result = processor.process_version(s3, key, bucket)
