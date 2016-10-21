@@ -107,6 +107,9 @@ class BucketMetrics(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'custodian-skunk-trails')
+        self.assertTrue('c7n.metrics' in resources[0])
+        self.assertTrue(
+            'AWS/S3.NumberOfObjects.Average' in resources[0]['c7n.metrics'])
 
 
 class BucketDelete(BaseTest):

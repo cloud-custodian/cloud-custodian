@@ -258,6 +258,23 @@ class ValueFilter(Filter):
             set_annotation(i, ANNOTATION_KEY, self.k)
         return matched
 
+    def get_resource_value(self, k, i):
+        if k.startswith('tag:'):
+            tk = k.split(':', 1)[1]
+            r = None
+            for t in i.get("Tags", []):
+                if t.get('Key') == tk:
+                    r = t.get('Value')
+                    break
+        elif '.' not in k and '[' not in k and '(' not in k:
+            r = i.get(k)
+        elif self.expr:
+            r = self.expr.search(i)
+        else:
+            self.expr = jmespath.compile(self.k)
+            r = self.expr.search(i)
+        return r
+
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
@@ -274,21 +291,11 @@ class ValueFilter(Filter):
         if i is None:
             return False
 
-        # Value extract
-        if self.k.startswith('tag:'):
-            tk = self.k.split(':', 1)[1]
-            r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
-        elif '.' not in self.k and '[' not in self.k and '(' not in self.k:
-            r = i.get(self.k)
-        elif self.expr:
-            r = self.expr.search(i)
-        else:
-            self.expr = jmespath.compile(self.k)
-            r = self.expr.search(i)
+        # value extract
+        r = self.get_resource_value(self.k, i)
+
+        if self.op in ('in', 'not-in') and r is None:
+            r = ()
 
         # value type conversion
         if self.vtype is not None:

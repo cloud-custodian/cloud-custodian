@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ModifyGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
-
+import c7n.filters.vpc as net_filters
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -339,6 +339,17 @@ class IPPermissionEgress(SGPermission):
         'required': ['type']}
 
 
+@SecurityGroup.action_registry.register('delete')
+class Delete(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_security_group(GroupId=r['GroupId'])
+
+
 @SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermissions(BaseAction):
 
@@ -391,52 +402,19 @@ class NetworkInterface(QueryResourceManager):
 
 
 @NetworkInterface.filter_registry.register('subnet')
-class InterfaceSubnet(ValueFilter):
+class InterfaceSubnetFilter(net_filters.SubnetFilter):
 
-    schema = type_schema('subnet', rinherit=ValueFilter.schema)
-    annotate = False
-
-    def process(self, resources, event=None):
-        subnets = set([r['SubnetId'] for r in resources])
-        manager = Subnet(self.manager.ctx, {})
-        self.subnets = {s['SubnetId']: s for s
-                        in manager.get_resources(list(subnets))}
-        return super(InterfaceSubnet, self).process(resources, event)
-
-    def __call__(self, resource):
-        return self.match(self.subnets[resource['SubnetId']])
+    RelatedIdsExpression = "SubnetId"
 
 
-@NetworkInterface.filter_registry.register('group')
-class InterfaceGroup(ValueFilter):
+@NetworkInterface.filter_registry.register('security-group')
+class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    annotate = False
-    schema = type_schema('group', rinherit=ValueFilter.schema)
-
-    def process(self, resources, event=None):
-        groups = set()
-        for r in resources:
-            for g in r['Groups']:
-                groups.add(g['GroupId'])
-        manager = SecurityGroup(self.manager.ctx, {})
-        self.groups = {s['GroupId']: s for s
-                       in manager.resources()}
-        # todo, something odd here
-        #in manager.get_resources(sorted(list(groups)))}
-        return super(InterfaceGroup, self).process(resources, event)
-
-    def __call__(self, resource):
-        matched = []
-        for g in resource.get('Groups', ()):
-            if self.match(self.groups[g['GroupId']]):
-                matched.append(g['GroupId'])
-        if matched:
-            resource['MatchedSecurityGroups'] = matched
-            return True
+    RelatedIdsExpression = "Groups[].GroupId"
 
 
 @NetworkInterface.action_registry.register('remove-groups')
-class InterfaceRemoveGroups(BaseAction):
+class InterfaceRemoveGroups(ModifyGroupsAction):
     """Remove security groups from an interface.
 
     Can target either physical groups as a list of group ids or
@@ -456,35 +434,12 @@ class InterfaceRemoveGroups(BaseAction):
            'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
-        target_group_ids = self.data.get('groups', 'matched')
-        isolation_group = self.data.get('isolation-group')
-
         client = local_session(self.manager.session_factory).client('ec2')
-
-        for r in resources:
-            rgroups = [g['GroupId'] for g in r['Groups']]
-            if target_group_ids == 'matched':
-                group_ids = r.get('MatchedSecurityGroups', ())
-            elif target_group_ids == 'all':
-                group_ids = rgroups
-            elif isinstance(target_group_ids, list):
-                group_ids = target_group_ids
-            else:
-                continue
-
-            if not group_ids:
-                continue
-
-            for g in group_ids:
-                if g in rgroups:
-                    rgroups.remove(g)
-
-            if not rgroups:
-                rgroups.append(isolation_group)
-
+        groups = super(InterfaceRemoveGroups, self).get_groups(resources)
+        for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
-                Groups=rgroups)
+                Groups=groups[idx])
 
 
 @resources.register('route-table')
@@ -497,7 +452,10 @@ class RouteTable(QueryResourceManager):
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
-    resource_type = 'aws.ec2.vpc-peering-connection'
+    class resource_type(ResourceQuery.resolve(
+            'aws.ec2.vpc-peering-connection')):
+        enum_spec = ('describe_vpc_peering_connections',
+                     'VpcPeeringConnections', None)
 
 
 @resources.register('network-acl')

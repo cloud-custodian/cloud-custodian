@@ -14,6 +14,7 @@
 from botocore.exceptions import ClientError
 
 from c7n.filters import CrossAccountAccessFilter
+import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session
@@ -23,6 +24,18 @@ from c7n.utils import local_session
 class AWSLambda(QueryResourceManager):
 
     resource_type = "aws.lambda.function"
+
+
+@AWSLambda.filter_registry.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
+
+
+@AWSLambda.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
 @AWSLambda.filter_registry.register('cross-account')
