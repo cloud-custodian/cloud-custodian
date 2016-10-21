@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:233be197-7092-485c-bcc0-e7c5aa08d6a3:autoScalingGroupName/c7n-asg-test-01", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "c7n-asg-test-01", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "c7n-asg-test-01", 
+                        "Key": "Name"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "c7n-asg-test-01", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-0da984a9cc826ea48", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "c7n-asg-lcCopy"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "c7n-asg-lcCopy", 
+                "CreatedTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 41, 
+                    "microsecond": 967000, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 15
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ce00e01e-97b4-11e6-a933-ed462081f1a4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ce00e01e-97b4-11e6-a933-ed462081f1a4", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2237", 
+                "content-type": "text/xml", 
+                "date": "Fri, 21 Oct 2016 17:35:48 GMT"
+            }
+        }
+    }
+}

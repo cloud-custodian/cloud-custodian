@@ -29,3 +29,24 @@ class TestAMI(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_unused_ami_true(self):
+        factory = self.replay_flight_data('test_unused_ami_true')
+        p = self.load_policy({
+            'name': 'test-unused-ami',
+            'resource': 'ami',
+            'filters': ['unused']
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_unused_ami_false(self):
+        factory = self.replay_flight_data('test_unused_ami_false')
+        p = self.load_policy({
+            'name': 'test-unused-ami',
+            'resource': 'ami',
+            'filters': [{
+                'type': 'unused','value': False}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
