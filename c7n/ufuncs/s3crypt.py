@@ -44,6 +44,7 @@ def process_key_event(event, context):
         key = {'Key': record['s3']['object']['key']}
         version = record['s3']['object'].get('versionId')
         if version is not None:
+            key['Version'] = version
             result = processor.process_version(s3, key, bucket)
         else:
             result = processor.process_key(s3, key, bucket)
