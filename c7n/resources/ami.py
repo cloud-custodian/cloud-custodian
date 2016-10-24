@@ -87,8 +87,7 @@ class ImageUnusedFilter(Filter):
     def _pull_asg_images(self, results):
         asg_manager = ASG(self.manager.ctx, {})
         asgs = asg_manager.resources()
-        lcfgs = [a['LaunchConfigurationName'] for a in asgs
-                 if len(a['Instances']) > 0]
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
 
         lcfg_manager = LaunchConfig(self.manager.ctx, {})
         for lcfg in lcfg_manager.resources():
