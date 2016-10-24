@@ -475,6 +475,7 @@ class RDSSnapshot(QueryResourceManager):
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
+    
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
     
@@ -518,7 +519,6 @@ def _rds_snap_tags(
         snap['Tags'] = tag_list or []
         return snap
 
-    # Rds maintains a low api call limit, so this can take some time :-(
     with executor_factory(max_workers=1) as w:
         return list(w.map(process_tags, snaps))    
     
@@ -555,9 +555,6 @@ class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
         op={'enum': ['delete']})
 
     batch_size = 5
-
-    #def process(self, snaps):
-    #    return super(TagDelayedAction, self).process(snaps)
 
     def process_resource_set(self, snaps, ts):
         client = local_session(self.manager.session_factory).client('rds')
