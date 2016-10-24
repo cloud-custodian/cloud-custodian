@@ -266,8 +266,15 @@ class Time(Filter):
         rid = i[self.id_key]
         if self.parser.has_resource_schedule(value):
             schedule = self.parser.parse(value)
-        else:
+        elif self.parser.keys_are_valid(value):
+            # respect timezone from tag
+            raw_data = self.parser.raw_data(value)
+            if 'tz' in raw_data:
+                self.default_tz = raw_data['tz']
+                self.default_schedule = self.get_default_schedule()
             schedule = self.default_schedule
+        else:
+            schedule = None
 
         if schedule is None:
             log.warning(
@@ -418,6 +425,29 @@ class ScheduleParser(object):
         self.default_schedule = default_schedule
         self.cache = {}
 
+    @staticmethod
+    def raw_data(tag_value):
+        """convert the tag to a dictionary, taking values as is"""
+        data = {}
+
+        # parse components
+        pieces = tag_value.split(';')
+        for piece in pieces:
+            kv = piece.split('=')
+            # components must by key=value
+            if not len(kv) == 2:
+                continue
+            key, value = kv
+            data[key] = value
+        return data
+
+    def keys_are_valid(self, tag_value):
+        """test that provided tag keys are valid"""
+        for key in ScheduleParser.raw_data(tag_value):
+            if key not in ('on', 'off', 'tz'):
+                return False
+        return True
+
     def parse(self, tag_value):
         # check the cache
         if tag_value in self.cache:
@@ -425,6 +455,8 @@ class ScheduleParser(object):
 
         schedule = {}
 
+        if not self.keys_are_valid(tag_value):
+            return None
         # parse schedule components
         pieces = tag_value.split(';')
         for piece in pieces:
@@ -433,8 +465,6 @@ class ScheduleParser(object):
             if not len(kv) == 2:
                 return None
             key, value = kv
-            if key not in ('on', 'off', 'tz'):
-                return None
             if key != 'tz':
                 value = self.parse_resource_schedule(value)
             if value is None:
@@ -451,9 +481,8 @@ class ScheduleParser(object):
 
     @staticmethod
     def has_resource_schedule(tag_value):
-        if 'off=' in tag_value and 'on=' in tag_value:
-            return True
-        return False
+        raw_data = ScheduleParser.raw_data(tag_value)
+        return 'on' in raw_data and 'off' in raw_data
 
     def parse_resource_schedule(self, lexeme):
         parsed = []
