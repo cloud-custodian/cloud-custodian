@@ -474,8 +474,55 @@ class RDSSnapshot(QueryResourceManager):
 
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
+    filter_registry.register('marked-for-op', tags.TagActionFilter)
+    _generate_arn = _account_id = None
+    retry = staticmethod(get_retry(('Throttled',)))
+    
+    @property
+    def account_id(self):
+        if self._account_id is None:
+            session = local_session(self.session_factory)
+            self._account_id = get_account_id(session)
+        return self._account_id
 
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds', region=self.config.region,
+                account_id=self.account_id, resource_type='snapshot', separator=':')
+        return self._generate_arn
 
+    def augment(self, snaps):
+        filter(None, _rds_snap_tags(
+            self.get_model(),
+            snaps, self.session_factory, self.executor_factory,
+            self.generate_arn, self.retry))
+        return snaps
+    
+    
+def _rds_snap_tags(
+        model, snaps, session_factory, executor_factory, generator, retry):
+    """Augment rds snapshots with their respective tags."""
+
+    def process_tags(snap):
+        client = local_session(session_factory).client('rds')
+        arn = generator(snap[model.id])
+        tag_list = None
+        try:
+            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+        except ClientError as e:
+            if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
+                log.warning("Exception getting rds snapshot tags  \n %s", e)
+            return None
+        snap['Tags'] = tag_list or []
+        return snap
+
+    # Rds maintains a low api call limit, so this can take some time :-(
+    with executor_factory(max_workers=1) as w:
+        return list(w.map(process_tags, snaps))    
+    
+    
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
 
@@ -486,6 +533,55 @@ class RDSSnapshotAge(AgeFilter):
     date_attribute = 'SnapshotCreateTime'
 
 
+@RDSSnapshot.action_registry.register('tag')
+class RDSSnapshotTag(tags.Tag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, snaps, ts):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for snap in snaps:
+            arn = self.manager.generate_arn(snap['DBSnapshotIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+
+
+@RDSSnapshot.action_registry.register('mark-for-op')
+class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
+
+    schema = type_schema(
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema,
+        op={'enum': ['delete']})
+
+    batch_size = 5
+
+    #def process(self, snaps):
+    #    return super(TagDelayedAction, self).process(snaps)
+
+    def process_resource_set(self, snaps, ts):
+        client = local_session(self.manager.session_factory).client('rds')
+        for snap in snaps:
+            arn = self.manager.generate_arn(snap['DBSnapshotIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+
+
+@RDSSnapshot.action_registry.register('remove-tag')
+@RDSSnapshot.action_registry.register('unmark')
+class RDSSnapshotRemoveTag(tags.RemoveTag):
+
+    concurrency = 2
+    batch_size = 5
+
+    def process_resource_set(self, snaps, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for snap in snaps:
+            arn = self.manager.generate_arn(snap['DBSnapshotIdentifier'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
+            
+            
 @RDSSnapshot.action_registry.register('delete')
 class RDSSnapshotDelete(BaseAction):
 
