@@ -368,6 +368,25 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         
+    def test_rds_snapshot_tag(self):
+        factory = self.replay_flight_data('test_rds_snapshot_mark')
+        client = factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-snapshot-tag',
+            'resource': 'rds-snapshot',
+            'actions': [{'type': 'tag',
+                        'key': 'test-key',
+                        'value': 'test-value'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBSnapshotIdentifier'])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('test-key' in tag_map)
+        self.assertTrue('test-value' in tag_map['test-key'])
+                
     def test_rds_snapshot_mark(self):
         factory = self.replay_flight_data('test_rds_snapshot_mark')
         client = factory().client('rds')
