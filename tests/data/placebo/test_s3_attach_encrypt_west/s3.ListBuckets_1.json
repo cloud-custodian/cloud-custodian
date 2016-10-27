@@ -21,16 +21,16 @@
             }, 
             {
                 "CreationDate": {
-                    "hour": 22, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 10, 
-                    "second": 44, 
+                    "second": 3, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 26, 
-                    "minute": 56
+                    "day": 27, 
+                    "minute": 8
                 }, 
-                "Name": "c7n-attach-encrypt-test-east"
+                "Name": "c7n-attach-encrypt-test-west"
             }, 
             {
                 "CreationDate": {
@@ -83,32 +83,19 @@
                     "minute": 48
                 }, 
                 "Name": "ocampotest"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 32, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 25, 
-                    "minute": 8
-                }, 
-                "Name": "root-west-test-c7n"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "DQWY4F7NBO657DPLMThFfmrAmfk2e+5r5X1SbNDyZy3a8IXoasu5QWKTOyrlj7ENxmvqvUypJQY=", 
-            "RequestId": "DD6D04067F6468F5", 
+            "HostId": "ip8oqp4z4v8bWP0jMD/3QVDn2x39x8+tUHEExBRgOk5RACYu/U2Uqy9lsOd8ThgpcUH0JwBAiSY=", 
+            "RequestId": "5DAA18106496FA71", 
             "HTTPHeaders": {
-                "x-amz-id-2": "DQWY4F7NBO657DPLMThFfmrAmfk2e+5r5X1SbNDyZy3a8IXoasu5QWKTOyrlj7ENxmvqvUypJQY=", 
+                "x-amz-id-2": "ip8oqp4z4v8bWP0jMD/3QVDn2x39x8+tUHEExBRgOk5RACYu/U2Uqy9lsOd8ThgpcUH0JwBAiSY=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "DD6D04067F6468F5", 
-                "date": "Wed, 26 Oct 2016 22:56:44 GMT", 
+                "x-amz-request-id": "5DAA18106496FA71", 
+                "date": "Thu, 27 Oct 2016 17:03:35 GMT", 
                 "content-type": "application/xml"
             }
         }
