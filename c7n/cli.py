@@ -86,12 +86,26 @@ def setup_parser():
 
     validate = subs.add_parser('validate')
     validate.set_defaults(command=commands.validate)
-    validate.add_argument("-c", "--config", required=True,
-                          help="Policy Configuration File")
+    validate.add_argument(
+        "-c", "--config",
+        help="Policy Configuration File (old; use configs instead)"
+    )
+    validate.add_argument("configs", nargs='*',
+                          help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
                           help="Verbose Logging")
     validate.add_argument("--debug", action="store_true",
                           help="Dev Debug")
+
+    schema = subs.add_parser('schema')
+    schema.set_defaults(command=commands.schema)
+    schema.add_argument('--summarize', action="store_true",
+                        help="Summarize counts of available resources, \
+                              actions and filters")
+    schema.add_argument('--json', action="store_true",
+                        help="Switch output to JSON")
+    schema.add_argument("-v", "--verbose", action="store_true",
+                        help="Verbose Logging")
 
     #resources = subs.add_parser('resources')
     #resources.set_defaults(command=commands.resources)
