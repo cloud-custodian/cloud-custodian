@@ -3,7 +3,7 @@
     "data": {
         "Code": {
             "RepositoryType": "S3", 
-            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/644160558196/c7n-s3-encrypt-dd126a07-221b-4f67-b216-f0ae36407c61?X-Amz-Security-Token=FQoDYXdzEPH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDLj0WK0TKzZXHGIasyK3A%2Bm6emnjEybQvQiL4Y2Zeu61aMCTKCgNItdGKCTnfOZzDP70H8%2FPTKbI8ucVyWEWQ7Js5Zldutbyh1dkIYJud8%2F1K%2BRmimczGO6o7dKCK5CWGjPltctaydtDYNI%2FDWWpkdUaglPNF9tF6O6hd7WNDuriqiGQAAuwvwsFyoZMsFVGw2Nqa%2B8yoOi2SE0jHnjM80v0GIc13c5KRrWDUbep1NrE7Lq6JqGLMQJxfPXdCLQKcW0pQ2IpsnQgVLCC0pWVu8CRe1%2FDOJfnqfJYBN9Z2jyw689HvoXQY4p0urUnB93QClnqT7QHe844FYmYDnoEAD8JhqoEFzPWWHKUxTPo6Xeo7wS523B0LHQRcfI1ej4iwO46bo2rCT7hX4mWatE%2FFwF%2FA8onFqagMnW1zDVvM20nrrxnLpnb7Vv215nG3Ybw%2BiFBvg2GY9I%2FaM8LjQ8s6eWHHWTBLtfmiK%2FtNV5d3u6%2BuV3v4CbcBOCOyENs2f5%2FJpDICADaPUt%2BygwTqRl%2BycsWXAgc49rLRuuiciEG3GlIZYMOrRWTJieG5V5dwaZI1D7tdvPYoWjTOP8bjfMIbhlEBhHPdeQo78jIwAU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20161027T170335Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAIUM6YVSUO5OIK6GQ%2F20161027%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=8b08d698b490b17cb0f0e6c936d0527713b58b00314f4d34266b5cc4c8950dfb"
+            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/644160558196/c7n-s3-encrypt-dd126a07-221b-4f67-b216-f0ae36407c61?X-Amz-Security-Token=FQoDYXdzEBkaDJzpS7c0LRbvlI9Q4iK3A8Wk7VN4cJvReeaxxaXF6t5ZjV0au6gVFPcFqSPmiewRlZUFlWW%2FzcfPurToO8ruKAcdEWETY7L1Pc4xdTuCwYA4l5jHDOt%2Flx74sjvhGZcHR41Cqbiv9p%2B2touUERnwnDuD6in3uf13dIj%2F30k%2B8Eq61KmFJR%2BnV5LCPg12YU0qGvdeBh57qtQZlU6eWNL%2F8LxuSa5zJR73SmuIgVerMvafQR00xoJTGmJfk6luiKMSDsBmB%2BMgKhSMGialMMyJYiDfCI0rQp3N15PMmwqgJcSBJd6eXuSCrVjjZC78uFxDOF3uXIhb%2FkTMGQLrhZbCjr3K4%2FLyKqOzcdGP4nw4YO48TjLoQpiqNt5JRrqlPacUjhyq75RwYyIvFLP1QxNE9RpKroj6PM%2F6tcBzL2yM%2FVShLJ7pbTM0SHIpp%2BLhwBCi2pCL78TjDmEo6fbldtg3P105ea1m0ZysXPdyBzwktN7OMFm1HVre8WlAIus0usTxh2BHZc5GRgV3RnzpRTGhJIW21Zqy37u%2F61BD19hZopKtIWoP2IpZ8jPHrgWSEvXt9SEL%2BnR3EdHGtifO54lOSZFRvTWR9FEojfHNwAU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20161028T170049Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAJAYCFRGTU34K73EA%2F20161028%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=e112b22dc2f86fc1e4c769392bca84d0742e23c2aeac325c4115f69886a8803b"
         }, 
         "Configuration": {
             "Version": "$LATEST", 
@@ -22,11 +22,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "4c4c4536-9c67-11e6-8d77-772969024740", 
+            "RequestId": "13c02883-9d30-11e6-9966-9fc8f2ecbc80", 
             "HTTPHeaders": {
-                "date": "Thu, 27 Oct 2016 17:03:34 GMT", 
-                "x-amzn-requestid": "4c4c4536-9c67-11e6-8d77-772969024740", 
-                "content-length": "1703", 
+                "date": "Fri, 28 Oct 2016 17:00:49 GMT", 
+                "x-amzn-requestid": "13c02883-9d30-11e6-9966-9fc8f2ecbc80", 
+                "content-length": "1669", 
                 "content-type": "application/json", 
                 "connection": "keep-alive"
             }

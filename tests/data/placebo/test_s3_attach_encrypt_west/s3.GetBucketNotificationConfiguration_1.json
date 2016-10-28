@@ -13,13 +13,13 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "LSNdf37K3ZYAoBEOgQ11JLkt17EnjhccHmFhVNBbY20cYE2ICfQiyoGJejYXKh8Yq1VBdYgG67E=", 
-            "RequestId": "C0B033AF56EC34BF", 
+            "HostId": "ktg1en+u7QT3XwCoQGrB6NTpfL8RJUOi3PWWkyY3J+ImQwOn0G7fu7UosyDtRdFtOzC4tHgtp1U=", 
+            "RequestId": "C510CA0F074A9EA3", 
             "HTTPHeaders": {
-                "x-amz-id-2": "LSNdf37K3ZYAoBEOgQ11JLkt17EnjhccHmFhVNBbY20cYE2ICfQiyoGJejYXKh8Yq1VBdYgG67E=", 
-                "date": "Thu, 27 Oct 2016 17:03:37 GMT", 
+                "x-amz-id-2": "ktg1en+u7QT3XwCoQGrB6NTpfL8RJUOi3PWWkyY3J+ImQwOn0G7fu7UosyDtRdFtOzC4tHgtp1U=", 
+                "date": "Fri, 28 Oct 2016 17:00:53 GMT", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "C0B033AF56EC34BF", 
+                "x-amz-request-id": "C510CA0F074A9EA3", 
                 "server": "AmazonS3"
             }
         }
