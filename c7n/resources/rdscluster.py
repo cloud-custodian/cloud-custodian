@@ -18,6 +18,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
+import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
@@ -48,6 +49,12 @@ class RDSCluster(QueryResourceManager):
     resource_type = Meta
     filter_registry = filters
     action_registry = actions
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
 @actions.register('delete')

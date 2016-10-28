@@ -1,0 +1,93 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "VpcId": "vpc-4a9ff72e",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                "State": {
+                    "Code": "active"
+                },
+                "DNSName": "internal-alb-1-2087922814.us-west-2.elb.amazonaws.com",
+                "SecurityGroups": [
+                    "sg-ce548cb7"
+                ],
+                "LoadBalancerName": "alb-1",
+                "CreatedTime": {
+                    "hour": 14,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 51,
+                    "microsecond": 200000,
+                    "year": 2016,
+                    "day": 29,
+                    "minute": 43
+                },
+                "Scheme": "internal",
+                "Type": "application",
+                "CanonicalHostedZoneId": "Z1H1FL5HABSF5",
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-77b23a2f",
+                        "ZoneName": "us-west-2c"
+                    },
+                    {
+                        "SubnetId": "subnet-bfd682c9",
+                        "ZoneName": "us-west-2b"
+                    },
+                    {
+                        "SubnetId": "subnet-c99aa7ad",
+                        "ZoneName": "us-west-2a"
+                    }
+                ]
+            },
+            {
+                "VpcId": "vpc-47b2b823",
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb",
+                "State": {
+                    "Code": "active"
+                },
+                "DNSName": "internal-alb-2-1990881227.us-west-2.elb.amazonaws.com",
+                "SecurityGroups": [
+                    "sg-f9cc4d9f"
+                ],
+                "LoadBalancerName": "alb-2",
+                "CreatedTime": {
+                    "hour": 14,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 37,
+                    "microsecond": 750000,
+                    "year": 2016,
+                    "day": 29,
+                    "minute": 45
+                },
+                "Scheme": "internal",
+                "Type": "application",
+                "CanonicalHostedZoneId": "Z1H1FL5HABSF5",
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-15452171",
+                        "ZoneName": "us-west-2a"
+                    },
+                    {
+                        "SubnetId": "subnet-5fb47507",
+                        "ZoneName": "us-west-2c"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "de4574a5-8653-11e6-b76c-c5e64157571b",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "de4574a5-8653-11e6-b76c-c5e64157571b",
+                "vary": "Accept-Encoding",
+                "content-length": "2484",
+                "content-type": "text/xml",
+                "date": "Thu, 29 Sep 2016 14:49:04 GMT"
+            }
+        }
+    }
+}
