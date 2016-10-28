@@ -10,6 +10,10 @@
      :target: https://www.apache.org/licenses/LICENSE-2.0
      :alt: License
 
+.. image:: https://coveralls.io/repos/github/capitalone/cloud-custodian/badge.svg?branch=master
+     :target: https://coveralls.io/github/capitalone/cloud-custodian?branch=master
+     :alt: Coverage
+
 .. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
      :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
      :alt: Requirements Status
