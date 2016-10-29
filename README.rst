@@ -24,21 +24,21 @@ Cloud Custodian
 
 Cloud Custodian is a rules engine for AWS fleet management. It
 allows users to define policies to enable a well managed cloud infrastructure,
-that's both secure, and cost optimized. It consolidates many of the adhoc
+that's both secure and cost optimized. It consolidates many of the adhoc
 scripts organizations have into a lightweight and flexible tool, with unified
 metrics and reporting.
 
-Custodian can be used manage to AWS accounts by ensuring real time
+Custodian can be used to manage AWS accounts by ensuring real time
 compliance to security policies (like encryption and access requirements),
-tag policies and cost management via garbage collection of unused resources
-and off-hours resource management for examples.
+tag policies, and cost management via garbage collection of unused resources
+and off-hours resource management.
 
 Custodian policies are written in simple YAML configuration files that
-enable specify policies on a resource type (ec2, asg, redshift, etc)
+enable users to specify policies on a resource type (ec2, asg, redshift, etc) 
 and are constructed from a vocabulary of filters and actions.
 
 It integrates with lambda and cloudwatch events to provide for
-realtime enforcement of policies with builtin provisioning of the lambdas, or
+real time enforcement of policies with builtin provisioning of the lambdas, or
 as a simple cron job on a server to execute against large existing fleets.
 
 “Engineering the Next Generation of Cloud Governance” by @drewfirment
@@ -48,7 +48,7 @@ https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-clou
 Features
 ########
 
-- Comprehensive support for aws services and resources (~60), along with
+- Comprehensive support for AWS services and resources (~60), along with
   ~160 actions and ~180 filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
@@ -57,8 +57,8 @@ Features
 - Cloudwatch metrics outputs on resources that matched a policy
 - Structured outputs into s3 of which resources matched a policy.
 - Intelligent cache usage to minimize api calls.
-- Battle-tested, In production on against some very large aws accounts.
-- Supports cross account usage via STS role assumption.
+- Battle-tested - in production on some very large AWS accounts.
+- Supports cross-account usage via STS role assumption.
 - Supports integration with custom/user supplied lambdas as actions.
 
 Links
@@ -80,7 +80,7 @@ Quick Install
 Usage
 #####
 
-First a policy file needs to be created in yaml format, as an example::
+First a policy file needs to be created in YAML format, as an example::
 
   policies:
   - name: remediate-extant-keys
@@ -169,6 +169,6 @@ impact Your rights to use Your own Contributions for any other purpose
 Code of Conduct
 ###############
 
-This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_ By participating, you are
+This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_. By participating, you are
 expected to honor this code.
 
