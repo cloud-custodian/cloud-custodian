@@ -1,25 +1,16 @@
 {
     "status_code": 200, 
     "data": {
-        "LambdaFunctionConfigurations": [
-            {
-                "LambdaFunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt", 
-                "Id": "c7n-s3-encrypt", 
-                "Events": [
-                    "s3:ObjectCreated:*"
-                ]
-            }
-        ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "ktg1en+u7QT3XwCoQGrB6NTpfL8RJUOi3PWWkyY3J+ImQwOn0G7fu7UosyDtRdFtOzC4tHgtp1U=", 
-            "RequestId": "C510CA0F074A9EA3", 
+            "HostId": "TXF0PiBB1av4PU/JcQDkpy4s4P6vGhPPPS0WStNT72etcmSwts5U5yFE7+6+mV/OgXnDFK7NNKI=", 
+            "RequestId": "C62599EF7F53496A", 
             "HTTPHeaders": {
-                "x-amz-id-2": "ktg1en+u7QT3XwCoQGrB6NTpfL8RJUOi3PWWkyY3J+ImQwOn0G7fu7UosyDtRdFtOzC4tHgtp1U=", 
-                "date": "Fri, 28 Oct 2016 17:00:53 GMT", 
+                "x-amz-id-2": "TXF0PiBB1av4PU/JcQDkpy4s4P6vGhPPPS0WStNT72etcmSwts5U5yFE7+6+mV/OgXnDFK7NNKI=", 
+                "date": "Mon, 31 Oct 2016 18:13:27 GMT", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "C510CA0F074A9EA3", 
+                "x-amz-request-id": "C62599EF7F53496A", 
                 "server": "AmazonS3"
             }
         }

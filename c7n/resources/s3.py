@@ -429,16 +429,10 @@ class AttachLambdaEncrypt(BucketActionBase):
             None, self.data.get('role', self.manager.config.assume_role))
 
         # Publish function to all of our buckets regions
-        regions = []
-        client = local_session(self.manager.session_factory).client('s3')
-        for b in buckets:
-            region = client.get_bucket_location(
-                Bucket=b['Name']).get('LocationConstraint', 'us-east-1')
-
-            if not region in regions:
-                regions.append(region)
-
         region_funcs = {}
+        regions = set([
+            b['Location']['LocationConstraint'] for b in buckets])
+
         for r in regions:
             lambda_mgr = LambdaManager(
                 functools.partial(self.manager.session_factory, region=r))
@@ -449,14 +443,11 @@ class AttachLambdaEncrypt(BucketActionBase):
             results = []
             futures = []
             for b in buckets:
-                region = client.get_bucket_location(
-                    Bucket=b['Name']).get('LocationConstraint', 'us-east-1')
-
                 futures.append(
                     w.submit(
                         self.process_bucket,
-                        region_funcs[region],
-                        b, region))
+                        region_funcs[b['Location']['LocationConstraint']],
+                        b))
             for f in as_completed(futures):
                 if f.exception():
                     log.exception(
@@ -464,11 +455,13 @@ class AttachLambdaEncrypt(BucketActionBase):
                 results.append(f.result())
             return filter(None, results)
 
-    def process_bucket(self, f, b, r):
+    def process_bucket(self, f, b):
         from c7n.mu import BucketNotification
         source = BucketNotification(
             {},
-            functools.partial(self.manager.session_factory, region=r),
+            functools.partial(
+                self.manager.session_factory,
+                region=b['Location']['LocationConstraint']),
             b)
         return source.add(f)
 

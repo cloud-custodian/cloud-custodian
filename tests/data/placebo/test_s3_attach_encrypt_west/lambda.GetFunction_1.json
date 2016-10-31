@@ -1,35 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Code": {
-            "RepositoryType": "S3", 
-            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/644160558196/c7n-s3-encrypt-dd126a07-221b-4f67-b216-f0ae36407c61?X-Amz-Security-Token=FQoDYXdzEBkaDJzpS7c0LRbvlI9Q4iK3A8Wk7VN4cJvReeaxxaXF6t5ZjV0au6gVFPcFqSPmiewRlZUFlWW%2FzcfPurToO8ruKAcdEWETY7L1Pc4xdTuCwYA4l5jHDOt%2Flx74sjvhGZcHR41Cqbiv9p%2B2touUERnwnDuD6in3uf13dIj%2F30k%2B8Eq61KmFJR%2BnV5LCPg12YU0qGvdeBh57qtQZlU6eWNL%2F8LxuSa5zJR73SmuIgVerMvafQR00xoJTGmJfk6luiKMSDsBmB%2BMgKhSMGialMMyJYiDfCI0rQp3N15PMmwqgJcSBJd6eXuSCrVjjZC78uFxDOF3uXIhb%2FkTMGQLrhZbCjr3K4%2FLyKqOzcdGP4nw4YO48TjLoQpiqNt5JRrqlPacUjhyq75RwYyIvFLP1QxNE9RpKroj6PM%2F6tcBzL2yM%2FVShLJ7pbTM0SHIpp%2BLhwBCi2pCL78TjDmEo6fbldtg3P105ea1m0ZysXPdyBzwktN7OMFm1HVre8WlAIus0usTxh2BHZc5GRgV3RnzpRTGhJIW21Zqy37u%2F61BD19hZopKtIWoP2IpZ8jPHrgWSEvXt9SEL%2BnR3EdHGtifO54lOSZFRvTWR9FEojfHNwAU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20161028T170049Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAJAYCFRGTU34K73EA%2F20161028%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=e112b22dc2f86fc1e4c769392bca84d0742e23c2aeac325c4115f69886a8803b"
-        }, 
-        "Configuration": {
-            "Version": "$LATEST", 
-            "CodeSha256": "kEqiTdRoxswJY8XQIwxaXPFf5J33JbpKtCwVDlhO8S0=", 
-            "FunctionName": "c7n-s3-encrypt", 
-            "MemorySize": 256, 
-            "CodeSize": 947016, 
-            "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt", 
-            "Handler": "s3crypt.process_key_event", 
-            "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
-            "Timeout": 15, 
-            "LastModified": "2016-10-27T16:13:10.476+0000", 
-            "Runtime": "python2.7", 
-            "Description": "Custodian S3 Key Encrypt"
-        }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "13c02883-9d30-11e6-9966-9fc8f2ecbc80", 
+            "HTTPStatusCode": 404, 
+            "RequestId": "b6288107-9f95-11e6-bc7c-fb3cb864b1a4", 
             "HTTPHeaders": {
-                "date": "Fri, 28 Oct 2016 17:00:49 GMT", 
-                "x-amzn-requestid": "13c02883-9d30-11e6-9966-9fc8f2ecbc80", 
-                "content-length": "1669", 
+                "x-amzn-requestid": "b6288107-9f95-11e6-bc7c-fb3cb864b1a4", 
+                "content-length": "109", 
+                "connection": "keep-alive", 
+                "date": "Mon, 31 Oct 2016 18:13:23 GMT", 
                 "content-type": "application/json", 
-                "connection": "keep-alive"
+                "x-amzn-errortype": "ResourceNotFoundException"
             }
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt", 
+            "Code": "ResourceNotFoundException"
         }
     }
 }

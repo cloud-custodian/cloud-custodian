@@ -11,26 +11,26 @@
                     "hour": 17, 
                     "__class__": "datetime", 
                     "month": 10, 
-                    "second": 57, 
+                    "second": 0, 
                     "microsecond": 0, 
                     "year": 2016, 
                     "day": 31, 
-                    "minute": 40
+                    "minute": 25
                 }, 
-                "Name": "c7n-attach-encrypt-test-oregon"
+                "Name": "c7n-attach-encrypt-test-east"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "gs/xa/91wrPMXZNeTaVARiM5RIkVissasyKH+bvXKEpsi+p9rtWNJLd9S67Ejedw9HNvP44/Yeg=", 
-            "RequestId": "5E0D5DB3DBEEB7F9", 
+            "HostId": "2vWUEn2XsOF0jywp4DSErFv0fZDbfi7RzYuRapRh02XYvXX4kVrAM1w10L2hrbOAtVhevDtE3rk=", 
+            "RequestId": "BC72EF2AFCC6F54D", 
             "HTTPHeaders": {
-                "x-amz-id-2": "gs/xa/91wrPMXZNeTaVARiM5RIkVissasyKH+bvXKEpsi+p9rtWNJLd9S67Ejedw9HNvP44/Yeg=", 
+                "x-amz-id-2": "2vWUEn2XsOF0jywp4DSErFv0fZDbfi7RzYuRapRh02XYvXX4kVrAM1w10L2hrbOAtVhevDtE3rk=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "5E0D5DB3DBEEB7F9", 
-                "date": "Mon, 31 Oct 2016 18:13:23 GMT", 
+                "x-amz-request-id": "BC72EF2AFCC6F54D", 
+                "date": "Mon, 31 Oct 2016 17:25:00 GMT", 
                 "content-type": "application/xml"
             }
         }
