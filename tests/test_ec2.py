@@ -205,6 +205,26 @@ class TestResizeInstance(BaseTest):
             list(sorted(['m4.large', 'm4.2xlarge', 'm4.2xlarge'])))
 
 
+class TestStateTransitionAgeFilter(BaseTest):
+
+    def test_ec2_state_transition_age(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_state_transition_age_filter'
+        )
+        policy = self.load_policy({
+            'name': 'ec2-state-transition-age',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'type': 'state-age',
+                 'days': 30}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        #compare stateTransition reason to expected
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['StateTransitionReason'], 'User initiated (2015-11-25 10:11:55 GMT)')
+
+
 class TestImageAgeFilter(BaseTest):
 
     def test_ec2_image_age(self):
