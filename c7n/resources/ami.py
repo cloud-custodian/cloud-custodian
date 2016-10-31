@@ -84,36 +84,22 @@ class ImageUnusedFilter(Filter):
 
     schema = type_schema('unused', value={'type': 'boolean'})
 
-    def _pull_asg_images(self, results):
+    def _pull_asg_images(self):
         asg_manager = ASG(self.manager.ctx, {})
         asgs = asg_manager.resources()
         lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
 
-        lcfg_manager = LaunchConfig(self.manager.ctx, {})
-        for lcfg in lcfg_manager.resources():
-            if lcfg['LaunchConfigurationName'] in lcfgs:
-                results.update(lcfg['ImageId'])
-        return results
+        lcfg_mgr = LaunchConfig(self.manager.ctx, {})
+        return set([
+            lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
+            if lcfg['LaunchConfigurationName'] in lcfgs])
 
     def _pull_ec2_images(self):
         ec2_manager = EC2(self.manager.ctx, {})
-        results = set()
-        results.update([i['ImageId'] for i in ec2_manager.resources()])
-        return results
+        return set([i['ImageId'] for i in ec2_manager.resources()])
 
     def process(self, resources, event=None):
-        inuse_amis = self._pull_ec2_images()
-        inuse_amis = self._pull_asg_images(inuse_amis)
-        results = []
-        for r in resources:
-            if self.data.get('value', True):
-                if r['ImageId'] not in inuse_amis:
-                    if r['ImageId'] not in results:
-                        results.append(r)
-            else:
-                if r['ImageId'] in inuse_amis:
-                    if r['ImageId'] not in results:
-                        results.append(r)
-        return results
-
-
+        images = self._pull_ec2_images().union(self._pull_asg_images())
+        if self.data.get('value', True):
+            return [r for r in resources if r['ImageId'] not in images]
+        return [r for r in resources if r['ImageId'] in images]
