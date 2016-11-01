@@ -58,7 +58,8 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import chunks, local_session, set_annotation, type_schema, dumps
+from c7n.utils import (
+    chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
 """
 TODO:
@@ -119,6 +120,8 @@ S3_AUGMENT_TABLE = (
 
 def assemble_bucket(item):
     """Assemble a document representing all the config state around a bucket.
+
+    TODO: Refactor this, the logic here feels quite muddled.
     """
     factory, b = item
     s = factory()
@@ -158,8 +161,11 @@ def assemble_bucket(item):
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
             # Location == region for all cases but EU per https://goo.gl/iXdpnl
-            if b_location == 'EU':
+            if b_location is None:
+                b_location = "us-east-1"
+            elif b_location == 'EU':
                 b_location = "eu-west-1"
+                v['LocationConstraint'] = 'eu-west-1'
             if v and v != c_location:
                 c = s.client('s3', region_name=b_location)
             elif c_location != location:
@@ -425,16 +431,30 @@ class AttachLambdaEncrypt(BucketActionBase):
     def process(self, buckets):
         from c7n.mu import LambdaManager
         from c7n.ufuncs.s3crypt import get_function
+
+        session = local_session(self.manager.session_factory)
+        account_id = get_account_id(session)
+
         func = get_function(
-            None, self.data.get('role', self.manager.config.assume_role))
+            None, self.data.get('role', self.manager.config.assume_role),
+            account_id=account_id)
+
+        regions = set([
+            b.get('Location', {
+                'LocationConstraint': 'us-east-1'})['LocationConstraint']
+            for b in buckets])
+
+        # session managers by region
+        region_sessions = {}
+        for r in regions:
+            region_sessions[r] = functools.partial(
+                self.manager.session_factory, region=r)
 
         # Publish function to all of our buckets regions
         region_funcs = {}
-        regions = set([
-            b.get('LocationConstraint', 'us-east-1') for b in buckets])
+
         for r in regions:
-            lambda_mgr = LambdaManager(
-                functools.partial(self.manager.session_factory, region=r))
+            lambda_mgr = LambdaManager(region_sessions[r])
             lambda_mgr.publish(func)
             region_funcs[r] = func
 
@@ -442,11 +462,17 @@ class AttachLambdaEncrypt(BucketActionBase):
             results = []
             futures = []
             for b in buckets:
+                region = b.get('Location', {
+                    'LocationConstraint': 'us-east-1'}).get(
+                        'LocationConstraint')
                 futures.append(
                     w.submit(
                         self.process_bucket,
-                        region_funcs[b.get('LocationConstraint', 'us-east-1')],
-                        b))
+                        region_funcs[region],
+                        b,
+                        account_id,
+                        region_sessions[region]
+                    ))
             for f in as_completed(futures):
                 if f.exception():
                     log.exception(
@@ -454,10 +480,11 @@ class AttachLambdaEncrypt(BucketActionBase):
                 results.append(f.result())
             return filter(None, results)
 
-    def process_bucket(self, f, b):
+    def process_bucket(self, func, bucket, account_id, session_factory):
         from c7n.mu import BucketNotification
-        source = BucketNotification({}, self.manager.session_factory, b)
-        return source.add(f)
+        source = BucketNotification(
+            {'account_s3': account_id}, session_factory, bucket)
+        return source.add(func)
 
 
 @actions.register('encryption-policy')
