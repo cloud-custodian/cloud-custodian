@@ -50,7 +50,7 @@ class SnapshotAge(AgeFilter):
         days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()})
     date_attribute = 'StartTime'
-    
+
 
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
@@ -63,30 +63,30 @@ def _filter_ami_snapshots(self, snapshots):
     for i in amis:
         for dev in i.get('BlockDeviceMappings'):
             if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                ami_snaps.append(dev['Ebs']['SnapshotId'])            
+                ami_snaps.append(dev['Ebs']['SnapshotId'])
     matches = []
     for snap in snapshots:
         if snap['SnapshotId'] not in ami_snaps:
             matches.append(snap)
     return matches
-        
+
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    
+
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
-    
+
     def validate(self):
         if self.data.get('skip-ami-snapshots', not True or False):
             raise FilterValidationError(
                 "invalid config: expected boolean value")
         return self
-    
+
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
         return resources
-    
-    
+
+
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
 
@@ -101,8 +101,9 @@ class SnapshotDelete(BaseAction):
         pre = len(snapshots)
         snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
         post = len(snapshots)
-        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots" %(post, pre-post))
-        
+        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
+                 post, pre-post)
+
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):

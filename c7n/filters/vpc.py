@@ -37,7 +37,7 @@ class SubnetFilter(RelatedResourceFilter):
         operator={'enum': ['and', 'or']})
 
     RelatedResource = "c7n.resources.vpc.Subnet"
-    AnnotationKey = "matched-subnets"    
+    AnnotationKey = "matched-subnets"
 
 
 class DefaultVpcBase(Filter):
@@ -52,8 +52,6 @@ class DefaultVpcBase(Filter):
             vpcs = [v['VpcId'] for v
                     in client.describe_vpcs(VpcIds=[vpc_id])['Vpcs']
                     if v['IsDefault']]
-            if not vpcs:
-                self.default_vpc = ""
-            else:
+            if vpcs:
                 self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False
