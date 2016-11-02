@@ -83,7 +83,10 @@ class SecurityGroupTest(BaseTest):
             'filters': ['used']
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
+        self.assertEqual(
+            set(['sg-f9cc4d9f', 'sg-13de8f75', 'sg-ce548cb7']),
+            set([r['GroupId'] for r in resources]))
 
     def test_unused(self):
         factory = self.replay_flight_data(
