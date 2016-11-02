@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Sid\":\"c7n-attach-encrypt-test-oregon\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:s3:::c7n-attach-encrypt-test-oregon\"}}}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "b846cd85-9f95-11e6-a00b-0fcbc75a85e8", 
+            "HTTPHeaders": {
+                "date": "Mon, 31 Oct 2016 18:13:26 GMT", 
+                "x-amzn-requestid": "b846cd85-9f95-11e6-a00b-0fcbc75a85e8", 
+                "content-length": "344", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

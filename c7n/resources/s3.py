@@ -431,7 +431,8 @@ class AttachLambdaEncrypt(BucketActionBase):
         # Publish function to all of our buckets regions
         region_funcs = {}
         regions = set([
-            b.get('LocationConstraint', 'us-east-1') for b in buckets])
+            b['Location']['LocationConstraint'] for b in buckets])
+
         for r in regions:
             lambda_mgr = LambdaManager(
                 functools.partial(self.manager.session_factory, region=r))
@@ -445,7 +446,7 @@ class AttachLambdaEncrypt(BucketActionBase):
                 futures.append(
                     w.submit(
                         self.process_bucket,
-                        region_funcs[b.get('LocationConstraint', 'us-east-1')],
+                        region_funcs[b['Location']['LocationConstraint']],
                         b))
             for f in as_completed(futures):
                 if f.exception():
@@ -456,7 +457,12 @@ class AttachLambdaEncrypt(BucketActionBase):
 
     def process_bucket(self, f, b):
         from c7n.mu import BucketNotification
-        source = BucketNotification({}, self.manager.session_factory, b)
+        source = BucketNotification(
+            {},
+            functools.partial(
+                self.manager.session_factory,
+                region=b['Location']['LocationConstraint']),
+            b)
         return source.add(f)
 
 

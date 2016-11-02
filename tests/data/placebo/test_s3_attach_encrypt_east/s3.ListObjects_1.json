@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "c7n-attach-encrypt-test-east", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "VUiidy4YqoQTLNhuQpTgi+mHuF9ndc8j8Ljrs5Z2qUb85T0memZTR7W1lwEuF+i+", 
+            "RequestId": "4CEADA378A4E18A9", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "VUiidy4YqoQTLNhuQpTgi+mHuF9ndc8j8Ljrs5Z2qUb85T0memZTR7W1lwEuF+i+", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "4CEADA378A4E18A9", 
+                "date": "Mon, 31 Oct 2016 17:25:04 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

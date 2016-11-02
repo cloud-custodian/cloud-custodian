@@ -580,11 +580,12 @@ class S3Test(BaseTest):
                  u'Sid': u'RequireEncryptedPutObject'}],
              u'Version': u'2012-10-17'})
 
-    def test_attach_encrypt(self):
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_attach_encrypt')
-        bname = "custodian-attach-encrypt-test"
-        role = 'arn:aws:iam::619193117841:role/lambda_s3_exec_role'
+    def test_attach_encrypt_east(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_location', 'Location', None, None)])
+        session_factory = self.replay_flight_data('test_s3_attach_encrypt_east')
+        bname = "c7n-attach-encrypt-test-east"
+        role = 'arn:aws:iam::644160558196:role/lambda_basic_execution'
         self.maxDiff = None
         session = session_factory()
         client = session.client('s3')
@@ -595,16 +596,15 @@ class S3Test(BaseTest):
             'name': 'attach-encrypt',
             'resource': 's3',
             'filters': [{'Name': bname}],
-            'actions': [{
-                'type': 'attach-encrypt',
-                'role': role}]
-            }, session_factory=session_factory)
+            'actions': [
+                {'type': 'attach-encrypt', 'role': role},
+            ]}, session_factory=session_factory)
 
         self.addCleanup(
             LambdaManager(session_factory).remove,
             s3crypt.get_function(None, role))
 
-        resources = p.run()
+        p.run()
         notifications = client.get_bucket_notification_configuration(
             Bucket=bname)
         notifications.pop('ResponseMetadata')
@@ -612,13 +612,37 @@ class S3Test(BaseTest):
             notifications,
             {'LambdaFunctionConfigurations': [{
                 'Events': ['s3:ObjectCreated:*'],
-                'Id': 'custodian-s3-encrypt',
-                'LambdaFunctionArn': 'arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt'}]})
-        client.put_object(
-            Bucket=bname, Key='hello-world.txt',
-            Body='hello world', ContentType='text/plain')
-        info = client.head_object(Bucket=bname, Key='hello-world.txt')
-        self.assertTrue('ServerSideEncryption' in info)
+                'Id': 'c7n-s3-encrypt',
+                'LambdaFunctionArn': 'arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt'}]})
+
+    def test_attach_encrypt_west(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_location', 'Location', None, None)])
+        session_factory = self.replay_flight_data('test_s3_attach_encrypt_west')
+        bname = "c7n-attach-encrypt-test-oregon"
+        role = 'arn:aws:iam::644160558196:role/lambda_basic_execution'
+        self.maxDiff = None
+        session = session_factory()
+        client = session.client('s3')
+
+        p = self.load_policy({
+            'name': 'attach-encrypt',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [
+                {'type': 'attach-encrypt', 'role': role},
+            ]}, session_factory=session_factory)
+
+        p.run()
+        notifications = client.get_bucket_notification_configuration(
+            Bucket=bname)
+        notifications.pop('ResponseMetadata')
+        self.assertEqual(
+            notifications,
+            {'LambdaFunctionConfigurations': [{
+                'Events': ['s3:ObjectCreated:*'],
+                'Id': 'c7n-s3-encrypt',
+                'LambdaFunctionArn': 'arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt'}]})
 
     def test_encrypt_versioned_bucket(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
