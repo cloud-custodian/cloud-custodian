@@ -863,9 +863,11 @@ class BucketNotification(object):
             StatementId=self.bucket['Name'],
             Action='lambda:InvokeFunction',
             Principal='s3.amazonaws.com')
-        if not self.data.get('account_s3'):
-            params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
-
+        if self.data.get('account_s3'):
+            params['SourceAccount'] = self.data['account_s3']
+            params['SourceArn'] = 'arn:aws:s3:::*'
+        else:
+            params['SourceArn'] = 'arn:aws:s3:::%' % self.bucket['Name']
         try:
             lambda_client.add_permission(**params)
         except ClientError as e:

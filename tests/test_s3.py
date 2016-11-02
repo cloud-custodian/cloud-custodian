@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import functools
 import json
 import shutil
 import tempfile
@@ -581,14 +582,19 @@ class S3Test(BaseTest):
              u'Version': u'2012-10-17'})
 
     def test_attach_encrypt(self):
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        self.patch(s3, 'S3_AUGMENT_TABLE',
+                   [('get_bucket_location', 'Location', None, None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_s3_attach_encrypt')
         bname = "custodian-attach-encrypt-test"
-        role = 'arn:aws:iam::619193117841:role/lambda_s3_exec_role'
+        role = "arn:aws:iam::644160558196:role/custodian-mu"
         self.maxDiff = None
-        session = session_factory()
+        session = session_factory(region='us-west-2')
         client = session.client('s3')
-        client.create_bucket(Bucket=bname)
+        client.create_bucket(
+            Bucket=bname,
+            CreateBucketConfiguration={
+                'LocationConstraint': 'us-west-2'})
         self.addCleanup(destroyBucket, client, bname)
 
         p = self.load_policy({
@@ -601,10 +607,12 @@ class S3Test(BaseTest):
             }, session_factory=session_factory)
 
         self.addCleanup(
-            LambdaManager(session_factory).remove,
+            LambdaManager(functools.partial(session_factory, region='us-west-2')).remove,
             s3crypt.get_function(None, role))
 
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
         notifications = client.get_bucket_notification_configuration(
             Bucket=bname)
         notifications.pop('ResponseMetadata')
@@ -612,11 +620,12 @@ class S3Test(BaseTest):
             notifications,
             {'LambdaFunctionConfigurations': [{
                 'Events': ['s3:ObjectCreated:*'],
-                'Id': 'custodian-s3-encrypt',
-                'LambdaFunctionArn': 'arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt'}]})
+                'Id': 'c7n-s3-encrypt',
+                'LambdaFunctionArn': 'arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt'}]})
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
+        #time.sleep(30)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
