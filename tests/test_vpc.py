@@ -154,7 +154,7 @@ class SecurityGroupTest(BaseTest):
                 client.delete_security_group(GroupId=sg_id)
             except Exception:
                 pass
-            
+
         self.addCleanup(delete_sg)
 
         p = self.load_policy({
@@ -173,7 +173,7 @@ class SecurityGroupTest(BaseTest):
             pass
         else:
             self.fail("group not deleted")
-    
+
     def test_port_within_range(self):
         factory = self.replay_flight_data(
             'test_security_group_port_in_range')

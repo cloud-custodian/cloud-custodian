@@ -62,6 +62,8 @@ class SecurityGroup(QueryResourceManager):
 
     class resource_type(ResourceQuery.resolve('aws.ec2.security-group')):
         config_type = "AWS::EC2::SecurityGroup"
+        filter_name = "GroupIds"
+        name = "GroupId"
 
 
 class SGUsage(Filter):

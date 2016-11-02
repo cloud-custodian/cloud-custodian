@@ -37,7 +37,7 @@ class SubnetFilter(RelatedResourceFilter):
         operator={'enum': ['and', 'or']})
 
     RelatedResource = "c7n.resources.vpc.Subnet"
-    AnnotationKey = "matched-subnets"    
+    AnnotationKey = "matched-subnets"
 
 
 class DefaultVpcBase(Filter):
