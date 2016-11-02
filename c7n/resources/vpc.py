@@ -177,7 +177,7 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used
             and 'VpcId' in r]
-        unused = set(self.filter_peered_refs(unused))
+        unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
         return [r for r in resources if r['GroupId'] not in unused]
 
 
