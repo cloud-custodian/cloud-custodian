@@ -188,6 +188,9 @@ class FSOutput(LogOutput):
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 
+    def use_s3(self):
+        raise NotImplementedError()
+
 
 class DirectoryOutput(FSOutput):
 
@@ -201,6 +204,9 @@ class DirectoryOutput(FSOutput):
 
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)
+
+    def use_s3(self):
+        return False
 
 
 class S3Output(FSOutput):
@@ -259,6 +265,10 @@ class S3Output(FSOutput):
                     os.path.join(root, f), self.bucket, key,
                     extra_args={
                         'ServerSideEncryption': 'AES256'})
+
+    def use_s3(self):
+        return True
+
 
 s3_join = S3Output.join
 
