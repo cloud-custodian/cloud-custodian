@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name="c7n_salactus",
+    name="c7n_mailer",
     version='0.1',
-    description="Cloud Custodian - Salactus S3",
+    description="Cloud Custodian - Reference Mailer",
     classifiers=[
       "Topic :: System :: Systems Administration",
       "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
-    py_modules=['salactus'],
+    find_packages('c7n_mailer'),
     entry_points={
         'console_scripts': [
-            'c7n-salactus = salactus:main']},
-    install_requires=["c7n"],
+            'c7n-mailer = c7n_mailer.cli:main']},
+    install_requires=["Jinja2", "boto3", "jsonschema"],
 )
 
