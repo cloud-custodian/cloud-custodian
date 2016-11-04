@@ -11,23 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from cStringIO import StringIO
+import json
 
-from setuptools import setup
 
-setup(
-    name="c7n_salactus",
-    version='0.1',
-    description="Cloud Custodian - Salactus S3",
-    classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
-    ],
-    url="https://github.com/capitalone/cloud-custodian",
-    license="Apache-2.0",
-    py_modules=['salactus'],
-    entry_points={
-        'console_scripts': [
-            'c7n-salactus = salactus:main']},
-    install_requires=["c7n"],
-)
+def format_struct(struct):
+    io = StringIO()
+    json.dump(struct, io, indent=2)
+    return io.getvalue()
+
+
+def setup_defaults(config):
+    config.setdefault('region', 'us-east-1')
+    config.setdefault('from_address', 'custodan@example.com')
+    config.setdefault('memory', 1024)
+    config.setdefault('timeout', 300)
 
