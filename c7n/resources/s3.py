@@ -200,8 +200,12 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-        client.put_bucket_tagging(
-            Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+        try:
+            client.put_bucket_tagging(
+                Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+        except ClientError as e:
+            log.exception('Exception tagging bucket %s: %s' %(bucket['Name'], e))
+            continue
 
 
 @filters.register('metrics')
