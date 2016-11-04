@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import json
 
-from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from operator import itemgetter
 
 from c7n.actions import ActionRegistry, BaseAction
+from botocore.exceptions import ClientError
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -36,7 +38,6 @@ class RDSCluster(QueryResourceManager):
     """
 
     class Meta(object):
-
         service = 'rds'
         type = 'rds-cluster'
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
@@ -59,7 +60,6 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
 @actions.register('delete')
 class Delete(BaseAction):
-
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'},
                      'delete-instances': {'type': 'boolean'}})
@@ -79,22 +79,6 @@ class Delete(BaseAction):
                         'Deleted RDS instance: %s',
                         instance['DBInstanceIdentifier'])
 
-            params = {'DBClusterIdentifier': cluster['DBClusterIdentifier']}
-            if skip:
-                params['SkipFinalSnapshot'] = True
-            else:
-                params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
-                    'Final', cluster['DBClusterIdentifier'])
-            try:
-                client.delete_db_cluster(**params)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'InvalidDBClusterStateFault':
-                    self.log.info(
-                        'RDS cluster in invalid state: %s',
-                        cluster['DBClusterIdentifier'])
-                    continue
-                raise
-
             self.log.info(
                 'Deleted RDS cluster: %s',
                 cluster['DBClusterIdentifier'])
@@ -102,7 +86,6 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-
     date_attribute = "BackupRetentionPeriod"
     # Tag copy not yet available for Aurora:
     #   https://forums.aws.amazon.com/thread.jspa?threadID=225812
@@ -144,7 +127,6 @@ class RetentionWindow(BaseAction):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-
     schema = type_schema('snapshot')
 
     def process(self, clusters):
@@ -176,7 +158,6 @@ class RDSClusterSnapshot(QueryResourceManager):
     """
 
     class Meta(object):
-
         service = 'rds'
         type = 'rds-cluster-snapshot'
         enum_spec = (
@@ -195,7 +176,6 @@ class RDSClusterSnapshot(QueryResourceManager):
 
 @RDSClusterSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
-
     schema = type_schema(
         'age', days={'type': 'number'},
         op={'type': 'string', 'enum': OPERATORS.keys()})
@@ -205,7 +185,6 @@ class RDSSnapshotAge(AgeFilter):
 
 @RDSClusterSnapshot.action_registry.register('delete')
 class RDSClusterSnapshotDelete(BaseAction):
-
     def process(self, snapshots):
         log.info("Deleting %d RDS cluster snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
@@ -223,5 +202,145 @@ class RDSClusterSnapshotDelete(BaseAction):
     def process_snapshot_set(self, snapshots_set):
         c = local_session(self.manager.session_factory).client('rds')
         for s in snapshots_set:
-            c.delete_db_cluster_snapshot(
-                DBClusterSnapshotIdentifier=s['DBClusterSnapshotIdentifier'])
+            try:
+                c.delete_db_cluster_snapshot(
+                    DBClusterSnapshotIdentifier=s['DBClusterSnapshotIdentifier'])
+            except ClientError as e:
+                raise
+
+
+@RDSClusterSnapshot.action_registry.register('restore')
+class RDSClusterSnapshotRestore(BaseAction):
+    schema = type_schema(
+        'restore', vpc_sec_groups={'type': 'array'}, port={'type': 'number'}, db_subnet_group_name={'type': 'string'},
+        snapshot_identifier={'type': 'string'})
+
+    def process(self, resources):
+
+        vpc_sec_groups = self.data.get('vpc-security-groups')
+        port = self.data.get('port')
+        db_subnet_group_name = self.data.get('db-security-group-name')
+        snapshot_id = self.data.get('snapshot-identifier');
+
+        for latest_snapshot in self.get_latest_snapshot(resources):
+            client = local_session(self.manager.session_factory).client('rds')
+
+            if vpc_sec_groups is None:
+                self.log_default_value('vpc_sec_group')
+            elif db_subnet_group_name is None:
+                self.log_default_value('db_subnet_group_name')
+            elif port is None:
+                self.log_default_value('port')
+            else:
+                log.info('USING PARAMS PROVIDED IN POLICY')
+
+            log.debug('USING SNAPSHOT FOR CLUSTER::', latest_snapshot['DBClusterIdentifier'])
+            log.debug('USING SNAPSHOT::', latest_snapshot['DBClusterSnapshotIdentifier'])
+
+            params = {'DBClusterIdentifier': latest_snapshot['DBClusterIdentifier'],
+                      'SnapshotIdentifier': latest_snapshot['DBClusterSnapshotIdentifier'],
+                      'Engine': latest_snapshot['Engine'],
+                      'Port': port,
+                      'VpcSecurityGroupIds': vpc_sec_groups,
+                      'DBSubnetGroupName': db_subnet_group_name
+                      }
+
+            if snapshot_id:
+                params['SnapshotIdentifier'] = snapshot_id
+
+            try:
+                client.restore_db_cluster_from_snapshot(**params)
+                self.create_db_instances_within_cluster(latest_snapshot)
+            except ClientError as e:
+                raise
+
+    """
+      Right now im only returning the first value returned by the cli. I sort them from bottom to top then append the top
+      value to the array then return the array.  I am setting this function up to handle an array of different
+      cluster's snapshot, but for right now I just want to get the single cluster restore working then Ill focus on
+      creating multiple rds cluster instances that have same values within an array in the policy.
+    """
+    @staticmethod
+    def get_latest_snapshot(snapshots):
+
+        x = []
+        prev_obj = None
+
+        for snapshot in snapshots:
+
+            curr_obj = snapshot
+
+            if prev_obj is None:
+                prev_obj = curr_obj
+                x.append(curr_obj)
+
+            if curr_obj['DBClusterIdentifier'] == prev_obj['DBClusterIdentifier']:
+                prev_obj = curr_obj
+            else:
+                x.append(curr_obj)
+                prev_obj = curr_obj
+
+        return x
+
+    def create_db_instances_within_cluster(self, snapshot):
+
+        db_instances = self.data.get('db-instances') or {}
+        num_of_instances = db_instances.get('number', 1)
+        db_identifier = db_instances.get('identifier', self.get_default_identifier(snapshot['DBClusterIdentifier']))
+        db_size = db_instances.get('size', 'db.r3.large')
+        id_suffix = db_instances.get('id-suffix', 'dev')
+
+        if db_identifier is None:
+            raise ClientError('MUST PROVIDE A db_identifier IN YOUR POLICY: Please delete cluster before trying again')
+        if db_size is None:
+            self.log_default_value('size:: default size is :: %s , which is minimum size', db_size)
+        if num_of_instances is None:
+            self.log_default_value('number:: number of db instances which is: %s', num_of_instances)
+
+        for instance in range(0, num_of_instances):
+
+            if instance == 0:
+                new_db_identifier = db_identifier + '-' + id_suffix
+            else:
+                new_db_identifier = db_identifier + '-' + id_suffix + '-' + str(instance)
+
+            params = {'DBClusterIdentifier': snapshot['DBClusterIdentifier'],
+                      'Engine': snapshot['Engine'],
+                      'DBInstanceClass': db_size,
+                      'DBInstanceIdentifier': new_db_identifier,
+                      }
+
+            client = local_session(self.manager.session_factory).client('rds')
+
+            try:
+                client.create_db_instance(**params)
+            except ClientError as e:
+                self.delete_cluster_on_failure(snapshot['DBClusterIdentifier'])
+
+                raise
+
+    """
+    TODO: Need to delete cluster when failure on database instance creation.  Wondering how I can call the Delete class
+    from within this function
+    """
+    def delete_cluster_on_failure(self, cluster):
+        action = Delete({'skip-snapshot': False, 'delete-instances': True}, manager(self.manager.ctx, {}))
+
+        RDSCluster()
+
+
+    @staticmethod
+    def get_default_identifier(cluster_identifier):
+        split_cluster_id = cluster_identifier.split('-')
+
+        length = len(split_cluster_id)
+        name = split_cluster_id[0:length - 2]
+        name = '-'.join(name)
+
+        return name
+
+    @staticmethod
+    def log_default_value(policy_type):
+        log.info('USING DEFAULT VALUE FOR: %s', policy_type)
+
+class APIUtils:

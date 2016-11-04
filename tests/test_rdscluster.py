@@ -16,6 +16,8 @@ from common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rdscluster
 
+import json
+
 
 class RDSClusterTest(BaseTest):
 
@@ -145,3 +147,47 @@ class RDSClusterSnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class RDSClusterSnapshotRestore(BaseTest):
+
+    data = []
+
+    def test_get_latest_snapshot(self):
+        with open('./tests/data/placebo/test_rdscluster_snapshot_restore/rds.DescribeDBClusterSnapshots_1.json', 'r') as f:
+            data = json.load(f)
+
+        latest_snapshot = rdscluster.RDSClusterSnapshotRestore.get_latest_snapshot(data['data']['DBClusterSnapshots'])
+
+        self.assertEqual(len(latest_snapshot), 1)
+        print latest_snapshot[0]
+        self.assertEqual(latest_snapshot[0]['SnapshotCreateTime']['month'], 9)
+
+    def test_rdscluster_snapshot_restore_filter(self):
+        session_factory = self.replay_flight_data('test_rdscluster_snapshot_restore')
+        p = self.load_policy({
+            'name': 'rds-cluster-snapshot',
+            'resource': 'rds-cluster-snapshot',
+            'filters': [{'type': 'value', 'key': 'DBClusterIdentifier', 'value': 'test-restore-qa-cluster', 'op': 'in'
+                         }]
+        },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_rdscluster_snapshot_restore(self):
+        session_factory = self.replay_flight_data('test_rdscluster_snapshot_restore')
+        p = self.load_policy({
+            'name': 'rds-cluster-snapshot',
+            'resource': 'rds-cluster-snapshot',
+            'filters': [{'type': 'value', 'key': 'DBClusterIdentifier', 'value': 'test-restore-qa-cluster'}],
+            'actions': [{'type': 'restore', 'vpc-security-groups': ['testsecgrp'], 'port': 3999,
+                         'db-security-group-name': 'test sec group name', 'db-instances': {'identifier': 'testrestore',
+                                                                                           'post-fix': 'qa',
+                                                                                           'number': 2,
+                                                                                           'size': 'db.r3.large'}
+                         }]
+        },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

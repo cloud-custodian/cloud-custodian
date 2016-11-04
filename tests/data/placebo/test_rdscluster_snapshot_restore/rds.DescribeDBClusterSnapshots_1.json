@@ -1,0 +1,132 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshots": [
+            {
+                "Engine": "aurora",
+                "SnapshotCreateTime": {
+                    "hour": 11,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 35,
+                    "microsecond": 118000,
+                    "year": 2016,
+                    "day": 16,
+                    "minute": 6
+                },
+                "VpcId": "vpc-1",
+                "DBClusterIdentifier": "test-restore-qa-cluster",
+                "MasterUsername": "root",
+                "LicenseModel": "aurora",
+                "Status": "available",
+                "PercentProgress": 100,
+                "DBClusterSnapshotIdentifier": "test-restore-qa-cluster-final-snapshot1-latest",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+                "ClusterCreateTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 866000,
+                    "year": 2016,
+                    "day": 19,
+                    "minute": 38
+                },
+                "StorageEncrypted": true,
+                "AllocatedStorage": 1,
+                "SnapshotType": "manual",
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1e"
+                ],
+                "Port": 0
+            },
+            {
+                "Engine": "aurora",
+                "SnapshotCreateTime": {
+                    "hour": 11,
+                    "__class__": "datetime",
+                    "month": 7,
+                    "second": 35,
+                    "microsecond": 118000,
+                    "year": 2016,
+                    "day": 19,
+                    "minute": 6
+                },
+                "VpcId": "vpc-1",
+                "DBClusterIdentifier": "test-restore-qa-cluster",
+                "MasterUsername": "root",
+                "LicenseModel": "aurora",
+                "Status": "available",
+                "PercentProgress": 100,
+                "DBClusterSnapshotIdentifier": "test-restore-qa-cluster-final-snapshot1",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+                "ClusterCreateTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 52,
+                    "microsecond": 866000,
+                    "year": 2016,
+                    "day": 12,
+                    "minute": 38
+                },
+                "StorageEncrypted": true,
+                "AllocatedStorage": 1,
+                "SnapshotType": "manual",
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1e"
+                ],
+                "Port": 0
+            },
+            {
+                "Engine": "aurora",
+                "SnapshotCreateTime": {
+                    "hour": 11,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 35,
+                    "microsecond": 118000,
+                    "year": 2016,
+                    "day": 19,
+                    "minute": 6
+                },
+                "VpcId": "vpc-1",
+                "DBClusterIdentifier": "test-restore-qa-cluster",
+                "MasterUsername": "root",
+                "LicenseModel": "aurora",
+                "Status": "available",
+                "PercentProgress": 100,
+                "DBClusterSnapshotIdentifier": "test-restore-qa-cluster-final-snapshot1",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
+                "ClusterCreateTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 12,
+                    "second": 52,
+                    "microsecond": 866000,
+                    "year": 2015,
+                    "day": 19,
+                    "minute": 38
+                },
+                "StorageEncrypted": true,
+                "AllocatedStorage": 1,
+                "SnapshotType": "manual",
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1e"
+                ],
+                "Port": 0
+            }
+
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "ea909505-55a4-11e6-8ef5-b3205bcebfaa"
+        }
+    }
+}
