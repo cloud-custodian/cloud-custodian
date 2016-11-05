@@ -591,7 +591,7 @@ class EncryptInstanceVolumes(BaseAction):
 @actions.register('delete')
 class Delete(BaseAction):
 
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, volumes):
         with self.executor_factory(max_workers=3) as w:
@@ -599,7 +599,12 @@ class Delete(BaseAction):
 
     def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
+
         try:
+            force_delete = self.data.get('force', False)
+            if force_delete and volume['Attachments'] != None and len(volume['Attachments']) > 0 and volume['Attachments'][0] != None:
+                client.detach_volume(InstanceId=volume['Attachments'][0], VolumeId=volume['VolumeId'])
+
             self._run_api(
                 client.delete_volume,
                 VolumeId=volume['VolumeId'],
