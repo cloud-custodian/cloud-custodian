@@ -35,7 +35,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
-    local_session, query_instances, type_schema, chunks, get_retry)
+    local_session, query_instances, type_schema, chunks, get_retry, worker)
 
 log = logging.getLogger('custodian.asg')
 
@@ -211,9 +211,9 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if elb not in self.elbs:
                 errors.append(('invalid-elb', elb))
 
-        for appelb_target_group in asg.get('TargetGroupARNs', []):
-            if appelb_target_group not in self.appelb_target_groups:
-                errors.append(('invalid-appelb-target-group', elb))
+        for appelb_target in asg.get('TargetGroupARNs', []):
+            if appelb_target not in self.appelb_target_groups:
+                errors.append(('invalid-appelb-target-group', appelb_target))
 
         cfg_id = asg.get(
             'LaunchConfigurationName', asg['AutoScalingGroupName'])
@@ -946,9 +946,10 @@ class Delete(BaseAction):
     schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, asgs):
-        with self.executor_factory(max_workers=5) as w:
+        with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 
+    @worker
     def process_asg(self, asg):
         force_delete = self.data.get('force', False)
         if force_delete:
@@ -995,14 +996,7 @@ class UnusedLaunchConfig(Filter):
     schema = type_schema('unused')
 
     def process(self, configs, event=None):
-        asgs = self.manager._cache.get(
-            {'region': self.manager.config.region,
-             'resource': 'asg'})
-        if asgs is None:
-            self.log.debug(
-                "Querying asgs to determine unused launch configs")
-            asg_manager = ASG(self.manager.ctx, {})
-            asgs = asg_manager.resources()
+        asgs = ASG(self.manager.ctx, {}).resources()
         self.used = set([
             a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
             for a in asgs])
@@ -1021,6 +1015,7 @@ class LaunchConfigDelete(BaseAction):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_config, configs))
 
+    @worker
     def process_config(self, config):
         session = local_session(self.manager.session_factory)
         client = session.client('autoscaling')
@@ -1032,3 +1027,4 @@ class LaunchConfigDelete(BaseAction):
             # Catch already deleted
             if e.response['Error']['Code'] == 'ValidationError':
                 return
+            raise
