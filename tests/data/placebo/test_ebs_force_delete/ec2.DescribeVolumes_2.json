@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b0d421bf-3a81-487e-88b3-5b662f4ae236", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 05 Nov 2016 18:26:14 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2a", 
+                "Attachments": [], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-d0790258", 
+                "State": "available", 
+                "Iops": 126, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 41, 
+                    "microsecond": 26000, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 24
+                }, 
+                "Size": 42
+            }
+        ]
+    }
+}
