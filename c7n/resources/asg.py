@@ -97,16 +97,29 @@ class SecurityGroupFilter(
 
     RelatedIdsExpression = ""
 
-    def get_related_ids(self, resources):
-        group_ids = []
-        for asg in resources:
+    def get_related_ids(self, asgs):
+        group_ids = set()
+        for asg in asgs:
             cfg = self.configs.get(asg['LaunchConfigurationName'])
-            group_ids.extend(cfg.get('SecurityGroups', ()))
-        return set(group_ids)
+            group_ids.update(cfg.get('SecurityGroups', ()))
+        return group_ids
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
         return super(SecurityGroupFilter, self).process(asgs, event)
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, asgs):
+        subnet_ids = set()
+        for asg in asgs:
+            subnet_ids.update(
+                [sid.strip() for sid in asg.get('VPCZoneIdentifier', '').split(',')])
+        return subnet_ids
 
 
 @filters.register('launch-config')

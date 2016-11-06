@@ -22,8 +22,8 @@ class SecurityGroupFilter(RelatedResourceFilter):
 
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
-        match_resource={'type': 'boolean'},
-        operator={'enum': ['and', 'or']})
+        **{'match-resource':{'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
 
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
     AnnotationKey = "matched-security-groups"
@@ -33,8 +33,8 @@ class SubnetFilter(RelatedResourceFilter):
 
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
-        match_resource={'type': 'boolean'},
-        operator={'enum': ['and', 'or']})
+        **{'match-resource':{'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
 
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"

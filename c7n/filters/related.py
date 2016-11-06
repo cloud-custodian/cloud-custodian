@@ -71,7 +71,6 @@ class RelatedResourceFilter(ValueFilter):
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
-
                 self.log.warning(
                     "Resource %s:%s references non existant %s: %s",
                     model.type,
