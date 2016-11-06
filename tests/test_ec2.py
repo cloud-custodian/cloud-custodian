@@ -242,6 +242,23 @@ class TestImageAgeFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestImageFilter(BaseTest):
+
+    def test_ec2_image(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_image_filter')
+        policy = self.load_policy({
+            'name': 'ec2-image',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'image', 'key': 'Public', 'value': True}
+                ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-039628786cabe8c16')
+
+
 class TestInstanceAge(BaseTest):
 
     # placebo doesn't record tz information

@@ -16,7 +16,48 @@ import boto3
 from common import BaseTest
 
 
+class LaunchConfigTest(BaseTest):
+
+    def test_config_unused(self):
+        factory = self.replay_flight_data('test_launch_config_unused')
+        p = self.load_policy({
+            'name': 'unused-cfg',
+            'resource': 'launch-config',
+            'filters': [{'type': 'unused'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchConfigurationName'],
+                         'CloudClusterCopy')
+
+    def test_config_delete(self):
+        factory = self.replay_flight_data('test_launch_config_delete')
+        p = self.load_policy({
+            'name': 'delete-cfg',
+            'resource': 'launch-config',
+            'filters': [{
+                'LaunchConfigurationName': 'CloudClusterCopy'}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchConfigurationName'],
+                         'CloudClusterCopy')
+        
+
 class AutoScalingTest(BaseTest):
+
+    def test_asg_delete(self):
+        factory = self.replay_flight_data('test_asg_delete')
+        p = self.load_policy({
+            'name': 'asg-delete',
+            'resource': 'asg',
+            'filters': [
+                {'AutoScalingGroupName': 'ContainersFTW'}],
+            'actions': [{'type': 'delete', 'force': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')
 
     def test_asg_non_encrypted_filter(self):
         factory = self.replay_flight_data('test_asg_non_encrypted_filter')
@@ -240,3 +281,17 @@ class AutoScalingTest(BaseTest):
         s = set([x[0] for x in resources[0]['Invalid']])
         self.assertTrue('invalid-subnet' in s)
         self.assertTrue('invalid-security-group' in s)
+
+    def test_asg_security_group(self):
+        factory = self.replay_flight_data('test_asg_security_group')
+        p = self.load_policy({
+            'name': 'asg-sg',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'GroupName',
+                 'value': 'default'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')

@@ -264,10 +264,10 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
-        return map(self, resources)
+        return super(InstanceImage, self).process(resources, event)
 
     def __call__(self, i):
-        image = self.image_map.get(i['InstanceId'])
+        image = self.image_map.get(i['ImageId'])
         if not image:
             self.log.warning(
                 "Could not locate image for instance:%s ami:%s" % (
@@ -275,6 +275,7 @@ class InstanceImage(ValueFilter, InstanceImageBase):
             # Match instead on empty skeleton?
             return False
         return self.match(image)
+                
 
 
 @filters.register('offhour')

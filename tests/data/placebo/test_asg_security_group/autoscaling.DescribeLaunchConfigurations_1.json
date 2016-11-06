@@ -1,0 +1,65 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "CloudCustodianRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-2:644160558196:launchConfiguration:b1eeb7b7-02a3-4ea7-b940-fc197b1b193d:launchConfigurationName/CloudCluster", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 1, 
+                    "microsecond": 648000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 43
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "NoDevice": true
+                    }, 
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "NoDevice": true
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-aa6c90c3"
+                ], 
+                "LaunchConfigurationName": "CloudCluster", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-153e6470", 
+                "InstanceType": "t2.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "09ba9475-a420-11e6-bbf6-71678cb8398a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "09ba9475-a420-11e6-bbf6-71678cb8398a", 
+                "date": "Sun, 06 Nov 2016 12:53:38 GMT", 
+                "content-length": "1812", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

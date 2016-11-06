@@ -417,8 +417,6 @@ class AgeFilter(Filter):
                 n = datetime.now()
             self.threshold_date = n - timedelta(days)
 
-        print self.threshold_date
-        print v
         return op(self.threshold_date, v)
 
 
