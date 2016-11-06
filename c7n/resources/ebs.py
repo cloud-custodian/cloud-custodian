@@ -25,7 +25,8 @@ from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import (
-    local_session, set_annotation, query_instances, chunks, type_schema)
+    local_session, set_annotation, query_instances, chunks,
+    type_schema, worker)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
@@ -116,6 +117,7 @@ class SnapshotDelete(BaseAction):
                             f.exception()))
         return snapshots
 
+    @worker
     def process_snapshot_set(self, snapshots_set):
         c = local_session(self.manager.session_factory).client('ec2')
         for s in snapshots_set:
@@ -162,6 +164,7 @@ class CopySnapshot(BaseAction):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
+    @worker
     def process_resource_set(self, resource_set):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
@@ -287,6 +290,7 @@ class CopyInstanceTags(BaseAction):
             instance_vol_map.setdefault(
                 v['Attachments'][0]['InstanceId'], []).append(v)
 
+        # TODO switch out to instance cache query
         instance_map = {i['InstanceId']: i for i in query_instances(
             local_session(self.manager.session_factory),
             InstanceIds=instance_vol_map.keys())}
@@ -301,7 +305,6 @@ class CopyInstanceTags(BaseAction):
 
     def process_instance_volumes(self, instance, volumes):
         client = local_session(self.manager.session_factory).client('ec2')
-
         for v in volumes:
             copy_tags = self.get_volume_tags(v, instance, v['Attachments'][0])
             if not copy_tags:
@@ -314,7 +317,6 @@ class CopyInstanceTags(BaseAction):
                         self.__class__.__name__.lower(),
                         v['VolumeId'], instance['InstanceId']))
                 continue
-
             try:
                 self.manager.retry(
                     client.create_tags,
@@ -590,8 +592,13 @@ class EncryptInstanceVolumes(BaseAction):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Delete an ebs volume.
 
-    schema = type_schema('delete')
+    If the force boolean is true, we will detach an attached volume
+    from an instance. Note this cannot be done for running instance
+    root volumes.
+    """
+    schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, volumes):
         with self.executor_factory(max_workers=3) as w:
@@ -600,10 +607,12 @@ class Delete(BaseAction):
     def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
         try:
-            self._run_api(
-                client.delete_volume,
-                VolumeId=volume['VolumeId'],
-                DryRun=self.manager.config.dryrun)
+            if self.data.get('force') and len(volume['Attachments']):
+                client.detach_volume(VolumeId=volume['VolumeId'], Force=True)
+                waiter = client.get_waiter('volume_available')
+                waiter.wait(VolumeIds=[volume['VolumeId']])
+            self.manager.retry(
+                client.delete_volume, VolumeId=volume['VolumeId'])
         except ClientError as e:
             if e.response['Error']['Code'] == "InvalidVolume.NotFound":
                 return

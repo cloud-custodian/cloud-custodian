@@ -532,24 +532,21 @@ class Terminate(BaseAction, StateTransitionFilter):
             self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
-            self._run_api(
+            self.manager.retry(
                 client.terminate_instances,
-                InstanceIds=[i['InstanceId'] for i in instances],
-                DryRun=self.manager.config.dryrun)
+                InstanceIds=[i['InstanceId'] for i in instances])
 
     def disable_deletion_protection(self, instances):
-
         @utils.worker
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
             try:
-                self._run_api(
+                self.manager.retry(
                     client.modify_instance_attribute,
                     InstanceId=i['InstanceId'],
                     Attribute='disableApiTermination',
-                    Value='false',
-                    DryRun=self.manager.config.dryrun)
+                    Value='false')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     return

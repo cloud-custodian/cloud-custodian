@@ -1,0 +1,97 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d9731213-ebad-47c6-b2ae-512b92c12c90", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 05 Nov 2016 18:25:57 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2a", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 10, 
+                            "second": 0, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 29, 
+                            "minute": 46
+                        }, 
+                        "InstanceId": "i-017cf4e2a33b853fe", 
+                        "VolumeId": "vol-e99af061", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/xvda"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-e99af061", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-c87f35ec", 
+                "CreateTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 0, 
+                    "microsecond": 294000, 
+                    "year": 2016, 
+                    "day": 29, 
+                    "minute": 46
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2a", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 18, 
+                            "__class__": "datetime", 
+                            "month": 11, 
+                            "second": 1, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 5, 
+                            "minute": 25
+                        }, 
+                        "InstanceId": "i-017cf4e2a33b853fe", 
+                        "VolumeId": "vol-d0790258", 
+                        "State": "attached", 
+                        "DeleteOnTermination": false, 
+                        "Device": "/dev/sdf"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-d0790258", 
+                "State": "in-use", 
+                "Iops": 126, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 41, 
+                    "microsecond": 26000, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 24
+                }, 
+                "Size": 42
+            }
+        ]
+    }
+}

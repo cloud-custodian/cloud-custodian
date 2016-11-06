@@ -13,9 +13,11 @@
 # limitations under the License.
 import logging
 
+from botocore.exceptions import ClientError
+
 from .common import BaseTest
 from c7n.resources.ebs import (
-    CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot)
+    CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot, Delete)
 from c7n.executor import MainThreadExecutor
 
 
@@ -146,6 +148,30 @@ class CopyInstanceTagsTest(BaseTest):
         self.assertEqual(tags['Name'], 'CompileLambda')
 
 
+class VolumeDeleteTest(BaseTest):
+
+    def test_volume_delete_force(self):
+        self.patch(Delete, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_ebs_force_delete')
+        policy = self.load_policy({
+            'name': 'test-ebs',
+            'resource': 'ebs',
+            'filters': [{'VolumeId': 'vol-d0790258'}],
+            'actions': [
+                {'type': 'delete', 'force': True}]},
+            session_factory=factory)
+        resources = policy.run()
+
+        try:
+            results = factory().client('ec2').describe_volumes(
+                VolumeIds=[resources[0]['VolumeId']])
+        except ClientError as e:
+            self.assertEqual(
+                e.response['Error']['Code'], 'InvalidVolume.NotFound')
+        else:
+            self.fail("Volume still exists")
+
+
 class EncryptExtantVolumesTest(BaseTest):
 
     def test_encrypt_volumes(self):
@@ -170,6 +196,7 @@ class EncryptExtantVolumesTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['Encrypted'], False)
+
 
 class TestKmsAlias(BaseTest):
 
