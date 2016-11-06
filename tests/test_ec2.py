@@ -245,7 +245,7 @@ class TestImageAgeFilter(BaseTest):
 class TestInstanceAge(BaseTest):
 
     # placebo doesn't record tz information
-    def xtest_ec2_instance_age(self):
+    def test_ec2_instance_age(self):
         session_factory = self.replay_flight_data(
             'test_ec2_instance_age_filter')
         policy = self.load_policy({
@@ -254,7 +254,7 @@ class TestInstanceAge(BaseTest):
             'filters': [
                 {'State.Name': 'running'},
                 {'type': 'instance-age',
-                 'days': 10}]},
+                 'days': 0}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
