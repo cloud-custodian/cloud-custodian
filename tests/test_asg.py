@@ -42,7 +42,7 @@ class LaunchConfigTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LaunchConfigurationName'],
                          'CloudClusterCopy')
-        
+
 
 class AutoScalingTest(BaseTest):
 
@@ -281,6 +281,40 @@ class AutoScalingTest(BaseTest):
         s = set([x[0] for x in resources[0]['Invalid']])
         self.assertTrue('invalid-subnet' in s)
         self.assertTrue('invalid-security-group' in s)
+
+    def test_asg_subnet(self):
+        factory = self.replay_flight_data('test_asg_subnet')
+        p = self.load_policy({
+            'name': 'asg-sub',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'subnet',
+                 'match-resource': True,
+                 'key': 'tag:NetworkLocation',
+                 'value': ''}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n.matched-subnets']),
+            sorted(['subnet-65dbce1d', 'subnet-b77a4ffd', 'subnet-db9f62b2']))
+
+    def test_asg_security_group_not_matched(self):
+        factory = self.replay_flight_data(
+            'test_asg_security_group_not_matched')
+        p = self.load_policy({
+            'name': 'asg-sg',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'tag:NetworkLocation',
+                 'op': 'not-equal',
+                 'value': ''}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n.matched-security-groups'], ['sg-aa6c90c3'])
 
     def test_asg_security_group(self):
         factory = self.replay_flight_data('test_asg_security_group')
