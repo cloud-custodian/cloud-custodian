@@ -45,7 +45,6 @@ Find rds instances that are not encrypted
 import functools
 import logging
 import re
-import operator
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
@@ -145,8 +144,10 @@ def _db_instance_eligible_for_backup(resource):
             "DB instance %s is not in available state",
             db_instance_id)
         return False
-    # The specified DB Instance is a member of a cluster and its backup retention should not be modified directly.
-    #   Instead, modify the backup retention of the cluster using the ModifyDbCluster API
+    # The specified DB Instance is a member of a cluster and its
+    #   backup retention should not be modified directly.  Instead,
+    #   modify the backup retention of the cluster using the
+    #   ModifyDbCluster API
     if resource.get('DBClusterIdentifier', ''):
         log.debug(
             "DB instance %s is a cluster member",
@@ -582,7 +583,8 @@ class RDSSnapshot(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot', separator=':')
+                account_id=self.account_id, resource_type='snapshot',
+                separator=':')
         return self._generate_arn
 
     def augment(self, snaps):
@@ -602,7 +604,8 @@ def _rds_snap_tags(
         arn = generator(snap[model.id])
         tag_list = None
         try:
-            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+            tag_list = retry(
+                client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
                 log.warning("Exception getting rds snapshot tags  \n %s", e)
@@ -692,4 +695,20 @@ class RDSSnapshotDelete(BaseAction):
         for s in snapshots_set:
             c.delete_db_snapshot(
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+
+
+@resources.register('rds-subnet-group')
+class RDSSubnetGroup(QueryResourceManager):
+    """RDS subnet group."""
+
+    class resource_type(object):
+        service = 'rds'
+        type = 'rds-subnet-group'
+        id = name = 'DBSubnetGroupName'
+        enum_spec = (
+            'describe_db_subnet_groups', 'DBSubnetGroups', None)
+        filter_name = 'DBSubnetGroupName'
+        filter_type = 'scalar'
+        dimension = None
+        date = None
 

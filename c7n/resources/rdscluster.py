@@ -57,6 +57,26 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['DBSubnetGroup']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        from c7n.resources.rds import RDSSubnetGroup
+        self.groups = {r['DBSubnetGroupName']: r for r in
+                       RDSSubnetGroup(self.manager.ctx, {}).resources()}
+        return super(SubnetFilter, self).process(resources, event)
+
+
 @actions.register('delete')
 class Delete(BaseAction):
 

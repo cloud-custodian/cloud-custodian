@@ -82,8 +82,23 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
-# TODO: Subnet Filter, need to deref cluster security group to components, and
-# then filter by cluster zone to get relevant subnets
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['ClusterSubnetGroupName']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        self.groups = {r['ClusterSubnetGroupName']: r for r in
+                       RedshiftSubnetGroup(self.manager.ctx, {}).resources()}
+        return super(SubnetFilter, self).process(resources, event)
 
 
 @filters.register('param')
@@ -158,7 +173,8 @@ class Delete(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidClusterState":
                     self.log.warning(
-                        "Cannot delete cluster when not in 'Available' state: %s" %db['ClusterIdentifier'])
+                        "Cannot delete cluster when not 'Available' state: %s",
+                        db['ClusterIdentifier'])
                     continue
                 raise
 
@@ -279,6 +295,22 @@ class TagTrim(tags.TagTrim):
         client.delete_tags(ResourceName=arn, TagKeys=candidates)
 
 
+@resources.register('redshift-subnet-group')
+class RedshiftSubnetGroup(QueryResourceManager):
+    """Redshift subnet group."""
+
+    class resource_type(object):
+        service = 'redshift'
+        type = 'redshift-subnet-group'
+        id = name = 'ClusterSubnetGroupName'
+        enum_spec = (
+            'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
+        filter_name = 'ClusterSubnetGroupName'
+        filter_type = 'scalar'
+        dimension = None
+        date = None
+
+
 @resources.register('redshift-snapshot')
 class RedshiftSnapshot(QueryResourceManager):
     """Resource manager for Redshift snapshots.
@@ -307,7 +339,7 @@ class RedshiftSnapshot(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'redshift'
         type = 'redshift-snapshot'
@@ -318,7 +350,6 @@ class RedshiftSnapshot(QueryResourceManager):
         dimension = None
         date = 'SnapshotCreateTime'
 
-    resource_type = Meta
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):
@@ -353,7 +384,8 @@ class RedshiftSnapshotDelete(BaseAction):
             c.delete_cluster_snapshot(
                 SnapshotIdentifier=s['SnapshotIdentifier'],
                 SnapshotClusterIdentifier=s['ClusterIdentifier'])
-            
+
+
 @RedshiftSnapshot.action_registry.register('mark-for-op')
 class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
 
@@ -362,7 +394,8 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
+            arn = self.manager.generate_arn(
+                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
             client.create_tags(ResourceName=arn, Tags=tags)
 
 
@@ -377,6 +410,7 @@ class RedshiftSnapshotTag(tags.Tag):
         for r in resources:
             arn = self.manager.generate_arn(r['SnapshotIdentifer'])
             client.create_tags(ResourceName=arn, Tags=tags)
+
 
 @RedshiftSnapshot.action_registry.register('unmark')
 @RedshiftSnapshot.action_registry.register('remove-tag')
