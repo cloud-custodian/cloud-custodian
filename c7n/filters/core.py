@@ -403,14 +403,20 @@ class AgeFilter(Filter):
         return v
 
     def __call__(self, i):
-        if not self.threshold_date:
-            days = self.data.get('days', 60)
-            n = datetime.now(tz=tzutc())
-            self.threshold_date = n - timedelta(days)
         v = self.get_resource_date(i)
         if v is None:
             return False
         op = OPERATORS[self.data.get('op', 'greater-than')]
+
+        if not self.threshold_date:
+            days = self.data.get('days', 60)
+            # Work around placebo issues with tz
+            if v.tzinfo:
+                n = datetime.now(tz=tzutc())
+            else:
+                n = datetime.now()
+            self.threshold_date = n - timedelta(days)
+
         return op(self.threshold_date, v)
 
 

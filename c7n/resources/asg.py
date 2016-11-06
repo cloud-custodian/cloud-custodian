@@ -610,7 +610,6 @@ class Tag(BaseAction):
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
-                    error = f.exception()
                     self.log.exception(
                         "Exception untagging tag:%s error:%s asg:%s" % (
                             self.data.get('key', DEFAULT_TAG),
