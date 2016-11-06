@@ -400,6 +400,26 @@ class TestEC2QueryFilter(unittest.TestCase):
             [{'tag:ASV': None}])
 
 
+class TestTerminate(BaseTest):
+
+    def test_ec2_terminate(self):
+        # Test conditions: single running instance, with delete protection
+        session_factory = self.replay_flight_data('test_ec2_terminate')
+        p = self.load_policy({
+            'name': 'ec2-term',
+            'resource': 'ec2',
+            'filters': [{'InstanceId': 'i-017cf4e2a33b853fe'}],
+            'actions': [
+                {'type': 'terminate',
+                 'force': True}]},
+           session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=['i-017cf4e2a33b853fe'])
+        self.assertEqual(instances[0]['State']['Name'], 'shutting-down')
+
+
 class TestDefaultVpc(BaseTest):
 
     def test_ec2_default_vpc(self):
@@ -413,7 +433,6 @@ class TestDefaultVpc(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
-        # import pdb; pdb.set_trace()
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')
