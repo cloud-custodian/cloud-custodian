@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "VpcId": "vpc-4a9ff72e", 
+                "CidrBlock": "172.31.16.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-west-2a", 
+                "SubnetId": "subnet-15452171", 
+                "AvailableIpAddressCount": 4087
+            }, 
+            {
+                "VpcId": "vpc-4a9ff72e", 
+                "CidrBlock": "172.31.32.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-west-2b", 
+                "SubnetId": "subnet-63c97615", 
+                "AvailableIpAddressCount": 4090
+            }, 
+            {
+                "VpcId": "vpc-4a9ff72e", 
+                "CidrBlock": "172.31.0.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-west-2c", 
+                "SubnetId": "subnet-5fb47507", 
+                "AvailableIpAddressCount": 4090
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ff919655-4ce2-44d3-bdac-2ed603682e08", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 06 Nov 2016 22:07:07 GMT"
+            }
+        }
+    }
+}

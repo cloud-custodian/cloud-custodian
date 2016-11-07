@@ -32,7 +32,6 @@ References
 
 """
 import json
-import logging
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom

@@ -25,9 +25,8 @@ class ElasticSearchDomain(QueryResourceManager):
         service = 'es'
         enum_spec = (
             'list_domain_names', 'DomainNames[].DomainName', None)
-        id = 'FileSystemId'
+        id = 'DomainName'
         name = 'Name'
-        date = 'CreationTime'
         dimension = "DomainName"
 
     resource_type = Meta

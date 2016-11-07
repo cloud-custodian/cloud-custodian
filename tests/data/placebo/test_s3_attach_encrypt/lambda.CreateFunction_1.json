@@ -1,19 +1,27 @@
 {
     "status_code": 201, 
     "data": {
-        "CodeSha256": "kghmbD8u5CDq6BbdjZKda1SsHQPGG1I5TI3OKVB5BqA=", 
-        "FunctionName": "custodian-s3-encrypt", 
+        "CodeSha256": "GRfGyPT94CNBev3pNmu+Y0+vRMc3/MjJ513w+WQ3dks=", 
+        "FunctionName": "c7n-s3-encrypt", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "73072fee-1acc-11e6-9247-e748149a1e9a"
+            "RequestId": "a20f3d30-a0d3-11e6-b85d-0508ea4f6843", 
+            "HTTPHeaders": {
+                "date": "Wed, 02 Nov 2016 08:09:13 GMT", 
+                "x-amzn-requestid": "a20f3d30-a0d3-11e6-b85d-0508ea4f6843", 
+                "content-length": "509", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
         }, 
-        "CodeSize": 561878, 
+        "CodeSize": 1168362, 
         "MemorySize": 256, 
-        "FunctionArn": "arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt", 
-        "Version": "22", 
-        "Role": "arn:aws:iam::619193117841:role/lambda_s3_exec_role", 
+        "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt", 
+        "Version": "43", 
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
         "Timeout": 15, 
-        "LastModified": "2016-05-15T18:40:22.896+0000", 
+        "LastModified": "2016-11-02T08:09:13.503+0000", 
         "Handler": "s3crypt.process_key_event", 
         "Runtime": "python2.7", 
         "Description": "Custodian S3 Key Encrypt"

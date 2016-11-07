@@ -22,10 +22,11 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema, get_retry
+from c7n.utils import local_session, chunks, type_schema, get_retry, worker
 
 log = logging.getLogger('custodian.elb')
 
@@ -129,7 +130,9 @@ class Delete(BaseAction):
 
     def process_elb(self, elb):
         client = local_session(self.manager.session_factory).client('elb')
-        client.delete_load_balancer(LoadBalancerName=elb['LoadBalancerName'])
+        self.manager.retry(
+            client.delete_load_balancer,
+            LoadBalancerName=elb['LoadBalancerName'])
 
 
 @actions.register('set-ssl-listener-policy')
@@ -145,6 +148,7 @@ class SetSslListenerPolicy(BaseAction):
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_elb, load_balancers))
 
+    @worker
     def process_elb(self, elb):
         if not is_ssl(elb):
             return
@@ -167,16 +171,26 @@ class SetSslListenerPolicy(BaseAction):
                 PolicyTypeName='SSLNegotiationPolicyType',
                 PolicyAttributes=policy_attributes)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'DuplicatePolicyName':
+            if e.response['Error']['Code'] in (
+                    'DuplicatePolicyName', 'DuplicationPolicyNameException'):
                 raise
 
         # Apply it to all SSL listeners.
+        ssl_policies = ()
+        if 'c7n.ssl-policies' in elb:
+            ssl_policies = set(elb['c7n.ssl-policies'])
+
         for ld in elb['ListenerDescriptions']:
             if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
+                policy_names = [policy_name]
+                # Preserve extant non-ssl listener policies
+                if ssl_policies:
+                    policy_names.extend(
+                        ssl_policies.difference(ld.get('PolicyNames', ())))
                 client.set_load_balancer_policies_of_listener(
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
-                    PolicyNames=[policy_name])
+                    PolicyNames=policy_names)
 
 
 def is_ssl(b):
@@ -186,11 +200,22 @@ def is_ssl(b):
     return False
 
 
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Subnets[]"
+
+
 @filters.register('instance')
 class Instance(ValueFilter):
 
-    schema = type_schema(
-        'instance', rinherit=ValueFilter.schema)
+    schema = type_schema('instance', rinherit=ValueFilter.schema)
 
     annotate = False
 
@@ -212,9 +237,6 @@ class Instance(ValueFilter):
         matched = []
         for i in elb['Instances']:
             instance = self.elb_instances[i['InstanceId']]
-            if not instance.get('IamInstanceProfile'):
-                print instance['InstanceId']
-                #import pdb; pdb.set_trace()
             if self.match(instance):
                 matched.append(instance)
         if not matched:
@@ -331,7 +353,7 @@ class SSLPolicyFilter(Filter):
         (myelb,['Protocol-SSLv1','Protocol-SSLv2'])
         """
         active_policy_attribute_tuples = []
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for elb_policy_set in chunks(elb_policy_tuples, 50):
                 futures.append(
@@ -348,6 +370,7 @@ class SSLPolicyFilter(Filter):
 
         return active_policy_attribute_tuples
 
+    @worker
     def process_elb_policy_set(self, elb_policy_set):
         results = []
         client = local_session(self.manager.session_factory).client('elb')
@@ -364,15 +387,18 @@ class SSLPolicyFilter(Filter):
                     continue
                 raise
             active_lb_policies = []
+            ssl_policies = []
             for p in policies:
                 if p['PolicyTypeName'] != 'SSLNegotiationPolicyType':
                     continue
+                ssl_policies.append(p['PolicyName'])
                 active_lb_policies.extend(
                     [policy_description['AttributeName']
                      for policy_description in
                      p['PolicyAttributeDescriptions']
                      if policy_description['AttributeValue'] == 'true']
                 )
+            elb['c7n.ssl-policies'] = ssl_policies
             results.append((elb, active_lb_policies))
 
         return results

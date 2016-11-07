@@ -1,0 +1,87 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusters": [
+            {
+                "MasterUsername": "devtest", 
+                "ReaderEndpoint": "devtest-1.cluster-ro-cnhganveedh2.us-west-2.rds.amazonaws.com", 
+                "ReadReplicaIdentifiers": [], 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-f9cc4d9f"
+                    }
+                ], 
+                "HostedZoneId": "Z1PVIF0B656C1W", 
+                "Status": "available", 
+                "LatestRestorableTime": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 276000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 1
+                }, 
+                "PreferredBackupWindow": "10:18-10:48", 
+                "DBSubnetGroup": "default", 
+                "AllocatedStorage": 1, 
+                "BackupRetentionPeriod": 1, 
+                "PreferredMaintenanceWindow": "thu:11:18-thu:11:48", 
+                "Engine": "aurora", 
+                "Endpoint": "devtest-1.cluster-cnhganveedh2.us-west-2.rds.amazonaws.com", 
+                "AssociatedRoles": [], 
+                "EarliestRestorableTime": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 21, 
+                    "microsecond": 800000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 15
+                }, 
+                "EngineVersion": "5.6.10a", 
+                "DBClusterIdentifier": "devtest-1", 
+                "DbClusterResourceId": "cluster-2XJSWGHOG5RCC6J6BL6MR2UJVA", 
+                "DBClusterMembers": [
+                    {
+                        "IsClusterWriter": true, 
+                        "DBClusterParameterGroupStatus": "in-sync", 
+                        "PromotionTier": 5, 
+                        "DBInstanceIdentifier": "dbtest"
+                    }, 
+                    {
+                        "IsClusterWriter": false, 
+                        "DBClusterParameterGroupStatus": "in-sync", 
+                        "PromotionTier": 5, 
+                        "DBInstanceIdentifier": "dbtest-us-west-2a"
+                    }
+                ], 
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:devtest-1", 
+                "StorageEncrypted": false, 
+                "DatabaseName": "devtest", 
+                "DBClusterParameterGroup": "default.aurora5.6", 
+                "AvailabilityZones": [
+                    "us-west-2a", 
+                    "us-west-2b", 
+                    "us-west-2c"
+                ], 
+                "Port": 3306
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b110048-a46d-11e6-a571-8db3f373f905", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b110048-a46d-11e6-a571-8db3f373f905", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2849", 
+                "content-type": "text/xml", 
+                "date": "Sun, 06 Nov 2016 22:07:05 GMT"
+            }
+        }
+    }
+}

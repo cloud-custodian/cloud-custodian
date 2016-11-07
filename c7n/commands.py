@@ -57,7 +57,7 @@ def validate(options):
 
     errors = schema.validate(data)
     if not errors:
-        null_config = Bag(log_group=None, cache=None, assume_role="na")
+        null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
         for p in data.get('policies', ()):
             try:
                 Policy(p, null_config, Bag())
@@ -99,7 +99,7 @@ def report(options, policies):
     delta = timedelta(days=options.days)
     begin_date = d - delta
     do_report(
-        policy, begin_date, sys.stdout,
+        policy, begin_date, options, sys.stdout,
         raw_output_fh=options.raw)
 
 

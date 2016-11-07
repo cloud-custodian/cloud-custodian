@@ -86,7 +86,7 @@ class PythonPackageArchive(object):
 
     def create(self):
         assert not self._temp_archive_file, "Archive already created"
-        self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
+        self._temp_archive_file = tempfile.NamedTemporaryFile()
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
@@ -144,8 +144,7 @@ class PythonPackageArchive(object):
         return self
 
     def remove(self):
-        # dispose of the temp file for garbag collection
-        os.remove(self._temp_archive_file.name)
+        # dispose of the temp file for garbage collection
         if self._temp_archive_file:
             self._temp_archive_file = None
 
@@ -864,9 +863,11 @@ class BucketNotification(object):
             StatementId=self.bucket['Name'],
             Action='lambda:InvokeFunction',
             Principal='s3.amazonaws.com')
-        if not self.data.get('account_s3'):
-            params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
-
+        if self.data.get('account_s3'):
+            params['SourceAccount'] = self.data['account_s3']
+            params['SourceArn'] = 'arn:aws:s3:::*'
+        else:
+            params['SourceArn'] = 'arn:aws:s3:::%' % self.bucket['Name']
         try:
             lambda_client.add_permission(**params)
         except ClientError as e:

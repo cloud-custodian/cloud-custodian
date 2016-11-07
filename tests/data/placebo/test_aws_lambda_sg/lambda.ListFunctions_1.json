@@ -1,0 +1,74 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "mGsk+d7ABcPEMu6ZwStxbVQtgiHlpZy+VnBq99/LWqs=", 
+                "FunctionName": "myIOTFunction", 
+                "VpcConfig": {
+                    "SubnetIds": [], 
+                    "SecurityGroupIds": []
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 1722, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:myIOTFunction", 
+                "Handler": "index.handler", 
+                "Role": "arn:aws:iam::644160558196:role/service-role/myIOTLambdaRole", 
+                "Timeout": 3, 
+                "LastModified": "2016-10-18T13:35:54.616+0000", 
+                "Runtime": "nodejs4.3", 
+                "Description": "An AWS Lambda function that sends an email on the click of an IoT button."
+            }, 
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "nr4MF+RJ6Tkwtn2hzdBJmAMSMuaOSdAmf13Uja2zMdA=", 
+                "FunctionName": "mys3", 
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-15452171"
+                    ], 
+                    "VpcId": "vpc-4a9ff72e", 
+                    "SecurityGroupIds": [
+                        "sg-f9cc4d9f"
+                    ]
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 577, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:mys3", 
+                "Handler": "lambda_function.lambda_handler", 
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+                "Timeout": 3, 
+                "LastModified": "2016-11-02T10:10:02.085+0000", 
+                "Runtime": "python2.7", 
+                "Description": "An Amazon S3 trigger that retrieves metadata for the object that has been updated."
+            }, 
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "K79fnDjyvKpxtnkJcGLGbT5ypm5g6XHwWZGW25Kf0lw=", 
+                "FunctionName": "c7n-cleanup", 
+                "MemorySize": 512, 
+                "CodeSize": 558, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-cleanup", 
+                "Handler": "lambda_function.lambda_handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 300, 
+                "LastModified": "2016-10-20T17:26:47.706+0000", 
+                "Runtime": "python2.7", 
+                "Description": "c7n Cleanup Function"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "266c9385-a0ea-11e6-bb1b-3ff48dbc12d0", 
+            "HTTPHeaders": {
+                "date": "Wed, 02 Nov 2016 10:50:20 GMT", 
+                "x-amzn-requestid": "266c9385-a0ea-11e6-bb1b-3ff48dbc12d0", 
+                "content-length": "1799", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

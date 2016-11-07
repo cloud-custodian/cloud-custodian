@@ -1,0 +1,79 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "VpcId": "vpc-5f6c9936", 
+                "Tags": [
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }, 
+                    {
+                        "Value": "", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlock": "172.31.0.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-east-2a", 
+                "SubnetId": "subnet-db9f62b2", 
+                "AvailableIpAddressCount": 4090
+            }, 
+            {
+                "VpcId": "vpc-5f6c9936", 
+                "Tags": [
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }, 
+                    {
+                        "Value": "", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlock": "172.31.16.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-east-2b", 
+                "SubnetId": "subnet-65dbce1d", 
+                "AvailableIpAddressCount": 4090
+            }, 
+            {
+                "VpcId": "vpc-5f6c9936", 
+                "Tags": [
+                    {
+                        "Value": "", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ], 
+                "CidrBlock": "172.31.32.0/20", 
+                "MapPublicIpOnLaunch": true, 
+                "DefaultForAz": true, 
+                "State": "available", 
+                "AvailabilityZone": "us-east-2c", 
+                "SubnetId": "subnet-b77a4ffd", 
+                "AvailableIpAddressCount": 4090
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "82b252ef-44c4-4995-acdc-a0a5143887a2", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 06 Nov 2016 16:31:56 GMT"
+            }
+        }
+    }
+}
