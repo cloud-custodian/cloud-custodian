@@ -3,7 +3,7 @@ from common import BaseTest
 
 class WAFTest(BaseTest):
 
-    def test_rdscluster_security_group(self):
+    def test_waf_query(self):
         session_factory = self.replay_flight_data('test_waf_query')
         p = self.load_policy({
             'name': 'waftest',

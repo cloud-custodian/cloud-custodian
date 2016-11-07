@@ -26,6 +26,7 @@ class SimpleDB(QueryResourceManager):
         service = "sdb"
         enum_spec = ("list_domains", "DomainNames", None)
         id = name = "DomainName"
+        dimension = None
 
     def augment(self, resources):
         def _augment(resource_set):
@@ -33,6 +34,7 @@ class SimpleDB(QueryResourceManager):
             results = []
             for r in resources:
                 info = client.domain_metadata(DomainName=r)
+                info.pop('ResponseMetadata')
                 info['DomainName'] = r
                 results.append(info)
             return results
