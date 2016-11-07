@@ -372,7 +372,7 @@ class EventFilterTest(BaseFilterTest):
         # event is None
         self.assertEqual(ef.process('resources'), 'resources')
         # event is not None, but is not "true" either
-        self.assertEqual(ef.process('resources', 0), [])
+        self.assertEqual(ef.process('resources', []), [])
 
     def test_event_no_mode(self):
         b = Bag(data={'resource': 'something'})
