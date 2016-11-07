@@ -275,7 +275,6 @@ class InstanceImage(ValueFilter, InstanceImageBase):
             # Match instead on empty skeleton?
             return False
         return self.match(image)
-                
 
 
 @filters.register('offhour')

@@ -1188,8 +1188,8 @@ class DeleteBucket(ScanBucket):
         self.manager.ctx.metrics.flush()
 
         log.info(
-            ("EmptyBucket bucket:%s Complete keys:%d rate:%0.2f/s time:%0.2fs"),
-            r['Bucket'], object_count, float(object_count) / run_time, run_time)
+            ("EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs"),
+            len(buckets), object_count, float(object_count) / run_time, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
