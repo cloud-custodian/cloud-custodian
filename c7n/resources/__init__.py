@@ -28,6 +28,7 @@ def load_resources():
     import c7n.resources.cloudfront
     import c7n.resources.cloudsearch
     import c7n.resources.cw
+    import c7n.resources.directory
     import c7n.resources.dynamodb
     import c7n.resources.ebs
     import c7n.resources.ec2
