@@ -3,6 +3,22 @@ from .common import BaseTest
 
 class LambdaTest(BaseTest):
 
+    def test_event_source(self):
+        factory = self.replay_flight_data('test_aws_lambda_source')
+        p = self.load_policy({
+            'name': 'lambda-events',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'event-source',
+                 'key': '',
+                 'value': 'not-null'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {r['c7n.EventSources'][0] for r in resources},
+            set(['iot.amazonaws.com']))
+
     def test_sg_filter(self):
         factory = self.replay_flight_data('test_aws_lambda_sg')
 
