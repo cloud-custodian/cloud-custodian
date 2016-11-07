@@ -130,7 +130,9 @@ class Delete(BaseAction):
 
     def process_elb(self, elb):
         client = local_session(self.manager.session_factory).client('elb')
-        client.delete_load_balancer(LoadBalancerName=elb['LoadBalancerName'])
+        self.manager.retry(
+            client.delete_load_balancer,
+            LoadBalancerName=elb['LoadBalancerName'])
 
 
 @actions.register('set-ssl-listener-policy')
