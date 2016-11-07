@@ -48,6 +48,7 @@ def load_resources():
     import c7n.resources.rdscluster
     import c7n.resources.route53
     import c7n.resources.s3
+    import c7n.resources.simpledb
     import c7n.resources.sns
     import c7n.resources.sqs
     import c7n.resources.vpc

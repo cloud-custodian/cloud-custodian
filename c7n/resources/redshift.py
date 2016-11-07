@@ -315,12 +315,12 @@ class RedshiftSubnetGroup(QueryResourceManager):
 class RedshiftSnapshot(QueryResourceManager):
     """Resource manager for Redshift snapshots.
     """
-    
+
     filter_registry = FilterRegistry('redshift-snapshot.filters')
     action_registry = ActionRegistry('redshift-snapshot.actions')
-   
+
     filter_registry.register('marked-for-op', tags.TagActionFilter)
-    
+
     _generate_arn = _account_id = None
 
     @property
