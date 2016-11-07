@@ -1,0 +1,402 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-09d1c1c9662ea6a41", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 17, 
+                            "__class__": "datetime", 
+                            "month": 11, 
+                            "second": 21, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 7, 
+                            "minute": 52
+                        }, 
+                        "PrivateIpAddress": "172.31.61.63", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-026416c071bbe5279", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-b73b63a0", 
+                        "PrivateDnsName": "ip-172-31-61-63.ec2.internal", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ], 
+                        "ClientToken": "SPuBz1478541141227", 
+                        "SubnetId": "subnet-3a334610", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "12:86:c8:22:0d:34", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-8eec0971", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-61-63.ec2.internal", 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.61.63"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-61-63.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-0e402bbe", 
+                                    "AttachTime": {
+                                        "hour": 17, 
+                                        "__class__": "datetime", 
+                                        "month": 11, 
+                                        "second": 21, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 7, 
+                                        "minute": 52
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-6c7fa917"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-3a334610", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.61.63"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1d"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-c822471c", 
+                                    "AttachTime": {
+                                        "hour": 17, 
+                                        "__class__": "datetime", 
+                                        "month": 11, 
+                                        "second": 22, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 7, 
+                                        "minute": 52
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "c7n-test-ec2", 
+                                "Key": "Name"
+                            }, 
+                            {
+                                "Value": "Value", 
+                                "Key": "Testing"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 1
+                    }, 
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 17, 
+                            "__class__": "datetime", 
+                            "month": 11, 
+                            "second": 21, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 7, 
+                            "minute": 52
+                        }, 
+                        "PrivateIpAddress": "172.31.61.62", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-0c9092b659123d376", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-b73b63a0", 
+                        "PrivateDnsName": "ip-172-31-61-62.ec2.internal", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ], 
+                        "ClientToken": "SPuBz1478541141227", 
+                        "SubnetId": "subnet-3a334610", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "12:8a:a9:28:df:ec", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-8fec0970", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-61-62.ec2.internal", 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.61.62"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-61-62.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-11402ba1", 
+                                    "AttachTime": {
+                                        "hour": 17, 
+                                        "__class__": "datetime", 
+                                        "month": 11, 
+                                        "second": 21, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 7, 
+                                        "minute": 52
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-6c7fa917"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-3a334610", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.61.62"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1d"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-55234681", 
+                                    "AttachTime": {
+                                        "hour": 17, 
+                                        "__class__": "datetime", 
+                                        "month": 11, 
+                                        "second": 22, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 7, 
+                                        "minute": 52
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "c7n-test-ec2", 
+                                "Key": "Name"
+                            }, 
+                            {
+                                "Value": "Value", 
+                                "Key": "Testing"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }, 
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-0d0ac487f6cd57ed3", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 13, 
+                            "__class__": "datetime", 
+                            "month": 10, 
+                            "second": 35, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 25, 
+                            "minute": 8
+                        }, 
+                        "PrivateIpAddress": "172.31.27.131", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-09c1c849ee8955035", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-c481fad3", 
+                        "PrivateDnsName": "ip-172-31-27-131.ec2.internal", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ], 
+                        "ClientToken": "UlLMa1477400914122", 
+                        "SubnetId": "subnet-efbcccb7", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0e:8a:8e:a7:5b:08", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-bea26970", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-27-131.ec2.internal", 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.27.131"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-27-131.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-dc0b3b6b", 
+                                    "AttachTime": {
+                                        "hour": 13, 
+                                        "__class__": "datetime", 
+                                        "month": 10, 
+                                        "second": 35, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 25, 
+                                        "minute": 8
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-6c7fa917"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-efbcccb7", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.27.131"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1b"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-5e1e96f8", 
+                                    "AttachTime": {
+                                        "hour": 13, 
+                                        "__class__": "datetime", 
+                                        "month": 10, 
+                                        "second": 35, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 25, 
+                                        "minute": 8
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "IamInstanceProfile": {
+                            "Id": "AIPAJBGQEL7545WR7UQ52", 
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/root_joshua"
+                        }, 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "c7n-test-ec2", 
+                                "Key": "Name"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "728833e8-92bd-4e54-b932-b338f9f037ef", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 07 Nov 2016 18:16:02 GMT"
+            }
+        }
+    }
+}

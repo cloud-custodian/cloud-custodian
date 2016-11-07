@@ -607,6 +607,69 @@ class Snapshot(BaseAction):
                 Tags=tags)
 
 
+@actions.register('rename-tag')
+class RenameTag(BaseAction):
+
+    schema = type_schema(
+        'rename-tag',
+        source={'type': 'string'},
+        dest={'type': 'string'})
+
+    def process_ec2(self, client, instance):
+        """
+        Move source tag value to destination tag value
+
+        - Collect value from old tag
+        - Delete old tag
+        - Create new tag & assign stored value
+        """
+
+        source_tag = self.data.get('source')
+        tag_map = {t['Key']: t for t in instance.get('Tags', [])}
+        source = tag_map[source_tag]
+        destination_tag = self.data.get('dest')
+
+        client.delete_tags(
+            Resources=[instance['InstanceId']],
+            Tags=[{
+                'Key': source_tag,
+                'Value': source['Value']}])
+        client.create_tags(
+            Resources=[instance['InstanceId']],
+            Tags=[{
+                'Key': destination_tag,
+                'Value': source['Value']}])
+
+    def process(self, resources):
+        src = self.data.get('source')
+        dest = self.data.get('dest')
+        count = len(resources)
+        filtered = []
+        for i in resources:
+            for t in i.get('Tags'):
+                if t['Key'] == src:
+                    filtered.append(i)
+                    break
+        resources = filtered
+        self.log.info("Filtered from %d instance(s) to %d" % (
+            count, len(resources)))
+        self.log.info("Renaming %s to %s on %d instance(s)" % (
+            src, dest, len(filtered)))
+
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        futures = []
+        with self.executor_factory(max_workers=3) as w:
+            for r in resources:
+                futures.append(w.submit(self.process_ec2, client, r))
+        for f in as_completed(futures):
+            if f.exception():
+                self.log.exception(
+                    "Exception renaming tag:%s error:%s ec2:%s" % (
+                        self.data.get('source'),
+                        f.exception(),
+                        ", ".join([r['InstanceId'] for r in resources])))
+
+
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {
