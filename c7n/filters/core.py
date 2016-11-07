@@ -404,6 +404,8 @@ class AgeFilter(Filter):
 
     def __call__(self, i):
         v = self.get_resource_date(i)
+        if v is None:
+            return False
         op = OPERATORS[self.data.get('op', 'greater-than')]
 
         if not self.threshold_date:
