@@ -19,7 +19,29 @@ from argparse import Namespace
 import cPickle
 import tempfile
 import mock
+import time
 
+
+class TestCache(TestCase):
+
+    def test_factory(self):
+        self.assertIsInstance(
+            cache.factory(None),
+            cache.NullCache,
+        )
+        test_config = Namespace(
+            cache_period=60,
+            cache='test-cloud-custodian.cache',
+        )
+        self.assertIsInstance(
+            cache.factory(test_config),
+            cache.FileCacheManager,
+        )
+        test_config.cache = None
+        self.assertIsInstance(
+            cache.factory(test_config),
+            cache.NullCache,
+        )
 
 class FileCacheManagerTest(TestCase):
     def setUp(self):
@@ -58,6 +80,18 @@ class FileCacheManagerTest(TestCase):
         self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
         self.assertEquals(self.test_cache.get(self.bad_key), None)
 
+    def test_load(self):
+        t = tempfile.NamedTemporaryFile(suffix='.cache')
+        load_config = Namespace(
+            cache_period=0,
+            cache=t.name,
+        )
+        load_cache = cache.FileCacheManager(load_config)
+        time.sleep(0.1)
+        self.assertFalse(load_cache.load())
+        load_cache.data = {'key': 'value'}
+        self.assertTrue(load_cache.load())
+
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
     @mock.patch.object(cache.cPickle, 'dump')
@@ -93,6 +127,7 @@ class FileCacheManagerTest(TestCase):
         #raise some sort of exception in the try
         mock_exists.return_value = False
         mock_dump.side_effect = Exception('Error')
+        mock_mkdir.side_effect = Exception('Error')
 
         #make the call
         self.test_cache.save(self.test_key, self.test_value)
