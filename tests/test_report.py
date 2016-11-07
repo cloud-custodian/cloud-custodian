@@ -29,7 +29,7 @@ class TestEC2Report(unittest.TestCase):
             rec['CustodianDate'] = date_parse(rec['CustodianDate'])
 
     def test_csv(self):
-        formatter = RECORD_TYPE_FORMATTERS.get("ec2")
+        formatter = RECORD_TYPE_FORMATTERS.get("ec2")()
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -41,6 +41,29 @@ class TestEC2Report(unittest.TestCase):
             rows = map(lambda x: self.rows[x], row_ids)
             self.assertEqual(formatter.to_csv(recs), rows)
 
+    def test_custom_fields(self):
+        """
+        Test the ability to include custom fields.
+        """
+        formatter_class = RECORD_TYPE_FORMATTERS.get("ec2")
+        extra_fields = [
+            "custom_field=CustomField",
+            "missing_field=MissingField",
+            "custom_tag=tag:CustomTag",
+        ]
+
+        # First do a test with adding custom fields to the normal ones
+        formatter = formatter_class(extra_fields=extra_fields)
+        recs = [self.records['full']]
+        rows = [self.rows['full_custom']]
+        self.assertEqual(formatter.to_csv(recs), rows)
+
+        # Then do a test with only having custom fields
+        formatter = formatter_class(extra_fields=extra_fields, no_default_fields=True)
+        recs = [self.records['full']]
+        rows = [self.rows['minimal_custom']]
+        self.assertEqual(formatter.to_csv(recs), rows)
+        
 
 class TestASGReport(unittest.TestCase):
     def setUp(self):
@@ -52,7 +75,7 @@ class TestASGReport(unittest.TestCase):
             rec['CustodianDate'] = date_parse(rec['CustodianDate'])
 
     def test_csv(self):
-        formatter = RECORD_TYPE_FORMATTERS.get("asg")
+        formatter = RECORD_TYPE_FORMATTERS.get("asg")()
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),

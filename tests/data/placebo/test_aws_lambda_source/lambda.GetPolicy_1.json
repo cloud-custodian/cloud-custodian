@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"d6f0db1a-7b19-44f4-9305-03466d53f1b5\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"iot.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-cleanup\",\"Condition\":{\"StringEquals\":{\"AWS:SourceAccount\":\"644160558196\"},\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:iot:us-west-2:644160558196:rule/iotbutton_G030JF051537S76R\"}}}]}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "46f99a64-a4f3-11e6-8a27-c9cfe6f376d3", 
+            "HTTPHeaders": {
+                "date": "Mon, 07 Nov 2016 14:05:44 GMT", 
+                "x-amzn-requestid": "46f99a64-a4f3-11e6-8a27-c9cfe6f376d3", 
+                "content-length": "488", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

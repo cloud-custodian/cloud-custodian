@@ -1,0 +1,55 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20161020", 
+                "Hypervisor": "xen", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-153e6470", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-7300a782", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "VirtualName": "ephemeral1"
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "099720109477/ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20161020", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "099720109477", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2016-10-21T23:49:28.000Z", 
+                "Public": true, 
+                "ImageType": "machine"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "efcd7526-e530-4d8d-9c4a-c63599411956", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 06 Nov 2016 12:15:22 GMT"
+            }
+        }
+    }
+}

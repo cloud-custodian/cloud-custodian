@@ -13,13 +13,12 @@
 # limitations under the License.
 from datetime import datetime
 
+from botocore.exceptions import ClientError
+
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.query import QueryResourceManager
-from c7n import utils
-from c7n.utils import (
-    local_session, type_schema, get_account_id,
-    get_retry, chunks, generate_arn, snapshot_identifier)
+from c7n.utils import local_session, type_schema
 
 actions = ActionRegistry('emr.actions')
 

@@ -59,9 +59,14 @@ class PolicyCollection(object):
 
     def policies(self, filters=None, resource_type=None):
         # self.options is the CLI options specified in cli.setup_parser()
-        policies = [Policy(p, self.options) for p in self.data.get(
-            'policies', [])
-                    if resource_type and resource_type == p.resource_type or 1]
+        policies = []
+        for p in self.data.get('policies', []):
+            policy = Policy(p, self.options)
+            if 'resource_type' in self.options and self.options.resource_type:
+                if policy.resource_type == self.options.resource_type:
+                    policies.append(policy)
+            else:
+                policies.append(policy)
 
         if not filters:
             return policies

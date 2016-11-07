@@ -26,7 +26,9 @@ def load_resources():
     import c7n.resources.awslambda
     import c7n.resources.cfn
     import c7n.resources.cloudfront
+    import c7n.resources.cloudsearch
     import c7n.resources.cw
+    import c7n.resources.directory
     import c7n.resources.dynamodb
     import c7n.resources.ebs
     import c7n.resources.ec2
@@ -46,9 +48,11 @@ def load_resources():
     import c7n.resources.rdscluster
     import c7n.resources.route53
     import c7n.resources.s3
+    import c7n.resources.simpledb
     import c7n.resources.sns
     import c7n.resources.sqs
     import c7n.resources.vpc
+    import c7n.resources.waf
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources

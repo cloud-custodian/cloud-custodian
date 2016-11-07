@@ -4,8 +4,18 @@
         "Name": "custodian-attach-encrypt-test", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "NZdMIjYiyaJtCO9fDwpZJRBJGOZK2JmNgWyVbI2hbg0vrAHuWImg0xGbZj7esHqv", 
-            "RequestId": "A6F1505346A5A59D"
+            "RetryAttempts": 0, 
+            "HostId": "XsbzOj1fFzHwMXifKIkG6YFks6M92whGqHsRo3HR5crbHYxtGNI8rPsh9x5wGh/8+fjSK6hlZ+k=", 
+            "RequestId": "E8962FAAF194EFDE", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-west-2", 
+                "x-amz-id-2": "XsbzOj1fFzHwMXifKIkG6YFks6M92whGqHsRo3HR5crbHYxtGNI8rPsh9x5wGh/8+fjSK6hlZ+k=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E8962FAAF194EFDE", 
+                "date": "Wed, 02 Nov 2016 08:09:59 GMT", 
+                "content-type": "application/xml"
+            }
         }, 
         "MaxKeys": 1000, 
         "Prefix": "", 
@@ -15,21 +25,21 @@
         "Contents": [
             {
                 "LastModified": {
-                    "hour": 18, 
+                    "hour": 8, 
                     "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 29, 
+                    "month": 11, 
+                    "second": 28, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 15, 
-                    "minute": 40
+                    "day": 2, 
+                    "minute": 9
                 }, 
                 "ETag": "\"5eb63bbbe01eeed093cb22bb8f5acdc3\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "hello-world.txt", 
                 "Owner": {
-                    "DisplayName": "k_vertigo", 
-                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "Size": 11
             }

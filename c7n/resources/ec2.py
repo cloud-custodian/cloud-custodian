@@ -140,16 +140,24 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+@filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
     """
-
     RE_PARSE_AGE = re.compile("\(.*?\)")
+
+    # this filter doesn't use date_attribute, but needs to define it to pass AgeFilter's validate method
+    date_attribute = "dummy"
+
+    schema = type_schema(
+        'state-age',
+        op={'type': 'string', 'enum': OPERATORS.keys()},
+        days={'type': 'number'})
 
     def get_resource_date(self, i):
         v = i.get('StateTransitionReason')
-        if v is None:
-            return v
+        if not v:
+            return None
         return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
 
 
@@ -256,10 +264,10 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
-        return map(self, resources)
+        return super(InstanceImage, self).process(resources, event)
 
     def __call__(self, i):
-        image = self.image_map.get(i['InstanceId'])
+        image = self.image_map.get(i['ImageId'])
         if not image:
             self.log.warning(
                 "Could not locate image for instance:%s ami:%s" % (
@@ -267,6 +275,7 @@ class InstanceImage(ValueFilter, InstanceImageBase):
             # Match instead on empty skeleton?
             return False
         return self.match(image)
+                
 
 
 @filters.register('offhour')
@@ -361,6 +370,7 @@ class Start(BaseAction, StateTransitionFilter):
     valid_origin_states = ('stopped',)
 
     schema = type_schema('start')
+    batch_size = 20
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -372,10 +382,14 @@ class Start(BaseAction, StateTransitionFilter):
             return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        self._run_api(
-            client.start_instances,
-            InstanceIds=[i['InstanceId'] for i in instances],
-            DryRun=self.manager.config.dryrun)
+        for batch in utils.chunks(instances, self.batch_size):
+            try:
+                self.manager.retry(
+                    client.start_instances,
+                    InstanceIds=[i['InstanceId'] for i in instances])
+            except ClientError as e:
+                self.log.error("Error while starting instances %s", e)
+                continue
 
 
 @actions.register('resize')
@@ -486,7 +500,7 @@ class Stop(BaseAction, StateTransitionFilter):
     def _run_instances_op(self, op, instance_ids):
         while True:
             try:
-                return op(InstanceIds=instance_ids)
+                return self.manager.retry(op, InstanceIds=instance_ids)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     msg = e.response['Error']['Message']
@@ -524,24 +538,21 @@ class Terminate(BaseAction, StateTransitionFilter):
             self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
-            self._run_api(
+            self.manager.retry(
                 client.terminate_instances,
-                InstanceIds=[i['InstanceId'] for i in instances],
-                DryRun=self.manager.config.dryrun)
+                InstanceIds=[i['InstanceId'] for i in instances])
 
     def disable_deletion_protection(self, instances):
-
         @utils.worker
         def process_instance(i):
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
             try:
-                self._run_api(
+                self.manager.retry(
                     client.modify_instance_attribute,
                     InstanceId=i['InstanceId'],
                     Attribute='disableApiTermination',
-                    Value='false',
-                    DryRun=self.manager.config.dryrun)
+                    Value='false')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     return

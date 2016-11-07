@@ -36,8 +36,9 @@ log = logging.getLogger('custodian.elasticache')
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
+
 #registered marked-for-op filter
-filters.register('marked-for-op', tags.TagActionFilter) 
+filters.register('marked-for-op', tags.TagActionFilter)
 
 TTYPE = re.compile('cache.t')
 
@@ -84,12 +85,32 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "SecurityGroups[].SecurityGroupId"
 
 
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['CacheSubnetGroupName']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        self.groups = {
+            r['CacheSubnetGroupName']: r for r in
+            ElastiCacheSubnetGroup(self.manager.ctx, {}).resources()}
+        return super(SubnetFilter, self).process(resources, event)
+
+
 # added mark-for-op
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
-    
+
     batch_size = 1
-    
+
     def process_resource_set(self, clusters, tags):
         client = local_session(self.manager.session_factory).client(
             'elasticache')
@@ -112,7 +133,7 @@ class RemoveTag(tags.RemoveTag):
         for cluster in clusters:
             arn = self.manager.generate_arn(cluster['CacheClusterId'])
             client.remove_tags_from_resource(
-                ResourceName=arn, TagKeys=tag_keys)            
+                ResourceName=arn, TagKeys=tag_keys)
 
 
 @actions.register('delete')
@@ -123,7 +144,8 @@ class DeleteElastiCacheCluster(BaseAction):
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
-        client = local_session(self.manager.session_factory).client('elasticache')
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
 
         clusters_to_delete = []
         replication_groups_to_delete = set()
@@ -138,9 +160,11 @@ class DeleteElastiCacheCluster(BaseAction):
             if _cluster_eligible_for_snapshot(cluster) and not skip:
                 params['FinalSnapshotIdentifier'] = snapshot_identifier(
                     'Final', cluster['CacheClusterId'])
-                self.log.debug("Taking final snapshot of %s" %cluster['CacheClusterId'])
+                self.log.debug(
+                    "Taking final snapshot of %s", cluster['CacheClusterId'])
             else:
-                self.log.debug("Skipping final snapshot of %s" %cluster['CacheClusterId'])
+                self.log.debug(
+                    "Skipping final snapshot of %s", cluster['CacheClusterId'])
             client.delete_cache_cluster(**params)
             self.log.info(
                 'Deleted ElastiCache cluster: %s',
@@ -175,7 +199,7 @@ class SnapshotElastiCacheCluster(BaseAction):
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Exception creating ElastiCache cluster snapshot  \n %s",
+                        "Exception creating cache cluster snapshot \n %s",
                         f.exception())
         return clusters
 
@@ -200,7 +224,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
     resource_type = 'aws.elasticache.snapshot'
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
-    filter_registry.register('marked-for-op', tags.TagActionFilter) 
+    filter_registry.register('marked-for-op', tags.TagActionFilter)
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -277,17 +301,20 @@ class DeleteElastiCacheSnapshot(BaseAction):
         for s in snapshots_set:
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
+
 # added mark-for-op
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
-    
+
     batch_size = 1
-    
+
     def process_resource_set(self, snapshots, tags):
-        client = local_session(self.manager.session_factory).client('elasticache')
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
         for snapshot in snapshots:
             arn = self.manager.generate_arn(snapshot['SnapshotName'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
 
 # added unmark
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
@@ -304,6 +331,7 @@ class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
             arn = self.manager.generate_arn(snapshot['SnapshotName'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
+
 
 def _elasticache_cluster_tags(
         model, clusters, session_factory, executor_factory, generator, retry):
@@ -350,6 +378,6 @@ def _elasticache_snapshot_tags(
 def _cluster_eligible_for_snapshot(cluster):
     # added regex search to filter unsupported cachenode types
     return (
-        cluster['Engine'] != 'memcached' and not 
+        cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
         )

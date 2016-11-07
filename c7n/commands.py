@@ -99,7 +99,7 @@ def report(options, policies):
     delta = timedelta(days=options.days)
     begin_date = d - delta
     do_report(
-        policy, begin_date, sys.stdout,
+        policy, begin_date, options, sys.stdout,
         raw_output_fh=options.raw)
 
 

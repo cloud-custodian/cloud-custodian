@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 from botocore.exceptions import ClientError
 
-from c7n.filters import CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('lambda')
@@ -36,6 +37,50 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
+
+
+@AWSLambda.filter_registry.register('event-source')
+class LambdaEventSource(ValueFilter):
+
+    annotation_key = "c7n.EventSources"
+    schema = type_schema('event-source', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        def _augment(r):
+            if 'c7n.Policy' in r:
+                return
+            client = local_session(
+                self.manager.session_factory).client('lambda')
+            try:
+                r['c7n.Policy'] = client.get_policy(
+                    FunctionName=r['FunctionName'])['Policy']
+                return r
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied getting policy lambda:%s",
+                        r['FunctionName'])
+
+        self.log.debug("fetching policy for %d lambdas" % len(resources))
+        self.data['key'] = self.annotation_key
+
+        with self.executor_factory(max_workers=3) as w:
+            resources = filter(None, w.map(_augment, resources))
+            return super(LambdaEventSource, self).process(resources, event)
+
+    def __call__(self, r):
+        if 'c7n.Policy' not in r:
+            return False
+        sources = set()
+        data = json.loads(r['c7n.Policy'])
+        for s in data.get('Statement', ()):
+            if s['Effect'] != 'Allow':
+                continue
+            if 'Service' in s['Principal']:
+                sources.add(s['Principal']['Service'])
+            if sources:
+                r[self.annotation_key] = list(sources)
+        return self.match(r)
 
 
 @AWSLambda.filter_registry.register('cross-account')

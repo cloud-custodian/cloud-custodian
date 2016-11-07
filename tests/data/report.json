@@ -12,6 +12,7 @@
         "VpcId": "VpcId-1",
         "PrivateIpAddress": "PrivateIpAddress-1",
         "IgnoredField": "IgnoredValue",
+        "CustomField": "CustomValue",
         "Tags": [
           {
             "Key": "Name",
@@ -28,6 +29,10 @@
           {
             "Key": "OwnerContact",
             "Value": "OwnerContact-1"
+          },
+          {
+            "Key": "CustomTag",
+            "Value": "Custom-1"
           }
         ]
       },
@@ -101,6 +106,26 @@
         "",
         "",
         ""
+      ],
+      "full_custom": [
+        "2015-12-23",
+        "InstanceId-1",
+        "Name-1",
+        "InstanceType-1",
+        "LaunchTime-1",
+        "VpcId-1",
+        "PrivateIpAddress-1",
+        "ASV-1",
+        "CMDBEnvironment-1",
+        "OwnerContact-1",
+	"CustomValue",
+	"",
+	"Custom-1"
+      ],
+      "minimal_custom": [
+        "CustomValue",
+	"",
+        "Custom-1"
       ]
     }
   },
