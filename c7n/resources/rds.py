@@ -207,7 +207,7 @@ def _list_engines_upgrade_version(client):
     for v in engine_versions:
         if not v['Engine'] in results:
             results[v['Engine']] = {}
-        if not 'ValidUpgradeTarget' in v or len(v['ValidUpgradeTarget']) == 0:
+        if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
             continue
         for t in v['ValidUpgradeTarget']:
             if t['IsMajorVersionUpgrade']:
@@ -320,6 +320,9 @@ class UpgradeAvailable(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         engine_upgrades = _list_engines_upgrade_version(client)
+
+        match_mode = self.data.get('value', True)
+
         for r in resources:
             upgrades = engine_upgrades[r['Engine']]
             if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
@@ -327,26 +330,22 @@ class UpgradeAvailable(Filter):
                     results.append(r)
                     continue
 
-            target_upgrade = "0.0.0"
-            for u in upgrades:
-                if u == r['EngineVersion']:
-                    target_upgrade = upgrades[u]
-
-            if target_upgrade == "0.0.0" and not self.data.get('value', True):
-                results.append(r)
+            target_upgrade = upgrades.get(r['EngineVersion'])
+            if target_upgrade is None:
+                if match_mode is False:
+                    results.append(r)
+                    continue
                 continue
-
-            upgrade = LooseVersion(
+            upgrade_found = LooseVersion(
                 r['EngineVersion']) < LooseVersion(target_upgrade)
-            res = (self.data.get('value', True), upgrade)
-            if res == (True, True):
+            if match_mode and upgrade_found:
                 r['c7n.rds-minor-engine-upgrade'] = target_upgrade
                 results.append(r)
         return results
 
 
 @actions.register('upgrade-minor')
-class UpgradeMinorRDS(BaseAction):
+class UpgradeMinor(BaseAction):
 
     schema = type_schema(
         'upgrade-minor', immediate={'type': 'boolean'})

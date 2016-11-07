@@ -216,6 +216,20 @@ class RDSTest(BaseTest):
              }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-001')
+
+    def test_rds_minor_upgrade_unavailable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_unavailable')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-done',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'upgrade-available', 'value': False}
+             ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
     def test_rds_minor_upgrade_do(self):
         session_factory = self.replay_flight_data(
@@ -232,49 +246,8 @@ class RDSTest(BaseTest):
                  'immediate': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-    def test_rds_minor_upgrade_unavailable(self):
-        session_factory = self.replay_flight_data(
-            'test_rds_minor_upgrade_unavailable')
-        p = self.load_policy(
-            {'name': 'rds-upgrade-done',
-             'resource': 'rds',
-             'filters': [
-                 {'type': 'upgrade-available', 'value': False}
-             ]}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 2)
-
-    def test_rds_minor_upgrade_immediate(self):
-        session_factory = self.replay_flight_data(
-            'test_rds_minor_upgrade_immediate')
-        p = self.load_policy(
-            {'name': 'rds-upgrade-do',
-             'resource': 'rds',
-             'filters': [
-                 {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                  'op': 'upgrade-minor'}],
-             'actions': [
-                 {'type': 'upgrade-minor', 'immediate': True},
-             ]}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-    def test_rds_minor_upgrade_complete(self):
-            session_factory = self.replay_flight_data(
-                'test_rds_minor_upgrade_complete')
-            p = self.load_policy(
-                {'name': 'rds-upgrade-complete',
-                 'resource': 'rds',
-                 'filters': [
-                     {'type': 'upgrade-available', 'value': False},
-                     {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                      'op': 'upgrade-minor'}],
-                 'actions': [{
-                     'type': 'remove-tag', 'tags': ['custodian_upgrade']}]
-                 }, session_factory=session_factory)
-            resources = p.run()
-            self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
 
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
