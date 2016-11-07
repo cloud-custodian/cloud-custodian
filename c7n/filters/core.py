@@ -266,7 +266,7 @@ class ValueFilter(Filter):
                 if t.get('Key') == tk:
                     r = t.get('Value')
                     break
-        elif '.' not in k and '[' not in k and '(' not in k:
+        elif k in i:
             r = i.get(k)
         elif self.expr:
             r = self.expr.search(i)
