@@ -18,7 +18,7 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('lambda')
@@ -43,6 +43,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n.EventSources"
+    schema = type_schema('event-source', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
         def _augment(r):
