@@ -440,18 +440,19 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
         return super(ImageAgeFilter, self).process(asgs, event)
 
     def initialize(self, asgs):
+        from c7n.resources.ami import AMI
         super(ImageAgeFilter, self).initialize(asgs)
         image_ids = set()
         for cfg in self.configs.values():
             image_ids.add(cfg['ImageId'])
-        ec2 = local_session(self.manager.session_factory).client('ec2')
-        results = ec2.describe_images(ImageIds=list(image_ids))
-        self.images = {i['ImageId']: i for i in results['Images']}
+        results = AMI(self.manager.ctx, {}).resources()
+        self.images = {i['ImageId']: i for i in results}
 
     def get_resource_date(self, i):
         cfg = self.configs[i['LaunchConfigurationName']]
-        ami = self.images[cfg['ImageId']]
-        return parse(ami[self.date_attribute])
+        ami = self.images.get(cfg['ImageId'], {})
+        return parse(ami.get(
+            self.date_attribute, "2000-01-01T01:01:01.000Z"))
 
 
 @filters.register('vpc-id')
@@ -874,9 +875,14 @@ class Suspend(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
-        self.manager.retry(
-            asg_client.suspend_processes,
-            AutoScalingGroupName=asg['AutoScalingGroupName'])
+        try:
+            self.manager.retry(
+                asg_client.suspend_processes,
+                AutoScalingGroupName=asg['AutoScalingGroupName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ValidationError':
+                return
+            raise
         ec2_client = session.client('ec2')
         try:
             instance_ids = [i['InstanceId'] for i in asg['Instances']]
@@ -970,9 +976,10 @@ class Delete(BaseAction):
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
         try:
-            asg_client.delete_auto_scaling_group(
-                    AutoScalingGroupName=asg['AutoScalingGroupName'],
-                    ForceDelete=force_delete)
+            self.manager.retry(
+                asg_client.delete_auto_scaling_group,
+                AutoScalingGroupName=asg['AutoScalingGroupName'],
+                ForceDelete=force_delete)
         except ClientError as e:
             if e.response['Error']['Code'] == 'ValidationError':
                 log.warning("Erroring deleting asg %s %s" % (

@@ -370,6 +370,7 @@ class Start(BaseAction, StateTransitionFilter):
     valid_origin_states = ('stopped',)
 
     schema = type_schema('start')
+    batch_size = 20
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -381,10 +382,14 @@ class Start(BaseAction, StateTransitionFilter):
             return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        self._run_api(
-            client.start_instances,
-            InstanceIds=[i['InstanceId'] for i in instances],
-            DryRun=self.manager.config.dryrun)
+        for batch in utils.chunks(instances, self.batch_size):
+            try:
+                self.manager.retry(
+                    client.start_instances,
+                    InstanceIds=[i['InstanceId'] for i in instances])
+            except ClientError as e:
+                self.log.error("Error while starting instances %s", e)
+                continue
 
 
 @actions.register('resize')
@@ -495,7 +500,7 @@ class Stop(BaseAction, StateTransitionFilter):
     def _run_instances_op(self, op, instance_ids):
         while True:
             try:
-                return op(InstanceIds=instance_ids)
+                return self.manager.retry(op, InstanceIds=instance_ids)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     msg = e.response['Error']['Message']
