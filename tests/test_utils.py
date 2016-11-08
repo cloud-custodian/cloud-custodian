@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import unittest
 import time
 
@@ -191,7 +192,9 @@ class UtilTest(unittest.TestCase):
             '{\n  "timestamp": 1234567891011, \n'
             '  "message": "This is a test"\n}'
         )
-        self.assertEqual(utils.format_event(event), event_json)
+        self.assertEqual(
+            json.loads(utils.format_event(event)),
+            json.loads(event_json))
 
     def test_date_time_decoder(self):
         dtdec = utils.DateTimeEncoder()

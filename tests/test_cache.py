@@ -19,7 +19,6 @@ from argparse import Namespace
 import cPickle
 import tempfile
 import mock
-import time
 
 
 class TestCache(TestCase):
@@ -42,6 +41,7 @@ class TestCache(TestCase):
             cache.factory(test_config),
             cache.NullCache,
         )
+
 
 class FileCacheManagerTest(TestCase):
     def setUp(self):
@@ -87,7 +87,6 @@ class FileCacheManagerTest(TestCase):
             cache=t.name,
         )
         load_cache = cache.FileCacheManager(load_config)
-        time.sleep(0.1)
         self.assertFalse(load_cache.load())
         load_cache.data = {'key': 'value'}
         self.assertTrue(load_cache.load())
@@ -119,7 +118,8 @@ class FileCacheManagerTest(TestCase):
     @mock.patch.object(cache.os.path, 'exists')
     @mock.patch.object(cache.cPickle, 'dump')
     @mock.patch.object(cache.cPickle, 'dumps')
-    def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
+    def test_save_doesnt_exists(
+            self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
         temp_cache_file = tempfile.NamedTemporaryFile()
         self.test_cache.cache_path = temp_cache_file.name
 
@@ -138,6 +138,6 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         #all 3 should be called once
-        self.assertEquals(mock_mkdir.call_count,1)
-        self.assertEquals(mock_dump.call_count,1)
-        self.assertEquals(mock_dumps.call_count,1)
+        self.assertEquals(mock_mkdir.call_count, 1)
+        self.assertEquals(mock_dump.call_count, 1)
+        self.assertEquals(mock_dumps.call_count, 1)
