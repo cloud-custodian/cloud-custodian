@@ -133,6 +133,15 @@ class BucketDelete(BaseTest):
         # Generate some versions
         generateBucketContents(s3_resource, bname)
 
+        upload_info = client.create_multipart_upload(
+            Bucket=bname, Key='abcdef12345')
+        client.upload_part(
+            Body='1' * 1024,
+            Bucket=bname,
+            Key='abcdef12345',
+            PartNumber=1,
+            UploadId=upload_info['UploadId'])
+
         p = self.load_policy({
             'name': 's3-delete-bucket',
             'resource': 's3',

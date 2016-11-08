@@ -3,41 +3,42 @@
     "data": {
         "Deleted": [
             {
-                "VersionId": "CHj4.wRO9gtGzmRhjvpyiHVuWfBNiuIe", 
+                "VersionId": "bdDlkF0ewGolANsQnu0ibVZ.T1uLdb_Q", 
                 "Key": "AWSLogs/2015/10/10"
             }, 
             {
-                "VersionId": "qtzJA2kh_fKhIczyCVpFcFuJIAd_dJBF", 
+                "VersionId": "WvWdGRg8XU.TxbOHYklLRvjNKnJ.LjRQ", 
                 "Key": "AWSLogs/2015/10/11"
             }, 
             {
-                "VersionId": "bWSk9sTsHU_04nr.XaKziLhq60_lM6bU", 
+                "VersionId": "eTenGbORgbGE3Hxsq27m6kUgBL1mSs4E", 
                 "Key": "home.txt"
             }, 
             {
-                "VersionId": "zvJqTgq7pIvMtzIV1QPrq6W3MZECH5Tk", 
+                "VersionId": "Z_aCyKULWqESa9prWU.M5dUhLyeXX1RS", 
+                "Key": "AWSLogs/2015/10/11"
+            }, 
+            {
+                "VersionId": "C34qCjmLGVyKR22ngXstnWaCSh46wG6R", 
+                "Key": "home.txt"
+            }, 
+            {
+                "VersionId": "mAw_RV_b2TU0t60P2qpw3g8d3gT3qI9q", 
                 "Key": "AWSLogs/2015/10/10"
-            }, 
-            {
-                "VersionId": ".sUZ3UDvWoXIMptgqUbK_LBwKoR_b.Bw", 
-                "Key": "AWSLogs/2015/10/11"
-            }, 
-            {
-                "VersionId": "Ee5fddSUGW8JlSwsCNi4q9NtPXJYTNQp", 
-                "Key": "home.txt"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "ZAsOydi3XqBLWErZnPwOf1UhYA+aHR6xVcUivbF3DJergwk0IzFHKMFbsRGQqqVLK16LkRWsVjE=", 
-            "RequestId": "E654F81BD6746449", 
+            "RetryAttempts": 0, 
+            "HostId": "VT9Y1NXKmAP2fci8c4wNi/RmFxvDYp/J1G4tBc61ImsWjScmfqFcbNXhHX6t8VV1R2sRMPG2oZs=", 
+            "RequestId": "28D30DC7CCF1C6CE", 
             "HTTPHeaders": {
-                "x-amz-id-2": "ZAsOydi3XqBLWErZnPwOf1UhYA+aHR6xVcUivbF3DJergwk0IzFHKMFbsRGQqqVLK16LkRWsVjE=", 
+                "x-amz-id-2": "VT9Y1NXKmAP2fci8c4wNi/RmFxvDYp/J1G4tBc61ImsWjScmfqFcbNXhHX6t8VV1R2sRMPG2oZs=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
                 "connection": "close", 
-                "x-amz-request-id": "E654F81BD6746449", 
-                "date": "Mon, 22 Aug 2016 09:24:04 GMT", 
+                "x-amz-request-id": "28D30DC7CCF1C6CE", 
+                "date": "Tue, 08 Nov 2016 23:19:27 GMT", 
                 "content-type": "application/xml"
             }
         }
