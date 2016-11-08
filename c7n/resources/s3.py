@@ -1186,7 +1186,7 @@ class DeleteBucket(ScanBucket):
         # Clear our multi-part uploads
         uploads = client.get_paginator('list_multipart_uploads')
         for p in uploads.paginate(Bucket=b['Name']):
-            for u in p.get('Uploads'):
+            for u in p.get('Uploads', ()):
                 client.abort_multipart_upload(
                     Bucket=b['Name'],
                     Key=u['Key'],
