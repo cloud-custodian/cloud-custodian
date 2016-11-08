@@ -182,6 +182,20 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_redshift_vpc_routing(self):
+        factory = self.replay_flight_data('test_redshift_vpc_routing')
+        p = self.load_policy({
+            'name': 'redshift-vpc-routing',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'value',
+                 'key': 'EnhancedVpcRouting',
+                 'value': True}],
+            'actions': [{'type': 'enable-vpc-routing', 'value': False}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestRedshiftSnapshot(BaseTest):
 
