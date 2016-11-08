@@ -132,6 +132,13 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+def group_by(resources, key):
+    resource_map = {}
+    for r in resources:
+        resource_map.setdefault(r.get(key), []).append(r)
+    return resource_map
+
+
 def chunks(iterable, size=50):
     """Break an iterable into lists of size"""
     batch = []
@@ -255,7 +262,7 @@ def snapshot_identifier(prefix, db_identifier):
     return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
 
 
-def get_retry(codes=(), max_attempts=8):
+def get_retry(codes=(), max_attempts=8, delay_iter=None):
     """Retry a boto3 api call on transient errors.
 
     https://www.awsarchitectureblog.com/2015/03/backoff.html
