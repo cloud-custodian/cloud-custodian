@@ -346,7 +346,7 @@ class ValueFilter(Filter):
                 # EMR not having more functionality.
                 try:
                     value = parse(value)
-                except AttributeError:
+                except (AttributeError, TypeError):
                     value = 0
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
