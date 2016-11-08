@@ -279,7 +279,9 @@ class OffHoursFilterTest(BaseTest):
             p = f.get_tag_value(i)
             self.assertEqual(p, 'tz=est')
             tz = f.get_tz('est')
-            self.assertEqual(str(tz), "tzfile('America/New_York')")
+            self.assertTrue(str(tz) in (
+                "tzfile('US/Eastern')",
+                "tzfile('America/New_York')"))
             self.assertEqual(
                 datetime.datetime.now(tz), t)
             self.assertEqual(t.hour, 19)
