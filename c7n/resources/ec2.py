@@ -394,7 +394,8 @@ class Start(BaseAction, StateTransitionFilter):
         # Setup retry with insufficient capacity as well
         retry = utils.get_retry((
             'InsufficientInstanceCapacity',
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.start_instances, InstanceIds=instance_ids)

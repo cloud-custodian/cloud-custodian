@@ -262,7 +262,7 @@ def snapshot_identifier(prefix, db_identifier):
     return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
 
 
-def get_retry(codes=(), max_attempts=8, delay_iter=None):
+def get_retry(codes=(), max_attempts=8):
     """Retry a boto3 api call on transient errors.
 
     https://www.awsarchitectureblog.com/2015/03/backoff.html
