@@ -368,7 +368,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
     schema = type_schema('start')
-    batch_size = 20
+    batch_size = 10
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
