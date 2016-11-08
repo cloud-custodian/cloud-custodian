@@ -204,7 +204,8 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
             client.put_bucket_tagging(
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
-            log.exception('Exception tagging bucket %s: %s' %(bucket['Name'], e))
+            log.exception(
+                'Exception tagging bucket %s: %s', (bucket['Name'], e))
             continue
 
 
@@ -1188,8 +1189,8 @@ class DeleteBucket(ScanBucket):
         self.manager.ctx.metrics.flush()
 
         log.info(
-            ("EmptyBucket bucket:%s Complete keys:%d rate:%0.2f/s time:%0.2fs"),
-            r['Bucket'], object_count, float(object_count) / run_time, run_time)
+            ("EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs"),
+            len(buckets), object_count, float(object_count) / run_time, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
