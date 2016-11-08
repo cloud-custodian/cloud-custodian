@@ -718,18 +718,10 @@ class ScanBucket(BucketActionBase):
         count = 0
 
         for key_set in p:
-
             keys = self.get_keys(b, key_set)
             count += len(keys)
-
-            # Empty bucket check
-            if not keys and not key_set['IsTruncated']:
-                b['KeyScanCount'] = count
-                b['KeyRemediated'] = key_log.count
-                return {'Bucket': b['Name'],
-                        'Remediated': key_log.count,
-                        'Count': count}
             futures = []
+
             for batch in chunks(keys, size=100):
                 if not batch:
                     continue
