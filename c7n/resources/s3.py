@@ -204,7 +204,8 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
             client.put_bucket_tagging(
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
-            log.exception('Exception tagging bucket %s: %s' %(bucket['Name'], e))
+            log.exception(
+                'Exception tagging bucket %s: %s', (bucket['Name'], e))
             continue
 
 

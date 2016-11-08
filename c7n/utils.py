@@ -132,6 +132,13 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+def group_by(resources, key):
+    resource_map = {}
+    for r in resources:
+        resource_map.setdefault(r.get(key), []).append(r)
+    return resource_map
+
+
 def chunks(iterable, size=50):
     """Break an iterable into lists of size"""
     batch = []

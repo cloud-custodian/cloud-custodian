@@ -367,9 +367,8 @@ class DefaultVpc(DefaultVpcBase):
 class Start(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
-
     schema = type_schema('start')
-    batch_size = 20
+    batch_size = 10
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -379,16 +378,37 @@ class Start(BaseAction, StateTransitionFilter):
             self.filter_instance_state(instances))
         if not len(instances):
             return
+
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        for batch in utils.chunks(instances, self.batch_size):
-            try:
-                self.manager.retry(
-                    client.start_instances,
-                    InstanceIds=[i['InstanceId'] for i in instances])
-            except ClientError as e:
-                self.log.error("Error while starting instances %s", e)
-                continue
+
+        # Play nice around aws having insufficient capacity...
+        for itype, t_instances in utils.group_by(
+                instances, 'InstanceType').items():
+            for izone, z_instances in utils.group_by(
+                    t_instances, 'AvailabilityZone').items():
+                for batch in utils.chunks(z_instances, self.batch_size):
+                    self.process_instance_set(client, batch, itype, izone)
+
+    def process_instance_set(self, client, instances, itype, izone):
+        # Setup retry with insufficient capacity as well
+        retry = utils.get_retry((
+            'InsufficientInstanceCapacity',
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5)
+        instance_ids = [i['InstanceId'] for i in instances]
+        try:
+            retry(client.start_instances, InstanceIds=instance_ids)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+                self.log.exception(
+                    ("Could not start instances:%d type:%s"
+                     " zone:%s instances:%s error:%s"),
+                    len(instances), itype, izone,
+                    ", ".join(instance_ids), e)
+                return
+            self.log.exception("Error while starting instances error %s", e)
+            raise
 
 
 @actions.register('resize')
