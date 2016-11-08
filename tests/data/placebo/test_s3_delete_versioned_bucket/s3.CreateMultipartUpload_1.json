@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Bucket": "custodian-byebye", 
+        "UploadId": "Sea417tbzMV0sgKoF7Uhf1Kk3ZVmN5_TmlE6gexwSP_LFzq.oBCWcEec.CLI6UKHV.7equQpH.Aru4zacTkOd1mxxV.mUBjvvr_zGS_.dVJo7L2cWaCEi7jDy7nDkezu", 
+        "Key": "abcdef12345", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "5rnwj5P/CRlx973ewTAt95oAn0M33Iz5nF1wjml9PMyVGH3OQhn3aMNSachNjvq8jyZJ67LZYwY=", 
+            "RequestId": "C1994E67F4D3D127", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "5rnwj5P/CRlx973ewTAt95oAn0M33Iz5nF1wjml9PMyVGH3OQhn3aMNSachNjvq8jyZJ67LZYwY=", 
+                "date": "Tue, 08 Nov 2016 23:01:56 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "C1994E67F4D3D127", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

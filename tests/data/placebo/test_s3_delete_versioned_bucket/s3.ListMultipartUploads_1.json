@@ -1,0 +1,51 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UploadIdMarker": "", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "BHfMOlNAklsY/jKvcyM335788yFa1aNjSIMtrOLN0uGbGHxFMOy/sQkDcXldxSQ8vYIT0e9N0SI=", 
+            "RequestId": "9E09F2F6549FC366", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "BHfMOlNAklsY/jKvcyM335788yFa1aNjSIMtrOLN0uGbGHxFMOy/sQkDcXldxSQ8vYIT0e9N0SI=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "9E09F2F6549FC366", 
+                "date": "Tue, 08 Nov 2016 23:02:02 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "NextKeyMarker": "abcdef12345", 
+        "Bucket": "custodian-byebye", 
+        "NextUploadIdMarker": "Sea417tbzMV0sgKoF7Uhf1Kk3ZVmN5_TmlE6gexwSP_LFzq.oBCWcEec.CLI6UKHV.7equQpH.Aru4zacTkOd1mxxV.mUBjvvr_zGS_.dVJo7L2cWaCEi7jDy7nDkezu", 
+        "Uploads": [
+            {
+                "Initiator": {
+                    "DisplayName": "kapil", 
+                    "ID": "arn:aws:iam::644160558196:user/kapil"
+                }, 
+                "Initiated": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 1
+                }, 
+                "UploadId": "Sea417tbzMV0sgKoF7Uhf1Kk3ZVmN5_TmlE6gexwSP_LFzq.oBCWcEec.CLI6UKHV.7equQpH.Aru4zacTkOd1mxxV.mUBjvvr_zGS_.dVJo7L2cWaCEi7jDy7nDkezu", 
+                "StorageClass": "STANDARD", 
+                "Key": "abcdef12345", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }
+            }
+        ], 
+        "KeyMarker": "", 
+        "MaxUploads": 1000, 
+        "IsTruncated": false
+    }
+}

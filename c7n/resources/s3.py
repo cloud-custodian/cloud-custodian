@@ -1165,7 +1165,7 @@ class DeleteBucket(ScanBucket):
             }
         }
 
-    def process_delete_enablement(self, buckets):
+    def process_delete_enablement(self, b):
         """Prep a bucket for deletion.
 
         Clear out any pending multi-part uploads.
@@ -1174,29 +1174,29 @@ class DeleteBucket(ScanBucket):
         generate fresh deletion markers.
         """
         client = local_session(self.manager).client('s3')
-        for b in buckets:
-            # Suspend versioning, so we don't get new delete markers
-            # as we walk and delete versions
-            if (self.get_bucket_style(b) == 'versioned'
-                and b['Versioning']['Status'] == 'Enabled'
+
+        # Suspend versioning, so we don't get new delete markers
+        # as we walk and delete versions
+        if (self.get_bucket_style(b) == 'versioned'
+            and b['Versioning']['Status'] == 'Enabled'
                 and self.data.get('remove-contents', True)):
-                client.put_bucket_versioning(
-                    Bucket=b,
-                    VersioningConfiguration={'Status': 'Suspended'})
-            # Clear our multi-part uploads
-            uploads = client.get_paginator('list_multipart_uploads')
-            for p in uploads.paginate(Bucket=b['Name']):
-                for u in p.get('Uploads'):
-                    client.abort_multipart_upload(
-                        Bucket=b['Name'],
-                        Key=u['Key'],
-                        UploadId=u['UploadId'])
+            client.put_bucket_versioning(
+                Bucket=b['Name'],
+                VersioningConfiguration={'Status': 'Suspended'})
+        # Clear our multi-part uploads
+        uploads = client.get_paginator('list_multipart_uploads')
+        for p in uploads.paginate(Bucket=b['Name']):
+            for u in p.get('Uploads'):
+                client.abort_multipart_upload(
+                    Bucket=b['Name'],
+                    Key=u['Key'],
+                    UploadId=u['UploadId'])
 
     def process(self, buckets):
         # might be worth sanity checking all our permissions
         # on the bucket up front before disabling versioning.
         with self.executor_factory(max_workers=3) as w:
-            w.map(self.process_delete_enablement, buckets)
+            list(w.map(self.process_delete_enablement, buckets))
         if self.data.get('remove-contents', True):
             self.empty_buckets(buckets)
         with self.executor_factory(max_workers=3) as w:
