@@ -316,13 +316,13 @@ class TestTag(BaseTest):
         policy = self.load_policy({
             'name': 'ec2-rename-tag',
             'resource': 'ec2',
-            'filters': [{'tag:Testing': 'not-null'}],
             'actions': [{
                 'type': 'rename-tag',
-                'source': 'Testing',
-                'dest': 'Success'}]}, session_factory=session_factory)
+                'map': [{
+                    'Success': 'Testing'}]
+            }]}, session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
 
 
 class TestStop(BaseTest):
