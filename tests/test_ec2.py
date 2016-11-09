@@ -394,6 +394,41 @@ class TestSnapshot(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_rename_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_rename_tag')
+
+        policy = self.load_policy({
+            'name': 'ec2-rename-start',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Success': 'not-null'},
+                {'tag:Testing': 'absent'}
+            ]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
+        policy = self.load_policy({
+            'name': 'ec2-rename-tag',
+            'resource': 'ec2',
+            'actions': [{
+                'type': 'rename-tag',
+                'old_key': 'Success',
+                'new_key': 'Testing'
+            }]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
+        policy = self.load_policy({
+            'name': 'ec2-rename-end',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'},
+                {'tag:Success': 'absent'}]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
 
 class TestEC2QueryFilter(unittest.TestCase):
 
