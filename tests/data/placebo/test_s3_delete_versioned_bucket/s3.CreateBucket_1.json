@@ -4,15 +4,16 @@
         "Location": "/custodian-byebye", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "Z8s7LknTT76xWYRMV+zRLLHNTBYXKprC1/MMGEPzICwz1+dGxeqoKSLNe3RDkxyN5hAGEK3UC64=", 
-            "RequestId": "0C7BE59A6E090DE5", 
+            "RetryAttempts": 0, 
+            "HostId": "IwmMr7Z8d2BFenorWh3BNljJ3WcjdrPVoM/trdo8wlLIrJrVpgMRVl7SIr8wYSvBAY8Vu+lA5X0=", 
+            "RequestId": "6EB0A482CA66B811", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "Z8s7LknTT76xWYRMV+zRLLHNTBYXKprC1/MMGEPzICwz1+dGxeqoKSLNe3RDkxyN5hAGEK3UC64=", 
+                "x-amz-id-2": "IwmMr7Z8d2BFenorWh3BNljJ3WcjdrPVoM/trdo8wlLIrJrVpgMRVl7SIr8wYSvBAY8Vu+lA5X0=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "0C7BE59A6E090DE5", 
+                "x-amz-request-id": "6EB0A482CA66B811", 
                 "location": "/custodian-byebye", 
-                "date": "Mon, 22 Aug 2016 09:23:56 GMT"
+                "date": "Tue, 08 Nov 2016 23:19:14 GMT"
             }
         }
     }

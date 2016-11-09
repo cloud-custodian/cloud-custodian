@@ -3,12 +3,13 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 204, 
-            "HostId": "KkkMHJyrwzguFFg0yICapo0rjtV8Z3QECC9Hb43t8i+0jlAEdrsO8x7ZQCFhcwjSfREeJeF2i4g=", 
-            "RequestId": "E88B067AB1D5F485", 
+            "RetryAttempts": 0, 
+            "HostId": "Nel4rwsjwLvBlARMqYA0JzHHteSY1aBtPdLIhWjjyJACEXiWbz6ysi3A7EuDeGHG3mG3oB6/7VU=", 
+            "RequestId": "75602DF2B5D613A0", 
             "HTTPHeaders": {
-                "x-amz-id-2": "KkkMHJyrwzguFFg0yICapo0rjtV8Z3QECC9Hb43t8i+0jlAEdrsO8x7ZQCFhcwjSfREeJeF2i4g=", 
-                "date": "Mon, 22 Aug 2016 09:24:05 GMT", 
-                "x-amz-request-id": "E88B067AB1D5F485", 
+                "x-amz-id-2": "Nel4rwsjwLvBlARMqYA0JzHHteSY1aBtPdLIhWjjyJACEXiWbz6ysi3A7EuDeGHG3mG3oB6/7VU=", 
+                "date": "Tue, 08 Nov 2016 23:19:28 GMT", 
+                "x-amz-request-id": "75602DF2B5D613A0", 
                 "server": "AmazonS3"
             }
         }
