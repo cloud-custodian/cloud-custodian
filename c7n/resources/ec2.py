@@ -653,6 +653,82 @@ class Snapshot(BaseAction):
                 Tags=tags)
 
 
+@actions.register('rename-tag')
+class RenameTag(BaseAction):
+
+    schema = type_schema(
+        'rename-tag',
+        map={'type': 'list', 'items': {'type': 'string'}})
+
+    def delete_tag(self, client, ec2, key, value):
+        client.delete_tags(
+            Resources=[ec2['InstanceId']],
+            Tags=[{'Key': key, 'Value': value}])
+
+    def create_tag(self, client, ec2, key, value):
+        client.create_tags(
+            Resources=[ec2['InstanceId']],
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_ec2(self, source_tag, source_value, resources):
+        """
+        Move source tag value to destination tag value
+
+        - Collect value from old tag
+        - Delete old tag
+        - Create new tag & assign stored value
+        """
+        tag_map = self.data.get('map', [{}])[0]
+        dest_tag = tag_map[source_tag]
+        over = []
+        under = []
+        for r in resources:
+            if len(r.get('Tags', [])) < 50:
+                under.append(r['InstanceId'])
+            else:
+                over.append(r['InstanceId'])
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+        if under:
+            self.create_tag(c, under, dest_tag, source_value)
+
+        self.delete_tag(
+            c, [r['InstanceId'] for r in resources], source_tag, source_value)
+        
+        if over:
+            self.create_tag(c, over, dest_tag, source_value)
+
+    def create_map(self, resources):
+        tag_map = self.data.get('map', [{}])[0]
+        keys = {}
+        for t in tag_map.keys():
+            if t not in keys:
+                keys[t] = {}
+        for r in resources:
+            tags = {t['Key']: t for t in r.get('Tags', [])}
+            for k in keys:
+                if k not in tags:
+                    continue
+                value = tags[k]['Value']
+                if value not in keys[k]:
+                    keys[k][value] = []
+                keys[k][value].append(r)
+        return keys
+
+    def process(self, resources):
+        keys = self.create_map(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for k in keys:
+                for v in keys[k]:
+                    futures.append(w.submit(self.process_ec2, k, v, keys[k][v]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception renaming ec2 tag set \n %s" % (
+                            f.exception()))
+        return len(futures)
+
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {

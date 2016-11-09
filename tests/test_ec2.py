@@ -310,6 +310,20 @@ class TestTag(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_rename_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_rename_tag')
+        policy = self.load_policy({
+            'name': 'ec2-rename-tag',
+            'resource': 'ec2',
+            'actions': [{
+                'type': 'rename-tag',
+                'map': [{
+                    'Success': 'Testing'}]
+            }]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
 
 class TestStop(BaseTest):
 
