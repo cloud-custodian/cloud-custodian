@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalDecision": "implicitDeny", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:RunInstances", 
+                "MatchedStatements": [], 
+                "EvalResourceName": "*"
+            }, 
+            {
+                "EvalDecision": "implicitDeny", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:TerminateInstances", 
+                "MatchedStatements": [], 
+                "EvalResourceName": "*"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1b6f4eeb-9623-11e6-9330-9d792b84470f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1b6f4eeb-9623-11e6-9330-9d792b84470f", 
+                "date": "Wed, 19 Oct 2016 17:40:20 GMT", 
+                "content-length": "881", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

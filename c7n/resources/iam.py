@@ -199,6 +199,33 @@ class UnusedIamPolicies(Filter):
 
 
 ###############################
+#   IAM Resource Simulation   #
+###############################
+
+@User.action_registry.register('simulate-principal')
+@Role.action_registry.register('simulate-principal')
+@Group.action_registry.register('simulate-principal')
+class SimulatePrincipalPolicy(BaseAction):
+    """ IAM simulate action for principal policies """
+    schema = type_schema(
+        'simulate-principal',
+        actions={'type': 'array', 'items': {'type': 'string'}})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        results = []
+        for r in resources:
+            results.append(client.simulate_principal_policy(
+                PolicySourceArn=r['Arn'],
+                ActionNames=self.data.get('actions'))['EvaluationResults'])
+        return results
+
+
+class SimulateCustomPolicy(BaseAction):
+    """ IAM simulate custom policies """
+
+
+###############################
 #    IAM Instance Profiles    #
 ###############################
 

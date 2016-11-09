@@ -1,0 +1,76 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalDecision": "allowed", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:RunInstances", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "AdministratorAccess", 
+                        "StartPosition": {
+                            "Column": 17, 
+                            "Line": 3
+                        }, 
+                        "EndPosition": {
+                            "Column": 6, 
+                            "Line": 8
+                        }
+                    }
+                ], 
+                "EvalResourceName": "*"
+            }, 
+            {
+                "EvalDecision": "allowed", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:TerminateInstances", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "AdministratorAccess", 
+                        "StartPosition": {
+                            "Column": 17, 
+                            "Line": 3
+                        }, 
+                        "EndPosition": {
+                            "Column": 6, 
+                            "Line": 8
+                        }
+                    }
+                ], 
+                "EvalResourceName": "*"
+            }, 
+            {
+                "EvalDecision": "allowed", 
+                "MissingContextValues": [], 
+                "EvalActionName": "ec2:DescribeInstances", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "AdministratorAccess", 
+                        "StartPosition": {
+                            "Column": 17, 
+                            "Line": 3
+                        }, 
+                        "EndPosition": {
+                            "Column": 6, 
+                            "Line": 8
+                        }
+                    }
+                ], 
+                "EvalResourceName": "*"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "caca4a49-9625-11e6-a51c-91acf66e66ea", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "caca4a49-9625-11e6-a51c-91acf66e66ea", 
+                "date": "Wed, 19 Oct 2016 17:59:33 GMT", 
+                "content-length": "2219", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

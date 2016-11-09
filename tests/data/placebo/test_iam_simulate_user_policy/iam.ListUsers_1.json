@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "c7n-test", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 39
+                }, 
+                "UserId": "AIDAJEKQZXQU4PIT6AUVG", 
+                "Arn": "arn:aws:iam::644160558196:user/c7n-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1b337ed2-9623-11e6-9d2b-5d6450484f9b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1b337ed2-9623-11e6-9d2b-5d6450484f9b", 
+                "date": "Wed, 19 Oct 2016 17:40:20 GMT", 
+                "content-length": "5937", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}
