@@ -14,7 +14,7 @@
         }, 
         "TagList": [
             {
-                "Value": "Minor engine upgrade available: upgrade-minor@2016/11/01", 
+                "Value": "Minor engine upgrade available: upgrade@2016/11/01", 
                 "Key": "custodian_upgrade"
             }, 
             {

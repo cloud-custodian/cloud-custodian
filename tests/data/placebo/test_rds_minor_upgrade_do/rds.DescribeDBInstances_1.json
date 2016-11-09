@@ -30,7 +30,9 @@
                         "OptionGroupName": "default:mysql-5-7"
                     }
                 ], 
-                "PendingModifiedValues": {}, 
+                "PendingModifiedValues": {
+		    "EngineVersion": "5.7.11"
+		}, 
                 "Engine": "mysql", 
                 "MultiAZ": false, 
                 "LatestRestorableTime": {
@@ -100,7 +102,7 @@
                     "Address": "c7n-mysql-test-01.cz6wy8cci3uf.us-east-1.rds.amazonaws.com"
                 }, 
                 "DBInstanceStatus": "available", 
-                "EngineVersion": "5.7.11", 
+                "EngineVersion": "5.7.10", 
                 "AvailabilityZone": "us-east-1e", 
                 "DomainMemberships": [], 
                 "StorageType": "gp2", 

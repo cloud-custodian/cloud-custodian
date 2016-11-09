@@ -209,7 +209,7 @@
                     "Address": "c7n-mysql-test-002.cz6wy8cci3uf.us-east-1.rds.amazonaws.com"
                 }, 
                 "DBInstanceStatus": "available", 
-                "EngineVersion": "5.6.27", 
+                "EngineVersion": "5.7.11", 
                 "AvailabilityZone": "us-east-1a", 
                 "DomainMemberships": [], 
                 "StorageType": "gp2", 

@@ -46,6 +46,7 @@ import functools
 import logging
 import re
 
+
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -201,7 +202,26 @@ def _db_instance_eligible_for_final_snapshot(resource):
     return True
 
 
-def _list_engines_upgrade_version(client):
+def _get_available_engine_upgrades(client, major=False):
+    """Returns all extant rds engine upgrades.
+
+    As a nested mapping of engine type to known versions
+    and their upgrades.
+
+    Defaults to minor upgrades, but configurable to major.
+
+    Example::
+
+      >>> _get_engine_upgrades(client)
+      {
+         'oracle-se2': {'12.1.0.2.v2': '12.1.0.2.v5',
+                        '12.1.0.2.v3': '12.1.0.2.v5'},
+         'postgres': {'9.3.1': '9.3.14',
+                      '9.3.10': '9.3.14',
+                      '9.3.12': '9.3.14',
+                      '9.3.2': '9.3.14'}
+      }
+    """
     results = {}
     engine_versions = client.describe_db_engine_versions()['DBEngineVersions']
     for v in engine_versions:
@@ -210,12 +230,10 @@ def _list_engines_upgrade_version(client):
         if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
             continue
         for t in v['ValidUpgradeTarget']:
-            if t['IsMajorVersionUpgrade']:
+            if not major and t['IsMajorVersionUpgrade']:
                 continue
-            if not v['EngineVersion'] in results[v['Engine']]:
-                results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
             if LooseVersion(t['EngineVersion']) > LooseVersion(
-                    results[v['Engine']][v['EngineVersion']]):
+                    results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
                 results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
     return results
 
@@ -314,61 +332,58 @@ class UpgradeAvailable(Filter):
 
     """
 
-    schema = type_schema('upgrade-available', value={'type': 'boolean'})
+    schema = type_schema('upgrade-available',
+                         major={'type': 'boolean'},
+                         value={'type': 'boolean'})
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('rds')
+        check_upgrade_extant = self.data.get('value', True)
+        check_major = self.data.get('major', False)
+        engine_upgrades = _get_available_engine_upgrades(
+            client, major=check_major)
         results = []
-        engine_upgrades = _list_engines_upgrade_version(client)
-
-        match_mode = self.data.get('value', True)
 
         for r in resources:
-            upgrades = engine_upgrades[r['Engine']]
-            if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
-                if not self.data.get('value', True):
-                    results.append(r)
-                    continue
-
-            target_upgrade = upgrades.get(r['EngineVersion'])
+            target_upgrade = engine_upgrades.get(
+                r['Engine'], {}).get(r['EngineVersion'])
             if target_upgrade is None:
-                if match_mode is False:
+                if check_upgrade_extant is False:
                     results.append(r)
-                    continue
                 continue
-            upgrade_found = LooseVersion(
-                r['EngineVersion']) < LooseVersion(target_upgrade)
-            if match_mode and upgrade_found:
-                r['c7n.rds-minor-engine-upgrade'] = target_upgrade
-                results.append(r)
+            r['c7n-rds-engine-upgrade'] = target_upgrade
+            results.append(r)
         return results
 
 
-@actions.register('upgrade-minor')
+@actions.register('upgrade')
 class UpgradeMinor(BaseAction):
 
     schema = type_schema(
-        'upgrade-minor', immediate={'type': 'boolean'})
+        'upgrade', major={'type': 'boolean'}, immediate={'type': 'boolean'})
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        engine_upgrades = _list_engines_upgrade_version(client)
-
+        engine_upgrades = None
         for r in resources:
             if 'EngineVersion' in r['PendingModifiedValues']:
                 # Upgrade has already been scheduled
                 continue
-
-            if 'c7n.rds-minor-engine-upgrade' not in r:
-                upgrades = engine_upgrades[r['Engine']]
-                if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
+            if 'c7n-rds-engine-upgrade' not in r:
+                if engine_upgrades is None:
+                    engine_upgrades = _get_available_engine_upgrades(
+                        client, major=self.data.get('major', False))
+                target = engine_upgrades.get(
+                    r['Engine'], {}).get(r['EngineVersion'])
+                if target is None:
+                    log.debug(
+                        "implicit filter no upgrade on %s",
+                        r['DBInstanceIdentifier'])
                     continue
-                target_upgrade = upgrades[r['EngineVersion']]
-                r['c7n.rds-minor-engine-upgrade'] = target_upgrade
-
+                r['c7n-rds-engine-upgrade'] = target
             client.modify_db_instance(
                 DBInstanceIdentifier=r['DBInstanceIdentifier'],
-                EngineVersion=r['c7n.rds-minor-engine-upgrade'],
+                EngineVersion=r['c7n-rds-engine-upgrade'],
                 ApplyImmediately=self.data.get('immediate', False))
 
 
@@ -566,10 +581,10 @@ class RDSSnapshot(QueryResourceManager):
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
-    
+
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
-    
+
     @property
     def account_id(self):
         if self._account_id is None:
@@ -582,8 +597,7 @@ class RDSSnapshot(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot',
-                separator=':')
+                account_id=self.account_id, resource_type='snapshot', separator=':')
         return self._generate_arn
 
     def augment(self, snaps):
@@ -592,8 +606,8 @@ class RDSSnapshot(QueryResourceManager):
             snaps, self.session_factory, self.executor_factory,
             self.generate_arn, self.retry))
         return snaps
-    
-    
+
+
 def _rds_snap_tags(
         model, snaps, session_factory, executor_factory, generator, retry):
     """Augment rds snapshots with their respective tags."""
@@ -607,15 +621,15 @@ def _rds_snap_tags(
                 client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
-                log.warning("Exception getting rds snapshot tags  \n %s", e)
+                log.warning("Exception getting rds snapshot:%s tags  \n %s", e)
             return None
         snap['Tags'] = tag_list or []
         return snap
 
     with executor_factory(max_workers=1) as w:
-        return list(w.map(process_tags, snaps))    
-    
-    
+        return filter(None, (w.map(process_tags, snaps)))
+
+
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
 
@@ -670,8 +684,8 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
             arn = self.manager.generate_arn(snap['DBSnapshotIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
-            
-            
+
+
 @RDSSnapshot.action_registry.register('delete')
 class RDSSnapshotDelete(BaseAction):
 
@@ -710,4 +724,3 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
-

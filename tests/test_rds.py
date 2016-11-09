@@ -197,6 +197,20 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_available_engine_upgrades(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_available_engine_upgrades', zdata=True)
+        client = session_factory().client('rds')
+        upgrades = rds._get_available_engine_upgrades(client)
+        self.assertEqual(upgrades['postgres']['9.3.1'], '9.3.14')
+        self.assertEqual(upgrades['sqlserver-ex']['10.50.6000.34.v1'],
+                         '10.50.6529.0.v1')
+        upgrades = rds._get_available_engine_upgrades(client, major=True)
+        self.assertEqual(upgrades['postgres']['9.3.1'], '9.4.9')
+        self.assertEqual(upgrades['postgres']['9.4.9'], '9.5.4')
+        self.assertEqual(upgrades['sqlserver-ex']['10.50.2789.0.v1'],
+                         '12.00.5000.0.v1')
+
     def test_rds_upgrade_available(self):
         session_factory = self.replay_flight_data(
             'test_rds_minor_upgrade_available')
@@ -204,20 +218,21 @@ class RDSTest(BaseTest):
             {'name': 'rds-upgrade-available',
              'resource': 'rds',
              'filters': [
-                 {'type': 'upgrade-available', 'value': True},
-                 {'AutoMinorVersionUpgrade': False}
+                 {'type': 'upgrade-available', 'major': True},
              ],
              'actions': [{
                  'type': 'mark-for-op',
                  'tag': 'custodian_upgrade',
                  'days': 1,
                  'msg': 'Minor engine upgrade available: {op}@{action_date}',
-                 'op': 'upgrade-minor'}],
+                 'op': 'upgrade'}],
              }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-001')
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.6.27': u'5.7.11'})
 
     def test_rds_minor_upgrade_unavailable(self):
         session_factory = self.replay_flight_data(
@@ -229,7 +244,11 @@ class RDSTest(BaseTest):
                  {'type': 'upgrade-available', 'value': False}
              ]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
+        self.assertEqual(
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.5.41': u'5.5.46', u'5.6.29': None, u'5.7.11': None})
 
     def test_rds_minor_upgrade_do(self):
         session_factory = self.replay_flight_data(
@@ -238,16 +257,23 @@ class RDSTest(BaseTest):
             {'name': 'rds-upgrade-do',
              'resource': 'rds',
              'filters': [
-                 'upgrade-available',
                  {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                  'op': 'upgrade-minor'}],
+                  'op': 'upgrade'}],
              'actions': [{
-                 'type': 'upgrade-minor',
+                 'type': 'upgrade',
                  'immediate': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
-            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.7.10': None, u'5.6.23': u'5.6.29'})
+        self.assertEqual(
+            resources[1]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+        self.assertEqual(
+            resources[1]['EngineVersion'], '5.6.23')
+        self.assertEqual(
+            resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
 
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
