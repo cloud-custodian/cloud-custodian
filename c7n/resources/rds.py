@@ -324,18 +324,20 @@ class UpgradeAvailable(Filter):
         match_mode = self.data.get('value', True)
 
         for r in resources:
+            if r['Engine'] not in engine_upgrades and not match_mode:
+                results.append(r)
+                continue
             upgrades = engine_upgrades[r['Engine']]
-            if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
-                if not self.data.get('value', True):
-                    results.append(r)
-                    continue
+            if len(upgrades) == 0 and not match_mode:
+                results.append(r)
+                continue
 
             target_upgrade = upgrades.get(r['EngineVersion'])
             if target_upgrade is None:
-                if match_mode is False:
+                if not match_mode:
                     results.append(r)
-                    continue
                 continue
+
             upgrade_found = LooseVersion(
                 r['EngineVersion']) < LooseVersion(target_upgrade)
             if match_mode and upgrade_found:
@@ -360,8 +362,10 @@ class UpgradeMinor(BaseAction):
                 continue
 
             if 'c7n.rds-minor-engine-upgrade' not in r:
+                if not r['EngineVersion'] in engine_upgrades:
+                    continue
                 upgrades = engine_upgrades[r['Engine']]
-                if len(upgrades) == 0 or r['EngineVersion'] not in upgrades:
+                if len(upgrades) == 0:
                     continue
                 target_upgrade = upgrades[r['EngineVersion']]
                 r['c7n.rds-minor-engine-upgrade'] = target_upgrade
