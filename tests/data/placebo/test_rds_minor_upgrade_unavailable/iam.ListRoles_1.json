@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "ABF8snU1rRt278eVwL/TU9SlNeNFods5w3T7mf9TE94EgbXJGIZj2gO9daRfQ+yaDZIbV/iW72obqYK2+uLvXAEs", 
+        "IsTruncated": true, 
+        "Roles": [
+            {
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "RoleId": "AROAI7ZS26HIW5UKQGHRM", 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 29, 
+                    "minute": 39
+                }, 
+                "RoleName": "CloudCustodianRole", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:role/CloudCustodianRole"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "045ff6a8-a112-11e6-8b19-c39d3944611a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "045ff6a8-a112-11e6-8b19-c39d3944611a", 
+                "date": "Wed, 02 Nov 2016 15:35:43 GMT", 
+                "content-length": "947", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,113 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "CloudCustodianRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-2:644160558196:launchConfiguration:b1eeb7b7-02a3-4ea7-b940-fc197b1b193d:launchConfigurationName/CloudCluster", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 1, 
+                    "microsecond": 648000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 43
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "NoDevice": true
+                    }, 
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "NoDevice": true
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-aa6c90c3"
+                ], 
+                "LaunchConfigurationName": "CloudCluster", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-153e6470", 
+                "InstanceType": "t2.medium"
+            }, 
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "CloudCustodianRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-2:644160558196:launchConfiguration:7fc730bf-51f6-457d-8faf-4a057e898e3e:launchConfigurationName/CloudClusterCopy", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 26, 
+                    "microsecond": 801000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 1
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "NoDevice": true
+                    }, 
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "NoDevice": true
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-aa6c90c3"
+                ], 
+                "LaunchConfigurationName": "CloudClusterCopy", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-153e6470", 
+                "InstanceType": "t2.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4982884-a421-11e6-bbf6-71678cb8398a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a4982884-a421-11e6-bbf6-71678cb8398a", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3255", 
+                "content-type": "text/xml", 
+                "date": "Sun, 06 Nov 2016 13:05:08 GMT"
+            }
+        }
+    }
+}

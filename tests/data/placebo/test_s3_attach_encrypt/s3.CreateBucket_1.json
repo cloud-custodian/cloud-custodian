@@ -1,11 +1,20 @@
 {
     "status_code": 200, 
     "data": {
-        "Location": "/custodian-attach-encrypt-test", 
+        "Location": "http://custodian-attach-encrypt-test.s3.amazonaws.com/", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "Dg3k8J77BThiisffEsW8UGO3NM4HOMph5XXbqjXPESLMVeHgoEDnJhnuab9DxmvtoWNIEnmm9rE=", 
-            "RequestId": "10BB2AF766E14B29"
+            "RetryAttempts": 0, 
+            "HostId": "BDPJLvzgoYtCCYcPvH7AKHb9y+Mz74tlea2MN1TMAIAWcu41ayl9lyRMACNBYVhAD0uWDOEXkbI=", 
+            "RequestId": "4A06F04CE900C0BF", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "BDPJLvzgoYtCCYcPvH7AKHb9y+Mz74tlea2MN1TMAIAWcu41ayl9lyRMACNBYVhAD0uWDOEXkbI=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "4A06F04CE900C0BF", 
+                "location": "http://custodian-attach-encrypt-test.s3.amazonaws.com/", 
+                "date": "Wed, 02 Nov 2016 08:09:06 GMT"
+            }
         }
     }
 }

@@ -1,0 +1,96 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-2:644160558196:autoScalingGroup:4cc6321e-930f-4dfb-9e44-217c4fe5f4e3:autoScalingGroupName/ContainersFTW", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 3, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "ContainersFTW", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }, 
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "ContainersFTW", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "Verizon", 
+                        "Key": "Verizon"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "ContainersFTW", 
+                "DefaultCooldown": 300, 
+                "MinSize": 3, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-2b", 
+                        "InstanceId": "i-0822c66c32960b539", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CloudCluster"
+                    }, 
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-2c", 
+                        "InstanceId": "i-09fa99d8763b017c3", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CloudCluster"
+                    }, 
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-2a", 
+                        "InstanceId": "i-0a7d9e4ed71204a90", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "CloudCluster"
+                    }
+                ], 
+                "MaxSize": 3, 
+                "VPCZoneIdentifier": "subnet-db9f62b2,subnet-65dbce1d,subnet-b77a4ffd", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "CloudCluster", 
+                "CreatedTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 209000, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 8
+                }, 
+                "AvailabilityZones": [
+                    "us-east-2a", 
+                    "us-east-2b", 
+                    "us-east-2c"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "76a4afe3-a442-11e6-a066-479200015c51", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "76a4afe3-a442-11e6-a066-479200015c51", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3407", 
+                "content-type": "text/xml", 
+                "date": "Sun, 06 Nov 2016 17:00:04 GMT"
+            }
+        }
+    }
+}

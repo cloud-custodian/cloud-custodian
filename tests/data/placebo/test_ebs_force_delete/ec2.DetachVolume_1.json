@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "53df5be5-89a7-4117-86d6-e8c4ed31a230", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 05 Nov 2016 18:25:58 GMT"
+            }
+        }, 
+        "AttachTime": {
+            "hour": 18, 
+            "__class__": "datetime", 
+            "month": 11, 
+            "second": 1, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 5, 
+            "minute": 25
+        }, 
+        "InstanceId": "i-017cf4e2a33b853fe", 
+        "VolumeId": "vol-d0790258", 
+        "State": "detaching", 
+        "Device": "/dev/sdf"
+    }
+}

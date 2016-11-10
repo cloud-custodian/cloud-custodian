@@ -279,7 +279,9 @@ class OffHoursFilterTest(BaseTest):
             p = f.get_tag_value(i)
             self.assertEqual(p, 'tz=est')
             tz = f.get_tz('est')
-            self.assertEqual(str(tz), "tzfile('America/New_York')")
+            self.assertTrue(str(tz) in (
+                "tzfile('US/Eastern')",
+                "tzfile('America/New_York')"))
             self.assertEqual(
                 datetime.datetime.now(tz), t)
             self.assertEqual(t.hour, 19)
@@ -288,14 +290,14 @@ class OffHoursFilterTest(BaseTest):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
         with mock_datetime_now(t, datetime):
-            for i in [
+            results = [OffHour({})(i) for i in [
                     instance(Tags=[
                         {'Key': 'maid_offhours', 'Value': ''}]),
                     instance(Tags=[
                         {'Key': 'maid_offhours', 'Value': '"Offhours tz=ET"'}]),
                     instance(Tags=[
-                        {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])]:
-                self.assertEqual(OffHour({})(i), True)
+                        {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])]]
+            self.assertEqual(results, [True, False, False])
 
     def test_offhours(self):
         t = datetime.datetime(year=2015, month=12, day=1, hour=19, minute=5,
@@ -383,6 +385,14 @@ class OffHoursFilterTest(BaseTest):
             i = instance(Tags=[{'Key': 'maid_offhours',
                                 'Value': 'off=(m-f,90);on=(m-f,7);tz=et'}])
             self.assertEqual(OffHour({})(i), False)
+
+    def test_tz_only(self):
+        t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
+        t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'tz=est'}])
+            self.assertEqual(OnHour({})(i), True)
 
 
 class ScheduleParserTest(BaseTest):

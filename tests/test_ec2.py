@@ -205,6 +205,26 @@ class TestResizeInstance(BaseTest):
             list(sorted(['m4.large', 'm4.2xlarge', 'm4.2xlarge'])))
 
 
+class TestStateTransitionAgeFilter(BaseTest):
+
+    def test_ec2_state_transition_age(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_state_transition_age_filter'
+        )
+        policy = self.load_policy({
+            'name': 'ec2-state-transition-age',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'type': 'state-age',
+                 'days': 30}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        #compare stateTransition reason to expected
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['StateTransitionReason'], 'User initiated (2015-11-25 10:11:55 GMT)')
+
+
 class TestImageAgeFilter(BaseTest):
 
     def test_ec2_image_age(self):
@@ -222,10 +242,27 @@ class TestImageAgeFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestImageFilter(BaseTest):
+
+    def test_ec2_image(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_image_filter')
+        policy = self.load_policy({
+            'name': 'ec2-image',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'image', 'key': 'Public', 'value': True}
+                ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-039628786cabe8c16')
+
+
 class TestInstanceAge(BaseTest):
 
     # placebo doesn't record tz information
-    def xtest_ec2_instance_age(self):
+    def test_ec2_instance_age(self):
         session_factory = self.replay_flight_data(
             'test_ec2_instance_age_filter')
         policy = self.load_policy({
@@ -234,7 +271,7 @@ class TestInstanceAge(BaseTest):
             'filters': [
                 {'State.Name': 'running'},
                 {'type': 'instance-age',
-                 'days': 10}]},
+                 'days': 0}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -380,6 +417,26 @@ class TestEC2QueryFilter(unittest.TestCase):
             [{'tag:ASV': None}])
 
 
+class TestTerminate(BaseTest):
+
+    def test_ec2_terminate(self):
+        # Test conditions: single running instance, with delete protection
+        session_factory = self.replay_flight_data('test_ec2_terminate')
+        p = self.load_policy({
+            'name': 'ec2-term',
+            'resource': 'ec2',
+            'filters': [{'InstanceId': 'i-017cf4e2a33b853fe'}],
+            'actions': [
+                {'type': 'terminate',
+                 'force': True}]},
+           session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=['i-017cf4e2a33b853fe'])
+        self.assertEqual(instances[0]['State']['Name'], 'shutting-down')
+
+
 class TestDefaultVpc(BaseTest):
 
     def test_ec2_default_vpc(self):
@@ -393,7 +450,6 @@ class TestDefaultVpc(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
-        # import pdb; pdb.set_trace()
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')

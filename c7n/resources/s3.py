@@ -58,7 +58,8 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import chunks, local_session, set_annotation, type_schema, dumps
+from c7n.utils import (
+    chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
 """
 TODO:
@@ -119,6 +120,8 @@ S3_AUGMENT_TABLE = (
 
 def assemble_bucket(item):
     """Assemble a document representing all the config state around a bucket.
+
+    TODO: Refactor this, the logic here feels quite muddled.
     """
     factory, b = item
     s = factory()
@@ -157,6 +160,12 @@ def assemble_bucket(item):
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
+            # Location == region for all cases but EU per https://goo.gl/iXdpnl
+            if b_location is None:
+                b_location = "us-east-1"
+            elif b_location == 'EU':
+                b_location = "eu-west-1"
+                v['LocationConstraint'] = 'eu-west-1'
             if v and v != c_location:
                 c = s.client('s3', region_name=b_location)
             elif c_location != location:
@@ -191,8 +200,13 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
-        client.put_bucket_tagging(
-            Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+        try:
+            client.put_bucket_tagging(
+                Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
+        except ClientError as e:
+            log.exception(
+                'Exception tagging bucket %s: %s', (bucket['Name'], e))
+            continue
 
 
 @filters.register('metrics')
@@ -422,16 +436,30 @@ class AttachLambdaEncrypt(BucketActionBase):
     def process(self, buckets):
         from c7n.mu import LambdaManager
         from c7n.ufuncs.s3crypt import get_function
+
+        session = local_session(self.manager.session_factory)
+        account_id = get_account_id(session)
+
         func = get_function(
-            None, self.data.get('role', self.manager.config.assume_role))
+            None, self.data.get('role', self.manager.config.assume_role),
+            account_id=account_id)
+
+        regions = set([
+            b.get('Location', {
+                'LocationConstraint': 'us-east-1'})['LocationConstraint']
+            for b in buckets])
+
+        # session managers by region
+        region_sessions = {}
+        for r in regions:
+            region_sessions[r] = functools.partial(
+                self.manager.session_factory, region=r)
 
         # Publish function to all of our buckets regions
         region_funcs = {}
-        regions = set([
-            b.get('LocationConstraint', 'us-east-1') for b in buckets])
+
         for r in regions:
-            lambda_mgr = LambdaManager(
-                functools.partial(self.manager.session_factory, region=r))
+            lambda_mgr = LambdaManager(region_sessions[r])
             lambda_mgr.publish(func)
             region_funcs[r] = func
 
@@ -439,11 +467,17 @@ class AttachLambdaEncrypt(BucketActionBase):
             results = []
             futures = []
             for b in buckets:
+                region = b.get('Location', {
+                    'LocationConstraint': 'us-east-1'}).get(
+                        'LocationConstraint')
                 futures.append(
                     w.submit(
                         self.process_bucket,
-                        region_funcs[b.get('LocationConstraint', 'us-east-1')],
-                        b))
+                        region_funcs[region],
+                        b,
+                        account_id,
+                        region_sessions[region]
+                    ))
             for f in as_completed(futures):
                 if f.exception():
                     log.exception(
@@ -451,10 +485,11 @@ class AttachLambdaEncrypt(BucketActionBase):
                 results.append(f.result())
             return filter(None, results)
 
-    def process_bucket(self, f, b):
+    def process_bucket(self, func, bucket, account_id, session_factory):
         from c7n.mu import BucketNotification
-        source = BucketNotification({}, self.manager.session_factory, b)
-        return source.add(f)
+        source = BucketNotification(
+            {'account_s3': account_id}, session_factory, bucket)
+        return source.add(func)
 
 
 @actions.register('encryption-policy')
@@ -585,12 +620,12 @@ class ScanBucket(BucketActionBase):
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
-            'contents_key': 'Contents',
+            'contents_key': ['Contents'],
             'key_processor': 'process_key'
             },
         'versioned': {
             'iterator': 'list_object_versions',
-            'contents_key': 'Versions',
+            'contents_key': ['Versions'],
             'key_processor': 'process_version'
             }
         }
@@ -601,7 +636,8 @@ class ScanBucket(BucketActionBase):
 
     def get_bucket_style(self, b):
         return (
-            b.get('Versioning', {'Status': ''}).get('Status') == 'Enabled'
+            b.get('Versioning', {'Status': ''}).get('Status') in (
+                'Enabled', 'Suspended')
             and 'versioned' or 'standard')
 
     def get_bucket_op(self, b, op_name):
@@ -610,6 +646,13 @@ class ScanBucket(BucketActionBase):
         if op_name == 'key_processor':
             return getattr(self, op)
         return op
+
+    def get_keys(self, b, key_set):
+        content_keys = self.get_bucket_op(b, 'contents_key')
+        keys = []
+        for ck in content_keys:
+            keys.extend(key_set.get(ck, []))
+        return keys
 
     def process(self, buckets):
         results = []
@@ -650,6 +693,7 @@ class ScanBucket(BucketActionBase):
         # bucketscan log should be used across worker boundary.
         p = s3.get_paginator(
             self.get_bucket_op(b, 'iterator')).paginate(Bucket=b['Name'])
+
         with BucketScanLog(self.manager.log_dir, b['Name']) as key_log:
             with self.executor_factory(max_workers=10) as w:
                 try:
@@ -671,21 +715,14 @@ class ScanBucket(BucketActionBase):
     __call__ = process_bucket
 
     def _process_bucket(self, b, p, key_log, w):
-        content_key = self.get_bucket_op(b, 'contents_key')
         count = 0
 
         for key_set in p:
-            count += len(key_set.get(content_key, []))
-
-            # Empty bucket check
-            if content_key not in key_set and not key_set['IsTruncated']:
-                b['KeyScanCount'] = count
-                b['KeyRemediated'] = key_log.count
-                return {'Bucket': b['Name'],
-                        'Remediated': key_log.count,
-                        'Count': count}
+            keys = self.get_keys(b, key_set)
+            count += len(keys)
             futures = []
-            for batch in chunks(key_set.get(content_key, []), size=100):
+
+            for batch in chunks(keys, size=100):
                 if not batch:
                     continue
                 futures.append(w.submit(self.process_chunk, batch, b))
@@ -702,7 +739,7 @@ class ScanBucket(BucketActionBase):
             # Log completion at info level, progress at debug level
             if key_set['IsTruncated']:
                 log.debug('Scan progress bucket:%s keys:%d remediated:%d ...',
-                         b['Name'], count, key_log.count)
+                          b['Name'], count, key_log.count)
             else:
                 log.info('Scan Complete bucket:%s keys:%d remediated:%d',
                          b['Name'], count, key_log.count)
@@ -1113,8 +1150,53 @@ class RemoveBucketTag(RemoveTag):
 class DeleteBucket(ScanBucket):
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
+    from c7n.executor import MainThreadExecutor
+    executor_factory = MainThreadExecutor
+    bucket_ops = {
+        'standard': {
+            'iterator': 'list_objects',
+            'contents_key': ['Contents'],
+            'key_processor': 'process_key'
+            },
+        'versioned': {
+            'iterator': 'list_object_versions',
+            'contents_key': ['Versions', 'DeleteMarkers'],
+            'key_processor': 'process_version'
+            }
+        }
+
+    def process_delete_enablement(self, b):
+        """Prep a bucket for deletion.
+
+        Clear out any pending multi-part uploads.
+
+        Disable versioning on the bucket, so deletes don't
+        generate fresh deletion markers.
+        """
+        client = local_session(self.manager).client('s3')
+
+        # Suspend versioning, so we don't get new delete markers
+        # as we walk and delete versions
+        if (self.get_bucket_style(b) == 'versioned'
+            and b['Versioning']['Status'] == 'Enabled'
+                and self.data.get('remove-contents', True)):
+            client.put_bucket_versioning(
+                Bucket=b['Name'],
+                VersioningConfiguration={'Status': 'Suspended'})
+        # Clear our multi-part uploads
+        uploads = client.get_paginator('list_multipart_uploads')
+        for p in uploads.paginate(Bucket=b['Name']):
+            for u in p.get('Uploads', ()):
+                client.abort_multipart_upload(
+                    Bucket=b['Name'],
+                    Key=u['Key'],
+                    UploadId=u['UploadId'])
 
     def process(self, buckets):
+        # might be worth sanity checking all our permissions
+        # on the bucket up front before disabling versioning.
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_delete_enablement, buckets))
         if self.data.get('remove-contents', True):
             self.empty_buckets(buckets)
         with self.executor_factory(max_workers=3) as w:
@@ -1148,14 +1230,14 @@ class DeleteBucket(ScanBucket):
             self.manager.ctx.metrics.put_metric(
                 "Total Keys", object_count, "Count", Scope=r['Bucket'],
                 buffer=True)
-
         self.manager.ctx.metrics.put_metric(
             "Total Keys", object_count, "Count", Scope="Account", buffer=True)
         self.manager.ctx.metrics.flush()
 
         log.info(
-            ("EmptyBucket bucket:%s Complete keys:%d rate:%0.2f/s time:%0.2fs"),
-            r['Bucket'], object_count, float(object_count) / run_time, run_time)
+            "EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs",
+            len(buckets), object_count,
+            float(object_count) / run_time, run_time)
         return results
 
     def process_chunk(self, batch, bucket):

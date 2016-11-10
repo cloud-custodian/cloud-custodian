@@ -134,9 +134,11 @@ class GrantCount(Filter):
 
         return key
 
+
 class ResourceKmsKeyAlias(ValueFilter):
 
     schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+
     def get_matching_aliases(self, resources, event=None):
 
         key_aliases = KeyAlias(self.manager.ctx, {}).resources()
@@ -145,7 +147,8 @@ class ResourceKmsKeyAlias(ValueFilter):
         matched = []
         for r in resources:
             if r.get('KmsKeyId'):
-                r['KeyAlias'] = key_aliases_dict.get(r.get('KmsKeyId').split("key/", 1)[-1])
+                r['KeyAlias'] = key_aliases_dict.get(
+                    r.get('KmsKeyId').split("key/", 1)[-1])
                 if self.match(r.get('KeyAlias')):
                     matched.append(r)
         return matched

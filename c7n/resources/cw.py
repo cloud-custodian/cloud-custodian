@@ -26,6 +26,21 @@ class Alarm(QueryResourceManager):
     resource_type = 'aws.cloudwatch.alarm'
 
 
+@resources.register('event-rule')
+class EventRule(QueryResourceManager):
+
+    class resource_type(object):
+
+        service = 'events'
+        type = 'event-rule'
+        enum_spec = ('list_rules', 'Rules', None)
+        name = "Name"
+        id = "Name"
+        filter_name = "NamePrefix"
+        filer_type = "scalar"
+        dimension = "RuleName"
+
+
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
 
@@ -88,6 +103,7 @@ class LastWriteDays(Filter):
         streams = logs.describe_log_streams(
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
+            descending=True,
             limit=3).get('logStreams')
         group['streams'] = streams
         if not streams:

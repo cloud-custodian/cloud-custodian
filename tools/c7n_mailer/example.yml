@@ -1,0 +1,42 @@
+# Which queue should we listen to for messages
+queue_url: https://sqs.us-east-1.amazonaws.com/0911411411411/cloud-custodian-message-relay
+
+# Default from address
+from_address: cloudcustodian@example.com
+
+
+# Tags that we should look at for address information
+contact_tags:
+  - OwnerContact
+  - OwnerEmail
+  - SNSTopicARN
+
+## Standard Lambda Function Config
+region: us-east-1
+role: "arn:aws:iam::0911411411411:role/CloudCustodianMailer"
+timeout: 300
+subnets:
+  - subnet-abcdef # for ldap lookups
+  - subnet-defgz  # for ldap looups
+  - subnet-yzerr  # for ldap looups
+security_groups:
+  - sg-abbdaaf3
+  - sg-bbd3erfa
+
+
+## Mailer Infrastructure Config
+
+# memcached for caching ldap lookups
+cache: "c7n-somewhere.out.there.cache.amazonaws.com"
+
+# ldap server for resolving users
+ldap_uri: "ldap://your_active_directory"
+ldap_bind_dn: "DC=us,DC=df,DC=example,DC=org"
+ldap_bind_user: custodian
+
+# kms encrypted bind password
+ldap_bind_password: "base64_encoded_ciphertext_password"
+
+# For sending to sns topics we need to assume back into the target account
+cross_accounts:
+  '991119991111': 'arn:aws:iam::991119991111:role/MyDeliveryRole'

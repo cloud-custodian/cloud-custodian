@@ -197,6 +197,84 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_available_engine_upgrades(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_available_engine_upgrades', zdata=True)
+        client = session_factory().client('rds')
+        upgrades = rds._get_available_engine_upgrades(client)
+        self.assertEqual(upgrades['postgres']['9.3.1'], '9.3.14')
+        self.assertEqual(upgrades['sqlserver-ex']['10.50.6000.34.v1'],
+                         '10.50.6529.0.v1')
+        upgrades = rds._get_available_engine_upgrades(client, major=True)
+        self.assertEqual(upgrades['postgres']['9.3.1'], '9.4.9')
+        self.assertEqual(upgrades['postgres']['9.4.9'], '9.5.4')
+        self.assertEqual(upgrades['sqlserver-ex']['10.50.2789.0.v1'],
+                         '12.00.5000.0.v1')
+
+    def test_rds_upgrade_available(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_available')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-available',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'upgrade-available', 'major': True},
+             ],
+             'actions': [{
+                 'type': 'mark-for-op',
+                 'tag': 'custodian_upgrade',
+                 'days': 1,
+                 'msg': 'Minor engine upgrade available: {op}@{action_date}',
+                 'op': 'upgrade'}],
+             }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.6.27': u'5.7.11'})
+
+    def test_rds_minor_upgrade_unavailable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_unavailable')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-done',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'upgrade-available', 'value': False}
+             ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        self.assertEqual(
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.5.41': u'5.5.46', u'5.6.29': None, u'5.7.11': None})
+
+    def test_rds_minor_upgrade_do(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_minor_upgrade_do')
+        p = self.load_policy(
+            {'name': 'rds-upgrade-do',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
+                  'op': 'upgrade'}],
+             'actions': [{
+                 'type': 'upgrade',
+                 'immediate': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
+             for r in resources},
+            {u'5.7.10': None, u'5.6.23': u'5.6.29'})
+        self.assertEqual(
+            resources[1]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+        self.assertEqual(
+            resources[1]['EngineVersion'], '5.6.23')
+        self.assertEqual(
+            resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
+
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
             'DBInstanceIdentifier': 'ABC'
@@ -328,6 +406,25 @@ class RDSTest(BaseTest):
 
 
 class RDSSnapshotTest(BaseTest):
+    
+    def test_rds_snapshot_tag_filter(self):
+        factory = self.replay_flight_data('test_rds_snapshot_tag_filter')
+        client = factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-snapshot-tag-filter',
+            'resource': 'rds-snapshot',
+            'filters': [{'type': 'marked-for-op',
+                         'op': 'delete'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBSnapshotIdentifier'])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('maid_status' in tag_map)
+        self.assertTrue('delete@' in tag_map['maid_status'])
+
 
     def test_rds_snapshot_age_filter(self):
         factory = self.replay_flight_data('test_rds_snapshot_age_filter')
@@ -348,3 +445,56 @@ class RDSSnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        
+    def test_rds_snapshot_tag(self):
+        factory = self.replay_flight_data('test_rds_snapshot_mark')
+        client = factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-snapshot-tag',
+            'resource': 'rds-snapshot',
+            'actions': [{'type': 'tag',
+                        'key': 'test-key',
+                        'value': 'test-value'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBSnapshotIdentifier'])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('test-key' in tag_map)
+        self.assertTrue('test-value' in tag_map['test-key'])
+                
+    def test_rds_snapshot_mark(self):
+        factory = self.replay_flight_data('test_rds_snapshot_mark')
+        client = factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-snapshot-mark',
+            'resource': 'rds-snapshot',
+            'actions': [{'type': 'mark-for-op',
+                        'op': 'delete',
+                        'days': 1}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBSnapshotIdentifier'])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('maid_status' in tag_map)
+        
+    def test_rds_snapshot_unmark(self):
+        factory = self.replay_flight_data('test_rds_snapshot_unmark')
+        client = factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-snapshot-unmark',
+            'resource': 'rds-snapshot',
+            'actions': [{'type': 'unmark'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBSnapshotIdentifier'])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('maid_status' in tag_map)        

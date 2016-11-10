@@ -1,10 +1,18 @@
 {
     "status_code": 201, 
     "data": {
-        "Statement": "{\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:s3:::custodian-attach-encrypt-test\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-east-1:619193117841:function:custodian-s3-encrypt\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Sid\":\"custodian-attach-encrypt-test\"}", 
+        "Statement": "{\"Sid\":\"custodian-attach-encrypt-test\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceAccount\":\"644160558196\"},\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:s3:::*\"}}}", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "7c3afd5e-1acc-11e6-ad2d-bd53c19bf551"
+            "RequestId": "a52508e0-a0d3-11e6-99f6-ab8f9d2be881", 
+            "HTTPHeaders": {
+                "date": "Wed, 02 Nov 2016 08:09:14 GMT", 
+                "x-amzn-requestid": "a52508e0-a0d3-11e6-99f6-ab8f9d2be881", 
+                "content-length": "372", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
         }
     }
 }

@@ -1,0 +1,98 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "root_joshua", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:7977f161-adb2-4ddc-b46f-3652c30ccd3b:launchConfigurationName/c7n-asg-lcCopy", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 47, 
+                    "microsecond": 47000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 12
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ], 
+                "LaunchConfigurationName": "c7n-asg-lcCopy", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-c481fad3", 
+                "InstanceType": "t2.micro"
+            }, 
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "root_joshua", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:a491155b-5041-49e4-9d25-3c835ab382bf:launchConfigurationName/c7n-asg-test-01", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 53, 
+                    "microsecond": 274000, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 0
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-04eef27e"
+                ], 
+                "LaunchConfigurationName": "c7n-asg-test-01", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-e0fba8f7", 
+                "InstanceType": "t2.micro", 
+                "AssociatePublicIpAddress": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ce26dec6-97b4-11e6-9cf5-b94607544e94", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ce26dec6-97b4-11e6-9cf5-b94607544e94", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2816", 
+                "content-type": "text/xml", 
+                "date": "Fri, 21 Oct 2016 17:35:48 GMT"
+            }
+        }
+    }
+}

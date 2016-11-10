@@ -1,0 +1,51 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UploadIdMarker": "", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ZMlgsyDq7NMVN+hayem19AXsAZ2up5LGYpUwZUXuc55is/SXEGKZJklbi11PfxBfdjD8TX5SVwc=", 
+            "RequestId": "FD7C14875BE64F1D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ZMlgsyDq7NMVN+hayem19AXsAZ2up5LGYpUwZUXuc55is/SXEGKZJklbi11PfxBfdjD8TX5SVwc=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "FD7C14875BE64F1D", 
+                "date": "Tue, 08 Nov 2016 23:19:25 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "NextKeyMarker": "abcdef12345", 
+        "Bucket": "custodian-byebye", 
+        "NextUploadIdMarker": "MBhYO6jd5UJvJdr6tvuDmQh8CzTh9OHM.2PJKOynn68tkRhfRVlnoYKvl1G0MP5XugMVxWhZwz0A3xECr3Lplx.y2RKtXTGfrWrVzP03xmCW9WEfyIFc0YUs8GVT3NWp", 
+        "Uploads": [
+            {
+                "Initiator": {
+                    "DisplayName": "kapil", 
+                    "ID": "arn:aws:iam::644160558196:user/kapil"
+                }, 
+                "Initiated": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 19
+                }, 
+                "UploadId": "MBhYO6jd5UJvJdr6tvuDmQh8CzTh9OHM.2PJKOynn68tkRhfRVlnoYKvl1G0MP5XugMVxWhZwz0A3xECr3Lplx.y2RKtXTGfrWrVzP03xmCW9WEfyIFc0YUs8GVT3NWp", 
+                "StorageClass": "STANDARD", 
+                "Key": "abcdef12345", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }
+            }
+        ], 
+        "KeyMarker": "", 
+        "MaxUploads": 1000, 
+        "IsTruncated": false
+    }
+}

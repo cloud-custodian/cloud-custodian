@@ -12,10 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from common import BaseTest
-from HTMLParser import tagfind
 
 
 class TestRedshift(BaseTest):
+
+    def test_redshift_security_group_filter(self):
+        factory = self.replay_flight_data(
+            'test_redshift_security_group_filter')
+        p = self.load_policy({
+            'name': 'redshift-query',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'GroupName',
+                 'value': 'default'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterIdentifier'], 'dev-test')
+
+    def test_redshift_subnet_filter(self):
+        factory = self.replay_flight_data('test_redshift_subnet_filter')
+        p = self.load_policy({
+            'name': 'redshift-query',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'subnet',
+                 'key': 'MapPublicIpOnLaunch',
+                 'value': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterIdentifier'], 'dev-test')
 
     def test_redshift_query(self):
         factory = self.replay_flight_data('test_redshift_query')
@@ -38,7 +66,7 @@ class TestRedshift(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_redshift_simple_tag_filter(self):
         factory = self.replay_flight_data('test_redshift_tag_filter')
         client = factory().client('redshift')
@@ -55,7 +83,7 @@ class TestRedshift(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertTrue('maid_status' in tag_map)
-        
+
     def test_redshift_cluster_mark(self):
         factory = self.replay_flight_data('test_redshift_cluster_mark')
         client = factory().client('redshift')
@@ -78,7 +106,7 @@ class TestRedshift(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertTrue('maid_status' in tag_map)
-    
+
     def test_redshift_cluster_unmark(self):
         factory = self.replay_flight_data('test_redshift_cluster_unmark')
         client = factory().client('redshift')
@@ -100,7 +128,7 @@ class TestRedshift(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertFalse('maid_status' in tag_map)
-            
+
     def test_redshift_delete(self):
         factory = self.replay_flight_data('test_redshift_delete')
         p = self.load_policy({
@@ -158,7 +186,8 @@ class TestRedshift(BaseTest):
 class TestRedshiftSnapshot(BaseTest):
 
     def test_redshift_snapshot_simple(self):
-        session_factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        session_factory = self.replay_flight_data(
+            'test_redshift_snapshot_simple')
         p = self.load_policy({
             'name': 'redshift-snapshot-simple',
             'resource': 'redshift-snapshot'},
@@ -167,7 +196,8 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_redshift_snapshot_simple_filter(self):
-        session_factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        session_factory = self.replay_flight_data(
+            'test_redshift_snapshot_simple')
         p = self.load_policy({
             'name': 'redshift-snapshot-simple-filter',
             'resource': 'redshift-snapshot',
@@ -198,7 +228,7 @@ class TestRedshiftSnapshot(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-        
+
     def test_redshift_snapshot_mark(self):
         factory = self.replay_flight_data('test_redshift_snapshot_mark')
         client = factory().client('redshift')
@@ -221,7 +251,7 @@ class TestRedshiftSnapshot(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertTrue('maid_status' in tag_map)
-    
+
     def test_redshift_snapshot_unmark(self):
         factory = self.replay_flight_data('test_redshift_snapshot_unmark')
         client = factory().client('redshift')

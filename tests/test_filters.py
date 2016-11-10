@@ -50,6 +50,11 @@ class TestFilter(unittest.TestCase):
             base_filters.FilterValidationError,
             filters.factory, {'type': 'ax', 'xyz': 1})
 
+    def test_filter_call(self):
+        filter_instance = base_filters.Filter({})
+        self.assertIsInstance(filter_instance, base_filters.Filter)
+        self.assertRaises(NotImplementedError, filter_instance, None)
+
 
 class TestOrFilter(unittest.TestCase):
 
@@ -91,6 +96,53 @@ class TestAndFilter(unittest.TestCase):
             [])
 
 
+class TestValueFilter(unittest.TestCase):
+
+    # TODO test_manager needs a valid session_factory object
+    # def test_value_match(self):
+    #     test_manager = ???
+    #     f_data = {
+    #         'type': 'value',
+    #         'key': 'day',
+    #         'value': 5,
+    #         'value_from': {
+    #             'url': 's3://custodian-byebye/resource.json',
+    #         },
+    #     }
+    #     vf = filters.factory(f_data, test_manager)
+    #     vf.match({'tag:ASV': 'present'})
+
+    def test_value_type(self):
+        sentinel = datetime.now()
+        value = 5
+        vf = filters.factory({'tag:ASV': 'absent'})
+        vf.vtype = 'size'
+        res = vf.process_value_type(sentinel, value)
+        self.assertEqual(res, (sentinel, 0))
+        vf.vtype = 'age'
+        res = vf.process_value_type(sentinel, value)
+        self.assertEqual(res, (0, sentinel))
+        vf.vtype = 'cidr'
+        sentinel = '10.0.0.0/16'
+        value = '10.10.10.10'
+        res = vf.process_value_type(sentinel, value)
+        self.assertEqual(
+            (str(res[0]), str(res[1])),
+            (sentinel, value),
+        )
+        vf.vtype = 'cidr_size'
+        value = '10.10.10.300'
+        res = vf.process_value_type(sentinel, value)
+        self.assertEqual(res, (sentinel, 0))
+
+
+class TestAgeFilter(unittest.TestCase):
+
+    def test_age_filter(self):
+        af = base_filters.AgeFilter({})
+        self.assertRaises(NotImplementedError, af.validate)
+
+
 class TestGlobValue(unittest.TestCase):
 
     def test_regex_match(self):
@@ -109,6 +161,10 @@ class TestGlobValue(unittest.TestCase):
                 Architecture='x86_64',
                 Color='blue')),
             False)
+
+    def test_glob_match(self):
+        glob_match = base_filters.core.glob_match
+        self.assertFalse(glob_match(0, ''))
 
 
 class TestRegexValue(unittest.TestCase):
@@ -310,8 +366,13 @@ class EventFilterTest(BaseFilterTest):
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
-        self.assertTrue(filters.factory(f, b).process(
+        ef = filters.factory(f, b)
+        self.assertTrue(ef.process(
             [instance()], event))
+        # event is None
+        self.assertEqual(ef.process('resources'), 'resources')
+        # event is not None, but is not "true" either
+        self.assertEqual(ef.process('resources', []), [])
 
     def test_event_no_mode(self):
         b = Bag(data={'resource': 'something'})
@@ -582,6 +643,17 @@ class TestNotInList(unittest.TestCase):
         self.assertEqual(
             f(instance(Thing='Foo')),
             False)
+
+
+class TestFilterRegistry(unittest.TestCase):
+
+    def test_filter_registry(self):
+        reg = base_filters.FilterRegistry('test.filters')
+        self.assertRaises(
+            base_filters.FilterValidationError,
+            reg.factory,
+            {'type': ''},
+        )
 
 
 if __name__ == '__main__':
