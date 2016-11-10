@@ -240,3 +240,15 @@ class AutoScalingTest(BaseTest):
         s = set([x[0] for x in resources[0]['Invalid']])
         self.assertTrue('invalid-subnet' in s)
         self.assertTrue('invalid-security-group' in s)
+
+    def test_asg_propagate_tag_filter(self):
+        session = self.replay_flight_data('test_asg_propagate_tag_filter')
+        policy = self.load_policy({
+            'name': 'asg-propagate-tag-filter',
+            'resource': 'asg',
+            'filters': [
+                'progagated-tag',
+                {'tag:PropTag01': 'ABC'}
+            ]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)

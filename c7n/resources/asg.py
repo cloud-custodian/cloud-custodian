@@ -476,6 +476,22 @@ class CapacityDelta(Filter):
                 len(a['Instances']) < a['MinSize']]
 
 
+@filters.register('progagated-tag')
+class PropagatedTagFilter(Filter):
+
+    schema = type_schema('progagated-tag')
+
+    def process(self, asgs, event=None):
+        results = []
+        for r in asgs:
+            tags = r.get('Tags', [])
+            for t in tags:
+                if not t['PropagateAtLaunch']:
+                    continue
+                results.append(r)
+        return results
+
+
 @actions.register('resize')
 class Resize(BaseAction):
 
