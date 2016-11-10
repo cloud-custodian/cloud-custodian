@@ -83,7 +83,10 @@ class SecurityGroupTest(BaseTest):
             'filters': ['used']
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
+        self.assertEqual(
+            set(['sg-f9cc4d9f', 'sg-13de8f75', 'sg-ce548cb7']),
+            set([r['GroupId'] for r in resources]))
 
     def test_unused(self):
         factory = self.replay_flight_data(
@@ -154,7 +157,7 @@ class SecurityGroupTest(BaseTest):
                 client.delete_security_group(GroupId=sg_id)
             except Exception:
                 pass
-            
+
         self.addCleanup(delete_sg)
 
         p = self.load_policy({
@@ -173,7 +176,7 @@ class SecurityGroupTest(BaseTest):
             pass
         else:
             self.fail("group not deleted")
-    
+
     def test_port_within_range(self):
         factory = self.replay_flight_data(
             'test_security_group_port_in_range')

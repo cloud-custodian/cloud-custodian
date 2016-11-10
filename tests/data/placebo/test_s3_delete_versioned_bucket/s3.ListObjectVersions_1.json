@@ -4,35 +4,36 @@
         "Name": "custodian-byebye", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "Ts8Ce0twRLLUGYU5+FzOKNnuGxRc2u2CT6ktc3Ut/0/uqt0b4+oQUItoEdht5XWrAT8/6gqDOBY=", 
-            "RequestId": "0DC8C409770BF244", 
+            "RetryAttempts": 0, 
+            "HostId": "1Qa+FyhWFfgoMqmRQ+dzdVgDC5foQkO/K9Kn7Ec7XwNJpqb98evvtzRgylgV+FvAKvOfMn/Lkec=", 
+            "RequestId": "5362F480ACF790CE", 
             "HTTPHeaders": {
-                "x-amz-id-2": "Ts8Ce0twRLLUGYU5+FzOKNnuGxRc2u2CT6ktc3Ut/0/uqt0b4+oQUItoEdht5XWrAT8/6gqDOBY=", 
+                "x-amz-id-2": "1Qa+FyhWFfgoMqmRQ+dzdVgDC5foQkO/K9Kn7Ec7XwNJpqb98evvtzRgylgV+FvAKvOfMn/Lkec=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "0DC8C409770BF244", 
-                "date": "Mon, 22 Aug 2016 09:24:04 GMT", 
+                "x-amz-request-id": "5362F480ACF790CE", 
+                "date": "Tue, 08 Nov 2016 23:19:26 GMT", 
                 "content-type": "application/xml"
             }
         }, 
         "Versions": [
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 16, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": "zvJqTgq7pIvMtzIV1QPrq6W3MZECH5Tk", 
+                "VersionId": "bdDlkF0ewGolANsQnu0ibVZ.T1uLdb_Q", 
                 "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/10", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": true, 
@@ -40,21 +41,21 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 15, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": "CHj4.wRO9gtGzmRhjvpyiHVuWfBNiuIe", 
+                "VersionId": "mAw_RV_b2TU0t60P2qpw3g8d3gT3qI9q", 
                 "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/10", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": false, 
@@ -62,21 +63,21 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 16, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": "qtzJA2kh_fKhIczyCVpFcFuJIAd_dJBF", 
+                "VersionId": "WvWdGRg8XU.TxbOHYklLRvjNKnJ.LjRQ", 
                 "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/11", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": true, 
@@ -84,21 +85,21 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 15, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": ".sUZ3UDvWoXIMptgqUbK_LBwKoR_b.Bw", 
+                "VersionId": "Z_aCyKULWqESa9prWU.M5dUhLyeXX1RS", 
                 "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/11", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": false, 
@@ -106,21 +107,21 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 16, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": "bWSk9sTsHU_04nr.XaKziLhq60_lM6bU", 
+                "VersionId": "eTenGbORgbGE3Hxsq27m6kUgBL1mSs4E", 
                 "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "home.txt", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": true, 
@@ -128,21 +129,21 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 9, 
+                    "hour": 23, 
                     "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 58, 
+                    "month": 11, 
+                    "second": 15, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 22, 
-                    "minute": 23
+                    "day": 8, 
+                    "minute": 19
                 }, 
-                "VersionId": "Ee5fddSUGW8JlSwsCNi4q9NtPXJYTNQp", 
+                "VersionId": "C34qCjmLGVyKR22ngXstnWaCSh46wG6R", 
                 "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "home.txt", 
                 "Owner": {
-                    "DisplayName": "ladyjane", 
+                    "DisplayName": "mandeep.bal", 
                     "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
                 }, 
                 "IsLatest": false, 

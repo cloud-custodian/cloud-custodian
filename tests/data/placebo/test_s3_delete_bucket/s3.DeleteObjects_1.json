@@ -3,27 +3,26 @@
     "data": {
         "Deleted": [
             {
-                "Key": "AWSLogs/2015/10/11"
+                "Key": "home.txt"
             }, 
             {
                 "Key": "AWSLogs/2015/10/10"
             }, 
             {
-                "Key": "home.txt"
+                "Key": "AWSLogs/2015/10/11"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "OyDnyu3F9oHnzLPEALPaCRVQZrEtjQZdJoUSlSspSrDm8r6HUTMbwM3bPGP1q/N9ZvfgoDBXIbw=", 
-            "RequestId": "283E0C60C604F73C", 
+            "RetryAttempts": 0, 
+            "HostId": "G12Yx1Vt7P1hdk8H4lWuItBtZrLvY+RIRuBYg/FkKe1Lkyps4JGgx3adV3ESBGbtIIRweSQUtt0=", 
+            "RequestId": "8C7A13B30D86A05A", 
             "HTTPHeaders": {
-                "x-amz-id-2": "OyDnyu3F9oHnzLPEALPaCRVQZrEtjQZdJoUSlSspSrDm8r6HUTMbwM3bPGP1q/N9ZvfgoDBXIbw=", 
-                "server": "AmazonS3", 
+                "x-amz-id-2": "G12Yx1Vt7P1hdk8H4lWuItBtZrLvY+RIRuBYg/FkKe1Lkyps4JGgx3adV3ESBGbtIIRweSQUtt0=", 
+                "date": "Tue, 08 Nov 2016 23:27:37 GMT", 
                 "transfer-encoding": "chunked", 
-                "connection": "close", 
-                "x-amz-request-id": "283E0C60C604F73C", 
-                "date": "Wed, 17 Aug 2016 11:01:14 GMT", 
-                "content-type": "application/xml"
+                "x-amz-request-id": "8C7A13B30D86A05A", 
+                "server": "AmazonS3"
             }
         }
     }

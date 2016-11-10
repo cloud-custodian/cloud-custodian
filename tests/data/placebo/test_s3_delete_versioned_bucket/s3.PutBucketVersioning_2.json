@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "+zy7zDg/+EuMVFSCwZ0nNmb/ccccfpwV50lL5XT0b7DUz1zU3/2RVwn6ujSl1mIG/tej42KfcuA=", 
+            "RequestId": "F9FF6007D0E8873E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "+zy7zDg/+EuMVFSCwZ0nNmb/ccccfpwV50lL5XT0b7DUz1zU3/2RVwn6ujSl1mIG/tej42KfcuA=", 
+                "date": "Tue, 08 Nov 2016 23:19:25 GMT", 
+                "content-length": "0", 
+                "x-amz-request-id": "F9FF6007D0E8873E", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

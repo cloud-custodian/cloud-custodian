@@ -60,6 +60,16 @@ def _dryrun_option(p):
         help="Don't change infrastructure but verify access.")
 
 
+def _key_val_pair(value):
+    """
+    Type checker to ensure that --field values are of the format key=val
+    """
+    if '=' not in value:
+        msg = 'values must be of the form `header=field`'
+        raise argparse.ArgumentTypeError(msg)
+    return value
+
+
 def setup_parser():
     parser = argparse.ArgumentParser()
     subs = parser.add_subparsers()
@@ -73,6 +83,14 @@ def setup_parser():
     report.add_argument(
         '--raw', type=argparse.FileType('wb'),
         help="Store raw json of collected records to given file path")
+    report.add_argument(
+        '--field', action='append', default=[], type=_key_val_pair,
+        metavar='HEADER=FIELD',
+        help='Repeatable. JMESPath of field to include in the output OR '\
+            'for a tag use prefix `tag:`')
+    report.add_argument(
+        '--no-default-fields', action="store_true",
+        help='Exclude default fields for report.')
 
     logs = subs.add_parser('logs')
     logs.set_defaults(command=commands.logs)

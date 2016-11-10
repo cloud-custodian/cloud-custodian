@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "576120f0-0f14-47b3-ac76-c5eabb15e917", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Sat, 05 Nov 2016 18:26:15 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The volume 'vol-d0790258' does not exist.", 
+            "Code": "InvalidVolume.NotFound"
+        }
+    }
+}

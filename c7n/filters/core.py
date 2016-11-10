@@ -266,7 +266,7 @@ class ValueFilter(Filter):
                 if t.get('Key') == tk:
                     r = t.get('Value')
                     break
-        elif '.' not in k and '[' not in k and '(' not in k:
+        elif k in i:
             r = i.get(k)
         elif self.expr:
             r = self.expr.search(i)
@@ -346,7 +346,7 @@ class ValueFilter(Filter):
                 # EMR not having more functionality.
                 try:
                     value = parse(value)
-                except AttributeError:
+                except (AttributeError, TypeError):
                     value = 0
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
@@ -403,14 +403,20 @@ class AgeFilter(Filter):
         return v
 
     def __call__(self, i):
-        if not self.threshold_date:
-            days = self.data.get('days', 60)
-            n = datetime.now(tz=tzutc())
-            self.threshold_date = n - timedelta(days)
         v = self.get_resource_date(i)
         if v is None:
             return False
         op = OPERATORS[self.data.get('op', 'greater-than')]
+
+        if not self.threshold_date:
+            days = self.data.get('days', 60)
+            # Work around placebo issues with tz
+            if v.tzinfo:
+                n = datetime.now(tz=tzutc())
+            else:
+                n = datetime.now()
+            self.threshold_date = n - timedelta(days)
+
         return op(self.threshold_date, v)
 
 

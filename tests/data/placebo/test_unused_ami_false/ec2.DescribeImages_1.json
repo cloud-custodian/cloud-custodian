@@ -1,0 +1,79 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "c7n-ami-02", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-04e2b113", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-af0eb71b", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/c7n-ami-02", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2016-10-21T16:59:46.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Description": "Test AMI 2"
+            }, 
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "c7n-image-01", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-e0fba8f7", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-07459fee", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/c7n-image-01", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2016-10-21T15:38:09.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Description": "Test Image"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ef3ad1b8-5287-429a-86f1-b30e1b38bef9", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 21 Oct 2016 17:35:46 GMT"
+            }
+        }
+    }
+}

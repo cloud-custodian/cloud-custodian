@@ -13,11 +13,36 @@
 # limitations under the License.
 from common import BaseTest
 
-from c7n.executor import MainThreadExecutor
-from c7n.resources import rdscluster
-
 
 class RDSClusterTest(BaseTest):
+
+    def test_rdscluster_security_group(self):
+        session_factory = self.replay_flight_data('test_rdscluster_sg_filter')
+        p = self.load_policy({
+            'name': 'rdscluster-sg',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'GroupName',
+                 'value': 'default'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DatabaseName'], 'devtest')
+
+    def test_rdscluster_subnet(self):
+        session_factory = self.replay_flight_data('test_rdscluster_subnet')
+        p = self.load_policy({
+            'name': 'rdscluster-sub',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'subnet',
+                 'key': 'MapPublicIpOnLaunch',
+                 'value': True}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DatabaseName'], 'devtest')
 
     def test_rdscluster_simple(self):
         session_factory = self.replay_flight_data('test_rdscluster_simple')
@@ -105,7 +130,8 @@ class RDSClusterTest(BaseTest):
 class RDSClusterSnapshotTest(BaseTest):
 
     def test_rdscluster_snapshot_simple(self):
-        session_factory = self.replay_flight_data('test_rdscluster_snapshot_simple')
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-simple',
             'resource': 'rds-cluster-snapshot'},
@@ -114,7 +140,8 @@ class RDSClusterSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_rdscluster_snapshot_simple_filter(self):
-        session_factory = self.replay_flight_data('test_rdscluster_snapshot_simple')
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-simple-filter',
             'resource': 'rds-cluster-snapshot',
