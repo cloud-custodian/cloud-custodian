@@ -1,0 +1,126 @@
+{
+    "status_code": 200, 
+    "data": {
+        "result": {
+            "checkId": "Qch7DwouX1", 
+            "status": "warning", 
+            "flaggedResources": [
+                {
+                    "status": "warning", 
+                    "resourceId": "Zz20Uf41-GIMiIQMOkbF-YYl7lwbX0x80I_J9nl3Edw", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2c", 
+                        "i-09fa99d8763b017c3", 
+                        null, 
+                        "t2.medium", 
+                        "$37.44", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.01MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%", 
+                        "0.00MB", 
+                        "4 days"
+                    ]
+                }, 
+                {
+                    "status": "warning", 
+                    "resourceId": "3Tfe3xRasqfv5K455N2ZsD483WIu4V_MAnJ0DRMDIYY", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2b", 
+                        "i-0822c66c32960b539", 
+                        null, 
+                        "t2.medium", 
+                        "$37.44", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.01MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%", 
+                        "0.00MB", 
+                        "4 days"
+                    ]
+                }, 
+                {
+                    "status": "warning", 
+                    "resourceId": "YOjKaGo1wj8W1Ok-dI8Ps1XzjkFXMgLD1TAgxwWD7bI", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2a", 
+                        "i-0a7d9e4ed71204a90", 
+                        null, 
+                        "t2.medium", 
+                        "$37.44", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.01MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%  0.00MB", 
+                        "0.0%", 
+                        "0.00MB", 
+                        "4 days"
+                    ]
+                }
+            ], 
+            "timestamp": "2016-11-10T14:18:30Z", 
+            "resourcesSummary": {
+                "resourcesFlagged": 3, 
+                "resourcesProcessed": 6, 
+                "resourcesSuppressed": 0, 
+                "resourcesIgnored": 0
+            }, 
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 112.32, 
+                    "estimatedPercentMonthlySavings": 1.0
+                }
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e916756e-a764-11e6-9f78-0539b7982b5c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e916756e-a764-11e6-9f78-0539b7982b5c", 
+                "date": "Thu, 10 Nov 2016 16:44:13 GMT", 
+                "content-length": "1330", 
+                "x-amzn-actiontrace": "amzn1.tr.e9167511-a764-11e6-869a-0aa22be20000.0..0C3@fB", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

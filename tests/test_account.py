@@ -155,4 +155,17 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-
+    def test_optimization_ec2(self):
+        session_factory = self.replay_flight_data('test_account_ec2_optimize')
+        p = self.load_policy({
+            'name': 'cost-optimizer-ec2',
+            'resource': 'account',
+            'filters': [{
+                'type': 'optimizer-ec2-usage',
+                'threshold': 1}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            resources[0][
+                'CostOptimization.LowUsageEC2'][
+                'resourcesSummary']['resourcesProcessed'], 6)
+        self.assertEqual(len(resources[0]['CostOptimization.EC2Usage.Low']), 3)
