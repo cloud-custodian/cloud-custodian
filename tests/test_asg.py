@@ -253,3 +253,4 @@ class AutoScalingTest(BaseTest):
                 ]}, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
