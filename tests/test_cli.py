@@ -28,7 +28,7 @@ class CliTest(BaseTest):
 
     def write_policy_file(self, policy, format='yaml'):
         """ Write a policy file to disk in the specified format.
-        
+
         Input a dictionary and a format. Valid formats are `yaml` and `json`
         Returns the file path.
         """
@@ -51,33 +51,35 @@ class CliTest(BaseTest):
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
-        
-        # Cache the original sys.stdout so we can restore it later.
-        # This is useful for using pdb when debugging tests.
-        orig_stdout = sys.stdout
+        out, err = self.run_and_expect_success(argv)
+        return out
 
+    def capture_output(self):
         out = StringIO()
-        self.patch(sys, "stdout", out)
-        self.run_and_expect_success(argv)
-        self.patch(sys, "stdout", orig_stdout)
+        err = StringIO()
+        self.patch(sys, 'stdout', out)
+        self.patch(sys, 'stderr', err)
+        return out, err
 
-        return out.getvalue()
-
-    def run_and_expect_success(self, argv):
+    def run_and_expect_success(self, argv, capture=True):
         """ Run cli.main() with supplied argv and expect normal execution. """
         self.patch(sys, 'argv', argv)
+        out, err = self.capture_output()
         try:
             cli.main()
         except SystemExit as e:
             self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.message))
+        return out.getvalue(), err.getvalue()
 
     def run_and_expect_failure(self, argv, exit_code):
         """ Run cli.main() with supplied argv and expect exit_code. """
         self.patch(sys, 'argv', argv)
+        out, err = self.capture_output()
         with self.assertRaises(SystemExit) as cm:
             cli.main()
         self.assertEqual(cm.exception.code, exit_code)
-        
+        return out.getvalue(), err.getvalue()
+
     def run_and_expect_exception(self, argv, exception):
         """ Run cli.main() with supplied argv and expect supplied exception. """
         self.patch(sys, 'argv', argv)
@@ -85,7 +87,6 @@ class CliTest(BaseTest):
             cli.main()
         except exception:
             return
-        
         self.fail('Error: did not raise {}.'.format(exception))
 
 
@@ -121,7 +122,8 @@ class ValidateTest(CliTest):
         self.run_and_expect_failure(['custodian', 'validate'], 2)
 
         # nonexistent file given
-        self.run_and_expect_exception(['custodian', 'validate', 'fake.yaml'], ValueError)
+        self.run_and_expect_exception(
+            ['custodian', 'validate', 'fake.yaml'], ValueError)
 
         valid_policies = {
             'policies':
@@ -140,7 +142,8 @@ class ValidateTest(CliTest):
         self.run_and_expect_success(['custodian', 'validate', '-c', yaml_file])
 
         # duplicate policy names
-        self.run_and_expect_failure(['custodian', 'validate', yaml_file, yaml_file], 1)
+        self.run_and_expect_failure(
+            ['custodian', 'validate', yaml_file, yaml_file], 1)
 
 
 class SchemaTest(CliTest):
@@ -166,21 +169,25 @@ class SchemaTest(CliTest):
         self.run_and_expect_success(['custodian', 'schema', 'ec2.filters'])
 
         # specific item
-        self.run_and_expect_success(['custodian', 'schema', 'ec2.filters.tag-count'])
+        self.run_and_expect_success(
+            ['custodian', 'schema', 'ec2.filters.tag-count'])
 
     def test_invalid_options(self):
 
         # invalid resource
         self.run_and_expect_failure(['custodian', 'schema', 'fakeresource'], 2)
-        
+
         # invalid category
-        self.run_and_expect_failure(['custodian', 'schema', 'ec2.arglbargle'], 2)
-        
+        self.run_and_expect_failure(
+            ['custodian', 'schema', 'ec2.arglbargle'], 2)
+
         # invalid item
-        self.run_and_expect_failure(['custodian', 'schema', 'ec2.filters.nonexistent'], 2)
+        self.run_and_expect_failure(
+            ['custodian', 'schema', 'ec2.filters.nonexistent'], 2)
 
         # invalid number of selectors
-        self.run_and_expect_failure(['custodian', 'schema', 'ec2.filters.and.foo'], 2)
+        self.run_and_expect_failure(
+            ['custodian', 'schema', 'ec2.filters.and.foo'], 2)
 
     def test_schema_output(self):
 
@@ -197,7 +204,7 @@ class SchemaTest(CliTest):
 
         output = self.get_output(['custodian', 'schema', 'ec2.filters.image'])
         self.assertIn('Help:', output)
-        
+
 
 class ReportTest(CliTest):
 
@@ -214,23 +221,24 @@ class ReportTest(CliTest):
         yaml_file = self.write_policy_file(valid_policies)
         temp_dir = self.get_temp_dir()
 
-        self.run_and_expect_success(['custodian', 'report', '-c', yaml_file, '-s', temp_dir])
+        self.run_and_expect_success(
+            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir])
 
         # empty file
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
-        self.run_and_expect_exception([
-                'custodian', 'report', '-c', yaml_file, '-s', temp_dir], AssertionError)
+        self.run_and_expect_exception(
+            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            AssertionError)
 
 
 class LogsTest(CliTest):
 
     def test_logs(self):
-
         temp_dir = self.get_temp_dir()
-
         # empty file
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
-        self.run_and_expect_exception([
-                'custodian', 'report', '-c', yaml_file, '-s', temp_dir], AssertionError)
+        self.run_and_expect_exception(
+            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            AssertionError)

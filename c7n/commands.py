@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
+
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
@@ -26,7 +28,6 @@ import yaml
 from c7n.credentials import SessionFactory
 from c7n.policy import Policy, load as policy_load
 from c7n.reports import report as do_report
-from c7n.metrics import metrics as do_metrics
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
 from c7n.resources import load_resources
@@ -54,7 +55,8 @@ def validate(options):
     if len(options.configs) < 1:
         # no configs to test
         # We don't have the parser object, so fake ArgumentParser.error
-        print('custodian validate: error: no config files specified')
+        print('custodian validate: error: no config files specified',
+              file=sys.stderr)
         sys.exit(2)
     used_policy_names = set()
     schm = schema.generate()
@@ -143,10 +145,10 @@ def logs(options, policies):
         options.region, options.profile, options.assume_role)
     manager = mu.LambdaManager(session_factory)
     for e in manager.logs(mu.PolicyLambda(policy)):
-        print "%s: %s" % (
+        print("%s: %s" % (
             time.strftime(
                 "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
-            e['message'])
+            e['message']))
 
 
 def _schema_get_docstring(starting_class):
@@ -165,7 +167,7 @@ def schema_cmd(options):
     if options.json:
         schema.json_dump(options.resource)
         return
-        
+
     load_resources()
     resource_mapping = schema.resource_vocabulary()
 
@@ -200,7 +202,7 @@ def schema_cmd(options):
     #
     resource = components[0].lower()
     if resource not in resource_mapping:
-        print('{} is not a valid resource'.format(resource))
+        print('{} is not a valid resource'.format(resource), file=sys.stderr)
         sys.exit(2)
 
     if len(components) == 1:
@@ -214,13 +216,15 @@ def schema_cmd(options):
     #
     category = components[1].lower()
     if category not in ('actions', 'filters'):
-        print("Valid choices are 'actions' and 'filters'.  You supplied '{}'".format(category))
+        print(("Valid choices are 'actions' and 'filters'."
+               " You supplied '{}'").format(category), file=sys.stderr)
         sys.exit(2)
-    
+
     if len(components) == 2:
         output = "No {} available for resource {}.".format(category, resource)
         if category in resource_mapping[resource]:
-            output = {resource: {category: resource_mapping[resource][category]}}
+            output = {resource: {
+                category: resource_mapping[resource][category]}}
         print(yaml.safe_dump(output))
         return
 
@@ -229,7 +233,8 @@ def schema_cmd(options):
     #
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
-        print('{} is not in the {} list for resource {}'.format(item, category, resource))
+        print('{} is not in the {} list for resource {}'.format(
+            item, category, resource), file=sys.stderr)
         sys.exit(2)
 
     if len(components) == 3:
@@ -251,21 +256,22 @@ def schema_cmd(options):
             pp.pprint(cls.schema)
         else:
             # Shouldn't ever hit this, so exclude from cover
-            print("No schema is available for this item.")  # pragma: no cover
-
+            print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
         print('')
         return
 
     # We received too much (e.g. s3.actions.foo.bar)
-    print("Invalid selector '{}'.  Max of 3 components in the "\
-          "format RESOURCE.CATEGORY.ITEM".format(options.resource))
+    print("Invalid selector '{}'.  Max of 3 components in the "
+          "format RESOURCE.CATEGORY.ITEM".format(options.resource),
+          file=sys.stderr)
     sys.exit(2)
 
 
 def _metrics_get_endpoints(options):
     """ Determine the start and end dates based on user-supplied options. """
     if bool(options.start) ^ bool(options.end):
-        print('Error: --start and --end must be specified together')
+        print('Error: --start and --end must be specified together',
+              file=sys.stderr)
         sys.exit(2)
 
     if options.start and options.end:
@@ -276,20 +282,17 @@ def _metrics_get_endpoints(options):
         start = end - timedelta(options.days)
 
     return start, end
-    
+
 
 @policy_command
 def metrics_cmd(options, policies):
-
+    load_resources()
     start, end = _metrics_get_endpoints(options)
-
-    factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
-    session = factory()
-    client = session.client('cloudwatch')
-
-    data = do_metrics(start, end, options.period, policies)
-    print dumps(data, indent=2)
+    data = {}
+    for p in policies:
+        log.info('Getting %s metrics', p)
+        data[p.name] = p.get_metrics(start, end, options.period)
+    print(dumps(data, indent=2))
 
 
 def cmd_version(options):

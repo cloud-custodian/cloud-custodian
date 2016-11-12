@@ -27,7 +27,7 @@ DEFAULT_REGION = 'us-east-1'
 
 def _default_options(p, blacklist=""):
     """ Add basic options ot the subparser.
-    
+
     `blacklist` is a list of options to exclude from the default set.
     e.g.: ['region', 'log-group']
     """
@@ -52,8 +52,7 @@ def _default_options(p, blacklist=""):
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Verbose Logging")
 
-    p.add_argument("--debug", action="store_true",
-                   help="Dev Debug")
+    p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
     if 'log-group' not in blacklist:
         p.add_argument(
@@ -63,11 +62,13 @@ def _default_options(p, blacklist=""):
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
                        help="Directory or S3 URL For Policy Output")
-        
+
     if 'cache' not in blacklist:
-        p.add_argument("-f", "--cache", default="~/.cache/cloud-custodian.cache")
-        p.add_argument("--cache-period", default=60, type=int,
-                       help="Cache validity in seconds (Default %(default)i)")
+        p.add_argument(
+            "-f", "--cache", default="~/.cache/cloud-custodian.cache")
+        p.add_argument(
+            "--cache-period", default=60, type=int,
+            help="Cache validity in seconds (Default %(default)i)")
 
 
 def _report_options(p):
@@ -98,7 +99,8 @@ def _metrics_options(p):
     _default_options(p, blacklist=['log-group', 'output-dir', 'cache'])
 
     p.add_argument(
-        '--start', type=date_parse, help='Start date (requires --end, overrides --days)')
+        '--start', type=date_parse,
+        help='Start date (requires --end, overrides --days)')
     p.add_argument(
         '--end', type=date_parse, help='End date')
     p.add_argument(
@@ -146,7 +148,7 @@ def _key_val_pair(value):
 
 def setup_parser():
     parser = argparse.ArgumentParser()
-    
+
     # Setting `dest` means we capture which subparser was used.  We'll use it
     # later on when doing post-parsing validation.
     subs = parser.add_subparsers(dest='subparser')
@@ -178,8 +180,7 @@ def setup_parser():
                           help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
                           help="Verbose Logging")
-    validate.add_argument("--debug", action="store_true",
-                          help="Dev Debug")
+    validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
     schema_desc = ("Browse the available resources, as well as actions and "
                    "filters available for each resource type. The selector "
