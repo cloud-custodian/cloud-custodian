@@ -33,6 +33,7 @@ from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
 from c7n.manager import resources
+from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
 
 
@@ -318,14 +319,53 @@ def process_resource(type_name, resource_type, resource_defs):
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-if __name__ == '__main__':
-    from c7n.resources import load_resources
+def resource_vocabulary():
+    vocabulary = {}
+    for type_name, resource_type in resources.items():
+        classes = {'actions': {}, 'filters': {}}
+
+        actions = []
+        for action_name, cls in resource_type.action_registry.items():
+            actions.append(action_name)
+            classes['actions'][action_name] = cls
+
+        filters = []
+        for filter_name, cls in resource_type.filter_registry.items():
+            filters.append(filter_name)
+            classes['filters'][filter_name] = cls
+
+        vocabulary[type_name] = {
+            'filters': sorted(filters),
+            'actions': sorted(actions),
+            'classes': classes,
+        }
+    return vocabulary
+
+
+def summary(vocabulary):
+    print "resource count: %d" % len(vocabulary)
+    action_count = filter_count = 0
+
+    common_actions = set(['notify', 'invoke-lambda'])
+    common_filters = set(['value', 'and', 'or', 'event'])
+
+    for rv in vocabulary.values():
+        action_count += len(
+            set(rv.get('actions', ())).difference(common_actions))
+        filter_count += len(
+            set(rv.get('filters', ())).difference(common_filters))
+    print "unique actions: %d" % action_count
+    print "common actions: %d" % len(common_actions)
+    print "unique filters: %d" % filter_count
+    print "common filters: %s" % len(common_filters)
+
+
+def json_dump(resource=None):
     load_resources()
-    # dump our schema
-    # $ python -m c7n.schema
     try:
-        print(json.dumps(generate(), indent=2))
+        print(json.dumps(generate(resource), indent=2))
     except:
         import traceback, pdb, sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
+
