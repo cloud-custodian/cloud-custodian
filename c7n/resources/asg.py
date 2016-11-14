@@ -594,6 +594,50 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
+@filters.register('progagated-tags')
+class PropagatedTagFilter(Filter):
+    """Filter ASG based on propagated tags
+
+    This filter is designed to find all autoscaling groups that have a list
+    of tag keys (provided) that are set to propagate to new instances. Using
+    this will allow for easy validation of asg tag sets are in place across an
+    account for compliance.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-non-propagated-tags
+                resource: asg
+                filters:
+                  - type: propagated-tags
+                    keys: ["ABC", "BCD"]
+                    match: false
+    """
+    schema = type_schema(
+        'progagated-tags',
+        keys={'type': 'array', 'items': {'type': 'string'}},
+        match={'type': 'boolean'})
+    permissions = (
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeAutoScalingGroups")
+
+    def process(self, asgs, event=None):
+        keys = self.data.get('keys', [])
+        results = []
+        for asg in asgs:
+            tags = [
+                t['Key'] for t in asg.get(
+                    'Tags', []) if t['Key'] in keys and t['PropagateAtLaunch']]
+            if all(k in tags for k in keys) == self.data.get('match', True):
+                results.append(asg)
+
+        self.log.info("Filtered %s to %s asg" % (
+            len(asgs), len(results)))
+        return results
+
+
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
