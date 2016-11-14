@@ -652,6 +652,76 @@ class Snapshot(BaseAction):
                     response['SnapshotId']],
                 Tags=tags)
 
+@actions.register('rename-tag')
+class RenameTag(BaseAction):
+
+    schema = type_schema(
+        'rename-tag',
+        old_key={'type': 'string'},
+        new_key={'type': 'string'})
+
+    def delete_tag(self, client, ids, key, value):
+        client.delete_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def create_tag(self, client, ids, key, value):
+        client.create_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_ec2(self, tag_value, resources):
+        """
+        Move source tag value to destination tag value
+
+        - Collect value from old tag
+        - Delete old tag
+        - Create new tag & assign stored value
+        """
+        self.log.info("Renaming tag on %s instances" % (len(resources)))
+        old_key = self.data.get('old_key')
+        new_key = self.data.get('new_key')
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+
+        self.create_tag(
+            c,
+            [r['InstanceId'] for r in resources if len(r.get('Tags', [])) < 50],
+            new_key, tag_value)
+
+        self.delete_tag(
+            c, [r['InstanceId'] for r in resources], old_key, tag_value)
+
+        self.create_tag(
+            c,
+            [r['InstanceId'] for r in resources if len(r.get('Tags', [])) > 49],
+            new_key, tag_value)
+
+    def create_map(self, instances):
+        old_key = self.data.get('old_key', None)
+        resource_map = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            for t in tags.keys():
+                if t != old_key:
+                    continue
+                if not tags[t] in resource_map:
+                    resource_map[tags[t]] = []
+                resource_map[tags[t]].append(r)
+        return resource_map
+
+    def process(self, resources):
+        resource_map = self.create_map(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resource_map:
+                futures.append(w.submit(self.process_ec2, r, resource_map[r]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception renaming ec2 tag set \n %s" % (
+                            f.exception()))
+
 
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
