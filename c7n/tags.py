@@ -45,6 +45,7 @@ def register_tags(filters, actions):
     actions.register('unmark', RemoveTag)
     actions.register('untag', RemoveTag)
     actions.register('remove-tag', RemoveTag)
+    actions.register('rename-tag', RenameTag)
 
 
 class TagTrim(Action):
@@ -354,6 +355,94 @@ class RemoveTag(Action):
             Resources=[v[self.id_key] for v in vol_set],
             Tags=[{'Key': k for k in tag_keys}],
             DryRun=self.manager.config.dryrun)
+
+
+class RenameTag(Action):
+    """ Create a new tag with identical value & remove old tag
+    """
+
+    schema = utils.type_schema(
+        'rename-tag',
+        old_key={'type': 'string'},
+        new_key={'type': 'string'})
+
+    def delete_tag(self, client, ids, key, value):
+        client.delete_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def create_tag(self, client, ids, key, value):
+        client.create_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_rename(self, tag_value, resource_set):
+        """
+        Move source tag value to destination tag value
+
+        - Collect value from old tag
+        - Delete old tag
+        - Create new tag & assign stored value
+        """
+        self.log.info("Renaming tag on %s instances" % (len(resource_set)))
+        old_key = self.data.get('old_key')
+        new_key = self.data.get('new_key')
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+
+        self.create_tag(
+            c,
+            [r[self.id_key] for r in resource_set if len(
+                r.get('Tags', [])) < 50],
+            new_key, tag_value)
+
+        self.delete_tag(
+            c, [r[self.id_key] for r in resource_set], old_key, tag_value)
+
+        self.create_tag(
+            c,
+            [r[self.id_key] for r in resource_set if len(
+                r.get('Tags', [])) > 49],
+            new_key, tag_value)
+
+    def create_set(self, instances):
+        old_key = self.data.get('old_key', None)
+        resource_set = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags[old_key] not in resource_set:
+                resource_set[tags[old_key]] = []
+            resource_set[tags[old_key]].append(r)
+        return resource_set
+
+    def filter_resources(self, resources):
+        old_key = self.data.get('old_key', None)
+        res = 0
+        for r in resources:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if old_key not in tags.keys():
+                resources.pop(res)
+            res += 1
+        return resources
+
+    def process(self, resources):
+        count = len(resources)
+        resources = self.filter_resources(resources)
+        self.log.info(
+            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.id_key = self.manager.get_model().id
+        resource_set = self.create_set(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resource_set:
+                futures.append(
+                    w.submit(self.process_rename, r, resource_set[r]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception renaming tag set \n %s" % (
+                            f.exception()))
+        return resources
 
 
 class TagDelayedAction(Action):
