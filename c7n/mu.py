@@ -107,16 +107,8 @@ class PythonPackageArchive(object):
                 files = self.filter_files(files)
                 for f in files:
                     f_path = os.path.join(root, f)
-                    info = zipfile.ZipInfo(os.path.join(arc_prefix, f))
-                    f_timestamp = os.path.getmtime(f_path)
-                    info.date_time = datetime.timetuple(
-                        datetime.fromtimestamp(f_timestamp)
-                    )
-                    info.external_attr = 0444 << 16L
-                    fp = open(f_path, 'rb')
-                    file_bytes = fp.read()
-                    fp.close()
-                    self._zip_file.writestr(info, file_bytes)
+                    dest_path = os.path.join(arc_prefix, f)
+                    self.add_file(f_path, dest_path)
 
         # Library Source
         venv_lib_path = os.path.join(
@@ -129,25 +121,26 @@ class PythonPackageArchive(object):
             files = self.filter_files(files)
             for f in files:
                 f_path = os.path.join(root, f)
-                info = zipfile.ZipInfo(os.path.join(arc_prefix, f))
-                f_timestamp = os.path.getmtime(f_path)
-                info.date_time = datetime.timetuple(
-                    datetime.fromtimestamp(f_timestamp)
-                )
-                info.external_attr = 0444 << 16L
-                fp = open(f_path, 'rb')
-                file_bytes = fp.read()
-                fp.close()
-                self._zip_file.writestr(info, file_bytes)
+                dest_path = os.path.join(arc_prefix, f)
+                self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
-        self._zip_file.write(src, dest)
+        info = zipfile.ZipInfo(dest)
+        timestamp = os.path.getmtime(src)
+        info.date_time = datetime.timetuple(
+            datetime.fromtimestamp(timestamp)
+        )
+        fp = open(src, 'rb')
+        contents = fp.read()
+        fp.close()
+        self.add_contents(info, contents)
 
     def add_contents(self, dest, contents):
         if not isinstance(dest, zipfile.ZipInfo):
             dest = zinfo(dest)
         # see zinfo function for some caveats
         assert not self._closed, "Archive closed"
+        dest.external_attr = 0444 << 16L
         self._zip_file.writestr(dest, contents)
 
     def close(self):
