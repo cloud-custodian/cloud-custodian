@@ -308,16 +308,6 @@ class UserAccessKeyLastUsed(Filter):
         'access-key-last-used',
         keyid={'type': 'string'})
 
-    def process_credential_report(self):
-        results = {}
-        client = local_session(self.manager.session_factory).client('iam')
-        report = client.get_credential_report()['Content'].split("\n")
-        for i in range(0, len(report)):
-            values = report[i].split(',')
-            for v in values:
-                if i == 0:
-                    results[v] = []
-
     def process(self, resources, event=None):
         keyid = self.data.get('keyid', None)
         if not keyid:
