@@ -112,17 +112,11 @@ class PythonPackageArchive(object):
                     info.date_time = datetime.timetuple(
                         datetime.fromtimestamp(f_timestamp)
                     )
-                    if os.path.isdir(f_path):
-                        info.external_attr = 0555 << 16L
-                        info.compress_type = zipfile.ZIP_STORED
-                        info.external_attr |= 0x10  # MS-DOS directory flag
-                        self._zip_file.writestr(info, '')
-                    else:
-                        info.external_attr = 0444 << 16L
-                        fp = open(f_path, 'rb')
-                        file_bytes = fp.read()
-                        fp.close()
-                        self._zip_file.writestr(info, file_bytes)
+                    info.external_attr = 0444 << 16L
+                    fp = open(f_path, 'rb')
+                    file_bytes = fp.read()
+                    fp.close()
+                    self._zip_file.writestr(info, file_bytes)
 
         # Library Source
         venv_lib_path = os.path.join(
@@ -140,17 +134,11 @@ class PythonPackageArchive(object):
                 info.date_time = datetime.timetuple(
                     datetime.fromtimestamp(f_timestamp)
                 )
-                if os.path.isdir(f_path):
-                    info.external_attr = 0555 << 16L
-                    info.compress_type = zipfile.ZIP_STORED
-                    info.external_attr |= 0x10  # MS-DOS directory flag
-                    self._zip_file.writestr(info, '')
-                else:
-                    info.external_attr = 0444 << 16L
-                    fp = open(f_path, 'rb')
-                    file_bytes = fp.read()
-                    fp.close()
-                    self._zip_file.writestr(info, file_bytes)
+                info.external_attr = 0444 << 16L
+                fp = open(f_path, 'rb')
+                file_bytes = fp.read()
+                fp.close()
+                self._zip_file.writestr(info, file_bytes)
 
     def add_file(self, src, dest):
         self._zip_file.write(src, dest)
