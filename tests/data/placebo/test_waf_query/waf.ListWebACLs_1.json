@@ -1,8 +1,7 @@
 {
     "status_code": 200, 
     "data": {
-        "NextMarker": "1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf", 
-        "ResponseMetadata": {
+         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
             "RequestId": "82da41dc-a48b-11e6-977a-07fadd0cad74", 

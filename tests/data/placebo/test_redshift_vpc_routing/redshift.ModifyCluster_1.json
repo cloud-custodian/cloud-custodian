@@ -1,0 +1,65 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Cluster": {
+            "PubliclyAccessible": true, 
+            "MasterUsername": "u1", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-f9cc4d9f"
+                }
+            ], 
+            "NumberOfNodes": 1, 
+            "PendingModifiedValues": {
+                "EnhancedVpcRouting": false
+            }, 
+            "VpcId": "vpc-4a9ff72e", 
+            "ClusterVersion": "1.0", 
+            "Tags": [], 
+            "AutomatedSnapshotRetentionPeriod": 1, 
+            "ClusterParameterGroups": [
+                {
+                    "ParameterGroupName": "default.redshift-1.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ], 
+            "PreferredMaintenanceWindow": "thu:10:30-thu:11:00", 
+            "Endpoint": {
+                "Port": 5439, 
+                "Address": "kit-test-1.caezprad5nrp.us-west-2.redshift.amazonaws.com"
+            }, 
+            "IamRoles": [], 
+            "AllowVersionUpgrade": true, 
+            "ClusterCreateTime": {
+                "hour": 22, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 46, 
+                "microsecond": 213000, 
+                "year": 2016, 
+                "day": 8, 
+                "minute": 19
+            }, 
+            "ClusterSubnetGroupName": "default", 
+            "EnhancedVpcRouting": true, 
+            "ClusterSecurityGroups": [], 
+            "ClusterIdentifier": "kit-test-1", 
+            "AvailabilityZone": "us-west-2c", 
+            "NodeType": "dc1.large", 
+            "Encrypted": false, 
+            "ClusterStatus": "modifying"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8e7b8080-a603-11e6-bd7e-9b6215900f84", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8e7b8080-a603-11e6-bd7e-9b6215900f84", 
+                "date": "Tue, 08 Nov 2016 22:34:48 GMT", 
+                "content-length": "1918", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

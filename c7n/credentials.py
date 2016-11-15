@@ -19,6 +19,7 @@ from botocore.session import get_session
 from boto3 import Session
 
 from c7n.version import version
+from c7n.utils import get_retry
 
 
 class SessionFactory(object):
@@ -60,8 +61,11 @@ def assumed_session(role_arn, session_name, session=None, region=None):
     if session is None:
         session = Session()
 
+    retry = get_retry(('Throttling',))
+
     def refresh():
-        credentials = session.client('sts').assume_role(
+        credentials = retry(
+            session.client('sts').assume_role,
             RoleArn=role_arn,
             RoleSessionName=session_name)['Credentials']
         return dict(

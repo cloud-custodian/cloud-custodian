@@ -51,7 +51,6 @@ class Policy(QueryResourceManager):
         config_type = "AWS::IAM::Policy"
 
 
-
 @resources.register('iam-profile')
 class InstanceProfile(QueryResourceManager):
     resource_type = 'aws.iam.instance-profile'
