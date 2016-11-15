@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "f41eca02-c104-4658-9825-1056901431ed", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Mon, 14 Nov 2016 19:13:03 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The request must contain the parameter resourceIdSet", 
+            "Code": "MissingParameter"
+        }
+    }
+}
