@@ -1,0 +1,473 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "andrewalexander", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 4, 
+                    "minute": 7
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAINLXB4P6J26AKFUC6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/andrewalexander"
+            }, 
+            {
+                "UserName": "anthony@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 14
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAJ6YGUR7BFD3X5M3GS", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/anthony@sixfeetup.com"
+            }, 
+            {
+                "UserName": "c7n-iam-test", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 4
+                }, 
+                "UserId": "AIDAIJLKWKDKWBL7XGIEY", 
+                "Arn": "arn:aws:iam::644160558196:user/c7n-iam-test"
+            }, 
+            {
+                "UserName": "c7n-test", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 39
+                }, 
+                "UserId": "AIDAJEKQZXQU4PIT6AUVG", 
+                "Arn": "arn:aws:iam::644160558196:user/c7n-test"
+            }, 
+            {
+                "UserName": "calvin@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 45
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIVQZEKBMLZZXYA5P2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/calvin@sixfeetup.com"
+            }, 
+            {
+                "UserName": "chrissy@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 8
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAJOCIX26Q6LITP6WQG", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/chrissy@sixfeetup.com"
+            }, 
+            {
+                "UserName": "christopherbritz", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAIQHIXZKJHZJN33JJY", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherbritz"
+            }, 
+            {
+                "UserName": "christopherocampo", 
+                "PasswordLastUsed": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 55
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJOWQFESQNYYH3RURU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherocampo"
+            }, 
+            {
+                "UserName": "davidromanowski", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 42
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJ2H7ZU2DNQQS3UIOY", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/davidromanowski"
+            }, 
+            {
+                "UserName": "jeff", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAIDQXAUMHSBC7HWWBI", 
+                "Arn": "arn:aws:iam::644160558196:user/jeff"
+            }, 
+            {
+                "UserName": "joshuaroot", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 25, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 43
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 26
+                }, 
+                "UserId": "AIDAJM67KUVNOIMGUCZO4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/joshuaroot"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 12, 
+                    "minute": 53
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kapil"
+            }, 
+            {
+                "UserName": "kit", 
+                "PasswordLastUsed": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 11
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAJKVAHLRG2G6PHIBAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kit"
+            }, 
+            {
+                "UserName": "mandeep", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 29, 
+                    "minute": 5
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAIRGKK45UIXHXNN2SI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/mandeep"
+            }, 
+            {
+                "UserName": "matt@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 6
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIZI7QSZIP42VCMOMK", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/matt@sixfeetup.com"
+            }, 
+            {
+                "UserName": "rob@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 2
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIPHUPZEIIDI4QI4GU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/rob@sixfeetup.com"
+            }, 
+            {
+                "UserName": "ryanwolfe", 
+                "PasswordLastUsed": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 32
+                }, 
+                "UserId": "AIDAILCCU2DTMX52QKXSQ", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/ryanwolfe"
+            }, 
+            {
+                "UserName": "scot@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 43
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "UserId": "AIDAIQF3HRTVXDF7TMNAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
+            }, 
+            {
+                "UserName": "stevenjo", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 20, 
+                    "minute": 22
+                }, 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 38
+                }, 
+                "UserId": "AIDAJTDYNP2J64DPXXTNC", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/stevenjo"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "665d13f9-ab78-11e6-9e3d-b56be3af805f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "665d13f9-ab78-11e6-9e3d-b56be3af805f", 
+                "date": "Tue, 15 Nov 2016 21:13:48 GMT", 
+                "content-length": "6263", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

@@ -303,6 +303,31 @@ class UserAttachedPolicy(Filter):
         return matched
 
 
+@User.filter_registry.register('access-key-last-used')
+class UserAccessKeyLastUsed(Filter):
+    schema = type_schema(
+        'access-key-last-used',
+        keyid={'type': 'string'})
+
+    def process_credential_report(self):
+        results = {}
+        client = local_session(self.manager.session_factory).client('iam')
+        report = client.get_credential_report()['Content'].split("\n")
+        for i in range(0, len(report)):
+            values = report[i].split(',')
+            for v in values:
+                if i == 0:
+                    results[v] = []
+
+    def process(self, resources, event=None):
+        keyid = self.data.get('keyid', None)
+        if not keyid:
+            return []
+        client = local_session(self.manager.session_factory).client('iam')
+        return client.get_access_key_last_used(AccessKeyId=keyid)
+
+
+
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
 

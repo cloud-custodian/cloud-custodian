@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UserName": "joshuaroot", 
+        "AccessKeyLastUsed": {
+            "Region": "us-east-1", 
+            "ServiceName": "iam", 
+            "LastUsedDate": {
+                "hour": 20, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 0, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 15, 
+                "minute": 39
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "66838890-ab78-11e6-94f0-c9470421a190", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "66838890-ab78-11e6-94f0-c9470421a190", 
+                "date": "Tue, 15 Nov 2016 21:13:48 GMT", 
+                "content-length": "494", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
