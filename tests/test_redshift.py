@@ -202,6 +202,8 @@ class TestRedshift(BaseTest):
             ClusterIdentifier=resources[0]['ClusterIdentifier'])
         cluster = response['Clusters'][0]
         self.assertEquals(
+            cluster['ClusterIdentifier'], resources[0]['ClusterIdentifier'])
+        self.assertEquals(
             cluster['ClusterStatus'], 'modifying')
         self.assertTrue(
             cluster['PendingModifiedValues']['EnhancedVpcRouting'])
