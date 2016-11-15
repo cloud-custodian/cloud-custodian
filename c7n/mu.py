@@ -19,6 +19,7 @@ docs/lambda.rst
 
 import abc
 import base64
+from datetime import datetime
 import inspect
 import fnmatch
 import hashlib
@@ -105,9 +106,23 @@ class PythonPackageArchive(object):
                     self.src_filter(root, dirs, files)
                 files = self.filter_files(files)
                 for f in files:
-                    self._zip_file.write(
-                        os.path.join(root, f),
-                        os.path.join(arc_prefix, f))
+                    f_path = os.path.join(root, f)
+                    info = zipfile.ZipInfo(os.path.join(arc_prefix, f))
+                    f_timestamp = os.path.getmtime(f_path)
+                    info.date_time = datetime.timetuple(
+                        datetime.fromtimestamp(f_timestamp)
+                    )
+                    if os.path.isdir(f_path):
+                        info.external_attr = 0555 << 16L
+                        info.compress_type = zipfile.ZIP_STORED
+                        info.external_attr |= 0x10  # MS-DOS directory flag
+                        self._zip_file.writestr(info, '')
+                    else:
+                        info.external_attr = 0444 << 16L
+                        fp = open(f_path, 'rb')
+                        file_bytes = fp.read()
+                        fp.close()
+                        self._zip_file.writestr(info, file_bytes)
 
         # Library Source
         venv_lib_path = os.path.join(
@@ -119,9 +134,23 @@ class PythonPackageArchive(object):
             arc_prefix = os.path.relpath(root, venv_lib_path)
             files = self.filter_files(files)
             for f in files:
-                self._zip_file.write(
-                    os.path.join(root, f),
-                    os.path.join(arc_prefix, f))
+                f_path = os.path.join(root, f)
+                info = zipfile.ZipInfo(os.path.join(arc_prefix, f))
+                f_timestamp = os.path.getmtime(f_path)
+                info.date_time = datetime.timetuple(
+                    datetime.fromtimestamp(f_timestamp)
+                )
+                if os.path.isdir(f_path):
+                    info.external_attr = 0555 << 16L
+                    info.compress_type = zipfile.ZIP_STORED
+                    info.external_attr |= 0x10  # MS-DOS directory flag
+                    self._zip_file.writestr(info, '')
+                else:
+                    info.external_attr = 0444 << 16L
+                    fp = open(f_path, 'rb')
+                    file_bytes = fp.read()
+                    fp.close()
+                    self._zip_file.writestr(info, file_bytes)
 
     def add_file(self, src, dest):
         self._zip_file.write(src, dest)
