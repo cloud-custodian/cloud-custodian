@@ -17,9 +17,6 @@
 import argparse
 import logging
 
-
-from c7n.output import FSOutput
-
 log = logging.getLogger("custodian.policyrename")
 
 
@@ -35,6 +32,12 @@ def setup_parser():
     return parser
 
 
+def rename_s3_output_dir(output_dir, old, new):
+
+
+def rename_local_output_dir(output_dir, old, new):
+
+
 def main():
     parser = setup_parser()
     options = parser.parse_args()
@@ -43,10 +46,10 @@ def main():
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
     output_dir = getattr(options, 'output_dir', '')
-    factory = FSOutput.select(output_dir)
-    output_path = factory.join(output_dir, policy.name)
-    # can we provide enough of a context object to satisfy the factory
-    output = factory(context)
+    if output_dir.startswith('s3://'):
+        rename_s3_ouput_dir(output_dir, old, new)
+    else:
+        rename_local_ouput_dir(output_dir, old, new)
 
 
 if __name__ == '__main__':
