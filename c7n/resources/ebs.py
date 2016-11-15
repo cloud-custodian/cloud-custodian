@@ -15,6 +15,8 @@ import logging
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -250,6 +252,41 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
+
+
+@filters.register('fault-tolerant')
+class FaultTolerantSnapshots(Filter):
+    schema = type_schema(
+        'fault-tolerant',
+        tolerant={'type': 'boolean'})
+
+    check_id = 'H7IgTzjTYb'
+
+    def pull_check_results(self):
+        result = []
+        client = local_session(self.manager.session_factory).client('support')
+        yday = datetime.now(tz=tzutc()) - timedelta(days=1)
+        results = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en')['result']
+        check_date = datetime.strptime(
+            results['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+
+        if check_date.date() < yday.date():
+            refresh = client.refresh_trusted_advisor_check(
+                checkId=self.check_id)
+            self.pull_check_results()
+
+        for r in results['flaggedResources']:
+            result.append(r['metadata'][1])
+        return result
+
+    def process(self, resources, event=None):
+        tolerant = self.data.get('tolerant', True)
+        flagged = self.pull_check_results()
+        if tolerant:
+            return [r for r in resources if r['VolumeId'] not in flagged]
+        return [r for r in resources if r['VolumeId'] in flagged]
+
 
 
 @actions.register('copy-instance-tags')
