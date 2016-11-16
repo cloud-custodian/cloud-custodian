@@ -126,10 +126,6 @@ class PythonPackageArchive(object):
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)
-        timestamp = os.path.getmtime(src)
-        info.date_time = datetime.timetuple(
-            datetime.fromtimestamp(timestamp)
-        )
         fp = open(src, 'rb')
         contents = fp.read()
         fp.close()
