@@ -126,10 +126,9 @@ class PythonPackageArchive(object):
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)
-        fp = open(src, 'rb')
-        contents = fp.read()
-        fp.close()
-        self.add_contents(info, contents)
+        with open(src, 'rb') as fp:
+            contents = fp.read()
+            self.add_contents(info, contents)
 
     def add_contents(self, dest, contents):
         if not isinstance(dest, zipfile.ZipInfo):
