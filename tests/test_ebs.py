@@ -223,12 +223,11 @@ class EbsFaultToleranceTest(BaseTest):
         policy = self.load_policy({
             'name': 'ebs-fault-tolerant',
             'resource': 'ebs',
-            'filters': [{
-                'type': 'fault-tolerant'}]
+            'filters': ['fault-tolerant']
         }, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['VolumeId'], 'vol-36ca89e2')
+        self.assertEqual(resources[0]['VolumeId'], 'vol-c5eaa459')
 
     def test_ebs_non_fault_tolerant(self):
         session = self.replay_flight_data('test_ebs_non_fault_tolerant')
@@ -241,4 +240,4 @@ class EbsFaultToleranceTest(BaseTest):
         }, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['VolumeId'], 'vol-c5eaa459')
+        self.assertEqual(resources[0]['VolumeId'], 'vol-abdb8d37')

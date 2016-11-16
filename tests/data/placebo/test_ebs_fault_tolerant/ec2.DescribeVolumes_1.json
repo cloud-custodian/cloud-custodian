@@ -4,13 +4,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5119d3ef-55cb-466d-b45d-8109cb6bb9fe", 
+            "RequestId": "ac4d3ace-4a3b-4861-8ba3-6745ca934558", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 15 Nov 2016 15:24:44 GMT"
+                "date": "Wed, 16 Nov 2016 20:23:43 GMT"
             }
         }, 
         "Volumes": [
@@ -19,7 +19,7 @@
                 "Attachments": [], 
                 "Tags": [
                     {
-                        "Value": "c7n-ebs-test", 
+                        "Value": "c7n-ebs-test-snapshot", 
                         "Key": "Name"
                     }
                 ], 
@@ -42,43 +42,31 @@
                 "Size": 1
             }, 
             {
-                "AvailabilityZone": "us-east-1d", 
-                "Attachments": [
+                "AvailabilityZone": "us-east-1a", 
+                "Attachments": [], 
+                "Tags": [
                     {
-                        "AttachTime": {
-                            "hour": 22, 
-                            "__class__": "datetime", 
-                            "month": 11, 
-                            "second": 6, 
-                            "microsecond": 0, 
-                            "year": 2016, 
-                            "day": 14, 
-                            "minute": 13
-                        }, 
-                        "InstanceId": "i-0eaf03feb2439b3c4", 
-                        "VolumeId": "vol-36ca89e2", 
-                        "State": "attached", 
-                        "DeleteOnTermination": true, 
-                        "Device": "/dev/xvda"
+                        "Value": "c7n-ebs-test-no-snapshot", 
+                        "Key": "Name"
                     }
                 ], 
                 "Encrypted": false, 
                 "VolumeType": "gp2", 
-                "VolumeId": "vol-36ca89e2", 
-                "State": "in-use", 
+                "VolumeId": "vol-abdb8d37", 
+                "State": "available", 
                 "Iops": 100, 
-                "SnapshotId": "snap-fe8a3c04", 
+                "SnapshotId": "", 
                 "CreateTime": {
-                    "hour": 22, 
+                    "hour": 20, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 6, 
-                    "microsecond": 529000, 
+                    "second": 40, 
+                    "microsecond": 663000, 
                     "year": 2016, 
-                    "day": 14, 
-                    "minute": 13
+                    "day": 16, 
+                    "minute": 4
                 }, 
-                "Size": 8
+                "Size": 1
             }
         ]
     }

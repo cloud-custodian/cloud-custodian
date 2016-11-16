@@ -7,13 +7,13 @@
             "flaggedResources": [
                 {
                     "status": "error", 
-                    "resourceId": "va4CFTKb-ryYMyiayZvDRydp79Rdk2ZvL2MAAbmSQy8", 
+                    "resourceId": "CwLIJp8c8NLj3p9zLVbM6Nbcw5o3uTOqzdMktKNAImM", 
                     "region": "us-east-1", 
                     "isSuppressed": false, 
                     "metadata": [
                         "us-east-1", 
-                        "vol-c5eaa459", 
-                        "c7n-ebs-test", 
+                        "vol-abdb8d37", 
+                        "c7n-ebs-test-no-snapshot", 
                         null, 
                         null, 
                         null, 
@@ -74,7 +74,7 @@
                     ]
                 }
             ], 
-            "timestamp": "2016-11-15T15:11:47Z", 
+            "timestamp": "2016-11-16T20:19:40Z", 
             "resourcesSummary": {
                 "resourcesFlagged": 4, 
                 "resourcesProcessed": 5, 
@@ -91,11 +91,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a36f5934-ab47-11e6-a373-e5a72ef6f861", 
+            "RequestId": "93e3f6ab-ac3a-11e6-953a-7914b57efc87", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "a36f5934-ab47-11e6-a373-e5a72ef6f861", 
-                "date": "Tue, 15 Nov 2016 15:24:44 GMT", 
-                "content-length": "1270", 
+                "x-amzn-requestid": "93e3f6ab-ac3a-11e6-953a-7914b57efc87", 
+                "date": "Wed, 16 Nov 2016 20:23:46 GMT", 
+                "content-length": "1282", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

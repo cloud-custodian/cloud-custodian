@@ -256,6 +256,18 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
 @filters.register('fault-tolerant')
 class FaultTolerantSnapshots(Filter):
+    """
+    This filter will return any EBS volume that does/does not have a
+    snapshot within the last 7 days. 'Fault-Tolerance' in this instance
+    means that, in the event of a failure, the volume can be restored
+    from a snapshot with (reasonable) data loss
+
+    - name: ebs-volume-tolerance
+    - resource: ebs
+    - filters: [{
+        'type': 'fault-tolerant',
+        'tolerant': True}]
+    """
     schema = type_schema(
         'fault-tolerant',
         tolerant={'type': 'boolean'})
@@ -263,27 +275,18 @@ class FaultTolerantSnapshots(Filter):
     check_id = 'H7IgTzjTYb'
 
     def pull_check_results(self):
-        result = []
+        result = set()
         client = local_session(self.manager.session_factory).client('support')
-        yday = datetime.now(tz=tzutc()) - timedelta(days=1)
+        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
-        check_date = datetime.strptime(
-            results['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
-
-        if check_date.date() < yday.date():
-            refresh = client.refresh_trusted_advisor_check(
-                checkId=self.check_id)
-            self.pull_check_results()
-
         for r in results['flaggedResources']:
-            result.append(r['metadata'][1])
+            result.update([r['metadata'][1]])
         return result
 
     def process(self, resources, event=None):
-        tolerant = self.data.get('tolerant', True)
         flagged = self.pull_check_results()
-        if tolerant:
+        if self.data.get('tolerant', True):
             return [r for r in resources if r['VolumeId'] not in flagged]
         return [r for r in resources if r['VolumeId'] in flagged]
 
