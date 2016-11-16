@@ -121,9 +121,7 @@ def _schema_options(p):
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
-    p.add_argument(
-        '--json', action="store_true",
-        help="Output to JSON format")
+    p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
     p.add_argument(
         '-v', '--verbose', action="store_true",
         help="Verbose logging")
