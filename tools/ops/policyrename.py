@@ -49,6 +49,13 @@ def s3_rename(output_dir, old, new):
     client = session.client('s3')
     s3 = session.resource('s3')
     s3_path, bucket, key_prefix = parse_s3(output_dir)
+    
+    # Ensure bucket exists
+    try:
+        client.head_bucket(Bucket=bucket)
+    except ClientError:
+        raise ArgumentError('S3 bucket {} does not exist.'.format(bucket))
+
     try:
         log.info(
             'Retrieving list of S3 objects to rename in bucket "{}"'.format(
@@ -58,6 +65,10 @@ def s3_rename(output_dir, old, new):
         to_rename = client.list_objects(Bucket=bucket, Prefix=old + '/')
     except ClientError as e:
         log.error(e.message)
+
+    if to_rename is None or to_rename.get('Contents') is None:
+        raise ArgumentError('Key {} does not exist in bucket {}'.format(
+                old, bucket))
 
     # Loop through the old objects copying and deleting
     for obj in to_rename.get('Contents'):
@@ -93,7 +104,8 @@ def local_rename(output_dir, old, new):
 
     # If the old_dir doesn't exist, there is nothing to do.
     if not os.path.exists(old_dir):
-        raise ArgumentError("Error: There is no existing output for a policy with name.")
+        raise ArgumentError(
+            "Error: There is no existing output for a policy with name {}.".format(old_dir))
 
     # If the new_dir doesn't exist yet, just rename the old one and we're done.
     if not os.path.exists(new_dir):
