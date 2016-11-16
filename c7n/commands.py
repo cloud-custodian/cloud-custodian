@@ -115,8 +115,9 @@ def run(options, policies):
             if options.debug:
                 raise
             # Output does an exception log
-            log.warning("Error while executing policy %s, continuing" % (
-                policy.name))
+            log.error(
+                "Error while executing policy %s, continuing" % (
+                    policy.name))
     sys.exit(exit_code)
 
 
