@@ -536,9 +536,8 @@ class IamUserKeyLastUsedtest(BaseTest):
             'name': 'iam-user-key-last-used',
             'resource': 'iam-user',
             'filters': [{
-                'type': 'access-key-last-used',
-                'keyid': 'AKIAJ6QYY7CQQ3KXHE5A'}]
+                'type': 'key-last-used',
+                'days': 14}]
         }, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources), 3)
-        self.assertEqual(resources['UserName'], 'joshuaroot')
