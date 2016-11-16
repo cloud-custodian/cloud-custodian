@@ -608,7 +608,6 @@ def zinfo(fname):
     """
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
-    info.external_attr = 0o644 << 16
     info.compress_type = zipfile.ZIP_DEFLATED
     return info
 
