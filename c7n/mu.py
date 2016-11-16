@@ -19,6 +19,7 @@ docs/lambda.rst
 
 import abc
 import base64
+from datetime import datetime
 import inspect
 import fnmatch
 import hashlib
@@ -105,9 +106,9 @@ class PythonPackageArchive(object):
                     self.src_filter(root, dirs, files)
                 files = self.filter_files(files)
                 for f in files:
-                    self._zip_file.write(
-                        os.path.join(root, f),
-                        os.path.join(arc_prefix, f))
+                    f_path = os.path.join(root, f)
+                    dest_path = os.path.join(arc_prefix, f)
+                    self.add_file(f_path, dest_path)
 
         # Library Source
         venv_lib_path = os.path.join(
@@ -119,18 +120,22 @@ class PythonPackageArchive(object):
             arc_prefix = os.path.relpath(root, venv_lib_path)
             files = self.filter_files(files)
             for f in files:
-                self._zip_file.write(
-                    os.path.join(root, f),
-                    os.path.join(arc_prefix, f))
+                f_path = os.path.join(root, f)
+                dest_path = os.path.join(arc_prefix, f)
+                self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
-        self._zip_file.write(src, dest)
+        info = zipfile.ZipInfo(dest)
+        with open(src, 'rb') as fp:
+            contents = fp.read()
+            self.add_contents(info, contents)
 
     def add_contents(self, dest, contents):
         if not isinstance(dest, zipfile.ZipInfo):
             dest = zinfo(dest)
         # see zinfo function for some caveats
         assert not self._closed, "Archive closed"
+        dest.external_attr = 0444 << 16L
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -603,7 +608,6 @@ def zinfo(fname):
     """
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
-    info.external_attr = 0o644 << 16
     info.compress_type = zipfile.ZIP_DEFLATED
     return info
 
