@@ -14,16 +14,35 @@
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import BaseAction as Action
+from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
 
     resource_type = "aws.kinesis.stream"
+
+
+@KinesisStream.action_registry.register('delete')
+class Delete(Action):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kinesis')
+
+        not_active = [r['StreamName'] for r in resources if r['StreamStatus'] != 'ACTIVE']
+        self.log.warning(
+            "The following streams cannot be deleted (wrong state): %s" % (
+                ", ".join(not_active)))
+        for r in resources:
+            if not r['StreamStatus'] == 'ACTIVE':
+                continue
+            client.delete_stream(
+                StreamName=r['StreamName'])
 
 
 @resources.register('firehose')
