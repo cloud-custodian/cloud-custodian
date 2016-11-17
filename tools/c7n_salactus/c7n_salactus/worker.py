@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""queues:
+"""Salactus, eater of s3 buckets.
+
+queues:
  - buckets-iterator
  - bucket-set
  - bucket-partition
@@ -35,20 +37,22 @@ monitor:
  - buckets-denied:set
 
 """
-
-import argparse
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-import json
 import logging
+import itertools
 import math
+import os
+import string
 import threading
 import time
-import random
-import os
+from uuid import uuid4
 
 import redis
 from rq.decorators import job
+# for bulk invoke impl
+from rq.queue import Queue
+from rq.job import JobStatus, Job
 
 import boto3
 from botocore.client import Config
@@ -66,6 +70,7 @@ REDIS_HOST = os.environ["SALACTUS_REDIS"]
 
 # Minimum size of the bucket before partitioning
 PARTITION_BUCKET_SIZE_THRESHOLD = 100000
+#PARTITION_BUCKET_SIZE_THRESHOLD = 20000
 
 # Page size for keys found during partition
 PARTITION_KEYSET_THRESHOLD = 500
@@ -74,7 +79,8 @@ PARTITION_KEYSET_THRESHOLD = 500
 PARTITION_QUEUE_THRESHOLD = 6
 
 BUCKET_OBJ_DESC = {
-    True: ('Versions', 'list_object_versions', ('NextContinuationToken',)),
+    True: ('Versions', 'list_object_versions',
+           ('NextContinuationToken',)),
     False: ('Contents', 'list_objects_v2',
             ('NextKeyMarker', 'NextVersionIdMarker'))
     }
@@ -84,7 +90,7 @@ connection = redis.Redis(host=REDIS_HOST)
 # seeing some odd net slowness all around.
 s3config = Config(read_timeout=420, connect_timeout=90)
 keyconfig = {
-    'report-only': False,
+    'report-only': True,
     'glacier': False,
     'large': True,
     'crypto': 'AES256'}
@@ -93,17 +99,18 @@ log = logging.getLogger("salactus")
 
 
 def get_session(account_info):
-    s = getattr(CONN_CACHE, '%s-session', None)
-    t = getattr(CONN_CACHE, 'time', 0)
-    n = time.time()
-    if s is not None and t + (60 * random.uniform(20, 45)) > n:
+    """Get a boto3 sesssion potentially cross account sts assumed
+
+    assumed sessions are automatically refreshed.
+    """
+    s = getattr(CONN_CACHE, '%s-session' % account_info['name'], None)
+    if s is not None:
         return s
     if account_info.get('role'):
         s = assumed_session(account_info['role'], SESSION_NAME)
     else:
         s = boto3.Session()
-    CONN_CACHE.session = s
-    CONN_CACHE.time = n
+    setattr(CONN_CACHE, '%s-session' % account_info['name'], s)
     return s
 
 
@@ -115,9 +122,34 @@ def invoke(func, *args, **kw):
     func.delay(*args, **kw)
 
 
+def bulk_invoke(func, args, nargs):
+    """Bulk invoke a function via queues
+
+    Uses internal implementation details of rq.
+    """
+    ctx = func.delay.func_closure[-1].cell_contents
+    q = Queue(ctx.queue, connection=connection)
+    argv = list(args)
+    argv.append(None)
+    job = Job.create(
+        func, args=argv, connection=connection,
+        description="bucket-%s" % func.func_name,
+        origin=q.name, status=JobStatus.QUEUED, timeout=None,
+        result_ttl=500, ttl=ctx.ttl)
+
+    for n in chunks(nargs, 100):
+        job.created_at = datetime.utcnow()
+        with connection.pipeline() as pipe:
+            for s in n:
+                argv[-1] = s
+                job._id = unicode(uuid4())
+                job.args = argv
+                q.enqueue_job(job, pipeline=pipe)
+
+
 @contextmanager
 def bucket_ops(account_info, bucket_name, api=""):
-    """context manager for dealing with s3 errors in one place
+    """Context manager for dealing with s3 errors in one place
     """
     try:
         yield 42
@@ -149,15 +181,18 @@ def page_strip(page, bucket):
 
     TODO: evolve this to a key filter on metadata.
     """
-    page.pop('ResponseMetadata')
+    page.pop('ResponseMetadata', None)
     contents_key = bucket['versioned'] and 'Versions' or 'Contents'
     contents = page.get(contents_key, ())
     if not contents:
-        return
+        return page
     # Depending on use case we may want these
     for k in contents:
         k.pop('Owner', None)
-        k.pop('LastModified')
+        k.pop('LastModified', None)
+        k.pop('ETag', None)
+        k.pop('StorageClass', None)
+        k.pop('Size', None)
     return page
 
 
@@ -175,21 +210,25 @@ def bucket_key_count(client, bucket):
         EndTime=datetime.now().replace(
             hour=0, minute=0, second=0, microsecond=0),
         Period=60*60*24,
-        Statistics=['Average'])
+        Statistics=['Minimum'])
     response = client.get_metric_statistics(**params)
     if not response['Datapoints']:
         return 0
-    return response['Datapoints'][0]['Average']
+    return response['Datapoints'][0]['Minimum']
 
 
 @job('buckets-iterator', timeout=3600, connection=connection)
 def process_account(account_info):
     """Scan all buckets in an account and schedule processing"""
-    log = logging.getLogger('bucket-iterator')
+    log = logging.getLogger('salactus.bucket-iterator')
     log.info("processing account %s", account_info)
     session = get_session(account_info)
     client = session.client('s3', config=s3config)
-    buckets = [n['Name'] for n in client.list_buckets()['Buckets']]
+    buckets = client.list_buckets()['Buckets']
+    account_buckets = account_info.pop('buckets', None)
+    buckets = [n['Name'] for n in buckets
+               if not account_buckets or
+               n['Name'] in account_buckets]
     log.info("processing %d buckets in account %s",
              len(buckets), account_info['name'])
     for bucket_set in chunks(buckets, 50):
@@ -204,7 +243,7 @@ def process_bucket_set(account_info, buckets):
     then kickoff processing strategy based on size.
     """
     region_clients = {}
-    log = logging.getLogger('bucket-iterator')
+    log = logging.getLogger('salactus.bucket-set')
     log.info("processing account %s", account_info)
     session = get_session(account_info)
     client = session.client('s3', config=s3config)
@@ -238,32 +277,216 @@ def process_bucket_set(account_info, buckets):
             info['keycount'] = bucket_key_count(cw, info)
             connection.hset('bucket-size', bid, info['keycount'])
             log.info("processing bucket %s", info)
+            connection.hset(
+                'buckets-start',
+                bucket_id(account_info, info['name']), time.time())
             if info['keycount'] > PARTITION_BUCKET_SIZE_THRESHOLD:
                 invoke(process_bucket_partitions, account_info, info)
             else:
                 invoke(process_bucket_iterator, account_info, info)
 
 
-@job('bucket-partition', timeout=3600*4, connection=connection)
-def process_bucket_partitions(
-        account_info, bucket, prefix_set=('',), partition='/',
-        limit=4):
-    """Split up a bucket keyspace into smaller sets for parallel iteration.
+class CharSet(object):
+    """Sets of character/gram populations for the ngram partition strategy.
+    """
+    hex_lower = set(string.hexdigits.lower())
+    hex = set(string.hexdigits)
+    digits = set(string.digits)
+    ascii_lower = set(string.ascii_lowercase)
+    ascii_letters = set(string.ascii_letters)
+    ascii_lower_digits = set(string.ascii_lowercase + string.digits)
+    ascii_alphanum = set(string.ascii_letters + string.digits)
+
+
+    punctuation = set(string.punctuation)
+
+    @classmethod
+    def charsets(cls):
+        return [
+            cls.hex_lower,
+            cls.hex,
+            cls.digits,
+            cls.ascii_lower,
+            cls.ascii_letters,
+            cls.ascii_lower_digits,
+            cls.ascii_alphanum]
+
+
+class Strategy(object):
+    """ Partitioning strategy for an s3 bucket.
+    """
+
+
+class NGramPartition(Strategy):
+    """A keyspace partition strategy that uses a fixed set of prefixes.
+
+    Good for flat, shallow keyspaces.
+    """
+
+    name = "ngram"
+
+    def __init__(self, grams=set(string.hexdigits.lower()), limit=3):
+        self.grams = grams
+        self.limit = limit
+
+    def initialize_prefixes(self, prefix_queue):
+        if prefix_queue != ('',):
+            return prefix_queue
+        return ["".join(n) for n in
+                itertools.permutations(self.grams, self.limit)]
+
+    def find_partitions(self, prefix_queue, results):
+        return []
+
+    def is_depth_execeeded(self, prefix):
+        return False
+
+
+class CommonPrefixPartition(Strategy):
+    """A keyspace partition strategy that probes common prefixes.
 
     We probe a bucket looking for common prefixes up to our max
     partition depth, and use parallel objects iterators on each that
     exceed the max depth or that have more than 1k keys.
 
-    design notes
-
-    as we go to process additional keys, should we give up partitioning
-    and process the subtree, can we change iteration part way through.
+    Note common prefixes are limited to a thousand by default, if that happens
+    we should record an error.
     """
+
+    name = "common-prefix"
+
+    def __init__(self, partition='/', limit=4):
+        self.partition = partition
+        self.limit = limit
+
+    def initialize_prefixes(self, prefix_queue):
+        if prefix_queue == ('',):
+            return ['']
+        return prefix_queue
+
+    def find_partitions(self, prefix_queue, results):
+        prefix_queue.extend([p['Prefix'] for p in results.get('CommonPrefixes', [])])
+
+    def is_depth_exceeded(self, prefix):
+        return prefix.count(self.partition) > self.limit
+
+
+def get_partition_strategy(account_info, bucket, strategy=None):
+    if strategy == 'p':
+        return CommonPrefixPartition()
+    elif strategy == 'n':
+        return NGramPartition()
+    elif isinstance(strategy, Strategy):
+        return strategy
+    raise ValueError("Invalid partition strategy %s" % strategy)
+
+
+def get_keys_charset(keys, bid):
+    """ Use set of keys as selector for character superset
+
+    Note this isn't optimal, its probabilistic on the keyset char population.
+    """
+    # use the keys found to sample possible chars
+    chars = set()
+    for k in keys:
+        chars.update(k[:4])
+    remainder = chars
+
+    # Normalize charsets for matching
+    normalized = {}
+    for n, sset in [
+        ("p", set(string.punctuation)),
+        ("w", set(string.whitespace))
+    ]:
+        m = chars.intersection(sset)
+        if m:
+            normalized[n] = m
+            remainder = remainder.difference(sset)
+
+    # Detect character sets
+    charset = None
+    for candidate in CharSet.charsets():
+        if remainder.issubset(candidate):
+            charset = candidate
+            break
+
+    if charset is None:
+        raise ValueError(
+            "Bucket: %s Failed charset ngram detection %r\n%s" % (
+                bid, "".join(chars)), "\n".join(sorted(keys)))
+
+    for n, sset in normalized.items():
+        charset = charset.symmetric_difference(sset)
+
+    return charset
+
+
+def detect_partition_strategy(account_info, bucket, delimiters=('/', '-')):
+    """Try to detect the best partitioning strategy for a large bucket
+
+    Consider nested buckets with common prefixes, and flat buckets.
+    """
+    bid = bucket_id(account_info, bucket['name'])
+    session = get_session(account_info)
+    s3 = session.client('s3', region_name=bucket['region'], config=s3config)
+
     (contents_key,
      contents_method,
      continue_tokens) = BUCKET_OBJ_DESC[bucket['versioned']]
-    prefix_queue = []
-    prefix_queue.extend(prefix_set)
+
+    with bucket_ops(account_info, bucket['name'], 'detect'):
+        keys = set()
+        for delimiter in delimiters:
+            method = getattr(s3, contents_method, None)
+            results = method(
+                Bucket=bucket['name'], Prefix='', Delimiter=delimiter)
+            prefixes = results.get('CommonPrefixes', [])
+            contents = results.get(contents_key, [])
+            keys.update([k['Key'] for k in contents])
+            # If we have common prefixes within limit thresholds go wide
+            if (len(prefixes) > 0 and
+                len(prefixes) < 1000 and
+                    len(contents) < 1000):
+                return process_bucket_partitions(
+                    account_info, bucket, partition=delimiter,
+                    strategy='p')
+
+    # Detect character sets
+    charset = get_keys_charset(keys, bid)
+
+    # Determine the depth we need to keep total api calls below threshold
+    scan_count = bucket['keycount'] / 1000.0
+    for limit in range(1, 4):
+        if math.pow(len(charset), limit) * 1000 > scan_count:
+            break
+
+    # Dispatch
+    prefixes = ('',)
+    prefixes = NGramPartition(
+        charset, limit=limit).initialize_prefixes(prefixes)
+
+    # Pregen on ngram means we have many potentially useless prefixes
+    # todo carry charset forward as param, and go incremental on prefix
+    # ngram expansion
+    connection.hincrby('bucket-partition', bid, len(prefixes))
+    return bulk_invoke(
+        process_bucket_iterator, [account_info, bucket], prefixes)
+
+
+@job('bucket-partition', timeout=3600*4, connection=connection)
+def process_bucket_partitions(
+        account_info, bucket, prefix_set=('',), partition='/',
+        strategy=None):
+    """Split up a bucket keyspace into smaller sets for parallel iteration.
+    """
+    if strategy is None:
+        return detect_partition_strategy(account_info, bucket)
+    strategy = get_partition_strategy(account_info, bucket, strategy)
+    (contents_key,
+     contents_method,
+     continue_tokens) = BUCKET_OBJ_DESC[bucket['versioned']]
+    prefix_queue = strategy.initialize_prefixes(prefix_set)
+
     keyset = []
     bid = bucket_id(account_info, bucket['name'])
 
@@ -271,27 +494,32 @@ def process_bucket_partitions(
     s3 = session.client('s3', region_name=bucket['region'], config=s3config)
 
     def statm(prefix):
-        return "keyset:%d queue:%d prefix:%s bucket:%s" % (
-            len(keyset), len(prefix_queue), prefix, bid)
-    
+        return "keyset:%d queue:%d prefix:%s bucket:%s size:%d" % (
+            len(keyset), len(prefix_queue), prefix, bid, bucket['keycount'])
+
     while prefix_queue:
+        connection.hincrby('bucket-partition', bid, 1)
         prefix = prefix_queue.pop()
-        log.info("Partioning bucket %s", statm(prefix))
-        if prefix.count(partition) >= limit:
+        if strategy.is_depth_exceeded(prefix):
             log.info("Partition max depth reached, %s", statm(prefix))
             invoke(process_bucket_iterator, account_info, bucket, prefix)
             continue
         method = getattr(s3, contents_method, None)
-        results = method(
-            Bucket=bucket['name'], Prefix=prefix, Delimiter=partition)
+        results = page_strip(method(
+            Bucket=bucket['name'], Prefix=prefix, Delimiter=partition),
+            bucket)
         keyset.extend(results.get(contents_key, ()))
+
         # As we probe we find keys, process any found
         if len(keyset) > PARTITION_KEYSET_THRESHOLD:
             log.info("Partition, processing keyset %s", statm(prefix))
             invoke(
-                process_keyset, account_info, bucket, {contents_key: keyset})
+                process_keyset, account_info, bucket,
+                page_strip({contents_key: keyset}, bucket))
             keyset = []
-        prefix_queue.extend([p['Prefix'] for p in results.get('CommonPrefixes', [])])
+
+        strategy.find_partitions(prefix_queue, results)
+
         # Do we have more than 1k keys at this level, continue iteration
         continuation_params = {
             k: results[k] for k in continue_tokens if k in results}
@@ -300,15 +528,18 @@ def process_bucket_partitions(
             invoke(process_bucket_iterator,
                    account_info, bucket, prefix, delimiter=partition,
                    **continuation_params)
-        # If the queue get too deep, then add a friend
+
+        # If the queue get too deep, then go parallel
         if len(prefix_queue) > PARTITION_QUEUE_THRESHOLD:
-            log.info("Partition add friend, %s", statm(prefix))
-            mid = int(math.floor(len(prefix_queue)/2.0))
-            invoke(process_bucket_partitions,
-                   account_info, bucket,
-                   prefix_set=prefix_queue[mid:],
-                   partition=partition, limit=limit)
-            prefix_queue = prefix_queue[:mid]
+            log.info("Partition add friends, %s", statm(prefix))
+            for s_prefix_set in chunks(
+                    prefix_queue[PARTITION_QUEUE_THRESHOLD-1:],
+                    PARTITION_QUEUE_THRESHOLD-1):
+                invoke(process_bucket_partitions,
+                       account_info, bucket,
+                       prefix_set=s_prefix_set, partition=partition,
+                       strategy=strategy)
+            prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD-1]
 
     if keyset:
         invoke(process_keyset, account_info, bucket, {contents_key: keyset})
@@ -328,28 +559,27 @@ def process_bucket_iterator(account_info, bucket,
      contents_method,
      _) = BUCKET_OBJ_DESC[bucket['versioned']]
 
-    params = dict(Bucket=bucket['name'], Prefix=prefix, Delimiter=delimiter)
+    params = dict(Bucket=bucket['name'], Prefix=prefix)
+    if delimiter:
+        params['Delimiter'] = delimiter
     if continuation:
         params.update(continuation)
     paginator = s3.get_paginator(contents_method).paginate(**params)
     with bucket_ops(account_info, bucket['name'], 'page'):
-        connection.hset(
-            'buckets-start',
-            bucket_id(account_info, bucket['name']), time.time())
         for page in paginator:
             page = page_strip(page, bucket)
-            if page is not None:
+            if page.get(contents_key):
                 invoke(process_keyset, account_info, bucket, page)
 
 
-@job('bucket-keyset-scan', timeout=3600*4, connection=connection)
+@job('bucket-keyset-scan', timeout=3600*8, connection=connection)
 def process_keyset(account_info, bucket, key_set):
     session = get_session(account_info)
     s3 = session.client('s3', region_name=bucket['region'], config=s3config)
-    processor = Eater(keyconfig)
+    processor = EncryptExtantKeys(keyconfig)
     remediation_count = 0
     denied_count = 0
-    contents_key = bucket['versioned'] and 'Versions' or 'Contents'
+    contents_key, _, _ = BUCKET_OBJ_DESC[bucket['versioned']]
     processor = (bucket['versioned'] and processor.process_version
                  or processor.process_key)
     connection.hincrby(
@@ -366,8 +596,16 @@ def process_keyset(account_info, bucket, key_set):
             except ConnectionError:
                 continue
             except ClientError as e:
-                if e.response['Error']['Code'] == '403':
+                #  https://goo.gl/HZLv9b
+                code = e.response['Error']['Code']
+                if code == '403':  # Permission Denied
                     denied_count += 1
+                    continue
+                elif code == '404':  # Not Found
+                    continue
+                elif code in ('503', '400'):  # Slow Down, or token err
+                    # TODO, consider backoff alg usage, and re-queue of keys
+                    time.sleep(3)
                     continue
                 raise
             if result is False:
@@ -383,56 +621,3 @@ def process_keyset(account_info, bucket, key_set):
                 'keys-denied',
                 bucket_id(account_info, bucket['name']),
                 denied_count)
-    #if not key_set.get('IsTruncated', True) or contents_key not in key_set:
-    #    connection.hset(
-    #        'buckets-end', bucket_id(account_info, bucket['name']), time.time())
-    #    connection.sadd(
-    #        'buckets-complete',
-    #        '%s:%s' % (account_info['name'], bucket['name']))
-
-
-# TODO :-)  ... by default errors will go error queue
-def process_error():
-    """
-    """
-
-
-class Eater(EncryptExtantKeys):
-    # Hot patch fix for suspended versioning support
-    def get_bucket_style(self, b):
-        return (
-            b.get('Versioning', {'Status': ''}).get('Status')
-            in ('Enabled', 'Suspended') and 'versioned' or 'standard')
-
-
-def setup_parser():
-    parser = argparse.ArgumentParser(
-        description="Scan s3 at scale, format")
-    parser.add_argument("--accounts", required=True)
-    parser.add_argument("--env", required=True, choices=('dev', 'prod'))
-    return parser
-
-
-def main():
-    parser = setup_parser()
-    options = parser.parse_args()
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
-    logging.getLogger('botocore').setLevel(level=logging.WARNING)
-    with open(options.accounts) as fh:
-        data = json.load(fh)
-        for account in data:
-            if options.env != account['env']:
-                continue
-            invoke(process_account, account)
-
-if __name__ == '__main__':
-    try:
-        main()
-    except (SystemExit, KeyboardInterrupt) as e:
-        raise
-    except:
-        import traceback, sys, pdb
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])

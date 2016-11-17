@@ -866,7 +866,8 @@ class EncryptExtantKeys(ScanBucket):
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
 
-        if key['Size'] > MAX_COPY_SIZE and self.data.get('large', True):
+        if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
+                'large', True):
             return self.process_large_file(s3, bucket_name, key, info, params)
 
         s3.copy_object(**params)
@@ -898,7 +899,7 @@ class EncryptExtantKeys(ScanBucket):
     def process_large_file(self, s3, bucket_name, key, info, params):
         """For objects over 5gb, use multipart upload to copy"""
         part_size = MAX_COPY_SIZE - (1024 ** 2)
-        num_parts = int(math.ceil(key['Size'] / part_size))
+        num_parts = int(math.ceil(info['ContentLength'] / part_size))
         source = params.pop('CopySource')
 
         params.pop('MetadataDirective')
@@ -912,13 +913,13 @@ class EncryptExtantKeys(ScanBucket):
                   'CopySource': "/%s/%s" % (bucket_name, key['Key']),
                   'UploadId': upload_id,
                   'CopySource': source,
-                  'CopySourceIfMatch': key['ETag']}
+                  'CopySourceIfMatch': info['ETag']}
 
         def upload_part(part_num):
             part_params = dict(params)
             part_params['CopySourceRange'] = "bytes=%d-%d" % (
                 part_size * (part_num - 1),
-                min(part_size * part_num - 1, key['Size'] - 1))
+                min(part_size * part_num - 1, info['ContentLength'] - 1))
             part_params['PartNumber'] = part_num
             response = s3.upload_part_copy(**part_params)
             return {'ETag': response['CopyPartResult']['ETag'],
