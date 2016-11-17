@@ -125,6 +125,10 @@ class Bucket(object):
     def error_count(self):
         return len(self.data['buckets-error'].get(self.bucket_id, ()))
 
+    @property
+    def partitions(self):
+        return self.data['bucket-partitions'].get(self.bucket_id, 0)
+
 
 def get_data():
     data = {}

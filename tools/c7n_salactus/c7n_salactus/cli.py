@@ -14,14 +14,17 @@
 """Salactus, eater of s3 buckets.
 """
 
-import click
+from collections import Counter
 import functools
 import json
 import logging
 import operator
 
+import click
+
 from rq.registry import FinishedJobRegistry, StartedJobRegistry
 from rq.queue import Queue
+from rq.worker import Worker
 
 from c7n_salactus import worker, db
 
@@ -107,6 +110,17 @@ def reset(dbpath):
         click.echo('Invalid input :(')
 
 
+
+@cli.command()
+def workers():
+    counter = Counter()
+    for w in Worker.all(connection=worker.connection):
+        for q in w.queues:
+            counter[q.name] += 1
+    import pprint
+    pprint.pprint(dict(counter))
+
+
 @cli.command()
 @click.option('--dbpath', '-f', help='json stats db')
 @click.option('--account', '-a',
@@ -152,7 +166,7 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
     def _repr(b):
         return (
             "account:%s name:%s percent:%0.2f matched:%d "
-            "scanned:%d size:%d kdenied:%d errors:%d") % (
+            "scanned:%d size:%d kdenied:%d errors:%d partitions:%d") % (
                 b.account,
                 b.name,
                 b.percent_scanned,
@@ -160,7 +174,8 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
                 b.scanned,
                 b.size,
                 b.keys_denied,
-                b.error_count)
+                b.error_count,
+                b.partitions)
 
     for b in d.buckets(account):
         if bucket and b.name not in bucket:

@@ -80,9 +80,9 @@ PARTITION_QUEUE_THRESHOLD = 6
 
 BUCKET_OBJ_DESC = {
     True: ('Versions', 'list_object_versions',
-           ('NextContinuationToken',)),
+           ('NextKeyMarker', 'NextVersionIdMarker')),
     False: ('Contents', 'list_objects_v2',
-            ('NextKeyMarker', 'NextVersionIdMarker'))
+            ('NextContinuationToken',))
     }
 
 connection = redis.Redis(host=REDIS_HOST)
@@ -421,7 +421,7 @@ def get_keys_charset(keys, bid):
     return charset
 
 
-def detect_partition_strategy(account_info, bucket, delimiters=('/', '-')):
+def detect_partition_strategy(account_info, bucket, delimiters=('/', '-'), prefix=''):
     """Try to detect the best partitioning strategy for a large bucket
 
     Consider nested buckets with common prefixes, and flat buckets.
@@ -439,20 +439,24 @@ def detect_partition_strategy(account_info, bucket, delimiters=('/', '-')):
         for delimiter in delimiters:
             method = getattr(s3, contents_method, None)
             results = method(
-                Bucket=bucket['name'], Prefix='', Delimiter=delimiter)
-            prefixes = results.get('CommonPrefixes', [])
+                Bucket=bucket['name'], Prefix=prefix, Delimiter=delimiter)
+            prefixes = [p['Prefix'] for p in results.get('CommonPrefixes', [])]
             contents = results.get(contents_key, [])
             keys.update([k['Key'] for k in contents])
             # If we have common prefixes within limit thresholds go wide
             if (len(prefixes) > 0 and
                 len(prefixes) < 1000 and
                     len(contents) < 1000):
+                log.info("%s detected common prefix delimiter:%s contents:%d common:%d",
+                         bid, delimiter, len(contents), len(prefixes))
+                limit = prefix and 2 or 4
                 return process_bucket_partitions(
                     account_info, bucket, partition=delimiter,
-                    strategy='p')
+                    strategy='p', prefix_set=prefixes, limit=limit)
 
     # Detect character sets
     charset = get_keys_charset(keys, bid)
+    log.info("Detected charset %s for %s", charset, bid)
 
     # Determine the depth we need to keep total api calls below threshold
     scan_count = bucket['keycount'] / 1000.0
@@ -476,12 +480,15 @@ def detect_partition_strategy(account_info, bucket, delimiters=('/', '-')):
 @job('bucket-partition', timeout=3600*4, connection=connection)
 def process_bucket_partitions(
         account_info, bucket, prefix_set=('',), partition='/',
-        strategy=None):
+        strategy=None, limit=4):
     """Split up a bucket keyspace into smaller sets for parallel iteration.
     """
+
     if strategy is None:
         return detect_partition_strategy(account_info, bucket)
     strategy = get_partition_strategy(account_info, bucket, strategy)
+    strategy.limit = limit
+    strategy.partition = partition
     (contents_key,
      contents_method,
      continue_tokens) = BUCKET_OBJ_DESC[bucket['versioned']]
@@ -489,7 +496,8 @@ def process_bucket_partitions(
 
     keyset = []
     bid = bucket_id(account_info, bucket['name'])
-
+    log.info("Process partition bid:%s strategy:%s delimiter:%s queue:%d limit:%d",
+             bid, strategy.__class__.__name__[0], partition, len(prefix_queue), limit)
     session = get_session(account_info)
     s3 = session.client('s3', region_name=bucket['region'], config=s3config)
 
@@ -524,7 +532,12 @@ def process_bucket_partitions(
         continuation_params = {
             k: results[k] for k in continue_tokens if k in results}
         if continuation_params:
-            log.info("Partition has 1k keys, %s", statm(prefix))
+            bp = int(connection.hget('bucket-partition', bid))
+            log.info("Partition has 1k keys, %s %s", statm(prefix), bp)
+            if not prefix_queue and bp < 5:
+                log.info("Recursive detection")
+                return detect_partition_strategy(account_info, bucket, prefix=prefix)
+
             invoke(process_bucket_iterator,
                    account_info, bucket, prefix, delimiter=partition,
                    **continuation_params)
@@ -535,10 +548,19 @@ def process_bucket_partitions(
             for s_prefix_set in chunks(
                     prefix_queue[PARTITION_QUEUE_THRESHOLD-1:],
                     PARTITION_QUEUE_THRESHOLD-1):
+
+                for s in list(s_prefix_set):
+                    if strategy.is_depth_exceeded(prefix):
+                        invoke(process_bucket_iterator,
+                            account_info, bucket, s)
+                        s_prefix_set.remove(s)
+
+                if not s_prefix_set:
+                    continue
                 invoke(process_bucket_partitions,
-                       account_info, bucket,
-                       prefix_set=s_prefix_set, partition=partition,
-                       strategy=strategy)
+                    account_info, bucket,
+                    prefix_set=s_prefix_set, partition=partition,
+                    strategy=strategy, limit=limit)
             prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD-1]
 
     if keyset:
@@ -563,7 +585,7 @@ def process_bucket_iterator(account_info, bucket,
     if delimiter:
         params['Delimiter'] = delimiter
     if continuation:
-        params.update(continuation)
+        params.update({k[4:]: v for k, v in continuation.items()})
     paginator = s3.get_paginator(contents_method).paginate(**params)
     with bucket_ops(account_info, bucket['name'], 'page'):
         for page in paginator:
