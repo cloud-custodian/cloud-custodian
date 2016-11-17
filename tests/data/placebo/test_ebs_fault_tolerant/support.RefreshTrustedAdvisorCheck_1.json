@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "status": {
+            "checkId": "H7IgTzjTYb", 
+            "status": "success", 
+            "millisUntilNextRefreshable": 56055
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "92a7f42b-ac3a-11e6-ab1d-51a15f6526da", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "92a7f42b-ac3a-11e6-ab1d-51a15f6526da", 
+                "date": "Wed, 16 Nov 2016 20:23:44 GMT", 
+                "content-length": "89", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

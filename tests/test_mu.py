@@ -336,3 +336,15 @@ class PythonArchiveTest(unittest.TestCase):
                       'c7n/resources/s3.pyc',
                       'boto3/__init__.py']:
                 self.assertFalse(i in fileset)
+
+    def test_archive_permissions(self):
+        # files should all be readable
+        self.archive = custodian_archive("*.pyc")
+        self.archive.create()
+        self.addCleanup(self.archive.remove)
+        self.archive.close()
+        readable = 0444 << 16L
+        with open(self.archive.path) as fh:
+            reader = zipfile.ZipFile(fh, mode='r')
+            for i in reader.infolist():
+                self.assertGreaterEqual(i.external_attr, readable)
