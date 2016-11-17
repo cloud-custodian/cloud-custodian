@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4f33f93e-371b-45ac-b801-edb17eb62e1a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 16 Nov 2016 20:23:45 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-east-1a", 
+                "Attachments": [], 
+                "Tags": [
+                    {
+                        "Value": "c7n-ebs-test-snapshot", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-c5eaa459", 
+                "State": "available", 
+                "Iops": 100, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 12, 
+                    "microsecond": 395000, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 11
+                }, 
+                "Size": 1
+            }, 
+            {
+                "AvailabilityZone": "us-east-1a", 
+                "Attachments": [], 
+                "Tags": [
+                    {
+                        "Value": "c7n-ebs-test-no-snapshot", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-abdb8d37", 
+                "State": "available", 
+                "Iops": 100, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 40, 
+                    "microsecond": 663000, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 4
+                }, 
+                "Size": 1
+            }
+        ]
+    }
+}

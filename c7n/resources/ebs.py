@@ -15,6 +15,8 @@ import logging
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -250,6 +252,44 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
+
+
+@filters.register('fault-tolerant')
+class FaultTolerantSnapshots(Filter):
+    """
+    This filter will return any EBS volume that does/does not have a
+    snapshot within the last 7 days. 'Fault-Tolerance' in this instance
+    means that, in the event of a failure, the volume can be restored
+    from a snapshot with (reasonable) data loss
+
+    - name: ebs-volume-tolerance
+    - resource: ebs
+    - filters: [{
+        'type': 'fault-tolerant',
+        'tolerant': True}]
+    """
+    schema = type_schema(
+        'fault-tolerant',
+        tolerant={'type': 'boolean'})
+
+    check_id = 'H7IgTzjTYb'
+
+    def pull_check_results(self):
+        result = set()
+        client = local_session(self.manager.session_factory).client('support')
+        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
+        results = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en')['result']
+        for r in results['flaggedResources']:
+            result.update([r['metadata'][1]])
+        return result
+
+    def process(self, resources, event=None):
+        flagged = self.pull_check_results()
+        if self.data.get('tolerant', True):
+            return [r for r in resources if r['VolumeId'] not in flagged]
+        return [r for r in resources if r['VolumeId'] in flagged]
+
 
 
 @actions.register('copy-instance-tags')
