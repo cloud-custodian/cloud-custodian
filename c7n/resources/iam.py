@@ -304,6 +304,16 @@ class UserAttachedPolicy(Filter):
 
 @User.filter_registry.register('key-last-used')
 class UserAccessKeyLastUsed(Filter):
+    """
+    This filter is designed to find all IAM user Access Keys that have not
+    been used within a specified time period (in days).
+
+    - name: iam-user-access-key-last-used
+      resource: iam-user
+      filters:
+        - type: key-last-used
+          days: 14
+    """
     schema = type_schema(
         'key-last-used',
         days={'type': 'number'})
@@ -311,33 +321,38 @@ class UserAccessKeyLastUsed(Filter):
     def process(self, resources, event=None):
 
         def _last_used(resource):
+            if 'c7n-ValidKeys' in resource or 'c7n-InvalidKeys' in resource:
+                return
+            resource['c7n-ValidKeys'] = []
+            resource['c7n-InvalidKeys'] = []
+            filter_date = datetime.now(
+                tz=tzutc()) - timedelta(days=self.data.get('days', 7))
             client = local_session(self.manager.session_factory).client('iam')
             keys = client.list_access_keys(
                 UserName=resource['UserName'])['AccessKeyMetadata']
-            resource['AccessKeys'] = []
+
             for k in keys:
-                if k['Status'] == 'Inactive':
-                    continue
                 result = client.get_access_key_last_used(
                     AccessKeyId=k['AccessKeyId'])['AccessKeyLastUsed']
                 if not 'LastUsedDate' in result:
                     result['LastUsedDate'] = datetime(
                         2000, 1, 1, 0, 0, tzinfo=tzutc())
-                last_used = result['LastUsedDate']
-                resource['AccessKeys'].append({
+                access_key = {
                     'KeyId': k['AccessKeyId'],
-                    'LastUsed': last_used})
+                    'LastUsed': result['LastUsedDate']}
+
+                key = 'c7n-ValidKeys'
+                if result['LastUsedDate'].date() < filter_date.date():
+                    key = 'c7n-InvalidKeys'
+                resource[key].append(access_key)
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(_last_used, resources))
 
-        days = self.data.get('days', 7)
-        check_date = datetime.now(tz=tzutc()) - timedelta(days=days)
         results = []
         for r in resources:
-            for d in r['AccessKeys']:
-                if d['LastUsed'].date() <= check_date.date():
-                    results.append(r)
+            if len(r['c7n-InvalidKeys']) > 0:
+                results.append(r)
         return results
 
 
