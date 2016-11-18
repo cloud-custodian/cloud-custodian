@@ -20,6 +20,7 @@ import argparse
 import fileinput
 import logging
 import os
+import shutil
 import sys
 
 from boto3.session import Session
