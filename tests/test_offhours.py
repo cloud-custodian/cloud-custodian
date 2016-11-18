@@ -297,7 +297,20 @@ class OffHoursFilterTest(BaseTest):
                         {'Key': 'maid_offhours', 'Value': '"Offhours tz=ET"'}]),
                     instance(Tags=[
                         {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])]]
-            self.assertEqual(results, [True, False, False])
+            # unclear what this is really checking
+            self.assertEqual(results, [True, True, True])
+
+    def test_offhours_get_value(self):
+        off = OffHour({'default_tz': 'ct'})
+        i = instance(Tags=[
+            {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])
+        self.assertEqual(off.get_tag_value(i), "offhours tz=pt")
+        self.assertFalse(off.parser.has_resource_schedule(
+            off.get_tag_value(i)))
+        self.assertTrue(off.parser.keys_are_valid(
+            off.get_tag_value(i)))
+        self.assertEqual(off.parser.raw_data(
+            off.get_tag_value(i)), {'tz': 'pt'})
 
     def test_offhours(self):
         t = datetime.datetime(year=2015, month=12, day=1, hour=19, minute=5,
