@@ -1,16 +1,7 @@
 .. _usage:
 
-Usage
-=====
-
-Offhours
---------
-
-.. automodule:: c7n.filters.offhours
-
-
-Outputs
--------
+Metrics and logs
+================
 
 Cloud Custodian generates a consistent set of outputs for any given
 policy.
@@ -19,9 +10,12 @@ Custodian automatically generates per policy outputs with resources metrics
 and archives serialization for all resources that match against a policy's
 filters.
 
+TODO: figure out where "Custodian Dashboards in CloudWatch" page goes -- 
+here? its own page? part of Getting Started?
+
 
 Metrics
-#######
+-------
 
 By default Cloud Custodian generates CloudWatch metrics on each policy for
 the number of resources that matched the set of filters,
@@ -41,7 +35,7 @@ flag needs to be specified when running Cloud Custodian::
 
 
 CloudWatch Logs
-###############
+---------------
 
 Custodian can optionally upload its logs in realtime to CloudWatch logs, if
 a log group is specified. Each policy's log output is generated as a
@@ -60,7 +54,7 @@ archival policy and to use the S3 logs as permanent/audit archive.
 
 
 S3 Logs & Records
-#################
+-----------------
 
 Custodian will output its logs and structured resource records in JSON format to S3, along
 with its log files for archival purposes.
