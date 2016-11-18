@@ -35,7 +35,12 @@ class ArgumentError(Exception): pass
 
 
 def setup_parser():
-    parser = argparse.ArgumentParser()
+    desc = ('This utility script will preserve the history of a policy '
+            'if it is renamed.  Pass in the old policy name and new '
+            'policy name and any old policy output and logs will be '
+            'copied to the new policy name.')
+
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-s', '--output-dir', required=True,
                         help="Directory or S3 URL For Policy Output")
     parser.add_argument("old", help="Old policy name")
