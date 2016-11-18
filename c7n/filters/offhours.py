@@ -232,8 +232,8 @@ class Time(Filter):
 
     def __call__(self, i):
         value = self.get_tag_value(i)
-        # Sigh delayed init, due to circle dep, process/init would be better but
-        # unit testing is calling this direct.
+        # Sigh delayed init, due to circle dep, process/init would be better
+        # but unit testing is calling this direct.
         if self.id_key is None:
             self.id_key = (
                 self.manager is None and 'InstanceId'
@@ -270,9 +270,10 @@ class Time(Filter):
             # respect timezone from tag
             raw_data = self.parser.raw_data(value)
             if 'tz' in raw_data:
-                self.default_tz = raw_data['tz']
-                self.default_schedule = self.get_default_schedule()
-            schedule = self.default_schedule
+                schedule = dict(self.default_schedule)
+                schedule['tz'] = raw_data['tz']
+            else:
+                schedule = self.default_schedule
         else:
             schedule = None
 
@@ -308,13 +309,14 @@ class Time(Filter):
         for t in i.get('Tags', ()):
             if t['Key'].lower() == self.tag_key:
                 found = t['Value']
+                break
         if found is False:
             return False
         # utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8')
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
-        value = value.strip("'").strip('"').translate(None, ' ')
+        value = value.strip("'").strip('"')
         return value
 
     @classmethod
@@ -427,11 +429,15 @@ class ScheduleParser(object):
 
     @staticmethod
     def raw_data(tag_value):
-        """convert the tag to a dictionary, taking values as is"""
-        data = {}
+        """convert the tag to a dictionary, taking values as is
 
+        This method name and purpose are opaque...  and not true.
+        """
+        data = {}
+        pieces = []
+        for p in tag_value.split(' '):
+            pieces.extend(p.split(';'))
         # parse components
-        pieces = tag_value.split(';')
         for piece in pieces:
             kv = piece.split('=')
             # components must by key=value
