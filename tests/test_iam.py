@@ -540,7 +540,6 @@ class IamUserKeyLastUsedtest(BaseTest):
                 'days': 14}]
         }, session_factory=session)
         resources = policy.run()
-        self.assertEqual(len(resources), 3)
         self.assertEqual(resources[0]['UserName'], 'c7n-test-03')
         self.assertEqual(
             resources[0]['c7n-InvalidKeys'][0]['KeyId'], 'AKIAJBY4ZMKLJEN6MSAA')
