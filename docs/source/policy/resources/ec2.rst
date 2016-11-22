@@ -9,7 +9,7 @@ Query
 - Basic JMESPath Query (see :py:class:`c7n.filters.ValueFilter`)
 - Valid EC2 Query Filters (see `EC2 Describe Instances <http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html>`_)
 
-.. code-block:: json
+.. code-block:: python
 
    EC2_VALID_FILTERS = {
        'architecture': ('i386', 'x86_64'),

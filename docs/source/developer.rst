@@ -1,5 +1,7 @@
-Developer Install
-=================
+.. _developer:
+
+Developer Install and Testing
+=============================
 
 
 Requirements

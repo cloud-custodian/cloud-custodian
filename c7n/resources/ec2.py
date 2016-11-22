@@ -87,7 +87,7 @@ class EC2(QueryResourceManager):
 
         Apriori we may be using custodian to ensure tags (including
         name), so there isn't a good default to ensure that we will
-        always get tags from describe_ calls.
+        always get tags from describe_x calls.
         """
 
         # First if we're in event based lambda go ahead and skip this,
