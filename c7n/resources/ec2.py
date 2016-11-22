@@ -185,6 +185,18 @@ class StateTransitionFilter(object):
 
 @filters.register('ebs')
 class AttachedVolume(ValueFilter):
+    """
+    Filters EC2 instances with EBS backed storage devices (non ephemeral
+    storage)
+
+    Example Policy:
+    - name: ec2-encrypted-ebs-volumes
+      resource: ec2
+      filters:
+        - type: ebs
+          key: encrypted
+          value: true
+    """
 
     schema = type_schema(
         'ebs', rinherit=ValueFilter.schema,
@@ -237,6 +249,17 @@ class InstanceImageBase(object):
 
 @filters.register('image-age')
 class ImageAge(AgeFilter, InstanceImageBase):
+    """
+    Filters EC2 instances based on the age of their AMI image (in days)
+
+    Example Policy:
+    - name: ec2-ancient-ami
+      resource: ec2
+      filters:
+        - type: image-age
+          op: ge
+          days: 90
+    """
 
     date_attribute = "CreationDate"
 
@@ -279,6 +302,22 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
 @filters.register('offhour')
 class InstanceOffHour(OffHour, StateTransitionFilter):
+    """Custodian OffHour filter
+
+    Filters running EC2 instances with the intent to stop at a given hour of
+    the day.
+
+    Example Policy:
+    - name: onhour-evening-stop
+      resource: ec2
+      filters:
+        - type: offhour
+          tag: custodian_downtime
+          default_tz: et
+          offhour: 20
+      actions:
+        - stop
+    """
 
     valid_origin_states = ('running',)
 
@@ -289,6 +328,22 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 
 @filters.register('onhour')
 class InstanceOnHour(OnHour, StateTransitionFilter):
+    """Custodian OnHour filter
+
+    Filters stopped EC2 instances with the intent to start at a given hour of
+    the day.
+
+    Example Policy:
+    - name: onhour-morning-start
+      resource: ec2
+      filters:
+        - type: onhour
+          tag: custodian_downtime
+          default_tz: et
+          onhour: 6
+      actions:
+        - start
+    """
 
     valid_origin_states = ('stopped',)
 
@@ -299,6 +354,18 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
 
 @filters.register('ephemeral')
 class EphemeralInstanceFilter(Filter):
+    """
+    Filters EC2 instances that have ephemeral storage (an instance-store backed
+    root device)
+
+    Example Policy:
+    - name: ec2-ephemeral-instances
+      resource: ec2
+      filters:
+        - type: ephemeral
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
+    """
 
     schema = type_schema('ephemeral')
 
@@ -328,6 +395,17 @@ class UpTimeFilter(AgeFilter):
 
 @filters.register('instance-age')
 class InstanceAgeFilter(AgeFilter):
+    """
+    Filters instances based on their age (in days)
+
+    Example Policy:
+    - name: ec2-30-days-plus
+      resource: ec2
+      filters:
+        - type: instance-age
+          op: ge
+          days: 30
+    """
 
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
@@ -365,6 +443,19 @@ class DefaultVpc(DefaultVpcBase):
 
 @actions.register('start')
 class Start(BaseAction, StateTransitionFilter):
+    """
+    Starts a previously stopped EC2 instance.
+
+    Example Policy:
+    - name: ec2-start-stopped-instances
+      resource: ec2
+      query:
+        - instance-state-name: stopped
+      actions:
+        - start
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/start-instances.html
+    """
 
     valid_origin_states = ('stopped',)
     schema = type_schema('start')
@@ -481,7 +572,7 @@ class Resize(BaseAction, StateTransitionFilter):
 
 @actions.register('stop')
 class Stop(BaseAction, StateTransitionFilter):
-    """Stop instances
+    """Stops a running EC2 instances
     """
     valid_origin_states = ('running',)
 
@@ -583,6 +674,18 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Snapshots volumes attached to an EC2 instance
+
+    Example Policy:
+    - name: ec2-snapshots
+      resource: ec2
+      filters:
+        - type: ebs
+      actions:
+        - snapshot
+          copy-tags:
+            - Name
+    """
 
     schema = type_schema(
         'snapshot',
