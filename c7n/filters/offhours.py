@@ -36,18 +36,17 @@ We provide an `onhour` and `offhour` time filter, each should be used in a
 different policy, they support the same configuration options
 
  - **weekends**: default true, whether to leave resources off for the weekend
- - **weekend-only**: default false, whether to turn the resource off only on the
-   weekend
+ - **weekend-only**: default false, whether to turn the resource off only on
+   the weekend
  - **default_tz**: which timezone to utilize when evaluating time
  - **tag**: default maid_offhours, which resource tag key to look for the
    resource's schedule.
  - **opt-out**: applies the default schedule to resource which do not specify
-   any value. a value of `off` to disable/exclude the resource.
+   any value.  a value of `off` to disable/exclude the resource.
 
 The default off hours and on hours are specified per the policy configuration
 along with the opt-in/opt-out behavior. Resources can specify the timezone
-that they wish to have this scheduled utilized with::
-
+that they wish to have this scheduled utilized with.
 
 Tag Based Configuration
 =======================

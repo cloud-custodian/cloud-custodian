@@ -221,7 +221,7 @@ class SGPermission(Filter):
 
     As well for assertions that a ingress/egress permission only matches
     a given set of ports, *note* onlyports is an inverse match, it matches
-    when a permission includes ports outside of the specified set:
+    when a permission includes ports outside of the specified set::
 
       - type: egress
         OnlyPorts: [22, 443, 80]
