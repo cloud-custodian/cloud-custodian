@@ -107,3 +107,34 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
+
+@actions.register('delete')
+class Delete(BaseAction):
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': ['delete'],
+                     'qualifier': {'type': 'string'}}
+            }
+        }
+
+    def process(self, functions):
+        qualifier = self.data.get('qualifier', '')
+
+        # Concurrency feels like overkill here.
+        client = local_session(self.manager.session_factory).client('awslambda')
+        for function in functions:
+            params = dict(
+                FunctionName=function['FunctionName'])
+            if qualifier:
+                params['Qualifier'] = qualifier
+
+            try:
+                client.delete_function(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] == "ResourceNotFoundException":
+                    continue
+                raise
+
+            self.log.info("Deleted function: %s", function['FunctionName'])
