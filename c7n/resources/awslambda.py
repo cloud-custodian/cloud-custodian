@@ -14,12 +14,14 @@
 import json
 from botocore.exceptions import ClientError
 
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
+actions = ActionRegistry('lambda.actions')
 
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
@@ -123,7 +125,7 @@ class Delete(BaseAction):
         qualifier = self.data.get('qualifier', '')
 
         # Concurrency feels like overkill here.
-        client = local_session(self.manager.session_factory).client('awslambda')
+        client = local_session(self.manager.session_factory).client('lambda')
         for function in functions:
             params = dict(
                 FunctionName=function['FunctionName'])
