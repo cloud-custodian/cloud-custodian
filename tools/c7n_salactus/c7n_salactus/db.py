@@ -35,7 +35,7 @@ class Database(object):
             json.dump(self.data, fh, indent=2)
 
 
-def db(dbpath):
+def db(dbpath=None):
     return Database(dbpath)
 
 
