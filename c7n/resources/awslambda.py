@@ -14,7 +14,7 @@
 import json
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -139,4 +139,4 @@ class Delete(BaseAction):
                     continue
                 raise
 
-            self.log.info("Deleted function: %s", function['FunctionName'])
+            self.log.debug("Deleted function: %s", function['FunctionName'])
