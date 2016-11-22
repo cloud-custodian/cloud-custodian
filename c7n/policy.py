@@ -97,9 +97,9 @@ class PolicyExecutionMode(object):
     def provision(self):
         """Provision any resources needed for the policy."""
 
-    def get_logs(self, start, end, period):
+    def get_logs(self, start, end):
         """Retrieve logs for the policy"""
-        raise NotImplementedError("not yet")
+        raise NotImplementedError("subclass responsibility")
 
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
@@ -447,6 +447,10 @@ class Policy(object):
         """Query resources and apply policy."""
         mode = self.get_execution_mode()
         return mode.run()
+
+    def get_logs(self, start, end):
+        mode = self.get_execution_mode()
+        return mode.get_logs(start, end)
 
     def get_metrics(self, start, end, period):
         mode = self.get_execution_mode()
