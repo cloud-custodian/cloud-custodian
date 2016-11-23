@@ -68,7 +68,7 @@ def log_entries_in_range(entries, start, end):
             yield entry
 
 
-def s3_folders_from_date(session, output, start):
+def log_entries_from_s3(session, output, start):
     client = session.client('s3')
     key_prefix = output.key_prefix.strip('/')
     start = datetime.fromtimestamp(
