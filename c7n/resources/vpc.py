@@ -193,13 +193,14 @@ class SGDefaultVpc(DefaultVpcBase):
 
 
 class SGPermission(Filter):
-    """Base class for verifying security group permissions
+    """Filter for verifying security group ingress and egress permissions
 
     All attributes of a security group permission are available as
     value filters.
 
     If multiple attributes are specified the permission must satisfy
-    all of them.
+    all of them. Note that within an attribute match against a list value
+    of a permission we default to or.
 
     If a group has any permissions that match all conditions, then it
     matches the filter.
@@ -207,21 +208,41 @@ class SGPermission(Filter):
     Permissions that match on the group are annotated onto the group and
     can subsequently be used by the remove-permission action.
 
-    An example::
+    We have specialized handling for matching `Ports` in ingress/egress
+    permission From/To range. The following example matches on ingress
+    rules which allow for a range that includes all of the given ports.
+
+    .. code-block: yaml
+
+      - type: ingress
+        Ports: [22, 443, 80]
+
+    As well for verifying that a rule only allows for a specific set of ports
+    as in the following example. The delta between this and the previous
+    example is that if the permission allows for any ports not specified here,
+    then the rule will match. ie. OnlyPorts is a negative assertion match,
+    it matches when a permission includes ports outside of the specified set.
+
+    .. code-block: yaml
+
+      - type: ingress
+        OnlyPorts: [22]
+
+    For simplifying ipranges handling which is specified as a list on a rule
+    we provide a `Cidr` key which can be used as a value type filter evaluated
+    against each of the rules. If any iprange cidr match then the permission
+    matches.
+
+    .. code-block: yaml
 
       - type: ingress
         IpProtocol: -1
         FromPort: 445
 
-    We have specialized handling for matching Ports in ingress/egress
-    permission From/To range::
-
-      - type: ingress
-        Ports: [22, 443, 80]
-
     As well for assertions that a ingress/egress permission only matches
-    a given set of ports, *note* onlyports is an inverse match, it matches
-    when a permission includes ports outside of the specified set::
+    a given set of ports, *note* onlyports is an inverse match.
+
+    .. code-block: yaml
 
       - type: egress
         OnlyPorts: [22, 443, 80]
@@ -231,6 +252,7 @@ class SGPermission(Filter):
           - value_type: cidr
           - op: in
           - value: x.y.z
+
     """
 
     perm_attrs = set((
@@ -264,23 +286,23 @@ class SGPermission(Filter):
         return super(SGPermission, self).process(resources, event)
 
     def process_ports(self, perm):
-        found = False
+        found = None
         if 'FromPort' in perm and 'ToPort' in perm:
             for port in self.ports:
                 if port >= perm['FromPort'] and port <= perm['ToPort']:
                     found = True
                     break
+                found = False
             only_found = False
             for port in self.only_ports:
                 if port == perm['FromPort'] and port == perm['ToPort']:
                     only_found = True
             if self.only_ports and not only_found:
-                found = True
+                found = found is None or found and True or False
         return found
 
     def process_cidrs(self, perm):
-        found = False
-
+        found = None
         if 'IpRanges' in perm and 'Cidr' in self.data:
             match_range = self.data['Cidr']
             match_range['key'] = 'CidrIp'
@@ -290,21 +312,30 @@ class SGPermission(Filter):
                 found = vf(ip_range)
                 if found:
                     break
+                else:
+                    found = False
         return found
 
     def __call__(self, resource):
         matched = []
         for perm in resource[self.ip_permissions_key]:
-            found = False
+            found = None
             for f in self.vfilters:
                 if f(perm):
                     found = True
+                else:
+                    found = False
                     break
-            if not found:
-                found = self.process_ports(perm)
-            if not found:
-                found = self.process_cidrs(perm)
-
+            if found is None or found:
+                port_found = self.process_ports(perm)
+                if port_found is not None:
+                    found = (
+                        found is not None and port_found & found or port_found)
+            if found is None or found:
+                cidr_found = self.process_cidrs(perm)
+                if cidr_found is not None:
+                    found = (
+                        found is not None and cidr_found & found or cidr_found)
             if not found:
                 continue
             matched.append(perm)
