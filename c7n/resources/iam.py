@@ -302,6 +302,60 @@ class UserAttachedPolicy(Filter):
         return matched
 
 
+@User.filter_registry.register('key-last-used')
+class UserAccessKeyLastUsed(Filter):
+    """
+    This filter is designed to find all IAM user Access Keys that have not
+    been used within a specified time period (in days).
+
+    - name: iam-user-access-key-last-used
+      resource: iam-user
+      filters:
+        - type: key-last-used
+          days: 14
+    """
+    schema = type_schema(
+        'key-last-used',
+        days={'type': 'number'})
+
+    def process(self, resources, event=None):
+
+        def _last_used(resource):
+            if 'c7n-ValidKeys' in resource or 'c7n-InvalidKeys' in resource:
+                return
+            resource['c7n-ValidKeys'] = []
+            resource['c7n-InvalidKeys'] = []
+            filter_date = datetime.now(
+                tz=tzutc()) - timedelta(days=self.data.get('days', 7))
+            client = local_session(self.manager.session_factory).client('iam')
+            keys = client.list_access_keys(
+                UserName=resource['UserName'])['AccessKeyMetadata']
+
+            for k in keys:
+                result = client.get_access_key_last_used(
+                    AccessKeyId=k['AccessKeyId'])['AccessKeyLastUsed']
+                if not 'LastUsedDate' in result:
+                    result['LastUsedDate'] = datetime(
+                        2000, 1, 1, 0, 0, tzinfo=tzutc())
+                access_key = {
+                    'KeyId': k['AccessKeyId'],
+                    'LastUsed': result['LastUsedDate']}
+
+                key = 'c7n-ValidKeys'
+                if result['LastUsedDate'].date() < filter_date.date():
+                    key = 'c7n-InvalidKeys'
+                resource[key].append(access_key)
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(_last_used, resources))
+
+        results = []
+        for r in resources:
+            if len(r['c7n-InvalidKeys']) > 0:
+                results.append(r)
+        return results
+
+
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
 

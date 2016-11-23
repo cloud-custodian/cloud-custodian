@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccessKeyMetadata": [
+            {
+                "UserName": "c7n-test-04", 
+                "Status": "Active", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "AccessKeyId": "AKIAJXVN42EITOUZ7NTQ"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "454ad99e-ac16-11e6-9e85-c567dd8e168b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "454ad99e-ac16-11e6-9e85-c567dd8e168b", 
+                "date": "Wed, 16 Nov 2016 16:03:53 GMT", 
+                "content-length": "559", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UserName": "c7n-test-03", 
+        "AccessKeyLastUsed": {
+            "Region": "N/A", 
+            "ServiceName": "N/A"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "450ee2be-ac16-11e6-b081-7bd6b930e893", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "450ee2be-ac16-11e6-b081-7bd6b930e893", 
+                "date": "Wed, 16 Nov 2016 16:03:52 GMT", 
+                "content-length": "433", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

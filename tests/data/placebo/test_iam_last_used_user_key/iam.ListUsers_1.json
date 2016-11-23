@@ -1,0 +1,99 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "c7n-test-01", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "UserId": "AIDAJBKKFUIQM3FB4NPW6", 
+                "Arn": "arn:aws:iam::385131497716:user/c7n-test-01"
+            }, 
+            {
+                "UserName": "c7n-test-02", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "UserId": "AIDAJR4JT32V437ZBVEAW", 
+                "Arn": "arn:aws:iam::385131497716:user/c7n-test-02"
+            }, 
+            {
+                "UserName": "c7n-test-03", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "UserId": "AIDAIDDER32JYYBV7HI7U", 
+                "Arn": "arn:aws:iam::385131497716:user/c7n-test-03"
+            }, 
+            {
+                "UserName": "c7n-test-04", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "UserId": "AIDAIQFME5I6HMTWLL342", 
+                "Arn": "arn:aws:iam::385131497716:user/c7n-test-04"
+            }, 
+            {
+                "UserName": "c7n-test-05", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 50
+                }, 
+                "UserId": "AIDAIVYNLI6YIBKNLM5XI", 
+                "Arn": "arn:aws:iam::385131497716:user/c7n-test-05"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4427dde7-ac16-11e6-9e85-c567dd8e168b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4427dde7-ac16-11e6-9e85-c567dd8e168b", 
+                "date": "Wed, 16 Nov 2016 16:03:51 GMT", 
+                "content-length": "1905", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

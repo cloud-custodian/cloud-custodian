@@ -29,7 +29,8 @@ from c7n.resources.iam import (UserMfaDevice,
                                UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole,
                                IamGroupUsers,
-                               IamRoleInlinePolicy, IamGroupInlinePolicy)
+                               IamRoleInlinePolicy, IamGroupInlinePolicy,
+                               UserAccessKeyLastUsed)
 from c7n.executor import MainThreadExecutor
 
 
@@ -523,3 +524,22 @@ class CrossAccountChecker(TestCase):
                            False, False, False, False]):
             violations = check_cross_account(p, set(['221800032964']))
             self.assertEqual(bool(violations), expected)
+
+
+class IamUserKeyLastUsedtest(BaseTest):
+
+    def test_last_used_user_key(self):
+        self.patch(
+            UserAccessKeyLastUsed, 'executor_factory', MainThreadExecutor)
+        session = self.replay_flight_data('test_iam_last_used_user_key')
+        policy = self.load_policy({
+            'name': 'iam-user-key-last-used',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'key-last-used',
+                'days': 14}]
+        }, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(resources[0]['UserName'], 'c7n-test-03')
+        self.assertEqual(
+            resources[0]['c7n-InvalidKeys'][0]['KeyId'], 'AKIAJBY4ZMKLJEN6MSAA')
