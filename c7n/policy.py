@@ -26,7 +26,13 @@ from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
+from c7n import mu
 from c7n import utils
+from c7n.logs_support import (
+    normalized_log_entries,
+    log_entries_in_range,
+    s3_folders_from_date,
+)
 from c7n.version import version
 
 from c7n.resources import load_resources
@@ -207,6 +213,29 @@ class PullMode(PolicyExecutionMode):
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
 
+    def get_logs(self, start, end):
+        log_source = self.policy.ctx.output
+        log_gen = ()
+        if log_source.use_s3():
+            session = utils.local_session(self.policy.session_factory)
+            raw_entries = s3_folders_from_date(session, log_source, start)
+            # log files can be downloaded out of order, so sort on timestamp
+            # log_gen isn't really a generator once we do this, but oh well
+            log_gen = sorted(
+                normalized_log_entries(raw_entries),
+                key=lambda e: e.get('timestamp', 0),
+            )
+        else:
+            log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
+            with open(log_path) as log_fh:
+                raw_entries = log_fh.readlines()
+                log_gen = normalized_log_entries(raw_entries)
+        return log_entries_in_range(
+            log_gen,
+            start,
+            end,
+        )
+
 
 class LambdaMode(PolicyExecutionMode):
     """A policy that runs/executes in lambda."""
@@ -298,6 +327,14 @@ class LambdaMode(PolicyExecutionMode):
             return manager.publish(
                 PolicyLambda(self.policy), 'current',
                 role=self.policy.options.assume_role)
+
+    def get_logs(self, start, end):
+        manager = mu.LambdaManager(self.policy.session_factory)
+        return log_entries_in_range(
+            manager.logs(mu.PolicyLambda(self.policy)),
+            start,
+            end,
+        )
 
 
 class PeriodicMode(LambdaMode, PullMode):
