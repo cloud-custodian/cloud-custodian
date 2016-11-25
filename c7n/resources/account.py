@@ -24,8 +24,19 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, get_account_id, type_schema
 
+
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+def get_account(session_factory):
+    session = local_session(session_factory)
+    client = session.client('iam')
+    aliases = client.list_account_aliases().get(
+        'AccountAliases', ('',))
+    name = aliases and aliases[0] or ""
+    return {'account_id': get_account_id(session),
+            'account_name': name}
 
 
 @resources.register('account')
@@ -34,21 +45,18 @@ class Account(ResourceManager):
     filter_registry = filters
     action_registry = actions
 
+    class resource_type(object):
+        id = 'account_id'
+        name = 'account_name'
+
+    def get_model(self):
+        return self.resource_type
+
     def resources(self):
-        session = local_session(self.session_factory)
-        client = session.client('iam')
-        return self.filter_resources(
-            [{'account_id': get_account_id(session),
-              'account_name': client.list_account_aliases(
-              ).get('AccountAliases', ('',))[0]}])
+        return self.filter_resources([get_account(self.session_factory)])
 
     def get_resources(self, resource_ids):
-        session = local_session(self.session_factory)
-        client = session.client('iam')
-        return [
-            {'account_id': get_account_id(session),
-             'account_name': client.list_account_aliases().get(
-                 'AccountAliases', ('',))[0]}]
+        return [get_account(self.session_factory)]
 
 
 @filters.register('check-cloudtrail')
@@ -183,6 +191,22 @@ class IAMSummary(ValueFilter):
             "UserPolicySizeQuota": 2048
         }
 
+    For example to determine if an account has either not been
+    enabled with root mfa or has root api keys.
+
+    .. code-block: yaml
+
+      policies:
+        - name: root-keys-or-no-mfa
+          resource: account
+          filters:
+            - or:
+              - type: iam-summary
+                key: AccountMFAEnabled
+                value: 0
+              - type: iam-summary
+                key: AccountAccessKeysPresent
+                value: 0
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 

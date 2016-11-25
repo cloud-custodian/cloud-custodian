@@ -179,7 +179,7 @@ class Or(Filter):
         return False
 
     def process_set(self, resources, event):
-        resource_type = self.manager.query.resolve(self.manager.resource_type)
+        resource_type = self.manager.get_model()
         resource_map = {r[resource_type.id]: r for r in resources}
         results = set()
         for f in self.filters:

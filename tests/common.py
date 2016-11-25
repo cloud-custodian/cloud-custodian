@@ -58,7 +58,7 @@ class BaseTest(PillTest):
 
     def load_policy(
             self, data, config=None, session_factory=None,
-            validate=C7N_VALIDATE):
+            validate=C7N_VALIDATE, cache=False):
         if validate:
             errors = schema_validate({'policies': [data]}, C7N_SCHEMA)
             if errors:
@@ -68,6 +68,9 @@ class BaseTest(PillTest):
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir)
         config['output_dir'] = temp_dir
+        if cache:
+            config['cache'] = os.path.join(temp_dir, 'c7n.cache')
+            config['cache_period'] = 300
         conf = Config.empty(**config)
         return policy.Policy(data, conf, session_factory)
 
