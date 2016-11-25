@@ -90,6 +90,28 @@ class BaseTest(PillTest):
         setattr(obj, attr, new)
         self.addCleanup(setattr, obj, attr, old)
 
+    def change_environment(self, **kw):
+        """Change the environment to the given set of variables.
+
+        Existing environment restored after test.
+        """
+        # preserve key elements needed for testing
+        for env in ["AWS_ACCESS_KEY_ID",
+                    "AWS_SECRET_ACCESS_KEY",
+                    "AWS_DEFAULT_REGION"]:
+            if env not in kw:
+                kw[env] = os.environ.get(env, "")
+
+        original_environ = dict(os.environ)
+
+        @self.addCleanup
+        def cleanup_env():
+            os.environ.clear()
+            os.environ.update(original_environ)
+
+        os.environ.clear()
+        os.environ.update(kw)
+
     def capture_logging(
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):

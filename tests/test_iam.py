@@ -26,9 +26,6 @@ from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (UserMfaDevice,
-                               AttachedInstanceProfiles,
-                               UserCredentialReport,
-                               UnattachedInstanceProfiles,
                                UsedIamPolicies, UnusedIamPolicies,
                                UsedInstanceProfiles,
                                UnusedInstanceProfiles,
@@ -210,31 +207,6 @@ class IamInstanceProfileFilterUsage(BaseTest):
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-    def test_iam_instance_profile_attached(self):
-        session_factory = self.replay_flight_data(
-            'test_iam_instance_profile_attached')
-
-        self.patch(
-            AttachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-attached-profile',
-            'resource': 'iam-profile',
-            'filters': ['attached']}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 2)
-
-    def test_iam_instance_profile_unattached(self):
-        session_factory = self.replay_flight_data(
-            'test_iam_instance_profile_unattached')
-        self.patch(
-            UnattachedInstanceProfiles, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-unattached-profiles',
-            'resource': 'iam-profile',
-            'filters': ['unattached']}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
 
 
 class IamPolicyFilterUsage(BaseTest):

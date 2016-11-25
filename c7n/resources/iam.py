@@ -243,38 +243,6 @@ class UnusedInstanceProfiles(IamRoleUsage):
         return results
 
 
-@InstanceProfile.filter_registry.register('attached')
-class AttachedInstanceProfiles(Filter):
-
-    schema = type_schema('attached')
-
-    def process(self, resources, event=None):
-        results = []
-        for r in resources:
-            if len(r['Roles']) != 0:
-                results.append(r)
-        self.log.info(
-            "%d of %d instance profiles attached to a role." % (
-                len(results), len(resources)))
-        return results
-
-
-@InstanceProfile.filter_registry.register('unattached')
-class UnattachedInstanceProfiles(Filter):
-
-    schema = type_schema('unattached')
-
-    def process(self, resources, event=None):
-        results = []
-        for r in resources:
-            if len(r['Roles']) == 0:
-                results.append(r)
-        self.log.info(
-            "%d of %d instance profiles not attached to a role." % (
-                len(results), len(resources)))
-        return results
-
-
 ###################
 #    IAM Users    #
 ###################
