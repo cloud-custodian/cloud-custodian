@@ -12,12 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+from cStringIO import StringIO
+import csv
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+import time
+from dateutil.tz import tzutc
+from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter, Filter
+from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ResourceQuery
 from c7n.utils import local_session, type_schema
@@ -272,6 +278,192 @@ class UnattachedInstanceProfiles(Filter):
 ###################
 #    IAM Users    #
 ###################
+
+@User.filter_registry.register('credential')
+class UserCredentialReport(Filter):
+    """Use IAM Credential report to filter users.
+
+    The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
+    multiple pieces of information on iam users. This makes it highly
+    efficient for querying multiple aspects of a user that would
+    otherwise require per user api calls.
+
+    For example if we wanted to retrieve all users with mfa who have
+    never used their password but have active access keys from the
+    last month
+
+    .. code-block: yaml
+
+     - name: iam-mfa-active-keys-no-login
+       resource: iam-user
+       filters:
+         - type: credential
+           key: mfa_active
+           value: true
+         - type: credential
+           key: password_last_used
+           value: absent
+         - type: credential
+           key: access_keys.last_used
+           value_type: age
+           value: 30
+           op: less-than
+
+    Credential Report Transforms
+
+    We perform some default transformations from the raw
+    credential report. Sub-objects (access_key_1, cert_2)
+    are turned into array of dictionaries for matching
+    purposes with their common prefixes stripped.
+    N/A values are turned into None, TRUE/FALSE are turned
+    into boolean values.
+
+    """
+    schema = type_schema(
+        'credential',
+        value_type={'type': 'string', 'enum': [
+            'age', 'expiration', 'size', 'regex']},
+
+        key={'type': 'string',
+             'title': 'report key to search',
+             'enum': [
+                 'user',
+                 'arn',
+                 'user_creation_time',
+                 'password_enabled',
+                 'password_last_used',
+                 'password_last_changed',
+                 'password_next_rotation',
+                 'mfa_active',
+                 'access_keys',
+                 'access_keys.active',
+                 'access_keys.last_used_date',
+                 'access_keys.last_used_region',
+                 'access_keys.last_used_service',
+                 'access_keys.last_rotated',
+                 'certs',
+                 'certs.active',
+                 'certs.last_rotated',
+                 ]},
+        value={'oneOf': [
+            {'type': 'array'},
+            {'type': 'string'},
+            {'type': 'boolean'},
+            {'type': 'number'}]},
+        op={'enum': OPERATORS.keys()},
+        report_generate={
+            'title': 'Generate a report if none is present.',
+            'default': True,
+            'type': 'boolean'},
+        report_delay={
+            'title': 'Number of seconds to wait for report generation.',
+            'default': 10,
+            'type': 'number'},
+        report_max_age={
+            'title': 'Number of seconds to consider a report valid.',
+            'default': 60 * 60 * 24,
+            'type': 'number'})
+
+    list_sub_objects = (
+        ('access_key_1_', 'access_keys'),
+        ('access_key_2_', 'access_keys'),
+        ('cert_1_', 'certs'),
+        ('cert_2_', 'certs'))
+
+    def get_value_or_schema_default(self, k):
+        if k in self.data:
+            return self.data[k]
+        return self.schema['properties'][k]['default']
+
+    def get_credential_report(self):
+        report = self.manager._cache.get('iam-credential-report')
+        if report:
+            return report
+        data = self.fetch_credential_report()
+        report = {}
+        reader = csv.reader(StringIO(data))
+        headers = reader.next()
+        for line in reader:
+            info = dict(zip(headers, line))
+            report[info['user']] = self.process_user_record(info)
+        self.manager._cache.save('iam-credential-report', report)
+        return report
+
+    @classmethod
+    def process_user_record(cls, info):
+        """Type convert the csv record, modifies in place."""
+        keys = info.keys()
+        # Value conversion
+        for k in keys:
+            v = info[k]
+            if v in ('N/A', 'no_information'):
+                info[k] = None
+            elif v == 'false':
+                info[k] = False
+            elif v == 'true':
+                info[k] = True
+        # Object conversion
+        for p, t in cls.list_sub_objects:
+            obj = dict([(k[len(p):], info.pop(k))
+                        for k in keys if k.startswith(p)])
+            if obj.get('active', False):
+                info.setdefault(t, []).append(obj)
+        return info
+
+    def fetch_credential_report(self):
+        client = local_session(self.manager.session_factory).client('iam')
+        try:
+            report = client.get_credential_report()
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ReportNotPresent':
+                raise
+            report = None
+        if report:
+            threshold = datetime.now(tz=tzutc()) - timedelta(
+                seconds=self.get_value_or_schema_default(
+                    'report_max_age'))
+            if not report['GeneratedTime'].tzinfo:
+                threshold = threshold.replace(tzinfo=None)
+            if report['GeneratedTime'] < threshold:
+                report = None
+        if report is None:
+            if not self.get_value_or_schema_default('report_generate'):
+                raise ValueError("Credential Report Not Present")
+            client.generate_credential_report()
+            time.sleep(self.get_value_or_schema_default('report_delay'))
+            report = client.get_credential_report()
+        return report['Content']
+
+    def process(self, resources, event=None):
+        if '.' in self.data['key']:
+            self.matcher_config = dict(self.data)
+            self.matcher_config['key'] = self.data['key'].split('.', 1)[1]
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        for r in resources:
+            info = report.get(r['UserName'])
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
+
+    def match(self, info):
+        if info is None:
+            return False
+        k = self.data.get('key')
+        if '.' not in k:
+            vf = ValueFilter(self.data)
+            vf.annotate = False
+            return vf(info)
+
+        prefix, sk = k.split('.', 1)
+        vf = ValueFilter(self.matcher_config)
+        vf.annotate = False
+        for v in info.get(prefix, ()):
+            if vf.match(v):
+                return True
 
 
 @User.filter_registry.register('policy')
