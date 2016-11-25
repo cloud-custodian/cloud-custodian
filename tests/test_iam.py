@@ -50,7 +50,7 @@ class UserCredentialReportTest(BaseTest):
                 {'type': 'credential',
                  'key': 'access_keys.last_used_date',
                  'report_delay': 0.01,
-                 'value': None}
+                 'value': 'empty'}
                 ],
             }, session_factory=session_factory, cache=True)
         resources = p.run()

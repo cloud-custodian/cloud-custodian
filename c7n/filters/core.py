@@ -310,6 +310,8 @@ class ValueFilter(Filter):
             return True
         elif v == 'not-null' and r:
             return True
+        elif v == 'empty' and not r:
+            return True
         elif self.op:
             op = OPERATORS[self.op]
             try:
