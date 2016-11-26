@@ -271,7 +271,7 @@ class ValueFilter(Filter):
         elif self.expr:
             r = self.expr.search(i)
         else:
-            self.expr = jmespath.compile(self.k)
+            self.expr = jmespath.compile(k)
             r = self.expr.search(i)
         return r
 
