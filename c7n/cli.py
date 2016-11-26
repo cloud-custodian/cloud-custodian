@@ -67,14 +67,15 @@ def _default_options(p, blacklist=""):
 
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For Policy Output")
+                       help="Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
-            "-f", "--cache", default="~/.cache/cloud-custodian.cache")
+            "-f", "--cache", default="~/.cache/cloud-custodian.cache",
+            help="Cache file (default %(default)s)")
         p.add_argument(
-            "--cache-period", default=60, type=int,
-            help="Cache validity in seconds (Default %(default)i)")
+            "--cache-period", default=15, type=int,
+            help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
 
