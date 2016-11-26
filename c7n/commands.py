@@ -114,8 +114,7 @@ def run(options, policies):
             exit_code = 1
             if options.debug:
                 raise
-            # Output does an exception log
-            log.error(
+            log.exception(
                 "Error while executing policy %s, continuing" % (
                     policy.name))
     sys.exit(exit_code)
@@ -243,7 +242,7 @@ def schema_cmd(options):
 
         # Print docstring
         docstring = _schema_get_docstring(cls)
-        print("\nHelp:\n-----\n")
+        print("\nHelp\n----\n")
         if docstring:
             print(docstring)
         else:
@@ -251,7 +250,7 @@ def schema_cmd(options):
             print("No help is available for this item.")  # pragma: no cover
 
         # Print schema
-        print("\nSchema:\n-------\n")
+        print("\nSchema\n------\n")
         pp = pprint.PrettyPrinter(indent=4)
         if hasattr(cls, 'schema'):
             pp.pprint(cls.schema)

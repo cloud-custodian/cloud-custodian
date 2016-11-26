@@ -19,7 +19,7 @@ from .related import RelatedResourceFilter
 
 
 class SecurityGroupFilter(RelatedResourceFilter):
-
+    """Filter a resource by its associated security groups."""
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
         **{'match-resource':{'type': 'boolean'},
@@ -30,7 +30,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
 
 
 class SubnetFilter(RelatedResourceFilter):
-
+    """Filter a resource by its associated subnets."""
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource':{'type': 'boolean'},
@@ -41,7 +41,7 @@ class SubnetFilter(RelatedResourceFilter):
 
 
 class DefaultVpcBase(Filter):
-
+    """Filter to resources in a default vpc."""
     vpcs = None
     default_vpc = None
 
