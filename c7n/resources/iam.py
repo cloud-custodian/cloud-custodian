@@ -11,15 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import base64
 from cStringIO import StringIO
 import csv
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
 import time
-from dateutil.tz import tzutc
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -387,7 +385,7 @@ class UserCredentialReport(Filter):
                 raise
             report = None
         if report:
-            threshold = datetime.now(tz=tzutc()) - timedelta(
+            threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
                 seconds=self.get_value_or_schema_default(
                     'report_max_age'))
             if not report['GeneratedTime'].tzinfo:
@@ -535,7 +533,7 @@ class UserRemoveAccessKey(BaseAction):
         disable = self.data.get('disable')
 
         if age:
-            threshold_date = datetime().now(tz=tzutc()) - timedelta(age)
+            threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
 
         for r in resources:
             if 'AccessKeys' not in r:
