@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "StaleSecurityGroupSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3883374d-fce5-4280-90ed-5ed89d1cc242", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 26 Nov 2016 15:11:02 GMT"
+            }
+        }
+    }
+}

@@ -74,6 +74,61 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    def test_stale(self):
+        # setup a multi vpc security group reference, break the ref
+        # and look for stale
+        factory = self.replay_flight_data('test_security_group_stale')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        vpc2_id = client.create_vpc(CidrBlock="10.5.0.0/16")['Vpc']['VpcId']
+        peer_id = client.create_vpc_peering_connection(
+            VpcId=vpc_id, PeerVpcId=vpc2_id)[
+            'VpcPeeringConnection']['VpcPeeringConnectionId']
+        client.accept_vpc_peering_connection(
+            VpcPeeringConnectionId=peer_id)
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        self.addCleanup(client.delete_vpc, VpcId=vpc2_id)
+        self.addCleanup(client.delete_vpc_peering_connection,
+                        VpcPeeringConnectionId=peer_id)
+        sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        t_sg_id = client.create_security_group(
+            GroupName="db-tier",
+            VpcId=vpc2_id,
+            Description="for apps")['GroupId']
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpPermissions=[
+                {'IpProtocol': 'tcp',
+                 'FromPort': 60000,
+                 'ToPort': 62000,
+                 'UserIdGroupPairs': [
+                     {'GroupId': t_sg_id,
+                      'VpcId': vpc2_id,
+                      'VpcPeeringConnectionId': peer_id}]}])
+        client.delete_security_group(GroupId=t_sg_id)
+        p = self.load_policy({
+            'name': 'sg-stale',
+            'resource': 'security-group',
+            'filters': ['stale']
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], sg_id)
+        self.assertEqual(
+            resources[0]['MatchedIpPermissions'],
+            [{u'FromPort': 60000,
+              u'IpProtocol': u'tcp',
+              u'ToPort': 62000,
+              u'UserIdGroupPairs': [
+                  {u'GroupId': t_sg_id,
+                   u'PeeringStatus': u'active',
+                   u'VpcId': vpc2_id,
+                   u'VpcPeeringConnectionId': peer_id}]}])
+
     def test_used(self):
         factory = self.replay_flight_data(
             'test_security_group_used')

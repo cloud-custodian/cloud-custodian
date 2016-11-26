@@ -181,6 +181,41 @@ class UsedSecurityGroup(SGUsage):
         return [r for r in resources if r['GroupId'] not in unused]
 
 
+@SecurityGroup.filter_registry.register('stale')
+class Stale(Filter):
+    """Filter to find security groups that contain stale references
+    to other groups that are either no longer present or traverse
+    a broken vpc peering connection. Note this applies to VPC
+    Security groups only and will implicitly filter security groups.
+
+    AWS Docs - https://goo.gl/nSj7VG
+    """
+    schema = type_schema('stale')
+
+    def process(self, resources, events):
+        client = local_session(self.manager.session_factory).client('ec2')
+        vpc_ids = set([r['VpcId'] for r in resources if 'VpcId' in r])
+        group_map = {r['GroupId']: r for r in resources}
+        results = []
+        self.log.debug("Querying %d vpc for stale refs", len(vpc_ids))
+        stale_count = 0
+        for vpc_id in vpc_ids:
+            stale_groups = client.describe_stale_security_groups(
+                VpcId=vpc_id).get('StaleSecurityGroupSet', ())
+            stale_count += len(stale_groups)
+            for s in stale_groups:
+                if s['GroupId'] in group_map:
+                    r = group_map[s['GroupId']]
+                    if 'StaleIpPermissions' in s:
+                        r['MatchedIpPermissions'] = s['StaleIpPermissions']
+                    if 'StaleIpPermissionsEgress' in s:
+                        r['MatchedIpPermissionsEgress'] = s[
+                            'StaleIpPermissionsEgress']
+                    results.append(r)
+        self.log.debug("Found %d stale security groups", stale_count)
+        return results
+
+
 @SecurityGroup.filter_registry.register('default-vpc')
 class SGDefaultVpc(DefaultVpcBase):
 
