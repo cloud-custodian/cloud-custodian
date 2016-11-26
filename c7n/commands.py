@@ -41,6 +41,7 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
+        load_resources()
         collection = policy_load(options, options.config)
         policies = collection.filter(options.policy_filter)
         return f(options, policies)
@@ -286,14 +287,9 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
-    load_resources()
     start, end = _metrics_get_endpoints(options)
     data = {}
     for p in policies:
         log.info('Getting %s metrics', p)
         data[p.name] = p.get_metrics(start, end, options.period)
     print(dumps(data, indent=2))
-
-
-def cmd_version(options):
-    print(version.version)
