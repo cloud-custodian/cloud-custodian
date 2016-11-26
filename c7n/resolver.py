@@ -106,7 +106,7 @@ class ValuesFrom(object):
 
         if format not in self.supported_formats:
             raise ValueError(
-                "Unsupported format %s for url %s", 
+                "Unsupported format %s for url %s",
                 format, self.data['url'])
         contents = self.resolver.resolve(self.data['url'])
         return contents, format
