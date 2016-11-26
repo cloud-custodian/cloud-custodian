@@ -14,6 +14,7 @@
 import json
 from botocore.exceptions import ClientError
 
+from c7n.actions import BaseAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -107,3 +108,21 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
+
+
+@AWSLambda.action_registry.register('delete')
+class Delete(BaseAction):
+    """Delete a lambda function (including aliases and older versions).
+    """
+    schema = type_schema('delete')
+
+    def process(self, functions):
+        client = local_session(self.manager.session_factory).client('lambda')
+        for function in functions:
+            try:
+                client.delete_function(FunctionName=function['FunctionName'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == "ResourceNotFoundException":
+                    continue
+                raise
+        self.log.debug("Deleted %d functions", len(functions))

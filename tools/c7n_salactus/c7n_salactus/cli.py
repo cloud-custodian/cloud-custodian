@@ -13,8 +13,10 @@
 # limitations under the License.
 """Salactus, eater of s3 buckets.
 """
+from __future__ import print_function
 
 from collections import Counter
+import csv
 import functools
 import json
 import logging
@@ -67,7 +69,7 @@ def run(config, tag, bucket, account, debug=False):
     if debug:
         def invoke(f, *args, **kw):
             if f.func_name == 'process_keyset':
-                print "skip keyset"
+                print("skip keyset")
                 return
             return f(*args, **kw)
         worker.invoke = invoke
@@ -142,8 +144,53 @@ def accounts(dbpath, account):
         click.echo(_repr(a))
 
 
+def format_plain(buckets, fh):
+    def _repr(b):
+        return (
+            "account:%s name:%s percent:%0.2f matched:%d "
+            "scanned:%d size:%d kdenied:%d errors:%d partitions:%d") % (
+                b.account,
+                b.name,
+                b.percent_scanned,
+                b.matched,
+                b.scanned,
+                b.size,
+                b.keys_denied,
+                b.error_count,
+                b.partitions)
+    for b in buckets:
+        print(_repr(b), file=fh)
+
+
+def format_csv(buckets, fh):
+    field_names = ['account', 'name', 'matched', 'scanned',
+                   'size', 'keys_denied', 'error_count', 'partitions']
+
+    totals = Counter()
+    skip = set(('account', 'name', 'percent'))
+    for b in buckets:
+        for n in field_names:
+            if n in skip:
+                continue
+            totals[n] += getattr(b, n)
+    totals['account'] = 'Total'
+    totals['name'] = ''
+
+    writer = csv.DictWriter(fh, fieldnames=field_names, extrasaction='ignore')
+    writer.writerow(dict(zip(field_names, field_names)))
+    writer.writerow(totals)
+
+    for b in buckets:
+        bd = {n: getattr(b, n) for n in field_names}
+        writer.writerow(bd)
+
+
 @cli.command()
 @click.option('--dbpath', '-f', help="json stats db")
+@click.option('--output', '-o', type=click.File('wb'), default='-',
+              help="file to to output to (default stdout)")
+@click.option('--format', help="format for output",
+              type=click.Choice(['plain', 'csv']), default='plain')
 @click.option('--bucket', '-b',
               help="stats on a particular bucket", multiple=True)
 @click.option('--account', '-a',
@@ -159,25 +206,14 @@ def accounts(dbpath, account):
 @click.option('--size', type=int,
               help="filter to buckets with at least size")
 def buckets(bucket=None, account=None, matched=False, kdenied=False,
-            errors=False, dbpath=None, size=None, denied=False):
+            errors=False, dbpath=None, size=None, denied=False,
+            format=None, output=None):
     """Report on stats by bucket"""
     d = db.db(dbpath)
 
-    def _repr(b):
-        return (
-            "account:%s name:%s percent:%0.2f matched:%d "
-            "scanned:%d size:%d kdenied:%d errors:%d partitions:%d") % (
-                b.account,
-                b.name,
-                b.percent_scanned,
-                b.matched,
-                b.scanned,
-                b.size,
-                b.keys_denied,
-                b.error_count,
-                b.partitions)
-
-    for b in d.buckets(account):
+    buckets = []
+    for b in sorted(d.buckets(account),
+                    key=operator.attrgetter('bucket_id')):
         if bucket and b.name not in bucket:
             continue
         if matched and not b.matched:
@@ -190,7 +226,10 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
             continue
         if denied and not b.denied:
             continue
-        click.echo(_repr(b))
+        buckets.append(b)
+
+    formatter = format == 'csv' and format_csv or format_plain
+    formatter(buckets, output)
 
 
 @cli.command()

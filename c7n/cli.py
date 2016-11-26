@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import argparse
+import importlib
 import logging
 import os
 import pdb
 import sys
 import traceback
-from dateutil.parser import parse as date_parse
 
-from c7n import commands, resources
+from dateutil.parser import parse as date_parse
 
 DEFAULT_REGION = 'us-east-1'
 
@@ -31,50 +31,58 @@ def _default_options(p, blacklist=""):
     `blacklist` is a list of options to exclude from the default set.
     e.g.: ['region', 'log-group']
     """
+    provider = p.add_argument_group(
+        "provider", "AWS account information, defaults per the aws cli")
     if 'region' not in blacklist:
-        p.add_argument(
+        provider.add_argument(
             "-r", "--region",
             default=os.environ.get('AWS_DEFAULT_REGION', DEFAULT_REGION),
             help="AWS Region to target (Default: %(default)s)")
-
-    p.add_argument(
+    provider.add_argument(
         "--profile",
         help="AWS Account Config File Profile to utilize")
-    p.add_argument("--assume", default=None, dest="assume_role",
-                   help="Role to assume")
-    p.add_argument("-c", "--config", required=True,
-                   help="Policy Configuration File")
-    p.add_argument("-p", "--policies", default=None, dest='policy_filter',
-                   help="Only execute named/matched policies")
-    p.add_argument("-t", "--resource", default=None, dest='resource_type',
-                   help="Only execute policies with the given resource type")
+    provider.add_argument("--assume", default=None, dest="assume_role",
+                          help="Role to assume")
+
+    config = p.add_argument_group(
+        "config", "Policy config file and policy selector")
+    config.add_argument("-c", "--config", required=True,
+                        help="Policy Configuration File")
+    config.add_argument("-p", "--policies", default=None, dest='policy_filter',
+                        help="Only use named/matched policies")
+    config.add_argument("-t", "--resource", default=None, dest='resource_type',
+                        help="Only use policies with the given resource type")
 
     p.add_argument("-v", "--verbose", action="store_true",
-                   help="Verbose Logging")
-
-    p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
+                   help="Verbose logging")
+    p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
+                   action="store_true")
 
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
             help="Cloudwatch Log Group to send policy logs")
+    else:
+        p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For Policy Output")
+                       help="Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
-            "-f", "--cache", default="~/.cache/cloud-custodian.cache")
+            "-f", "--cache", default="~/.cache/cloud-custodian.cache",
+            help="Cache file (default %(default)s)")
         p.add_argument(
-            "--cache-period", default=60, type=int,
-            help="Cache validity in seconds (Default %(default)i)")
+            "--cache-period", default=15, type=int,
+            help="Cache validity in minutes (default %(default)i)")
+    else:
+        p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
 
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    p.set_defaults(command=commands.report)
-    _default_options(p, blacklist=['region'])
+    _default_options(p, blacklist=['region', 'cache', 'log-group'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -108,11 +116,6 @@ def _metrics_options(p):
         help='Number of days of history to consider (default: %(default)i)')
     p.add_argument('--period', type=int, default=60*24*24)
 
-    # The original tools/policymetrics.py set these to None, so I am adding them
-    # as hidden options so they are always None.
-    p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
-    p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
-
 
 def _schema_options(p):
     """ Add options specific to schema subcommand. """
@@ -145,64 +148,78 @@ def _key_val_pair(value):
 
 
 def setup_parser():
-    parser = argparse.ArgumentParser()
+    c7n_desc = "Cloud fleet management"
+    parser = argparse.ArgumentParser(description=c7n_desc)
 
     # Setting `dest` means we capture which subparser was used.  We'll use it
     # later on when doing post-parsing validation.
     subs = parser.add_subparsers(dest='subparser')
 
-    report = subs.add_parser("report")
+    report_desc = "CSV report of resources that a policy matched/ran on"
+    report = subs.add_parser(
+        "report", description=report_desc, help=report_desc)
+    report.set_defaults(command="c7n.commands.report")
     _report_options(report)
 
-    logs = subs.add_parser('logs')
-    logs.set_defaults(command=commands.logs)
-    _default_options(logs)
+    logs_desc = "Get policy execution logs from s3 or cloud watch logs"
+    logs = subs.add_parser(
+        'logs', help=logs_desc, description=logs_desc)
+    logs.set_defaults(command="c7n.commands.logs")
+    _default_options(logs, blacklist=['cache'])
 
-    metrics = subs.add_parser('metrics')
-    metrics.set_defaults(command=commands.metrics_cmd)
+    metrics_desc = "Retrieve metrics for policies from CloudWatch Metrics"
+    metrics = subs.add_parser(
+        'metrics', description=metrics_desc, help=metrics_desc)
+    metrics.set_defaults(command="c7n.commands.metrics_cmd")
     _metrics_options(metrics)
 
-    version = subs.add_parser('version')
-    version.set_defaults(command=commands.cmd_version)
+    version = subs.add_parser(
+        'version', help="Display installed version of custodian")
+    version.set_defaults(command=cmd_version)
     version.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose Logging")
 
-    validate = subs.add_parser('validate')
-    validate.set_defaults(command=commands.validate)
+    validate_desc = (
+        "Validate config files against the custodian jsonschema")
+    validate = subs.add_parser(
+        'validate', description=validate_desc, help=validate_desc)
+    validate.set_defaults(command="c7n.commands.validate")
     validate.add_argument(
         "-c", "--config",
-        help="Policy Configuration File (old; use configs instead)"
-    )
+        help="Policy Configuration File (old; use configs instead)")
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
                           help="Verbose Logging")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
-    schema_desc = ("Browse the available resources, as well as actions and "
-                   "filters available for each resource type. The selector "
-                   "can be passed in the form of RESOURCE[.CATEGORY[.ITEM]], "
-                   "e.g.: s3, ebs.actions, or ec2.filters.instance-age")
-    schema = subs.add_parser('schema', description=schema_desc)
-    schema.set_defaults(command=commands.schema_cmd)
+    schema_desc = ("Browse the available vocabularies (resources, filters, and "
+                   "actions) for policy construction. The selector "
+                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
+                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
+    schema = subs.add_parser(
+        'schema', description=schema_desc,
+        help="Interactive cli docs for policy authors")
+    schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    #resources = subs.add_parser('resources')
-    #resources.set_defaults(command=commands.resources)
-    #_default_options(resources)
-    #resources.add_argument('--all', default=True, action="store_false")
-
-    run = subs.add_parser("run")
-    run.set_defaults(command=commands.run)
+    run_desc = ("Execute the policies in a config file")
+    run = subs.add_parser("run", description=run_desc, help=run_desc)
+    run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
-        help="Emit Metrics")
+        help="Emit metrics to CloudWatch Metrics")
 
     return parser
+
+
+def cmd_version(options):
+    from c7n.version import version
+    print(version)
 
 
 def main():
@@ -217,8 +234,12 @@ def main():
     logging.getLogger('s3transfer').setLevel(logging.ERROR)
 
     try:
-        resources.load_resources()
-        options.command(options)
+        command = options.command
+        if not callable(command):
+            command = getattr(
+                importlib.import_module(command.rsplit('.', 1)[0]),
+                command.rsplit('.', 1)[-1])
+        command(options)
     except Exception:
         if not options.debug:
             raise
