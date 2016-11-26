@@ -61,8 +61,9 @@ class Account(ResourceManager):
 
 @filters.register('check-cloudtrail')
 class CloudTrailEnabled(Filter):
-    """Is cloud trail enabled for this account, returns
-    annotated account resource if trail is not enabled.
+    """Verify cloud trail enabled for this account per specifications.
+
+    Returns an annotated account resource if trail is not enabled.
     """
     schema = type_schema(
         'check-cloudtrail',
