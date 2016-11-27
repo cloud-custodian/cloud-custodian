@@ -1,9 +1,21 @@
 {
-    "status_code": 200, 
+    "status_code": 400, 
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "734f6e09-cd93-11e5-b7c5-9353fc464fb1"
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "6d865d1b-b4d3-11e6-8f49-fd2ab443b28f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6d865d1b-b4d3-11e6-8f49-fd2ab443b28f", 
+                "date": "Sun, 27 Nov 2016 18:58:04 GMT", 
+                "content-length": "90", 
+                "content-type": "application/x-amz-json-1.1", 
+                "nncoection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified log group does not exist.", 
+            "Code": "ResourceNotFoundException"
         }
     }
 }
