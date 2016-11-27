@@ -128,7 +128,3 @@ And you can output logs and resource records to S3::
 
 For details, see :ref:`usage`.
 
-
-
-
-
