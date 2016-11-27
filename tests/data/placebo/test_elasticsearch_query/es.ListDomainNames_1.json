@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8e3a6c7a-b3fd-11e6-8d8a-d3753f123174", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8e3a6c7a-b3fd-11e6-8d8a-d3753f123174", 
+                "date": "Sat, 26 Nov 2016 17:27:07 GMT", 
+                "content-length": "42", 
+                "content-type": "application/json"
+            }
+        }, 
+        "DomainNames": [
+            {
+                "DomainName": "indexme"
+            }
+        ]
+    }
+}

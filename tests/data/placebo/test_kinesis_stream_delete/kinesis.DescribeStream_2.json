@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ef4a2612-547f-f68d-bffe-f7f258bb0518", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ef4a2612-547f-f68d-bffe-f7f258bb0518", 
+                "content-length": "811", 
+                "x-amz-id-2": "Tx1Vr+Skd/K3foYUzMXjbU8nYhngFLInicbjEp2AyTxOlDeqW35CsB3s/o1Z/+SUHp0HmK93vyrdgycARTZXlcG3uTlLKNxEYvIOvIOhvDY=", 
+                "server": "Apache-Coyote/1.1", 
+                "date": "Sun, 27 Nov 2016 12:20:48 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "StreamDescription": {
+            "RetentionPeriodHours": 24, 
+            "StreamName": "sock-drawer", 
+            "Shards": [],
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/sock-drawer", 
+            "EnhancedMonitoring": [
+                {
+                    "ShardLevelMetrics": []
+                }
+            ], 
+            "StreamStatus": "DELETING"
+        }
+    }
+}
