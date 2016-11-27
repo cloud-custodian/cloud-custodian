@@ -14,7 +14,7 @@
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('efs')
@@ -36,18 +36,16 @@ class Delete(Action):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
-        mounted = []
+        self.unmount_filesystems(resources)
+        retry = get_retry(('FileSystemInUse',), 12)
         for r in resources:
-            if r['NumberOfMountTargets']:
-                mounted.append(r)
-        self.unmount_filesystems(mounted)
-        for r in resources:
-            client.delete_file_system(FileSystemId=r['FileSystemId'])
+            retry(client.delete_file_system, FileSystemId=r['FileSystemId'])
 
     def unmount_filesystems(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
-        fs_ids = {r['FileSystmId'] for r in resources}
-        targets = [t for t in client.describe_mount_targets()['MountTargets']
-                   if t['FileSystemId'] in fs_ids]
-        for t in targets:
-            client.delete_mount_target(TargetId=t['MountTargetId'])
+        for r in resources:
+            if not r['NumberOfMountTargets']:
+                continue
+            for t in client.describe_mount_targets(
+                    FileSystemId=r['FileSystemId'])['MountTargets']:
+                client.delete_mount_target(MountTargetId=t['MountTargetId'])

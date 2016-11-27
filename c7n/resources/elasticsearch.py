@@ -51,6 +51,4 @@ class Delete(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('es')
         for r in resources:
-            client.delete_elasticsearch_domain(
-                DomainName=r['DomainName'])
-            
+            client.delete_elasticsearch_domain(DomainName=r['DomainName'])

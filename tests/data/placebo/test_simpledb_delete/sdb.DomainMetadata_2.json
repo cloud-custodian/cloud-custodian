@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "BoxUsage": "0.0000071759", 
+            "RequestId": "9d4cddd6-6a6b-7447-cdd7-d328afbca7e1", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "Amazon SimpleDB", 
+                "connection": "keep-alive", 
+                "date": "Sat, 26 Nov 2016 16:37:14 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Timestamp": 1480178234, 
+        "AttributeValueCount": 0, 
+        "AttributeValuesSizeBytes": 0, 
+        "ItemNamesSizeBytes": 0, 
+        "AttributeNameCount": 0, 
+        "ItemCount": 0, 
+        "AttributeNamesSizeBytes": 0
+    }
+}

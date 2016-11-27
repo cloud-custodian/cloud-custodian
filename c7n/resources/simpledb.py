@@ -51,7 +51,6 @@ class Delete(Action):
     schema = type_schema('delete')
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client('simpledb')
+        client = local_session(self.manager.session_factory).client('sdb')
         for r in resources:
             client.delete_domain(DomainName=r['DomainName'])
-        

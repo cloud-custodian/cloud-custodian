@@ -1,0 +1,107 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ApplicationDetail": {
+            "ApplicationName": "sock-app", 
+            "OutputDescriptions": [
+                {
+                    "OutputId": "3.1", 
+                    "DestinationSchema": {
+                        "RecordFormatType": "JSON"
+                    }, 
+                    "KinesisFirehoseOutputDescription": {
+                        "ResourceARN": "arn:aws:firehose:us-east-1:644160558196:deliverystream/sock-index-hose", 
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/kinesis-analytics-sock-app"
+                    }, 
+                    "Name": "DESTINATION_SQL_STREAM"
+                }
+            ], 
+            "LastUpdateTimestamp": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 23, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 27, 
+                "minute": 2
+            }, 
+            "ApplicationVersionId": 3, 
+            "ApplicationStatus": "RUNNING", 
+            "CreateTimestamp": {
+                "hour": 6, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 18, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 27, 
+                "minute": 56
+            }, 
+            "InputDescriptions": [
+                {
+                    "InputStartingPositionConfiguration": {
+                        "InputStartingPosition": "NOW"
+                    }, 
+                    "InputId": "2.1", 
+                    "KinesisStreamsInputDescription": {
+                        "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/sock-drawer", 
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/kinesis-analytics-sock-app"
+                    }, 
+                    "NamePrefix": "SOURCE_SQL_STREAM", 
+                    "InputParallelism": {
+                        "Count": 1
+                    }, 
+                    "InAppStreamNames": [
+                        "SOURCE_SQL_STREAM_001"
+                    ], 
+                    "InputSchema": {
+                        "RecordColumns": [
+                            {
+                                "SqlType": "VARCHAR(4)", 
+                                "Name": "TICKER_SYMBOL", 
+                                "Mapping": "$.TICKER_SYMBOL"
+                            }, 
+                            {
+                                "SqlType": "VARCHAR(16)", 
+                                "Name": "SECTOR", 
+                                "Mapping": "$.SECTOR"
+                            }, 
+                            {
+                                "SqlType": "REAL", 
+                                "Name": "CHANGE", 
+                                "Mapping": "$.CHANGE"
+                            }, 
+                            {
+                                "SqlType": "REAL", 
+                                "Name": "PRICE", 
+                                "Mapping": "$.PRICE"
+                            }
+                        ], 
+                        "RecordFormat": {
+                            "MappingParameters": {
+                                "JSONMappingParameters": {
+                                    "RecordRowPath": "$"
+                                }
+                            }, 
+                            "RecordFormatType": "JSON"
+                        }, 
+                        "RecordEncoding": "UTF-8"
+                    }
+                }
+            ], 
+            "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/sock-app"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3350a508-b4a7-11e6-a6de-338b8339c9d0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3350a508-b4a7-11e6-a6de-338b8339c9d0", 
+                "date": "Sun, 27 Nov 2016 13:41:29 GMT", 
+                "content-length": "1421", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
