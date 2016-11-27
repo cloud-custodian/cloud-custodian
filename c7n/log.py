@@ -37,6 +37,7 @@ try:
 except ImportError:
     import queue as Queue
 
+from c7n.utils import get_retry
 
 FLUSH_MARKER = object()
 SHUTDOWN_MARKER = object()
@@ -82,9 +83,15 @@ class CloudWatchLogHandler(logging.Handler):
         # cleanup atexit, custodian is a bit more explicitly scoping shutdown to
         # each policy, so use a sentinel value to avoid deadlocks.
         self.shutdown = False
+        retry = get_retry(('ThrottlingException',))
         try:
-            self.session_factory().client(
-                'logs').create_log_group(logGroupName=self.log_group)
+            client = self.session_factory().client('logs')
+            logs = retry(
+                client.describe_log_groups,
+                logGroupNamePrefix=self.log_group)['logGroups']
+            if [l for l in logs if l['logGroupName'] == self.log_group]:
+                retry(client.create_log_group,
+                      logGroupName=self.log_group)
         except ClientError as e:
             if Error.code(e) != Error.ResourceExists:
                 raise
