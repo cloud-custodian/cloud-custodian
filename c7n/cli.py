@@ -119,7 +119,7 @@ def _metrics_options(p):
 
 def _logs_options(p):
     """ Add options specific to logs subcommand. """
-    _default_options(p)
+    _default_options(p, blacklist=['cache'])
 
     # default time range is 0 to "now" (to include all log entries)
     p.add_argument(
