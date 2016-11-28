@@ -17,7 +17,7 @@ import sys
 import tempfile
 import yaml
 
-
+from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
 from c7n import cli, version
@@ -88,6 +88,18 @@ class CliTest(BaseTest):
         except exception:
             return
         self.fail('Error: did not raise {}.'.format(exception))
+
+
+class UtilsTest(BaseTest):
+
+    def test_key_val_pair(self):
+        self.assertRaises(
+            ArgumentTypeError,
+            cli._key_val_pair,
+            'invalid option',
+        )
+        param = 'day=today'
+        self.assertIs(cli._key_val_pair(param), param)
 
 
 class VersionTest(CliTest):
