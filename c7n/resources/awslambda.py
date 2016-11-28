@@ -14,14 +14,13 @@
 import json
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import BaseAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-actions = ActionRegistry('lambda.actions')
 
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
@@ -110,33 +109,20 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
 
-@actions.register('delete')
-class Delete(BaseAction):
 
-    schema = {
-        'type': 'object',
-        'properties': {
-            'type': {'enum': ['delete'],
-                     'qualifier': {'type': 'string'}}
-            }
-        }
+@AWSLambda.action_registry.register('delete')
+class Delete(BaseAction):
+    """Delete a lambda function (including aliases and older versions).
+    """
+    schema = type_schema('delete')
 
     def process(self, functions):
-        qualifier = self.data.get('qualifier', '')
-
-        # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('lambda')
         for function in functions:
-            params = dict(
-                FunctionName=function['FunctionName'])
-            if qualifier:
-                params['Qualifier'] = qualifier
-
             try:
-                client.delete_function(**params)
+                client.delete_function(FunctionName=function['FunctionName'])
             except ClientError as e:
                 if e.response['Error']['Code'] == "ResourceNotFoundException":
                     continue
                 raise
-
-            self.log.debug("Deleted function: %s", function['FunctionName'])
+        self.log.debug("Deleted %d functions", len(functions))

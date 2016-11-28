@@ -23,7 +23,11 @@ class LogTest(BaseTest):
 
     def test_existing_stream(self):
         session_factory = self.replay_flight_data('test_log_existing_stream')
-        handler = CloudWatchLogHandler(session_factory=session_factory)
+        client =  session_factory().client('logs')
+        group_name = "/custodian-dev"
+        client.create_log_group(logGroupName=group_name)
+        handler = CloudWatchLogHandler(
+            group_name, session_factory=session_factory)
         log = logging.getLogger("custodian")
         log.addHandler(handler)
         self.addCleanup(log.removeHandler, handler)
@@ -40,7 +44,7 @@ class LogTest(BaseTest):
         log = logging.getLogger("test-c7n")
         handler = CloudWatchLogHandler(
             "test-maid-4", "alpha", session_factory=session_factory)
-        handler.batch_interval = 1
+        handler.batch_interval = 0.1
         log.addHandler(handler)
         self.addCleanup(log.removeHandler, handler)
         log.setLevel(logging.DEBUG)
@@ -48,7 +52,7 @@ class LogTest(BaseTest):
         for i in range(100, 105):
             log.info('hello world %s' % i)
 
-        time.sleep(1.1)
+        time.sleep(0.2)
         log.info('bye world')
         self.assertFalse(handler.buf)
         handler.flush()

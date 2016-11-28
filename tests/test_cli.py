@@ -203,7 +203,7 @@ class SchemaTest(CliTest):
         self.assertIn('filters:', output)
 
         output = self.get_output(['custodian', 'schema', 'ec2.filters.image'])
-        self.assertIn('Help:', output)
+        self.assertIn('Help', output)
 
 
 class ReportTest(CliTest):

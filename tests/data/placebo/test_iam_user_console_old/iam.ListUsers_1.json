@@ -1,0 +1,499 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "andrew", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 10
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAINLXB4P6J26AKFUC6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/andrew"
+            }, 
+            {
+                "UserName": "anthony", 
+                "PasswordLastUsed": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 14
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAJ6YGUR7BFD3X5M3GS", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/anthony"
+            }, 
+            {
+                "UserName": "c7n-iam-test", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 4
+                }, 
+                "UserId": "AIDAIJLKWKDKWBL7XGIEY", 
+                "Arn": "arn:aws:iam::644160558196:user/c7n-iam-test"
+            }, 
+            {
+                "UserName": "c7n-test", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 39
+                }, 
+                "UserId": "AIDAJEKQZXQU4PIT6AUVG", 
+                "Arn": "arn:aws:iam::644160558196:user/c7n-test"
+            }, 
+            {
+                "UserName": "calvin", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 45
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIVQZEKBMLZZXYA5P2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/calvin"
+            }, 
+            {
+                "UserName": "chrissy", 
+                "PasswordLastUsed": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 8
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAJOCIX26Q6LITP6WQG", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/chrissy"
+            }, 
+            {
+                "UserName": "christopherbritz", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAIQHIXZKJHZJN33JJY", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherbritz"
+            }, 
+            {
+                "UserName": "christopherocampo", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 42
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJOWQFESQNYYH3RURU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/christopher"
+            }, 
+            {
+                "UserName": "david", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 42
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJ2H7ZU2DNQQS3UIOY", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/david"
+            }, 
+            {
+                "UserName": "jeff", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAIDQXAUMHSBC7HWWBI", 
+                "Arn": "arn:aws:iam::644160558196:user/jeff"
+            }, 
+            {
+                "UserName": "Jennifer", 
+                "PasswordLastUsed": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 48
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 18, 
+                    "minute": 28
+                }, 
+                "UserId": "AIDAICZIZSSMRDNAII6SI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/Jennifer"
+            }, 
+            {
+                "UserName": "joshua", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 14
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 26
+                }, 
+                "UserId": "AIDAJM67KUVNOIMGUCZO4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/joshua"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 21
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kapil"
+            }, 
+            {
+                "UserName": "kit", 
+                "PasswordLastUsed": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 12
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAJKVAHLRG2G6PHIBAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kit"
+            }, 
+            {
+                "UserName": "mandeep", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 18, 
+                    "minute": 30
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAIRGKK45UIXHXNN2SI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/mandeep"
+            }, 
+            {
+                "UserName": "matt", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 6
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIZI7QSZIP42VCMOMK", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/matt"
+            }, 
+            {
+                "UserName": "rob", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 23, 
+                    "minute": 31
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIPHUPZEIIDI4QI4GU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/rob"
+            }, 
+            {
+                "UserName": "ryan", 
+                "PasswordLastUsed": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 32
+                }, 
+                "UserId": "AIDAILCCU2DTMX52QKXSQ", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/ryan"
+            }, 
+            {
+                "UserName": "scot", 
+                "PasswordLastUsed": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 18, 
+                    "minute": 16
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "UserId": "AIDAIQF3HRTVXDF7TMNAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/scot"
+            }, 
+            {
+                "UserName": "steven", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 20, 
+                    "minute": 22
+                }, 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 38
+                }, 
+                "UserId": "AIDAJTDYNP2J64DPXXTNC", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/steven"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d96c31ee-b30a-11e6-94f0-c9470421a190", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d96c31ee-b30a-11e6-94f0-c9470421a190", 
+                "date": "Fri, 25 Nov 2016 12:29:45 GMT", 
+                "content-length": "6581", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

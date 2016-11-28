@@ -30,13 +30,14 @@ class SessionFactory(object):
         self.assume_role = assume_role
 
     def __call__(self, assume=True, region=None):
-        session = Session(
-            region_name=region or self.region,
-            profile_name=self.profile)
         if self.assume_role and assume:
+            session = Session(profile_name=self.profile)
             session = assumed_session(
                 self.assume_role, "CloudCustodian", session,
                 region or self.region)
+        else:
+            session = Session(
+                region_name=region or self.region, profile_name=self.profile)
 
         session._session.user_agent_name = "CloudCustodian"
         session._session.user_agent_version = version

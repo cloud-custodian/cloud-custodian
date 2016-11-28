@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "058bae76-b4b1-11e6-ab15-dffd003f06c4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "058bae76-b4b1-11e6-ab15-dffd003f06c4", 
+                "date": "Sun, 27 Nov 2016 14:51:47 GMT", 
+                "content-length": "467", 
+                "content-type": "application/json"
+            }
+        }, 
+        "MountTargets": [
+            {
+                "MountTargetId": "fsmt-09eb4e40", 
+                "NetworkInterfaceId": "eni-193cecf5", 
+                "FileSystemId": "fs-5e7fac17", 
+                "LifeCycleState": "available", 
+                "SubnetId": "subnet-914763e7", 
+                "OwnerId": "644160558196", 
+                "IpAddress": "172.31.9.22"
+            }, 
+            {
+                "MountTargetId": "fsmt-77eb4e3e", 
+                "NetworkInterfaceId": "eni-d21d0b13", 
+                "FileSystemId": "fs-5e7fac17", 
+                "LifeCycleState": "available", 
+                "SubnetId": "subnet-efbcccb7", 
+                "OwnerId": "644160558196", 
+                "IpAddress": "172.31.20.60"
+            }
+        ]
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cb9bdd14-e00e-d3fc-9b2f-0c505aea6073", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cb9bdd14-e00e-d3fc-9b2f-0c505aea6073", 
+                "content-length": "811", 
+                "x-amz-id-2": "XHKqr2hANVUMsQcIl4hUw+GTNgwJJPGgrQD3UJm8/iTBKJq5X1L/YpqcPOGSfU5oNTSg5YyKJJb1Nl74Ny7VPiu4OQFobyWXj8dkokOj3ZI=", 
+                "server": "Apache-Coyote/1.1", 
+                "date": "Sun, 27 Nov 2016 12:18:11 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "StreamDescription": {
+            "HasMoreShards": false, 
+            "RetentionPeriodHours": 24, 
+            "StreamName": "sock-drawer", 
+            "Shards": [
+                {
+                    "ShardId": "shardId-000000000000", 
+                    "HashKeyRange": {
+                        "EndingHashKey": "170141183460469231731687303715884105727", 
+                        "StartingHashKey": "0"
+                    }, 
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49568027013051417042124392152163093257658725395469434882"
+                    }
+                }, 
+                {
+                    "ShardId": "shardId-000000000001", 
+                    "HashKeyRange": {
+                        "EndingHashKey": "340282366920938463463374607431768211455", 
+                        "StartingHashKey": "170141183460469231731687303715884105728"
+                    }, 
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49568027013073717787322922775304628975931373756975415314"
+                    }
+                }
+            ], 
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/sock-drawer", 
+            "EnhancedMonitoring": [
+                {
+                    "ShardLevelMetrics": []
+                }
+            ], 
+            "StreamStatus": "ACTIVE"
+        }
+    }
+}

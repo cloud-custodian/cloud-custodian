@@ -14,9 +14,10 @@
 
 import itertools
 
+from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, type_schema
 
 
 @resources.register('simpledb')
@@ -43,3 +44,13 @@ class SimpleDB(QueryResourceManager):
             return list(itertools.chain(
                 *w.map(_augment, chunks(resources, 20))))
 
+
+@SimpleDB.action_registry.register('delete')
+class Delete(Action):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sdb')
+        for r in resources:
+            client.delete_domain(DomainName=r['DomainName'])

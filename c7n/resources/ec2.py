@@ -143,6 +143,16 @@ class SubnetFilter(net_filters.SubnetFilter):
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-state-running-7-days
+            resource: ec2
+            filters:
+              - type: state-age
+                op: ge
+                days: 7
     """
     RE_PARSE_AGE = re.compile("\(.*?\)")
 
@@ -169,7 +179,6 @@ class StateTransitionFilter(object):
     they are valid for.
 
     For more details see http://goo.gl/TZH9Q5
-
     """
     valid_origin_states = ()
 
@@ -185,6 +194,22 @@ class StateTransitionFilter(object):
 
 @filters.register('ebs')
 class AttachedVolume(ValueFilter):
+    """EC2 instances with EBS backed volume
+
+    Filters EC2 instances with EBS backed storage devices (non ephemeral)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-encrypted-ebs-volumes
+            resource: ec2
+            filters:
+              - type: ebs
+                key: encrypted
+                value: true
+    """
 
     schema = type_schema(
         'ebs', rinherit=ValueFilter.schema,
@@ -237,6 +262,22 @@ class InstanceImageBase(object):
 
 @filters.register('image-age')
 class ImageAge(AgeFilter, InstanceImageBase):
+    """EC2 AMI age filter
+
+    Filters EC2 instances based on the age of their AMI image (in days)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-ancient-ami
+            resource: ec2
+            filters:
+              - type: image-age
+                op: ge
+                days: 90
+    """
 
     date_attribute = "CreationDate"
 
@@ -279,6 +320,26 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
 @filters.register('offhour')
 class InstanceOffHour(OffHour, StateTransitionFilter):
+    """Custodian OffHour filter
+
+    Filters running EC2 instances with the intent to stop at a given hour of
+    the day.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: onhour-evening-stop
+            resource: ec2
+            filters:
+              - type: offhour
+                tag: custodian_downtime
+                default_tz: et
+                offhour: 20
+            actions:
+              - stop
+    """
 
     valid_origin_states = ('running',)
 
@@ -289,6 +350,26 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 
 @filters.register('onhour')
 class InstanceOnHour(OnHour, StateTransitionFilter):
+    """Custodian OnHour filter
+
+    Filters stopped EC2 instances with the intent to start at a given hour of
+    the day.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: onhour-morning-start
+            resource: ec2
+            filters:
+              - type: onhour
+                tag: custodian_downtime
+                default_tz: et
+                onhour: 6
+            actions:
+              - start
+    """
 
     valid_origin_states = ('stopped',)
 
@@ -299,6 +380,23 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
 
 @filters.register('ephemeral')
 class EphemeralInstanceFilter(Filter):
+    """EC2 instances with ephemeral storage
+
+    Filters EC2 instances that have ephemeral storage (an instance-store backed
+    root device)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-ephemeral-instances
+            resource: ec2
+            filters:
+              - type: ephemeral
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
+    """
 
     schema = type_schema('ephemeral')
 
@@ -328,6 +426,20 @@ class UpTimeFilter(AgeFilter):
 
 @filters.register('instance-age')
 class InstanceAgeFilter(AgeFilter):
+    """Filters instances based on their age (in days)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-30-days-plus
+            resource: ec2
+            filters:
+              - type: instance-age
+                op: ge
+                days: 30
+    """
 
     date_attribute = "LaunchTime"
     ebs_key_func = operator.itemgetter('AttachTime')
@@ -365,6 +477,22 @@ class DefaultVpc(DefaultVpcBase):
 
 @actions.register('start')
 class Start(BaseAction, StateTransitionFilter):
+    """Starts a previously stopped EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-start-stopped-instances
+            resource: ec2
+            query:
+              - instance-state-name: stopped
+            actions:
+              - start
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/start-instances.html
+    """
 
     valid_origin_states = ('stopped',)
     schema = type_schema('start')
@@ -481,7 +609,19 @@ class Resize(BaseAction, StateTransitionFilter):
 
 @actions.register('stop')
 class Stop(BaseAction, StateTransitionFilter):
-    """Stop instances
+    """Stops a running EC2 instances
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-stop-running-instances
+            resource: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - stop
     """
     valid_origin_states = ('running',)
 
@@ -540,6 +680,19 @@ class Terminate(BaseAction, StateTransitionFilter):
     reliabily, we need to process the instances individually. Additionally
     If we're configured with 'force' then we'll turn off instance termination
     protection.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-process-termination
+            resource: ec2
+            filters:
+              - type: marked-for-op
+                op: terminate
+            actions:
+              - terminate
     """
 
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
@@ -583,6 +736,22 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Snapshots volumes attached to an EC2 instance
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-snapshots
+            resource: ec2
+            filters:
+              - type: ebs
+          actions:
+            - snapshot
+              copy-tags:
+                - Name
+    """
 
     schema = type_schema(
         'snapshot',

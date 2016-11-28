@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
-
+from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import chunks, local_session
+from c7n.utils import chunks, local_session, type_schema
 
 
 @resources.register('elasticsearch')
@@ -42,3 +42,13 @@ class ElasticSearchDomain(QueryResourceManager):
             return list(itertools.chain(
                 *w.map(_augment, chunks(resources, 20))))
 
+
+@ElasticSearchDomain.action_registry.register('delete')
+class Delete(Action):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            client.delete_elasticsearch_domain(DomainName=r['DomainName'])

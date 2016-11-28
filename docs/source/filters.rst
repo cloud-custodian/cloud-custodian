@@ -1,5 +1,10 @@
 .. _filters:
 
+Filters
+=======
+
+These filters can be applied to all policies for all resources. See the :ref:`Resources and Actions reference <policy>` for resource-specific filters.
+
 Value Filters
 -------------
 
