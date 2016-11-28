@@ -20,7 +20,7 @@ import yaml
 
 from common import BaseTest
 from cStringIO import StringIO
-from c7n import cli, version
+from c7n import cli, version, manager
 
 
 class CliTest(BaseTest):
@@ -54,6 +54,12 @@ class CliTest(BaseTest):
         out, err = self.run_and_expect_success(argv)
         return out
 
+    def clear_resources(self):
+        for m in sys.modules.keys():
+            if m.startswith('c7n.resources'):
+                del sys.modules[m]
+        manager.resources._factories.clear()
+
     def capture_output(self):
         out = StringIO()
         err = StringIO()
@@ -75,6 +81,7 @@ class CliTest(BaseTest):
         """ Run cli.main() with supplied argv and expect exit_code. """
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
+        self.clear_resources()
         with self.assertRaises(SystemExit) as cm:
             cli.main()
         self.assertEqual(cm.exception.code, exit_code)
@@ -83,6 +90,7 @@ class CliTest(BaseTest):
     def run_and_expect_exception(self, argv, exception):
         """ Run cli.main() with supplied argv and expect supplied exception. """
         self.patch(sys, 'argv', argv)
+        self.clear_resources()
         try:
             cli.main()
         except exception:

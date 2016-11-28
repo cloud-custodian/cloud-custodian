@@ -31,7 +31,7 @@ from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
 from c7n.resources import load_resources
-from c7n import mu, schema, version
+from c7n import mu, schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -50,6 +50,7 @@ def policy_command(f):
 
 
 def validate(options):
+    load_resources()
     if options.config is not None:
         # support the old -c option
         options.configs.append(options.config)
