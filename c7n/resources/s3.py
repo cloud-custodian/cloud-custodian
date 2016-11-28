@@ -1151,8 +1151,7 @@ class RemoveBucketTag(RemoveTag):
 class DeleteBucket(ScanBucket):
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
-    from c7n.executor import MainThreadExecutor
-    executor_factory = MainThreadExecutor
+
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
@@ -1174,7 +1173,7 @@ class DeleteBucket(ScanBucket):
         Disable versioning on the bucket, so deletes don't
         generate fresh deletion markers.
         """
-        client = local_session(self.manager).client('s3')
+        client = local_session(self.manager.session_factory).client('s3')
 
         # Suspend versioning, so we don't get new delete markers
         # as we walk and delete versions
