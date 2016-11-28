@@ -240,5 +240,5 @@ class LogsTest(CliTest):
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
         self.run_and_expect_exception(
-            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'logs', '-c', yaml_file, '-s', temp_dir],
             AssertionError)
