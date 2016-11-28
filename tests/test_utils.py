@@ -218,6 +218,6 @@ class UtilTest(unittest.TestCase):
 
     def test_timestamp_from_string(self):
         tfs = utils.timestamp_from_string
-        date_text = '2016-11-21 13:13:41 EST'
-        self.assertEqual(tfs(date_text), 1479752021.0)
+        date_text = '2016-11-21 13:13:41'
+        self.assertIsInstance(tfs(date_text), float)
         self.assertEqual(tfs('not a date'), 0)
