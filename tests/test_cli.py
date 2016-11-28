@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -254,3 +255,24 @@ class LogsTest(CliTest):
         self.run_and_expect_exception(
             ['custodian', 'logs', '-c', yaml_file, '-s', temp_dir],
             AssertionError)
+        p_data = {
+            'name': 'test-policy',
+            'resource': 'rds',
+            'filters': [
+                {
+                    'key': 'GroupName',
+                    'type': 'security-group',
+                    'value': 'default',
+                },
+            ],
+            'actions': [{'days': 10, 'type': 'retention'}],
+        }
+        yaml_file = self.write_policy_file({'policies': [p_data]})
+        output_dir = os.path.join(
+            os.path.dirname(__file__),
+            'data',
+            'logs',
+        )
+        self.run_and_expect_success(
+            ['custodian', 'logs', '-c', yaml_file, '-s', output_dir],
+        )

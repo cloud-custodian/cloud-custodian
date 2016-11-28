@@ -1,0 +1,144 @@
+2016-11-21 11:13:07,750 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:13:07,751 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:13:07,751 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:17:58,586 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:17:58,587 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:17:58,587 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:19:55,868 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:19:55,868 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:19:55,868 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:24:02,557 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:24:02,557 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:24:02,557 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:25:09,765 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:25:09,766 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:25:09,767 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:25:25,884 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:25:25,887 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:25:25,888 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 11:25:51,811 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 11:25:51,812 - custodian.resources.rds - INFO - Filtered from 0 to 0 rds
+2016-11-21 11:25:51,812 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:0 time:0.00
+2016-11-21 12:37:09,502 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:37:12,287 - custodian.output - ERROR - Error while executing policy
+Traceback (most recent call last):
+  File "/path/prefix/c7n/policy.py", line 167, in run
+    resources = self.policy.resource_manager.resources()
+  File "/path/prefix/c7n/query.py", line 164, in resources
+    return self.filter_resources(resources)
+  File "/path/prefix/c7n/manager.py", line 63, in filter_resources
+    resources = f.process(resources, event)
+  File "/path/prefix/c7n/filters/related.py", line 95, in process
+    return [r for r in resources if self.process_resource(r, related)]
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['key'], resource)
+  File "/path/prefix/c7n/filters/core.py", line 274, in get_resource_value
+    self.expr = jmespath.compile(self.k)
+AttributeError: 'SecurityGroupFilter' object has no attribute 'k'
+2016-11-21 12:41:39,200 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:44:33,030 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 12:44:33,030 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:173.83
+2016-11-21 12:44:33,761 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.73
+2016-11-21 12:46:57,214 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:46:57,971 - custodian.output - ERROR - Error while executing policy
+Traceback (most recent call last):
+  File "/path/prefix/c7n/policy.py", line 167, in run
+    resources = self.policy.resource_manager.resources()
+  File "/path/prefix/c7n/query.py", line 152, in resources
+    return self.filter_resources(resources)
+  File "/path/prefix/c7n/manager.py", line 63, in filter_resources
+    resources = f.process(resources, event)
+  File "/path/prefix/c7n/filters/related.py", line 95, in process
+    return [r for r in resources if self.process_resource(r, related)]
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['key'], resource)
+  File "/path/prefix/c7n/filters/core.py", line 274, in get_resource_value
+    self.expr = jmespath.compile(self.k)
+AttributeError: 'SecurityGroupFilter' object has no attribute 'k'
+2016-11-21 12:48:18,732 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:50:50,251 - custodian.output - ERROR - Error while executing policy
+Traceback (most recent call last):
+  File "/path/prefix/c7n/policy.py", line 167, in run
+    resources = self.policy.resource_manager.resources()
+  File "/path/prefix/c7n/query.py", line 152, in resources
+    return self.filter_resources(resources)
+  File "/path/prefix/c7n/manager.py", line 63, in filter_resources
+    resources = f.process(resources, event)
+  File "/path/prefix/c7n/filters/related.py", line 96, in process
+    return [r for r in resources if self.process_resource(r, related)]
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['value'] = self.get_resource_value(
+  File "/path/prefix/c7n/filters/core.py", line 274, in get_resource_value
+    self.expr = jmespath.compile(self.k)
+AttributeError: 'SecurityGroupFilter' object has no attribute 'k'
+2016-11-21 12:52:34,415 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:54:44,670 - custodian.output - ERROR - Error while executing policy
+Traceback (most recent call last):
+  File "/path/prefix/c7n/policy.py", line 167, in run
+    resources = self.policy.resource_manager.resources()
+  File "/path/prefix/c7n/query.py", line 152, in resources
+    return self.filter_resources(resources)
+  File "/path/prefix/c7n/manager.py", line 63, in filter_resources
+    resources = f.process(resources, event)
+  File "/path/prefix/c7n/filters/related.py", line 96, in process
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['key'], resource)
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['key'], resource)
+  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/bdb.py", line 49, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/bdb.py", line 67, in dispatch_line
+    self.user_line(frame)
+  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/pdb.py", line 158, in user_line
+    self.interaction(frame, None)
+  File "/path/prefix/lib/python2.7/site-packages/pdb.py", line 250, in interaction
+    self.cmdloop()
+  File "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/cmd.py", line 130, in cmdloop
+    line = raw_input(self.prompt)
+  File "/path/prefix/lib/python2.7/site-packages/pyrepl/readline.py", line 199, in raw_input
+    return reader.readline(reader, startup_hook=self.startup_hook)
+  File "/path/prefix/lib/python2.7/site-packages/pyrepl/reader.py", line 603, in readline
+    self.handle1()
+  File "/path/prefix/lib/python2.7/site-packages/pyrepl/reader.py", line 586, in handle1
+    self.do_cmd(cmd)
+  File "/path/prefix/lib/python2.7/site-packages/pyrepl/reader.py", line 533, in do_cmd
+    cmd.do()
+  File "/path/prefix/lib/python2.7/site-packages/pyrepl/commands.py", line 187, in do
+    os.kill(os.getpid(), signal.SIGINT)
+KeyboardInterrupt
+2016-11-21 12:57:01,955 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 12:57:02,664 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 12:57:02,664 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:0.71
+2016-11-21 12:57:03,375 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.71
+2016-11-21 13:07:26,678 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 13:07:27,464 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 13:07:27,464 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:0.79
+2016-11-21 13:07:28,179 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.71
+2016-11-21 13:07:40,577 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 13:07:41,117 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 13:07:41,117 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:0.54
+2016-11-21 13:07:41,688 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.57
+2016-11-21 13:13:27,352 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 13:13:28,075 - custodian.output - ERROR - Error while executing policy
+Traceback (most recent call last):
+  File "/path/prefix/c7n/policy.py", line 167, in run
+    resources = self.policy.resource_manager.resources()
+  File "/path/prefix/c7n/query.py", line 152, in resources
+    return self.filter_resources(resources)
+  File "/path/prefix/c7n/manager.py", line 63, in filter_resources
+    resources = f.process(resources, event)
+  File "/path/prefix/c7n/filters/related.py", line 95, in process
+    return [r for r in resources if self.process_resource(r, related)]
+  File "/path/prefix/c7n/filters/related.py", line 70, in process_resource
+    self.data['key'], resource)
+  File "/path/prefix/c7n/filters/core.py", line 274, in get_resource_value
+    self.expr = jmespath.compile(self.k)
+AttributeError: 'SecurityGroupFilter' object has no attribute 'k'
+2016-11-21 13:13:40,040 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 13:13:40,594 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 13:13:40,594 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:0.55
+2016-11-21 13:13:41,477 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.88
+2016-11-21 13:42:44,192 - custodian.policy - INFO - Running policy related-rds-test resource: rds region:us-west-1 c7n:0.8.21.0
+2016-11-21 13:42:46,619 - custodian.resources.rds - INFO - Filtered from 1 to 1 rds
+2016-11-21 13:42:46,620 - custodian.policy - INFO - policy: related-rds-test resource:rds has count:1 time:2.43
+2016-11-21 13:42:46,624 - custodian.policy - INFO - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.00
