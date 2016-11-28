@@ -1,7 +1,7 @@
 .. _usage:
 
-Metrics and logs
-================
+Monitoring your environment
+===========================
 
 Cloud Custodian generates a consistent set of outputs for any given
 policy.
@@ -31,7 +31,7 @@ Additionally some filters and actions may generate their own metrics.
 In order to enable metrics output, the boolean metrics
 flag needs to be specified when running Cloud Custodian::
 
-  $ cloud-custodian run -c config.yml --metrics
+  $ custodian run -c <policyfile>.yml -s <output_directory> --metrics
 
 
 CloudWatch Logs
@@ -43,7 +43,7 @@ separate stream.
 
 Usage example::
 
-  $ cloud-custodian run -c config.yml --log-group=/cloud-custodian/dev-account/us-east-1
+  $ custodian run -c <policyfile>.yml --log-group=/cloud-custodian/<dev-account>/<region>
 
 
 If enabled, it is recommended to set a log subscription on the group to
@@ -61,6 +61,9 @@ with its log files for archival purposes.
 
 The S3 bucket and prefix can be specified via parameters::
 
-  $ cloud-custodian run -c config.yml --output-dir s3://my-bucket/my/prefix
+  $ custodian run -c <policyfile>.yml --output-dir s3://<my-bucket>/<my-prefix>
+
+Reports
+-------
 
 CSV reports can be generated with the ``report`` subcommand.
