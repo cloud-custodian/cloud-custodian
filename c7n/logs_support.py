@@ -20,6 +20,7 @@ import re
 from concurrent.futures import as_completed
 from cStringIO import StringIO
 from datetime import datetime
+from dateutil import tz
 from gzip import GzipFile
 
 from c7n.executor import ThreadPoolExecutor
@@ -68,12 +69,16 @@ def log_entries_in_range(entries, start, end):
             yield entry
 
 
-def log_entries_from_s3(session, output, start):
+def log_entries_from_s3(session, output, start, end):
     client = session.client('s3')
     key_prefix = output.key_prefix.strip('/')
+    local_tz = tz.tzlocal()
     start = datetime.fromtimestamp(
         timestamp_from_string(start)
     )
+    end = datetime.fromtimestamp(
+        timestamp_from_string(end)
+    ).replace(tzinfo=local_tz)
     records = []
     key_count = 0
     log_filename = 'custodian-run.log.gz'
@@ -92,7 +97,8 @@ def log_entries_from_s3(session, output, start):
             if 'Contents' not in key_set:
                 continue
             keys = [k for k in key_set['Contents']
-                    if k['Key'].endswith(log_filename)]
+                    if k['Key'].endswith(log_filename)
+                    and k['LastModified'].astimezone(local_tz) < end]
             key_count += len(keys)
             futures = map(
                 lambda k: w.submit(get_records, output.bucket, k, client), keys
