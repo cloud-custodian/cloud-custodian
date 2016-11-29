@@ -32,6 +32,7 @@ from c7n.logs_support import (
     normalized_log_entries,
     log_entries_in_range,
     log_entries_from_s3,
+    log_entries_from_group,
 )
 from c7n.version import version
 
@@ -216,7 +217,13 @@ class PullMode(PolicyExecutionMode):
     def get_logs(self, start, end):
         log_source = self.policy.ctx.output
         log_gen = ()
-        if log_source.use_s3():
+        if self.policy.options.log_group is not None:
+            session = utils.local_session(self.policy.session_factory)
+            log_gen = log_entries_from_group(
+                session,
+                self.policy.options.log_group,
+            )
+        elif log_source.use_s3():
             session = utils.local_session(self.policy.session_factory)
             raw_entries = log_entries_from_s3(session, log_source, start, end)
             # log files can be downloaded out of order, so sort on timestamp

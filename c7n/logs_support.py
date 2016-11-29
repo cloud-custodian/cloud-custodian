@@ -17,6 +17,7 @@ of PolicyExecutionMode.get_logs()
 '''
 import logging
 import re
+from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from cStringIO import StringIO
 from datetime import datetime
@@ -122,3 +123,33 @@ def get_records(bucket, key, client):
     log.debug("bucket: %s key: %s records: %d",
               bucket, key['Key'], len(records))
     return records
+
+
+def log_entries_from_group(session, group_name):
+    '''Get logs for a specific log group'''
+    logs = session.client('logs')
+    log.info("Fetching logs from group: %s" % group_name)
+    try:
+        logs.describe_log_groups(logGroupNamePrefix=group_name)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            return
+        raise
+    try:
+        log_streams = logs.describe_log_streams(
+            logGroupName=group_name,
+            orderBy="LastEventTime",
+            limit=3,
+            descending=True,
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            return
+        raise
+    for s in reversed(log_streams['logStreams']):
+        result = logs.get_log_events(
+            logGroupName=group_name,
+            logStreamName=s['logStreamName'],
+        )
+        for e in result['events']:
+            yield e
