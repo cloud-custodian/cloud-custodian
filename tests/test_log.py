@@ -63,7 +63,7 @@ class LogTest(BaseTest):
             'test_transport_buffer_flush')
         log = logging.getLogger("test-c7n")
         handler = CloudWatchLogHandler(
-            "test-maid-4", "alpha", session_factory=session_factory)
+            "test-maid-5", "alpha", session_factory=session_factory)
         handler.batch_size = 5
         log.addHandler(handler)
         self.addCleanup(log.removeHandler, handler)

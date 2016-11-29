@@ -75,6 +75,7 @@ class CliTest(BaseTest):
         """ Run cli.main() with supplied argv and expect exit_code. """
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
+        #clear_resources()
         with self.assertRaises(SystemExit) as cm:
             cli.main()
         self.assertEqual(cm.exception.code, exit_code)
@@ -83,6 +84,7 @@ class CliTest(BaseTest):
     def run_and_expect_exception(self, argv, exception):
         """ Run cli.main() with supplied argv and expect supplied exception. """
         self.patch(sys, 'argv', argv)
+        #clear_resources()
         try:
             cli.main()
         except exception:
