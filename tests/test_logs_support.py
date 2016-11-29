@@ -18,6 +18,7 @@ from unittest import TestCase
 from c7n.logs_support import (
     normalized_log_entries,
     log_entries_in_range,
+    _timestamp_from_string,
 )
 
 
@@ -65,3 +66,9 @@ class TestLogsSupport(TestCase):
         # entries are within 5 minutes of each other
         span = (in_range[-1]['timestamp'] - in_range[0]['timestamp']) / 1000
         self.assertLess(span, 300)
+
+    def test_timestamp_from_string(self):
+        tfs = _timestamp_from_string
+        date_text = '2016-11-21 13:13:41'
+        self.assertIsInstance(tfs(date_text), float)
+        self.assertEqual(tfs('not a date'), 0)

@@ -15,7 +15,6 @@ from botocore.exceptions import ClientError
 
 import copy
 from datetime import datetime
-from dateutil import parser
 import functools
 import json
 import itertools
@@ -344,11 +343,3 @@ def worker(f):
             raise
     functools.update_wrapper(_f, f)
     return _f
-
-
-def timestamp_from_string(date_text):
-    try:
-        date_dt = parser.parse(date_text)
-        return time.mktime(date_dt.timetuple())
-    except (AttributeError, TypeError, ValueError):
-        return 0

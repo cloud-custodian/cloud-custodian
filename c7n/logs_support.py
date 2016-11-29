@@ -17,18 +17,27 @@ of PolicyExecutionMode.get_logs()
 '''
 import logging
 import re
+import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from cStringIO import StringIO
 from datetime import datetime
+from dateutil import parser
 from dateutil import tz
 from gzip import GzipFile
 
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import timestamp_from_string
 
 
 log = logging.getLogger('custodian.logs')
+
+
+def _timestamp_from_string(date_text):
+    try:
+        date_dt = parser.parse(date_text)
+        return time.mktime(date_dt.timetuple()) * 1000
+    except (AttributeError, TypeError, ValueError):
+        return 0
 
 
 def normalized_log_entries(raw_entries):
@@ -45,7 +54,7 @@ def normalized_log_entries(raw_entries):
                 yield entry
             (log_time, log_level, log_text) = m.groups()
             # convert time
-            log_timestamp = timestamp_from_string(log_time) * 1000
+            log_timestamp = _timestamp_from_string(log_time)
             # join level and first line of message
             msg = '[{}] {}'.format(log_level, log_text)
             entry = {
@@ -62,8 +71,8 @@ def normalized_log_entries(raw_entries):
 
 def log_entries_in_range(entries, start, end):
     '''filter out entries before start and after end'''
-    start = timestamp_from_string(start) * 1000
-    end = timestamp_from_string(end) * 1000
+    start = _timestamp_from_string(start)
+    end = _timestamp_from_string(end)
     for entry in entries:
         log_timestamp = entry.get('timestamp', 0)
         if log_timestamp >= start and log_timestamp <= end:
@@ -75,10 +84,10 @@ def log_entries_from_s3(session, output, start, end):
     key_prefix = output.key_prefix.strip('/')
     local_tz = tz.tzlocal()
     start = datetime.fromtimestamp(
-        timestamp_from_string(start)
+        _timestamp_from_string(start) / 1000
     )
     end = datetime.fromtimestamp(
-        timestamp_from_string(end)
+        _timestamp_from_string(end) / 1000
     ).replace(tzinfo=local_tz)
     records = []
     key_count = 0

@@ -215,9 +215,3 @@ class UtilTest(unittest.TestCase):
             utils.parse_s3('s3://things'),
             ('s3://things', 'things', ''),
         )
-
-    def test_timestamp_from_string(self):
-        tfs = utils.timestamp_from_string
-        date_text = '2016-11-21 13:13:41'
-        self.assertIsInstance(tfs(date_text), float)
-        self.assertEqual(tfs('not a date'), 0)
