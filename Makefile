@@ -21,9 +21,6 @@ lint:
 test:
 	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests  --processes=-1 tests
 
-test:
-	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests  --processes=-1 tests --pdb
-
 ftests:
 	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
 
