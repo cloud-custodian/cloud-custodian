@@ -224,8 +224,12 @@ class PullMode(PolicyExecutionMode):
                 self.policy.options.log_group,
             )
         elif log_source.use_s3():
-            session = utils.local_session(self.policy.session_factory)
-            raw_entries = log_entries_from_s3(session, log_source, start, end)
+            raw_entries = log_entries_from_s3(
+                self.policy.session_factory,
+                log_source,
+                start,
+                end,
+            )
             # log files can be downloaded out of order, so sort on timestamp
             # log_gen isn't really a generator once we do this, but oh well
             log_gen = sorted(

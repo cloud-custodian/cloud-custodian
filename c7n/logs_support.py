@@ -27,6 +27,7 @@ from dateutil import tz
 from gzip import GzipFile
 
 from c7n.executor import ThreadPoolExecutor
+from c7n.utils import local_session
 
 
 log = logging.getLogger('custodian.logs')
@@ -79,8 +80,8 @@ def log_entries_in_range(entries, start, end):
             yield entry
 
 
-def log_entries_from_s3(session, output, start, end):
-    client = session.client('s3')
+def log_entries_from_s3(session_factory, output, start, end):
+    client = local_session(session_factory).client('s3')
     key_prefix = output.key_prefix.strip('/')
     local_tz = tz.tzlocal()
     start = datetime.fromtimestamp(
@@ -111,7 +112,9 @@ def log_entries_from_s3(session, output, start, end):
                     and k['LastModified'].astimezone(local_tz) < end]
             key_count += len(keys)
             futures = map(
-                lambda k: w.submit(get_records, output.bucket, k, client), keys
+                lambda k:
+                    w.submit(get_records, output.bucket, k, session_factory),
+                keys,
             )
 
             for f in as_completed(futures):
@@ -124,7 +127,8 @@ def log_entries_from_s3(session, output, start, end):
     return records
 
 
-def get_records(bucket, key, client):
+def get_records(bucket, key, session_factory):
+    client = local_session(session_factory).client('s3')
     result = client.get_object(Bucket=bucket, Key=key['Key'])
     blob = StringIO(result['Body'].read())
 
