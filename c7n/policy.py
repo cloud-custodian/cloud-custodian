@@ -343,8 +343,9 @@ class LambdaMode(PolicyExecutionMode):
 
     def get_logs(self, start, end):
         manager = mu.LambdaManager(self.policy.session_factory)
+        log_gen = manager.logs(mu.PolicyLambda(self.policy), start, end)
         return log_entries_in_range(
-            manager.logs(mu.PolicyLambda(self.policy)),
+            log_gen,
             start,
             end,
         )
