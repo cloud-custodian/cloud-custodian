@@ -222,6 +222,8 @@ class PullMode(PolicyExecutionMode):
             log_gen = log_entries_from_group(
                 session,
                 self.policy.options.log_group,
+                start,
+                end,
             )
         elif log_source.use_s3():
             raw_entries = log_entries_from_s3(

@@ -139,7 +139,7 @@ def get_records(bucket, key, session_factory):
     return records
 
 
-def log_entries_from_group(session, group_name):
+def log_entries_from_group(session, group_name, start, end):
     '''Get logs for a specific log group'''
     logs = session.client('logs')
     log.info("Fetching logs from group: %s" % group_name)
@@ -160,10 +160,14 @@ def log_entries_from_group(session, group_name):
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
             return
         raise
+    start = _timestamp_from_string(start)
+    end = _timestamp_from_string(end)
     for s in reversed(log_streams['logStreams']):
         result = logs.get_log_events(
             logGroupName=group_name,
             logStreamName=s['logStreamName'],
+            startTime=start,
+            endTime=end,
         )
         for e in result['events']:
             yield e
