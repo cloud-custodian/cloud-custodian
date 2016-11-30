@@ -36,7 +36,8 @@ log = logging.getLogger('custodian.logs')
 def _timestamp_from_string(date_text):
     try:
         date_dt = parser.parse(date_text)
-        return time.mktime(date_dt.timetuple()) * 1000
+        date_ts = time.mktime(date_dt.timetuple())
+        return long(date_ts * 1000)
     except (AttributeError, TypeError, ValueError):
         return 0
 

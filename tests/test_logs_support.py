@@ -48,7 +48,7 @@ class TestLogsSupport(TestCase):
         entry = nrm_entries[1]
         self.assertIn('timestamp', entry)
         self.assertIn('message', entry)
-        self.assertIsInstance(entry['timestamp'], float)
+        self.assertIsInstance(entry['timestamp'], long)
         self.assertIsInstance(entry['message'], str)
 
     def test_entries_in_range(self):
@@ -70,5 +70,5 @@ class TestLogsSupport(TestCase):
     def test_timestamp_from_string(self):
         tfs = _timestamp_from_string
         date_text = '2016-11-21 13:13:41'
-        self.assertIsInstance(tfs(date_text), float)
+        self.assertIsInstance(tfs(date_text), long)
         self.assertEqual(tfs('not a date'), 0)
