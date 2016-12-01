@@ -132,7 +132,7 @@ def resource_format(resource, resource_type):
             resource['SnapshotId'],
             resource['StartTime'])
     elif resource_type == 'subnet':
-        return "%s %s %s %s" %(
+        return "%s %s %s %s %s %s" %(
             resource['SubnetId'],
             resource['VpcId'],
             resource['AvailabilityZone'],
