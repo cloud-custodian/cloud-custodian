@@ -19,7 +19,6 @@ docs/lambda.rst
 
 import abc
 import base64
-from datetime import datetime
 import inspect
 import fnmatch
 import hashlib
