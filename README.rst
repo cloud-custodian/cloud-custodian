@@ -162,9 +162,12 @@ Agreement indicating agreement to the license terms below. Except for
 the license granted in this Agreement to Capital One and to recipients
 of software distributed by Capital One, You reserve all right, title,
 and interest in and to Your Contributions; this Agreement does not
-impact Your rights to use Your own Contributions for any other purpose
+impact Your rights to use Your own Contributions for any other purpose.
 
-`Download the Agreement <https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform>`_
+`Sign the Individual Agreement <https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform>`_
+
+`Sign the Corporate Agreement <https://docs.google.com/forms/d/e/1FAIpQLSeAbobIPLCVZD_ccgtMWBDAcN68oqbAJBQyDTSAQ1AkYuCp_g/viewform?usp=send_form>`_
+
 
 Code of Conduct
 ###############
