@@ -110,7 +110,7 @@ def log_entries_from_s3(session_factory, output, start, end):
                 continue
             keys = [k for k in key_set['Contents']
                     if k['Key'].endswith(log_filename)
-                    and k['LastModified'].astimezone(local_tz) < end]
+                    and k['LastModified'] < end]
             key_count += len(keys)
             futures = map(
                 lambda k:
