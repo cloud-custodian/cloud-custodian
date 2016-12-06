@@ -20,7 +20,7 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda,
-    CloudWatchLogSubscription)
+    CloudWatchLogSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from .common import BaseTest, Config, event_data
@@ -184,7 +184,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-s3-bucket-policy',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': RUNTIME,
              'Timeout': 60})
         mgr.remove(pl)
 
@@ -227,7 +227,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'maid-ec2-encrypted-vol',
              'Handler': 'maid_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -262,7 +262,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'maid-asg-spin-detector',
              'Handler': 'maid_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -298,7 +298,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'maid-periodic-ec2-checker',
              'Handler': 'maid_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
