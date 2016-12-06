@@ -39,7 +39,7 @@ from c7n.utils import get_account_id, local_session, type_schema
 
 
 class CrossAccountAccessFilter(Filter):
-    """Matches any resource which
+    """Check a resource's embedded iam policy for cross account access.
     """
 
     schema = type_schema(

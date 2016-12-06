@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "382c2a68-b4a9-11e6-982e-7b1543e50a96", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "382c2a68-b4a9-11e6-982e-7b1543e50a96", 
+                "date": "Sun, 27 Nov 2016 13:55:56 GMT", 
+                "content-length": "773", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "DomainStatus": {
+            "DomainId": "644160558196/sock-index", 
+            "Created": true, 
+            "Deleted": true, 
+            "SearchInstanceCount": 0, 
+            "DomainName": "sock-index", 
+            "SearchService": {}, 
+            "RequiresIndexDocuments": false, 
+            "Processing": false, 
+            "DocService": {}, 
+            "ARN": "arn:aws:cloudsearch:us-east-1:644160558196:domain/sock-index", 
+            "SearchPartitionCount": 0
+        }
+    }
+}

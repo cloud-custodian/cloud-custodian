@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatus": {
+            "ElasticsearchClusterConfig": {
+                "DedicatedMasterEnabled": false, 
+                "InstanceCount": 1, 
+                "ZoneAwarenessEnabled": false, 
+                "InstanceType": "m3.medium.elasticsearch"
+            }, 
+            "Endpoint": "search-indexme-3weeiii2sdicnuxqvunwj432um.us-east-1.es.amazonaws.com", 
+            "Created": true, 
+            "Deleted": true, 
+            "DomainName": "indexme", 
+            "EBSOptions": {
+                "EBSEnabled": false
+            }, 
+            "SnapshotOptions": {
+                "AutomatedSnapshotStartHour": 0
+            }, 
+            "DomainId": "644160558196/indexme", 
+            "AccessPolicies": "", 
+            "Processing": true, 
+            "AdvancedOptions": {
+                "rest.action.multi.allow_explicit_index": "true"
+            }, 
+            "ElasticsearchVersion": "1.5", 
+            "ARN": "arn:aws:es:us-east-1:644160558196:domain/indexme"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fbfa82ec-b4a9-11e6-baac-114a53c451fc", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fbfa82ec-b4a9-11e6-baac-114a53c451fc", 
+                "date": "Sun, 27 Nov 2016 14:01:24 GMT", 
+                "content-length": "742", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

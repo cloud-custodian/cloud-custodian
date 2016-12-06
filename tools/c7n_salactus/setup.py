@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="c7n_salactus",
@@ -24,10 +24,10 @@ setup(
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
-    py_modules=['salactus'],
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'c7n-salactus = salactus:main']},
-    install_requires=["c7n"],
+            'c7n-salactus = c7n_salactus.cli:cli']},
+    install_requires=["c7n", "click"],
 )
 

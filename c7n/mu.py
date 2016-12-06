@@ -19,7 +19,6 @@ docs/lambda.rst
 
 import abc
 import base64
-from datetime import datetime
 import inspect
 import fnmatch
 import hashlib
@@ -45,6 +44,10 @@ from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
+RUNTIME = 'python{}.{}'.format(
+    sys.version_info.major,
+    sys.version_info.minor,
+)
 
 
 class PythonPackageArchive(object):
@@ -52,6 +55,8 @@ class PythonPackageArchive(object):
 
     Packages up a virtualenv and a source package directory per lambda's
     directory structure.
+
+    See http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python
     """
 
     def __init__(self, src_path, virtualenv_dir=None, skip=None,
@@ -111,18 +116,29 @@ class PythonPackageArchive(object):
                     self.add_file(f_path, dest_path)
 
         # Library Source
-        venv_lib_path = os.path.join(
-            self.virtualenv_dir, 'lib', 'python2.7', 'site-packages')
+        venv_lib_paths = (
+            os.path.join(
+                self.virtualenv_dir,
+                'lib', RUNTIME, 'site-packages',
+            ),
+            os.path.join(
+                self.virtualenv_dir,
+                'lib64', RUNTIME, 'site-packages',
+            ),
+        )
 
-        for root, dirs, files in os.walk(venv_lib_path):
-            if self.lib_filter:
-                dirs, files = self.lib_filter(root, dirs, files)
-            arc_prefix = os.path.relpath(root, venv_lib_path)
-            files = self.filter_files(files)
-            for f in files:
-                f_path = os.path.join(root, f)
-                dest_path = os.path.join(arc_prefix, f)
-                self.add_file(f_path, dest_path)
+        for venv_lib_path in venv_lib_paths:
+            if not os.path.exists(venv_lib_path):
+                continue
+            for root, dirs, files in os.walk(venv_lib_path):
+                if self.lib_filter:
+                    dirs, files = self.lib_filter(root, dirs, files)
+                arc_prefix = os.path.relpath(root, venv_lib_path)
+                files = self.filter_files(files)
+                for f in files:
+                    f_path = os.path.join(root, f)
+                    dest_path = os.path.join(arc_prefix, f)
+                    self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)

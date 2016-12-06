@@ -100,6 +100,8 @@ class BaseAction(object):
                         self.__class__.__name__.lower()))
             raise
 
+Action = BaseAction
+
 
 class ModifyGroupsAction(BaseAction):
     """Common actions for modifying security groups on a resource
