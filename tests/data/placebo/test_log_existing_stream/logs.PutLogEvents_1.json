@@ -1,13 +1,17 @@
 {
-    "status_code": 400, 
+    "status_code": 200, 
     "data": {
+        "nextSequenceToken": "49567511072778230234585680335896857312552072736688602210", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 400, 
-            "RequestId": "eadcf0f3-cd1a-11e5-be2d-e781e8260755"
-        }, 
-        "Error": {
-            "Message": "The given sequenceToken is invalid. The next expected sequenceToken is: 49540751441854908238376988780308869790031137916571370994", 
-            "Code": "InvalidSequenceTokenException"
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c2c72969-b4d3-11e6-bade-e96ef0364aec", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c2c72969-b4d3-11e6-bade-e96ef0364aec", 
+                "date": "Sun, 27 Nov 2016 19:00:28 GMT", 
+                "content-length": "80", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }
     }
 }

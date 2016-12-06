@@ -1,0 +1,103 @@
+{
+    "status_code": 200, 
+    "data": {
+        "result": {
+            "checkId": "H7IgTzjTYb", 
+            "status": "error", 
+            "flaggedResources": [
+                {
+                    "status": "error", 
+                    "resourceId": "CwLIJp8c8NLj3p9zLVbM6Nbcw5o3uTOqzdMktKNAImM", 
+                    "region": "us-east-1", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-1", 
+                        "vol-abdb8d37", 
+                        "c7n-ebs-test-no-snapshot", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "Red", 
+                        "No snapshot"
+                    ]
+                }, 
+                {
+                    "status": "error", 
+                    "resourceId": "kBtgTXWDQWrhaEjEl7gEAJQRugdiDvNAP8tzkHaG0F0", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2", 
+                        "vol-0d6a4c64551afc66e", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "/dev/sda1:i-09fa99d8763b017c3", 
+                        "Red", 
+                        "No snapshot"
+                    ]
+                }, 
+                {
+                    "status": "error", 
+                    "resourceId": "GKSR4ejK7qD4Yt4kQ-IhSX27J_OgBuLL6luivgp3Z6w", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2", 
+                        "vol-04e2ad391f87d8147", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "/dev/sda1:i-0a7d9e4ed71204a90", 
+                        "Red", 
+                        "No snapshot"
+                    ]
+                }, 
+                {
+                    "status": "error", 
+                    "resourceId": "vA6ujpU6QgH0HTLQfEqylc1o-RLrwXavKG2i_2sLD8E", 
+                    "region": "us-east-2", 
+                    "isSuppressed": false, 
+                    "metadata": [
+                        "us-east-2", 
+                        "vol-0b1e548adc0c6feea", 
+                        null, 
+                        null, 
+                        null, 
+                        null, 
+                        "/dev/sda1:i-0822c66c32960b539", 
+                        "Red", 
+                        "No snapshot"
+                    ]
+                }
+            ], 
+            "timestamp": "2016-11-16T20:19:40Z", 
+            "resourcesSummary": {
+                "resourcesFlagged": 4, 
+                "resourcesProcessed": 5, 
+                "resourcesSuppressed": 0, 
+                "resourcesIgnored": 0
+            }, 
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0, 
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "92be62cd-ac3a-11e6-b8ec-a776bbbbe8cd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "92be62cd-ac3a-11e6-b8ec-a776bbbbe8cd", 
+                "date": "Wed, 16 Nov 2016 20:23:44 GMT", 
+                "content-length": "1282", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

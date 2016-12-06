@@ -1,13 +1,16 @@
 {
-    "status_code": 400, 
+    "status_code": 200, 
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 400, 
-            "RequestId": "eac08fe9-cd1a-11e5-a37b-e943bdecb17e"
-        }, 
-        "Error": {
-            "Message": "The specified log group already exists", 
-            "Code": "ResourceAlreadyExistsException"
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c240e2eb-b4d3-11e6-a157-01f518f82ed7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c240e2eb-b4d3-11e6-a157-01f518f82ed7", 
+                "date": "Sun, 27 Nov 2016 19:00:26 GMT", 
+                "content-length": "0", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }
     }
 }

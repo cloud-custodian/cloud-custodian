@@ -5,5 +5,7 @@ Overview
 .. toctree::
 
    capabilities
+   glossary
    roadmap
    comparisons
+   deployment

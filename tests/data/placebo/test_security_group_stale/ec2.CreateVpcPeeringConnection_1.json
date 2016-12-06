@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VpcPeeringConnection": {
+            "Status": {
+                "Message": "Initiating Request to 644160558196", 
+                "Code": "initiating-request"
+            }, 
+            "Tags": [], 
+            "RequesterVpcInfo": {
+                "PeeringOptions": {
+                    "AllowEgressFromLocalVpcToRemoteClassicLink": false, 
+                    "AllowDnsResolutionFromRemoteVpc": false, 
+                    "AllowEgressFromLocalClassicLinkToRemoteVpc": false
+                }, 
+                "OwnerId": "644160558196", 
+                "VpcId": "vpc-595ea73f", 
+                "CidrBlock": "10.4.0.0/16"
+            }, 
+            "VpcPeeringConnectionId": "pcx-7fc05116", 
+            "ExpirationTime": {
+                "hour": 15, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 56, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 3, 
+                "minute": 10
+            }, 
+            "AccepterVpcInfo": {
+                "OwnerId": "644160558196", 
+                "VpcId": "vpc-265ea740"
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c4aedd83-f3e7-4428-b452-ecdab44bd2b9", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 26 Nov 2016 15:10:56 GMT"
+            }
+        }
+    }
+}

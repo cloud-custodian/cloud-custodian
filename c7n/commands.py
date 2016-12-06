@@ -31,7 +31,7 @@ from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
 from c7n.resources import load_resources
-from c7n import mu, schema, version
+from c7n import mu, schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -41,6 +41,7 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
+        load_resources()
         collection = policy_load(options, options.config)
         policies = collection.filter(options.policy_filter)
         return f(options, policies)
@@ -49,6 +50,7 @@ def policy_command(f):
 
 
 def validate(options):
+    load_resources()
     if options.config is not None:
         # support the old -c option
         options.configs.append(options.config)
@@ -114,9 +116,9 @@ def run(options, policies):
             exit_code = 1
             if options.debug:
                 raise
-            # Output does an exception log
-            log.warning("Error while executing policy %s, continuing" % (
-                policy.name))
+            log.exception(
+                "Error while executing policy %s, continuing" % (
+                    policy.name))
     sys.exit(exit_code)
 
 
@@ -242,7 +244,7 @@ def schema_cmd(options):
 
         # Print docstring
         docstring = _schema_get_docstring(cls)
-        print("\nHelp:\n-----\n")
+        print("\nHelp\n----\n")
         if docstring:
             print(docstring)
         else:
@@ -250,7 +252,7 @@ def schema_cmd(options):
             print("No help is available for this item.")  # pragma: no cover
 
         # Print schema
-        print("\nSchema:\n-------\n")
+        print("\nSchema\n------\n")
         pp = pprint.PrettyPrinter(indent=4)
         if hasattr(cls, 'schema'):
             pp.pprint(cls.schema)
@@ -286,14 +288,9 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
-    load_resources()
     start, end = _metrics_get_endpoints(options)
     data = {}
     for p in policies:
         log.info('Getting %s metrics', p)
         data[p.name] = p.get_metrics(start, end, options.period)
     print(dumps(data, indent=2))
-
-
-def cmd_version(options):
-    print(version.version)

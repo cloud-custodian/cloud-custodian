@@ -58,7 +58,7 @@ class BaseTest(PillTest):
 
     def load_policy(
             self, data, config=None, session_factory=None,
-            validate=C7N_VALIDATE):
+            validate=C7N_VALIDATE, cache=False):
         if validate:
             errors = schema_validate({'policies': [data]}, C7N_SCHEMA)
             if errors:
@@ -68,6 +68,9 @@ class BaseTest(PillTest):
         temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, temp_dir)
         config['output_dir'] = temp_dir
+        if cache:
+            config['cache'] = os.path.join(temp_dir, 'c7n.cache')
+            config['cache_period'] = 300
         conf = Config.empty(**config)
         return policy.Policy(data, conf, session_factory)
 
@@ -86,6 +89,28 @@ class BaseTest(PillTest):
         old = getattr(obj, attr, None)
         setattr(obj, attr, new)
         self.addCleanup(setattr, obj, attr, old)
+
+    def change_environment(self, **kw):
+        """Change the environment to the given set of variables.
+
+        Existing environment restored after test.
+        """
+        # preserve key elements needed for testing
+        for env in ["AWS_ACCESS_KEY_ID",
+                    "AWS_SECRET_ACCESS_KEY",
+                    "AWS_DEFAULT_REGION"]:
+            if env not in kw:
+                kw[env] = os.environ.get(env, "")
+
+        original_environ = dict(os.environ)
+
+        @self.addCleanup
+        def cleanup_env():
+            os.environ.clear()
+            os.environ.update(original_environ)
+
+        os.environ.clear()
+        os.environ.update(kw)
 
     def capture_logging(
             self, name=None, level=logging.INFO,
