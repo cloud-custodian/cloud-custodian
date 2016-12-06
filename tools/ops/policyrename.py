@@ -42,6 +42,7 @@ def setup_parser():
             'are the same, it will re-encrypt in-place')
 
     parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-v', '--verbose', default=False, action="store_true")
     parser.add_argument('--sse-kms-key-id',
                         help="Key id for SSE-KMS encrypted objects")
     parser.add_argument('-s', '--output-dir', required=True,
@@ -72,6 +73,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
     )
     paginator = client.get_paginator('list_objects_v2')
     rename_iterator = paginator.paginate(Bucket=bucket, Prefix=old + '/')
+    obj_count = 0
 
     for page in rename_iterator:
         # loop through the pages of results renaming
@@ -92,7 +94,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
             # in the new key
             new_obj = s3.Object(bucket, new_key)
             if new_key == old_key:
-                log.info(('Old and new keys match and new SSEKMSKeyId '
+                log.debug(('Old and new keys match and new SSEKMSKeyId '
                          'Specified, re-encrypting {}').format(new_obj.key))
             else:
                 try:
@@ -136,14 +138,19 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
             if new_key != old_key:
                 s3.Object(bucket, old_key).delete()
                 log.debug('Deleted "{}"'.format(old_key))
+            obj_count += 1
+
+        log.info(('Finished renaming/re-encrypting '
+                  '{} objects').format(obj_count))
 
 
 def main():
     parser = setup_parser()
     options = parser.parse_args()
 
+    level = options.verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
