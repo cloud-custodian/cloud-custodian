@@ -41,10 +41,13 @@ import c7n
 # Static event mapping to help simplify cwe rules creation
 from c7n.cwe import CloudWatchEvents
 from c7n.utils import parse_s3, local_session
-from c7n.version import RUNTIME
 
 
 log = logging.getLogger('custodian.lambda')
+RUNTIME = 'python{}.{}'.format(
+    sys.version_info.major,
+    sys.version_info.minor,
+)
 
 
 class PythonPackageArchive(object):
