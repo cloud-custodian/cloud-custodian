@@ -127,7 +127,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
                 # Re-encrypt with the existing key
                 copy_from_args['ServerSideEncryption'] = 'aws:kms'
                 copy_from_args['SSEKMSKeyId'] = old_sse_key
-            if old_sse_type == 'AES256':
+            if not sse_kms_key_id and old_sse_type == 'AES256':
                 # Re-encrypt with the existing AES256
                 copy_from_args['ServerSideEncryption'] = 'AES256'
 
