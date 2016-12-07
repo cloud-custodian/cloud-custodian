@@ -82,7 +82,8 @@ def get_user(eid, bind_user=None, bind_password=None,
     if manager:
         manager_eid = info['manager'].split(',', 1)[0].split('=')[1]
         manager = get_user(manager_eid, manager=False)
-        info['manager_email'] = manager['mail']
-        info['manager_name'] = manager['displayName']
+        if manager is not None:
+            info['manager_email'] = manager['mail']
+            info['manager_name'] = manager['displayName']
         info.pop('manager')
     return info
