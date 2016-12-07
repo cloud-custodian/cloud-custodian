@@ -12,34 +12,42 @@ Organizations can use Custodian to manage their AWS environments by ensuring com
 
 Navigate below and get started with Cloud Custodian!
 
-Overview
-~~~~~~~~
-
 .. toctree::
+   :maxdepth: 2
+   :caption: Introduction
 
    overview/index
-
-Quickstart
-~~~~~~~~~~
-
-.. toctree::
-
    quickstart/index
-
-
-Sample Use Cases
-~~~~~~~~~~~~~~~~
+   quickstart/usage
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Examples
 
-  usecases/index
-
-Policy
-~~~~~~
+   quickstart/offhours
+   quickstart/tagCompliance
+   usecases/index
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Working with AWS Lambda
 
-   policy/index
+   policy/lambda
+   policy/mu
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Policies reference
+
+   policy/index.rst
+   filters
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contributing
+
+   contribute
+   developer   
 
 
 Indices and tables

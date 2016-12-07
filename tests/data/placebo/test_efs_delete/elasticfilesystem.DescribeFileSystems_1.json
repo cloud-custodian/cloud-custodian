@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "051a7685-b4b1-11e6-8cda-e73e53a6be2f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "051a7685-b4b1-11e6-8cda-e73e53a6be2f", 
+                "date": "Sun, 27 Nov 2016 14:51:46 GMT", 
+                "content-length": "357", 
+                "content-type": "application/json"
+            }
+        }, 
+        "FileSystems": [
+            {
+                "SizeInBytes": {
+                    "Timestamp": {
+                        "hour": 8, 
+                        "__class__": "datetime", 
+                        "month": 11, 
+                        "second": 59, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 27, 
+                        "minute": 59
+                    }, 
+                    "Value": 6144
+                }, 
+                "Name": "MyDocs", 
+                "CreationToken": "console-43c2e0a4-487f-4a6c-b699-a8523911dbf2", 
+                "CreationTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 46
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "FileSystemId": "fs-5e7fac17", 
+                "NumberOfMountTargets": 2, 
+                "LifeCycleState": "available", 
+                "OwnerId": "644160558196"
+            }
+        ]
+    }
+}

@@ -1,0 +1,340 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "Includes ports other than 80 and 443", 
+                "IpPermissions": [], 
+                "GroupName": "bad-ports", 
+                "VpcId": "vpc-aed2dec9", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-05eef27f"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-04eef27e"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-aed2dec9", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-04eef27e"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-3866f845"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-265ea740", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-3866f845"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-3966f844"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-595ea73f", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-3966f844"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "108.56.181.242/32"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-6c7fa917"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "launch-wizard-1 created 2016-10-11T08:37:50.939-04:00", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "launch-wizard-1", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-926a56e8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 3306, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "204.63.44.147/32"
+                            }
+                        ], 
+                        "ToPort": 3306, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-cd3d01b7"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 3306, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "204.63.44.142/32"
+                            }
+                        ], 
+                        "ToPort": 3306, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-1", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-314baa4c"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 3306, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "199.244.214.109/32"
+                            }
+                        ], 
+                        "ToPort": 3306, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-2", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-704f840d"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "for apps", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 60000, 
+                        "IpRanges": [], 
+                        "ToPort": 62000, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [
+                            {
+                                "VpcId": "vpc-265ea740", 
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-3066f84d", 
+                                "VpcPeeringConnectionId": "pcx-7fc05116", 
+                                "PeeringStatus": "active"
+                            }
+                        ]
+                    }
+                ], 
+                "GroupName": "web-tier", 
+                "VpcId": "vpc-595ea73f", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-3166f84c"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ac2ee03d-8a1b-4cea-9b74-cd58115d7c2d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 26 Nov 2016 15:11:01 GMT"
+            }
+        }
+    }
+}

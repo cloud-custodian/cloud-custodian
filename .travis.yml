@@ -1,4 +1,5 @@
 language: python
+sudo: false
 cache: pip
 env:
   # Region required, and Bypass credential lookup

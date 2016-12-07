@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "Version": "$LATEST", 
+                "CodeSha256": "S4GfM9GqG9jLOHBC/vhBARizHv0vTvhSkPbrDHL/J1E=", 
+                "FunctionName": "superduper", 
+                "VpcConfig": {
+                    "SubnetIds": [], 
+                    "SecurityGroupIds": []
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 216, 
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:superduper", 
+                "Handler": "lambda_function.lambda_handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 3, 
+                "LastModified": "2016-11-26T13:36:29.225+0000", 
+                "Runtime": "python2.7", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "636caeeb-b3dd-11e6-9533-035e8a1598d3", 
+            "HTTPHeaders": {
+                "date": "Sat, 26 Nov 2016 13:36:50 GMT", 
+                "x-amzn-requestid": "636caeeb-b3dd-11e6-9533-035e8a1598d3", 
+                "content-length": "576", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

@@ -1,13 +1,16 @@
 {
-    "status_code": 400, 
+    "status_code": 200, 
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 400, 
-            "RequestId": "8aa7a046-e2d9-11e5-a277-013d8210e78d"
-        }, 
-        "Error": {
-            "Message": "The specified log stream already exists", 
-            "Code": "ResourceAlreadyExistsException"
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4f3abba0-b5c6-11e6-aa71-497ec504b7c1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4f3abba0-b5c6-11e6-aa71-497ec504b7c1", 
+                "date": "Mon, 28 Nov 2016 23:56:41 GMT", 
+                "content-length": "0", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }
     }
 }
