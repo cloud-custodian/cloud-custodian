@@ -24,8 +24,19 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, get_account_id, type_schema
 
+
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+def get_account(session_factory):
+    session = local_session(session_factory)
+    client = session.client('iam')
+    aliases = client.list_account_aliases().get(
+        'AccountAliases', ('',))
+    name = aliases and aliases[0] or ""
+    return {'account_id': get_account_id(session),
+            'account_name': name}
 
 
 @resources.register('account')
@@ -34,27 +45,25 @@ class Account(ResourceManager):
     filter_registry = filters
     action_registry = actions
 
+    class resource_type(object):
+        id = 'account_id'
+        name = 'account_name'
+
+    def get_model(self):
+        return self.resource_type
+
     def resources(self):
-        session = local_session(self.session_factory)
-        client = session.client('iam')
-        return self.filter_resources(
-            [{'account_id': get_account_id(session),
-              'account_name': client.list_account_aliases(
-              ).get('AccountAliases', ('',))[0]}])
+        return self.filter_resources([get_account(self.session_factory)])
 
     def get_resources(self, resource_ids):
-        session = local_session(self.session_factory)
-        client = session.client('iam')
-        return [
-            {'account_id': get_account_id(session),
-             'account_name': client.list_account_aliases().get(
-                 'AccountAliases', ('',))[0]}]
+        return [get_account(self.session_factory)]
 
 
 @filters.register('check-cloudtrail')
 class CloudTrailEnabled(Filter):
-    """Is cloud trail enabled for this account, returns
-    annotated account resource if trail is not enabled.
+    """Verify cloud trail enabled for this account per specifications.
+
+    Returns an annotated account resource if trail is not enabled.
 
     :example:
 
@@ -177,7 +186,7 @@ class IAMSummary(ValueFilter):
     Example iam summary wrt to matchable fields::
 
       {
-    "UsersQuota": 5000,
+            "UsersQuota": 5000,
             "GroupsPerUserQuota": 10,
             "AttachedPoliciesPerGroupQuota": 10,
             "PoliciesQuota": 1000,
@@ -211,20 +220,22 @@ class IAMSummary(ValueFilter):
             "UserPolicySizeQuota": 2048
         }
 
-    :example:
+    For example to determine if an account has either not been
+    enabled with root mfa or has root api keys.
 
-        .. code-block: yaml
+    .. code-block: yaml
 
-            policies:
-              - name: mfa-disabled
-                resource: account
-                region: us-east-1
-                filters:
-                  - type: iam-summary
-                    key: AccountMFAEnabled
-                    value: false
-                    op: eq
-                    value_type: swap
+      policies:
+        - name: root-keys-or-no-mfa
+          resource: account
+          filters:
+            - or:
+              - type: iam-summary
+                key: AccountMFAEnabled
+                value: 0
+              - type: iam-summary
+                key: AccountAccessKeysPresent
+                value: 0
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
@@ -240,7 +251,7 @@ class IAMSummary(ValueFilter):
 
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
-    """Check an account's password policy for compliance
+    """Check an account's password policy
 
     :example:
 
