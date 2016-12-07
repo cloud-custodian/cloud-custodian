@@ -3,6 +3,21 @@ from .common import BaseTest
 
 class LambdaTest(BaseTest):
 
+    def test_delete(self):
+        factory = self.replay_flight_data('test_aws_lambda_delete')
+        p = self.load_policy({
+            'name': 'lambda-events',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': 'superduper'}],
+            'actions': [{'type': 'delete'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'superduper')
+        client = factory().client('lambda')
+        self.assertEqual(client.list_functions()['Functions'], [])
+
     def test_event_source(self):
         factory = self.replay_flight_data('test_aws_lambda_source')
         p = self.load_policy({

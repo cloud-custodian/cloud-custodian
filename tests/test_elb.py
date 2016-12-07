@@ -100,6 +100,24 @@ class ELBTagTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class ELBInstance(BaseTest):
+
+    def test_instance_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_elb_instance_filter')
+        policy = self.load_policy({
+            'name': 'elb-instance',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'instance',
+                 'key': 'ImageId',
+                 'value': 'ami-40d28157'}],
+            }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'balanced')
+
+
 class HealthCheckProtocolMismatchTest(BaseTest):
 
     def test_healthcheck_protocol_mismatch(self):

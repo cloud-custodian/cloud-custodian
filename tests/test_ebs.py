@@ -214,3 +214,30 @@ class TestKmsAlias(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VolumeId'], 'vol-14a3cd9d')
+
+
+class EbsFaultToleranceTest(BaseTest):
+
+    def test_ebs_fault_tolerant(self):
+        session = self.replay_flight_data('test_ebs_fault_tolerant')
+        policy = self.load_policy({
+            'name': 'ebs-fault-tolerant',
+            'resource': 'ebs',
+            'filters': ['fault-tolerant']
+        }, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VolumeId'], 'vol-c5eaa459')
+
+    def test_ebs_non_fault_tolerant(self):
+        session = self.replay_flight_data('test_ebs_non_fault_tolerant')
+        policy = self.load_policy({
+            'name': 'ebs-non-fault-tolerant',
+            'resource': 'ebs',
+            'filters': [{
+                'type': 'fault-tolerant',
+                'tolerant': False}]
+        }, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VolumeId'], 'vol-abdb8d37')
