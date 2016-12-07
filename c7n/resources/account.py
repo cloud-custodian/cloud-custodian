@@ -115,7 +115,7 @@ class CloudTrailEnabled(Filter):
 
 @filters.register('check-config')
 class ConfigEnabled(Filter):
-    """ Is config service enabled for this account
+    """Is config service enabled for this account
 
     :example:
 
@@ -240,7 +240,7 @@ class IAMSummary(ValueFilter):
 
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
-    """Check an account's password policy
+    """Check an account's password policy for compliance
 
     :example:
 
