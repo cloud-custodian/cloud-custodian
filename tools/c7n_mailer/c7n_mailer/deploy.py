@@ -36,9 +36,7 @@ def dispatch(event, context):
 def get_archive(config):
 
     required = ['ldap', 'jinja2', 'markupsafe']
-    remove = ['_ldap.so',
-              '_yaml.so',
-              'c7n.egg-link']
+    remove = ['_yaml.so', 'c7n.egg-link']
 
     def lib_filter(root, dirs, files):
         for f in tuple(files):
@@ -70,10 +68,6 @@ def get_archive(config):
 
     archive.add_contents('config.json', json.dumps(config))
     archive.add_contents('periodic.py', entry_source)
-    archive.add_contents(
-        '_ldap.so',
-        open(os.path.join(
-            os.path.dirname(sys.executable), '..', 'deps', '_ldap.so')).read())
 
     archive.close()
     return archive
