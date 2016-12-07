@@ -64,6 +64,20 @@ class CloudTrailEnabled(Filter):
     """Verify cloud trail enabled for this account per specifications.
 
     Returns an annotated account resource if trail is not enabled.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: account-cloudtrail-enabled
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-cloudtrail
+                    global-events: true
+                    multi-region: true
+                    running: true
     """
     schema = type_schema(
         'check-cloudtrail',
