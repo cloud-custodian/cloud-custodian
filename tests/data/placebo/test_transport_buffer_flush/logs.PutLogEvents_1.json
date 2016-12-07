@@ -1,13 +1,17 @@
 {
-    "status_code": 400, 
+    "status_code": 200, 
     "data": {
+        "nextSequenceToken": "49565922872534556717328883174015372270080969827623632962", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 400, 
-            "RequestId": "8ad36b5d-e2d9-11e5-8deb-e540c8247bdb"
-        }, 
-        "Error": {
-            "Message": "The given batch of log events has already been accepted. The next batch can be sent with sequenceToken: 49547819337610807837224084818942476068710828687556098530", 
-            "Code": "DataAlreadyAcceptedException"
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4f5150e6-b5c6-11e6-aa71-497ec504b7c1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4f5150e6-b5c6-11e6-aa71-497ec504b7c1", 
+                "date": "Mon, 28 Nov 2016 23:56:41 GMT", 
+                "content-length": "80", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }
     }
 }

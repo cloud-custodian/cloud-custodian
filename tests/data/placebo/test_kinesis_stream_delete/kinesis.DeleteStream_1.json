@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fcbe810e-552c-77a0-ac0a-50ef44a5fdd2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fcbe810e-552c-77a0-ac0a-50ef44a5fdd2", 
+                "content-length": "0", 
+                "x-amz-id-2": "/oiU6wti79SNzpEX1eDEhMyvURu7VxPb0B3S4PfKg0SmWk1XWaHLZ/V+BAFkef+Io1eBtpd39gogZOtqMD1V87lwSer09/jsVGw7Jlt5RsE=", 
+                "server": "Apache-Coyote/1.1", 
+                "date": "Sun, 27 Nov 2016 12:20:48 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

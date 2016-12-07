@@ -1,0 +1,79 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a5c02d47-b4a4-11e6-bb66-1f8536df0cd8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a5c02d47-b4a4-11e6-bb66-1f8536df0cd8", 
+                "x-amz-id-2": "bdkGttB7mjT4R3rkPKikNO25B2e1xfypDRK46fvqkqfexrxn0WeOxYY5UZTSVYeQ5Naj3tZa7g+OQIr3kxbPvax+spPymY3s", 
+                "content-length": "1357", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Sun, 27 Nov 2016 13:23:12 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "HasMoreDestinations": false, 
+            "VersionId": "1", 
+            "CreateTimestamp": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 47, 
+                "microsecond": 479000, 
+                "year": 2016, 
+                "day": 27, 
+                "minute": 1
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:644160558196:deliverystream/sock-index-hose", 
+            "DeliveryStreamStatus": "DELETING", 
+            "DeliveryStreamName": "sock-index-hose", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "ElasticsearchDestinationDescription": {
+                        "IndexName": "stocks", 
+                        "RetryOptions": {
+                            "DurationInSeconds": 300
+                        }, 
+                        "RoleARN": "arn:aws:iam::644160558196:role/stock_firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        }, 
+                        "TypeName": "ticker", 
+                        "S3BackupMode": "FailedDocumentsOnly", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": true, 
+                            "LogStreamName": "ElasticsearchDelivery", 
+                            "LogGroupName": "/aws/kinesisfirehose/sock-index-hose"
+                        }, 
+                        "DomainARN": "arn:aws:es:us-east-1:644160558196:domain/indexme", 
+                        "S3DestinationDescription": {
+                            "RoleARN": "arn:aws:iam::644160558196:role/stock_firehose_delivery_role", 
+                            "Prefix": "sock-index-hosed", 
+                            "BufferingHints": {
+                                "IntervalInSeconds": 300, 
+                                "SizeInMBs": 5
+                            }, 
+                            "EncryptionConfiguration": {
+                                "KMSEncryptionConfig": {
+                                    "AWSKMSKeyARN": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3"
+                                }
+                            }, 
+                            "CompressionFormat": "Snappy", 
+                            "CloudWatchLoggingOptions": {
+                                "Enabled": true, 
+                                "LogStreamName": "S3Delivery", 
+                                "LogGroupName": "/aws/kinesisfirehose/sock-index-hose"
+                            }, 
+                            "BucketARN": "arn:aws:s3:::c7n-test"
+                        }, 
+                        "IndexRotationPeriod": "OneMonth"
+                    }
+                }
+            ]
+        }
+    }
+}

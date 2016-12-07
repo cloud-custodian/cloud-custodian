@@ -245,6 +245,38 @@ class Snapshot(BaseAction):
             ClusterIdentifier=cluster['ClusterIdentifier'])
 
 
+@actions.register('enable-vpc-routing')
+class EnhancedVpcRoutine(BaseAction):
+
+    schema = type_schema(
+        'enable-vpc-routing',
+        value={'type': 'boolean'})
+
+    def process(self, clusters):
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for cluster in clusters:
+                futures.append(w.submit(
+                    self.process_vpc_routing,
+                    cluster))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception changing Redshift VPC routing  \n %s",
+                        f.exception())
+        return clusters
+
+    def process_vpc_routing(self, cluster):
+        current_routing = bool(cluster.get('EnhancedVpcRouting', False))
+        new_routing = self.data.get('value', True)
+
+        if current_routing != new_routing:
+            c = local_session(self.manager.session_factory).client('redshift')
+            c.modify_cluster(
+                ClusterIdentifier=cluster['ClusterIdentifier'],
+                EnhancedVpcRouting=new_routing)
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
 

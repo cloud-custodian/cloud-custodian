@@ -15,6 +15,8 @@ import logging
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -45,6 +47,22 @@ class Snapshot(QueryResourceManager):
 
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
+    """EBS Snapshot Age Filter
+
+    Filters an EBS snapshot based on the age of the snapshot (in days)
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: ebs-snapshots-week-old
+                resource: ebs-snapshot
+                filters:
+                  - type: age
+                    days: 7
+                    op: ge
+    """
 
     schema = type_schema(
         'age',
@@ -74,6 +92,24 @@ def _filter_ami_snapshots(self, snapshots):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
+    """Filter to remove snapshots of AMIs from results
+
+    This filter is 'true' by default.
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: delete-stale-snapshots
+                resource: ebs-snapshots
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                  - skip-ami-snapshots: true
+
+    """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
 
@@ -90,6 +126,22 @@ class SnapshotSkipAmiSnapshots(Filter):
 
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
+    """Deletes EBS snapshots
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: delete-stale-snapshots
+                resource: ebs-snapshots
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
@@ -138,6 +190,23 @@ class CopySnapshot(BaseAction):
     """Copy a snapshot across regions
 
     http://goo.gl/CP3dq
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: copy-snapshot-east-west
+                resource: ebs-snapshot
+                filters:
+                  - type: age
+                    days: 7
+                    op: le
+                actions:
+                  - type: copy
+                    target_region: us-west-2
+                    target_key: *target_kms_key*
+                    encrypted: true
     """
 
     schema = type_schema(
@@ -216,7 +285,18 @@ class EBS(QueryResourceManager):
 
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
-    """Filter volumes based on filtering on their attached instance"""
+    """Filter volumes based on filtering on their attached instance
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: instance-ebs-volumes
+                resource: ebs
+                filters:
+                  - instance
+    """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
 
@@ -252,6 +332,44 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(resources)
 
 
+@filters.register('fault-tolerant')
+class FaultTolerantSnapshots(Filter):
+    """
+    This filter will return any EBS volume that does/does not have a
+    snapshot within the last 7 days. 'Fault-Tolerance' in this instance
+    means that, in the event of a failure, the volume can be restored
+    from a snapshot with (reasonable) data loss
+
+    - name: ebs-volume-tolerance
+    - resource: ebs
+    - filters: [{
+        'type': 'fault-tolerant',
+        'tolerant': True}]
+    """
+    schema = type_schema(
+        'fault-tolerant',
+        tolerant={'type': 'boolean'})
+
+    check_id = 'H7IgTzjTYb'
+
+    def pull_check_results(self):
+        result = set()
+        client = local_session(self.manager.session_factory).client('support')
+        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
+        results = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en')['result']
+        for r in results['flaggedResources']:
+            result.update([r['metadata'][1]])
+        return result
+
+    def process(self, resources, event=None):
+        flagged = self.pull_check_results()
+        if self.data.get('tolerant', True):
+            return [r for r in resources if r['VolumeId'] not in flagged]
+        return [r for r in resources if r['VolumeId'] in flagged]
+
+
+
 @actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.
@@ -264,6 +382,22 @@ class CopyInstanceTags(BaseAction):
     instance tags gives us more semantic information to determine if
     their useful, as well letting us know the last time the volume
     was actually used.
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: ebs-copy-instance-tags
+                resource: ebs
+                filters:
+                  - type: value
+                    key: "Attachments[0].Device"
+                    value: not-null
+                actions:
+                  - type: copy-instance-tags
+                    tags:
+                      - Name
     """
 
     schema = type_schema(
@@ -381,6 +515,18 @@ class EncryptInstanceVolumes(BaseAction):
        - Delete unencrypted volume
     - Start Instance (if originally running)
 
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: encrypt-unencrypted-ebs
+                resource: ebs
+                filters:
+                  - Encrypted: false
+                actions:
+                  - type: encrypt-instance-volumes
+                    key: alias/encrypted
     """
 
     schema = type_schema(
@@ -597,6 +743,19 @@ class Delete(BaseAction):
     If the force boolean is true, we will detach an attached volume
     from an instance. Note this cannot be done for running instance
     root volumes.
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: delete-unattached-volumes
+                resource: ebs
+                filters:
+                  - Attachments: []
+                  - State: available
+                actions:
+                  - delete
     """
     schema = type_schema('delete', force={'type': 'boolean'})
 

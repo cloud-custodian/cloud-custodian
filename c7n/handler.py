@@ -50,7 +50,9 @@ class Config(dict):
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': True,
-            'output_dir': '/tmp/' + str(uuid.uuid4()),
+            'output_dir': os.environ.get(
+                'C7N_OUTPUT_DIR',
+                '/tmp/' + str(uuid.uuid4())),
             'cache_period': 0,
             'dryrun': False})
         d.update(kw)
@@ -68,8 +70,7 @@ def dispatch_event(event, context):
     if error:
         log.debug("Skipping failed operation: %s" % error)
         return
-
     policies = load(Config.empty(), 'config.json', format='json')
     for p in policies:
         p.push(event, context)
-
+    return True

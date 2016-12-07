@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('efs')
@@ -25,3 +27,25 @@ class ElasticFileSystem(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         dimension = None
+
+
+@ElasticFileSystem.action_registry.register('delete')
+class Delete(Action):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        self.unmount_filesystems(resources)
+        retry = get_retry(('FileSystemInUse',), 12)
+        for r in resources:
+            retry(client.delete_file_system, FileSystemId=r['FileSystemId'])
+
+    def unmount_filesystems(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        for r in resources:
+            if not r['NumberOfMountTargets']:
+                continue
+            for t in client.describe_mount_targets(
+                    FileSystemId=r['FileSystemId'])['MountTargets']:
+                client.delete_mount_target(MountTargetId=t['MountTargetId'])

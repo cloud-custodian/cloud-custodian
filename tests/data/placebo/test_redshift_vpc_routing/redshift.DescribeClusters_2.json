@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "PubliclyAccessible": false, 
+                "MasterUsername": "user1", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-f9cc4d9f"
+                    }
+                ], 
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSEJJfDYaki91a7qhLOnsTnRLjZ40OreQv8aJ5R1Mdy+cZ6nziGKaUBGnQVaS7RcTsX4+nWxks9UdM4uVe5/Md9MCK3LKwaZOT7a0vBZ2NULIhHVpZyu5gDSbcE1ylZvfVfB4SNW6nsWL51IEFRsL0gYjBnwQ0VpwpA9icy0kGeKJ+7gQMyLAZH8kYZBk4cdeVFCHUtaShcTn45/7dsfwj5bFdG1BHfoktBS6M9eb8N2NqTlDkSO/oxYZqCGlQK+UiuagK7ZT4kBll/ybDJ5vtBmOLUJ5w2FVB+GS2pv9nag9xZRFG1HHH3UjPoVyxdg70WbDiJSN9/juojrTBBbO/ Amazon-Redshift\n", 
+                "NumberOfNodes": 1, 
+                "PendingModifiedValues": {
+                    "EnhancedVpcRouting": true
+                }, 
+                "VpcId": "vpc-4a9ff72e", 
+                "ClusterVersion": "1.0", 
+                "Tags": [], 
+                "AutomatedSnapshotRetentionPeriod": 1, 
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "default.redshift-1.0", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "PreferredMaintenanceWindow": "wed:13:00-wed:13:30", 
+                "Endpoint": {
+                    "Port": 5439, 
+                    "Address": "kit-test-1.caezprad5nrp.us-west-2.redshift.amazonaws.com"
+                }, 
+                "IamRoles": [], 
+                "AllowVersionUpgrade": true, 
+                "ClusterCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 38, 
+                    "microsecond": 348000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 15
+                }, 
+                "ClusterSubnetGroupName": "default", 
+                "EnhancedVpcRouting": false, 
+                "ClusterSecurityGroups": [], 
+                "ClusterIdentifier": "kit-test-1", 
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED", 
+                        "PrivateIPAddress": "172.31.19.41", 
+                        "PublicIPAddress": "35.163.238.208"
+                    }
+                ], 
+                "AvailabilityZone": "us-west-2a", 
+                "NodeType": "dc1.large", 
+                "Encrypted": false, 
+                "ClusterRevisionNumber": "1115", 
+                "ClusterStatus": "modifying"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f183ad21-aac0-11e6-89bb-83d10ab8eb9a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f183ad21-aac0-11e6-89bb-83d10ab8eb9a", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2798", 
+                "content-type": "text/xml", 
+                "date": "Mon, 14 Nov 2016 23:20:34 GMT"
+            }
+        }
+    }
+}

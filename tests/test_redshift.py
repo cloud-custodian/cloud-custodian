@@ -96,7 +96,7 @@ class TestRedshift(BaseTest):
                  'value': 'c7n'}],
             'actions': [
                 {'type': 'mark-for-op', 'days': 30,
-                'op': 'delete'}]},
+                 'op': 'delete'}]},
             session_factory=factory)
 
         resources = p.run()
@@ -182,6 +182,32 @@ class TestRedshift(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_redshift_vpc_routing(self):
+        factory = self.replay_flight_data('test_redshift_vpc_routing')
+        client = factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-vpc-routing',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'value',
+                 'key': 'EnhancedVpcRouting',
+                 'value': True}],
+            'actions': [{'type': 'enable-vpc-routing', 'value': False}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Ensure that the cluster starts to modify EnhancedVpcRouting value.
+        response = client.describe_clusters(
+            ClusterIdentifier=resources[0]['ClusterIdentifier'])
+        cluster = response['Clusters'][0]
+        self.assertEquals(
+            cluster['ClusterIdentifier'], resources[0]['ClusterIdentifier'])
+        self.assertEquals(
+            cluster['ClusterStatus'], 'modifying')
+        self.assertTrue(
+            cluster['PendingModifiedValues']['EnhancedVpcRouting'])
+
 
 class TestRedshiftSnapshot(BaseTest):
 
@@ -241,7 +267,7 @@ class TestRedshiftSnapshot(BaseTest):
                  'value': 'c7n-snapshot'}],
             'actions': [
                 {'type': 'mark-for-op', 'days': 30,
-                'op': 'delete'}]},
+                 'op': 'delete'}]},
             session_factory=factory)
 
         resources = p.run()
