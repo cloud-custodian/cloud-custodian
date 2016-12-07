@@ -55,6 +55,20 @@ class Account(ResourceManager):
 class CloudTrailEnabled(Filter):
     """Is cloud trail enabled for this account, returns
     annotated account resource if trail is not enabled.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: account-cloudtrail-enabled
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-cloudtrail
+                    global-events: true
+                    multi-region: true
+                    running: true
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -102,6 +116,20 @@ class CloudTrailEnabled(Filter):
 @filters.register('check-config')
 class ConfigEnabled(Filter):
     """ Is config service enabled for this account
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: account-check-config-services
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-config
+                    all-resources: true
+                    global-resources: true
+                    running: true
     """
 
     schema = type_schema(
@@ -183,6 +211,20 @@ class IAMSummary(ValueFilter):
             "UserPolicySizeQuota": 2048
         }
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: mfa-disabled
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: iam-summary
+                    key: AccountMFAEnabled
+                    value: false
+                    op: eq
+                    value_type: swap
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
@@ -199,6 +241,23 @@ class IAMSummary(ValueFilter):
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
     """Check an account's password policy
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: password-policy-check
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: password-policy
+                    key: MinimumPasswordLength
+                    value: 10
+                    op: ge
+                  - type: password-policy
+                    key: RequireSymbols
+                    value: true
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
 
@@ -251,6 +310,19 @@ class ServiceLimit(Filter):
       - service: SES limit: Daily sending quota
       - service: VPC limit: VPCs
       - service: VPC limit: VPC Elastic IP addresses (EIPs)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: account-service-limits
+                resource: account
+                filters:
+                  - type: service-limit
+                    services:
+                      - IAM
+                    threshold: 1.0
     """
 
     schema = type_schema(
