@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# python ldap rhel 7.2 compile deps
-# yum install -y gcc openssl-devel openldap-devel
-# pip install python-ldap
-
-import ldap
 import logging
 import os
+from ldap3 import (
+    Connection,
+    Server,
+)
+from ldap3.core.exceptions import LDAPSocketOpenError
 
 
 log = logging.getLogger('custodian.ldap')
@@ -27,22 +26,22 @@ CONN = None
 
 
 def get_connection(ldap_uri, bind_user, bind_password):
-    conn = ldap.initialize(ldap_uri)
-    conn.set_option(ldap.OPT_REFERRALS, 0)
-    conn.set_option(ldap.OPT_NETWORK_TIMEOUT, 30)
-    conn.protocol_version = 3
-
     if not (bind_user and bind_password):
         if 'SSO_USER' in os.environ:
             bind_user = os.environ['SSO_USER']
             bind_password = os.environ['SSO_PASS']
         else:
             raise ValueError("missing ldap credentials")
+    server = Server(ldap_uri)
     try:
-        result = conn.simple_bind_s(bind_user, bind_password)
-    except ldap.SERVER_DOWN:
-        return None
-
+        conn = Connection(
+            server, user=bind_user, password=bind_password,
+            auto_bind=True,
+            receive_timeout=30,
+            auto_referrals=False,
+        )
+    except LDAPSocketOpenError:
+        conn = None
     return conn
 
 
@@ -68,21 +67,23 @@ def get_user(eid, bind_user=None, bind_password=None,
     if manager:
         attributes.append('manager')
 
-    query = 'sAMAccountName={0}'.format(eid)
-    ldap_result_id = CONN.search(
-        base_dn, ldap.SCOPE_SUBTREE, query, attributes)
-    ok, results = CONN.result(ldap_result_id, 0)
-    if ok != ldap.RES_SEARCH_ENTRY:
-        log.warning("userid not found %s" % (eid))
+    query = '(sAMAccountName={0})'.format(eid)
+    CONN.search(base_dn, query, attributes=attributes)
+    if len(CONN.entries) == 0:
+        log.warning("userid not found %s", eid)
+        return None
+    if len(CONN.entries) > 1:
+        log.warning("too many results for search %s", query)
         return None
 
-    cn, info = results[0]
-    info = {k: v[0] for k, v in info.items()}
+    entry = CONN.entries[0]
+    info = {attr.key: attr.value for attr in entry}
 
     if manager:
         manager_eid = info['manager'].split(',', 1)[0].split('=')[1]
         manager = get_user(manager_eid, manager=False)
-        info['manager_email'] = manager['mail']
-        info['manager_name'] = manager['displayName']
+        if manager is not None:
+            info['manager_email'] = manager['mail']
+            info['manager_name'] = manager['displayName']
         info.pop('manager')
     return info
