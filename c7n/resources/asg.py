@@ -94,6 +94,7 @@ class LaunchConfigFilterBase(object):
 @filters.register('security-group')
 class SecurityGroupFilter(
         net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
+    """Filters ASG based on security group"""
 
     RelatedIdsExpression = ""
 
@@ -111,6 +112,7 @@ class SecurityGroupFilter(
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
+    """Filters ASG based on associated subnet"""
 
     RelatedIdsExpression = ""
 
@@ -124,7 +126,20 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
-    """Filter asg by launch config attributes."""
+    """Filter asg by launch config attributes.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-launch-config-xyz
+                resource: asg
+                filters:
+                  - type: launch-config
+                    key: ImageId
+                    value: ami-12ab34cd
+    """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
 
@@ -266,6 +281,16 @@ class ValidConfigFilter(ConfigValidFilter):
     workflows.
 
     See details on the invalid filter for a list of checks made.
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: asg-valid-config
+                resource: asg
+                filters:
+                  - valid
     """
 
     schema = type_schema('valid')
@@ -291,6 +316,16 @@ class InvalidConfigFilter(ConfigValidFilter):
 
     Internally this tries to reuse other resource managers for better
     cache utilization.
+
+    :example:
+
+        .. code-base: yaml
+
+            policies:
+              - name: asg-invalid-config
+                resource: asg
+                filters:
+                  - invalid
     """
     schema = type_schema('invalid')
 
@@ -306,6 +341,17 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
     """Check if an asg is configured to have unencrypted volumes.
 
     Checks both the ami snapshots and the launch configuration.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-unencrypted
+                resource: asg
+                filters:
+                  - type: not-encrypted
+                    exclude_image: true
     """
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     images = unencrypted_configs = unencrypted_images = None
@@ -427,7 +473,20 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
-    """Filter asg by image age."""
+    """Filter asg by image age (in days).
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-expired
+                resource: asg
+                filters:
+                  - type: image-age
+                    days: 90
+                    op: ge
+    """
 
     date_attribute = "CreationDate"
     schema = type_schema(
@@ -457,6 +516,21 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
 
 @filters.register('vpc-id')
 class VpcIdFilter(ValueFilter):
+    """Filters ASG based on the VpcId
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-vpc-xyz
+                resource: asg
+                filters:
+                  - type: vpc-id
+                    key: VpcId
+                    value: vpc-12ab34cd
+                    op: eq
+    """
 
     schema = type_schema(
         'vpc-id', rinherit=ValueFilter.schema)
@@ -494,6 +568,25 @@ class VpcIdFilter(ValueFilter):
 
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
+    """Action to trim the number of tags to avoid hitting tag limits
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-tag-trim
+                resource: asg
+                filters:
+                  - type: tag-count
+                    count: 10
+                actions:
+                  - type: tag-trim
+                    space: 1
+                    preserve:
+                      - OwnerName
+                      - OwnerContact
+    """
 
     max_tag_count = 10
 
@@ -510,6 +603,18 @@ class GroupTagTrim(TagTrim):
 
 @filters.register('capacity-delta')
 class CapacityDelta(Filter):
+    """Filter returns ASG that have less instances than desired or required
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-capacity-delta
+                resource: asg
+                filters:
+                  - capacity-delta
+    """
 
     schema = type_schema('size-delta')
 
@@ -521,6 +626,23 @@ class CapacityDelta(Filter):
 
 @actions.register('resize')
 class Resize(BaseAction):
+    """Action to resize the min/max instances in an ASG
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-resize
+                resource: asg
+                filters:
+                  - type: value
+                    key: MinSize
+                    value: 2
+                actions:
+                  - type: resize
+                    desired_size: 4
+    """
 
     schema = type_schema(
         'resize',
@@ -555,6 +677,21 @@ class Resize(BaseAction):
 @actions.register('untag')
 @actions.register('unmark')
 class RemoveTag(BaseAction):
+    """Action to remove tag/tags from an ASG
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-remove-unnecessary-tags
+                resource: asg
+                filters:
+                  - "tag:UnnecessaryTag": present
+                actions:
+                  - type: remove-tag
+                    key: UnnecessaryTag
+    """
 
     schema = type_schema(
         'remove-tag',
@@ -595,6 +732,23 @@ class RemoveTag(BaseAction):
 @actions.register('tag')
 @actions.register('mark')
 class Tag(BaseAction):
+    """Action to add a tag to an ASG
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-add-owner-tag
+                resource: asg
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+                    propagate: true
+    """
 
     schema = type_schema(
         'tag',
@@ -652,6 +806,21 @@ class PropagateTags(BaseAction):
 
     This action exists to do that, and can also trim older tags
     not present on the asg anymore that are present on instances.
+
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-propagate-required
+                resource: asg
+                filters:
+                  - "tag:OwnerName": present
+                actions:
+                  - type: propagate-tags
+                    tags:
+                      - OwnerName
     """
 
     schema = type_schema(
@@ -747,6 +916,21 @@ class PropagateTags(BaseAction):
 @actions.register('rename-tag')
 class RenameTag(BaseAction):
     """Rename a tag on an AutoScaleGroup.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-rename-owner-tag
+                resource: asg
+                filters:
+                  - "tag:OwnerNames": present
+                actions:
+                  - type: rename-tag
+                    propagate: true
+                    source: OwnerNames
+                    dest: OwnerName
     """
 
     schema = type_schema(
@@ -821,6 +1005,26 @@ class RenameTag(BaseAction):
 
 @actions.register('mark-for-op')
 class MarkForOp(Tag):
+    """Action to create a delayed action for a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-suspend-schedule
+                resource: asg
+                filters:
+                  - type: value
+                    key: MinSize
+                    value: 2
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_suspend
+                    message: "Suspending: {op}@{action_date}"
+                    op: suspend
+                    days: 7
+    """
 
     schema = type_schema(
         'mark-for-op',
@@ -856,6 +1060,20 @@ class MarkForOp(Tag):
 
 @actions.register('suspend')
 class Suspend(BaseAction):
+    """Action to suspend ASG processes and instances
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-suspend-processes
+                resource: asg
+                filters:
+                  - "tag:SuspendTag": present
+                actions:
+                  - suspend
+    """
 
     schema = type_schema('suspend')
 
@@ -904,6 +1122,22 @@ class Suspend(BaseAction):
 @actions.register('resume')
 class Resume(BaseAction):
     """Resume a suspended autoscale group and its instances
+
+    Parameter 'delay' is the amount of time (in seconds) to wait between
+    resuming each instance (default value: 30)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-resume-processes
+                resource: asg
+                filters:
+                  - "tag:Resume": present
+                actions:
+                  - type: resume
+                    delay: 300
     """
     schema = type_schema('resume', delay={'type': 'number'})
 
@@ -960,6 +1194,25 @@ class Resume(BaseAction):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete an ASG
+
+    The 'force' parameter is needed when deleting an ASG that has instances
+    attached to it.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-unencrypted
+                resource: asg
+                filters:
+                  - type: not-encrypted
+                    exclude_image: true
+                actions:
+                  - type: delete
+                    force: true
+    """
 
     schema = type_schema('delete', force={'type': 'boolean'})
 
@@ -1001,6 +1254,20 @@ class LaunchConfig(QueryResourceManager):
 
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
+    """Filter ASG launch configuration by age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-launch-config-old
+                resource: launch-config
+                filters:
+                  - type: age
+                    days: 90
+                    op: ge
+    """
 
     date_attribute = "CreatedTime"
     schema = type_schema(
@@ -1011,6 +1278,18 @@ class LaunchConfigAge(AgeFilter):
 
 @LaunchConfig.filter_registry.register('unused')
 class UnusedLaunchConfig(Filter):
+    """Filters all launch configurations that are current not being used
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-unused-launch-config
+                resource: launch-config
+                filters:
+                  - unused
+    """
 
     schema = type_schema('unused')
 
@@ -1027,6 +1306,20 @@ class UnusedLaunchConfig(Filter):
 
 @LaunchConfig.action_registry.register('delete')
 class LaunchConfigDelete(BaseAction):
+    """Filters all launch configurations that are current not being used
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-unused-launch-config-delete
+                resource: launch-config
+                filters:
+                  - unused
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
