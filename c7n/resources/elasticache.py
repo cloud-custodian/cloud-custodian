@@ -122,7 +122,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 # added mark-for-op
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
-    """Action to create an action to occur at a later date
+    """Action to specify an action to occur at a later date
 
     :example:
 
@@ -156,7 +156,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 @actions.register('remove-tag')
 @actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
-    """Action to remove tag/tags on a resource
+    """Action to remove tag(s) on a resource
 
     :example:
 
@@ -425,7 +425,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
 # added mark-for-op
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
-    """Action to create a delayed action on an elasticache snapshot
+    """Action to specify a delayed action on an elasticache snapshot
 
     :example:
 
@@ -461,7 +461,7 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
 @ElastiCacheSnapshot.action_registry.register('unmark')
 class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
-    """Action to remove tag/tags from an elasticache snapshot
+    """Action to remove tag(s) from an elasticache snapshot
 
     :example:
 
