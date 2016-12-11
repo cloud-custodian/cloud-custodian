@@ -241,6 +241,16 @@ def _get_available_engine_upgrades(client, major=False):
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: default-vpc-rds
+                resource: rds
+                filters:
+                  - default-vpc
     """
 
     schema = type_schema('default-vpc')
@@ -283,7 +293,22 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
+    """Mark a RDS instance for specific custodian action
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: mark-for-delete
+                resource: rds
+                filters:
+                  - type: default-vpc
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema)
 
@@ -301,6 +326,27 @@ class TagDelayedAction(tags.TagDelayedAction):
 
 @actions.register('auto-patch')
 class AutoPatch(BaseAction):
+    """Toggle AutoMinorUpgrade flag on RDS instance
+
+    'window' parameter needs to be in the format 'ddd:hh:mm-ddd:hh:mm' and
+    have at least 30 minutes between start & end time.
+    If 'window' is not specified, AWS will assign a random maintenance window
+    to each instance selected.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: enable-rds-autopatch
+                resource: rds
+                filters:
+                  - AutoMinorVersionUpgrade: false
+                actions:
+                  - type: auto-patch
+                    minor: true
+                    window: Mon:23:00-Tue:01:00
+    """
 
     schema = type_schema(
         'auto-patch',
@@ -330,6 +376,17 @@ class UpgradeAvailable(Filter):
     This will also annotate the rds instance with 'target_engine' which is
     the most recent version of the engine available
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-upgrade-available
+                resource: rds
+                filters:
+                  - upgrade-available
+                    major: false
+
     """
 
     schema = type_schema('upgrade-available',
@@ -358,6 +415,27 @@ class UpgradeAvailable(Filter):
 
 @actions.register('upgrade')
 class UpgradeMinor(BaseAction):
+    """Upgrades a RDS instance to the latest major/minor version available
+
+    Use of the 'immediate' flag (default False) will automatically upgrade
+    the RDS engine disregarding the existing maintenance window.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: upgrade-rds-minor
+                resource: rds
+                filters:
+                  - name: upgrade-available
+                    major: false
+                actions:
+                  - type: upgrade
+                    major: false
+                    immediate: false
+
+    """
 
     schema = type_schema(
         'upgrade', major={'type': 'boolean'}, immediate={'type': 'boolean'})
@@ -390,6 +468,22 @@ class UpgradeMinor(BaseAction):
 @actions.register('tag')
 @actions.register('mark')
 class Tag(tags.Tag):
+    """Mark/tag a RDS instance with a key/value
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-owner-tag
+                resource: rds
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
 
     concurrency = 2
     batch_size = 5
@@ -405,6 +499,21 @@ class Tag(tags.Tag):
 @actions.register('remove-tag')
 @actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
+    """Removes a tag or set of tags from RDS instances
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-unmark-instances
+                resource: rds
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: unmark
+                    tags: ["ExpiredTag"]
+    """
 
     concurrency = 2
     batch_size = 5
@@ -430,6 +539,24 @@ class TagTrim(tags.TagTrim):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Deletes selected RDS instances
+
+    This will delete RDS instances. It is recommended to apply with a filter
+    to avoid deleting all RDS instances in the account.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-delete
+                resource: rds
+                filters:
+                  - default-vpc
+                actions:
+                  - type: delete
+                    skip-snapshot: true
+    """
 
     schema = {
         'type': 'object',
@@ -465,6 +592,18 @@ class Delete(BaseAction):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Creates a manual snapshot of a RDS instance
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot
+                resource: rds
+                actions:
+                  - snapshot
+    """
 
     schema = {'properties': {
         'type': {
@@ -498,6 +637,25 @@ class Snapshot(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
+    """Sets the 'BackupRetentionPeriod' value for automated snapshots
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: value
+                    key: BackupRetentionPeriod
+                    value: 7
+                    op: lt
+                actions:
+                  - type: retention
+                    days: 7
+                    copy-tags: true
+    """
 
     date_attribute = "BackupRetentionPeriod"
     schema = type_schema(
@@ -632,6 +790,22 @@ def _rds_snap_tags(
 
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
+    """Filters RDS snapshots based on age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-expired
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
 
     schema = type_schema(
         'age', days={'type': 'number'},
@@ -642,6 +816,24 @@ class RDSSnapshotAge(AgeFilter):
 
 @RDSSnapshot.action_registry.register('tag')
 class RDSSnapshotTag(tags.Tag):
+    """Action to tag a RDS snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-add-owner
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 7
+                    op: le
+                actions:
+                  - type: tag
+                    key: rds_owner
+                    value: rds_owner_name
+    """
 
     concurrency = 2
     batch_size = 5
@@ -656,6 +848,24 @@ class RDSSnapshotTag(tags.Tag):
 
 @RDSSnapshot.action_registry.register('mark-for-op')
 class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
+    """Mark RDS snapshot resource for an operation at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-stale-snapshots
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 21
+                    op: eq
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
 
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema,
@@ -673,6 +883,22 @@ class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
 @RDSSnapshot.action_registry.register('remove-tag')
 @RDSSnapshot.action_registry.register('unmark')
 class RDSSnapshotRemoveTag(tags.RemoveTag):
+    """Removes a tag/set of tags from a RDS snapshot resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-unmark
+                resource: rds-snapshot
+                filters:
+                  - "tag:rds_owner": present
+                actions:
+                  - type: remove-tag
+                    tags:
+                      - rds_owner
+    """
 
     concurrency = 2
     batch_size = 5
@@ -688,6 +914,22 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
 
 @RDSSnapshot.action_registry.register('delete')
 class RDSSnapshotDelete(BaseAction):
+    """Deletes a RDS snapshot resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-delete-stale
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
 
     def process(self, snapshots):
         log.info("Deleting %d rds snapshots", len(snapshots))

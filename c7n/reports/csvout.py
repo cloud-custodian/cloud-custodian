@@ -38,11 +38,6 @@ CLI Usage
      -p ec2-tag-compliance-terminate -v > terminated.csv
 
 
-TODO
-
-The type specific formatting needs easy customization, 
-a config file for the report or custodian, or named formats
-with format spec on the cli are all viable.
 """
 
 from concurrent.futures import as_completed

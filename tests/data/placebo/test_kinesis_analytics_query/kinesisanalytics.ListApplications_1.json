@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "HasMoreApplications": false, 
+        "ApplicationSummaries": [
+            {
+                "ApplicationName": "sock-app", 
+                "ApplicationStatus": "RUNNING", 
+                "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/sock-app"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fa66b5d2-b499-11e6-8d08-ad6338587ef4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fa66b5d2-b499-11e6-8d08-ad6338587ef4", 
+                "date": "Sun, 27 Nov 2016 12:06:49 GMT", 
+                "content-length": "203", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

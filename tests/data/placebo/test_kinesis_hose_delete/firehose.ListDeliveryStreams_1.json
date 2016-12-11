@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DeliveryStreamNames": [
+            "sock-index-hose"
+        ], 
+        "HasMoreDeliveryStreams": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4465e64-b4a4-11e6-be1b-0ddaefba9e07", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a4465e64-b4a4-11e6-be1b-0ddaefba9e07", 
+                "x-amz-id-2": "m5nSnUaoKVcimIOaQ4IvmqNqF8WryhCJjxOeGhN/rk2L+df9k25mIdqS4NimMTZCRLF5uzCqGQZfb6QyGlVlrD8t5BGP0mMi", 
+                "content-length": "74", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Sun, 27 Nov 2016 13:23:09 GMT"
+            }
+        }
+    }
+}

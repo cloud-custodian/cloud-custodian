@@ -157,7 +157,7 @@ class BucketDelete(BaseTest):
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
-            s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
+            s3.DeleteBucket, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         session_factory = self.replay_flight_data('test_s3_delete_bucket')
         session = session_factory()

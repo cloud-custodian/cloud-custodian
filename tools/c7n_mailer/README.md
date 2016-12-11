@@ -111,10 +111,6 @@ Clone the repository:
 ```
 $ git clone https://github.com/capitalone/cloud-custodian
 ```
-Fix the include path for building `python-ldap`:
-```
-$ sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include/sasl /usr/local/include/sasl
-```
 Install dependencies (with virtualenv):
 ```
 $ virtualenv c7n_mailer

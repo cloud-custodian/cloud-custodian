@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "BoxUsage": "0.0055590278", 
+            "RequestId": "e03cf9d5-a12d-a7e9-138a-16fba5f5bc8f", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "Amazon SimpleDB", 
+                "connection": "keep-alive", 
+                "date": "Sat, 26 Nov 2016 16:37:15 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
