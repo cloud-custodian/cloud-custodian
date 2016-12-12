@@ -310,6 +310,9 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
     """Filter to pull ELB with mismatched health check protocols
 
+    Mismatched health check protocol is where the protocol on the target group
+    does not match the load balancer health check protocol
+
     :example:
 
         .. code-block: yaml
