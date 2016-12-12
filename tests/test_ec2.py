@@ -516,12 +516,18 @@ class TestSecurityGroupFilter(BaseTest):
             'name': 'restrict-sensitive-sg',
             'resource': 'ec2',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': '.*PROD-ONLY.*', 'op': 'regex'},
-                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
-                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
+                {'or': [
+                    {'and': [
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
+                    ]},
+                    {'type': 'value', 'key': 'IamInstanceProfile', 'value': 'absent'}
+                ]},
+                {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'},
+
             ]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceId'], 'i-DEADBEEF')
+        self.assertEqual(resources[0]['InstanceId'], 'i-0dd3919bc5bac1ea8')
 
