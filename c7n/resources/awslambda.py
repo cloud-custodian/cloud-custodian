@@ -30,18 +30,38 @@ class AWSLambda(QueryResourceManager):
 
 @AWSLambda.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+    """Security group filter"""
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
 
 
 @AWSLambda.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
+    """Subnet filter"""
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
 @AWSLambda.filter_registry.register('event-source')
 class LambdaEventSource(ValueFilter):
+    """Filter Lambda functions by event source
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-iot-delete
+                resource: lambda
+                filters:
+                  - type: event-source
+                    value: 'iot.amazonaws.com'
+                    key: ''
+                    value_type: swap
+                    op: in
+                actions:
+                  - type: delete
+    """
 
     annotation_key = "c7n.EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
@@ -86,6 +106,19 @@ class LambdaEventSource(ValueFilter):
 
 @AWSLambda.filter_registry.register('cross-account')
 class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filters lambda functions with cross-account permissions
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-cross-account
+                resource: lambda
+                filters:
+                  - type: cross-account
+                    whitelist: *allowed-accounts
+    """
 
     def process(self, resources, event=None):
 
@@ -113,6 +146,25 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 @AWSLambda.action_registry.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
+
+    It is recommended to apply a filter to the delete function to avoid
+    deletion of all lambda functions.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-iot-delete
+                resource: lambda
+                filters:
+                  - type: event-source
+                    value: 'iot.amazonaws.com'
+                    key: ''
+                    value_type: swap
+                    op: in
+                actions:
+                  - type: delete
     """
     schema = type_schema('delete')
 
