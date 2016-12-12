@@ -36,6 +36,8 @@ Explore Cloud Custodian
 
   $ custodian schema ebs.actions
 
+  ::
+
   $ custodian schema ecs.filters.instance-age
 
 

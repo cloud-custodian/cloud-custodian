@@ -62,6 +62,19 @@ class LogGroup(QueryResourceManager):
 
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
+    """Action to set the retention period (in days) for CloudWatch log groups
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-set-log-group-retention
+                resource: log-group
+                actions:
+                  - type: retention
+                    days: 200
+    """
 
     schema = type_schema(
         'retention', days={'type': 'integer'})
@@ -77,6 +90,21 @@ class Retention(BaseAction):
 
 @LogGroup.action_registry.register('delete')
 class Delete(BaseAction):
+    """
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-log-group
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 182.5
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
@@ -88,6 +116,19 @@ class Delete(BaseAction):
 
 @LogGroup.filter_registry.register('last-write')
 class LastWriteDays(Filter):
+    """Filters CloudWatch log groups by last write
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-stale-groups
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 60
+    """
 
     schema = type_schema(
         'last-write', days={'type': 'number'})
