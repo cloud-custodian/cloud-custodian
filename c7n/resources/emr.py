@@ -75,6 +75,23 @@ class EMRCluster(QueryResourceManager):
 
 @actions.register('terminate')
 class Terminate(BaseAction):
+    """Action to terminate EMR cluster(s)
+
+    It is recommended to apply a filter to the terminate action to avoid
+    termination of all EMR clusters
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-terminate
+                resource: emr
+                filters:
+                  - "tag:ExpiredEmrTag": present
+                actions:
+                  - terminate
+    """
 
     schema = type_schema('terminate')
 
