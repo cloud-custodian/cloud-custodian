@@ -505,62 +505,23 @@ class TestActions(unittest.TestCase):
 
 class TestSecurityGroupFilter(BaseTest):
     def test_security_group_type(self):
+        # Test conditions:
+        #   - running two instances; one with TestProductionInstanceProfile and one with none
+        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to both test instances
         session_factory = self.replay_flight_data(
             'test_ec2_security_group_filter')
-        client = session_factory().client('ec2')
 
-        vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
-        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
-
-        subnet_id = client.create_subnet(
-            DryRun=False,
-            VpcId=vpc_id,
-            CidrBlock='10.42.0.1/24'
-        )['Subnet']['SubnetId']
-        self.addCleanup(client.delete_subnet, SubnetId=subnet_id)
-
-        sg_id = client.create_security_group(
-            GroupName="CUSTODIAN-PROD-ONLY-WEB-SG",
-            VpcId=vpc_id,
-            Description="for production use only")['GroupId']
-        self.addCleanup(client.delete_security_group, GroupId=sg_id)
-
-        # attach the sg to known running instance
-        # ami_id: (
-        clean_ec2_id = client.run_instances(
-            DryRun=False,
-            ImageId='ami-b73b63a0',
-            SecurityGroupIds=[sg_id],
-            MinCount = 1,
-            MaxCount = 1,
-            InstanceType='t2.micro',
-            IamInstanceProfile={'Name': 'TestProductionInstanceProfile'},
-            SubnetId=subnet_id,
-            InstanceInitiatedShutdownBehavior='stop'
-        )['Instances'][0]['InstanceId']
-
-        bad_ec2_id = client.run_instances(
-            DryRun=False,
-            ImageId='ami-b73b63a0',
-            SecurityGroupIds=[sg_id],
-            MinCount = 1,
-            MaxCount = 1,
-            InstanceType='t2.micro',
-            SubnetId=subnet_id,
-            InstanceInitiatedShutdownBehavior='stop'
-        )['Instances'][0]['InstanceId']
-        self.addCleanup(client.terminate_instances, InstanceIds=[clean_ec2_id, bad_ec2_id])
-
-
+        # Catch on anything that uses the *PROD-ONLY* security groups but isn't in a prod role
         policy = self.load_policy({
             'name': 'restrict-sensitive-sg',
             'resource': 'ec2',
             'filters': [
                 {'type': 'security-group', 'key': 'GroupName', 'value': '.*PROD-ONLY.*', 'op': 'regex'},
-                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'}
+                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
+                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
             ]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceId'], bad_ec2_id)
+        self.assertEqual(resources[0]['InstanceId'], 'i-DEADBEEF')
 

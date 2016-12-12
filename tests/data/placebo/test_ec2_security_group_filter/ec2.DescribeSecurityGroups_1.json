@@ -48,23 +48,36 @@
                         "PrefixListIds": []
                     }
                 ], 
-                "Description": "for production use only", 
-                "IpPermissions": [], 
-                "GroupName": "CUSTODIAN-PROD-ONLY-WEB-SG", 
-                "VpcId": "vpc-29e0314f", 
+                "Description": "SG created to test EC2 Security Group Filters", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "204.63.44.148/32"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "TEST-PROD-ONLY-SG", 
+                "VpcId": "vpc-d2d616b5", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-12eeb66f"
+                "GroupId": "sg-411b413c"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "a1663ced-8065-4f12-b77a-add7da28d8c1", 
+            "RequestId": "ec834da5-171f-46e0-841b-222d6f75989b", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 12 Dec 2016 16:11:15 GMT"
+                "date": "Mon, 12 Dec 2016 22:23:04 GMT"
             }
         }
     }
