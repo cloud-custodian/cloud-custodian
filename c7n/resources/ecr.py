@@ -45,6 +45,9 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
                 resource: ecr
                 filters:
                   - type: cross-account
+                    whitelist_from:
+                      expr: "accounts.*.accountNumber"
+                      url: *accounts_url
     """
 
     def process(self, resources, event=None):
