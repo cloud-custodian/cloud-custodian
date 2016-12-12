@@ -950,9 +950,28 @@ class RDSSnapshotDelete(BaseAction):
         for s in snapshots_set:
             c.delete_db_snapshot(
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
+
+
+@actions.register('modify-groups')
+class RDSModifyGroups(ModifyGroupsAction):
+
+    schema = type_schema(
+        'modify-groups',
+        **{'groups': {'anyOf': [
+            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'array', 'items': {'type': 'string'}}]},
+           'isolation-group': {'type': 'string'}})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        groups = super(RDSModifyGroups, self).get_groups(resources)
+        for idx, r in enumerate(resources):
+            client.modify_db_instance(
+                VpcSecurityGroupIds=db['NetworkInterfaceId'],
+                Groups=groups[idx])
+
+
 @resources.register('rds-subnet-group')
-
-
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
 
@@ -962,12 +981,8 @@ class RDSSubnetGroup(QueryResourceManager):
         id = name = 'DBSubnetGroupName'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
-
-    def process(self, resources):
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
-        for idx, r in enumerate(resources):
-            client.modify_db_instance(
-                VpcSecurityGroupIds=db['NetworkInterfaceId'],
         dimension = None
         date = None
+
