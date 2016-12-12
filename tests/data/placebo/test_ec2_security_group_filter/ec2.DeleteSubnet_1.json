@@ -1,0 +1,19 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400, 
+            "RequestId": "80a296bd-35ba-4303-9657-9bb9594de24e", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Mon, 12 Dec 2016 16:11:17 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The subnet 'subnet-b9248885' has dependencies and cannot be deleted.", 
+            "Code": "DependencyViolation"
+        }
+    }
+}

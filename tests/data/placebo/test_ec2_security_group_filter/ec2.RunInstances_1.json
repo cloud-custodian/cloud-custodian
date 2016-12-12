@@ -1,0 +1,120 @@
+{
+    "status_code": 200, 
+    "data": {
+        "OwnerId": "644160558196", 
+        "ReservationId": "r-08227406dbddddd1d", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "bdbaf4ad-eb65-46e9-8722-cf95975f8fd6", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 12 Dec 2016 16:11:13 GMT"
+            }
+        }, 
+        "Groups": [], 
+        "Instances": [
+            {
+                "Monitoring": {
+                    "State": "disabled"
+                }, 
+                "PublicDnsName": "", 
+                "RootDeviceType": "ebs", 
+                "State": {
+                    "Code": 0, 
+                    "Name": "pending"
+                }, 
+                "EbsOptimized": false, 
+                "LaunchTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 12, 
+                    "minute": 11
+                }, 
+                "PrivateIpAddress": "10.42.0.144", 
+                "ProductCodes": [], 
+                "VpcId": "vpc-29e0314f", 
+                "StateTransitionReason": "", 
+                "InstanceId": "i-0d47fbae2afb76ea2", 
+                "ImageId": "ami-b73b63a0", 
+                "PrivateDnsName": "ip-10-42-0-144.ec2.internal", 
+                "SecurityGroups": [
+                    {
+                        "GroupName": "CUSTODIAN-PROD-ONLY-WEB-SG", 
+                        "GroupId": "sg-12eeb66f"
+                    }
+                ], 
+                "ClientToken": "", 
+                "SubnetId": "subnet-b9248885", 
+                "InstanceType": "t2.micro", 
+                "NetworkInterfaces": [
+                    {
+                        "Status": "in-use", 
+                        "MacAddress": "06:f5:73:18:fb:12", 
+                        "SourceDestCheck": true, 
+                        "VpcId": "vpc-29e0314f", 
+                        "Description": "", 
+                        "NetworkInterfaceId": "eni-f5ae461d", 
+                        "PrivateIpAddresses": [
+                            {
+                                "Primary": true, 
+                                "PrivateIpAddress": "10.42.0.144"
+                            }
+                        ], 
+                        "Attachment": {
+                            "Status": "attaching", 
+                            "DeviceIndex": 0, 
+                            "DeleteOnTermination": true, 
+                            "AttachmentId": "eni-attach-51c37eaa", 
+                            "AttachTime": {
+                                "hour": 16, 
+                                "__class__": "datetime", 
+                                "month": 12, 
+                                "second": 14, 
+                                "microsecond": 0, 
+                                "year": 2016, 
+                                "day": 12, 
+                                "minute": 11
+                            }
+                        }, 
+                        "Groups": [
+                            {
+                                "GroupName": "CUSTODIAN-PROD-ONLY-WEB-SG", 
+                                "GroupId": "sg-12eeb66f"
+                            }
+                        ], 
+                        "SubnetId": "subnet-b9248885", 
+                        "OwnerId": "644160558196", 
+                        "PrivateIpAddress": "10.42.0.144"
+                    }
+                ], 
+                "SourceDestCheck": true, 
+                "Placement": {
+                    "Tenancy": "default", 
+                    "GroupName": "", 
+                    "AvailabilityZone": "us-east-1e"
+                }, 
+                "Hypervisor": "xen", 
+                "BlockDeviceMappings": [], 
+                "Architecture": "x86_64", 
+                "StateReason": {
+                    "Message": "pending", 
+                    "Code": "pending"
+                }, 
+                "IamInstanceProfile": {
+                    "Id": "AIPAIBZGUJ5B2RKN4MCAI", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/TestProductionInstanceProfile"
+                }, 
+                "RootDeviceName": "/dev/xvda", 
+                "VirtualizationType": "hvm", 
+                "AmiLaunchIndex": 0
+            }
+        ]
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400, 
+            "RequestId": "bf2f6466-81c3-4c2a-95dd-f6345059eba3", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Mon, 12 Dec 2016 16:11:16 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "resource sg-12eeb66f has a dependent object", 
+            "Code": "DependencyViolation"
+        }
+    }
+}

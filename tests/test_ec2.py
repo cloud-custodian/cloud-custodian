@@ -505,7 +505,7 @@ class TestActions(unittest.TestCase):
 
 class TestSecurityGroupFilter(BaseTest):
     def test_security_group_type(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_security_group_filter')
         client = session_factory().client('ec2')
 
