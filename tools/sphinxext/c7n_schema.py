@@ -1,3 +1,10 @@
+"""
+Based on bokeh_model.py Sphinx Extension from Bokeh project:
+https://github.com/bokeh/bokeh/tree/master/bokeh/sphinxext
+"""
+
+from __future__ import absolute_import
+
 import importlib
 import json
 import re
@@ -10,7 +17,7 @@ from sphinx.errors import SphinxError
 from sphinx.util.compat import Directive
 from sphinx.util.nodes import nested_parse_with_titles
 
-from c7n.sphinxext.templates import TEMPLATE_C7N_SCHEMA
+from .templates import TEMPLATE_C7N_SCHEMA
 from c7n.utils import reformat_schema
 
 

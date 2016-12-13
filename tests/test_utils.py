@@ -215,3 +215,11 @@ class UtilTest(unittest.TestCase):
             utils.parse_s3('s3://things'),
             ('s3://things', 'things', ''),
         )
+
+    def test_reformat_schema(self):
+        # Not a real schema, just doing a smoke test of the function
+        properties = 'target'
+
+        from c7n.resources.ec2 import AttachedVolume
+        ret = utils.reformat_schema(AttachedVolume)
+        self.assertEqual(ret, AttachedVolume.schema['properties'])
