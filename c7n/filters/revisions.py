@@ -15,194 +15,97 @@
 Custodian support for diffing and patching across multiple versions
 of a resource.
 """
-import contextlib
 import json
-import os
-from pprint import pprint
-import shutil
-import subprocess
-import tempfile
 import zlib
 
 from botocore.exceptions import ClientError
 from botocore.parsers import BaseJSONParser
-#from concurrent.futures import as_completed
-#from datetime import datetime, timedelta
 
-import functools
-#import jmespath
-
-#from c7n.actions import Action
 from c7n.filters import Filter
-#from c7n.mu import ConfigRule
-from c7n.utils import local_session, type_schema, camelResource
+from c7n.utils import local_session, type_schema, camelResource, get_retry
 
-
-DEVELOPER_NOTES = """
-Three python diff libraries were evaluated for comparing resource revisions.
-
- - jsonpatch
- - dictdiffer
- - DeepDiff
-
-Additional a consideration of rolling our own thats specific to custodian's
-needs.
-
-# jsonpatch
-
-On a whole it does a good job of producing a minimal diff that matches the
-semantic changes. There are some bugs on the repo that need investigation.
-
-- Url https://github.com/stefankoegl/python-json-patch
-- License BSD
-
-```python
-[{u'op': u'replace', u'path': u'/IpPermissions/0/ToPort', u'value': 80},
- {u'op': u'add',
-  u'path': u'/Tags/1',
-  u'value': {'Key': 'AppId', 'Value': 'SomethingGood'}}]
-```
-
-# dictdiffer
-
-- Url https://github.com/inveniosoftware/dictdiffer
-- License MIT
-
-[('change', ['IpPermissions', 0, 'ToPort'], (53, 80)),
- ('change', ['Tags', 1, 'Value'], ('Name', 'SomethingGood')),
- ('change', ['Tags', 1, 'Key'], ('Origin', 'AppId')),
- ('add', 'Tags', [(2, {'Key': 'Origin', 'Value': 'Name'})])]
-
-The change here is correct, but requires a bit of semantic interpretation, it
-ends up mutating elements in position as it considers position within a list
-a strict diff, where as in all circumstances we want the semantic delta
-on a list rather than a mutation in place.
-
-# DeepDiff
-
-- Url https://github.com/seperman/deepdiff
-- License MIT
-
-{'iterable_item_added': {"root['IpPermissions'][0]": {'FromPort': 53,
-                                                      'IpProtocol': 'tcp',
-                                                      'IpRanges': ['10.0.0.0/8'],
-                                                      'PrefixListIds': [],
-                                                      'ToPort': 80,
-                                                      'UserIdGroupPairs': []},
-                         "root['Tags'][1]": {'Key': 'AppId',
-                                             'Value': 'SomethingGood'}},
- 'iterable_item_removed': {"root['IpPermissions'][0]": {'FromPort': 53,
-                                                        'IpProtocol': 'tcp',
-                                                        'IpRanges': ['10.0.0.0/8'],
-                                                        'PrefixListIds': [],
-                                                        'ToPort': 53,
-                                                        'UserIdGroupPairs': []}}}
-
-Deep diff is fairly configurable, the only non default param here is
-ignore_order.
-
-The returned semantic structure of the diff is quite obtuse, and idiosyncratic.
-
-# Rolling our own
-
-The issue with most of the diff libraries, is that they require
-significant interpretation to line up with the api call semantics
-around any given resource.  Ie. a security group rule is effectively
-immutable, and modification which might be represented by a diff
-library as a 'change', requires removal of original and addition of
-modified.
-"""
-
-
-class Revisions(Filter):
-    """Get previous revisions of a resource from config.
-
-    Default operation mode is bit different than other filters
-    in that it returns additional.
-    """
 
 ErrNotFound = "ResourceNotDiscoveredException"
 
 
-class Diff(Revisions):
-    """Compute the diff from the current revision to its previous."""
+class Diff(Filter):
+    """Compute the diff from the current resource to a previous version.
 
-    SELECTOR_PREVIOUS = 'previous'
+    A resource matches the filter if a diff exists between the current
+    resource and the selected revision.
 
-    schema = type_schema('diff')
+    Utilizes config as a resource revision database.
+    """
 
-    parser = resource_shape = None
+    schema = type_schema(
+        'diff',
+        selector={'enum': ['previous', 'date', 'locked']},
+        # For date selectors allow value specification
+        selector_value={'type': 'string'})
 
-    def initialize(self):
-        pass
+    selector_value = mode = parser = resource_shape = None
 
     def process(self, resources, event=None):
-        model = self.manager.get_model()
         session = local_session(self.manager.session_factory)
         config = session.client('config')
-        parser = ConfigResourceParser()
-        resource_shape = self.get_resource_shape(session)
 
-        # previous, locked, date
-        selector = self.data.get('selector', self.SELECTOR_PREVIOUS)
-        limit = selector == self.SELECTOR_PREVIOUS and 4
+        self.model = self.manager.get_model()
+        self.parser = ConfigResourceParser()
+        self.resource_shape = self.get_resource_shape(session)
+
         results = []
+        for r in resources:
+            revisions = self.get_revisions(session, config, r)
+            r['c7n:previous-revision'] = rev = self.select_revision(revisions)
+            delta = self.diff(r, rev)
+            if delta:
+                r['c7n:diff'] = delta
+                results.append(r)
+        return r
 
-        for res in resources:
-            res = dict(res)
-            res.pop('MatchedFilters')
-            try:
-                revisions = config.get_resource_config_history(
-                    resourceType=model.config_type,
-                    resourceId=res[model.id],
-                    limit=limit)['configurationItems']
-            except ClientError as e:
-                raise
-                if e.response['Error']['Code'] != ErrNotFound:
-                    self.log.debug(
-                        "config - resource %s:%s not found" % (
-                            model.config_type, res[model.id]))
-                    raise
-                continue
+    def get_revisions(self, config, resource):
+        config = session.client('config')
+        params = {
+            resourceType: self.model.config_type,
+            resourceId: res[self.model.id]}
+        params.update(self.get_selector_params(resource))
+        try:
+            revisions = config.get_resource_config_history(
+                **params)['configurationItems']
+        except ClientError as e:
+            if e.response['Error']['Code'] != ErrNotFound:
+                self.log.debug(
+                    "config - resource %s:%s not found" % (
+                        model.config_type, res[model.id]))
+                revisions = []
+            raise
+        return revisions
 
-            cur = res
+    def get_selector_params(self, resource):
+        params = {}
+        selector = self.data.get('selector', 'previous')
+        if selector == 'date':
+            if not self.selector_value:
+                self.selector_value = parse_date(
+                    self.data.get('selector_value'))
+            params['laterTime'] = self.selector_value
+            params['limit'] = 3
+        elif selector == 'previous':
+            params['limit'] = 2
+        elif selector == 'locked':
+            params['laterTime'] = resource.get('c7n:locked_date')
+            params['limit'] = 2
+        return params
 
-            for rev in revisions:
-                previous = parser.parse(
-                    camelResource(json.loads(rev['configuration'])),
-                    resource_shape)
-                # print rev.keys()
-                # print rev['relatedEvents'],
-                # rev['configurationItemStatus'],
-                # rev['supplementaryConfiguration'],
-                # rev['configurationItemCaptureTime']
-                from dictdiffer import diff
-                diff = list(diff(previous, cur))
-                pprint(diff)
-                if diff:
-                    res['c7n.Diff'] = diff
-                    results.append(res)
-                    break
-                #from deepdiff import DeepDiff
-                #pprint(DeepDiff(previous, cur, ignore_order=True))
+    def select_revision(self, resource, revisions, selector):
+        for rev in revisions:
+            return parser.parse(
+                camelResource(json.loads(rev['configuration'])),
+                resource_shape)
 
-                cur = previous
-            res['c7n.Revisions'] = revisions
-
-        return results
-
-    def process_resource(self, r):
-        pass
-
-    def get_revisions(self, i):
-        pass
-
-    def process_revisions(self, i):
-        for r in self.get_revisions(i):
-            return any(self.process_revision(i, r))
-
-    def process_revision(self, i, r):
-        pass
+    def diff(self, source, target):
+        differ = SecurityGroupDiff()
+        return differ.diff(source, target)
 
     def get_resource_shape(self, session):
         resource_model = self.manager.get_model()
@@ -220,95 +123,143 @@ class ConfigResourceParser(BaseJSONParser):
         return self._parse_shape(shape, data)
 
 
-Action = object
+class SecurityGroupDiff(object):
+    """Diff two versions of a security group
 
+    Immutable: GroupId, GroupName, Description, VpcId, OwnerId
+    Mutable: Tags, Rules
+    """
 
-class ApplyReverseDiff(object):
+    def diff(self, source, target):
+        delta = {}
+        tag_delta = self.get_tag_delta(source, target)
+        if tag_delta:
+            delta['tags'] = tag_delta
+        ingress_delta = self.get_rule_delta('IpPermissions', source, target)
+        if ingress_delta:
+            delta['ingress'] = ingress_delta
+        egress_delta = self.get_rule_delta(
+            'IpPermissionsEgress', source, target)
+        if egress_delta:
+            delta['egress'] = egress_delta
+        if delta:
+            return delta
 
-    def process(self, resources):
-        pass
+    def get_tag_delta(self, source, target):
+        source_tags = {t['Key']: t['Value'] for t in source['Tags']}
+        target_tags = {t['Key']: t['Value'] for t in target['Tags']}
+        target_keys = set(target_tags.keys())
+        source_keys = set(source_tags.keys())
+        removed = source_keys.difference(target_keys)
+        added = target_keys.difference(source_keys)
+        changed = set()
+        for k in target_keys.intersection(source_keys):
+            if source_tags[k] != target_tags[k]:
+                changed.add(k)
+        return {k: v for k, v in {
+            'added': {k: target_tags[k] for k in added},
+            'removed': {k: source_tags[k] for k in removed},
+            'updated': {k: target_tags[k] for k in changed}}.items() if v}
 
-    def apply_delta(self, resource, delta):
-        handler_names = [h for h in dir(self) if h.startswith('handle_')]
-        for hn in handler_names:
-            h = getattr(self, hn)
-            h(resource, delta)
+    def get_rule_delta(self, key, source, target):
+        source_rules = {
+            self.compute_rule_hash(r): r for r in source.get(key, ())}
+        target_rules = {
+            self.compute_rule_hash(r): r for r in target.get(key, ())}
+        source_keys = set(source_rules.keys())
+        target_keys = set(target_rules.keys())
+        removed = source_keys.difference(target_keys)
+        added = target_keys.difference(source_keys)
+        return {k: v for k, v in
+                {'removed': [source_rules[rid] for rid in removed],
+                'added': [target_rules[rid] for rid in added]}.items() if v}
 
+    RULE_ATTRS = (
+        ('PrefixListIds', 'PrefixListId'),
+        ('UserIdGroupPairs', 'GroupId'),
+        ('IpRanges', 'CidrIp'),
+        ('Ipv6Ranges', 'CidrIpv6')
+    )
 
-def delta_selector(expr):
-    def decorator(f):
-        functools.wrap(f)
-
-        def delta_handler(client, resource, change_set):
-            changes = [c for c in change_set if c['path'].startswith(expr)]
-            return f(client, resource, changes)
+    def compute_rule_hash(self, rule):
+        buf = "%d-%d-%s-" % (
+            rule.get('FromPort', 0),
+            rule.get('ToPort', 0),
+            rule.get('IpProtocol', '-1')
+            )
+        for a, ke in self.RULE_ATTRS:
+            ev = [e[ke] for e in rule[a]]
+            ev.sort()
+            for e in ev:
+                buf += "%s-" % e
+        return abs(zlib.crc32(buf))
 
 
 class SecurityGroupPatch(object):
 
-    @delta_selector("/Tags")
-    def handle_tags(self, client, source, target, change_set):
-        """
-        """
-        source_tags = {t['Key']: t['Value'] for t in source['Tags']}
-        target_tags = {t['Key']: t['Value'] for t in target['Tags']}
+    RULE_TYPE_MAP = {
+        'egress': ('IpPermissionsEgress',
+                   'revoke_security_group_egress',
+                   'authorize_security_group_egress'),
+        'ingress': ('IpPermissions',
+                    'revoke_security_group_ingress',
+                    'authorize_security_group_ingress')}
 
-        target_keys = set(target_tags.keys())
-        source_keys = set(source_tags.keys())
+    retry = staticmethod(get_retry((
+        'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
 
-        removed = source_keys.difference(target_keys)
-        added = target_keys.difference(source_keys)
-        changed = set()
+    def apply_delta(self, client, target, change_set):
+        if 'tags' in change_set:
+            self.process_tags(client, target, change_set['tags'])
+        if 'ingress' in change_set:
+            self.process_rules(
+                client, 'ingress', target, change_set['ingress'])
+        if 'egress' in change_set:
+            self.process_rules(
+                client, 'egress', target, change_set['egress'])
 
-        for k in target_keys.intersection(source_keys):
-            if source_tags[k] != target_tags[k]:
-                changed.add(k)
+    def process_tags(self, client, group, tag_delta):
+        if 'removed' in tag_delta:
+            self.retry(client.delete_tags,
+                       Resources=[group['GroupId']],
+                       Tags=[{'Key': k}
+                             for k in tag_delta['removed']])
+        tags = []
+        if 'added' in tag_delta:
+            tags.extend(
+                [{'Key': k, 'Value': v}
+                 for k, v in tag_delta['added'].items()])
+        if 'updated' in tag_delta:
+            tags.extend(
+                [{'Key': k, 'Value': v}
+                 for k, v in tag_delta['updated'].items()])
+        self.retry(client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
-        client.create_tags(
-            Resources=target['GroupId'],
-            Tags=[{'Key': k, 'Value': v} for k, v in target_tags.items() if
-                  k in added or k in changed])
-        client.remove_tags(
-            Resources=target['GroupId'],
-            Tags=[{'Key': k, 'Value': v} for k, v in source_tags.items() if
-                  k in removed])
+    def process_rules(self, client, rule_type, group, delta):
+        key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
+        revoke, authorize = getattr(
+            client, revoke_op), getattr(client, auth_op)
 
-    def group_rule_changes(self, source, target, change_set, prefix):
-        """
-        """
-        source_rules = source.get(prefix, ())
-        target_rules = target.get(prefix, ())
+        # Process removes
+        self.retry(revoke, GroupId=group['GroupId'],
+                   IpPermissions=[r for r in delta['removed']])
 
-        changed_items = [
-            resource['Tags'][idx] for idx
-            in set([c[1][1] for c in change_set if c[0] == 'change'])]
-        removed_items = [
-            resource['Tags'][idx] for idx
-            in set([c[1][1] for c in change_set if c[0] == 'remove'])]
-
-    @delta_selector("/IpPermissionsEgress")
-    def handle_ingress(self, client, resource, change_set):
-        """
-        handle ingress rule changes
-        """
-        added, removed = self.group_rule_changes(
-            resource, change_set, 'IpPermissionsEgress')
-        return added, removed
-
-    @delta_selector("/IpPermissions")
-    def handle_egress(self, client, resource, change_set):
-        """
-        handle egress rule changes
-        """
-        added, removed = self.group_rule_changes(
-            resource, change_set, 'IpPermissionsEgress')
-        return added, removed
+        # Process adds
+        self.retry(authorize, GroupId=group['GroupId'],
+                   IpPermissions=[r for r in delta['added']])
 
 
 # TODO List
 
+Action = object
+
+
 class Locked(Filter):
     """Has the resource been locked."""
+    schema = type_schema(
+        'locked',
+        value={'type': 'boolean'},
+        api_endpoint={'type': 'string'})
 
 
 class Lock(Action):
@@ -317,6 +268,7 @@ class Lock(Action):
     Get current revision of given object. We may have an inflight
     snapshotDelivery coming.
     """
+    schema = type_schema('lock')
 
 
 class Unlock(Action):
