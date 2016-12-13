@@ -30,7 +30,21 @@ class Vpc(QueryResourceManager):
 
 @Vpc.filter_registry.register('subnets')
 class VpcSubnets(ValueFilter):
-    """Filter VPC by subnet"""
+    """Filter VPC by subnet
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: eni-filter-by-sg
+                resource: eni
+                filters:
+                  - type: security-group
+                    match-resource: true
+                    key: FromPort
+                    value: 22
+    """
 
     schema = type_schema('subnets', rinherit=ValueFilter.schema)
 
@@ -582,12 +596,12 @@ class InterfaceSubnetFilter(net_filters.SubnetFilter):
         .. code-block: yaml
 
             policies:
-              - name: network-interface-subnet-x
+              - name: network-interface-in-subnet
                 resource: eni
                 filters:
                   - type: subnet
-                    key: SubnetId
-                    value: subnet-01ab23cd
+                    key: CidrBlock
+                    value: 172.31.32.0/20
     """
 
     RelatedIdsExpression = "SubnetId"
@@ -602,12 +616,13 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
         .. code-block: yaml
 
             policies:
-              - name: network-interface-sg-x
+              - name: network-interface-ssh
                 resource: eni
                 filters:
                   - type: security-group
-                    key: GroupId
-                    value: sg-01ab23cd
+                    match-resource: true
+                    key: FromPort
+                    value: 22
     """
 
     RelatedIdsExpression = "Groups[].GroupId"
@@ -634,12 +649,14 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
               - name: network-interface-remove-group
                 resource: eni
                 filters:
-                  - type: subnet
-                    key: SubnetId
-                    value: subnet-01ab23cd
+                  - type: security-group
+                    match-resource: true
+                    key: FromPort
+                    value: 22
                 actions:
                   - type: remove-groups
                     groups: matched
+                    isolation-group: sg-01ab23c4
     """
 
     schema = type_schema(
