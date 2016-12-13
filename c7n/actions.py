@@ -118,7 +118,7 @@ class ModifyGroupsAction(BaseAction):
     schema = utils.type_schema(
         'modify-groups',
         **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
+            {'type': 'string', 'enum': ['add', 'remove', 'all']},
             {'type': 'array', 'items': {'type': 'string'}}]},
            'isolation-group': {'type': 'string'}})
 
@@ -128,7 +128,11 @@ class ModifyGroupsAction(BaseAction):
         return_groups = []
 
         for r in resources:
-            rgroups = [g['GroupId'] for g in r['Groups']]
+            if r.get('Groups'):
+                rgroups = [g['GroupId'] for g in r['Groups']]
+            elif r.get('NetworkInterfaces'):
+                interfaces = r['NetworkInterfaces']
+                rgroups = [g['GroupId'] for i in interfaces for g in i['Groups']]
             if target_group_ids == 'matched':
                 group_ids = r.get('c7n.matched-security-groups', ())
             elif target_group_ids == 'all':

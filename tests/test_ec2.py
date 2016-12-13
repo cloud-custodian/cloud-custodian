@@ -531,3 +531,41 @@ class TestSecurityGroupFilter(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-0dd3919bc5bac1ea8')
 
+    def test_security_group_modify_groups_action(self):
+        # Test conditions:
+        #   - running two instances; one with TestProductionInstanceProfile and one with none
+        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to both test instances
+        session_factory = self.replay_flight_data(
+            'test_ec2_modify_groups_action')
+        client = session_factory().client('ec2')
+
+        default_sg_id = client.describe_security_groups(
+            GroupNames=[
+                'default',
+            ]
+        )['SecurityGroups'][0]['GroupId']
+
+
+        # Catch on anything that uses the *PROD-ONLY* security groups but isn't in a prod role
+        policy = self.load_policy({
+            'name': 'remove-sensitive-sg',
+            'resource': 'ec2',
+            'filters': [
+                {'or': [
+                    {'and': [
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
+                    ]},
+                    {'type': 'value', 'key': 'IamInstanceProfile', 'value': 'absent'}
+                ]},
+                {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+            'actions': [
+                {'type': 'modify-groups', 'remove': 'matched', 'isolation-group': default_sg_id}]
+            },
+            session_factory=session_factory)
+        before_action_resources = policy.run()
+        after_action_resources = policy.run()
+        self.assertEqual(len(before_action_resources), 1)
+        self.assertEqual(before_action_resources[0]['InstanceId'], 'i-0dd3919bc5bac1ea8')
+        self.assertEqual(len(after_action_resources), 0)
+

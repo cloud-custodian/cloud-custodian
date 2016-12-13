@@ -838,7 +838,7 @@ class EC2ModifyGroups(ModifyGroupsAction):
             return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        groups = super(EC2ModifyGroups, self).get_groups(resources)
+        groups = super(EC2ModifyGroups, self).get_groups(instances)
         for idx, i in enumerate(instances):
             client.modify_instance_attribute(
                 InstanceId=i['InstanceId'],
