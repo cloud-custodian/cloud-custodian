@@ -108,6 +108,10 @@ class LambdaEventSource(ValueFilter):
 class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filters lambda functions with cross-account permissions
 
+    The whitelist parameter can be used to prevent certain accounts from being
+    included in the results. This can be useful when combining this filter with
+    the delete action.
+
     :example:
 
         .. code-block: yaml
