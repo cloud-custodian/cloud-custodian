@@ -108,9 +108,12 @@ def log_entries_from_s3(session_factory, output, start, end):
         for key_set in p:
             if 'Contents' not in key_set:
                 continue
-            keys = [k for k in key_set['Contents']
-                    if k['Key'].endswith(log_filename)
-                    and k['LastModified'] < end]
+            log_keys = [k for k in key_set['Contents']
+                    if k['Key'].endswith(log_filename)]
+            keys = [k for k in log_keys if k['LastModified'] < end]
+            if len(log_keys) >= 1 and len(keys) == 0:
+                # there were logs, but we're now past the end date
+                break
             key_count += len(keys)
             futures = map(
                 lambda k:
