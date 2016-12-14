@@ -74,6 +74,15 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    def test_id_selector(self):
+        p = self.load_policy({
+            'name': 'sg',
+            'resource': 'security-group'})
+        self.assertEqual(
+            p.resource_manager.match_ids(
+                ['vpc-asdf', 'i-asdf3e', 'sg-1235a', 'sg-4671']),
+            ['sg-1235a', 'sg-4671'])
+
     def test_stale(self):
         # setup a multi vpc security group reference, break the ref
         # and look for stale

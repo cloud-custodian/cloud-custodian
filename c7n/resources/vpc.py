@@ -68,6 +68,7 @@ class SecurityGroup(QueryResourceManager):
         config_type = "AWS::EC2::SecurityGroup"
         filter_name = "GroupIds"
         name = "GroupId"
+        id_prefix = "sg-"
 
 
 @SecurityGroup.filter_registry.register('diff')
@@ -87,7 +88,7 @@ class SecurityGroupDiffFilter(Diff):
                 if p.get('ToPort', '') is None:
                     p.pop('ToPort')
                 if 'Ipv6Ranges' not in p:
-                    p['Ipv6Ranges'] = []
+                    p[u'Ipv6Ranges'] = []
                 for attribute, element_key in (
                         ('IpRanges', u'CidrIp'),):
                     if attribute not in p:
@@ -144,8 +145,8 @@ class SecurityGroupDiff(object):
         removed = source_keys.difference(target_keys)
         added = target_keys.difference(source_keys)
         return {k: v for k, v in
-                {'removed': [source_rules[rid] for rid in removed],
-                'added': [target_rules[rid] for rid in added]}.items() if v}
+                {'removed': [source_rules[rid] for rid in sorted(removed)],
+                 'added': [target_rules[rid] for rid in sorted(added)]}.items() if v}
 
     RULE_ATTRS = (
         ('PrefixListIds', 'PrefixListId'),
