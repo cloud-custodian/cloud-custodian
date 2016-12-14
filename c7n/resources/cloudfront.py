@@ -56,18 +56,8 @@ class DistributionMetrics(MetricsFilter):
                 resource: distribution
                 filters:
                   - type: metrics
-                    name: TotalErrorRate
-                    days: 7
-                    value: 50
-                    op: ge
-
-              - name: cloudfront-streaming-errors
-                resource: streaming-distribution
-                filters:
-                  - type: metrics
-                    name: TotalErrorRate
-                    days: 1
-                    value: 50
+                    name: Requests
+                    value: 3
                     op: ge
     """
 
