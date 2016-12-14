@@ -1325,8 +1325,6 @@ class MarkBucketForOp(TagDelayedAction):
 
 
 @actions.register('unmark')
-@actions.register('remove-tag')
-@actions.register('untag')
 class RemoveBucketTag(RemoveTag):
     """Removes tag/tags from a S3 object
 
