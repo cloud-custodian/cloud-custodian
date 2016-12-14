@@ -13,13 +13,85 @@
 # limitations under the License.
 
 from common import BaseTest
-from c7n.filters.revisions import SecurityGroupDiff, SecurityGroupPatch
+from c7n.resources.vpc import SecurityGroupDiff, SecurityGroupPatch
 
 
-class DiffLibTest(BaseTest):
+class SGDiffLibTest(BaseTest):
 
-    def test_sg_mods(self):
-        factory = self.replay_flight_data('test_security_group_revisions_delta')
+    def test_sg_diff_pitr(self):
+        factory = self.replay_flight_data('test_sg_config_diff')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-a38ed1de'},
+                {'type': 'diff',
+                 'selector': 'date',
+                 'selector_value': '2016/12/11 17:25Z'}],
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.maxDiff = None
+        self.assertEqual(resources[0]['c7n:diff'],
+            {'egress': {
+                'added': [{u'IpProtocol': u'-1',
+                           u'IpRanges': [{u'CidrIp': u'0.0.0.0/0'}],
+                           u'Ipv6Ranges': [],
+                           u'PrefixListIds': [],
+                           u'UserIdGroupPairs': [{u'GroupId': u'sg-a08ed1dd',
+                                                  u'UserId': u'644160558196'}]}],
+                'removed': [{
+                             u'IpProtocol': u'-1',
+                             u'IpRanges': [{u'CidrIp': u'0.0.0.0/0'}],
+                             u'Ipv6Ranges': [],
+                             u'PrefixListIds': [],
+                             u'UserIdGroupPairs': []}]},
+             'ingress': {
+                 'added': [{u'FromPort': 8485,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 8485,
+                            u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
+                                                   u'UserId': u'644160558196'}]},
+                           {u'FromPort': 22,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 22,
+                            u'UserIdGroupPairs': []}]},
+             'tags': {'added': {u'Scope': u'account'}}})
+
+    def test_sg_patch_pitr(self):
+        factory = self.replay_flight_data('test_sg_config_patch_pitr')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-a38ed1de'},
+                {'type': 'diff',
+                 'selector': 'date',
+                 'selector_value': '2016/12/11 17:25Z'}],
+            'actions': ['patch']
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        current_resource = factory().client('ec2').describe_security_groups(
+            GroupIds=['sg-a38ed1de'])['SecurityGroups'][0]
+
+        self.maxDiff = None
+        self.assertEqual(
+            current_resource,
+            resources[0]['c7n:previous-revision']['resource'])
+                
+    def test_sg_diff_patch(self):
+        factory = self.replay_flight_data(
+            'test_security_group_revisions_delta')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -51,6 +123,7 @@ class DiffLibTest(BaseTest):
         s1 = client.describe_security_groups(GroupIds=[sg_id])[
             'SecurityGroups'][0]
 
+        # Modify state
         client.create_tags(
             Resources=[sg_id],
             Tags=[
@@ -74,6 +147,7 @@ class DiffLibTest(BaseTest):
         s2 = client.describe_security_groups(GroupIds=[sg_id])[
             'SecurityGroups'][0]
 
+        # Apply reverse delta
         self.maxDiff = None
         self.assertEqual(
             {'ingress': {'added': [{u'FromPort': 80,
@@ -98,6 +172,7 @@ class DiffLibTest(BaseTest):
             client, s2,
             SecurityGroupDiff().diff(s2, s1))
 
+        # Compare to origin
         s3 = client.describe_security_groups(GroupIds=[sg_id])[
             'SecurityGroups'][0]
 
