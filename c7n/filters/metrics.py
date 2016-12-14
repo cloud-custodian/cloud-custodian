@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
-TODO make filters package
-  - offhours
-  - metrics
-  -
+CloudWatch Metrics suppport for resources
 """
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
