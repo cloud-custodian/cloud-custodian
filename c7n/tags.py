@@ -46,6 +46,7 @@ def register_tags(filters, actions):
     actions.register('untag', RemoveTag)
     actions.register('remove-tag', RemoveTag)
     actions.register('rename-tag', RenameTag)
+    actions.register('change-tag-value-case', ChangeTagValueCase)
 
 
 class TagTrim(Action):
@@ -524,3 +525,100 @@ class TagDelayedAction(Action):
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
+
+class ChangeTagValueCase(Action):
+    """Change the case of a Tag Value.
+
+    .. code-block :: yaml
+
+        policies:
+          - name: ec2-service-tag-value-to-lower
+          resource: ec2
+          comment: |
+            ec2-service-tag-value-to-lower
+          query:
+          - instance-state-name: running
+          filters:
+          - "tag:Service": present
+          - "tag:testing8882": present
+          actions:
+          - type: change-tag-value-case
+          key: target
+          case: Lower
+    """
+
+    schema = utils.type_schema(
+        'change-tag-value-case',
+        key={'type': 'string'},
+        case={'type': 'array', 'items': {
+            'enum': ['Upper', 'Lower']}})
+
+    def create_tag(self, client, ids, key, value):
+        client.create_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_case_change(self, tag_value, resource_set):
+        """
+        Change tag value case of tag key
+
+        - Collect value from tag
+        - Change case
+        - Assign new value for key
+        """
+        self.log.info("Changing tag value case for tag on %s instances" % (len(resource_set)))
+        key = self.data.get('key')
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+
+        if self.data.get('case') == 'Lower':
+            new_value = tag_value.lower()
+        elif self.data.get('case') == 'Upper':
+            new_value = tag_value.upper()
+        else:
+            self.log.error("%s is an invalid case type" % (self.data.get('case')))
+
+        self.create_tag(
+            c,
+            [r[self.id_key] for r in resource_set if len(
+                r.get('Tags', [])) < 50],
+            key, new_value)
+
+    def create_set(self, instances):
+        key = self.data.get('key', None)
+        resource_set = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags[key] not in resource_set:
+                resource_set[tags[key]] = []
+            resource_set[tags[key]].append(r)
+        return resource_set
+
+    def filter_resources(self, resources):
+        key = self.data.get('key', None)
+        res = 0
+        for r in resources:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if key not in tags.keys():
+                resources.pop(res)
+            res += 1
+        return resources
+
+    def process(self, resources):
+        count = len(resources)
+        resources = self.filter_resources(resources)
+        self.log.info(
+            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.id_key = self.manager.get_model().id
+        resource_set = self.create_set(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resource_set:
+                futures.append(
+                    w.submit(self.process_case_change, r, resource_set[r]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception renaming tag set \n %s" % (
+                            f.exception()))
+        return resources
