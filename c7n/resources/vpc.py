@@ -461,6 +461,15 @@ class SGPermission(Filter):
         IpProtocol: -1
         FromPort: 445
 
+    We also have specialized handling for matching self-references in
+    ingress/egress permissions. The following example matches on ingress
+    rules which allow traffic its own same security group.
+
+    .. code-block: yaml
+
+      - type: ingress
+        SelfReference: True
+
     As well for assertions that a ingress/egress permission only matches
     a given set of ports, *note* OnlyPorts is an inverse match.
 
@@ -591,7 +600,8 @@ class IPPermission(SGPermission):
         #'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}}
+            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+            'SelfReference': {'type': 'boolean'}
             },
         'required': ['type']}
 
@@ -604,7 +614,8 @@ class IPPermissionEgress(SGPermission):
         'type': 'object',
         #'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['egress']}
+            'type': {'enum': ['egress']},
+            'SelfReference': {'type': 'boolean'}
             },
         'required': ['type']}
 
