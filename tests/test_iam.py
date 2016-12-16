@@ -182,6 +182,21 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 7)
 
 
+class IamUserFilterUsage(BaseTest):
+
+    def test_iam_user_policy(self):
+        session_factory = self.replay_flight_data('test_iam_user_policy')
+        self.patch(
+            UsedIamRole, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-policy',
+            'resource': 'iam-user',
+            'filters': ['policy']}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
+
+
 class IamInstanceProfileFilterUsage(BaseTest):
 
     def test_iam_instance_profile_inuse(self):

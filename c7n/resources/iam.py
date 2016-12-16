@@ -437,27 +437,24 @@ class UserAttachedPolicy(Filter):
 
     schema = type_schema('policy')
 
+    def user_policies(self, resource):
+        client = local_session(self.manager.session_factory).client('iam')
+        resource['c7n.AttachedPolicies'] = client.list_attached_user_policies(
+            UserName=resource['UserName'])['AttachedPolicies']
+
     def process(self, resources, event=None):
-
-        def _user_policies(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AttachedPolicies'] = client.list_attached_user_policies(
-                UserName=resource['UserName'])['AttachedPolicies']
-
+        query_resources = [
+            r for r in resources if 'c7n.AttachedPolicies' not in r]
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AttachedPolicies' not in r]
             self.log.debug(
                 "Querying %d users policies" % len(query_resources))
-            list(w.map(_user_policies, query_resources))
+            w.map(self.user_policies, query_resources)
 
-        matched = []
+        results = []
         for r in resources:
-            for p in r['AttachedPolicies']:
-                if self.match(p):
-                    matched.append(r)
-                    break
-        return matched
+            if len(r['c7n.AttachedPolicies']) > 0:
+                results.append(r)
+        return results
 
 
 @User.filter_registry.register('access-key')
