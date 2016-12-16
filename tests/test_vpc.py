@@ -59,7 +59,7 @@ class NetworkInterfaceTest(BaseTest):
                  'value': 'for apps'}
             ],
             'actions': [{
-                'type': 'modify-groups',
+                'type': 'modify-security-groups',
                 'groups': 'matched',
                 'isolation-group': qsg_id}]
             }, session_factory=factory)

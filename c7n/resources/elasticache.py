@@ -299,16 +299,9 @@ class SnapshotElastiCacheCluster(BaseAction):
             CacheClusterId=cluster['CacheClusterId'])
 
 
-@actions.register('modify-groups')
+@actions.register('modify-security-groups')
 class ElasticacheClusterModifyGroups(ModifyGroupsAction):
     """Modify security groups on an Elasticache cluster"""
-
-    schema = type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('elasticache')

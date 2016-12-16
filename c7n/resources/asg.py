@@ -988,59 +988,48 @@ class Delete(BaseAction):
             raise
 
 
-@actions.register('modify-groups')
+@actions.register('modify-security-groups')
 class ASGModifyGroups(ModifyGroupsAction):
+    # Need some kind of a warning - this will require the ASGs to bring up new instances
+    # in order to see the new security groups
 
-    schema = type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
+    # TODO: Implement. Lots of other gotchas
 
     def process(self, asgs):
-        client = local_session(self.manager.session_factory).client('autoscaling')
-        groups = super(ASGModifyGroups, self).get_groups(resources)
-        for idx, a in enumerate(asgs):
-            # Create new launch config from old
-            # May be a better way to do these describe calls - batch them together
-            config_name = a['LaunchConfigurationName']
-            old_config = client.describe_launch_configurations(
-                    LaunchConfigurationNames=[config_name]
-            )['LaunchConfigurations'][0]
-
-            # other than these two, the describe is identical to create syntax. convenient
-            new_config = old_config.pop('LaunchConfigurationARN').pop('CreatedTime')
-            new_config['SecurityGroups'] = groups[idx]
-            client.create_launch_configuration(**new_config)
-
-            # Update ASG with new config
-            # something with client.update(config_name)
-
-            # Some logic to apply changes when the user wants them applied (immediately, config window, etc.)
-
-    def process(self, asgs):
+        raise NotImplemented('The modify-security-groups action has not been implemented on this resource')
         with self.executor_factory(max_workers=5) as w:
             list(w.map(self.process_asg, asgs))
 
     def process_asg(self, asg):
-        force_delete = self.data.get('force', False)
-        if force_delete:
-            log.info('Forcing deletion of Auto Scaling group %s' % (
-                asg['AutoScalingGroupName']))
-        session = local_session(self.manager.session_factory)
-        asg_client = session.client('autoscaling')
-        try:
-            asg_client.delete_auto_scaling_group(
-                    AutoScalingGroupName=asg['AutoScalingGroupName'],
-                    ForceDelete=force_delete)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'ValidationError':
-                log.warning("Erroring deleting asg %s %s" % (
-                    asg['AutoScalingGroupName'], e))
-                return
-            raise
+        client = local_session(self.manager.session_factory).client('autoscaling')
 
+        # patch the resource obj for the generic actions
+        asg['Groups'] = asg['SecurityGroups']
+
+        groups = super(ASGModifyGroups, self).get_groups(asg)
+
+        # create new launch config from old
+        # May be a better way to do these describe calls - batch them together
+        config_name = asg['LaunchConfigurationName']
+        old_config = client.describe_launch_configurations(
+                LaunchConfigurationNames=[config_name]
+        )['LaunchConfigurations'][0]
+
+        # other than these two, the describe is identical to create syntax. convenient
+        new_config = old_config.pop('LaunchConfigurationARN').pop('CreatedTime').pop('LaunchConfigurationName')
+        new_config['SecurityGroups'] = groups
+        # TODO: come up with a way to generate a new launch config name
+        new_launch_config_name = ''
+        new_config['LaunchConfigurationName'] = new_launch_config_name
+
+        client.create_launch_configuration(**new_config)
+
+        # Update ASG with new config
+        # something with client.update(config_name)
+        client.update_auto_scaling_group(
+            AutoScalingGroupName=asg['AutoScalingGroupName'],
+            LaunchConfigurationName=new_launch_config_name
+        )
 
 @resources.register('launch-config')
 class LaunchConfig(QueryResourceManager):

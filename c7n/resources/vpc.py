@@ -707,13 +707,6 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
     that can be specified if there would otherwise be no groups.
     """
 
-    # schema = type_schema(
-    #     'modify-groups',
-    #     **{'groups': {'anyOf': [
-    #         {'type': 'string', 'enum': ['matched', 'all']},
-    #         {'type': 'array', 'items': {'type': 'string'}}]},
-    #        'isolation-group': {'type': 'string'}})
-
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
         groups = super(InterfaceRemoveGroups, self).get_groups(resources)

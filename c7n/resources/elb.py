@@ -193,17 +193,10 @@ class SetSslListenerPolicy(BaseAction):
                     PolicyNames=policy_names)
 
 
-@actions.register('modify-groups')
+@actions.register('modify-security-groups')
 class ELBModifyGroups(ModifyGroupsAction):
     """Modify security groups on an instance."""
 
-    schema = type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
-           
     def process(self, load_balancers):
         client = local_session(self.manager.session_factory).client('elb')
         groups = super(EC2ModifyGroups, self).get_groups(load_balancers)

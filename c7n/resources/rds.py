@@ -952,15 +952,8 @@ class RDSSnapshotDelete(BaseAction):
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
 
 
-@actions.register('modify-groups')
+@actions.register('modify-security-groups')
 class RDSModifyGroups(ModifyGroupsAction):
-
-    schema = type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
