@@ -709,11 +709,11 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        groups = super(InterfaceRemoveGroups, self).get_groups(resources)
         for idx, r in enumerate(resources):
+            groups = super(InterfaceRemoveGroups, self).get_groups([r])
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
-                Groups=groups[idx])
+                Groups=groups)
 
 
 @resources.register('route-table')
