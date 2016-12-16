@@ -3,29 +3,29 @@
     "data": {
         "AccessKeyMetadata": [
             {
-                "UserName": "alphabet_soup",
-                "Status": "Active",
+                "UserName": "alphabet_soup", 
+                "Status": "Active", 
                 "CreateDate": {
-                    "hour": 19,
-                    "__class__": "datetime",
-                    "month": 12,
-                    "second": 32,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 8,
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
                     "minute": 36
-                },
+                }, 
                 "AccessKeyId": "AKIAJRLD3ESRQSWUHEWA"
             }
-        ],
+        ], 
         "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "941e7240-c3bc-11e6-897d-9168e9c29943",
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "814f2cb1-c3c2-11e6-bd0c-e318d2d80fde", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "941e7240-c3bc-11e6-897d-9168e9c29943",
-                "date": "Fri, 16 Dec 2016 18:22:17 GMT",
-                "content-length": "561",
+                "x-amzn-requestid": "814f2cb1-c3c2-11e6-bd0c-e318d2d80fde", 
+                "date": "Fri, 16 Dec 2016 19:04:43 GMT", 
+                "content-length": "561", 
                 "content-type": "text/xml"
             }
         }, 
