@@ -571,7 +571,7 @@ class TestSecurityGroupFilter(BaseTest):
 
 
     def test_invalid_modify_groups_schema(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_invalid_modify_groups_schema'
         )
 

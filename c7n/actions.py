@@ -123,9 +123,8 @@ class ModifyGroupsAction(BaseAction):
     properties = {
         'add': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': 'string'}]},
         'remove': {'oneOf': [
-            {'type': 'string'},
             {'type': 'array', 'items': 'string'},
-            {'enum': ['matched', 'all']}]},
+            {'enum': ['matched', 'all', {'type': 'string'}]}]},
         'isolation-group': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': 'string'}]}
     }
     schema = utils.type_schema(
