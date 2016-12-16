@@ -310,6 +310,22 @@ class TestTag(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_change_tag_value_case(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_change_tag_value_case')
+        policy = self.load_policy({
+            'name': 'ec2-test-change-tag-value-case',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'change-tag-value-case',
+                 'key': 'Testing',
+                 'case': 'Lower'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+
     def test_ec2_rename_tag(self):
         session_factory = self.replay_flight_data(
             'test_ec2_rename_tag')
