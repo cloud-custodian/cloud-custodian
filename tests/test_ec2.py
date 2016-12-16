@@ -535,7 +535,7 @@ class TestSecurityGroupFilter(BaseTest):
         # Test conditions:
         #   - running two instances; one with TestProductionInstanceProfile and one with none
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to both test instances
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_modify_groups_action')
         client = session_factory().client('ec2')
 

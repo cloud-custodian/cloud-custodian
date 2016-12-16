@@ -833,14 +833,18 @@ class EC2ModifyGroups(ModifyGroupsAction):
             self.manager.session_factory).client('ec2')
 
         # handle multiple ENIs
-        interfaces = [eni for i in instances for eni in i['NetworkInterfaces']]
+        interfaces = []
+        for i in instances:
+            for eni in i['NetworkInterfaces']:
+                if i.get('c7n.matched-security-groups'):
+                    eni['c7n.matched-security-groups'] = i['c7n.matched-security-groups']
+                interfaces.append(eni)
 
-        groups = super(EC2ModifyGroups, self).get_groups(interfaces)
         for idx, i in enumerate(interfaces):
-            if groups[idx]:
-                client.modify_network_interface_attribute(
-                    NetworkInterfaceId=i['NetworkInterfaceId'],
-                    Groups=groups[idx])
+            groups = super(EC2ModifyGroups, self).get_groups([i])
+            client.modify_network_interface_attribute(
+                NetworkInterfaceId=i['NetworkInterfaceId'],
+                Groups=groups)
 
 
 # Valid EC2 Query Filters

@@ -137,9 +137,12 @@ class ModifyGroupsAction(BaseAction):
         if 'remove' in self.data:
             if 'isolation-group' not in self.data and 'add' not in self.data:
                 raise ValueError('Must specify `isolation-group` or `add` parameters when using the `remove` action')
-            if isinstance(self.data['remove'], basestring) and 'sg-' not in self.data['remove']:
-                raise ValueError('Must specify a valid security group id for the `remove` parameter')
-            if isinstance(self.data['remove']) and any('sg-' not in g for g in self.data['remove']):
+            if isinstance(self.data['remove'], basestring):
+                if 'sg-' not in self.data['remove'] and 'all' not in self.data['remove'] and 'matched' not in self.data['remove']:
+                    raise ValueError('Must specify valid input for the `remove` parameter')
+
+
+            if isinstance(self.data['remove'], list) and any('sg-' not in g for g in self.data['remove']):
                 raise ValueError('Must specify valid security group ids for the `remove` parameter')
         if 'add' in self.data:
             if isinstance('add', basestring) and 'sg-' not in self.data['add']:
@@ -203,7 +206,7 @@ class ModifyGroupsAction(BaseAction):
             if not rgroups:
                 rgroups.append(isolation_group)
 
-            return_groups.append(rgroups)
+            return_groups = rgroups
 
         return return_groups
 

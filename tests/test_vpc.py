@@ -60,7 +60,7 @@ class NetworkInterfaceTest(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-security-groups',
-                'groups': 'matched',
+                'remove': 'matched',
                 'isolation-group': qsg_id}]
             }, session_factory=factory)
         resources = p.run()
