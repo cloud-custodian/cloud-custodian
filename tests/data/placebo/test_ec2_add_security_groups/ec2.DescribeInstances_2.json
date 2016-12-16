@@ -166,6 +166,10 @@
                         "PrivateDnsName": "ip-172-31-59-103.ec2.internal", 
                         "SecurityGroups": [
                             {
+                                "GroupName": "Test-SG1", 
+                                "GroupId": "sg-8a4b64f7"
+                            }, 
+                            {
                                 "GroupName": "TEST-PROD-ONLY-SG", 
                                 "GroupId": "sg-411b413c"
                             }
@@ -206,6 +210,10 @@
                                     }
                                 }, 
                                 "Groups": [
+                                    {
+                                        "GroupName": "Test-SG1", 
+                                        "GroupId": "sg-8a4b64f7"
+                                    }, 
                                     {
                                         "GroupName": "TEST-PROD-ONLY-SG", 
                                         "GroupId": "sg-411b413c"
@@ -390,13 +398,13 @@
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "944d508a-b599-4266-ba34-3e7f121525e2", 
+            "RequestId": "85a8cc77-7090-46f2-8be5-c66fd8f0a2c3", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 15 Dec 2016 21:37:47 GMT"
+                "date": "Fri, 16 Dec 2016 20:45:25 GMT"
             }
         }
     }

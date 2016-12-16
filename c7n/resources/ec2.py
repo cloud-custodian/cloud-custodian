@@ -826,30 +826,20 @@ class Snapshot(BaseAction):
 class EC2ModifyGroups(ModifyGroupsAction):
     """Modify security groups on an instance."""
 
-    # schema = type_schema(
-    #     'modify-groups',
-    #     **{'groups': {'anyOf': [
-    #         {'type': 'string', 'enum': ['matched', 'all']},
-    #         {'type': 'array', 'items': {'type': 'string'}}]},
-    #        'isolation-group': {'type': 'string'}})
-
     def process(self, instances):
         if not len(instances):
             return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        groups = super(EC2ModifyGroups, self).get_groups(instances)
 
-        # Check if we needed to handle multiple ENIs
-        if groups and isinstance(groups[0], tuple):
-            for eni_id, group_ids in enumerate(groups):
+        # handle multiple ENIs
+        interfaces = [eni for i in instances for eni in i['NetworkInterfaces']]
+
+        groups = super(EC2ModifyGroups, self).get_groups(interfaces)
+        for idx, i in enumerate(interfaces):
+            if groups[idx]:
                 client.modify_network_interface_attribute(
-                    NetworkInterfaceId=eni_id,
-                    Groups=group_ids)
-        elif groups and isinstance(groups[0], basestring):
-            for idx, i in enumerate(instances):
-                client.modify_instance_attribute(
-                    InstanceId=i['InstanceId'],
+                    NetworkInterfaceId=i['NetworkInterfaceId'],
                     Groups=groups[idx])
 
 

@@ -120,7 +120,6 @@ class ModifyGroupsAction(BaseAction):
         isolation-group: sg-xyz
     """
 
-    # THIS ISN"T FAILING FOR modify-groups.... why not?
     properties = {
         'add': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': 'string'}]},
         'remove': {'oneOf': [
@@ -168,35 +167,11 @@ class ModifyGroupsAction(BaseAction):
         add_groups = []
         remove_groups = []
         return_groups = []
-        interfaces = []
-        multiple = False
-
-        # add groups - append sg-id(s) to the ones already on the resource
-        # isolation-group - only apply if len(matched-security-groups) == total sgs on resource
 
         for idx, r in enumerate(resources):
             # single eni resources
             if r.get('Groups'):
                 rgroups = [g['GroupId'] for g in r['Groups']]
-            # multi-eni resources
-            elif r.get('NetworkInterfaces'):
-                enis = r['NetworkInterfaces']
-                for i in enis:
-                    rgroups = [g['GroupId'] for g in i['Groups']]
-                    interfaces.append((i['NetworkInterfaceId'], rgroups))
-                # rgroups = [g['GroupId'] for i in interfaces for g in i['Groups']]
-
-            if len(interfaces) > 1:
-                multiple = True
-
-            # if target_group_ids == 'matched':
-            #     group_ids = r.get('c7n.matched-security-groups', ())
-            # elif target_group_ids == 'all':
-            #     group_ids = rgroups
-            # elif isinstance(target_group_ids, list):
-            #     group_ids = target_group_ids
-            # else:
-            #     continue
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
@@ -218,25 +193,17 @@ class ModifyGroupsAction(BaseAction):
                 continue
 
             for g in remove_groups:
-                if not multiple and g in rgroups:
+                if g in rgroups:
                     rgroups.remove(g)
-                elif multiple and g in rgroups:
-                    interfaces[idx][1].remove(g)
+
             for g in add_groups:
-                if not multiple and g not in rgroups:
+                if g not in rgroups:
                     rgroups.append(g)
-                elif multiple and g not in rgroups:
-                    interfaces[idx][1].append(g)
 
-            if not multiple and not rgroups:
+            if not rgroups:
                 rgroups.append(isolation_group)
-            elif multiple and not interfaces[idx][1]:
-                interfaces[idx][1].append(isolation_group)
 
-            if not multiple:
-                return_groups.append(rgroups)
-            elif multiple:
-                return_groups.append(interfaces)
+            return_groups.append(rgroups)
 
         return return_groups
 
