@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccessKeyMetadata": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "94778f6b-c3bc-11e6-a52d-93b2f4d32db8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "94778f6b-c3bc-11e6-a52d-93b2f4d32db8", 
+                "date": "Fri, 16 Dec 2016 18:22:18 GMT", 
+                "content-length": "321", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

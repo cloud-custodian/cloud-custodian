@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "6e4297c2-c3ba-11e6-a21a-61d5857a5c2c",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6e4297c2-c3ba-11e6-a21a-61d5857a5c2c",
+                "date": "Fri, 16 Dec 2016 18:06:55 GMT",
+                "content-length": "360",
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

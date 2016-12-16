@@ -435,54 +435,53 @@ class UserCredentialReport(Filter):
 @User.filter_registry.register('policy')
 class UserAttachedPolicy(Filter):
 
-    schema = type_schema('policy')
+    schema = type_schema(
+        'policy',
+        attached={'type': 'boolean'})
 
     def user_policies(self, resource):
+        if 'c7n.AttachedPolicies' in resource:
+            return
         client = local_session(self.manager.session_factory).client('iam')
         resource['c7n.AttachedPolicies'] = client.list_attached_user_policies(
             UserName=resource['UserName'])['AttachedPolicies']
 
     def process(self, resources, event=None):
-        query_resources = [
-            r for r in resources if 'c7n.AttachedPolicies' not in r]
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
-                "Querying %d users policies" % len(query_resources))
-            w.map(self.user_policies, query_resources)
+                "Querying %d users policies" % len(resources))
+            w.map(self.user_policies, resources)
 
-        results = []
-        for r in resources:
-            if len(r['c7n.AttachedPolicies']) > 0:
-                results.append(r)
-        return results
+        if self.data.get('attached', True):
+            return [r for r in resources if r['c7n.AttachedPolicies']]
+        else:
+            return [r for r in resources if not r['c7n.AttachedPolicies']]
 
 
 @User.filter_registry.register('access-key')
-class UserAccessKey(ValueFilter):
+class UserAccessKey(Filter):
 
-    schema = type_schema('access-key', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'access-key',
+        present={'type': 'boolean'})
+
+    def user_keys(self, resource):
+        if 'c7n.AccessKeys' in resource:
+            return
+        client = local_session(self.manager.session_factory).client('iam')
+        resource['c7n.AccessKeys'] = client.list_access_keys(
+            UserName=resource['UserName'])['AccessKeyMetadata']
 
     def process(self, resources, event=None):
-
-        def _user_keys(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AccessKeys'] = client.list_access_keys(
-                UserName=resource['UserName'])['AccessKeyMetadata']
-
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AccessKeys' not in r]
             self.log.debug(
-                "Querying %d users' api keys" % len(query_resources))
-            list(w.map(_user_keys, query_resources))
+                "Querying %d users' api keys" % len(resources))
+            w.map(self.user_keys, resources)
 
-        matched = []
-        for r in resources:
-            for p in r['AccessKeys']:
-                if self.match(p):
-                    matched.append(r)
-                    break
-        return matched
+        if self.data.get('present', True):
+            return [r for r in resources if r['c7n.AccessKeys']]
+        else:
+            return [r for r in resources if not r['c7n.AccessKeys']]
 
 
 # Mfa-device filter for iam-users
