@@ -113,47 +113,131 @@ class ModifyGroupsAction(BaseAction):
     Note an interface always gets at least one security group, so
     we also allow specification of an isolation/quarantine group
     that can be specified if there would otherwise be no groups.
+
+    type: modify-security-groups
+        add: []
+        remove: [] | matched
+        isolation-group: sg-xyz
     """
 
+    # THIS ISN"T FAILING FOR modify-groups.... why not?
+    properties = {
+        'add': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': 'string'}]},
+        'remove': {'oneOf': [
+            {'type': 'string'},
+            {'type': 'array', 'items': 'string'},
+            {'enum': ['matched', 'all']}]},
+        'isolation-group': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': 'string'}]}
+    }
     schema = utils.type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['add', 'remove', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
+        'modify-security-groups',
+        **properties
+    )
+
+    def validate(self):
+        if 'remove' in self.data:
+            if 'isolation-group' not in self.data and 'add' not in self.data:
+                raise ValueError('Must specify `isolation-group` or `add` parameters when using the `remove` action')
+            if isinstance(self.data['remove'], basestring) and 'sg-' not in self.data['remove']:
+                raise ValueError('Must specify a valid security group id for the `remove` parameter')
+            if isinstance(self.data['remove']) and any('sg-' not in g for g in self.data['remove']):
+                raise ValueError('Must specify valid security group ids for the `remove` parameter')
+        if 'add' in self.data:
+            if isinstance('add', basestring) and 'sg-' not in self.data['add']:
+                raise ValueError('Must specify a valid security group id for the `add` parameter')
+            if isinstance('add', list) and any('sg-' not in g for g in self.data['add']):
+                raise ValueError('Must specify valid security group ids for the `add` parameter')
+        if 'isolation-group' in self.data:
+            if isinstance('isolation-group', basestring) and 'sg-' not in self.data['isolation-group']:
+                raise ValueError('Must specify a valid security group id for the `isolation-group` parameter')
+            if isinstance('isolation-group', list) and any('sg-' not in g for g in self.data['isolation-group']):
+                raise ValueError('Must specify valid security group ids for the `isolation-group` parameter')
+        if 'add' not in self.data and 'remove' not in self.data:
+            raise ValueError('Must specify either `add` or `remove` parameters')
+
+        return self
 
     def get_groups(self, resources):
-        target_group_ids = self.data.get('groups', 'matched')
-        isolation_group = self.data.get('isolation-group')
-        return_groups = []
+        # parse the add, remove, and isolation group params to return the
+        # list of security groups that will end up on the resource
+        # target_group_ids = self.data.get('groups', 'matched')
 
-        for r in resources:
+        add_target_group_ids = self.data.get('add', None)
+        remove_target_group_ids = self.data.get('remove', None)
+        isolation_group = self.data.get('isolation-group')
+        add_groups = []
+        remove_groups = []
+        return_groups = []
+        interfaces = []
+        multiple = False
+
+        # add groups - append sg-id(s) to the ones already on the resource
+        # isolation-group - only apply if len(matched-security-groups) == total sgs on resource
+
+        for idx, r in enumerate(resources):
+            # single eni resources
             if r.get('Groups'):
                 rgroups = [g['GroupId'] for g in r['Groups']]
+            # multi-eni resources
             elif r.get('NetworkInterfaces'):
-                interfaces = r['NetworkInterfaces']
-                rgroups = [g['GroupId'] for i in interfaces for g in i['Groups']]
-            if target_group_ids == 'matched':
-                group_ids = r.get('c7n.matched-security-groups', ())
-            elif target_group_ids == 'all':
-                group_ids = rgroups
-            elif isinstance(target_group_ids, list):
-                group_ids = target_group_ids
-            else:
+                enis = r['NetworkInterfaces']
+                for i in enis:
+                    rgroups = [g['GroupId'] for g in i['Groups']]
+                    interfaces.append((i['NetworkInterfaceId'], rgroups))
+                # rgroups = [g['GroupId'] for i in interfaces for g in i['Groups']]
+
+            if len(interfaces) > 1:
+                multiple = True
+
+            # if target_group_ids == 'matched':
+            #     group_ids = r.get('c7n.matched-security-groups', ())
+            # elif target_group_ids == 'all':
+            #     group_ids = rgroups
+            # elif isinstance(target_group_ids, list):
+            #     group_ids = target_group_ids
+            # else:
+            #     continue
+
+            # Parse remove_groups
+            if remove_target_group_ids == 'matched':
+                remove_groups = r.get('c7n.matched-security-groups', ())
+            elif remove_target_group_ids == 'all':
+                remove_groups = rgroups
+            elif isinstance(remove_target_group_ids, list):
+                remove_groups = remove_target_group_ids
+            elif isinstance(remove_target_group_ids, basestring):
+                remove_groups = [remove_target_group_ids]
+
+            # Parse add_groups
+            if isinstance(add_target_group_ids, list):
+                add_groups = add_target_group_ids
+            elif isinstance(add_target_group_ids, basestring):
+                add_groups = [add_target_group_ids]
+
+            if not remove_groups and not add_groups:
                 continue
 
-            if not group_ids:
-                continue
-
-            for g in group_ids:
-                if g in rgroups:
+            for g in remove_groups:
+                if not multiple and g in rgroups:
                     rgroups.remove(g)
+                elif multiple and g in rgroups:
+                    interfaces[idx][1].remove(g)
+            for g in add_groups:
+                if not multiple and g not in rgroups:
+                    rgroups.append(g)
+                elif multiple and g not in rgroups:
+                    interfaces[idx][1].append(g)
 
-            if not rgroups:
+            if not multiple and not rgroups:
                 rgroups.append(isolation_group)
-            
-            return_groups.append(rgroups)  
-        
+            elif multiple and not interfaces[idx][1]:
+                interfaces[idx][1].append(isolation_group)
+
+            if not multiple:
+                return_groups.append(rgroups)
+            elif multiple:
+                return_groups.append(interfaces)
+
         return return_groups
 
 

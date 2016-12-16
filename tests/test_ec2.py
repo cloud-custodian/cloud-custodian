@@ -535,7 +535,7 @@ class TestSecurityGroupFilter(BaseTest):
         # Test conditions:
         #   - running two instances; one with TestProductionInstanceProfile and one with none
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to both test instances
-        session_factory = self.replay_flight_data(
+        session_factory = self.record_flight_data(
             'test_ec2_modify_groups_action')
         client = session_factory().client('ec2')
 
@@ -560,7 +560,7 @@ class TestSecurityGroupFilter(BaseTest):
                 ]},
                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
             'actions': [
-                {'type': 'modify-groups', 'remove': 'matched', 'isolation-group': default_sg_id}]
+                {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': default_sg_id}]
             },
             session_factory=session_factory)
         before_action_resources = policy.run()
@@ -568,4 +568,60 @@ class TestSecurityGroupFilter(BaseTest):
         self.assertEqual(len(before_action_resources), 1)
         self.assertEqual(before_action_resources[0]['InstanceId'], 'i-0dd3919bc5bac1ea8')
         self.assertEqual(len(after_action_resources), 0)
+
+
+    def test_invalid_modify_groups_schema(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_invalid_modify_groups_schema'
+        )
+
+        class foo():
+            def __init__(self, test_obj):
+                self.test_obj = test_obj
+            def bar(self):
+                policy = self.test_obj.load_policy({
+                    'name': 'invalid-modify-security-groups-action',
+                    'resource': 'ec2',
+                    'filters': [
+                        {'or': [
+                            {'and': [
+                                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
+                                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
+                            ]},
+                            {'type': 'value', 'key': 'IamInstanceProfile', 'value': 'absent'}
+                        ]},
+                        {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+                    'actions': [
+                        {'type': 'modify-security-groups', 'change': 'matched'}
+                    ]
+                },
+                session_factory=session_factory)
+                resources = policy.run()
+                return resources
+
+        i = foo(self)
+        self.assertRaises(ValueError, lambda: i.bar())
+
+
+    def test_ec2_add_security_groups(self):
+        session_factory = self.record_flight_data(
+            'test_ec2_add_security_groups'
+        )
+
+        policy = self.load_policy({
+            'name': 'add-sg-to-prod-instances',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(.*TestProductionInstanceProfile)', 'op': 'regex'}
+            ],
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'sg-8a4b64f7'}
+            ]
+        },
+        session_factory=session_factory)
+
+        first_resources = policy.run()
+        self.assertEqual(len(first_resources[0]['NetworkInterfaces'][0]['Groups']), 1)
+        second_resources = policy.run()
+        self.assertEqual(len(second_resources[0]['NetworkInterfaces'][0]['Groups']), 2)
 

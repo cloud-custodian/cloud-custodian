@@ -667,7 +667,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
-@NetworkInterface.action_registry.register('modify-groups')
+@NetworkInterface.action_registry.register('modify-security-groups')
 class InterfaceRemoveGroups(ModifyGroupsAction):
     """Remove security groups from an interface.
 
@@ -680,12 +680,12 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
     that can be specified if there would otherwise be no groups.
     """
 
-    schema = type_schema(
-        'modify-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
+    # schema = type_schema(
+    #     'modify-groups',
+    #     **{'groups': {'anyOf': [
+    #         {'type': 'string', 'enum': ['matched', 'all']},
+    #         {'type': 'array', 'items': {'type': 'string'}}]},
+    #        'isolation-group': {'type': 'string'}})
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
