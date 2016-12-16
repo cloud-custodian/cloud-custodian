@@ -42,3 +42,6 @@ ghpages:
 	git add -u && \
 	git add -A && \
 	git commit -m "Updated generated Sphinx documentation"
+
+clean:
+	rm -rf .Python bin include lib pip-selfcheck.json 
