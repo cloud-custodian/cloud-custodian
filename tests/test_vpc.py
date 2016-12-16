@@ -267,7 +267,7 @@ class SecurityGroupTest(BaseTest):
             }])
 
         p = self.load_policy({
-            'name': 'sg-find-0',
+            'name': 'sg-find0',
             'resource': 'security-group',
             'filters': [
                 {'type': 'ingress',
@@ -278,7 +278,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
         p = self.load_policy({
-            'name': 'sg-find-1',
+            'name': 'sg-find1',
             'resource': 'security-group',
             'filters': [
                 {'type': 'ingress',
@@ -289,7 +289,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         p = self.load_policy({
-            'name': 'sg-find-2',
+            'name': 'sg-find2',
             'resource': 'security-group',
             'filters': [
                 {'type': 'egress',
