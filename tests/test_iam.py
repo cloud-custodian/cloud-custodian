@@ -30,8 +30,8 @@ from c7n.resources.iam import (UserMfaDevice,
                                UsedInstanceProfiles,
                                UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole,
-                               IamGroupUsers,
-                               UserCredentialReport,
+                               IamGroupUsers, UserAttachedPolicy,
+                               UserCredentialReport, UserAccessKey,
                                IamRoleInlinePolicy, IamGroupInlinePolicy)
 from c7n.executor import MainThreadExecutor
 
@@ -188,7 +188,7 @@ class IamUserFilterUsage(BaseTest):
         session_factory = self.replay_flight_data(
             'test_iam_user_policy_attached')
         self.patch(
-            UsedIamRole, 'executor_factory', MainThreadExecutor)
+            UserAttachedPolicy, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
             'name': 'iam-user-policy-attached',
             'resource': 'iam-user',
@@ -203,7 +203,7 @@ class IamUserFilterUsage(BaseTest):
         session_factory = self.replay_flight_data(
             'test_iam_user_policy_unattached')
         self.patch(
-            UsedIamRole, 'executor_factory', MainThreadExecutor)
+            UserAttachedPolicy, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
             'name': 'iam-user-policy-unattached',
             'resource': 'iam-user',
@@ -218,7 +218,7 @@ class IamUserFilterUsage(BaseTest):
         session_factory = self.replay_flight_data(
             'test_iam_user_with_key')
         self.patch(
-            UsedIamRole, 'executor_factory', MainThreadExecutor)
+            UserAccessKey, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
             'name': 'iam-user-with-key',
             'resource': 'iam-user',
@@ -233,7 +233,7 @@ class IamUserFilterUsage(BaseTest):
         session_factory = self.replay_flight_data(
             'test_iam_user_without_key')
         self.patch(
-            UsedIamRole, 'executor_factory', MainThreadExecutor)
+            UserAccessKey, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
             'name': 'iam-user-with-key',
             'resource': 'iam-user',

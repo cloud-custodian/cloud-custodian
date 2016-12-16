@@ -450,7 +450,7 @@ class UserAttachedPolicy(Filter):
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
                 "Querying %d users policies" % len(resources))
-            w.map(self.user_policies, resources)
+            list(w.map(self.user_policies, resources))
 
         if self.data.get('attached', True):
             return [r for r in resources if r['c7n.AttachedPolicies']]
@@ -476,7 +476,7 @@ class UserAccessKey(Filter):
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
                 "Querying %d users' api keys" % len(resources))
-            w.map(self.user_keys, resources)
+            list(w.map(self.user_keys, resources))
 
         if self.data.get('present', True):
             return [r for r in resources if r['c7n.AccessKeys']]
