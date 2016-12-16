@@ -6,6 +6,8 @@ Developer Install and Testing
 Requirements
 ------------
 
+The Custodian requires Python 2.7, and a make/C toolchain.
+
 On Linux
 ~~~~~~~~
 
@@ -22,8 +24,6 @@ On Mac
 
 Installing
 ----------
-
-Building the Custodian requires Python 2 or 3, and a make/C toolchain.
 
 First, clone the repository:
 
