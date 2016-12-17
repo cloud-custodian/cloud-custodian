@@ -353,7 +353,7 @@ def reformat_schema(model):
     if 'properties' not in model.schema:
         return "Schema in unexpected format."
     
-    ret = model.schema['properties']
+    ret = copy.deepcopy(model.schema['properties'])
     
     if 'type' in ret:
         del(ret['type'])
