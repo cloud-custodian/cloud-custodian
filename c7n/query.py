@@ -136,6 +136,13 @@ class QueryResourceManager(ResourceManager):
     def get_model(self):
         return self.query.resolve(self.resource_type)
 
+    def match_ids(self, ids):
+        """return ids that match this resource type's id format."""
+        id_prefix = getattr(self.get_model(), 'id_prefix', None)
+        if id_prefix is not None:
+            return [i for i in ids if i.startswith(id_prefix)]
+        return ids
+
     def resources(self, query=None):
         key = {'region': self.config.region,
                'resource': str(self.__class__.__name__),

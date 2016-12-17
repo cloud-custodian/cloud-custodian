@@ -6,6 +6,8 @@ Developer Install and Testing
 Requirements
 ------------
 
+The Custodian requires Python 2.7, and a make/C toolchain.
+
 On Linux
 ~~~~~~~~
 
@@ -28,25 +30,13 @@ First, clone the repository:
 .. code-block:: bash
 
    $ git clone https://github.com/capitalone/cloud-custodian.git
+   $ cd cloud-custodian
 
-Also recommended is to use a virtualenv to sandbox this install from your system packages:
-
-.. code-block:: bash
-
-   $ virtualenv cloud-custodian
-   $ source cloud-custodian/bin/activate
-
-And then install the dependencies. Deployed systems will just use `requirements.txt`; you'll need the additional testing libraries in `requirements-dev.txt`.
+Then build the software:
 
 .. code-block:: bash
 
-   $ pip install -r requirements-dev.txt
-
-And then the Custodian itself:
-
-.. code-block:: bash
-
-   $ python setup.py develop
+   $ make develop
 
 You should have the ``custodian`` command available now:
 
@@ -54,25 +44,10 @@ You should have the ``custodian`` command available now:
 
    $ custodian -h
 
-Alternatively, you can just run the commands below:
-
-.. code-block:: bash
-
-   $ cd cloud-custodian
-   $ make develop
-   $ ./bin/custodian -h
-
 Running tests
 -------------
 
-There are several additional dependencies for running unit tests.
-
-.. code-block:: bash
-
-   $ cd cloud-custodian
-   $ make install
-
-Then unit tests can be run with:
+Unit tests can be run with:
 
 .. code-block:: bash
 

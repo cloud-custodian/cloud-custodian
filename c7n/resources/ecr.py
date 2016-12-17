@@ -34,6 +34,21 @@ class ECR(QueryResourceManager):
 
 @ECR.filter_registry.register('cross-account')
 class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filters all EC2 Container Registries (ECR) with cross-account access
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ecr-cross-account
+                resource: ecr
+                filters:
+                  - type: cross-account
+                    whitelist_from:
+                      expr: "accounts.*.accountNumber"
+                      url: *accounts_url
+    """
 
     def process(self, resources, event=None):
 
