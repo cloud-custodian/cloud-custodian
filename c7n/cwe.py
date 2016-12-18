@@ -103,7 +103,6 @@ class CloudWatchEvents(object):
         info = CloudWatchEvents.match(event)
         if info:
             return info['ids'].search(event)
-
         resource_ids = ()
         event_name = event['detail']['eventName']
         event_source = event['detail']['eventSource']
