@@ -51,7 +51,7 @@ from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -953,15 +953,15 @@ class RDSSnapshotDelete(BaseAction):
 
 
 @actions.register('modify-security-groups')
-class RDSModifyGroups(ModifyGroupsAction):
+class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        groups = super(RDSModifyGroups, self).get_groups(resources)
+        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(resources)
         for idx, r in enumerate(resources):
             client.modify_db_instance(
-                VpcSecurityGroupIds=db['NetworkInterfaceId'],
-                Groups=groups[idx])
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                VpcSecurityGroupIds=groups[idx])
 
 
 @resources.register('rds-subnet-group')

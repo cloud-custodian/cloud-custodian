@@ -22,7 +22,7 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 
-from c7n.actions import ActionRegistry, BaseAction, ModifyGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -300,12 +300,12 @@ class SnapshotElastiCacheCluster(BaseAction):
 
 
 @actions.register('modify-security-groups')
-class ElasticacheClusterModifyGroups(ModifyGroupsAction):
+class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an Elasticache cluster"""
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('elasticache')
-        groups = super(ElasticacheClusterModifyGroups, self).get_groups(resources)
+        groups = super(ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(resources)
         for idx, c in enumerate(clusters):
             client.modify_cache_cluster(
                 CacheClusterId=c['CacheClusterId'],

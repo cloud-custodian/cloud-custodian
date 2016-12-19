@@ -24,7 +24,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -989,7 +989,7 @@ class Delete(BaseAction):
 
 
 @actions.register('modify-security-groups')
-class ASGModifyGroups(ModifyGroupsAction):
+class ASGModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     # Need some kind of a warning - this will require the ASGs to bring up new instances
     # in order to see the new security groups
 
@@ -1003,10 +1003,7 @@ class ASGModifyGroups(ModifyGroupsAction):
     def process_asg(self, asg):
         client = local_session(self.manager.session_factory).client('autoscaling')
 
-        # patch the resource obj for the generic actions
-        asg['Groups'] = asg['SecurityGroups']
-
-        groups = super(ASGModifyGroups, self).get_groups(asg)
+        groups = super(ASGModifyVpcSecurityGroups, self).get_groups(asg, metadata_key='SecurityGroups')
 
         # create new launch config from old
         # May be a better way to do these describe calls - batch them together
@@ -1030,6 +1027,7 @@ class ASGModifyGroups(ModifyGroupsAction):
             AutoScalingGroupName=asg['AutoScalingGroupName'],
             LaunchConfigurationName=new_launch_config_name
         )
+
 
 @resources.register('launch-config')
 class LaunchConfig(QueryResourceManager):

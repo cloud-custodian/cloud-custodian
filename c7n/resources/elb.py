@@ -19,7 +19,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -194,12 +194,12 @@ class SetSslListenerPolicy(BaseAction):
 
 
 @actions.register('modify-security-groups')
-class ELBModifyGroups(ModifyGroupsAction):
-    """Modify security groups on an instance."""
+class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify VPC security groups on an ELB."""
 
     def process(self, load_balancers):
         client = local_session(self.manager.session_factory).client('elb')
-        groups = super(EC2ModifyGroups, self).get_groups(load_balancers)
+        groups = super(ELBModifyVpcSecurityGroups, self).get_groups(load_balancers)
         for idx, l in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancers(
                 LoadBalancerName=l['LoadBalancerName'],

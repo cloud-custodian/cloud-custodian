@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
@@ -823,7 +823,7 @@ class Snapshot(BaseAction):
                 
 
 @actions.register('modify-security-groups')
-class EC2ModifyGroups(ModifyGroupsAction):
+class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     def process(self, instances):
@@ -840,11 +840,12 @@ class EC2ModifyGroups(ModifyGroupsAction):
                     eni['c7n.matched-security-groups'] = i['c7n.matched-security-groups']
                 interfaces.append(eni)
 
+        groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
+
         for idx, i in enumerate(interfaces):
-            groups = super(EC2ModifyGroups, self).get_groups([i])
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=i['NetworkInterfaceId'],
-                Groups=groups)
+                Groups=groups[idx])
 
 
 # Valid EC2 Query Filters

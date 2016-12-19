@@ -575,35 +575,31 @@ class TestSecurityGroupFilter(BaseTest):
             'test_ec2_invalid_modify_groups_schema'
         )
 
-        class foo():
-            def __init__(self, test_obj):
-                self.test_obj = test_obj
-            def bar(self):
-                policy = self.test_obj.load_policy({
-                    'name': 'invalid-modify-security-groups-action',
-                    'resource': 'ec2',
-                    'filters': [
-                        {'or': [
-                            {'and': [
-                                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
-                                {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
-                            ]},
-                            {'type': 'value', 'key': 'IamInstanceProfile', 'value': 'absent'}
-                        ]},
-                        {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
-                    'actions': [
-                        {'type': 'modify-security-groups', 'change': 'matched'}
-                    ]
-                },
-                session_factory=session_factory)
-                resources = policy.run()
-                return resources
+        policy = {
+            'name': 'invalid-modify-security-groups-action',
+            'resource': 'ec2',
+            'filters': [
+                {'or': [
+                    {'and': [
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': '(?!.*TestProductionInstanceProfile)(.*)', 'op': 'regex'},
+                        {'type': 'value', 'key': 'IamInstanceProfile.Arn', 'value': 'not-null'}
+                    ]},
+                    {'type': 'value', 'key': 'IamInstanceProfile', 'value': 'absent'}
+                ]},
+                {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+            'actions': [
+                {'type': 'modify-security-groups', 'change': 'matched'}
+            ]
+        }
 
-        i = foo(self)
-        self.assertRaises(ValueError, lambda: i.bar())
+        self.assertRaises(ValueError, lambda: self.load_policy(policy, session_factory=session_factory))
 
 
     def test_ec2_add_security_groups(self):
+        # Test conditions:
+        #   - running one instance with TestProductionInstanceProfile
+        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to test instance
+        #   - security group with id sg-8a4b64f7 exists in VPC and is selected in a policy to be attached
         session_factory = self.replay_flight_data(
             'test_ec2_add_security_groups'
         )

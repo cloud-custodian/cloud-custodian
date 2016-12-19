@@ -15,7 +15,7 @@
 import json
 import zlib
 
-from c7n.actions import BaseAction, ModifyGroupsAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -695,7 +695,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
 
 @NetworkInterface.action_registry.register('modify-security-groups')
-class InterfaceRemoveGroups(ModifyGroupsAction):
+class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
 
     Can target either physical groups as a list of group ids or
@@ -709,11 +709,13 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
+
+        groups = super(InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
+
         for idx, r in enumerate(resources):
-            groups = super(InterfaceRemoveGroups, self).get_groups([r])
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
-                Groups=groups)
+                Groups=groups[idx])
 
 
 @resources.register('route-table')

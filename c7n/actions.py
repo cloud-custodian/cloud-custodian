@@ -103,7 +103,7 @@ class BaseAction(object):
 Action = BaseAction
 
 
-class ModifyGroupsAction(BaseAction):
+class ModifyVpcSecurityGroupsAction(BaseAction):
     """Common actions for modifying security groups on a resource
     
     Can target either physical groups as a list of group ids or
@@ -133,14 +133,27 @@ class ModifyGroupsAction(BaseAction):
     )
 
     def validate(self):
+        """ Validate the schema for modify-security-groups action
+
+        Must specify 'add' or 'remove'.
+
+        If 'remove' is specified, one of 'add' or 'isolation-group' must also
+        be specified in the event that the 'remove' operation marks all extant
+        security groups on the interface. All network-attached resources
+        require at least one security group to be present.
+
+        Valid input types:
+        'add': list, string
+        'remove': list, string, keywords: 'matched' or 'all'
+        'isolation-group': list, string
+
+        """
         if 'remove' in self.data:
             if 'isolation-group' not in self.data and 'add' not in self.data:
                 raise ValueError('Must specify `isolation-group` or `add` parameters when using the `remove` action')
             if isinstance(self.data['remove'], basestring):
                 if 'sg-' not in self.data['remove'] and 'all' not in self.data['remove'] and 'matched' not in self.data['remove']:
                     raise ValueError('Must specify valid input for the `remove` parameter')
-
-
             if isinstance(self.data['remove'], list) and any('sg-' not in g for g in self.data['remove']):
                 raise ValueError('Must specify valid security group ids for the `remove` parameter')
         if 'add' in self.data:
@@ -158,7 +171,20 @@ class ModifyGroupsAction(BaseAction):
 
         return self
 
-    def get_groups(self, resources):
+    def get_groups(self, resources, metadata_key=None):
+        """ Parse policies to get lists of security groups to attach to each input resource
+
+        For each input resource, parse the various add/remove/isolation-
+        group policies for `modify-security-groups` to find the resulting
+        set of VPC security groups to attach to that resource.
+
+        Returns a list of lists containing the resulting VPC security groups
+        that should end up on each resource passed in.
+
+        :param resources: List of resources containing VPC Security Groups
+        :param metadata_key: Metadata key for security groups list (only required if not 'Groups')
+        :return: List of lists of security groups per resource
+        """
         # parse the add, remove, and isolation group params to return the
         # list of security groups that will end up on the resource
         # target_group_ids = self.data.get('groups', 'matched')
@@ -174,6 +200,8 @@ class ModifyGroupsAction(BaseAction):
             # single eni resources
             if r.get('Groups'):
                 rgroups = [g['GroupId'] for g in r['Groups']]
+            elif metadata_key and r.get(metadata_key):
+                rgroups = [g['GroupId'] for g in r[metadata_key]]
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
@@ -205,7 +233,7 @@ class ModifyGroupsAction(BaseAction):
             if not rgroups:
                 rgroups.append(isolation_group)
 
-            return_groups = rgroups
+            return_groups.append(rgroups)
 
         return return_groups
 
