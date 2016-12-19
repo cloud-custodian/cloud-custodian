@@ -97,6 +97,33 @@ class CloudWatchEvents(object):
         return False
 
     @classmethod
+    def get_trail_ids(cls, event, mode):
+        """extract resources ids from a cloud trail event."""
+        # Check if we have a short cut / alias
+        info = CloudWatchEvents.match(event)
+        if info:
+            return info['ids'].search(event)
+        resource_ids = ()
+        event_name = event['detail']['eventName']
+        event_source = event['detail']['eventSource']
+        for e in mode.get('events', []):
+            if not isinstance(e, dict):
+                continue
+            if event_name != e.get('event'):
+                continue
+            if event_source != e.get('source'):
+                continue
+
+            id_query = e.get('ids')
+            if not id_query:
+                raise ValueError("No id query configured")
+            resource_ids = jmespath.search(
+                id_query, event.get('detail', {}))
+            if resource_ids:
+                break
+        return resource_ids
+
+    @classmethod
     def get_ids(cls, event, mode):
         mode_type = mode.get('type')
         if mode_type == 'ec2-instance-state':
@@ -106,20 +133,9 @@ class CloudWatchEvents(object):
         elif mode_type != 'cloudtrail':
             return None
         else:
-            info = CloudWatchEvents.match(event)
-            if info:
-                resource_ids = info['ids'].search(event)
-            else:
-                for e in mode.get('events', []):
-                    if not isinstance(e, dict):
-                        continue
-                    id_query = e.get('ids')
-                    if not id_query:
-                        raise ValueError("No id query configured")
-                    resource_ids = jmespath.search(
-                        id_query, event.get('detail', {}))
+            resource_ids = cls.get_trail_ids(event, mode)
 
-        if not isinstance(resource_ids, list):
+        if not isinstance(resource_ids, (tuple, list)):
             resource_ids = [resource_ids]
 
         return filter(None, resource_ids)
