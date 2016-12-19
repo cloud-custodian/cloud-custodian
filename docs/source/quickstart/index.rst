@@ -38,7 +38,7 @@ Explore Cloud Custodian
 
   ::
 
-  $ custodian schema ecs.filters.instance-age
+  $ custodian schema ecs.filters.instance
 
 
 .. _write-policy:
