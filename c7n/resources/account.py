@@ -229,13 +229,11 @@ class IAMSummary(ValueFilter):
         - name: root-keys-or-no-mfa
           resource: account
           filters:
-            - or:
-              - type: iam-summary
-                key: AccountMFAEnabled
-                value: 0
-              - type: iam-summary
-                key: AccountAccessKeysPresent
-                value: 0
+            - type: iam-summary
+              key: AccountMFAEnabled
+              value: true
+              op: eq
+              value_type: swap
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
