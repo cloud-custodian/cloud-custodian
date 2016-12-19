@@ -281,6 +281,7 @@ class RDSFormatter(Formatter):
         return [
             record['DBInstanceIdentifier'],
             record.get('DBName', ''),
+            record['InstanceCreateTime'],
             record['StorageEncrypted'],
             record['PubliclyAccessible'],
             tag_map.get("ASV", ""),

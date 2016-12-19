@@ -133,12 +133,14 @@ class QueryResourceManager(ResourceManager):
         super(QueryResourceManager, self).__init__(data, options)
         self.query = ResourceQuery(self.session_factory)
 
-    def get_model(self):
-        return self.query.resolve(self.resource_type)
+    @classmethod
+    def get_model(cls):
+        return ResourceQuery.resolve(cls.resource_type)
 
-    def match_ids(self, ids):
+    @classmethod
+    def match_ids(cls, ids):
         """return ids that match this resource type's id format."""
-        id_prefix = getattr(self.get_model(), 'id_prefix', None)
+        id_prefix = getattr(cls.get_model(), 'id_prefix', None)
         if id_prefix is not None:
             return [i for i in ids if i.startswith(id_prefix)]
         return ids
