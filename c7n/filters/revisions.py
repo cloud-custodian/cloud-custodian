@@ -15,14 +15,11 @@
 Custodian support for diffing and patching across multiple versions
 of a resource.
 """
-import json
-
 from botocore.exceptions import ClientError
-from botocore.parsers import BaseJSONParser
-
 from dateutil.parser import parse as parse_date
+
 from c7n.filters import Filter, FilterValidationError
-from c7n.utils import local_session, type_schema, camelResource
+from c7n.utils import local_session, type_schema
 
 
 ErrNotFound = "ResourceNotDiscoveredException"
@@ -75,15 +72,14 @@ class Diff(Filter):
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         config = session.client('config')
-
         self.model = self.manager.get_model()
-        self.parser = ConfigResourceParser()
-        self.resource_shape = self.get_resource_shape(session)
 
         results = []
         for r in resources:
             revisions = self.get_revisions(config, r)
             r['c7n:previous-revision'] = rev = self.select_revision(revisions)
+            if not rev:
+                continue
             delta = self.diff(rev['resource'], r)
             if delta:
                 r['c7n:diff'] = delta
@@ -137,50 +133,3 @@ class Diff(Filter):
 
     def diff(self, source, target):
         raise NotImplementedError("Subclass responsibility")
-
-    def get_resource_shape(self, session):
-        resource_model = self.manager.get_model()
-        service = session.client(resource_model.service)
-        shape_name = resource_model.config_type.split('::')[-1]
-        return service.meta.service_model.shape_for(shape_name)
-
-
-class ConfigResourceParser(BaseJSONParser):
-
-    def parse(self, data, shape):
-        return self._do_parse(data, shape)
-
-    def _do_parse(self, data, shape):
-        return self._parse_shape(shape, data)
-
-
-
-# TODO List
-
-Action = object
-
-
-class Locked(Filter):
-    """Has the resource been locked."""
-    schema = type_schema(
-        'locked',
-        value={'type': 'boolean'},
-        api_endpoint={'type': 'string'})
-
-
-class Lock(Action):
-    """Lock a resource from further modifications.
-
-    Get current revision of given object. We may have an inflight
-    snapshotDelivery coming.
-    """
-    schema = type_schema('lock')
-
-
-class Unlock(Action):
-    """Unlock a resource for further modifications."""
-
-
-class Revert(Action):
-    """Restore a resource to a previous version."""
-

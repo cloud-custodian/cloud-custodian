@@ -461,8 +461,17 @@ class SGPermission(Filter):
         IpProtocol: -1
         FromPort: 445
 
+    We also have specialized handling for matching self-references in
+    ingress/egress permissions. The following example matches on ingress
+    rules which allow traffic its own same security group.
+
+    .. code-block: yaml
+
+      - type: ingress
+        SelfReference: True
+
     As well for assertions that a ingress/egress permission only matches
-    a given set of ports, *note* onlyports is an inverse match.
+    a given set of ports, *note* OnlyPorts is an inverse match.
 
     .. code-block: yaml
 
@@ -480,7 +489,7 @@ class SGPermission(Filter):
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts'))
+    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
 
     def validate(self):
@@ -538,8 +547,17 @@ class SGPermission(Filter):
                     found = False
         return found
 
+    def process_self_reference(self, perm, sg_id):
+        found = None
+        if 'UserIdGroupPairs' in perm and 'SelfReference' in self.data:
+            self_reference = sg_id in [p['GroupId']
+                                       for p in perm['UserIdGroupPairs']]
+            found = self_reference & self.data['SelfReference']
+        return found
+
     def __call__(self, resource):
         matched = []
+        sg_id = resource['GroupId']
         for perm in resource[self.ip_permissions_key]:
             found = None
             for f in self.vfilters:
@@ -558,6 +576,12 @@ class SGPermission(Filter):
                 if cidr_found is not None:
                     found = (
                         found is not None and cidr_found & found or cidr_found)
+            if found is None or found:
+                self_reference_found = self.process_self_reference(perm, sg_id)
+                if self_reference_found is not None:
+                    found = (
+                        found is not None and
+                        self_reference_found & found or self_reference_found)
             if not found:
                 continue
             matched.append(perm)
@@ -576,7 +600,8 @@ class IPPermission(SGPermission):
         #'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}}
+            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+            'SelfReference': {'type': 'boolean'}
             },
         'required': ['type']}
 
@@ -589,7 +614,8 @@ class IPPermissionEgress(SGPermission):
         'type': 'object',
         #'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['egress']}
+            'type': {'enum': ['egress']},
+            'SelfReference': {'type': 'boolean'}
             },
         'required': ['type']}
 

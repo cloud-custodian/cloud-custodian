@@ -205,6 +205,100 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 62000,
               u'UserIdGroupPairs': []}])
 
+    def test_self_reference(self):
+        factory = self.replay_flight_data(
+            'test_security_group_self_reference')
+        client = factory().client('ec2')
+
+        vpc_id = client.create_vpc(CidrBlock='10.4.0.0/16')['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        # Find the ID of the default security group.
+        default_sg_id = client.describe_security_groups(Filters=[
+            {'Name': 'vpc-id', 'Values': [vpc_id]},
+            {'Name': 'group-name', 'Values': ['default']}])['SecurityGroups'][0]['GroupId']
+
+        sg1_id = client.create_security_group(
+            GroupName='sg1',
+            VpcId=vpc_id,
+            Description='SG 1')['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg1_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg1_id,
+            IpPermissions=[{
+                'IpProtocol': 'tcp',
+                'FromPort': 80,
+                'ToPort': 80,
+                'UserIdGroupPairs': [
+                    {
+                        'GroupId': default_sg_id
+                    },
+                    {
+                        'GroupId': sg1_id
+                    }]
+            }])
+        client.authorize_security_group_ingress(
+            GroupId=sg1_id,
+            IpProtocol='tcp',
+            FromPort=60000,
+            ToPort=62000,
+            CidrIp='10.2.0.0/16')
+        client.authorize_security_group_ingress(
+            GroupId=sg1_id,
+            IpProtocol='tcp',
+            FromPort=61000,
+            ToPort=61000,
+            CidrIp='10.2.0.0/16')
+
+        sg2_id = client.create_security_group(
+            GroupName='sg2',
+            VpcId=vpc_id,
+            Description='SG 2')['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=sg2_id)
+        client.authorize_security_group_egress(
+            GroupId=sg2_id,
+            IpPermissions=[{
+                'IpProtocol': 'tcp',
+                'FromPort': 443,
+                'ToPort': 443,
+                'UserIdGroupPairs': [
+                    {
+                        'GroupId': sg1_id
+                    }]
+            }])
+
+        p = self.load_policy({
+            'name': 'sg-find0',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'SelfReference': False},
+                {'GroupName': 'sg1'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 'sg-find1',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'SelfReference': True},
+                {'GroupName': 'sg1'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'sg-find2',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'egress',
+                 'SelfReference': True},
+                {'GroupName': 'sg2'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_security_group_delete(self):
         factory = self.replay_flight_data(
             'test_security_group_delete')
