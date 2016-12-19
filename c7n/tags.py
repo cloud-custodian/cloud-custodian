@@ -540,7 +540,6 @@ class NormalizeTag(Action):
             query:
               - instance-state-name: running
             filters:
-              - "tag:Service": present
               - "tag:testing8882": present
             actions:
               - type: normalize-tag
@@ -554,12 +553,13 @@ class NormalizeTag(Action):
             query:
               - instance-state-name: running
             filters:
-              - "tag:Service": present
               - "tag:testing8882": present
             actions:
               - type: normalize-tag
                 key: strip_key
-                case: blah
+                action: strip
+                value: blah
+
     """
 
     schema = utils.type_schema(
