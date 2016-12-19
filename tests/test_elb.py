@@ -261,7 +261,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         session_factory = self.replay_flight_data('test_elb_add_security_groups')
         policy = self.load_policy({
-            'name': 'add-sg-to-prod-elb',
+            'name': 'add-sgs-to-prod-elb',
             'resource': 'elb',
             'filters': [
                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},

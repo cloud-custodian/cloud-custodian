@@ -519,7 +519,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
     def test_invalid_remove_params(self):
         # basestring invalid
         policy = {
-            'name': 'remove-with-incorrect-param',
+            'name': 'remove-with-incorrect-param-string',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'remove': 'none'}
@@ -529,7 +529,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
 
         # list - one valid, one invalid
         policy = {
-            'name': 'remove-with-incorrect-param',
+            'name': 'remove-with-incorrect-param-list',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'remove': ['invalid-sg', 'sg-abcd1234']}
@@ -540,7 +540,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
     def test_invalid_add_params(self):
         # basestring invalid
         policy = {
-            'name': 'add-with-incorrect-param',
+            'name': 'add-with-incorrect-param-string',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'add': 'none'}
@@ -550,7 +550,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
 
         # list - one valid, one invalid
         policy = {
-            'name': 'add-with-incorrect-param',
+            'name': 'add-with-incorrect-param-list',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'add': ['invalid-sg', 'sg-abcd1234']}
@@ -560,7 +560,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
 
     def test_invalid_isolation_group_params(self):
         policy = {
-            'name': 'isolation-group-with-incorrect-param',
+            'name': 'isolation-group-with-incorrect-param-string',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'isolation-group': 'none'}
@@ -570,7 +570,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
 
         # list - one valid, one invalid
         policy = {
-            'name': 'isolation-group-with-incorrect-param',
+            'name': 'isolation-group-with-incorrect-param-list',
             'resource': 'ec2',
             'actions': [
                 {'type': 'modify-security-groups', 'isolation-group': ['invalid-sg', 'sg-abcd1234']}
