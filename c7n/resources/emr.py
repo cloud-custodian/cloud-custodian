@@ -87,8 +87,8 @@ class Terminate(BaseAction):
             policies:
               - name: emr-terminate
                 resource: emr
-                filters:
-                  - "tag:ExpiredEmrTag": present
+                query:
+                  - ClusterStates: [STARTING, BOOTSTRAPPING, RUNNING, WAITING]
                 actions:
                   - terminate
     """
