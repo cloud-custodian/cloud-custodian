@@ -124,7 +124,6 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
                   - type: value
                     key: State
                     value: failed
-                    op: eq
                 actions:
                   - type: mark-for-op
                     tag: custodian_elb_cleanup
@@ -215,7 +214,6 @@ class AppELBDeleteAction(BaseAction):
                   - type: value
                     key: State
                     value: failed
-                    op: eq
                 actions:
                   - delete
     """
@@ -289,9 +287,9 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
                 resource: app-elb
                 filters:
                   - type: listener
-                    key: Port
-                    value: 443
-                    op: eq
+                    key: length([?Protocol=='HTTPS'])
+                    value: 1
+                    op: gte
     """
 
     schema = type_schema('listener', rinherit=ValueFilter.schema)
@@ -352,8 +350,8 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
                 resource: app-elb
                 filters:
                   - type: target-group
-                    key: VpcId
-                    value: vpc-12ab34cd
+                    key: length([?Protocol=='HTTPS'])
+                    value: 1
                     op: eq
     """
 
@@ -370,7 +368,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 @filters.register('default-vpc')
 class AppELBDefaultVpcFilter(DefaultVpcBase):
-    """Filter all ELB existing within the default vpc
+    """Filter all ELB that exist within the default vpc
 
     :example:
 
@@ -474,7 +472,7 @@ def _remove_target_group_tags(target_groups, session_factory, tag_keys):
 
 @AppELBTargetGroup.action_registry.register('mark-for-op')
 class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
-    """Action to create a delayed action on an ELB target group"""
+    """Action to specify a delayed action on an ELB target group"""
 
     batch_size = 1
 
@@ -542,7 +540,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
 class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
-    """Filter all AppElb target groups in the default vpc
+    """Filter all application elb target groups within the default vpc
 
     :example:
 
