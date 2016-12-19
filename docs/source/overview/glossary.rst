@@ -18,7 +18,7 @@ Mode
   Provides for retrieval of a resource of a given type (typically via AWS API)
   and defines the vocabulary of filters and actions that can be used on those
   resources. Example resource types are Auto Scaling Groups, S3 buckets, EC2
-  instances, Elastic Load Balancers, etc).
+  instances, Elastic Load Balancers, etc.
 
 .. code-block:: yaml
 
@@ -59,6 +59,6 @@ Actions - :py:class:`c7n.actions`
    actions:
      - type: tag
        key: c7n_status
-       value: "Unencrypted EBS! Please recreate with Encryption)"
+       value: "Unencrypted EBS! Please recreate with Encryption"
      - type: terminate
        force: true
