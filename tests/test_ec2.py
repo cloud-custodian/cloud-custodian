@@ -503,7 +503,83 @@ class TestActions(unittest.TestCase):
             actions.factory('terminate', None),
             ec2.Terminate)
 
-class TestSecurityGroupFilter(BaseTest):
+class TestModifySecurityGroupsActionSchema(BaseTest):
+    def test_remove_dependencies(self):
+
+        policy = {
+            'name': 'remove-with-no-isolation-or-add',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'remove': 'matched'}
+            ]
+        }
+
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+    def test_invalid_remove_params(self):
+        # basestring invalid
+        policy = {
+            'name': 'remove-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'remove': 'none'}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+        # list - one valid, one invalid
+        policy = {
+            'name': 'remove-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'remove': ['invalid-sg', 'sg-abcd1234']}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+    def test_invalid_add_params(self):
+        # basestring invalid
+        policy = {
+            'name': 'add-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'none'}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+        # list - one valid, one invalid
+        policy = {
+            'name': 'add-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'add': ['invalid-sg', 'sg-abcd1234']}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+    def test_invalid_isolation_group_params(self):
+        policy = {
+            'name': 'isolation-group-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'isolation-group': 'none'}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+        # list - one valid, one invalid
+        policy = {
+            'name': 'isolation-group-with-incorrect-param',
+            'resource': 'ec2',
+            'actions': [
+                {'type': 'modify-security-groups', 'isolation-group': ['invalid-sg', 'sg-abcd1234']}
+            ]
+        }
+        self.assertRaises(ValueError, lambda: self.load_policy(policy))
+
+
+class TestModifySecurityGroupAction(BaseTest):
     def test_security_group_type(self):
         # Test conditions:
         #   - running two instances; one with TestProductionInstanceProfile and one with none

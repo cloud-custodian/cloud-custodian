@@ -157,14 +157,14 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
             if isinstance(self.data['remove'], list) and any('sg-' not in g for g in self.data['remove']):
                 raise ValueError('Must specify valid security group ids for the `remove` parameter')
         if 'add' in self.data:
-            if isinstance('add', basestring) and 'sg-' not in self.data['add']:
+            if isinstance(self.data['add'], basestring) and 'sg-' not in self.data['add']:
                 raise ValueError('Must specify a valid security group id for the `add` parameter')
-            if isinstance('add', list) and any('sg-' not in g for g in self.data['add']):
+            if isinstance(self.data['add'], list) and any('sg-' not in g for g in self.data['add']):
                 raise ValueError('Must specify valid security group ids for the `add` parameter')
         if 'isolation-group' in self.data:
-            if isinstance('isolation-group', basestring) and 'sg-' not in self.data['isolation-group']:
+            if isinstance(self.data['isolation-group'], basestring) and 'sg-' not in self.data['isolation-group']:
                 raise ValueError('Must specify a valid security group id for the `isolation-group` parameter')
-            if isinstance('isolation-group', list) and any('sg-' not in g for g in self.data['isolation-group']):
+            if isinstance(self.data['isolation-group'], list) and any('sg-' not in g for g in self.data['isolation-group']):
                 raise ValueError('Must specify valid security group ids for the `isolation-group` parameter')
         if 'add' not in self.data and 'remove' not in self.data:
             raise ValueError('Must specify either `add` or `remove` parameters')

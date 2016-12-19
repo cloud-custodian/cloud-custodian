@@ -4,15 +4,24 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9d6609c2-c5f8-11e6-98f0-ddb7778f1957", 
+            "RequestId": "b900e8ca-c5f6-11e6-98f0-ddb7778f1957", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "9d6609c2-c5f8-11e6-98f0-ddb7778f1957", 
-                "date": "Mon, 19 Dec 2016 14:37:05 GMT", 
+                "x-amzn-requestid": "b900e8ca-c5f6-11e6-98f0-ddb7778f1957", 
+                "date": "Mon, 19 Dec 2016 14:23:32 GMT", 
                 "content-length": "885", 
                 "content-type": "text/xml"
             }
         }, 
         "TagDescriptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "BalancedWork", 
+                        "Key": "Name"
+                    }
+                ], 
+                "LoadBalancerName": "balanced"
+            }, 
             {
                 "Tags": [
                     {
@@ -25,15 +34,6 @@
                     }
                 ], 
                 "LoadBalancerName": "test-load-balancer"
-            }, 
-            {
-                "Tags": [
-                    {
-                        "Value": "BalancedWork", 
-                        "Key": "Name"
-                    }
-                ], 
-                "LoadBalancerName": "balanced"
             }
         ]
     }

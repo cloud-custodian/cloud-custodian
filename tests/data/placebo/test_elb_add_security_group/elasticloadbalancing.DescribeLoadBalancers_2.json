@@ -96,8 +96,6 @@
                 "Instances": [], 
                 "DNSName": "test-load-balancer-575133547.us-east-1.elb.amazonaws.com", 
                 "SecurityGroups": [
-                    "sg-8a4b64f7", 
-                    "sg-5d4a6520", 
                     "sg-411b413c", 
                     "sg-6c7fa917"
                 ], 
@@ -133,13 +131,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9d43b4fe-c5f8-11e6-aca6-19c0737c614a", 
+            "RequestId": "622434b5-c5f8-11e6-84d6-b38d66425488", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "9d43b4fe-c5f8-11e6-aca6-19c0737c614a", 
+                "x-amzn-requestid": "622434b5-c5f8-11e6-84d6-b38d66425488", 
                 "vary": "Accept-Encoding", 
-                "content-length": "4415", 
+                "content-length": "4337", 
                 "content-type": "text/xml", 
-                "date": "Mon, 19 Dec 2016 14:37:06 GMT"
+                "date": "Mon, 19 Dec 2016 14:35:27 GMT"
             }
         }
     }
