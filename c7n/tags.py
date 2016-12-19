@@ -46,7 +46,7 @@ def register_tags(filters, actions):
     actions.register('untag', RemoveTag)
     actions.register('remove-tag', RemoveTag)
     actions.register('rename-tag', RenameTag)
-    actions.register('change-tag-value-case', ChangeTagValueCase)
+    actions.register('normalize-tag', NormalizeTag)
 
 
 class TagTrim(Action):
@@ -526,13 +526,13 @@ class TagDelayedAction(Action):
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 
-class ChangeTagValueCase(Action):
-    """Change the case of a Tag Value.
+class NormalizeTag(Action):
+    """Transform the value of a tag.
 
     .. code-block :: yaml
 
         policies:
-          - name: ec2-service-tag-value-to-lower
+          - name: ec2-service-transform-lower
           resource: ec2
           comment: |
             ec2-service-tag-value-to-lower
@@ -542,16 +542,33 @@ class ChangeTagValueCase(Action):
           - "tag:Service": present
           - "tag:testing8882": present
           actions:
-          - type: change-tag-value-case
-          key: target
-          case: Lower
+          - type: normalize-tag
+          key: testing8882
+          action: lower
+
+          - name: ec2-service-strip
+          resource: ec2
+          comment: |
+            ec2-service-tag-strip-blah
+          query:
+          - instance-state-name: running
+          filters:
+          - "tag:Service": present
+          - "tag:testing8882": present
+          actions:
+          - type: normalize-tag
+          key: testing8882
+          action: strip
+          value: blah
+
     """
 
     schema = utils.type_schema(
-        'change-tag-value-case',
+        'normalize-tag',
         key={'type': 'string'},
-        case={'type': 'array', 'items': {
-            'enum': ['Upper', 'Lower']}})
+        action={'type': 'array', 'items': {
+            'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        value={'type': 'string'})
 
     def create_tag(self, client, ids, key, value):
         client.create_tags(
@@ -571,12 +588,17 @@ class ChangeTagValueCase(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        if self.data.get('case') == 'Lower':
+        if self.data.get('action') == 'lower':
             new_value = tag_value.lower()
-        elif self.data.get('case') == 'Upper':
+        elif self.data.get('action') == 'upper':
             new_value = tag_value.upper()
+        elif self.data.get('action') == 'title':
+            new_value = tag_value.title()
+        elif self.data.get('action') == 'strip' and self.data.get('value'):
+            print "Action: %s Value %s"%(self.data.get('action'),self.data.get('value') )
+            new_value = tag_value.strip(self.data.get('value'))
         else:
-            self.log.error("%s is an invalid case type" % (self.data.get('case')))
+            self.log.error("%s is an invalid action type" % (self.data.get('action')))
 
         self.create_tag(
             c,
