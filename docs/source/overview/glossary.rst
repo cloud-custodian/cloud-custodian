@@ -12,12 +12,12 @@ Policy - :py:class:`c7n.policy`
 Resource - :py:class:`c7n.manager.ResourceManager`
   Provides for retrieval of a resource of a given type (typically via AWS API)
   and defines the vocabulary of filters and actions that can be used on those
-  resource (e.g., ASG, S3, EC2, ELBs, etc).
+  resources (e.g., ASG, S3, EC2, ELBs, etc).
 
 Mode
   Provides for retrieval of a resource of a given type (typically via AWS API)
   and defines the vocabulary of filters and actions that can be used on those
-  resource. Example resource types are Auto Scaling Groups, S3 buckets, EC2
+  resources. Example resource types are Auto Scaling Groups, S3 buckets, EC2
   instances, Elastic Load Balancers, etc).
 
 .. code-block:: yaml
