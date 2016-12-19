@@ -15,7 +15,10 @@ Resource - :py:class:`c7n.manager.ResourceManager`
   resource (e.g., ASG, S3, EC2, ELBs, etc).
 
 Mode
-  Provides for retrieval of a resource of a given type (typically via AWS API) and defines the vocabulary of filters and actions that can be used on those resource. Example resource types are Auto Scaling Groups, S3 buckets, EC2 instances, Elastic Load Balancers, etc).
+  Provides for retrieval of a resource of a given type (typically via AWS API)
+  and defines the vocabulary of filters and actions that can be used on those
+  resource. Example resource types are Auto Scaling Groups, S3 buckets, EC2
+  instances, Elastic Load Balancers, etc).
 
 .. code-block:: yaml
 
