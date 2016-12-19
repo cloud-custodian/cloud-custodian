@@ -201,7 +201,7 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
             if r.get('Groups'):
                 rgroups = [g['GroupId'] for g in r['Groups']]
             elif metadata_key and r.get(metadata_key):
-                rgroups = [g['GroupId'] for g in r[metadata_key]]
+                rgroups = [g for g in r[metadata_key]]
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
