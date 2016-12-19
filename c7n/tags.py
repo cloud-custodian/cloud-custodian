@@ -528,39 +528,38 @@ class TagDelayedAction(Action):
 
 class NormalizeTag(Action):
     """Transform the value of a tag.
+    Set the tag value to uppercase, title, lowercase. Strip text from a tag key.
 
     .. code-block :: yaml
 
         policies:
           - name: ec2-service-transform-lower
-          resource: ec2
-          comment: |
-            ec2-service-tag-value-to-lower
-          query:
-          - instance-state-name: running
-          filters:
-          - "tag:Service": present
-          - "tag:testing8882": present
-          actions:
-          - type: normalize-tag
-          key: testing8882
-          action: lower
+            resource: ec2
+            comment: |
+              ec2-service-tag-value-to-lower
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:Service": present
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: lower_key
+                action: lower
 
           - name: ec2-service-strip
-          resource: ec2
-          comment: |
-            ec2-service-tag-strip-blah
-          query:
-          - instance-state-name: running
-          filters:
-          - "tag:Service": present
-          - "tag:testing8882": present
-          actions:
-          - type: normalize-tag
-          key: testing8882
-          action: strip
-          value: blah
-
+            resource: ec2
+            comment: |
+              ec2-service-tag-strip-blah
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:Service": present
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: strip_key
+                case: blah
     """
 
     schema = utils.type_schema(
@@ -575,15 +574,15 @@ class NormalizeTag(Action):
             Resources=ids,
             Tags=[{'Key': key, 'Value': value}])
 
-    def process_case_change(self, tag_value, resource_set):
+    def process_transform(self, tag_value, resource_set):
         """
-        Change tag value case of tag key
+        Transform tag value
 
         - Collect value from tag
-        - Change case
+        - Transform Tag value
         - Assign new value for key
         """
-        self.log.info("Changing tag value case for tag on %s instances" % (len(resource_set)))
+        self.log.info("Transforming tag value on %s instances" % (len(resource_set)))
         key = self.data.get('key')
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
@@ -595,7 +594,6 @@ class NormalizeTag(Action):
         elif self.data.get('action') == 'title':
             new_value = tag_value.title()
         elif self.data.get('action') == 'strip' and self.data.get('value'):
-            print "Action: %s Value %s"%(self.data.get('action'),self.data.get('value') )
             new_value = tag_value.strip(self.data.get('value'))
         else:
             self.log.error("%s is an invalid action type" % (self.data.get('action')))
@@ -637,7 +635,7 @@ class NormalizeTag(Action):
             futures = []
             for r in resource_set:
                 futures.append(
-                    w.submit(self.process_case_change, r, resource_set[r]))
+                    w.submit(self.process_transform, r, resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
