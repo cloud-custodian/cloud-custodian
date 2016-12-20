@@ -1,11 +1,11 @@
 
 install:
-	virtualenv .
+	python2.7 -m virtualenv .
 	source bin/activate && pip install -r requirements.txt
 	source bin/activate && python setup.py develop
 
 develop:
-	virtualenv .
+	python2.7 -m virtualenv .
 	source bin/activate && pip install -r requirements-dev.txt
 	source bin/activate && python setup.py develop
 
@@ -26,7 +26,7 @@ ftests:
 
 depcache:
 	mkdir -p deps
-	virtualenv dep-download
+	python2.7 -m virtualenv dep-download
 	dep-download/bin/pip install -d deps -r requirements.txt
 	tar cvf custodian-deps.tgz deps
 	rm -Rf dep-download
@@ -42,3 +42,6 @@ ghpages:
 	git add -u && \
 	git add -A && \
 	git commit -m "Updated generated Sphinx documentation"
+
+clean:
+	rm -rf .Python bin include lib pip-selfcheck.json 
