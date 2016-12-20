@@ -127,6 +127,8 @@ class QueryResourceManager(ResourceManager):
     __metaclass__ = QueryMeta
 
     resource_type = ""
+    id_field = ""
+    report_fields = []
     retry = None
 
     def __init__(self, data, options):

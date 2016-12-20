@@ -46,6 +46,19 @@ class EC2(QueryResourceManager):
     class resource_type(ResourceQuery.resolve("aws.ec2.instance")):
         config_type = "AWS::EC2::Instance"
 
+    id_field = 'InstanceId'
+    report_fields = [
+        'CustodianDate',
+        'InstanceId',
+        'tag:Name',
+        'InstanceType',
+        'LaunchTime',
+        'VpcId',
+        'PrivateIpAddress',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
 

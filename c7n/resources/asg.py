@@ -53,6 +53,14 @@ actions.register('auto-tag-user', AutoTagUser)
 class ASG(QueryResourceManager):
 
     resource_type = "aws.autoscaling.autoScalingGroup"
+    id_field = 'AutoScalingGroupName'
+    report_fields = [
+        'AutoScalingGroupName',
+        'count:Instances',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
 

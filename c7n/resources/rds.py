@@ -78,6 +78,17 @@ actions.register('auto-tag-user', AutoTagUser)
 class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
     """
+    id_field = 'DBInstanceIdentifier'
+    report_fields = [
+        'DBInstanceIdentifier',
+        'DBName',
+        'InstanceCreateTime',
+        'StorageEncrypted',
+        'PubliclyAccessible',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
 
     class resource_type(rds.DBInstance.Meta):
         filter_name = 'DBInstanceIdentifier'
