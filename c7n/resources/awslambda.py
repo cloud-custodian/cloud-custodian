@@ -46,6 +46,8 @@ class SubnetFilter(net_filters.SubnetFilter):
 class LambdaEventSource(ValueFilter):
     """Filter Lambda functions by event source
 
+    An event source is the entity that publishes events
+
     :example:
 
         .. code-block: yaml
@@ -109,8 +111,10 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filters lambda functions with cross-account permissions
 
     The whitelist parameter can be used to prevent certain accounts from being
-    included in the results. This can be useful when combining this filter with
-    the delete action.
+    included in the results (essentially stating that these accounts permissions
+    are allowed to exist)
+
+    This can be useful when combining this filter with the delete action.
 
     :example:
 
