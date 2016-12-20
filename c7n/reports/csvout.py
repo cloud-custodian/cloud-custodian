@@ -63,14 +63,16 @@ log = logging.getLogger('custodian.reports')
 
 def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=None):
     """Format a policy's extant records into a report."""
-    formatter_cls = RECORD_TYPE_FORMATTERS.get(policy.resource_type)
-    formatter = formatter_cls(
-        extra_fields=options.field, no_default_fields=options.no_default_fields)
-
-    if formatter is None:
+    if not policy.resource_manager.report_fields:
         raise ValueError(
-            "No formatter defined for resource type '%s', valid options: %s" % (
-                policy.resource_type, ", ".join(RECORD_TYPE_FORMATTERS)))
+            "No formatter configured for resource type '%s', valid options: %s" % (
+                policy.resource_type))
+
+    formatter = Formatter(
+        policy.resource_manager,
+        extra_fields=options.field,
+        no_default_fields=options.no_default_fields,
+    )
 
     if policy.ctx.output.use_s3():
         records = record_set(
@@ -91,30 +93,50 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=N
         dumps(records, raw_output_fh, indent=2)
 
 
+def _get_values(record, field_list, tag_map):
+    tag_prefix = 'tag:'
+    vals = []
+    for field in field_list:
+        # TODO process list: values
+        # ','.join(record.get('GlobalPermissions', '')),
+        # TODO process count: values
+        # str(len(record['Instances'])),
+        if field.startswith(tag_prefix):
+            tag_field = field.replace(tag_prefix, '', 1)
+            vals.append(tag_map.get(tag_field, ''))
+        else:
+            value = jmespath.search(field, record)
+            if value is None:
+                value = ''
+            vals.append(value)
+    return vals
+
+
 class Formatter(object):
     
-    tag_prefix = 'tag:'
-    
-    def __init__(self, id_field, headers, **kwargs):
-        self._id_field = id_field
-
+    def __init__(self, resource_manager, **kwargs):
+        self._id_field = resource_manager.id_field
+        self.fields = resource_manager.report_fields
         # Make a copy because we modify the values when we strip off the header
         self.extra_fields = copy.copy(kwargs.get('extra_fields', []))
         self.no_default_fields = kwargs.get('no_default_fields', False)
-        self.set_headers(headers)
+        self.set_headers()
 
     def csv_fields(self, record, tag_map):
-        '''Must be implemented by subclass'''
-        raise Exception("Method not implemented by subclass: csv_fields")
+        return _get_values(record, self.fields, tag_map)
 
     def filter_record(self, record):
         '''Override in subclass if filtering needed.'''
+        # TODO reimplement this somehow for EC2 formatter
+        # def filter_record(self, record):
+        #     return record['State']['Name'] != 'terminated'
+        
         return True
 
-    def set_headers(self, headers):
+    def set_headers(self):
         self._headers = []
         if not self.no_default_fields:
-            self._headers = headers
+            self._headers = copy.copy(self.fields)
 
         for index, field in enumerate(self.extra_fields):
             header, field_minus_header = field.split('=', 1)
@@ -131,15 +153,7 @@ class Formatter(object):
         if not self.no_default_fields:
             output = self.csv_fields(record, tag_map)
             
-        for field in self.extra_fields:
-            if field.startswith(self.tag_prefix):
-                tag_field = field.replace(self.tag_prefix, '', 1)
-                output.append(tag_map.get(tag_field, ''))
-            else:
-                value = jmespath.search(field, record)
-                if value is None:
-                    value = ""
-                output.append(value)
+        output = output + _get_values(record, self.extra_fields, tag_map)
         
         return output
 
