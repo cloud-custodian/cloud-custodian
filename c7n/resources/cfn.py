@@ -42,7 +42,7 @@ class Delete(BaseAction):
 
     def process(self, stacks):
         with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_stack, stacks))
+            list(w.map(self.process_stacks, stacks))
 
     def process_stacks(self, stack):
         client = local_session(

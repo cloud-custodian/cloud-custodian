@@ -34,6 +34,23 @@ class Glacier(QueryResourceManager):
 
 @Glacier.filter_registry.register('cross-account')
 class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filter to return all glacier vaults with cross account access permissions
+
+    The whitelist parameter will omit the accounts that match from the return
+
+    :example:
+
+        .. code-block:
+
+            policies:
+              - name: glacier-cross-account
+                resource: glacier
+                filters:
+                  - type: cross-account
+                    whitelist:
+                      - permitted-account-01
+                      - permitted-account-02
+    """
 
     def process(self, resources, event=None):
         def _augment(r):
