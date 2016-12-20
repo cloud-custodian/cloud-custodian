@@ -28,9 +28,9 @@ Write your first policy
 
 A policy specifies the following items:
 
-* The resource to run the policy against
-* The resource state or states the policy checks (filters)
-* The action or actions to take on the resource depending on the specified filters
+* The type of resource to run the policy against
+* Filters to narrow down the set of resources
+* Actions to take on the filtered set of resources
 
 For this tutorial, let's stop all EC2 instances that are tagged with
 ``Custodian``. To get started, go make an EC2 instance in your `AWS console
