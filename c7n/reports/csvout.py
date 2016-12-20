@@ -96,10 +96,9 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=N
 def _get_values(record, field_list, tag_map):
     tag_prefix = 'tag:'
     list_prefix = 'list:'
+    count_prefix = 'count:'
     vals = []
     for field in field_list:
-        # TODO process count: values
-        # str(len(record['Instances'])),
         if field.startswith(tag_prefix):
             tag_field = field.replace(tag_prefix, '', 1)
             vals.append(tag_map.get(tag_field, ''))
@@ -110,6 +109,14 @@ def _get_values(record, field_list, tag_map):
                 value = ''
             else:
                 value = ', '.join(value)
+            vals.append(value)
+        elif field.startswith(count_prefix):
+            count_field = field.replace(count_prefix, '', 1)
+            value = jmespath.search(count_field, record)
+            if value is None:
+                value = ''
+            else:
+                value = str(len(value))
             vals.append(value)
         else:
             value = jmespath.search(field, record)
