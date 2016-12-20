@@ -20,26 +20,6 @@ To install Cloud Custodian, just run::
 
   $ pip install c7n
 
-.. _explore-cc:
-
-Explore Cloud Custodian
------------------------
-
-* Run ``custodian -h`` to see a list of available commands.
-* Run ``custodian schema`` to see the complete list of AWS resources against which you can run policies. To invoke command-line help with more information about policy schema details, run ``custodian schema -h``.
-* Run ``custodian schema -<resource_name>`` to see the available filters and actions for each resource.
-* Drill down to get more information about available policy settings for each resource, where the model for the command is::
-
-  $ custodian schema <resource>.<category>.<item>
-
-  Examples::
-
-  $ custodian schema ebs.actions
-
-  ::
-
-  $ custodian schema ec2.filters.instance-age
-
 
 .. _write-policy:
 
@@ -98,6 +78,27 @@ For more information on basic concepts and terms, check the :ref:`glossary
 <glossary>`. See our extended examples of an :ref:`offhours policy <offhours>`
 and a :ref:`tag compliance policy <tagCompliance>`, or browse all of our
 :ref:`use case recipes <usecases>`.
+
+
+.. _explore-cc:
+
+Explore Cloud Custodian
+-----------------------
+
+* Run ``custodian -h`` to see a list of available commands.
+* Run ``custodian schema`` to see the complete list of AWS resources against which you can run policies. To invoke command-line help with more information about policy schema details, run ``custodian schema -h``.
+* Run ``custodian schema -<resource_name>`` to see the available filters and actions for each resource.
+* Drill down to get more information about available policy settings for each resource, where the model for the command is::
+
+  $ custodian schema <resource>.<category>.<item>
+
+  Examples::
+
+  $ custodian schema ebs.actions
+
+  ::
+
+  $ custodian schema ec2.filters.instance-age
 
 The ``custodian schema`` commands show you the available filters and actions for each resource. For each individual item, they also provide a detailed schema. For example::
 
