@@ -20,6 +20,66 @@ To install Cloud Custodian, just run::
 
   $ pip install c7n
 
+
+.. _write-policy:
+
+Write your first policy
+-----------------------
+
+A policy specifies the following items:
+
+* The type of resource to run the policy against
+* Filters to narrow down the set of resources
+* Actions to take on the filtered set of resources
+
+For this tutorial, let's stop all EC2 instances that are tagged with
+``Custodian``. To get started, go make an EC2 instance in your `AWS console
+<https://console.aws.amazon.com/>`_, and tag it with the key ``Custodian`` (any
+value).  Also, make sure you have an access key handy.
+
+Then, create a file named ``custodian.yml`` with this content:
+
+.. code-block:: yaml
+
+    policies:
+      - name: my-first-policy
+        resource: ec2
+        filters:
+          - "tag:Custodian": present
+        actions:
+          - stop
+
+Now, run Custodian:
+
+.. code-block:: bash
+
+    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output=. --config=custodian.yml
+
+If you are not using the ``us-east-1`` region, then you'll need to specify that as well, like so:
+
+.. code-block:: bash
+
+    --region=us-west-1
+
+If successful, you should see output similar to the following on the command line::
+
+    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
+    2016-12-20 08:35:07,514: custodian.resources.ec2:INFO Filtered from 3 to 1 ec2
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:ec2 has count:1 time:1.38
+    2016-12-20 08:35:07,515: custodian.actions:INFO Stop 1 of 1 instances
+    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: stop resources: 1 execution_time: 0.67
+
+You should also find a new ``my-first-policy`` directory with a log and other
+files (subsequent runs will append to the log by default rather than
+overwriting it). Lastly, you should find the instance stopping or stopped in
+your AWS console. Congratulations, and welcome to Custodian!
+
+For more information on basic concepts and terms, check the :ref:`glossary
+<glossary>`. See our extended examples of an :ref:`offhours policy <offhours>`
+and a :ref:`tag compliance policy <tagCompliance>`, or browse all of our
+:ref:`use case recipes <usecases>`.
+
+
 .. _explore-cc:
 
 Explore Cloud Custodian
@@ -39,24 +99,6 @@ Explore Cloud Custodian
   ::
 
   $ custodian schema ec2.filters.instance-age
-
-
-.. _write-policy:
-
-Write your first policy
------------------------
-
-A policy specifies the following items:
-
-* The resource to run the policy against
-* The resource state or states the policy checks (filters)
-* The action or actions to take on the resource depending on the specified filters
-
-For more information, see the following topics:
-
-* :ref:`Basic concepts and terms <glossary>`
-* :ref:`Example offhours policy <offhours>`
-* :ref:`Example tag compliance policy <tagCompliance>`
 
 The ``custodian schema`` commands show you the available filters and actions for each resource. For each individual item, they also provide a detailed schema. For example::
 
@@ -95,19 +137,6 @@ You can also check which resources are identified by the policy, without running
 
   $ custodian run --dryrun -c <policy>.yml -c <output-directory>
 
-
-.. _run-policy:
-
-Run the policy
---------------
-
-At its most basic, running a policy requires only the following command::
-
-  $ custodian run -c <policy_file> -s <output_directory>
-
-Custodian will create the output directory if it does not exist.
-
-This command writes the log files to the output directory. Note that the logs are appended to any existing log files; the logs are not overwritten by default. 
 
 .. _monitor-cc:
 
