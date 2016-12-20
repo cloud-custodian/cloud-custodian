@@ -90,8 +90,9 @@ If successful, you should see output similar to the following on the command lin
     2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: stop resources: 1 execution_time: 0.67
 
 You should also find a new ``my-first-policy`` directory with a log and other
-files. Lastly, you should find the instance stopping or stopped in your AWS
-console. Congratulations, and welcome to Custodian!
+files (subsequent runs will append to the log by default rather than
+overwriting it). Lastly, you should find the instance stopping or stopped in
+your AWS console. Congratulations, and welcome to Custodian!
 
 For more information on basic concepts and terms, check the :ref:`glossary
 <glossary>`. See our extended examples of an :ref:`offhours policy <offhours>`
@@ -135,19 +136,6 @@ You can also check which resources are identified by the policy, without running
 
   $ custodian run --dryrun -c <policy>.yml -c <output-directory>
 
-
-.. _run-policy:
-
-Run the policy
---------------
-
-At its most basic, running a policy requires only the following command::
-
-  $ custodian run -c <policy_file> -s <output_directory>
-
-Custodian will create the output directory if it does not exist.
-
-This command writes the log files to the output directory. Note that the logs are appended to any existing log files; the logs are not overwritten by default. 
 
 .. _monitor-cc:
 
