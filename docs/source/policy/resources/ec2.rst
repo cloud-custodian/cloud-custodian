@@ -113,6 +113,9 @@ Start
   Start a set of instances (presumably) already stopped, the start action will automatically
   filter instances to those that are already in the correct state.
 
+  .. c7n-schema:: Start
+      :module: c7n.resources.ec2
+
   This example will restart all stopped instances.
 
   .. code-block:: yaml

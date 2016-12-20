@@ -1,11 +1,10 @@
 
 .. container:: toggle
 
-    .. container:: header
+  .. container:: header
 
-        Schema:
+    Schema:
 
-    .. code-block:: javascript
+  .. code-block:: javascript
 
-       {{ schema_json|indent(4) }}
-
+    {{ schema_json|indent(4) }}

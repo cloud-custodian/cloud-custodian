@@ -10,6 +10,9 @@ Filters
 ``age``
   Based on ``SnapshotCreateTime`` of the snapshot, the time stamp when the snapshot was created, in days
 
+  .. c7n-schema:: ElastiCacheSnapshotAge
+      :module: c7n.resources.elasticache
+
 Actions
 -------
 
