@@ -133,12 +133,12 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
         .. code-block: yaml
 
             policies:
-              - name: asg-launch-config-xyz
+              - name: launch-config-public-ip
                 resource: asg
                 filters:
                   - type: launch-config
-                    key: ImageId
-                    value: ami-12ab34cd
+                    key: AssociatePublicIpAddress
+                    value: true
     """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
@@ -338,7 +338,7 @@ class InvalidConfigFilter(ConfigValidFilter):
 
 @filters.register('not-encrypted')
 class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
-    """Check if an asg is configured to have unencrypted volumes.
+    """Check if an ASG is configured to have unencrypted volumes.
 
     Checks both the ami snapshots and the launch configuration.
 
@@ -480,7 +480,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
         .. code-block: yaml
 
             policies:
-              - name: asg-expired
+              - name: asg-older-image
                 resource: asg
                 filters:
                   - type: image-age
@@ -527,9 +527,7 @@ class VpcIdFilter(ValueFilter):
                 resource: asg
                 filters:
                   - type: vpc-id
-                    key: VpcId
                     value: vpc-12ab34cd
-                    op: eq
     """
 
     schema = type_schema(
@@ -628,6 +626,9 @@ class CapacityDelta(Filter):
 class Resize(BaseAction):
     """Action to resize the min/max instances in an ASG
 
+    Resizing of scaling groups desired/minimum size is limited to the
+    current size of the autoscaling group(s).
+
     :example:
 
         .. code-block: yaml
@@ -636,12 +637,10 @@ class Resize(BaseAction):
               - name: asg-resize
                 resource: asg
                 filters:
-                  - type: value
-                    key: MinSize
-                    value: 2
+                  - DesiredCapacity: 1
                 actions:
                   - type: resize
-                    desired_size: 4
+                    desired_size: current
     """
 
     schema = type_schema(
@@ -1072,7 +1071,7 @@ class Suspend(BaseAction):
                 filters:
                   - "tag:SuspendTag": present
                 actions:
-                  - suspend
+                  - type: suspend
     """
 
     schema = type_schema('suspend')
@@ -1124,7 +1123,7 @@ class Resume(BaseAction):
     """Resume a suspended autoscale group and its instances
 
     Parameter 'delay' is the amount of time (in seconds) to wait between
-    resuming each instance (default value: 30)
+    resuming each instance within the ASG (default value: 30)
 
     :example:
 
@@ -1278,7 +1277,7 @@ class LaunchConfigAge(AgeFilter):
 
 @LaunchConfig.filter_registry.register('unused')
 class UnusedLaunchConfig(Filter):
-    """Filters all launch configurations that are current not being used
+    """Filters all launch configurations that are not in use but exist
 
     :example:
 
