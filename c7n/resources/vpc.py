@@ -30,20 +30,18 @@ class Vpc(QueryResourceManager):
 
 @Vpc.filter_registry.register('subnets')
 class VpcSubnets(ValueFilter):
-    """Filter VPC by subnet
+    """Filter VPC by subnet value
 
     :example:
 
         .. code-block: yaml
 
             policies:
-              - name: eni-filter-by-sg
-                resource: eni
+              - name: empty-vpc
+                resource: vpc
                 filters:
-                  - type: security-group
-                    match-resource: true
-                    key: FromPort
-                    value: 22
+                  - type: subnets
+                    value: []
     """
 
     schema = type_schema('subnets', rinherit=ValueFilter.schema)
@@ -446,11 +444,11 @@ class IPPermission(SGPermission):
         .. code-block: yaml
 
             policies:
-              - name: security-groups-ingress-http
+              - name: security-groups-ingress-https
                 resource: security-group
                 filters:
                   - type: ingress
-                    Ports: [443, 80]
+                    OnlyPorts: [443]
     """
 
     ip_permissions_key = "IpPermissions"
@@ -477,7 +475,10 @@ class IPPermissionEgress(SGPermission):
                 resource: security-group
                 filters:
                   - type: egress
-                    Ports: [443]
+                    Cidr:
+                      value: 24
+                      op: lt
+                      value_type: cidr_size
     """
 
     ip_permissions_key = "IpPermissionsEgress"
@@ -601,7 +602,7 @@ class InterfaceSubnetFilter(net_filters.SubnetFilter):
                 filters:
                   - type: subnet
                     key: CidrBlock
-                    value: 172.31.32.0/20
+                    value: 10.0.2.0/24
     """
 
     RelatedIdsExpression = "SubnetId"
