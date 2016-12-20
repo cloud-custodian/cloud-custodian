@@ -505,8 +505,16 @@ class TestActions(unittest.TestCase):
 
 
 class TestModifySecurityGroupsActionSchema(BaseTest):
-    def test_remove_dependencies(self):
+    def setUp(self):
+        try:
+            import os
+            self.invalid_input_dir = 'invalid_modify_security_groups_action_policy'
+            os.mkdir(os.path.join(self.placebo_dir, self.invalid_input_dir))
+        except OSError:
+            pass
 
+    def test_remove_dependencies(self):
+        session_factory = self.replay_flight_data(self.invalid_input_dir)
         policy = {
             'name': 'remove-with-no-isolation-or-add',
             'resource': 'ec2',
@@ -514,9 +522,10 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'remove': 'matched'}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
     def test_invalid_remove_params(self):
+        session_factory = self.replay_flight_data(self.invalid_input_dir)
         # basestring invalid
         policy = {
             'name': 'remove-with-incorrect-param-string',
@@ -525,7 +534,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'remove': 'none'}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
         # list - one valid, one invalid
         policy = {
@@ -535,9 +544,10 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'remove': ['invalid-sg', 'sg-abcd1234']}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
     def test_invalid_add_params(self):
+        session_factory = self.replay_flight_data(self.invalid_input_dir)
         # basestring invalid
         policy = {
             'name': 'add-with-incorrect-param-string',
@@ -547,9 +557,10 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'add': ['invalid-sg', 'sg-abcd1234']}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
     def test_invalid_isolation_group_params(self):
+        session_factory = self.replay_flight_data(self.invalid_input_dir)
         policy = {
             'name': 'isolation-group-with-incorrect-param-string',
             'resource': 'ec2',
@@ -557,7 +568,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'isolation-group': 'none'}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
         # list - one valid, one invalid
         policy = {
@@ -567,7 +578,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 {'type': 'modify-security-groups', 'isolation-group': ['invalid-sg', 'sg-abcd1234']}
             ]
         }
-        self.assertRaises(ValueError, lambda: self.load_policy(data=policy))
+        self.assertRaises(ValueError, lambda: self.load_policy(data=policy, session_factory=session_factory))
 
 
 class TestModifySecurityGroupAction(BaseTest):
