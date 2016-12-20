@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "GroupId": "sg-46a8b13f", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "68691456-5298-4528-bab8-86c1cf5a1cf7", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 16 Dec 2016 15:09:20 GMT"
+            }
+        }
+    }
+}

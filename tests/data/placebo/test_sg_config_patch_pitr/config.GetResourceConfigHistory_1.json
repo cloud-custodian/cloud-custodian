@@ -1,0 +1,91 @@
+{
+    "status_code": 200, 
+    "data": {
+        "configurationItems": [
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 3, 
+                    "microsecond": 800000, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 4
+                }, 
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::VPC", 
+                        "resourceId": "vpc-72885e14", 
+                        "relationshipName": "Is contained in Vpc"
+                    }
+                ], 
+                "availabilityZone": "Not Applicable", 
+                "awsRegion": "us-east-1", 
+                "tags": {
+                    "NetworkLocation": "DMZ", 
+                    "App": "blue-moon"
+                }, 
+                "resourceType": "AWS::EC2::SecurityGroup", 
+                "resourceId": "sg-a38ed1de", 
+                "configurationStateId": "1481454243800", 
+                "relatedEvents": [], 
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-a38ed1de", 
+                "version": "1.2", 
+                "configurationItemMD5Hash": "d0139d586aa17b17f0dbb2aa62084c12", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "{\"ownerId\":\"644160558196\",\"groupName\":\"allow-access\",\"groupId\":\"sg-a38ed1de\",\"description\":\"inbound access\",\"ipPermissions\":[{\"ipProtocol\":\"tcp\",\"fromPort\":8080,\"toPort\":8080,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]},{\"ipProtocol\":\"tcp\",\"fromPort\":443,\"toPort\":443,\"userIdGroupPairs\":[],\"ipRanges\":[\"10.42.1.0/24\"],\"prefixListIds\":[]}],\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]}],\"vpcId\":\"vpc-72885e14\",\"tags\":[{\"key\":\"App\",\"value\":\"blue-moon\"},{\"key\":\"NetworkLocation\",\"value\":\"DMZ\"}]}", 
+                "configurationItemStatus": "ResourceDiscovered", 
+                "accountId": "644160558196"
+            }, 
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 2, 
+                    "microsecond": 376000, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 4
+                }, 
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::VPC", 
+                        "resourceId": "vpc-72885e14", 
+                        "relationshipName": "Is contained in Vpc"
+                    }
+                ], 
+                "availabilityZone": "Not Applicable", 
+                "awsRegion": "us-east-1", 
+                "tags": {
+                    "NetworkLocation": "DMZ", 
+                    "App": "blue-moon"
+                }, 
+                "resourceType": "AWS::EC2::SecurityGroup", 
+                "resourceId": "sg-a38ed1de", 
+                "configurationStateId": "1481454242376", 
+                "relatedEvents": [], 
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-a38ed1de", 
+                "version": "1.2", 
+                "configurationItemMD5Hash": "d0139d586aa17b17f0dbb2aa62084c12", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "{\"ownerId\":\"644160558196\",\"groupName\":\"allow-access\",\"groupId\":\"sg-a38ed1de\",\"description\":\"inbound access\",\"ipPermissions\":[{\"ipProtocol\":\"tcp\",\"fromPort\":8080,\"toPort\":8080,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]},{\"ipProtocol\":\"tcp\",\"fromPort\":443,\"toPort\":443,\"userIdGroupPairs\":[],\"ipRanges\":[\"10.42.1.0/24\"],\"prefixListIds\":[]}],\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]}],\"vpcId\":\"vpc-72885e14\",\"tags\":[{\"key\":\"App\",\"value\":\"blue-moon\"},{\"key\":\"NetworkLocation\",\"value\":\"DMZ\"}]}", 
+                "configurationItemStatus": "ResourceDiscovered", 
+                "accountId": "644160558196"
+            }
+        ], 
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbODYsLTIxLDk0LDEwMiw0LC00OCwxNywtOTgsMCwtODEsMTIwLC02LDk4LC0xOSwtMTIyLC0yMiwyNSwtMTgsNTMsLTcxLDc0LC01NiwtMTIsLTY4LDcsNjksLTU4LDU2LC04MiwtMjgsLTE2LC0yMiw0MSwtMTExLDM1LC04OCwtMTE3LDEwMywxMDgsLTExNSwtNjUsNTAsMTAzLC04LDI2LDEyMiwxOCwtNzAsLTgzLDk1LC00OSwxNiwtMzMsMTEsLTEyLC05MywtODEsLTk1LC03MCwtMTUsNjUsMjAsLTEwNywtMTAxLDIsMTI2LDEzLDEyNiwtMTA3LDEyMywxMDcsMTExLDUzLDU0LDcxLDIzLDQzLDI2LC04MywtNTgsOTMsLTE4LC04OSwtMjIsLTk2LC0yMywtNywtMTEyLDc5LC02MiwyMywtNywtOTAsNjAsLTMzLDk3LC0xMTIsLTg1LC0yLDM1LC04NCwtNjAsLTU0LC0zNSwxMTYsLTEzLC02LC05NywxNSwxMDQsLTY3LC0yNSw2OSwtODMsLTg5LDk5LDI4LC04NywtMzcsMTA2LC05MCwxOSwtNjIsLTc1LC0xMTgsNTIsLTQzLC05NCwtMyw5Myw4LDQxLC0xMDksMTE5LDEwNSwtMSwxMywtNDksLTM1LDY2LC01OSwyMSwxOSwtNTEsNzYsNzIsMjksMTE5LC02OSw5OCw4MiwxLC03NSwyOCw4MywtMzEsLTQxLC01MiwtNTAsNjEsLTMzLC0xMDcsLTExOCw3OSwtMSwtMTIxXSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6WzExOCw2OCw0NSwtNiw1NCw0NCwyNiwtMTQsLTk0LC0yNywtOTEsMzYsNDgsLTMsLTgwLC0xMTddfX0=", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f026ba26-c20a-11e6-a4cb-cd974dc893b3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f026ba26-c20a-11e6-a4cb-cd974dc893b3", 
+                "date": "Wed, 14 Dec 2016 14:38:11 GMT", 
+                "content-length": "3771", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
