@@ -444,6 +444,55 @@ class S3Test(BaseTest):
         versioning = client.get_bucket_versioning(Bucket=bname)['Status']
         self.assertEqual('Suspended', versioning)
 
+    def test_enable_logging(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_logging', 'Logging', None, None)])
+        session_factory = self.replay_flight_data('test_s3_enable_logging')
+        bname = 'superduper-and-magic'
+
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy({
+            'name': 's3-version',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [
+                {'type': 'toggle-logging',
+                 'target_bucket': bname}]
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], bname)
+
+        # eventual consistency fun for recording
+        #time.sleep(10)
+        logging = client.get_bucket_logging(Bucket=bname)['Status']
+        self.assertEqual('Enabled', logging)
+
+        # running against a bucket with logging already on
+        # is idempotent
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 's3-version',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [
+                {'type': 'toggle-logging', 'enabled': False}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # eventual consistency fun for recording
+        #time.sleep(10)
+        logging = client.get_bucket_logging(Bucket=bname)['Status']
+        self.assertEqual('Disabled', logging)
+
     def test_encrypt_policy(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),

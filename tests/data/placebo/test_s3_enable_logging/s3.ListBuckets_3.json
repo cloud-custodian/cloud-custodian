@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 14
+                }, 
+                "Name": "cf-templates-9c4kee3xbart-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 4, 
+                    "minute": 25
+                }, 
+                "Name": "superduper-and-magic"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "EqK/69eXILLN2uTLJ5fvk4PfPyOKeIrCiM7ex3ycmzgnl9C89KlqqGsKEZuAAQ8en04YvTmtfUY=", 
+            "RequestId": "7797D8F8AAD2B384", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "EqK/69eXILLN2uTLJ5fvk4PfPyOKeIrCiM7ex3ycmzgnl9C89KlqqGsKEZuAAQ8en04YvTmtfUY=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "7797D8F8AAD2B384", 
+                "date": "Tue, 04 Oct 2016 15:25:53 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
