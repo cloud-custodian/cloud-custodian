@@ -220,6 +220,22 @@ class UtilTest(unittest.TestCase):
         # Not a real schema, just doing a smoke test of the function
         properties = 'target'
 
-        from c7n.resources.ec2 import AttachedVolume
-        ret = utils.reformat_schema(AttachedVolume)
-        self.assertEqual(ret, AttachedVolume.schema['properties'])
+        class FakeResource(object):
+            schema = {
+                'additionalProperties': False,
+                'properties': {
+                    'default': {'type': 'object'},
+                    'key': {'type': 'string'},
+                    'op': {'enum': ['regex',
+                                    'ni',
+                                    'gt',
+                                    'not-in']},
+                    'value': {'oneOf': [{'type': 'array'},
+                                        {'type': 'string'},
+                                        {'type': 'boolean'},
+                                        {'type': 'number'}]},
+                }
+            }
+
+        ret = utils.reformat_schema(FakeResource)
+        self.assertEqual(ret, FakeResource.schema['properties'])
