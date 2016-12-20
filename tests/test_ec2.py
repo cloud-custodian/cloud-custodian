@@ -543,16 +543,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             'name': 'add-with-incorrect-param-string',
             'resource': 'ec2',
             'actions': [
-                {'type': 'modify-security-groups', 'add': 'none'}
-            ]
-        }
-        self.assertRaises(ValueError, lambda: self.load_policy(policy))
-
-        # list - one valid, one invalid
-        policy = {
-            'name': 'add-with-incorrect-param-list',
-            'resource': 'ec2',
-            'actions': [
+                {'type': 'modify-security-groups', 'add': 'none'},
                 {'type': 'modify-security-groups', 'add': ['invalid-sg', 'sg-abcd1234']}
             ]
         }
