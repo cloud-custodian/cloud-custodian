@@ -49,6 +49,11 @@ Then, create a file named ``custodian.yml`` with this content:
         actions:
           - stop
 
+.. _run-policy:
+
+Run your policy
+---------------
+
 Now, run Custodian:
 
 .. code-block:: bash

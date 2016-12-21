@@ -332,7 +332,7 @@ class HasStatementFilter(Filter):
                 filters:
                   - type: has-statement
                     statement_ids:
-11	                  - RequireEncryptedPutObject
+                      - RequireEncryptedPutObject
     """
     schema = type_schema(
         'has-statement',
@@ -371,7 +371,7 @@ class MissingPolicyStatementFilter(Filter):
                 filters:
                   - type: missing-statement
                     statement_ids:
-11	                  - RequireEncryptedPutObject
+                      - RequireEncryptedPutObject
     """
 
     schema = type_schema(
