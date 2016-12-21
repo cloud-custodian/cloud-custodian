@@ -49,10 +49,7 @@ class Delete(BaseAction):
               - name: cloudformation-delete-failed-stacks
                 resource: cfn
                 filters:
-                  - type: value
-                    key: StackStatus
-                    value: "CREATE_FAILED"
-                    op: eq
+                  - StackStatus: ROLLBACK_COMPLETE
                 actions:
                   - delete
     """
