@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "G5jiF07IsZF3NUY7ImQFU0NA7DfwIl8g4iYz4y1W3jQd4hhddpxilmtYEB7YrB4FNiuud6LfW5E=", 
-            "RequestId": "F6F93820CE319468", 
+            "HostId": "8QGW/+n5Oc1LqcerWMR5k1fRqwI8ORP4YsJTNKfdyPG6e/k3yi5W4c7ztqM0cnPf7XzNj6JOKjw=", 
+            "RequestId": "D8ADCFB844F25E15", 
             "HTTPHeaders": {
                 "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "G5jiF07IsZF3NUY7ImQFU0NA7DfwIl8g4iYz4y1W3jQd4hhddpxilmtYEB7YrB4FNiuud6LfW5E=", 
+                "x-amz-id-2": "8QGW/+n5Oc1LqcerWMR5k1fRqwI8ORP4YsJTNKfdyPG6e/k3yi5W4c7ztqM0cnPf7XzNj6JOKjw=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "F6F93820CE319468", 
-                "date": "Tue, 20 Dec 2016 23:43:28 GMT", 
+                "x-amz-request-id": "D8ADCFB844F25E15", 
+                "date": "Tue, 20 Dec 2016 23:33:05 GMT", 
                 "content-type": "application/xml"
             }
         }, 
@@ -28,13 +28,13 @@
                     "hour": 23, 
                     "__class__": "datetime", 
                     "month": 12, 
-                    "second": 28, 
+                    "second": 5, 
                     "microsecond": 0, 
                     "year": 2016, 
                     "day": 20, 
-                    "minute": 43
+                    "minute": 33
                 }, 
-                "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "ETag": "\"a464522089f63853f27b5b6d46248918\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/10", 
                 "Owner": {
@@ -48,13 +48,13 @@
                     "hour": 23, 
                     "__class__": "datetime", 
                     "month": 12, 
-                    "second": 28, 
+                    "second": 5, 
                     "microsecond": 0, 
                     "year": 2016, 
                     "day": 20, 
-                    "minute": 43
+                    "minute": 33
                 }, 
-                "ETag": "\"b2e189abf85e809a51522cdb0e53083a\"", 
+                "ETag": "\"38c441aabafaeddbf47b5437569d8f90\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/11", 
                 "Owner": {
@@ -68,13 +68,13 @@
                     "hour": 23, 
                     "__class__": "datetime", 
                     "month": 12, 
-                    "second": 28, 
+                    "second": 5, 
                     "microsecond": 0, 
                     "year": 2016, 
                     "day": 20, 
-                    "minute": 43
+                    "minute": 33
                 }, 
-                "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "ETag": "\"f65a0781ff29281512e824e929681dd6\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "home.txt", 
                 "Owner": {
