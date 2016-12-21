@@ -24,7 +24,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -986,47 +986,6 @@ class Delete(BaseAction):
                     asg['AutoScalingGroupName'], e))
                 return
             raise
-
-
-@actions.register('modify-security-groups')
-class ASGModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
-    # Need some kind of a warning - this will require the ASGs to bring up new instances
-    # in order to see the new security groups
-
-    # TODO: Implement. Lots of other gotchas
-
-    def process(self, asgs):
-        raise NotImplemented('The modify-security-groups action has not been implemented on this resource')
-        with self.executor_factory(max_workers=5) as w:
-            list(w.map(self.process_asg, asgs))
-
-    def process_asg(self, asg):
-        client = local_session(self.manager.session_factory).client('autoscaling')
-
-        groups = super(ASGModifyVpcSecurityGroups, self).get_groups(asg, metadata_key='SecurityGroups')
-
-        # create new launch config from old
-        # May be a better way to do these describe calls - batch them together
-        config_name = asg['LaunchConfigurationName']
-        old_config = client.describe_launch_configurations(
-                LaunchConfigurationNames=[config_name]
-        )['LaunchConfigurations'][0]
-
-        # other than these two, the describe is identical to create syntax. convenient
-        new_config = old_config.pop('LaunchConfigurationARN').pop('CreatedTime').pop('LaunchConfigurationName')
-        new_config['SecurityGroups'] = groups
-        # TODO: come up with a way to generate a new launch config name
-        new_launch_config_name = ''
-        new_config['LaunchConfigurationName'] = new_launch_config_name
-
-        client.create_launch_configuration(**new_config)
-
-        # Update ASG with new config
-        # something with client.update(config_name)
-        client.update_auto_scaling_group(
-            AutoScalingGroupName=asg['AutoScalingGroupName'],
-            LaunchConfigurationName=new_launch_config_name
-        )
 
 
 @resources.register('launch-config')
