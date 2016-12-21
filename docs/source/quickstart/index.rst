@@ -52,7 +52,7 @@ Now, run Custodian:
 
 .. code-block:: bash
 
-    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output=. --config=custodian.yml
+    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. --config=custodian.yml
 
 If you are not using the ``us-east-1`` region, then you'll need to specify that as well, like so:
 
@@ -134,7 +134,7 @@ The policy is validated automatically when you run it, but you can also validate
 
 You can also check which resources are identified by the policy, without running any actions on the resources::
 
-  $ custodian run --dryrun -c <policy>.yml -c <output-directory>
+  $ custodian run --dryrun -c <policy>.yml -s <output-directory>
 
 
 .. _monitor-cc:
