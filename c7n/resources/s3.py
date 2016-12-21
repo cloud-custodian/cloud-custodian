@@ -332,7 +332,7 @@ class HasStatementFilter(Filter):
                 filters:
                   - type: has-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
     schema = type_schema(
         'has-statement',
@@ -371,7 +371,7 @@ class MissingPolicyStatementFilter(Filter):
                 filters:
                   - type: missing-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
 
     schema = type_schema(
@@ -423,7 +423,7 @@ class RemovePolicyStatement(BucketActionBase):
                 actions:
                   - type: remove-statements
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
 
     schema = type_schema(
@@ -1310,7 +1310,7 @@ class MarkBucketForOp(TagDelayedAction):
                 filters:
                   - type: missing-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
                 actions:
                   - type: mark-for-op
                     op: attach-encrypt
@@ -1364,7 +1364,7 @@ class DeleteBucket(ScanBucket):
                 filters:
                   - type: missing-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
                 actions:
                   - type: delete
                     remove-contents: true
