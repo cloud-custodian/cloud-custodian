@@ -26,7 +26,6 @@ class ResourceManager(object):
 
     filter_registry = None
     action_registry = None
-
     executor_factory = ThreadPoolExecutor
 
     def __init__(self, ctx, data):
@@ -48,6 +47,10 @@ class ResourceManager(object):
 
     def format_json(self, resources, fh):
         return dumps(resources, fh, indent=2)
+
+    def match_ids(self, ids):
+        """return ids that match this resource type's id format."""
+        return ids
 
     def get_resources(self, resource_ids):
         """Retrieve a set of resources by id."""
