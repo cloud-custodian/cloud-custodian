@@ -97,14 +97,14 @@ validate it separately:
 
 .. code-block:: bash
 
-    custodian validate -c custodian.yml
+  $ custodian validate -c custodian.yml
 
 You can also check which resources are identified by the policy, without
 running any actions on the resources:
 
 .. code-block:: bash
 
-    custodian run --dryrun -c custodian.yml -s .
+  $ custodian run --dryrun -c custodian.yml -s .
 
 
 .. _explore-cc:
