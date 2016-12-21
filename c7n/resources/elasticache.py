@@ -301,15 +301,25 @@ class SnapshotElastiCacheCluster(BaseAction):
 
 @actions.register('modify-security-groups')
 class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
-    """Modify security groups on an Elasticache cluster"""
+    """Modify security groups on an Elasticache cluster.
+
+    Looks at the individual clusters and modifies the Replication Group's configuration
+    for Security groups so all nodes get affected equally
+    """
 
     def process(self, clusters):
+        replication_group_map = {}
         client = local_session(self.manager.session_factory).client('elasticache')
-        groups = super(ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(resources)
+        groups = super(ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='SecurityGroupId')
         for idx, c in enumerate(clusters):
-            client.modify_cache_cluster(
-                CacheClusterId=c['CacheClusterId'],
-                SecurityGroupIds=groups[idx])
+            # build map of Replication Groups to Security Groups
+            replication_group_map[c['ReplicationGroupId']] = groups[idx]
+
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_replication_group(
+                ReplicationGroupId=r,
+                SecurityGroupIds=replication_group_map[r]
+            )
 
 
 @resources.register('cache-subnet-group')

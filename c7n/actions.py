@@ -181,11 +181,20 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         group policies for 'modify-security-groups' to find the resulting
         set of VPC security groups to attach to that resource.
 
+        The 'metadata_key' parameter can be used for two purposes at the moment;
+        The first use is for resources' APIs that return a list of security group
+        IDs but use a different metadata key than 'Groups' or 'SecurityGroups'.
+
+        The second use is for when there are richer objects in the 'Groups' or
+        'SecurityGroups' lists. The custodian actions need to act on lists of
+        just security group IDs, so the metadata_key can be used to select IDs
+        from the richer objects in the provided lists.
+
         Returns a list of lists containing the resulting VPC security groups
         that should end up on each resource passed in.
 
         :param resources: List of resources containing VPC Security Groups
-        :param metadata_key: Metadata key for security groups list (only required if not 'Groups')
+        :param metadata_key: Metadata key for security groups list (see notes for detailed usage)
         :return: List of lists of security groups per resource
         """
         # parse the add, remove, and isolation group params to return the
@@ -200,9 +209,17 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         return_groups = []
 
         for idx, r in enumerate(resources):
-            # single eni resources
             if r.get('Groups'):
-                rgroups = [g['GroupId'] for g in r['Groups']]
+                if metadata_key and isinstance(r['Groups'][0], dict):
+                    rgroups = [g[metadata_key] for g in r['SecurityGroups']]
+                else:
+                    rgroups = [g['GroupId'] for g in r['Groups']]
+            elif r.get('SecurityGroups'):
+                if metadata_key and isinstance(r['SecurityGroups'][0], dict):
+                    rgroups = [g[metadata_key] for g in r['SecurityGroups']]
+                else:
+                    rgroups = [g for g in r['SecurityGroups']]
+            # use as substitution for 'Groups or 'SecurityGroups
             elif metadata_key and r.get(metadata_key):
                 rgroups = [g for g in r[metadata_key]]
 
@@ -222,8 +239,9 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
             elif isinstance(add_target_group_ids, basestring):
                 add_groups = [add_target_group_ids]
 
-            if not remove_groups and not add_groups:
-                continue
+            # seems extraneous with list?
+            # if not remove_groups and not add_groups:
+            #     continue
 
             for g in remove_groups:
                 if g in rgroups:

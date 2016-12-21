@@ -1,0 +1,130 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ReplicationGroups": [
+            {
+                "Status": "available", 
+                "Description": "Demonstrates valid config options or \"correct behavior\"", 
+                "NodeGroups": [
+                    {
+                        "Status": "available", 
+                        "NodeGroupMembers": [
+                            {
+                                "CurrentRole": "primary", 
+                                "PreferredAvailabilityZone": "ca-central-1a", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-base-001.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-base-001"
+                            }, 
+                            {
+                                "CurrentRole": "replica", 
+                                "PreferredAvailabilityZone": "ca-central-1b", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-base-002.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-base-002"
+                            }, 
+                            {
+                                "CurrentRole": "replica", 
+                                "PreferredAvailabilityZone": "ca-central-1b", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-base-003.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-base-003"
+                            }
+                        ], 
+                        "NodeGroupId": "0001", 
+                        "PrimaryEndpoint": {
+                            "Port": 6379, 
+                            "Address": "sg-test-base.ewuuco.ng.0001.cac1.cache.amazonaws.com"
+                        }
+                    }
+                ], 
+                "ReplicationGroupId": "sg-test-base", 
+                "SnapshotRetentionLimit": 0, 
+                "AutomaticFailover": "enabled", 
+                "SnapshotWindow": "01:00-02:00", 
+                "MemberClusters": [
+                    "sg-test-base-001", 
+                    "sg-test-base-002", 
+                    "sg-test-base-003"
+                ], 
+                "PendingModifiedValues": {}
+            }, 
+            {
+                "Status": "available", 
+                "Description": "Used to demonstrate \"bad behavior\"", 
+                "NodeGroups": [
+                    {
+                        "Status": "available", 
+                        "NodeGroupMembers": [
+                            {
+                                "CurrentRole": "primary", 
+                                "PreferredAvailabilityZone": "ca-central-1a", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-fail-001.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-fail-001"
+                            }, 
+                            {
+                                "CurrentRole": "replica", 
+                                "PreferredAvailabilityZone": "ca-central-1b", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-fail-002.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-fail-002"
+                            }, 
+                            {
+                                "CurrentRole": "replica", 
+                                "PreferredAvailabilityZone": "ca-central-1a", 
+                                "CacheNodeId": "0001", 
+                                "ReadEndpoint": {
+                                    "Port": 6379, 
+                                    "Address": "sg-test-fail-003.ewuuco.0001.cac1.cache.amazonaws.com"
+                                }, 
+                                "CacheClusterId": "sg-test-fail-003"
+                            }
+                        ], 
+                        "NodeGroupId": "0001", 
+                        "PrimaryEndpoint": {
+                            "Port": 6379, 
+                            "Address": "sg-test-fail.ewuuco.ng.0001.cac1.cache.amazonaws.com"
+                        }
+                    }
+                ], 
+                "ReplicationGroupId": "sg-test-fail", 
+                "SnapshotRetentionLimit": 0, 
+                "AutomaticFailover": "enabled", 
+                "SnapshotWindow": "01:00-02:00", 
+                "MemberClusters": [
+                    "sg-test-fail-001", 
+                    "sg-test-fail-002", 
+                    "sg-test-fail-003"
+                ], 
+                "PendingModifiedValues": {}
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2e8ef32a-c7bf-11e6-8300-d9d35fe558ff", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2e8ef32a-c7bf-11e6-8300-d9d35fe558ff", 
+                "date": "Wed, 21 Dec 2016 20:51:01 GMT", 
+                "content-length": "5494", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
