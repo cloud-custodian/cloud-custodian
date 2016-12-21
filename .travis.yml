@@ -10,9 +10,6 @@ install:
   - pip install -r requirements-dev.txt
   - pip install coveralls
   - python setup.py develop
-script: nosetests -s -v --with-coverage --cover-package=c7n tests
+script: make sphinx && nosetests -s -v --with-coverage --cover-package=c7n tests
 after_success:
   coveralls
-
-
-
