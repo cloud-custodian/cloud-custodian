@@ -3,21 +3,31 @@
     "data": {
         "CopyObjectResult": {
             "LastModified": {
-                "hour": 9, 
+                "hour": 23, 
                 "__class__": "datetime", 
-                "month": 5, 
-                "second": 15, 
+                "month": 12, 
+                "second": 29, 
                 "microsecond": 0, 
                 "year": 2016, 
-                "day": 8, 
-                "minute": 39
+                "day": 20, 
+                "minute": 43
             }, 
             "ETag": "\"c68271a63ddbc431c307beb7d2918275\""
         }, 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "L1ZMtrOGwF+vkecrlREyjgBXICb17QQzgslMtlD2cuw/wPfW2WQdduJCdv0SihxDegQqekKx56g=", 
-            "RequestId": "DBCAF1251C0F0B79"
+            "RetryAttempts": 0, 
+            "HostId": "YrgyrXKdjgYLs09ixH8UUOpZMhK7VaqpoV/7lZZjIUr3VY2VD4SP0NW2h+/nNW9lI8sK5dYzUX8=", 
+            "RequestId": "D4AABBE372B7F5EB", 
+            "HTTPHeaders": {
+                "content-length": "234", 
+                "x-amz-id-2": "YrgyrXKdjgYLs09ixH8UUOpZMhK7VaqpoV/7lZZjIUr3VY2VD4SP0NW2h+/nNW9lI8sK5dYzUX8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "D4AABBE372B7F5EB", 
+                "date": "Tue, 20 Dec 2016 23:43:29 GMT", 
+                "x-amz-server-side-encryption": "AES256", 
+                "content-type": "application/xml"
+            }
         }, 
         "ServerSideEncryption": "AES256"
     }
