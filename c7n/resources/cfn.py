@@ -49,10 +49,7 @@ class Delete(BaseAction):
               - name: cloudformation-delete-failed-stacks
                 resource: cfn
                 filters:
-                  - type: value
-                    key: StackStatus
-                    value: "CREATE_FAILED"
-                    op: eq
+                  - StackStatus: ROLLBACK_COMPLETE
                 actions:
                   - delete
     """
@@ -61,7 +58,7 @@ class Delete(BaseAction):
 
     def process(self, stacks):
         with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_stack, stacks))
+            list(w.map(self.process_stacks, stacks))
 
     def process_stacks(self, stack):
         client = local_session(

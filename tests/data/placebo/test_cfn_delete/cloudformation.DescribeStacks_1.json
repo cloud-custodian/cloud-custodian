@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:185106417252:stack/TestStack-2/f7644780-c7ae-11e6-8439-500c28b23699", 
+                "Description": "Generic EC2", 
+                "Tags": [], 
+                "CreationTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 57, 
+                    "microsecond": 73000, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 54
+                }, 
+                "StackName": "TestStack-2", 
+                "NotificationARNs": [], 
+                "StackStatus": "ROLLBACK_COMPLETE", 
+                "DisableRollback": false
+            }, 
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:185106417252:stack/TestStack/1f7b5ea0-c7ac-11e6-88e6-500c28637499", 
+                "Description": "Generic EC2", 
+                "Tags": [], 
+                "CreationTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 35, 
+                    "microsecond": 898000, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 34
+                }, 
+                "StackName": "TestStack", 
+                "NotificationARNs": [], 
+                "StackStatus": "CREATE_COMPLETE", 
+                "DisableRollback": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "89fe308a-c7af-11e6-96f6-f168db2f7dd0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "89fe308a-c7af-11e6-96f6-f168db2f7dd0", 
+                "date": "Wed, 21 Dec 2016 18:59:02 GMT", 
+                "content-length": "1204", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

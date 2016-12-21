@@ -14,6 +14,10 @@
 
 from common import BaseTest
 
+from c7n.resources.cfn import Delete
+
+from c7n.executor import MainThreadExecutor
+
 
 class TestCFN(BaseTest):
 
@@ -24,3 +28,44 @@ class TestCFN(BaseTest):
             'resource': 'cfn'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(resources, [])
+
+    def test_value_filter(self):
+        session = self.replay_flight_data('test_cfn_value_filter')
+        policy = self.load_policy({
+            'name': 'cfn-filter-status',
+            'resource': 'cfn',
+            'filters': [{
+                'StackStatus': 'ROLLBACK_COMPLETE'}]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['StackName'], 'TestStack-2')
+
+    def test_delete_cfn(self):
+        self.patch(Delete, 'executor_factory', MainThreadExecutor)
+        session = self.replay_flight_data('test_cfn_delete')
+        policy = self.load_policy({
+            'name': 'cfn-delete-failed',
+            'resource': 'cfn',
+            'filters': [{
+                'StackStatus': 'ROLLBACK_COMPLETE'}]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['StackName'], 'TestStack-2')
+
+        policy = self.load_policy({
+            'name': 'cfn-delete-failed',
+            'resource': 'cfn',
+            'filters': [{
+                'StackStatus': 'ROLLBACK_COMPLETE'}],
+            'actions': [{
+                'type': 'delete'}]}, session_factory=session)
+        policy.run()
+
+        policy = self.load_policy({
+            'name': 'cfn-delete-failed',
+            'resource': 'cfn',
+            'filters': [{
+                'StackStatus': 'DELETE_IN_PROGRESS'}]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['StackName'], 'TestStack-2')
