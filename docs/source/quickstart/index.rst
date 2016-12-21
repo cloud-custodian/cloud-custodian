@@ -6,9 +6,8 @@ Getting Started
 See also the readme in the GitHub repository.
 
 * :ref:`install-cc`
-* :ref:`explore-cc`
 * :ref:`write-policy`
-* :ref:`run-policy`
+* :ref:`explore-cc`
 * :ref:`monitor-cc`
 
 .. _install-cc:
