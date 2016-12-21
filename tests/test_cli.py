@@ -108,7 +108,8 @@ class ValidateTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'untag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'untag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(invalid_policies)
@@ -133,7 +134,8 @@ class ValidateTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'tag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(valid_policies)
@@ -217,7 +219,8 @@ class ReportTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'tag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(valid_policies)
