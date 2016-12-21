@@ -497,8 +497,7 @@ class EncryptInstanceVolumes(BaseAction):
     - Requires instance restart
     - Not suitable for autoscale groups.
 
-    Multistep process
-    -----------------
+    Multistep process:
 
     - Stop instance (if running)
     - For each volume
@@ -517,7 +516,7 @@ class EncryptInstanceVolumes(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block:: yaml
 
             policies:
               - name: encrypt-unencrypted-ebs
