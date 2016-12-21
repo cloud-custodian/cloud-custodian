@@ -112,22 +112,21 @@ running any actions on the resources:
 Explore Cloud Custodian
 -----------------------
 
-* Run ``custodian -h`` to see a list of available commands.
-* Run ``custodian schema`` to see the complete list of AWS resources against which you can run policies. To invoke command-line help with more information about policy schema details, run ``custodian schema -h``.
-* Run ``custodian schema -<resource_name>`` to see the available filters and actions for each resource.
-* Drill down to get more information about available policy settings for each resource, where the model for the command is::
+Run ``custodian -h`` to see a list of available commands.
+
+Run ``custodian schema`` to see the complete list of AWS resources against
+which you can run policies. To invoke command-line help with more information
+about policy schema details, run ``custodian schema -h``.
+
+Run ``custodian schema <resource>`` to see the available :ref:`filters and
+actions <policy>` for each resource.
+
+Drill down to get more information about available policy settings for each
+resource, where the model for the command is::
 
   $ custodian schema <resource>.<category>.<item>
 
-  Examples::
-
-  $ custodian schema ebs.actions
-
-  ::
-
-  $ custodian schema ec2.filters.instance-age
-
-The ``custodian schema`` commands show you the available filters and actions for each resource. For each individual item, they also provide a detailed schema. For example::
+For example::
 
   $ custodian schema s3.filters.is-log-target
 
