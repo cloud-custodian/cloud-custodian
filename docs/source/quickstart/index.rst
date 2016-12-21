@@ -59,12 +59,6 @@ Now, run Custodian:
 
     AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. --config=custodian.yml
 
-If you are not using the ``us-east-1`` region, then you'll need to specify that as well, like so:
-
-.. code-block:: bash
-
-    --region=us-west-1
-
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
@@ -83,63 +77,93 @@ For more information on basic concepts and terms, check the :ref:`glossary
 and a :ref:`tag compliance policy <tagCompliance>`, or browse all of our
 :ref:`use case recipes <usecases>`.
 
+Troubleshooting & Tinkering
++++++++++++++++++++++++++++
+
+If you are not using the ``us-east-1`` region, then you'll need to specify that
+as well, either on the command line or in an environment variable:
+
+.. code-block:: bash
+
+    --region=us-west-1
+
+.. code-block:: bash
+
+    AWS_DEFAULT_REGION=us-west-1
+
+
+The policy is validated automatically when you run it, but you can also
+validate it separately:
+
+.. code-block:: bash
+
+  $ custodian validate -c custodian.yml
+
+You can also check which resources are identified by the policy, without
+running any actions on the resources:
+
+.. code-block:: bash
+
+  $ custodian run --dryrun -c custodian.yml -s .
+
 
 .. _explore-cc:
 
 Explore Cloud Custodian
 -----------------------
 
-* Run ``custodian -h`` to see a list of available commands.
-* Run ``custodian schema`` to see the complete list of AWS resources against which you can run policies. To invoke command-line help with more information about policy schema details, run ``custodian schema -h``.
-* Run ``custodian schema -<resource_name>`` to see the available filters and actions for each resource.
-* Drill down to get more information about available policy settings for each resource, where the model for the command is::
+Run ``custodian -h`` to see a list of available commands.
+
+Run ``custodian schema`` to see the complete list of AWS resources against
+which you can run policies. To invoke command-line help with more information
+about policy schema details, run ``custodian schema -h``.
+
+Run ``custodian schema <resource>`` to see the available :ref:`filters and
+actions <policy>` for each resource.
+
+Drill down to get more information about available policy settings for each
+resource, where the model for the command is::
 
   $ custodian schema <resource>.<category>.<item>
 
-  Examples::
-
-  $ custodian schema ebs.actions
-
-  ::
-
-  $ custodian schema ec2.filters.instance-age
-
-The ``custodian schema`` commands show you the available filters and actions for each resource. For each individual item, they also provide a detailed schema. For example::
+For example::
 
   $ custodian schema s3.filters.is-log-target
 
 provides the following information::
 
-  Help:
-  -----
-  
+  Help
+  ----
+
   Filter and return buckets are log destinations.
 
   Not suitable for use in lambda on large accounts, This is a api
   heavy process to detect scan all possible log sources.
-  
+
   Sources:
     - elb (Access Log)
     - s3 (Access Log)
     - cfn (Template writes)
     - cloudtrail
 
-  Schema:
-  -------
+  :example:
+
+      .. code-block: yaml
+
+          policies:
+            - name: s3-log-bucket
+              resource: s3
+              filters:
+                - type: is-log-target
+
+  Schema
+  ------
   
   {   'additionalProperties': False,
       'properties': {   'type': {   'enum': ['is-log-target']},
-                      'value': {   'type': 'boolean'}},
+                        'value': {   'type': 'boolean'}},
       'required': ['type'],
       'type': 'object'}
-
-The policy is validated automatically when you run it, but you can also validate it separately::
-
-  $ custodian validate -c <policy>.yml
-
-You can also check which resources are identified by the policy, without running any actions on the resources::
-
-  $ custodian run --dryrun -c <policy>.yml -s <output-directory>
 
 
 .. _monitor-cc:
