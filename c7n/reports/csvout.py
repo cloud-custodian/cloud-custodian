@@ -101,7 +101,7 @@ def _get_values(record, field_list, tag_map):
     for field in field_list:
         if field.startswith(tag_prefix):
             tag_field = field.replace(tag_prefix, '', 1)
-            vals.append(tag_map.get(tag_field, ''))
+            value = tag_map.get(tag_field, '')
         elif field.startswith(list_prefix):
             list_field = field.replace(list_prefix, '', 1)
             value = jmespath.search(list_field, record)
@@ -109,7 +109,6 @@ def _get_values(record, field_list, tag_map):
                 value = ''
             else:
                 value = ', '.join(value)
-            vals.append(value)
         elif field.startswith(count_prefix):
             count_field = field.replace(count_prefix, '', 1)
             value = jmespath.search(count_field, record)
@@ -117,12 +116,11 @@ def _get_values(record, field_list, tag_map):
                 value = ''
             else:
                 value = str(len(value))
-            vals.append(value)
         else:
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            vals.append(value)
+        vals.append(value)
     return vals
 
 
