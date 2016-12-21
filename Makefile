@@ -11,7 +11,7 @@ develop:
 
 coverage:
 	rm -Rf .coverage
-	AWS_DEFAULT_REGION=us-east-1 nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --cover-inclusive tests
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --processes=-1 --cover-inclusive tests
 
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer tests
