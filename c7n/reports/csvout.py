@@ -193,6 +193,37 @@ class S3Formatter(Formatter):
             tag_map.get("ASV", ""),
             tag_map.get("CMDBEnvironment", ""),
         ]
+#SQS Begin
+class SQSFormatter(Formatter):
+
+    def __init__(self, **kwargs):
+        super(SQSFormatter, self).__init__(
+            'QueueArn',
+            ['queuearn'
+             ],
+            **kwargs)
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['QueueArn'],
+        ]
+#SQS End
+
+#SNS Begin
+class SNSFormatter(Formatter):
+
+    def __init__(self, **kwargs):
+        super(SNSFormatter, self).__init__(
+            'TopicArn',
+            ['topicarn'
+             ],
+            **kwargs)
+
+    def csv_fields(self, record, tag_map):
+        return [
+            record['TopicArn'],
+        ]
+#SNS End
 
 
 class EC2Formatter(Formatter):
@@ -250,6 +281,7 @@ class RDSFormatter(Formatter):
         return [
             record['DBInstanceIdentifier'],
             record.get('DBName', ''),
+            record['InstanceCreateTime'],
             record['StorageEncrypted'],
             record['PubliclyAccessible'],
             tag_map.get("ASV", ""),
@@ -334,6 +366,8 @@ RECORD_TYPE_FORMATTERS = {
     'elb': ELBFormatter,
     'rds': RDSFormatter,
     's3': S3Formatter,
+    'sqs': SQSFormatter,
+    'sns': SNSFormatter,
 }
 
 
