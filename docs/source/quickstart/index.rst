@@ -59,12 +59,6 @@ Now, run Custodian:
 
     AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. --config=custodian.yml
 
-If you are not using the ``us-east-1`` region, then you'll need to specify that as well, like so:
-
-.. code-block:: bash
-
-    --region=us-west-1
-
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
@@ -82,6 +76,35 @@ For more information on basic concepts and terms, check the :ref:`glossary
 <glossary>`. See our extended examples of an :ref:`offhours policy <offhours>`
 and a :ref:`tag compliance policy <tagCompliance>`, or browse all of our
 :ref:`use case recipes <usecases>`.
+
+Troubleshooting & Tinkering
++++++++++++++++++++++++++++
+
+If you are not using the ``us-east-1`` region, then you'll need to specify that
+as well, either on the command line or in an environment variable:
+
+.. code-block:: bash
+
+    --region=us-west-1
+
+.. code-block:: bash
+
+    AWS_DEFAULT_REGION=us-west-1
+
+
+The policy is validated automatically when you run it, but you can also
+validate it separately:
+
+.. code-block:: bash
+
+    custodian validate -c custodian.yml
+
+You can also check which resources are identified by the policy, without
+running any actions on the resources:
+
+.. code-block:: bash
+
+    custodian run --dryrun -c custodian.yml -s .
 
 
 .. _explore-cc:
@@ -132,14 +155,6 @@ provides the following information::
                       'value': {   'type': 'boolean'}},
       'required': ['type'],
       'type': 'object'}
-
-The policy is validated automatically when you run it, but you can also validate it separately::
-
-  $ custodian validate -c <policy>.yml
-
-You can also check which resources are identified by the policy, without running any actions on the resources::
-
-  $ custodian run --dryrun -c <policy>.yml -s <output-directory>
 
 
 .. _monitor-cc:
