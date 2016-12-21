@@ -289,13 +289,10 @@ class EBS(QueryResourceManager):
         default_namespace = 'AWS/EBS'
         config_type = "AWS::EC::Volume"
 
-    # TODO find a way to recreate this?
-    # instance_id = (record['Attachments'][0]['InstanceId'] if
-    #                len(record['Attachments']) > 0 else 'Unattached')
     id_field = 'VolumeId'
     report_fields = [
         'VolumeId',
-        # instance_id,
+        'Attachments[0].InstanceId',
         'tag:ASV',
         'tag:CMDBEnvironment',
         'tag:OwnerContact',
