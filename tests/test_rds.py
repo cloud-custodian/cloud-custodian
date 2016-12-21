@@ -500,7 +500,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertFalse('maid_status' in tag_map)        
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
-    def test_elasticache_remove_matched_security_groups(self):
+    def test_rds_remove_matched_security_groups(self):
         """
         Test conditions:
             - running 2 Aurora DB clusters in default VPC with 2 instances each

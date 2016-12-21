@@ -559,13 +559,14 @@ class RedshiftSnapshot(QueryResourceManager):
 
 @actions.register('modify-security-groups')
 class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
-    """Modify security groups on an Redshift cluster"""
+    """Modify security groups on a Redshift cluster"""
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('redshift')
-        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(resources)
+        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='VpcSecurityGroupId')
+
         for idx, c in enumerate(clusters):
-            client.modify_cache_cluster(
+            client.modify_cluster(
                 ClusterIdentifier=c['ClusterIdentifier'],
                 VpcSecurityGroupIds=groups[idx])
 
