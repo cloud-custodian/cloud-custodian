@@ -190,3 +190,8 @@ class QueryResourceManager(ResourceManager):
         s3 buckets.
         """
         return resources
+
+    def filter_record(self, record):
+        '''Filters records for report formatters'''
+        # Override in subclass if filtering needed.
+        return True

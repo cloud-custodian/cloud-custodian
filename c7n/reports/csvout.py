@@ -129,6 +129,7 @@ def _get_values(record, field_list, tag_map):
 class Formatter(object):
     
     def __init__(self, resource_manager, **kwargs):
+        self.resource_manager = resource_manager
         self._id_field = resource_manager.id_field
         self.fields = resource_manager.report_fields
         # Make a copy because we modify the values when we strip off the header
@@ -138,14 +139,6 @@ class Formatter(object):
 
     def csv_fields(self, record, tag_map):
         return _get_values(record, self.fields, tag_map)
-
-    def filter_record(self, record):
-        '''Override in subclass if filtering needed.'''
-        # TODO reimplement this somehow for EC2 formatter
-        # def filter_record(self, record):
-        #     return record['State']['Name'] != 'terminated'
-        
-        return True
 
     def set_headers(self):
         self._headers = []
@@ -186,7 +179,7 @@ class Formatter(object):
         if not records:
             return []
 
-        filtered = filter(self.filter_record, records)
+        filtered = filter(self.resource_manager.filter_record, records)
         log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
         if 'CustodianDate' in records[0]:
             filtered.sort(
