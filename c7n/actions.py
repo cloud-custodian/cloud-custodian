@@ -219,7 +219,13 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
                     rgroups = [g[metadata_key] for g in r['SecurityGroups']]
                 else:
                     rgroups = [g for g in r['SecurityGroups']]
-            # use as substitution for 'Groups or 'SecurityGroups
+            elif r.get('VpcSecurityGroups'):
+                if metadata_key and isinstance(r['VpcSecurityGroups'][0], dict):
+                    rgroups = [g[metadata_key] for g in r['VpcSecurityGroups']]
+                else:
+                    rgroups = [g for g in r['VpcSecurityGroups']]
+            # use as substitution for 'Groups' or '[Vpc]SecurityGroups'
+            # unsure if necessary - defer to coverage report
             elif metadata_key and r.get(metadata_key):
                 rgroups = [g for g in r[metadata_key]]
 

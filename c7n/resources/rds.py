@@ -955,13 +955,27 @@ class RDSSnapshotDelete(BaseAction):
 @actions.register('modify-security-groups')
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
-    def process(self, resources):
+    def process(self, rds_instances):
+        replication_group_map = {}
         client = local_session(self.manager.session_factory).client('rds')
-        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(resources)
-        for idx, r in enumerate(resources):
-            client.modify_db_instance(
-                DBInstanceIdentifier=r['DBInstanceIdentifier'],
-                VpcSecurityGroupIds=groups[idx])
+        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(rds_instances, metadata_key='VpcSecurityGroupId')
+
+        # either build map for DB cluster or modify DB instance directly
+        for idx, i in enumerate(rds_instances):
+            if i.get('DBClusterIdentifier'):
+                # build map of Replication Groups to Security Groups
+                replication_group_map[i['DBClusterIdentifier']] = groups[idx]
+            else:
+                client.modify_db_instance(
+                    DBInstanceIdentifier=i['DBInstanceIdentifier'],
+                    VpcSecurityGroupIds=groups[idx])
+
+        # handle DB cluster, if necessary
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_db_cluster(
+                DBClusterIdentifier=r,
+                VpcSecurityGroupIds=replication_group_map[r]
+            )
 
 
 @resources.register('rds-subnet-group')
