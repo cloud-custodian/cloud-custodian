@@ -1,11 +1,11 @@
 
 install:
-	python2.7 -m virtualenv .
+	python -m virtualenv --python python2.7 .
 	source bin/activate && pip install -r requirements.txt
 	source bin/activate && python setup.py develop
 
 develop:
-	python2.7 -m virtualenv .
+	python -m virtualenv --python python2.7 .
 	source bin/activate && pip install -r requirements-dev.txt
 	source bin/activate && python setup.py develop
 
@@ -26,7 +26,7 @@ ftests:
 
 depcache:
 	mkdir -p deps
-	python2.7 -m virtualenv dep-download
+	python -m virtualenv --python python2.7 dep-download
 	dep-download/bin/pip install -d deps -r requirements.txt
 	tar cvf custodian-deps.tgz deps
 	rm -Rf dep-download

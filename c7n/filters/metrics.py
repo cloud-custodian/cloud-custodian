@@ -31,7 +31,7 @@ class MetricsFilter(Filter):
     - GetMetricStatistics - http://goo.gl/w8mMEY
     - Supported Metrics - http://goo.gl/n0E0L7
 
-    usage:: yaml
+    .. code-block:: yaml
 
       - name: ec2-underutilized
         resource: ec2

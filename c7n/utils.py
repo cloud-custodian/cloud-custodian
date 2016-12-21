@@ -89,7 +89,7 @@ def type_schema(
                  inherits issues with additionalProperties and type enums.
      - aliases: additional names this type maybe called
      - required: list of required properties, by default 'type' is required
-     - **props: additional key value properties
+     - props: additional key value properties
     """
     if aliases:
         type_names = [type_name]

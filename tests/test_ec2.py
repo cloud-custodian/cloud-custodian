@@ -310,6 +310,63 @@ class TestTag(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_normalize_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_normalize_tag')
+
+        policy = self.load_policy({
+            'name': 'ec2-test-normalize-tag-lower',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing-lower': 'not-null'}],
+            'actions': [
+                {'type': 'normalize-tag',
+                 'key': 'Testing-lower',
+                 'action': 'lower'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy({
+            'name': 'ec2-test-normalize-tag-upper',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing-upper': 'not-null'}],
+            'actions': [
+                {'type': 'normalize-tag',
+                 'key': 'Testing-upper',
+                 'action': 'upper'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy({
+            'name': 'ec2-test-normalize-tag-title',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing-title': 'not-null'}],
+            'actions': [
+                {'type': 'normalize-tag',
+                 'key': 'Testing-title',
+                 'action': 'title'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy({
+            'name': 'ec2-test-normalize-tag-strip',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing-strip': 'not-null'}],
+            'actions': [
+                {'type': 'normalize-tag',
+                 'key': 'Testing-strip',
+                 'action': 'strip',
+                 'value': 'blah'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
     def test_ec2_rename_tag(self):
         session_factory = self.replay_flight_data(
             'test_ec2_rename_tag')
