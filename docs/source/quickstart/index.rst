@@ -133,26 +133,36 @@ The ``custodian schema`` commands show you the available filters and actions for
 
 provides the following information::
 
-  Help:
-  -----
-  
+  Help
+  ----
+
   Filter and return buckets are log destinations.
 
   Not suitable for use in lambda on large accounts, This is a api
   heavy process to detect scan all possible log sources.
-  
+
   Sources:
     - elb (Access Log)
     - s3 (Access Log)
     - cfn (Template writes)
     - cloudtrail
 
-  Schema:
-  -------
+  :example:
+
+      .. code-block: yaml
+
+          policies:
+            - name: s3-log-bucket
+              resource: s3
+              filters:
+                - type: is-log-target
+
+  Schema
+  ------
   
   {   'additionalProperties': False,
       'properties': {   'type': {   'enum': ['is-log-target']},
-                      'value': {   'type': 'boolean'}},
+                        'value': {   'type': 'boolean'}},
       'required': ['type'],
       'type': 'object'}
 
