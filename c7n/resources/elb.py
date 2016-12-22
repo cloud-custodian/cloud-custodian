@@ -94,10 +94,7 @@ class TagDelayedAction(tags.TagDelayedAction):
                 resource: elb
                 filters:
                   - "tag:custodian_cleanup": absent
-                  - type: value
-                    key: Instances
-                    value: []
-                    op: eq
+                  - Instances: []
                 actions:
                   - type: mark-for-op
                     tag: custodian_cleanup
@@ -187,10 +184,7 @@ class Delete(BaseAction):
               - name: elb-delete-unused
                 resource: elb
                 filters:
-                  - type: value
-                    key: Instances
-                    value: []
-                    op: eq
+                  - Instances: []
                 actions:
                   - delete
     """
@@ -392,7 +386,6 @@ class SSLPolicyFilter(Filter):
             resource: elb
             filters:
               - type: ssl-policy
-                whitelist: []
                 blacklist:
                     - "Protocol-SSLv2"
                     - "Protocol-SSLv3"
