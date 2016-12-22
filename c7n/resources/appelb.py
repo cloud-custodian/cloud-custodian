@@ -121,9 +121,7 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
                 resource: app-elb
                 filters:
                   - "tag:custodian_elb_cleanup": absent
-                  - type: value
-                    key: State
-                    value: failed
+                  - State: failed
                 actions:
                   - type: mark-for-op
                     tag: custodian_elb_cleanup
@@ -211,9 +209,7 @@ class AppELBDeleteAction(BaseAction):
               - name: appelb-delete-failed-elb
                 resource: app-elb
                 filters:
-                  - type: value
-                    key: State
-                    value: failed
+                  - State: failed
                 actions:
                   - delete
     """
@@ -306,9 +302,9 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 @filters.register('healthcheck-protocol-mismatch')
 class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
-    """Filter to pull ELB with mismatched health check protocols
+    """Filter AppELBs with mismatched health check protocols
 
-    Mismatched health check protocol is where the protocol on the target group
+    A mismatched health check protocol is where the protocol on the target group
     does not match the load balancer health check protocol
 
     :example:
