@@ -311,14 +311,16 @@ class Notify(EventAction):
 class AutoTagUser(EventAction):
     """Tag a resource with the user who created/modified it.
 
-    policies:
-      - name: ec2-auto-tag-owner
-        resource: ec2
-        filters:
-         - tag:Owner: absent
-        actions:
-         - type: auto-tag-creator
-           tag: OwnerContact
+    .. code-block:: yaml
+
+      policies:
+        - name: ec2-auto-tag-owner
+          resource: ec2
+          filters:
+           - tag:Owner: absent
+          actions:
+           - type: auto-tag-creator
+             tag: OwnerContact
 
     There's a number of caveats to usage, resources which don't
     include tagging as part of their api, may have some delay before
