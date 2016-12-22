@@ -13,17 +13,18 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 
+from configparser import ConfigParser
 import copy
 from datetime import datetime
 import functools
 import json
 import itertools
 import logging
+import os
 import random
 import threading
 import time
 import ipaddress
-
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
@@ -323,6 +324,18 @@ class IPv4Network(ipaddress.IPv4Network):
 
 worker_log = logging.getLogger('c7n.worker')
 
+
+def read_aws_config_file(file=None):
+    """ Read the AWS config file and return the config """
+
+    if file is None:
+        file = os.environ.get('AWS_CONFIG_FILE',
+                              os.path.expanduser('~/.aws/config'))
+
+    config = ConfigParser()
+    config.read([file])
+    return config
+        
 
 def worker(f):
     """Generic wrapper to log uncaught exceptions in a function.
