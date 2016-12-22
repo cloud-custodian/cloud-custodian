@@ -25,6 +25,8 @@ actions = ActionRegistry('emr.actions')
 
 @resources.register('emr')
 class EMRCluster(QueryResourceManager):
+    """Resource manager for Elastic MapReduce clusters
+    """
 
     action_registry = actions
 
