@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
-TODO make filters package
-  - offhours
-  - metrics
-  -
+CloudWatch Metrics suppport for resources
 """
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
@@ -35,7 +31,7 @@ class MetricsFilter(Filter):
     - GetMetricStatistics - http://goo.gl/w8mMEY
     - Supported Metrics - http://goo.gl/n0E0L7
 
-    usage:: yaml
+    .. code-block:: yaml
 
       - name: ec2-underutilized
         resource: ec2
