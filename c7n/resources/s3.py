@@ -197,7 +197,6 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
             if (t['Key'] not in new_tags and
                     not t['Key'].startswith('aws') and
                     t['Key'] not in remove_tags):
-
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
         try:
@@ -333,7 +332,7 @@ class HasStatementFilter(Filter):
                 filters:
                   - type: has-statement
                     statement_ids:
-11	                  - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
     schema = type_schema(
         'has-statement',
@@ -372,7 +371,7 @@ class MissingPolicyStatementFilter(Filter):
                 filters:
                   - type: missing-statement
                     statement_ids:
-11	                  - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
 
     schema = type_schema(
@@ -424,7 +423,7 @@ class RemovePolicyStatement(BucketActionBase):
                 actions:
                   - type: remove-statements
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
     """
 
     schema = type_schema(
@@ -1311,7 +1310,7 @@ class MarkBucketForOp(TagDelayedAction):
                 filters:
                   - type: missing-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
                 actions:
                   - type: mark-for-op
                     op: attach-encrypt
@@ -1340,11 +1339,11 @@ class RemoveBucketTag(RemoveTag):
                   - "tag:BucketOwner": present
                 actions:
                   - type: unmark
-                    key: BucketOwner
+                    tags: ['BucketOwner']
     """
 
     schema = type_schema(
-        'remove-tag', aliases=('unmark'), key={'type': 'string'})
+        'unmark', aliases=('remove-tag'), tags={'type': 'array'})
 
     def process_resource_set(self, resource_set, tags):
         modify_bucket_tags(
@@ -1365,7 +1364,7 @@ class DeleteBucket(ScanBucket):
                 filters:
                   - type: missing-statement
                     statement_ids:
-                      - RequireEncryptedPutObject
+                      - RequiredEncryptedPutObject
                 actions:
                   - type: delete
                     remove-contents: true
