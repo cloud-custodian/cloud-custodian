@@ -381,14 +381,14 @@ class SSLPolicyFilter(Filter):
 
         .. code-block: yaml
 
-        policies:
-          - name: elb-ssl-policies
-            resource: elb
-            filters:
-              - type: ssl-policy
-                blacklist:
-                    - "Protocol-SSLv2"
-                    - "Protocol-SSLv3"
+            policies:
+              - name: elb-ssl-policies
+                resource: elb
+                filters:
+                  - type: ssl-policy
+                    blacklist:
+                        - "Protocol-SSLv2"
+                        - "Protocol-SSLv3"
     """
 
     schema = {
