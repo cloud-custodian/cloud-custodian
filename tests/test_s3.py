@@ -147,7 +147,7 @@ class BucketDelete(BaseTest):
             'resource': 's3',
             'filters': [
                 {'Name': bname}],
-            'actions': [{'type': 'delete', 'empty': True}]
+            'actions': [{'type': 'delete', 'remove-contents': True}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -171,7 +171,7 @@ class BucketDelete(BaseTest):
             'resource': 's3',
             'filters': [
                 {'Name': bname}],
-            'actions': [{'type': 'delete', 'empty': True}]
+            'actions': [{'type': 'delete', 'remove-contents': True}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

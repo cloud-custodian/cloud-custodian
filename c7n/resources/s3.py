@@ -480,7 +480,7 @@ class ToggleVersioning(BucketActionBase):
     """
 
     schema = type_schema(
-        'enable-versioning',
+        'toggle-versioning',
         enabled={'type': 'boolean'})
 
     # mfa delete enablement looks like it needs the serial and a current token.
