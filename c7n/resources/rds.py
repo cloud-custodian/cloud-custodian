@@ -48,7 +48,13 @@ import re
 
 
 from distutils.version import LooseVersion
+
+from botocore.auth import EMPTY_SHA256_HASH
+from botocore.awsrequest import prepare_request_dict
 from botocore.exceptions import ClientError
+from botocore.compat import OrderedDict
+from botocore.model import OperationModel, StructureShape
+
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
@@ -910,6 +916,160 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
             arn = self.manager.generate_arn(snap['DBSnapshotIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
+
+
+@RDSSnapshot.action_registry.register('region-copy')
+class RegionCopySnapshot(BaseAction):
+    """ Copy a snapshot across regions.
+
+    Example::
+      - name: copy-encrypted-snapshots
+        description: |
+          copy snapshots under 1 day old to dr region with kms
+        resource: rdb-snapshot
+        region: us-east-1
+        filters:
+         - Status: available
+         - type: value
+           key: SnapshotCreateTime
+           value_type: age
+           value: 1
+           op: less-than
+        actions:
+          - type: region-copy
+            target_region: us-east-2
+            target_key: arn:aws:kms:us-east-2:0000:key/cb291f53-c9cf61
+            copy_tags: true
+            tags:
+              - OriginRegion: us-east-1
+    """
+
+    schema = type_schema(
+        'copy',
+        target_region={'type': 'string'},
+        target_key={'type': 'string'},
+        copy_tags={'type': 'boolean'},
+        tags={'type': 'object'},
+        required=('target_region',))
+
+    def process(self, resources):
+        if self.data['target_region'] == self.manager.config.region:
+            self.log.info(
+                "Source and destination region are the same, skipping")
+            return
+        self.process_resource_set(resources[:20])
+        #with self.executor_factory(max_workers=1) as w:
+        #    list(w.map(self.process_resource_set, chunks(resources, 20)))
+
+    def get_presign_operation(self, client):
+        op = client.meta.service_model.operation_model('CopyDBSnapshot')
+        resolver = op.input_shape._shape_resolver
+        op = OperationModel(op._operation_model, op.service_model, op.name)
+        op.input_shape = StructureShape(
+            'CopyDBSnapshot',
+            {u'type': 'structure',
+             u'documentation': '',
+             u'required': [],
+             u'members': OrderedDict(
+                 [(u'SourceDBSnapshotIdentifier',
+                   OrderedDict([(u'shape', u'String')])),
+                  (u'TargetDBSnapshotIdentifier',
+                   OrderedDict([(u'shape', u'String')])),
+                  (u'KmsKeyId', OrderedDict([(u'shape', u'String')])),
+                  (u'DestinationRegion', OrderedDict([(u'shape', u'String')]))
+            ])},
+            shape_resolver=resolver)
+        return op
+
+    def get_presigned_url(self, source, target, key, snapshot):
+        """get a presigned url for cross region copy with kms
+
+        This ends up being much more work then typically nesc due to
+        some model mismatch currently between botocore data models and
+        the rds api docs for the method. Specifically
+        DestinationRegion is a new parameter that's not current in the
+        json api models. Additionally TargetDBSnapshotIdentifier is
+        not a requirement for the request.
+
+        We do the legwork nesc to work around.
+        """
+        # https://goo.gl/dPaX2L
+        params = dict(
+            DestinationRegion=self.data['target_region'],
+            SourceDBSnapshotIdentifier=snapshot['DBSnapshotArn'],
+            #TargetDBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'] + '22',
+            KmsKeyId=key)
+        op = self.get_presign_operation(source)
+
+        request_dict = source._serializer.serialize_to_request(
+            params, op)
+        #request_dict['body']['SignatureMethod'] = 'HmacSHA256'
+        #request_dict['body']['SignatureVersion'] = '4'
+        request_dict['headers']['X-Amz-Content-SHA256'] = EMPTY_SHA256_HASH
+        prepare_request_dict(
+            request_dict, endpoint_url=source.meta.endpoint_url)
+        #print request_dict
+        return source._request_signer.generate_presigned_url(
+            request_dict=request_dict, expires_in=86400,
+            operation_name='CopyDBSnapshot')
+
+    def process_resource(self, target, source, key, tags, snapshot):
+        p = {}
+
+        if "KmsKeyId" in snapshot:
+            p['PreSignedUrl'] = self.get_presigned_url(
+                source, target, key, snapshot)
+            # Try and verify why the copydbsnapshot api doesn't like our
+            # valid pre-signed url.
+
+            #import urlparse, pprint
+            #parsed = urlparse.urlparse(p['PreSignedUrl'])
+            #d = urlparse.parse_qs(parsed.query)
+            #pprint.pprint(d)
+            #import requests
+            #response = requests.post(p['PreSignedUrl'])
+            #print response
+            #print response.text
+
+        if key:
+            p['KmsKeyId'] = key
+
+        p['TargetDBSnapshotIdentifier'] = snapshot[
+            'DBSnapshotIdentifier'].replace(':', '-')
+        p['SourceRegion'] = self.manager.config.region
+        p['SourceDBSnapshotIdentifier'] = snapshot['DBSnapshotArn']
+
+        if self.data.get('copy_tags', True):
+            p['CopyTags'] = True
+        if tags:
+            p['Tags'] = tags
+        result = target.copy_db_snapshot(**p)
+        snapshot['c7n:CopiedSnapshot'] = result[
+            'DBSnapshot']['DBSnapshotIdentifier']
+
+    def process_resource_set(self, resource_set):
+        target_client = self.manager.session_factory(
+            region=self.data['target_region']).client('rds')
+        target_key = self.data.get('target_key')
+        tags = [{'Key': k, 'Value': v} for k, v in self.data.get('tags', {})]
+        source_client = local_session(
+            self.manager.session_factory).client('rds')
+
+        for snapshot_set in chunks(resource_set, 5):
+            for r in snapshot_set:
+                self.process_resource(
+                    target_client, source_client, target_key, tags, r)
+
+            if len(snapshot_set) < 5:
+                continue
+
+            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
+            self.log.debug(
+                "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
+            waiter = target_client.get_waiter('db_snapshot_completed')
+            waiter.config.delay = 60
+            waiter.config.max_attempts = 60
+            waiter.wait(SnapshotIds=copy_ids)
 
 
 @RDSSnapshot.action_registry.register('delete')

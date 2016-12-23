@@ -15,8 +15,6 @@ import logging
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime, timedelta
-from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -256,12 +254,12 @@ class CopySnapshot(BaseAction):
                 client.create_tags(
                     Resources=[snapshot_id],
                     Tags=r['Tags'])
-                r['CopiedSnapshot'] = snapshot_id
+                r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
                 continue
 
-            copy_ids = [r['CopiedSnapshot'] for r in snapshot_set]
+            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
             self.log.debug(
                 "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
@@ -367,7 +365,6 @@ class FaultTolerantSnapshots(Filter):
         if self.data.get('tolerant', True):
             return [r for r in resources if r['VolumeId'] not in flagged]
         return [r for r in resources if r['VolumeId'] in flagged]
-
 
 
 @actions.register('copy-instance-tags')
