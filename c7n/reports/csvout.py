@@ -63,14 +63,16 @@ log = logging.getLogger('custodian.reports')
 
 def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=None):
     """Format a policy's extant records into a report."""
-    formatter_cls = RECORD_TYPE_FORMATTERS.get(policy.resource_type)
-    formatter = formatter_cls(
-        extra_fields=options.field, no_default_fields=options.no_default_fields)
-
-    if formatter is None:
+    if not policy.resource_manager.report_fields:
         raise ValueError(
-            "No formatter defined for resource type '%s', valid options: %s" % (
-                policy.resource_type, ", ".join(RECORD_TYPE_FORMATTERS)))
+            "No formatter configured for resource type '%s', valid options: %s" % (
+                policy.resource_type))
+
+    formatter = Formatter(
+        policy.resource_manager,
+        extra_fields=options.field,
+        no_default_fields=options.no_default_fields,
+    )
 
     if policy.ctx.output.use_s3():
         records = record_set(
@@ -91,30 +93,55 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=N
         dumps(records, raw_output_fh, indent=2)
 
 
+def _get_values(record, field_list, tag_map):
+    tag_prefix = 'tag:'
+    list_prefix = 'list:'
+    count_prefix = 'count:'
+    vals = []
+    for field in field_list:
+        if field.startswith(tag_prefix):
+            tag_field = field.replace(tag_prefix, '', 1)
+            value = tag_map.get(tag_field, '')
+        elif field.startswith(list_prefix):
+            list_field = field.replace(list_prefix, '', 1)
+            value = jmespath.search(list_field, record)
+            if value is None:
+                value = ''
+            else:
+                value = ', '.join(value)
+        elif field.startswith(count_prefix):
+            count_field = field.replace(count_prefix, '', 1)
+            value = jmespath.search(count_field, record)
+            if value is None:
+                value = ''
+            else:
+                value = str(len(value))
+        else:
+            value = jmespath.search(field, record)
+            if value is None:
+                value = ''
+        vals.append(value)
+    return vals
+
+
 class Formatter(object):
     
-    tag_prefix = 'tag:'
-    
-    def __init__(self, id_field, headers, **kwargs):
-        self._id_field = id_field
-
+    def __init__(self, resource_manager, **kwargs):
+        self.resource_manager = resource_manager
+        self._id_field = resource_manager.id_field
+        self.fields = resource_manager.report_fields
         # Make a copy because we modify the values when we strip off the header
         self.extra_fields = copy.copy(kwargs.get('extra_fields', []))
         self.no_default_fields = kwargs.get('no_default_fields', False)
-        self.set_headers(headers)
+        self.set_headers()
 
     def csv_fields(self, record, tag_map):
-        '''Must be implemented by subclass'''
-        raise Exception("Method not implemented by subclass: csv_fields")
+        return _get_values(record, self.fields, tag_map)
 
-    def filter_record(self, record):
-        '''Override in subclass if filtering needed.'''
-        return True
-
-    def set_headers(self, headers):
+    def set_headers(self):
         self._headers = []
         if not self.no_default_fields:
-            self._headers = headers
+            self._headers = copy.copy(self.fields)
 
         for index, field in enumerate(self.extra_fields):
             header, field_minus_header = field.split('=', 1)
@@ -131,15 +158,7 @@ class Formatter(object):
         if not self.no_default_fields:
             output = self.csv_fields(record, tag_map)
             
-        for field in self.extra_fields:
-            if field.startswith(self.tag_prefix):
-                tag_field = field.replace(self.tag_prefix, '', 1)
-                output.append(tag_map.get(tag_field, ''))
-            else:
-                value = jmespath.search(field, record)
-                if value is None:
-                    value = ""
-                output.append(value)
+        output = output + _get_values(record, self.extra_fields, tag_map)
         
         return output
 
@@ -158,7 +177,7 @@ class Formatter(object):
         if not records:
             return []
 
-        filtered = filter(self.filter_record, records)
+        filtered = filter(self.resource_manager.filter_record, records)
         log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
         if 'CustodianDate' in records[0]:
             filtered.sort(
@@ -167,208 +186,6 @@ class Formatter(object):
         log.debug("Uniqued from %d to %d" % (len(filtered), len(uniq)))
         rows = map(self.extract_csv, uniq)
         return rows
-
-
-class S3Formatter(Formatter):
-
-    def __init__(self, **kwargs):
-        super(S3Formatter, self).__init__(
-            'Name',
-            ['name',
-             'creation-date',
-             'global-permissions',
-             'ownercontact',
-             'asv',
-             'env'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['Name'],
-            record['CreationDate'],
-            # s3 formatter is used for multiple s3 rules.
-            # the buckets may not have any global permissions
-            ','.join(record.get('GlobalPermissions', '')),
-            tag_map.get("OwnerContact", ""),
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-        ]
-#SQS Begin
-class SQSFormatter(Formatter):
-
-    def __init__(self, **kwargs):
-        super(SQSFormatter, self).__init__(
-            'QueueArn',
-            ['queuearn'
-             ],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['QueueArn'],
-        ]
-#SQS End
-
-#SNS Begin
-class SNSFormatter(Formatter):
-
-    def __init__(self, **kwargs):
-        super(SNSFormatter, self).__init__(
-            'TopicArn',
-            ['topicarn'
-             ],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['TopicArn'],
-        ]
-#SNS End
-
-
-class EC2Formatter(Formatter):
-    def __init__(self, **kwargs):
-        super(EC2Formatter, self).__init__(
-            'InstanceId',
-            ['action-date', 'instance-id', 'name', 'instance-type', 'launch',
-             'vpc-id', 'ip-addr', 'asv', 'env', 'owner'],
-            **kwargs)
-
-    def filter_record(self, record):
-        return record['State']['Name'] != 'terminated'
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['CustodianDate'].strftime("%Y-%m-%d"),
-            record['InstanceId'],
-            tag_map.get('Name', ''),
-            record['InstanceType'],
-            record['LaunchTime'],
-            record.get('VpcId', ''),
-            record.get('PrivateIpAddress', ''),
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-            tag_map.get("OwnerContact", ""),
-        ]
-
-
-class ELBFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(ELBFormatter, self).__init__(
-            'DNSName',
-            ['name', 'dns name', 'vpc-id', 'asv', 'env', 'owner'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['LoadBalancerName'],
-            record['DNSName'],
-            record['VPCId'],
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-            tag_map.get("OwnerContact", "")
-        ]
-
-
-class RDSFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(RDSFormatter, self).__init__(
-            'DBInstanceIdentifier',
-            ['instance id', 'db name', 'creation time', 'encrypted', 'publicly accessible', 'asv', 'env', 'owner'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['DBInstanceIdentifier'],
-            record.get('DBName', ''),
-            record['InstanceCreateTime'],
-            record['StorageEncrypted'],
-            record['PubliclyAccessible'],
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-            tag_map.get("OwnerContact", "")
-        ]
-
-
-class ASGFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(ASGFormatter, self).__init__(
-            'AutoScalingGroupName',
-            ['name', 'instance-count', 'asv', 'env', 'owner'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['AutoScalingGroupName'],
-            str(len(record['Instances'])),
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-            tag_map.get("OwnerContact", "")
-        ]
-
-
-class AMIFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(AMIFormatter, self).__init__(
-            'ImageId',
-            ['id', 'name'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['ImageId'],
-            record['Name']
-        ]
-
-
-class EBSFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(EBSFormatter, self).__init__(
-            'VolumeId',
-            ['id', 'instance-id', 'asv', 'env', 'owner'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        instance_id = (record['Attachments'][0]['InstanceId'] if
-                       len(record['Attachments']) > 0 else 'Unattached')
-        return [
-            record['VolumeId'],
-            instance_id,
-            tag_map.get("ASV", ""),
-            tag_map.get("CMDBEnvironment", ""),
-            tag_map.get("OwnerContact", "")
-        ]
-
-class EBSSnapshotFormatter(Formatter):
-    def __init__(self, **kwargs):
-        super(EBSSnapshotFormatter, self).__init__(
-            'SnapshotId',
-            ['SnapshotId', 'VolumeId', 'InstanceId', 'VolumeSize', 'StartTime', 'State'],
-            **kwargs)
-
-    def csv_fields(self, record, tag_map):
-        return [
-            record['SnapshotId'],
-            record['VolumeId'],
-            tag_map.get("InstanceId", ""),
-            record['VolumeSize'],
-            record['StartTime'],
-            record['State'],
-        ]
-
-# FIXME: Should we use a PluginRegistry instead?
-RECORD_TYPE_FORMATTERS = {
-    'ami': AMIFormatter,
-    'asg': ASGFormatter,
-    'ebs': EBSFormatter,
-    'ebs-snapshot': EBSSnapshotFormatter,
-    'ec2': EC2Formatter,
-    'elb': ELBFormatter,
-    'rds': RDSFormatter,
-    's3': S3Formatter,
-    'sqs': SQSFormatter,
-    'sns': SNSFormatter,
-}
 
 
 def fs_record_set(output_path, policy_name):

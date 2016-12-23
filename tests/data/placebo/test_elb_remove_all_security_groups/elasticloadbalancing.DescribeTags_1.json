@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b85bf6c5-c5f6-11e6-8aa4-999314df278d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b85bf6c5-c5f6-11e6-8aa4-999314df278d", 
+                "date": "Mon, 19 Dec 2016 14:23:32 GMT", 
+                "content-length": "885", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "BalancedWork", 
+                        "Key": "Name"
+                    }
+                ], 
+                "LoadBalancerName": "balanced"
+            }, 
+            {
+                "Tags": [
+                    {
+                        "Value": "AndrewAlexander", 
+                        "Key": "Owner"
+                    }, 
+                    {
+                        "Value": "test-load-balancer", 
+                        "Key": "Name"
+                    }
+                ], 
+                "LoadBalancerName": "test-load-balancer"
+            }
+        ]
+    }
+}

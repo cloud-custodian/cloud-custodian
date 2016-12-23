@@ -22,7 +22,7 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -297,6 +297,29 @@ class SnapshotElastiCacheCluster(BaseAction):
                 'Backup',
                 cluster['CacheClusterId']),
             CacheClusterId=cluster['CacheClusterId'])
+
+
+@actions.register('modify-security-groups')
+class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on an Elasticache cluster.
+
+    Looks at the individual clusters and modifies the Replication Group's configuration
+    for Security groups so all nodes get affected equally
+    """
+
+    def process(self, clusters):
+        replication_group_map = {}
+        client = local_session(self.manager.session_factory).client('elasticache')
+        groups = super(ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='SecurityGroupId')
+        for idx, c in enumerate(clusters):
+            # build map of Replication Groups to Security Groups
+            replication_group_map[c['ReplicationGroupId']] = groups[idx]
+
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_replication_group(
+                ReplicationGroupId=r,
+                SecurityGroupIds=replication_group_map[r]
+            )
 
 
 @resources.register('cache-subnet-group')

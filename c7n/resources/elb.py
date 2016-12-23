@@ -19,7 +19,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -42,6 +42,15 @@ filters.register('marked-for-op', tags.TagActionFilter)
 class ELB(QueryResourceManager):
 
     resource_type = "aws.elb.loadbalancer"
+    id_field = 'DNSName'
+    report_fields = [
+        'LoadBalancerName',
+        'DNSName',
+        'VPCId',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
@@ -191,6 +200,19 @@ class SetSslListenerPolicy(BaseAction):
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
                     PolicyNames=policy_names)
+
+
+@actions.register('modify-security-groups')
+class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify VPC security groups on an ELB."""
+
+    def process(self, load_balancers):
+        client = local_session(self.manager.session_factory).client('elb')
+        groups = super(ELBModifyVpcSecurityGroups, self).get_groups(load_balancers, 'SecurityGroups')
+        for idx, l in enumerate(load_balancers):
+            client.apply_security_groups_to_load_balancer(
+                LoadBalancerName=l['LoadBalancerName'],
+                SecurityGroups=groups[idx])
 
 
 def is_ssl(b):

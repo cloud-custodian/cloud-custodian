@@ -50,6 +50,13 @@ Navigate below and get started with Cloud Custodian!
    developer   
 
 
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference
+
+   generated/modules
+
+
 Indices and tables
 ==================
 

@@ -41,6 +41,16 @@ actions = ActionRegistry('ebs.actions')
 class Snapshot(QueryResourceManager):
 
     resource_type = "aws.ec2.snapshot"
+    id_field = 'SnapshotId'
+    report_fields = [
+        'SnapshotId',
+        'VolumeId',
+        'tag:InstanceId',
+        'VolumeSize',
+        'StartTime',
+        'State',
+    ]
+    
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
@@ -279,6 +289,14 @@ class EBS(QueryResourceManager):
         default_namespace = 'AWS/EBS'
         config_type = "AWS::EC::Volume"
 
+    id_field = 'VolumeId'
+    report_fields = [
+        'VolumeId',
+        'Attachments[0].InstanceId',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
 
@@ -497,8 +515,7 @@ class EncryptInstanceVolumes(BaseAction):
     - Requires instance restart
     - Not suitable for autoscale groups.
 
-    Multistep process
-    -----------------
+    Multistep process:
 
     - Stop instance (if running)
     - For each volume
@@ -517,7 +534,7 @@ class EncryptInstanceVolumes(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block:: yaml
 
             policies:
               - name: encrypt-unencrypted-ebs

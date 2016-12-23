@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
+import time
 
 from botocore.exceptions import ClientError
 
@@ -41,6 +42,15 @@ class EMRCluster(QueryResourceManager):
         dimension = 'ClusterId'
 
     resource_type = Meta
+
+    def get_resources(self, ids):
+        # no filtering by id set supported at the api
+        client = local_session(self.session_factory).client('emr')
+        results = []
+        for jid in ids:
+            results.append(
+                client.describe_cluster(ClusterId=jid)['Cluster'])
+        return results
 
     def resources(self, query=None):
         q = self.consolidate_query_filter()
@@ -76,19 +86,17 @@ class EMRCluster(QueryResourceManager):
 @actions.register('terminate')
 class Terminate(BaseAction):
 
-    schema = type_schema('terminate')
+    schema = type_schema('terminate', force={'type': 'boolean'})
+    delay = 5
 
     def process(self, emrs):
-
         client = local_session(self.manager.session_factory).client('emr')
-        cluster_ids = []
-        for emr in emrs:
-            cluster_ids.append(emr['ClusterId'])
-        try:
-            client.terminate_job_flows(JobFlowIds=cluster_ids)
-        except ClientError as e:
-            raise
-
+        cluster_ids = [emr['Id'] for emr in emrs]
+        if self.data.get('force'):
+            client.set_termination_protection(
+                JobFlowIds=cluster_ids, TerminationProtected=False)
+            time.sleep(self.delay)
+        client.terminate_job_flows(JobFlowIds=cluster_ids)
         self.log.info("Deleted emrs: %s", cluster_ids)
         return emrs
 

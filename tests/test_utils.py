@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import unittest
+import tempfile
 import time
 
 from botocore.exceptions import ClientError
@@ -100,6 +101,17 @@ class WorkerDecorator(BaseTest):
 
 
 class UtilTest(unittest.TestCase):
+
+    def write_temp_file(self, contents, suffix='.tmp'):
+        """ Write a temporary file and return the filename.
+
+        The file will be cleaned up after the test.
+        """
+        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        file.write(contents)
+        file.flush()
+        self.addCleanup(file.close)
+        return file.name
 
     def test_ipv4_network(self):
         n1 = utils.IPv4Network(u'10.0.0.0/16')

@@ -1,0 +1,80 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-7a3fcb13"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-09b75e60", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-7a3fcb13"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Used for policy matching on many policies", 
+                "Tags": [
+                    {
+                        "Value": "PROD-ONLY-Test-Security-Group", 
+                        "Key": "Name"
+                    }
+                ], 
+                "IpPermissions": [], 
+                "GroupName": "PROD-ONLY-Test-Security-Group", 
+                "VpcId": "vpc-09b75e60", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-6360920a"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c3f23245-c9c9-4f56-b88f-25fb77f47114", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 21 Dec 2016 22:11:28 GMT"
+            }
+        }
+    }
+}

@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Cluster": {
+            "PubliclyAccessible": false, 
+            "MasterUsername": "custodian", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "removing", 
+                    "VpcSecurityGroupId": "sg-6360920a"
+                }, 
+                {
+                    "Status": "adding", 
+                    "VpcSecurityGroupId": "sg-7a3fcb13"
+                }
+            ], 
+            "NumberOfNodes": 1, 
+            "PendingModifiedValues": {}, 
+            "VpcId": "vpc-09b75e60", 
+            "ClusterVersion": "1.0", 
+            "Tags": [], 
+            "AutomatedSnapshotRetentionPeriod": 1, 
+            "ClusterParameterGroups": [
+                {
+                    "ParameterGroupName": "default.redshift-1.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ], 
+            "PreferredMaintenanceWindow": "tue:20:30-tue:21:00", 
+            "Endpoint": {
+                "Port": 5439, 
+                "Address": "test-sg-fail.ckxbkraibktf.ca-central-1.redshift.amazonaws.com"
+            }, 
+            "IamRoles": [], 
+            "AllowVersionUpgrade": true, 
+            "ClusterCreateTime": {
+                "hour": 22, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 11, 
+                "microsecond": 783000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 25
+            }, 
+            "ClusterSubnetGroupName": "default", 
+            "EnhancedVpcRouting": false, 
+            "ClusterSecurityGroups": [], 
+            "ClusterIdentifier": "test-sg-fail", 
+            "AvailabilityZone": "ca-central-1a", 
+            "NodeType": "dc1.large", 
+            "Encrypted": false, 
+            "ClusterStatus": "available"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "afc6e717-c7cd-11e6-9753-dbd8e8d4f855", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "afc6e717-c7cd-11e6-9753-dbd8e8d4f855", 
+                "date": "Wed, 21 Dec 2016 22:34:51 GMT", 
+                "content-length": "2006", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
