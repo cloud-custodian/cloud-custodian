@@ -13,7 +13,7 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 
-from configparser import ConfigParser
+from ConfigParser import ConfigParser
 import copy
 from datetime import datetime
 import functools
