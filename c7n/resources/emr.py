@@ -92,7 +92,7 @@ class Terminate(BaseAction):
         client = local_session(self.manager.session_factory).client('emr')
         cluster_ids = []
         for emr in emrs:
-            cluster_ids.append(emr['ClusterId'])
+            cluster_ids.append(emr['Id'])
         try:
             client.terminate_job_flows(JobFlowIds=cluster_ids)
         except ClientError as e:
