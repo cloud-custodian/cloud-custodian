@@ -42,6 +42,15 @@ filters.register('marked-for-op', tags.TagActionFilter)
 class ELB(QueryResourceManager):
 
     resource_type = "aws.elb.loadbalancer"
+    id_field = 'DNSName'
+    report_fields = [
+        'LoadBalancerName',
+        'DNSName',
+        'VPCId',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))

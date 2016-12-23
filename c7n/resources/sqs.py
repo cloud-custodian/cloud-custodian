@@ -23,6 +23,10 @@ from c7n.query import QueryResourceManager
 class SQS(QueryResourceManager):
 
     resource_type = 'aws.sqs.queue'
+    id_field = 'QueueArn'
+    report_fields = [
+        'QueueArn',
+    ]
 
     def augment(self, resources):
 

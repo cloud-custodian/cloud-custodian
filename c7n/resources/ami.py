@@ -38,6 +38,11 @@ class AMI(QueryResourceManager):
         date = 'CreationDate'
         taggable = True
 
+    id_field = 'ImageId'
+    report_fields = [
+        'ImageId',
+        'Name',
+    ]
     filter_registry = filters
     action_registry = actions
 

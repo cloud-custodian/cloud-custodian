@@ -81,6 +81,16 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 class S3(QueryResourceManager):
 
     #resource_type = "aws.s3.bucket"
+    report_fields = [
+        'Name',
+        'CreationDate',
+        # s3 formatter is used for multiple s3 rules.
+        # the buckets may not have any global permissions
+        'list:GlobalPermissions',
+        'tag:OwnerContact',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+    ]
 
     class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
         dimension = 'BucketName'
