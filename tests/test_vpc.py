@@ -59,8 +59,8 @@ class NetworkInterfaceTest(BaseTest):
                  'value': 'for apps'}
             ],
             'actions': [{
-                'type': 'remove-groups',
-                'groups': 'matched',
+                'type': 'modify-security-groups',
+                'remove': 'matched',
                 'isolation-group': qsg_id}]
             }, session_factory=factory)
         resources = p.run()

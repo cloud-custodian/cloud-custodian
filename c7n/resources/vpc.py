@@ -15,7 +15,7 @@
 import json
 import zlib
 
-from c7n.actions import BaseAction, ModifyGroupsAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -694,8 +694,8 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
-@NetworkInterface.action_registry.register('remove-groups')
-class InterfaceRemoveGroups(ModifyGroupsAction):
+@NetworkInterface.action_registry.register('modify-security-groups')
+class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
 
     Can target either physical groups as a list of group ids or
@@ -707,16 +707,11 @@ class InterfaceRemoveGroups(ModifyGroupsAction):
     that can be specified if there would otherwise be no groups.
     """
 
-    schema = type_schema(
-        'remove-groups',
-        **{'groups': {'anyOf': [
-            {'type': 'string', 'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}}]},
-           'isolation-group': {'type': 'string'}})
-
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        groups = super(InterfaceRemoveGroups, self).get_groups(resources)
+
+        groups = super(InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
+
         for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],

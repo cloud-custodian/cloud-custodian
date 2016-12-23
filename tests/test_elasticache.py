@@ -253,3 +253,97 @@ class TestElastiCacheSnapshot(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+    def test_elasticache_remove_matched_security_groups(self):
+        """
+        Test conditions:
+            - running 2 Elasticache replication group in default VPC with 3 clusters
+                - translates to 6 clusters
+            - a default security group with id 'sg-7a3fcb13' exists
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one replication
+              group
+                - translates to 3 clusters marked non-compliant
+
+        Results in 6 clusters with default Security Group attached
+        """
+        session_factory = self.replay_flight_data('test_elasticache_remove_matched_security_groups')
+        client = session_factory().client('elasticache', region_name='ca-central-1')
+
+        p = self.load_policy(
+            {'name': 'elasticache-remove-matched-security-groups',
+             'resource': 'cache-cluster',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+             'actions': [
+                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': 'sg-7a3fcb13'}]
+             },
+            session_factory=session_factory)
+        clean_p = self.load_policy(
+            {'name': 'elasticache-verifyremove-matched-security-groups',
+             'resource': 'cache-cluster',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}]
+             },
+            session_factory=session_factory)
+
+        resources = p.run()
+
+        waiter = client.get_waiter('replication_group_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        # clusters autoscale across AZs, so they get -001, -002, etc appended
+        self.assertIn('sg-test-base', resources[0]['CacheClusterId'])
+
+        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources[0]['SecurityGroups']), 1)
+        # show that it was indeed a replacement of security groups
+        self.assertEqual(len(clean_resources[0]['SecurityGroups']), 1)
+        self.assertEqual(len(clean_resources), 6)
+
+    def test_elasticache_add_security_group(self):
+        """
+        Test conditions:
+            - running Elasticache replication group in default VPC with 3 clusters
+            - a default security group with id 'sg-7a3fcb13' exists
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is not attached
+                - translates to 3 clusters marked to get new group attached
+
+        Results in 3 clusters with default Security Group and PROD-ONLY-Test-Security-Group
+        """
+        session_factory = self.replay_flight_data('test_elasticache_add_security_group')
+        client = session_factory().client('elasticache', region_name='ca-central-1')
+
+        p = self.load_policy({
+            'name': 'add-sg-to-prod-elasticache',
+            'resource': 'cache-cluster',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}
+            ],
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
+            ]
+        },
+        session_factory=session_factory)
+        clean_p = self.load_policy({
+            'name': 'validate-add-sg-to-prod-elasticache',
+            'resource': 'cache-cluster',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'PROD-ONLY-Test-Security-Group'}
+            ]
+        },
+        session_factory=session_factory)
+
+        resources = p.run()
+        waiter = client.get_waiter('replication_group_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        self.assertEqual(len(resources), 3)
+        self.assertIn('sg-test-base', resources[0]['CacheClusterId'])
+        self.assertEqual(len(resources[0]['SecurityGroups']), 1)
+        self.assertEqual(len(clean_resources[0]['SecurityGroups']), 2)
+        self.assertEqual(len(clean_resources), 3)

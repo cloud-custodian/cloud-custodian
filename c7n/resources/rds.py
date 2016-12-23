@@ -51,7 +51,7 @@ from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -963,6 +963,32 @@ class RDSSnapshotDelete(BaseAction):
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
 
 
+@actions.register('modify-security-groups')
+class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    def process(self, rds_instances):
+        replication_group_map = {}
+        client = local_session(self.manager.session_factory).client('rds')
+        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(rds_instances, metadata_key='VpcSecurityGroupId')
+
+        # either build map for DB cluster or modify DB instance directly
+        for idx, i in enumerate(rds_instances):
+            if i.get('DBClusterIdentifier'):
+                # build map of Replication Groups to Security Groups
+                replication_group_map[i['DBClusterIdentifier']] = groups[idx]
+            else:
+                client.modify_db_instance(
+                    DBInstanceIdentifier=i['DBInstanceIdentifier'],
+                    VpcSecurityGroupIds=groups[idx])
+
+        # handle DB cluster, if necessary
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_db_cluster(
+                DBClusterIdentifier=r,
+                VpcSecurityGroupIds=replication_group_map[r]
+            )
+
+
 @resources.register('rds-subnet-group')
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
@@ -977,3 +1003,4 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+

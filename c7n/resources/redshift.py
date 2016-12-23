@@ -18,7 +18,7 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
 import c7n.filters.vpc as net_filters
@@ -555,6 +555,20 @@ class RedshiftSnapshot(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'SnapshotCreateTime'
+
+
+@actions.register('modify-security-groups')
+class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on a Redshift cluster"""
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('redshift')
+        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='VpcSecurityGroupId')
+
+        for idx, c in enumerate(clusters):
+            client.modify_cluster(
+                ClusterIdentifier=c['ClusterIdentifier'],
+                VpcSecurityGroupIds=groups[idx])
 
 
 @RedshiftSnapshot.filter_registry.register('age')
