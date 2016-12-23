@@ -961,79 +961,11 @@ class RegionCopySnapshot(BaseAction):
         #with self.executor_factory(max_workers=1) as w:
         #    list(w.map(self.process_resource_set, chunks(resources, 20)))
 
-    def get_presign_operation(self, client):
-        op = client.meta.service_model.operation_model('CopyDBSnapshot')
-        resolver = op.input_shape._shape_resolver
-        op = OperationModel(op._operation_model, op.service_model, op.name)
-        op.input_shape = StructureShape(
-            'CopyDBSnapshot',
-            {u'type': 'structure',
-             u'documentation': '',
-             u'required': [],
-             u'members': OrderedDict(
-                 [(u'SourceDBSnapshotIdentifier',
-                   OrderedDict([(u'shape', u'String')])),
-                  (u'TargetDBSnapshotIdentifier',
-                   OrderedDict([(u'shape', u'String')])),
-                  (u'KmsKeyId', OrderedDict([(u'shape', u'String')])),
-                  (u'DestinationRegion', OrderedDict([(u'shape', u'String')]))
-            ])},
-            shape_resolver=resolver)
-        return op
-
-    def get_presigned_url(self, source, target, key, snapshot):
-        """get a presigned url for cross region copy with kms
-
-        This ends up being much more work then typically nesc due to
-        some model mismatch currently between botocore data models and
-        the rds api docs for the method. Specifically
-        DestinationRegion is a new parameter that's not current in the
-        json api models. Additionally TargetDBSnapshotIdentifier is
-        not a requirement for the request.
-
-        We do the legwork nesc to work around.
-        """
-        # https://goo.gl/dPaX2L
-        params = dict(
-            DestinationRegion=self.data['target_region'],
-            SourceDBSnapshotIdentifier=snapshot['DBSnapshotArn'],
-            #TargetDBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'] + '22',
-            KmsKeyId=key)
-        op = self.get_presign_operation(source)
-
-        request_dict = source._serializer.serialize_to_request(
-            params, op)
-        #request_dict['body']['SignatureMethod'] = 'HmacSHA256'
-        #request_dict['body']['SignatureVersion'] = '4'
-        request_dict['headers']['X-Amz-Content-SHA256'] = EMPTY_SHA256_HASH
-        prepare_request_dict(
-            request_dict, endpoint_url=source.meta.endpoint_url)
-        #print request_dict
-        return source._request_signer.generate_presigned_url(
-            request_dict=request_dict, expires_in=86400,
-            operation_name='CopyDBSnapshot')
-
-    def process_resource(self, target, source, key, tags, snapshot):
+    def process_resource(self, target, key, tags, snapshot):
         p = {}
-
-        if "KmsKeyId" in snapshot:
-            p['PreSignedUrl'] = self.get_presigned_url(
-                source, target, key, snapshot)
-            # Try and verify why the copydbsnapshot api doesn't like our
-            # valid pre-signed url.
-
-            #import urlparse, pprint
-            #parsed = urlparse.urlparse(p['PreSignedUrl'])
-            #d = urlparse.parse_qs(parsed.query)
-            #pprint.pprint(d)
-            #import requests
-            #response = requests.post(p['PreSignedUrl'])
-            #print response
-            #print response.text
 
         if key:
             p['KmsKeyId'] = key
-
         p['TargetDBSnapshotIdentifier'] = snapshot[
             'DBSnapshotIdentifier'].replace(':', '-')
         p['SourceRegion'] = self.manager.config.region
@@ -1058,7 +990,7 @@ class RegionCopySnapshot(BaseAction):
         for snapshot_set in chunks(resource_set, 5):
             for r in snapshot_set:
                 self.process_resource(
-                    target_client, source_client, target_key, tags, r)
+                    target_client, target_key, tags, r)
 
             if len(snapshot_set) < 5:
                 continue
