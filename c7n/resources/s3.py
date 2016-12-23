@@ -490,7 +490,7 @@ class ToggleVersioning(BucketActionBase):
     """
 
     schema = type_schema(
-        'enable-versioning',
+        'toggle-versioning',
         enabled={'type': 'boolean'})
 
     # mfa delete enablement looks like it needs the serial and a current token.
@@ -899,6 +899,8 @@ class EncryptExtantKeys(ScanBucket):
                 resource: s3
                 actions:
                   - type: encrypt-keys
+                    crypto: aws:kms
+                    key-id: 9c3983be-c6cf-11e6-9d9d-cec0c932ce01
     """
 
     permissions = (
@@ -910,14 +912,24 @@ class EncryptExtantKeys(ScanBucket):
 
     schema = {
         'type': 'object',
-        'additonalProperties': False,
+        'additionalProperties': False,
         'properties': {
+            'type': {'pattern': 'encrypt-keys'},
             'report-only': {'type': 'boolean'},
             'glacier': {'type': 'boolean'},
             'large': {'type': 'boolean'},
-            'crypto': {'enum': ['AES256', 'aws:kms']}
+            'crypto': {'enum': ['AES256', 'aws:kms']},
+            'key-id': {'type': 'string'}
+            },
+        'dependencies': {
+            'key-id': {
+              'properties': {
+                'crypto': {'pattern': 'aws:kms'}
+              },
+              'required': ['crypto']
             }
         }
+    }
 
     metrics = [
         ('Total Keys', {'Scope': 'Account'}),
@@ -997,6 +1009,7 @@ class EncryptExtantKeys(ScanBucket):
             storage_class == 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
+        key_id = self.data.get('key-id')
         # Note on copy we lose individual object acl grants
         params = {'Bucket': bucket_name,
                   'Key': k,
@@ -1004,6 +1017,9 @@ class EncryptExtantKeys(ScanBucket):
                   'MetadataDirective': 'COPY',
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
+
+        if key_id and crypto_method is 'aws:kms':
+            params['SSEKMSKeyId'] = key_id
 
         if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
                 'large', True):
