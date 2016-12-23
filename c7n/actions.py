@@ -450,7 +450,7 @@ class AutoTagUser(EventAction):
     """
 
     schema = utils.type_schema(
-        'auto-tag',
+        'auto-tag-user',
         required=['tag'],
         **{'user-type': {
             'type': 'array',
