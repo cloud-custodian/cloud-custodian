@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import os
 import unittest
 import tempfile
 import time
@@ -105,7 +104,7 @@ class UtilTest(unittest.TestCase):
 
     def write_temp_file(self, contents, suffix='.tmp'):
         """ Write a temporary file and return the filename.
-        
+
         The file will be cleaned up after the test.
         """
         file = tempfile.NamedTemporaryFile(suffix=suffix)
@@ -228,38 +227,3 @@ class UtilTest(unittest.TestCase):
             utils.parse_s3('s3://things'),
             ('s3://things', 'things', ''),
         )
-
-    def test_read_aws_config_file(self):
-        #
-        # Test 1 - make sure we can read a file
-        #
-        region = 'us-west-2'
-        ini_contents = "[default]\nregion={}".format(region)
-        filename = self.write_temp_file(ini_contents, suffix='.ini')
-
-        config = utils.read_aws_config_file(filename)
-        self.assertEqual(
-            config.get('default', 'region'),
-            region
-        )
-
-        #
-        # Test 2 - make sure that setting AWS_CONFIG_FILE works
-        #
-        region = 'us-west-1'
-        ini_contents = "[default]\nregion={}".format(region)
-        filename = self.write_temp_file(ini_contents, suffix='.ini')
-
-        original_setting = os.environ.get('AWS_CONFIG_FILE')
-        os.environ['AWS_CONFIG_FILE'] = filename
-        
-        config = utils.read_aws_config_file()
-        self.assertEqual(
-            config.get('default', 'region'),
-            region
-        )
-
-        if original_setting:
-            os.environ['AWS_CONFIG_FILE'] = original_setting
-        else:
-            del(os.environ['AWS_CONFIG_FILE'])

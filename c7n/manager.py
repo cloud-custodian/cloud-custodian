@@ -27,6 +27,7 @@ class ResourceManager(object):
     filter_registry = None
     action_registry = None
     executor_factory = ThreadPoolExecutor
+    retry = None
 
     def __init__(self, ctx, data):
         self.ctx = ctx
