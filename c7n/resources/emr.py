@@ -42,6 +42,15 @@ class EMRCluster(QueryResourceManager):
 
     resource_type = Meta
 
+    def get_resources(self, ids):
+        # no filtering by id set supported at the api
+        client = local_session(self.session_factory).client('emr')
+        results = []
+        for jid in ids:
+            results.append(
+                client.describe_cluster(ClusterId=jid)['Cluster'])
+        return results
+
     def resources(self, query=None):
         q = self.consolidate_query_filter()
         if q is not None:

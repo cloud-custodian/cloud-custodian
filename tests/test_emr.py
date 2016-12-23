@@ -15,9 +15,24 @@ import unittest
 
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
-from c7n import tags, utils
 
-from .common import BaseTest
+from .common import BaseTest, Bag, Config
+
+
+class TestEMR(BaseTest):
+
+    def test_get_emr_by_ids(self):
+        session_factory = self.replay_flight_data(
+            'test_emr_query_ids')
+
+        ctx = Bag(
+            session_factory=session_factory,
+            log_dir='',
+            options=Config.empty())
+
+        mgr = emr.EMRCluster(ctx, {})
+        resources = mgr.get_resources(["j-1EJMJNTXC63JW"])
+        self.assertEqual(resources[0]['Id'], "j-1EJMJNTXC63JW")
 
 
 class TestEMRQueryFilter(unittest.TestCase):
