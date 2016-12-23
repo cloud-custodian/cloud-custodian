@@ -20,3 +20,5 @@ Actions
 ``delete``
   Delete DB cluster snapshot
 
+  .. c7n-schema:: RDSClusterSnapshotDelete
+      :module: c7n.resources.rdscluster

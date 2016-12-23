@@ -18,3 +18,6 @@ Actions
 
 ``delete``
   Delete ElastiCache cluster snapshot
+
+  .. c7n-schema:: DeleteElastiCacheSnapshot
+      :module: c7n.resources.elasticache

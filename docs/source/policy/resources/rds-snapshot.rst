@@ -19,3 +19,6 @@ Actions
 
 ``delete``
   Delete DB Snapshot
+
+  .. c7n-schema:: RDSSnapshotDelete
+      :module: c7n.resources.rds

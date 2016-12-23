@@ -20,3 +20,6 @@ Actions
 
 ``snapshot``
   Create a manual ElastiCache cluster snapshot
+
+  .. c7n-schema:: SnapshotElastiCacheCluster
+      :module: c7n.resources.elasticache
