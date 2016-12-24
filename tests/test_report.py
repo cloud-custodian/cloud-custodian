@@ -17,8 +17,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.policy import Policy
 from c7n.reports.csvout import Formatter
-from .common import Config
-from .common import load_data
+from common import Config, load_data
 
 
 EC2_POLICY = Policy(

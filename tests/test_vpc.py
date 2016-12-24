@@ -215,7 +215,8 @@ class SecurityGroupTest(BaseTest):
         # Find the ID of the default security group.
         default_sg_id = client.describe_security_groups(Filters=[
             {'Name': 'vpc-id', 'Values': [vpc_id]},
-            {'Name': 'group-name', 'Values': ['default']}])['SecurityGroups'][0]['GroupId']
+            {'Name': 'group-name', 'Values': ['default']}]
+            )['SecurityGroups'][0]['GroupId']
 
         sg1_id = client.create_security_group(
             GroupName='sg1',
