@@ -174,7 +174,17 @@ class QueryResourceManager(ResourceManager):
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
-    def get_resources(self, ids):
+    def get_resources(self, ids, cache=True):
+        key = {'region': self.config.region,
+               'resource': str(self.__class__.__name__),
+               'q': None}
+        if cache and self._cache.load():
+            resources = self._cache.get(key)
+            if resources is not None:
+                self.log.debug("Using cached results for get_resources")
+                m = self.get_model()
+                id_set = set(ids)
+                return [r for r in resources if r[m.id] in id_set]
         try:
             resources = self.query.get(self.resource_type, ids)
             resources = self.augment(resources)

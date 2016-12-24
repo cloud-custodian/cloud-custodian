@@ -242,17 +242,13 @@ class Instance(ValueFilter):
     annotate = False
 
     def process(self, resources, event=None):
+        self.elb_instances = {}
         instances = []
         for r in resources:
             instances.extend([i['InstanceId'] for i in r['Instances']])
-        instances = set(instances)
-        from c7n.resources.ec2 import EC2
-        manager = EC2(self.manager.ctx, {})
-
-        self.elb_instances = {}
-        for i in manager.resources():
-            if i['InstanceId'] in instances:
-                self.elb_instances[i['InstanceId']] = i
+        for i in self.manager.get_resource_manager(
+                'ec2').get_resources(list(instances)):
+            self.elb_instances[i['InstanceId']] = i
         return super(Instance, self).process(resources, event)
 
     def __call__(self, elb):

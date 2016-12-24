@@ -35,7 +35,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
-    local_session, query_instances, type_schema, chunks, get_retry, worker)
+    local_session, type_schema, chunks, get_retry, worker)
 
 log = logging.getLogger('custodian.asg')
 
@@ -167,33 +167,27 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.images = self.get_images()
 
     def get_subnets(self):
-        from c7n.resources.vpc import Subnet
-        manager = Subnet(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('subnet')
         return set([s['SubnetId'] for s in manager.resources()])
 
     def get_security_groups(self):
-        from c7n.resources.vpc import SecurityGroup
-        manager = SecurityGroup(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('security-group')
         return set([s['GroupId'] for s in manager.resources()])
 
     def get_key_pairs(self):
-        from c7n.resources.vpc import KeyPair
-        manager = KeyPair(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('key-pair')
         return set([k['KeyName'] for k in manager.resources()])
 
     def get_elbs(self):
-        from c7n.resources.elb import ELB
-        manager = ELB(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('elb')
         return set([e['LoadBalancerName'] for e in manager.resources()])
 
     def get_appelb_target_groups(self):
-        from c7n.resources.appelb import AppELBTargetGroup
-        manager = AppELBTargetGroup(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('app-elb')   
         return set([a['TargetGroupArn'] for a in manager.resources()])
 
     def get_images(self):
-        from c7n.resources.ami import AMI
-        manager = AMI(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('ami')
         images = set()
         # Verify image snapshot validity, i've been told by a TAM this
         # is a possibility, but haven't seen evidence of it, since
@@ -212,8 +206,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         return images
 
     def get_snapshots(self):
-        from c7n.resources.ebs import Snapshot
-        manager = Snapshot(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('ebs-snapshot')
         return set([s['SnapshotId'] for s in manager.resources()])
 
     def process(self, asgs, event=None):
@@ -448,12 +441,11 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
         return super(ImageAgeFilter, self).process(asgs, event)
 
     def initialize(self, asgs):
-        from c7n.resources.ami import AMI
         super(ImageAgeFilter, self).initialize(asgs)
         image_ids = set()
         for cfg in self.configs.values():
             image_ids.add(cfg['ImageId'])
-        results = AMI(self.manager.ctx, {}).resources()
+        results = self.manager.get_resource_manager('ami').resources()
         self.images = {i['ImageId']: i for i in results}
 
     def get_resource_date(self, i):
@@ -746,10 +738,9 @@ class PropagateTags(BaseAction):
                 for g in asgs if g['Instances']]))]
         if not instance_ids:
             return {}
-        instances = query_instances(
-            local_session(self.manager.session_factory),
-            InstanceIds=instance_ids)
-        return {i['InstanceId']: i for i in instances}
+        return {i['InstanceId']: i for i in
+                self.manager.get_resource_manager(
+                    'ec2').get_resources(instance_ids)}
 
 
 @actions.register('rename-tag')
