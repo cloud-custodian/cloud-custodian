@@ -53,7 +53,6 @@ class TestFilter(unittest.TestCase):
     def test_filter_call(self):
         filter_instance = base_filters.Filter({})
         self.assertIsInstance(filter_instance, base_filters.Filter)
-        self.assertRaises(NotImplementedError, filter_instance, None)
 
 
 class TestOrFilter(unittest.TestCase):

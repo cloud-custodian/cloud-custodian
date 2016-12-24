@@ -51,7 +51,8 @@ from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+from c7n.actions import (
+    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -61,8 +62,6 @@ from c7n.utils import (
     local_session, type_schema, get_account_id,
     get_retry, chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
-
-from skew.resources.aws import rds
 
 log = logging.getLogger('custodian.rds')
 
@@ -78,21 +77,30 @@ actions.register('auto-tag-user', AutoTagUser)
 class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
     """
-    id_field = 'DBInstanceIdentifier'
-    report_fields = [
-        'DBInstanceIdentifier',
-        'DBName',
-        'InstanceCreateTime',
-        'StorageEncrypted',
-        'PubliclyAccessible',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
 
-    class resource_type(rds.DBInstance.Meta):
+    class resource_type(object):
+        service = 'rds'
+        type = 'db'
+        enum_spec = ('describe_db_instances', 'DBInstances', None)
+        id = 'DBInstanceIdentifier'
+        name = 'Endpoint.Address'
         filter_name = 'DBInstanceIdentifier'
+        filter_type = 'scalar'
+        date = 'InstanceCreateTime'
+        dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+
+        default_report_fields = (
+            'DBInstanceIdentifier',
+            'DBName',
+            'Engine',
+            'EngineVersion',
+            'MultiAZ',
+            'AllocatedStorage',
+            'StorageEncrypted',
+            'PubliclyAccessible',
+            'InstanceCreateTime',
+        )
 
     filter_registry = filters
     action_registry = actions
@@ -736,7 +744,6 @@ class RDSSnapshot(QueryResourceManager):
     """
 
     class resource_type(object):
-
         service = 'rds'
         type = 'rds-snapshot'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
@@ -766,7 +773,8 @@ class RDSSnapshot(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot', separator=':')
+                account_id=self.account_id, resource_type='snapshot',
+                separator=':')
         return self._generate_arn
 
     def augment(self, snaps):
@@ -969,7 +977,8 @@ class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     def process(self, rds_instances):
         replication_group_map = {}
         client = local_session(self.manager.session_factory).client('rds')
-        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(rds_instances, metadata_key='VpcSecurityGroupId')
+        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(
+            rds_instances, metadata_key='VpcSecurityGroupId')
 
         # either build map for DB cluster or modify DB instance directly
         for idx, i in enumerate(rds_instances):

@@ -19,7 +19,8 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+from c7n.actions import (
+    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -41,16 +42,26 @@ filters.register('marked-for-op', tags.TagActionFilter)
 @resources.register('elb')
 class ELB(QueryResourceManager):
 
-    resource_type = "aws.elb.loadbalancer"
-    id_field = 'DNSName'
-    report_fields = [
-        'LoadBalancerName',
-        'DNSName',
-        'VPCId',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
+    class resource_type(object):
+        service = 'elb'
+        type = 'loadbalancer'
+        enum_spec = ('describe_load_balancers',
+                     'LoadBalancerDescriptions', None)
+        detail_spec = None
+        id = 'LoadBalancerName'
+        filter_name = 'LoadBalancerNames'
+        filter_type = 'list'
+        name = 'DNSName'
+        date = 'CreatedTime'
+        dimension = 'LoadBalancerName'
+
+        default_report_fields = (
+            'LoadBalancerName',
+            'DNSName',
+            'VPCId',
+            'count:Instances',
+            'list:ListenerDescriptions[].Listener.LoadBalancerPort')
+
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))

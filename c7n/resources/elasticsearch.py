@@ -21,15 +21,15 @@ from c7n.utils import chunks, local_session, type_schema
 @resources.register('elasticsearch')
 class ElasticSearchDomain(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'es'
+        type = "elasticsearch"
         enum_spec = (
             'list_domain_names', 'DomainNames[].DomainName', None)
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
-
-    resource_type = Meta
+        filter_name = None
 
     def augment(self, resources):
 
@@ -41,6 +41,11 @@ class ElasticSearchDomain(QueryResourceManager):
         with self.executor_factory(max_workers=2) as w:
             return list(itertools.chain(
                 *w.map(_augment, chunks(resources, 20))))
+
+    def get_resources(self, resource_ids):
+        client = local_session(self.session_factory).client('es')
+        return client.describe_elasticsearch_domains(
+            DomainNames=resource_ids)['DomainStatusList']
 
 
 @ElasticSearchDomain.action_registry.register('delete')

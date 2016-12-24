@@ -593,19 +593,3 @@ class SecurityGroupTest(BaseTest):
               u'PrefixListIds': [],
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
-
-
-class VpcTest(BaseTest):
-
-    def test_subnets(self):
-        factory = self.replay_flight_data(
-            'test_vpc_subnets_filter')
-        p = self.load_policy({
-            'name': 'empty-vpc-test',
-            'resource': 'vpc',
-            'filters': [
-                {'type': 'subnets',
-                 'value': []}]},
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
