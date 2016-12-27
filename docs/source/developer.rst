@@ -13,7 +13,7 @@ On Linux
 
 .. code-block:: bash
 
-   sudo apt-get install python python-dev python-pip python-virtualdev
+   sudo apt-get install python python-dev python-pip python-virtualenv
 
 On Mac
 ~~~~~~

@@ -21,6 +21,10 @@ from c7n.utils import local_session
 class SNS(QueryResourceManager):
 
     resource_type = 'aws.sns.topic'
+    id_field = 'TopicArn'
+    report_fields = [
+        'TopicArn',
+    ]
 
     def augment(self, resources):
 

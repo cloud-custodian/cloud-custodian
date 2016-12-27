@@ -498,3 +498,98 @@ class RDSSnapshotTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)        
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+    def test_rds_remove_matched_security_groups(self):
+        """
+        Test conditions:
+            - running 2 Aurora DB clusters in default VPC with 2 instances each
+                - translates to 4 actual instances
+            - a default security group with id 'sg-7a3fcb13' exists
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one set of DB instances
+                - translates to 2 instances marked non-compliant
+
+        Results in 4 DB Instances with default Security Group attached
+        """
+        session_factory = self.replay_flight_data('test_rds_remove_matched_security_groups')
+        client = session_factory().client('rds', region_name='ca-central-1')
+
+        p = self.load_policy(
+            {'name': 'rds-remove-matched-security-groups',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+             'actions': [
+                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': 'sg-7a3fcb13'}]
+             },
+        session_factory=session_factory)
+        clean_p = self.load_policy(
+            {'name': 'rds-verify-remove-matched-security-groups',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}]
+             },
+        session_factory=session_factory)
+
+        resources = p.run()
+
+        waiter = client.get_waiter('db_instance_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        # clusters autoscale across AZs, so they get -001, -002, etc appended
+        self.assertIn('test-sg-fail', resources[0]['DBInstanceIdentifier'])
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        # show that it was indeed a replacement of security groups
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources), 4)
+
+    def test_rds_add_security_group(self):
+        """
+        Test conditions:
+            - running 2 Aurora DB clusters in default VPC with 2 instances each
+                - translates to 4 actual instances
+            - a default security group with id 'sg-7a3fcb13' exists - attached to all instances
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 2/4
+              instances
+                - translates to 2 instances marked to get new group attached
+
+        Results in 4 instances with default Security Group and PROD-ONLY-Test-Security-Group
+        """
+        session_factory = self.replay_flight_data('test_rds_add_security_group')
+        client = session_factory().client('rds', region_name='ca-central-1')
+
+        p = self.load_policy({
+            'name': 'add-sg-to-prod-rds',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
+                {'type': 'value', 'key': 'DBInstanceIdentifier', 'value': 'test-sg-fail.*', 'op': 'regex'}
+            ],
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
+            ]
+        },
+        session_factory=session_factory)
+        clean_p = self.load_policy({
+            'name': 'validate-add-sg-to-prod-rds',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'PROD-ONLY-Test-Security-Group'}
+            ]
+        },
+        session_factory=session_factory)
+
+        resources = p.run()
+        waiter = client.get_waiter('db_instance_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertIn('test-sg-fail', resources[0]['DBInstanceIdentifier'])
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 2)
+        self.assertEqual(len(clean_resources), 4)

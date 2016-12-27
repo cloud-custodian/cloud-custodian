@@ -27,6 +27,7 @@ class ResourceManager(object):
     filter_registry = None
     action_registry = None
     executor_factory = ThreadPoolExecutor
+    retry = None
 
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -55,6 +56,10 @@ class ResourceManager(object):
     def get_resources(self, resource_ids):
         """Retrieve a set of resources by id."""
         return []
+
+    def get_resource_manager(self, resource_type, data=None):
+        klass = resources.get(resource_type)
+        return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):
         original = len(resources)

@@ -15,8 +15,26 @@ import unittest
 
 from dateutil.parser import parse as date_parse
 
-from c7n.reports.csvout import RECORD_TYPE_FORMATTERS
+from c7n.policy import Policy
+from c7n.reports.csvout import Formatter
+from .common import Config
 from .common import load_data
+
+
+EC2_POLICY = Policy(
+    {
+        'name': 'report-test-ec2',
+        'resource': 'ec2',
+    },
+    Config.empty(),
+)
+ASG_POLICY = Policy(
+    {
+        'name': 'report-test-asg',
+        'resource': 'asg',
+    },
+    Config.empty(),
+)
 
 
 class TestEC2Report(unittest.TestCase):
@@ -25,11 +43,9 @@ class TestEC2Report(unittest.TestCase):
         self.records = data['ec2']['records']
         self.headers = data['ec2']['headers']
         self.rows = data['ec2']['rows']
-        for rec in self.records.values():
-            rec['CustodianDate'] = date_parse(rec['CustodianDate'])
 
     def test_csv(self):
-        formatter = RECORD_TYPE_FORMATTERS.get("ec2")()
+        formatter = Formatter(EC2_POLICY.resource_manager)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -45,7 +61,6 @@ class TestEC2Report(unittest.TestCase):
         """
         Test the ability to include custom fields.
         """
-        formatter_class = RECORD_TYPE_FORMATTERS.get("ec2")
         extra_fields = [
             "custom_field=CustomField",
             "missing_field=MissingField",
@@ -53,17 +68,24 @@ class TestEC2Report(unittest.TestCase):
         ]
 
         # First do a test with adding custom fields to the normal ones
-        formatter = formatter_class(extra_fields=extra_fields)
+        formatter = Formatter(
+            EC2_POLICY.resource_manager,
+            extra_fields=extra_fields,
+        )
         recs = [self.records['full']]
         rows = [self.rows['full_custom']]
         self.assertEqual(formatter.to_csv(recs), rows)
 
         # Then do a test with only having custom fields
-        formatter = formatter_class(extra_fields=extra_fields, no_default_fields=True)
+        formatter = Formatter(
+            EC2_POLICY.resource_manager,
+            extra_fields=extra_fields,
+            no_default_fields=True,
+        )
         recs = [self.records['full']]
         rows = [self.rows['minimal_custom']]
         self.assertEqual(formatter.to_csv(recs), rows)
-        
+
 
 class TestASGReport(unittest.TestCase):
     def setUp(self):
@@ -71,11 +93,9 @@ class TestASGReport(unittest.TestCase):
         self.records = data['asg']['records']
         self.headers = data['asg']['headers']
         self.rows = data['asg']['rows']
-        for rec in self.records.values():
-            rec['CustodianDate'] = date_parse(rec['CustodianDate'])
 
     def test_csv(self):
-        formatter = RECORD_TYPE_FORMATTERS.get("asg")()
+        formatter = Formatter(ASG_POLICY.resource_manager)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),

@@ -3,42 +3,42 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "104f7af8-2619-4e16-942b-887b1a02bc80", 
+            "RequestId": "7c81b6c2-eda9-46a6-b7f7-6b5ad22f6b75", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 23 Jul 2016 16:49:03 GMT"
+                "date": "Fri, 16 Dec 2016 22:06:12 GMT"
             }
         }, 
         "NetworkInterfaces": [
             {
                 "Status": "available", 
-                "MacAddress": "06:ea:23:0c:c5:21", 
+                "MacAddress": "06:06:48:36:49:e8", 
                 "SourceDestCheck": true, 
-                "VpcId": "vpc-28089a4f", 
+                "VpcId": "vpc-885c83ee", 
                 "Description": "", 
-                "NetworkInterfaceId": "eni-b4460ab8", 
+                "NetworkInterfaceId": "eni-3439c3dc", 
                 "PrivateIpAddresses": [
                     {
                         "Primary": true, 
-                        "PrivateIpAddress": "10.4.8.141"
+                        "PrivateIpAddress": "10.4.8.223"
                     }
                 ], 
                 "RequesterManaged": false, 
                 "Groups": [
                     {
                         "GroupName": "quarantine-group", 
-                        "GroupId": "sg-98121ae3"
+                        "GroupId": "sg-6d4b6010"
                     }
                 ], 
                 "AvailabilityZone": "us-east-1e", 
-                "RequesterId": "AIDAJEZOTH6YPO3DY45QW", 
-                "SubnetId": "subnet-e3f6fbde", 
+                "RequesterId": "AIDAINLXB4P6J26AKFUC6", 
+                "SubnetId": "subnet-ed02abd1", 
                 "OwnerId": "644160558196", 
                 "TagSet": [], 
-                "PrivateIpAddress": "10.4.8.141"
+                "PrivateIpAddress": "10.4.8.223"
             }
         ]
     }
