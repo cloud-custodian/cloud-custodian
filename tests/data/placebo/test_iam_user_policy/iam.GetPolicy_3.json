@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": {
+            "PolicyName": "IAMUserChangePassword", 
+            "Description": "Provides the ability for an IAM user to change their own password.", 
+            "CreateDate": {
+                "hour": 0, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 16, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 15, 
+                "minute": 25
+            }, 
+            "AttachmentCount": 1, 
+            "IsAttachable": true, 
+            "PolicyId": "ANPAJ4L4MM2A7QIEB56MS", 
+            "DefaultVersionId": "v2", 
+            "Path": "/", 
+            "Arn": "arn:aws:iam::aws:policy/IAMUserChangePassword", 
+            "UpdateDate": {
+                "hour": 23, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 55, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 15, 
+                "minute": 18
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b4835732-cc5d-11e6-822d-810deb780f00", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b4835732-cc5d-11e6-822d-810deb780f00", 
+                "date": "Tue, 27 Dec 2016 17:55:51 GMT", 
+                "content-length": "785", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

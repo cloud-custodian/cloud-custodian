@@ -5,14 +5,14 @@
             {
                 "UserName": "alphabet_soup", 
                 "PasswordLastUsed": {
-                    "hour": 18, 
+                    "hour": 15, 
                     "__class__": "datetime", 
                     "month": 12, 
-                    "second": 17, 
+                    "second": 11, 
                     "microsecond": 0, 
                     "year": 2016, 
-                    "day": 16, 
-                    "minute": 24
+                    "day": 27, 
+                    "minute": 23
                 }, 
                 "CreateDate": {
                     "hour": 19, 
@@ -27,22 +27,6 @@
                 "UserId": "AIDAI4HREXSL6KOVVKGGU", 
                 "Path": "/", 
                 "Arn": "arn:aws:iam::185106417252:user/alphabet_soup"
-            }, 
-            {
-                "UserName": "generic_no_policy", 
-                "Path": "/", 
-                "CreateDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 0, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 33
-                }, 
-                "UserId": "AIDAJFRA5OWOUJBKRUWUY", 
-                "Arn": "arn:aws:iam::185106417252:user/generic_no_policy"
             }, 
             {
                 "UserName": "root", 
@@ -74,11 +58,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "59086f5c-c3c4-11e6-8044-1b08f350bca0", 
+            "RequestId": "b4085b6d-cc5d-11e6-bac0-33f1d1d1749c", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "59086f5c-c3c4-11e6-8044-1b08f350bca0", 
-                "date": "Fri, 16 Dec 2016 19:17:54 GMT", 
-                "content-length": "1209", 
+                "x-amzn-requestid": "b4085b6d-cc5d-11e6-bac0-33f1d1d1749c", 
+                "date": "Tue, 27 Dec 2016 17:55:50 GMT", 
+                "content-length": "939", 
                 "content-type": "text/xml"
             }
         }, 

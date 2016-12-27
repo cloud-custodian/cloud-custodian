@@ -5,21 +5,17 @@
             {
                 "PolicyName": "AdministratorAccess", 
                 "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
-            }, 
-            {
-                "PolicyName": "IAMUserChangePassword", 
-                "PolicyArn": "arn:aws:iam::aws:policy/IAMUserChangePassword"
             }
         ], 
         "IsTruncated": false, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5babc9fd-c3c4-11e6-903d-736d5caf3b3b", 
+            "RequestId": "b42e806a-cc5d-11e6-990b-1f4b6774251a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "5babc9fd-c3c4-11e6-903d-736d5caf3b3b", 
-                "date": "Fri, 16 Dec 2016 19:17:59 GMT", 
-                "content-length": "705", 
+                "x-amzn-requestid": "b42e806a-cc5d-11e6-990b-1f4b6774251a", 
+                "date": "Tue, 27 Dec 2016 17:55:50 GMT", 
+                "content-length": "542", 
                 "content-type": "text/xml"
             }
         }

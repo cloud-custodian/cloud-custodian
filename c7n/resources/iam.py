@@ -433,18 +433,20 @@ class UserCredentialReport(Filter):
 
 
 @User.filter_registry.register('policy')
-class UserAttachedPolicy(Filter):
+class UserPolicy(ValueFilter):
 
-    schema = type_schema(
-        'policy',
-        attached={'type': 'boolean'})
+    schema = type_schema('policy', rinherit=ValueFilter.schema)
 
     def user_policies(self, resource):
         if 'c7n.AttachedPolicies' in resource:
             return
         client = local_session(self.manager.session_factory).client('iam')
-        resource['c7n.AttachedPolicies'] = client.list_attached_user_policies(
+        aps = client.list_attached_user_policies(
             UserName=resource['UserName'])['AttachedPolicies']
+        resource['c7n.AttachedPolicies'] = []
+        for ap in aps:
+            resource['c7n.AttachedPolicies'].append(
+                client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
 
     def process(self, resources, event=None):
         with self.executor_factory(max_workers=2) as w:
@@ -452,18 +454,19 @@ class UserAttachedPolicy(Filter):
                 "Querying %d users policies" % len(resources))
             list(w.map(self.user_policies, resources))
 
-        if self.data.get('attached', True):
-            return [r for r in resources if r['c7n.AttachedPolicies']]
-        else:
-            return [r for r in resources if not r['c7n.AttachedPolicies']]
+        matched = []
+        for r in resources:
+            for p in r['c7n.AttachedPolicies']:
+                if self.match(p):
+                    matched.append(r)
+                    break
+        return matched
 
 
 @User.filter_registry.register('access-key')
-class UserAccessKey(Filter):
+class UserAccessKey(ValueFilter):
 
-    schema = type_schema(
-        'access-key',
-        present={'type': 'boolean'})
+    schema = type_schema('access-key', rinherit=ValueFilter.schema)
 
     def user_keys(self, resource):
         if 'c7n.AccessKeys' in resource:
@@ -478,10 +481,12 @@ class UserAccessKey(Filter):
                 "Querying %d users' api keys" % len(resources))
             list(w.map(self.user_keys, resources))
 
-        if self.data.get('present', True):
-            return [r for r in resources if r['c7n.AccessKeys']]
-        else:
-            return [r for r in resources if not r['c7n.AccessKeys']]
+        matched = []
+        for r in resources:
+            for k in r['c7n.AccessKeys']:
+                if self.match(k):
+                    matched.append(r)
+        return matched
 
 
 # Mfa-device filter for iam-users

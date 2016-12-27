@@ -30,7 +30,7 @@ from c7n.resources.iam import (UserMfaDevice,
                                UsedInstanceProfiles,
                                UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole,
-                               IamGroupUsers, UserAttachedPolicy,
+                               IamGroupUsers, UserPolicy,
                                UserCredentialReport, UserAccessKey,
                                IamRoleInlinePolicy, IamGroupInlinePolicy)
 from c7n.executor import MainThreadExecutor
@@ -184,39 +184,26 @@ class IamRoleFilterUsage(BaseTest):
 
 class IamUserFilterUsage(BaseTest):
 
-    def test_iam_user_policy_attached(self):
+    def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
-            'test_iam_user_policy_attached')
+            'test_iam_user_policy')
         self.patch(
-            UserAttachedPolicy, 'executor_factory', MainThreadExecutor)
+            UserPolicy, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
-            'name': 'iam-user-policy-attached',
+            'name': 'iam-user-policy',
             'resource': 'iam-user',
             'filters': [{
                 'type': 'policy',
-                'attached': True}]}, session_factory=session_factory)
+                'key': 'CreateDate',
+                'value': 10,
+                'op': 'gt',
+                'value_type': 'age'}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
-    def test_iam_user_policy_unattached(self):
+    def test_iam_user_created_filter(self):
         session_factory = self.replay_flight_data(
-            'test_iam_user_policy_unattached')
-        self.patch(
-            UserAttachedPolicy, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-user-policy-unattached',
-            'resource': 'iam-user',
-            'filters': [{
-                'type': 'policy',
-                'attached': False}]}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['UserName'], 'generic_no_policy')
-
-    def test_iam_user_with_key(self):
-        session_factory = self.replay_flight_data(
-            'test_iam_user_with_key')
+            'test_iam_user_access_key_created')
         self.patch(
             UserAccessKey, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -224,25 +211,12 @@ class IamUserFilterUsage(BaseTest):
             'resource': 'iam-user',
             'filters': [{
                 'type': 'access-key',
-                'present': True}]}, session_factory=session_factory)
+                'key': 'CreateDate',
+                'value': 10,
+                'op': 'gt',
+                'value_type': 'age'}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
-
-    def test_iam_user_without_key(self):
-        session_factory = self.replay_flight_data(
-            'test_iam_user_without_key')
-        self.patch(
-            UserAccessKey, 'executor_factory', MainThreadExecutor)
-        p = self.load_policy({
-            'name': 'iam-user-with-key',
-            'resource': 'iam-user',
-            'filters': [{
-                'type': 'access-key',
-                'present': False}]}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 2)
-        self.assertEqual(resources[0]['UserName'], 'generic_no_policy')
 
 
 class IamInstanceProfileFilterUsage(BaseTest):
