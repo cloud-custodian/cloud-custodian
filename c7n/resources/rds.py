@@ -934,6 +934,7 @@ class RegionCopySnapshot(BaseAction):
     for an hr.
 
     Example::
+
       - name: copy-encrypted-snapshots
         description: |
           copy snapshots under 1 day old to dr region with kms
