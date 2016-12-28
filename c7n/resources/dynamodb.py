@@ -15,7 +15,10 @@ import itertools
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import chunks, local_session
+from c7n.utils import chunks, local_session, type_schema
+from c7n.actions import BaseAction
+
+from concurrent.futures import as_completed
 
 
 @resources.register('dynamodb-table')
@@ -33,3 +36,37 @@ class Table(QueryResourceManager):
         with self.executor_factory(max_workers=3) as w:
             return list(itertools.chain(
                 *w.map(_augment, chunks(resources, 20))))
+
+
+@Table.action_registry.register('delete')
+class DeleteTable(BaseAction):
+    """Action to delete dynamodb tables
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-tables
+                resource: dynamodb-table
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+
+    def delete_table(self, resource):
+        print resource.get('TableName')
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        client.delete_table(TableName=resource['TableName'])
+
+    def process(self, resources):
+        for r in resources:
+            with self.executor_factory(max_workers=3) as w:
+                futures = []
+                futures.append(w.submit(self.delete_table, r))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception deleting dynamodb table \n %s" % (
+                                f.exception()))
