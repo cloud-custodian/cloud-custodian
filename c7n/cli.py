@@ -33,10 +33,10 @@ def _default_options(p, blacklist=""):
     """
     provider = p.add_argument_group(
         "provider", "AWS account information, defaults per the aws cli")
+
     if 'region' not in blacklist:
         provider.add_argument(
-            "-r", "--region",
-            default=os.environ.get('AWS_DEFAULT_REGION', DEFAULT_REGION),
+            "-r", "--region", default=None,
             help="AWS Region to target (Default: %(default)s)")
     provider.add_argument(
         "--profile",

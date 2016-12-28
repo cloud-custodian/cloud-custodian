@@ -24,7 +24,6 @@ import threading
 import time
 import ipaddress
 
-
 # Try to place nice in lambda exec environment
 # where we don't require yaml
 try:

@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AcceptRanges": "bytes", 
+        "ContentType": "text/plain", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Qr1RSy9sBf1Nr3dyR3kGigGi56jXEfNN2JzXq/cYGOTSqSP/AXb88y+oOwA++58em/zDvlo77zw=", 
+            "RequestId": "62026FBEE46A219C", 
+            "HTTPHeaders": {
+                "content-length": "5", 
+                "x-amz-id-2": "Qr1RSy9sBf1Nr3dyR3kGigGi56jXEfNN2JzXq/cYGOTSqSP/AXb88y+oOwA++58em/zDvlo77zw=", 
+                "accept-ranges": "bytes", 
+                "server": "AmazonS3", 
+                "last-modified": "Tue, 20 Dec 2016 23:43:29 GMT", 
+                "x-amz-request-id": "62026FBEE46A219C", 
+                "etag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "date": "Tue, 20 Dec 2016 23:43:30 GMT", 
+                "x-amz-server-side-encryption": "AES256", 
+                "content-type": "text/plain"
+            }
+        }, 
+        "LastModified": {
+            "hour": 23, 
+            "__class__": "datetime", 
+            "month": 12, 
+            "second": 29, 
+            "microsecond": 0, 
+            "year": 2016, 
+            "day": 20, 
+            "minute": 43
+        }, 
+        "ContentLength": 5, 
+        "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+        "ServerSideEncryption": "AES256", 
+        "Metadata": {}
+    }
+}

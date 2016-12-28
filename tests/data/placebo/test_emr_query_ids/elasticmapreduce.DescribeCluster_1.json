@@ -1,0 +1,93 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Cluster": {
+            "Status": {
+                "Timeline": {
+                    "ReadyDateTime": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 57, 
+                        "microsecond": 915000, 
+                        "year": 2016, 
+                        "day": 22, 
+                        "minute": 22
+                    }, 
+                    "CreationDateTime": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 45, 
+                        "microsecond": 859000, 
+                        "year": 2016, 
+                        "day": 22, 
+                        "minute": 14
+                    }, 
+                    "EndDateTime": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 7, 
+                        "microsecond": 150000, 
+                        "year": 2016, 
+                        "day": 22, 
+                        "minute": 25
+                    }
+                }, 
+                "State": "TERMINATED", 
+                "StateChangeReason": {
+                    "Message": "Terminated by user request", 
+                    "Code": "USER_REQUEST"
+                }
+            }, 
+            "Ec2InstanceAttributes": {
+                "ServiceAccessSecurityGroup": "sg-abcde123", 
+                "EmrManagedMasterSecurityGroup": "sg-abcde456", 
+                "AdditionalSlaveSecurityGroups": [
+                    "sg-abcde123", 
+                    "sg-abcde456"
+                ], 
+                "AdditionalMasterSecurityGroups": [
+                    "sg-abcde123", 
+                    "sg-abcde456"
+                ], 
+                "Ec2SubnetId": "subnet-5aaaaaaa", 
+                "IamInstanceProfile": "EMR_EC2_DefaultRole", 
+                "Ec2KeyName": "joe_r_pce-dev", 
+                "Ec2AvailabilityZone": "us-east-1e", 
+                "EmrManagedSlaveSecurityGroup": "sg-abcde456"
+            }, 
+            "Name": "KMS public testing no LUK", 
+            "ServiceRole": "EMR_DefaultRole", 
+            "Tags": [], 
+            "TerminationProtected": false, 
+            "ReleaseLabel": "emr-5.1.0", 
+            "NormalizedInstanceHours": 16, 
+            "Applications": [
+                {
+                    "Version": "2.7.3", 
+                    "Name": "Hadoop"
+                }
+            ], 
+            "MasterPublicDnsName": "ip-10-10-10-10.ec2.internal", 
+            "ScaleDownBehavior": "TERMINATE_AT_INSTANCE_HOUR", 
+            "VisibleToAllUsers": true, 
+            "LogUri": "s3n://aws-logs-emr-randr-us-east-1/elasticmapreduce/", 
+            "AutoTerminate": false, 
+            "Id": "j-1EJMJNTXC63JW", 
+            "Configurations": []
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e5e39bb2-c90f-11e6-b9e9-133af44706a5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e5e39bb2-c90f-11e6-b9e9-133af44706a5", 
+                "date": "Fri, 23 Dec 2016 13:01:19 GMT", 
+                "content-length": "1266", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

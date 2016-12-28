@@ -4,8 +4,17 @@
         "Location": "/custodian-encrypt-test", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "5pyFMZtQ70VhhVLcTrt7/3L2v5P/0eq8NakfA5tbuPJzsUe3IbZg/RAT4mnNEv2kCcC65ItsOnM=", 
-            "RequestId": "90AB2AA2BCF1AADB"
+            "RetryAttempts": 0, 
+            "HostId": "jB7JFF0WpD42fEiZ6LB9xLy55PiO3AKL85XcWj4n9rsuaL75p2hlb/3o2weoYA5IVaswDMI6BE8=", 
+            "RequestId": "36C05370E35B8B56", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "jB7JFF0WpD42fEiZ6LB9xLy55PiO3AKL85XcWj4n9rsuaL75p2hlb/3o2weoYA5IVaswDMI6BE8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "36C05370E35B8B56", 
+                "location": "/custodian-encrypt-test", 
+                "date": "Tue, 20 Dec 2016 23:43:27 GMT"
+            }
         }
     }
 }

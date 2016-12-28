@@ -19,7 +19,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -42,6 +42,15 @@ filters.register('marked-for-op', tags.TagActionFilter)
 class ELB(QueryResourceManager):
 
     resource_type = "aws.elb.loadbalancer"
+    id_field = 'DNSName'
+    report_fields = [
+        'LoadBalancerName',
+        'DNSName',
+        'VPCId',
+        'tag:ASV',
+        'tag:CMDBEnvironment',
+        'tag:OwnerContact',
+    ]
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
@@ -193,6 +202,19 @@ class SetSslListenerPolicy(BaseAction):
                     PolicyNames=policy_names)
 
 
+@actions.register('modify-security-groups')
+class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify VPC security groups on an ELB."""
+
+    def process(self, load_balancers):
+        client = local_session(self.manager.session_factory).client('elb')
+        groups = super(ELBModifyVpcSecurityGroups, self).get_groups(load_balancers, 'SecurityGroups')
+        for idx, l in enumerate(load_balancers):
+            client.apply_security_groups_to_load_balancer(
+                LoadBalancerName=l['LoadBalancerName'],
+                SecurityGroups=groups[idx])
+
+
 def is_ssl(b):
     for ld in b['ListenerDescriptions']:
         if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
@@ -220,17 +242,13 @@ class Instance(ValueFilter):
     annotate = False
 
     def process(self, resources, event=None):
+        self.elb_instances = {}
         instances = []
         for r in resources:
             instances.extend([i['InstanceId'] for i in r['Instances']])
-        instances = set(instances)
-        from c7n.resources.ec2 import EC2
-        manager = EC2(self.manager.ctx, {})
-
-        self.elb_instances = {}
-        for i in manager.resources():
-            if i['InstanceId'] in instances:
-                self.elb_instances[i['InstanceId']] = i
+        for i in self.manager.get_resource_manager(
+                'ec2').get_resources(list(instances)):
+            self.elb_instances[i['InstanceId']] = i
         return super(Instance, self).process(resources, event)
 
     def __call__(self, elb):
