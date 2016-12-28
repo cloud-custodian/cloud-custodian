@@ -18,7 +18,7 @@ from c7n.executor import MainThreadExecutor
 class HealthResource(BaseTest):
 
     def test_resource(self):
-        session_factory = self.record_flight_data('test_health_resources')
+        session_factory = self.replay_flight_data('test_health_resources')
         p = self.load_policy({
             'name': 'health-events',
             'resource': 'health'
