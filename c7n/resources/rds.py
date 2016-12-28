@@ -46,19 +46,13 @@ import functools
 import logging
 import re
 
-
 from distutils.version import LooseVersion
-
-from botocore.auth import EMPTY_SHA256_HASH
-from botocore.awsrequest import prepare_request_dict
 from botocore.exceptions import ClientError
-from botocore.compat import OrderedDict
-from botocore.model import OperationModel, StructureShape
-
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+from c7n.filters import (
+    FilterRegistry, Filter, AgeFilter, OPERATORS, FilterValidationError)
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -323,11 +317,11 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process(self, dbs):
         return super(TagDelayedAction, self).process(dbs)
 
-    def process_resource_set(self, dbs, ts):
+    def process_resource_set(self, dbs, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
             arn = self.manager.generate_arn(db['DBInstanceIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
 @actions.register('auto-patch')
@@ -952,14 +946,20 @@ class RegionCopySnapshot(BaseAction):
         tags={'type': 'object'},
         required=('target_region',))
 
+    def validate(self):
+        if self.data.get('target_region') and self.manager.data.get('mode'):
+            raise FilterValidationError(
+                "cross region snapshot may require waiting for "
+                "longer then lambda runtime allows")
+        return self
+
     def process(self, resources):
         if self.data['target_region'] == self.manager.config.region:
             self.log.info(
                 "Source and destination region are the same, skipping")
             return
-        self.process_resource_set(resources[:20])
-        #with self.executor_factory(max_workers=1) as w:
-        #    list(w.map(self.process_resource_set, chunks(resources, 20)))
+        for resource_set in chunks(resources, 20):
+            self.process_resource_set(resource_set)
 
     def process_resource(self, target, key, tags, snapshot):
         p = {}
@@ -977,20 +977,27 @@ class RegionCopySnapshot(BaseAction):
             p['Tags'] = tags
         result = target.copy_db_snapshot(**p)
         snapshot['c7n:CopiedSnapshot'] = result[
-            'DBSnapshot']['DBSnapshotIdentifier']
+            'DBSnapshot']['DBSnapshotArn']
 
     def process_resource_set(self, resource_set):
         target_client = self.manager.session_factory(
             region=self.data['target_region']).client('rds')
         target_key = self.data.get('target_key')
-        tags = [{'Key': k, 'Value': v} for k, v in self.data.get('tags', {})]
+        tags = [{'Key': k, 'Value': v} for k, v
+                in self.data.get('tags', {}).items()]
         source_client = local_session(
             self.manager.session_factory).client('rds')
 
         for snapshot_set in chunks(resource_set, 5):
             for r in snapshot_set:
+                # If tags are supplied, copy tags are ignored, and
+                # we need to augment the tag set with the original
+                # resource tags to preserve the common case.
+                rtags = tags and list(tags) or None
+                if tags:
+                    rtags.extend(r['Tags'])
                 self.process_resource(
-                    target_client, target_key, tags, r)
+                    target_client, target_key, rtags, r)
 
             if len(snapshot_set) < 5:
                 continue

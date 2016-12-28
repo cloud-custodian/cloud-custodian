@@ -406,7 +406,42 @@ class RDSTest(BaseTest):
 
 
 class RDSSnapshotTest(BaseTest):
-    
+
+    def test_rds_cross_region_copy(self):
+        # preconditions
+        # rds snapshot, encrypted in region with kms, and tags
+        factory = self.replay_flight_data('test_rds_snapshot_region_copy')
+        client = factory().client('rds', region_name='us-east-2')
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy({
+            'name': 'rds-snapshot-region-copy',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'DBSnapshotIdentifier': "rds:originb-2016-12-28-09-15"}],
+            'actions': [
+                {'type': 'region-copy',
+                 'target_region': 'us-east-2',
+                 'tags': {'migrated_from': 'us-east-1'},
+                 'target_key': 'cb291f53-f3ab-4e64-843e-47b0a7c9cf61'}
+                ]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        snapshots = client.describe_db_snapshots(
+            DBSnapshotIdentifier=resources[
+                0]['c7n:CopiedSnapshot'].rsplit(':', 1)[1])['DBSnapshots']
+        self.assertEqual(len(snapshots), 1)
+        self.assertEqual(snapshots[0]['DBInstanceIdentifier'], 'originb')
+        tags = {t['Key']: t['Value'] for t in client.list_tags_for_resource(
+            ResourceName=resources[0]['c7n:CopiedSnapshot'])['TagList']}
+        self.assertEqual(
+            {'migrated_from': 'us-east-1',
+             'app': 'mgmt-portal',
+             'env': 'staging',
+             'workload-type': 'other'},
+            tags)
+
     def test_rds_snapshot_tag_filter(self):
         factory = self.replay_flight_data('test_rds_snapshot_tag_filter')
         client = factory().client('rds')
@@ -424,7 +459,6 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('maid_status' in tag_map)
         self.assertTrue('delete@' in tag_map['maid_status'])
-
 
     def test_rds_snapshot_age_filter(self):
         factory = self.replay_flight_data('test_rds_snapshot_age_filter')
@@ -445,7 +479,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_rds_snapshot_tag(self):
         factory = self.replay_flight_data('test_rds_snapshot_mark')
         client = factory().client('rds')
@@ -464,7 +498,7 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('test-key' in tag_map)
         self.assertTrue('test-value' in tag_map['test-key'])
-                
+
     def test_rds_snapshot_mark(self):
         factory = self.replay_flight_data('test_rds_snapshot_mark')
         client = factory().client('rds')
@@ -482,7 +516,7 @@ class RDSSnapshotTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('maid_status' in tag_map)
-        
+
     def test_rds_snapshot_unmark(self):
         factory = self.replay_flight_data('test_rds_snapshot_unmark')
         client = factory().client('rds')
@@ -497,4 +531,4 @@ class RDSSnapshotTest(BaseTest):
             resources[0]['DBSnapshotIdentifier'])
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
-        self.assertFalse('maid_status' in tag_map)        
+        self.assertFalse('maid_status' in tag_map)
