@@ -23,7 +23,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters import ValueFilter, Filter, OPERATORS, FilterRegistry
 from c7n.manager import resources
-from c7n.query import ResourceManager, ResourceQuery
+from c7n.query import ResourceManager
 from c7n.utils import local_session, type_schema
 
 
@@ -39,15 +39,14 @@ def get_health_events(session_factory):
     return events
 
 
-@resources.register('health-event')
+@resources.register('health')
 class HealthEvents(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
 
     class resource_type(object):
-        id = 'account_id'
-        name = 'account_name'
+        service = 'health'
 
     def get_model(self):
         return self.resource_type
@@ -57,4 +56,3 @@ class HealthEvents(ResourceManager):
 
     def get_resources(self, resource_ids):
         return [get_health_events(self.session_factory)]
-

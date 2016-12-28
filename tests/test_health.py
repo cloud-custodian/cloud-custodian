@@ -21,7 +21,7 @@ class HealthResource(BaseTest):
         session_factory = self.replay_flight_data('test_health_resources')
         p = self.load_policy({
             'name': 'health-events',
-            'resource': 'health-event'
+            'resource': 'health'
         }, session_factory=session_factory)
         resources = p.run()
         self.assertGreater(len(resources), 0)
