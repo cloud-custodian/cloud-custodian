@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
+import time
+
 from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
@@ -407,6 +410,40 @@ class RDSTest(BaseTest):
 
 class RDSSnapshotTest(BaseTest):
 
+    def test_rds_cross_region_copy_many(self):
+        # preconditions
+        # rds snapshot, encrypted in region with kms, and tags
+        # in this scenario we have 9 snapshots in source region,
+        # 3 snaps already in target region, 6 to copy, which means
+        # we will hit transfer limits.
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_region_copy_many')
+
+        # no sleep till, beastie boys ;-)
+        def brooklyn(delay):
+            return
+
+        output = self.capture_logging('c7n.worker', level=logging.DEBUG)
+        self.patch(time, 'sleep', brooklyn)
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy({
+            'name': 'rds-snapshot-region-copy',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'DBInstanceIdentifier': "originb"}],
+            'actions': [
+                {'type': 'region-copy',
+                 'target_region': 'us-east-2',
+                 'tags': {'migrated_from': 'us-east-1'},
+                 'target_key': 'cb291f53-f3ab-4e64-843e-47b0a7c9cf61'}
+                ]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 9)
+        self.assertEqual(
+            6, len([r for r in resources if 'c7n:CopiedSnapshot' in r]))
+        self.assertEqual(
+            output.getvalue(), "")
     def test_rds_cross_region_copy(self):
         # preconditions
         # rds snapshot, encrypted in region with kms, and tags

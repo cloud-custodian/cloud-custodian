@@ -916,6 +916,10 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
 class RegionCopySnapshot(BaseAction):
     """ Copy a snapshot across regions.
 
+    Note there is a max in flight for cross region rds snapshots
+    of 5 per region. This action will attempt to retry automatically
+    for an hr.
+
     Example::
       - name: copy-encrypted-snapshots
         description: |
@@ -946,6 +950,9 @@ class RegionCopySnapshot(BaseAction):
         tags={'type': 'object'},
         required=('target_region',))
 
+    min_delay = 120
+    max_attempts = 30
+
     def validate(self):
         if self.data.get('target_region') and self.manager.data.get('mode'):
             raise FilterValidationError(
@@ -963,7 +970,6 @@ class RegionCopySnapshot(BaseAction):
 
     def process_resource(self, target, key, tags, snapshot):
         p = {}
-
         if key:
             p['KmsKeyId'] = key
         p['TargetDBSnapshotIdentifier'] = snapshot[
@@ -975,7 +981,22 @@ class RegionCopySnapshot(BaseAction):
             p['CopyTags'] = True
         if tags:
             p['Tags'] = tags
-        result = target.copy_db_snapshot(**p)
+
+        retry = get_retry(
+            ('SnapshotQuotaExceeded',),
+            # TODO make this configurable, class defaults to 1hr
+            min_delay=self.min_delay,
+            max_attempts=self.max_attempts,
+            log_retries=logging.DEBUG)
+        try:
+            result = retry(target.copy_db_snapshot, **p)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DBSnapshotAlreadyExists':
+                self.log.warning(
+                    "Snapshot %s already exists in target region",
+                    snapshot['DBSnapshotIdentifier'])
+                return
+            raise
         snapshot['c7n:CopiedSnapshot'] = result[
             'DBSnapshot']['DBSnapshotArn']
 
@@ -996,19 +1017,7 @@ class RegionCopySnapshot(BaseAction):
                 rtags = tags and list(tags) or None
                 if tags:
                     rtags.extend(r['Tags'])
-                self.process_resource(
-                    target_client, target_key, rtags, r)
-
-            if len(snapshot_set) < 5:
-                continue
-
-            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
-            self.log.debug(
-                "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
-            waiter = target_client.get_waiter('db_snapshot_completed')
-            waiter.config.delay = 60
-            waiter.config.max_attempts = 60
-            waiter.wait(SnapshotIds=copy_ids)
+                self.process_resource(target_client, target_key, rtags, r)
 
 
 @RDSSnapshot.action_registry.register('delete')

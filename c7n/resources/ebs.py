@@ -251,9 +251,9 @@ class CopySnapshot(BaseAction):
                     SourceSnapshotId=r['SnapshotId'],
                     Description=r.get('Description', ''),
                     **params)['SnapshotId']
-                client.create_tags(
-                    Resources=[snapshot_id],
-                    Tags=r['Tags'])
+                if r.get('Tags'):
+                    client.create_tags(
+                        Resources=[snapshot_id], Tags=r['Tags'])
                 r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
