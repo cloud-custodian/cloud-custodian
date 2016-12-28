@@ -34,8 +34,10 @@ actions = ActionRegistry('aws.health.filters')
 def get_health_events(session_factory):
     session = local_session(session_factory)
     client = session.client('health')
-    events = client.describe_events().get(
-        'events', ('',))
+    p = client.get_paginator('describe_events')
+    events = []
+    for r in p.paginate():
+        events.append(r['events'])
     return events
 
 
