@@ -927,7 +927,7 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
 
 @RDSSnapshot.action_registry.register('region-copy')
 class RegionCopySnapshot(BaseAction):
-    """ Copy a snapshot across regions.
+    """Copy a snapshot across regions.
 
     Note there is a max in flight for cross region rds snapshots
     of 5 per region. This action will attempt to retry automatically
