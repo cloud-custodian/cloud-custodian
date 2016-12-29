@@ -632,16 +632,16 @@ class RDSSnapshotTest(BaseTest):
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_rds_remove_matched_security_groups(self):
-        """
-        Test conditions:
-            - running 2 Aurora DB clusters in default VPC with 2 instances each
-                - translates to 4 actual instances
-            - a default security group with id 'sg-7a3fcb13' exists
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one set of DB instances
-                - translates to 2 instances marked non-compliant
+        #
+        # Test conditions:
+        #    - running 2 Aurora DB clusters in default VPC with 2 instances each
+        #        - translates to 4 actual instances
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one set of DB instances
+        #        - translates to 2 instances marked non-compliant
+        #
+        # Results in 4 DB Instances with default Security Group attached
 
-        Results in 4 DB Instances with default Security Group attached
-        """
         session_factory = self.replay_flight_data('test_rds_remove_matched_security_groups')
         client = session_factory().client('rds', region_name='ca-central-1')
 
@@ -678,17 +678,16 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources), 4)
 
     def test_rds_add_security_group(self):
-        """
-        Test conditions:
-            - running 2 Aurora DB clusters in default VPC with 2 instances each
-                - translates to 4 actual instances
-            - a default security group with id 'sg-7a3fcb13' exists - attached to all instances
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 2/4
-              instances
-                - translates to 2 instances marked to get new group attached
-
-        Results in 4 instances with default Security Group and PROD-ONLY-Test-Security-Group
-        """
+        #
+        # Test conditions:
+        #   - running 2 Aurora DB clusters in default VPC with 2 instances each
+        #        - translates to 4 actual instances
+        #    - a default security group with id 'sg-7a3fcb13' exists - attached to all instances
+        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 2/4
+        #      instances
+        #        - translates to 2 instances marked to get new group attached
+        #
+        # Results in 4 instances with default Security Group and PROD-ONLY-Test-Security-Group
         session_factory = self.replay_flight_data('test_rds_add_security_group')
         client = session_factory().client('rds', region_name='ca-central-1')
 

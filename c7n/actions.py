@@ -120,16 +120,22 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         isolation-group: sg-xyz
     """
 
-    properties = {
-        'add': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': {'type':'string'}}]},
-        'remove': {'oneOf': [
-            {'type': 'array', 'items': {'type': 'string'}},
-            {'enum': ['matched', 'all', {'type': 'string'}]}]},
-        'isolation-group': {'oneOf': [{'type': 'string'}, {'type': 'array', 'items': {'type': 'string'}}]}
-    }
     schema = utils.type_schema(
         'modify-security-groups',
-        **properties
+        **{
+        'add': {'oneOf': [{'type': 'string', 'pattern': '^sg-*'},
+                          {'type': 'array', 'items': {
+                              'pattern': '^sg-*',
+                              'type': 'string'}}]},
+        'remove': {'oneOf': [
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}},
+            {'enum': ['matched', 'all',
+                      {'type': 'string', 'pattern': '^sg-*'}]}]},
+        'isolation-group': {
+            'oneOf': [
+                {'type': 'string', 'pattern': '^sg-*'},
+                {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}}]}
+        }
     )
 
     def validate(self):
@@ -149,18 +155,27 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         """
         # must specify add and remove params
         if 'add' not in self.data and 'remove' not in self.data:
-            raise ValueError('Must specify either \'add\' or \'remove\' parameters')
+            raise ValueError(
+                "Must specify either 'add' or 'remove' parameters")
         if 'remove' in self.data:
             # need 'add' or 'isolation-group'
             if 'isolation-group' not in self.data and 'add' not in self.data:
-                raise ValueError('Must specify \'isolation-group\' or \'add\' parameters when using the \'remove\' action')
+                raise ValueError(
+                    "Must specify 'isolation-group' or 'add\' parameters "
+                    "when using the 'remove' action")
             # type validation
             if isinstance(self.data['remove'], basestring):
-                if 'sg-' not in self.data['remove'] and 'all' not in self.data['remove'] and 'matched' not in self.data['remove']:
-                    raise ValueError('Must specify valid input for the \'remove\' parameter')
-            if isinstance(self.data['remove'], list) and any('sg-' not in g for g in self.data['remove']):
-                raise ValueError('Must specify valid security group ids for the \'remove\' parameter')
-        # type validations for the rest: str with 'sg-' or list with all 'sg-' strs
+                if ('sg-' not in self.data['remove'] and
+                    'all' not in self.data['remove'] and
+                    'matched' not in self.data['remove']):
+                    raise ValueError(
+                        "Must specify valid input for the 'remove' parameter")
+            if isinstance(self.data['remove'], list) and any(
+                    'sg-' not in g for g in self.data['remove']):
+                raise ValueError(
+                    "Must specify valid security group ids "
+                    "for the 'remove' parameter")
+        # type validations: str with 'sg-' or list with all 'sg-' strs
         if 'add' in self.data:
             if isinstance(self.data['add'], basestring) and 'sg-' not in self.data['add']:
                 raise ValueError('Must specify a valid security group id for the \'add\' parameter')
@@ -170,20 +185,23 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
             if isinstance(self.data['isolation-group'], basestring) and 'sg-' not in self.data['isolation-group']:
                 raise ValueError('Must specify a valid security group id for the \'isolation-group\' parameter')
             if isinstance(self.data['isolation-group'], list) and any('sg-' not in g for g in self.data['isolation-group']):
-                raise ValueError('Must specify valid security group ids for the \'isolation-group\' parameter')
+                raise ValueError(
+                    "Must specify valid security group ids "
+                    "for the 'isolation-group' parameter")
 
         return self
 
     def get_groups(self, resources, metadata_key=None):
-        """ Parse policies to get lists of security groups to attach to each input resource
+        """Parse policies to get lists of security groups to attach to each resource
 
         For each input resource, parse the various add/remove/isolation-
         group policies for 'modify-security-groups' to find the resulting
         set of VPC security groups to attach to that resource.
 
-        The 'metadata_key' parameter can be used for two purposes at the moment;
-        The first use is for resources' APIs that return a list of security group
-        IDs but use a different metadata key than 'Groups' or 'SecurityGroups'.
+        The 'metadata_key' parameter can be used for two purposes at
+        the moment; The first use is for resources' APIs that return a
+        list of security group IDs but use a different metadata key
+        than 'Groups' or 'SecurityGroups'.
 
         The second use is for when there are richer objects in the 'Groups' or
         'SecurityGroups' lists. The custodian actions need to act on lists of
@@ -194,8 +212,9 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         that should end up on each resource passed in.
 
         :param resources: List of resources containing VPC Security Groups
-        :param metadata_key: Metadata key for security groups list (see notes for detailed usage)
+        :param metadata_key: Metadata key for security groups list
         :return: List of lists of security groups per resource
+
         """
         # parse the add, remove, and isolation group params to return the
         # list of security groups that will end up on the resource

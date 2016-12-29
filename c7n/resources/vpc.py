@@ -20,7 +20,7 @@ from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.revisions import Diff
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema, get_retry, camelResource
 
@@ -28,59 +28,49 @@ from c7n.utils import local_session, type_schema, get_retry, camelResource
 @resources.register('vpc')
 class Vpc(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.vpc')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc'
+        enum_spec = ('describe_vpcs', 'Vpcs', None)
+        name = id = 'VpcId'
+        filter_name = 'VpcIds'
+        filter_type = 'list'
+        date = None
+        dimension = None
         config_type = 'AWS::EC2::VPC'
-
-
-@Vpc.filter_registry.register('subnets')
-class VpcSubnets(ValueFilter):
-    """Filter VPC by subnet value
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: empty-vpc
-                resource: vpc
-                filters:
-                  - type: subnets
-                    value: []
-    """
-
-    schema = type_schema('subnets', rinherit=ValueFilter.schema)
-
-    def __init__(self, *args, **kw):
-        super(VpcSubnets, self).__init__(*args, **kw)
-        self.data['key'] = 'Subnets'
-
-    def process(self, resources, event=None):
-
-        subnets = Subnet(self.manager.ctx, {}).resources()
-
-        matched = []
-        for r in resources:
-            r['Subnets'] = [s for s in subnets if s['VpcId'] == r['VpcId']]
-            if self.match(r):
-                matched.append(r)
-
-        return matched
+        id_prefix = "vpc-"
 
 
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.subnet')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'subnet'
+        enum_spec = ('describe_subnets', 'Subnets', None)
+        name = id = 'SubnetId'
+        filter_name = 'SubnetIds'
+        filter_type = 'list'
+        date = None
+        dimension = None
         config_type = 'AWS::EC2::Subnet'
+        id_prefix = "subnet-"
 
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.security-group')):
-        config_type = "AWS::EC2::SecurityGroup"
+    class resource_type(object):
+        service = 'ec2'
+        type = 'security-group'
+        enum_spec = ('describe_security_groups', 'SecurityGroups', None)
+        detail_spec = None
+        name = id = 'GroupId'
         filter_name = "GroupIds"
-        name = "GroupId"
+        filter_type = 'list'
+        date = None
+        dimension = None
+        config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
 
@@ -432,6 +422,7 @@ class Stale(Filter):
         for vpc_id in vpc_ids:
             stale_groups = client.describe_stale_security_groups(
                 VpcId=vpc_id).get('StaleSecurityGroupSet', ())
+
             stale_count += len(stale_groups)
             for s in stale_groups:
                 if s['GroupId'] in group_map:
@@ -786,8 +777,7 @@ class RemovePermissions(BaseAction):
 @resources.register('eni')
 class NetworkInterface(QueryResourceManager):
 
-    class Meta(object):
-
+    class resource_type(object):
         service = 'ec2'
         type = 'eni'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
@@ -797,8 +787,7 @@ class NetworkInterface(QueryResourceManager):
         dimension = None
         date = None
         config_type = "AWS::EC2::NetworkInterface"
-
-    resource_type = Meta
+        id_prefix = "eni-"
 
 
 @NetworkInterface.filter_registry.register('subnet')
@@ -875,9 +864,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-
         groups = super(InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
-
         for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
@@ -887,30 +874,62 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 @resources.register('route-table')
 class RouteTable(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.route-table')):
-        config_type = "AWS::EC2::RouteTable"
+    class resource_type(object):
+        service = 'ec2'
+        type = 'route-table'
+        enum_spec = ('describe_route_tables', 'RouteTables', None)
+        name = id = 'RouteTableId'
+        filter_name = 'RouteTableIds'
+        filter_type = 'list'
+        date = None
+        dimension = None
+        id_prefix = "rtb-"
 
 
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve(
-            'aws.ec2.vpc-peering-connection')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc-peering-connection'
         enum_spec = ('describe_vpc_peering_connections',
                      'VpcPeeringConnections', None)
+        name = id = 'VpcPeeringConnectionId'
+        filter_name = 'VpcPeeringConnectionIds'
+        filter_type = 'list'
+        date = None
+        dimension = None
+        id_prefix = "pcx-"
 
 
 @resources.register('network-acl')
 class NetworkAcl(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.network-acl')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'network-acl'
+        enum_spec = ('describe_network_acls', 'NetworkAcls', None)
+        name = id = 'NetworkAclId'
+        filter_name = 'NetworkAclIds'
+        filter_type = 'list'
+        date = None
+        dimension = None
         config_type = "AWS::EC2::NetworkAcl"
+        id_prefix = "acl-"
 
 
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.address')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'network-addr'
+        enum_spec = ('describe_addresses', 'Addresses', None)
+        name = id = 'PublicIp'
+        filter_name = 'PublicIps'
+        filter_type = 'list'
+        date = None
+        dimension = None
         config_type = "AWS::EC2::EIP"
         taggable = False
 
@@ -918,15 +937,24 @@ class Address(QueryResourceManager):
 @resources.register('customer-gateway')
 class CustomerGateway(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.customer-gateway')):
-        config_type = "AWS::EC2::CustomerGateway"
+    class resource_type(object):
+        service = 'ec2'
+        type = 'customer-gateway'
+        enum_spec = ('describe_customer_gateways', 'CustomerGateway', None)
+        detail_spec = None
+        id = 'CustomerGatewayId'
+        filter_name = 'CustomerGatewayIds'
+        filter_type = 'list'
+        name = 'CustomerGatewayId'
+        date = None
+        dimension = None
+        id_prefix = "cgw-"
 
 
 @resources.register('internet-gateway')
 class InternetGateway(QueryResourceManager):
 
     class resource_type(object):
-
         service = 'ec2'
         type = 'internet-gateway'
         enum_spec = ('describe_internet_gateways', 'InternetGateways', None)
@@ -936,6 +964,7 @@ class InternetGateway(QueryResourceManager):
         dimension = None
         date = None
         config_type = "AWS::EC2::InternetGateway"
+        id_prefix = "igw-"
 
 
 @resources.register('vpn-connection')
@@ -951,6 +980,7 @@ class VPNConnection(QueryResourceManager):
         dimension = None
         date = None
         config_type = 'AWS::EC2::VPNConnection'
+        id_prefix = "vpn-"
 
 
 @resources.register('vpn-gateway')
@@ -966,10 +996,21 @@ class VPNGateway(QueryResourceManager):
         dimension = None
         date = None
         config_type = 'AWS::EC2::VPNGateway'
+        id_prefix = "vgw-"
 
 
 @resources.register('key-pair')
 class KeyPair(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.key-pair')):
-        taggable = False
+    class resource_type(object):
+        service = 'ec2'
+        type = 'key-pair'
+        enum_spec = ('describe_key_pairs', 'KeyPairs', None)
+        detail_spec = None
+        id = 'KeyName'
+        filter_name = 'KeyNames'
+        name = 'KeyName'
+        date = None
+        dimension = None
+
+

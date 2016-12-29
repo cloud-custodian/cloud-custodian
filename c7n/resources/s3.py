@@ -37,11 +37,6 @@ Actions:
    delivery.
 
 """
-from botocore.client import Config
-from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import SSLError
-from concurrent.futures import as_completed
-
 import functools
 import json
 import itertools
@@ -51,21 +46,21 @@ import os
 import time
 import ssl
 
+from botocore.client import Config
+from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
+from concurrent.futures import as_completed
+
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
-"""
-TODO:
- - How does replication status effect in place encryption.
- - Test glacier support
-"""
 
 log = logging.getLogger('custodian.s3')
 
@@ -80,20 +75,19 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    #resource_type = "aws.s3.bucket"
-    report_fields = [
-        'Name',
-        'CreationDate',
-        # s3 formatter is used for multiple s3 rules.
-        # the buckets may not have any global permissions
-        'list:GlobalPermissions',
-        'tag:OwnerContact',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-    ]
-
-    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+    class resource_type(object):
+        service = 's3'
+        type = 'bucket'
+        enum_spec = ('list_buckets', 'Buckets[]', None)
+        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        name = id = 'Name'
+        filter_name = None
+        date = 'CreationDate'
         dimension = 'BucketName'
+        default_report_fields = (
+            'Name',
+            'CreationDate',
+        )
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -218,7 +212,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
             log.exception(
-                'Exception tagging bucket %s: %s', (bucket['Name'], e))
+                'Exception tagging bucket %s: %s', bucket['Name'], e)
             continue
 
 

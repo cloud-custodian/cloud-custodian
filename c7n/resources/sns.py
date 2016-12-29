@@ -20,11 +20,24 @@ from c7n.utils import local_session
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
-    resource_type = 'aws.sns.topic'
-    id_field = 'TopicArn'
-    report_fields = [
-        'TopicArn',
-    ]
+    class resource_type(object):
+        service = 'sns'
+        type = 'topic'
+        enum_spec = ('list_topics', 'Topics', None)
+        detail_spec = ('get_topic_attributes', 'TopicArn', 'Attributes')
+        id = 'TopicArn'
+        filter_name = None
+        filter_type = None
+        name = 'DisplayName'
+        date = None
+        dimension = 'TopicName'
+        default_report_fields = (
+            'TopicArn',
+            'DisplayName',
+            'SubscriptionsConfirmed',
+            'SubscriptionsPending',
+            'SubscriptionsDeleted'
+            )
 
     def augment(self, resources):
 

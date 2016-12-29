@@ -29,21 +29,20 @@ class EMRCluster(QueryResourceManager):
     """Resource manager for Elastic MapReduce clusters
     """
 
-    action_registry = actions
-
-    def __init__(self, ctx, data):
-        super(EMRCluster, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    class Meta(object):
+    class resource_type(object):
         service = 'emr'
         type = 'emr'
         enum_spec = ('list_clusters', 'Clusters', None)
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
+        filter_name = None
 
-    resource_type = Meta
+    action_registry = actions
+
+    def __init__(self, ctx, data):
+        super(EMRCluster, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
 
     def get_resources(self, ids):
         # no filtering by id set supported at the api

@@ -35,7 +35,7 @@ class RDSCluster(QueryResourceManager):
     """Resource manager for RDS clusters.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'rds'
         type = 'rds-cluster'
@@ -46,7 +46,6 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         date = None
 
-    resource_type = Meta
     filter_registry = filters
     action_registry = actions
 
@@ -248,7 +247,7 @@ class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'rds'
         type = 'rds-cluster-snapshot'
@@ -259,8 +258,6 @@ class RDSClusterSnapshot(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'SnapshotCreateTime'
-
-    resource_type = Meta
 
     filter_registry = FilterRegistry('rdscluster-snapshot.filters')
     action_registry = ActionRegistry('rdscluster-snapshot.actions')

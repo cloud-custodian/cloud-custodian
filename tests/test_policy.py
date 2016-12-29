@@ -21,7 +21,7 @@ from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 
-from .common import BaseTest, Config
+from common import BaseTest, Config
 
 
 class DummyResource(manager.ResourceManager):

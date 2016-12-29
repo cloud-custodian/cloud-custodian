@@ -52,15 +52,25 @@ actions.register('auto-tag-user', AutoTagUser)
 @resources.register('asg')
 class ASG(QueryResourceManager):
 
-    resource_type = "aws.autoscaling.autoScalingGroup"
-    id_field = 'AutoScalingGroupName'
-    report_fields = [
-        'AutoScalingGroupName',
-        'count:Instances',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
+    class resource_type(object):
+        service = 'autoscaling'
+        type = 'autoScalingGroup'
+        id = name = 'AutoScalingGroupName'
+        date = 'CreatedTime'
+        dimension = 'AutoScalingGroupName'
+        enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
+        filter_name = 'AutoScalingGroupNames'
+        filter_type = 'list'
+        default_report_fields = (
+            'AutoScalingGroupName',
+            'CreatedTime',
+            'LaunchConfigurationName',
+            'count:Instances',
+            'DesiredCapacity',
+            'HealthCheckType',
+            'list:LoadBalancerNames',
+        )
+
     filter_registry = filters
     action_registry = actions
 
@@ -153,7 +163,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def validate(self):
         if self.manager.data.get('mode'):
             raise FilterValidationError(
-                "invalid-config makes too many queries to be run efficiently in lambda")
+                "invalid-config makes too many queries to be run in lambda")
         return self
 
     def initialize(self, asgs):
@@ -990,7 +1000,16 @@ class Delete(BaseAction):
 @resources.register('launch-config')
 class LaunchConfig(QueryResourceManager):
 
-    resource_type = "aws.autoscaling.launchConfigurationName"
+    class resource_type(object):
+        service = 'autoscaling'
+        type = 'launchConfiguration'
+        id = name = 'LaunchConfigurationName'
+        date = 'CreatedTime'
+        dimension = None
+        enum_spec = (
+            'describe_launch_configurations', 'LaunchConfigurations', None)
+        filter_name = 'LaunchConfigurationNames'
+        filter_type = 'list'
 
     def augment(self, resources):
         for r in resources:

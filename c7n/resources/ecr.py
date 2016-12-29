@@ -22,14 +22,12 @@ from c7n.utils import local_session
 @resources.register('ecr')
 class ECR(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
         name = "repositoryName"
         id = "repositoryArn"
         dimension = None
-
-    resource_type = Meta
 
 
 @ECR.filter_registry.register('cross-account')

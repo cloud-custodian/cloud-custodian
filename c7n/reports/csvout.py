@@ -50,8 +50,8 @@ import json
 import jmespath
 import logging
 import os
-import copy
 
+from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
@@ -61,13 +61,8 @@ from c7n.utils import local_session, dumps
 log = logging.getLogger('custodian.reports')
 
 
-def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=None):
+def report(policy, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
-    if not policy.resource_manager.report_fields:
-        raise ValueError(
-            "No formatter configured for resource type '%s', valid options: %s" % (
-                policy.resource_type))
-
     formatter = Formatter(
         policy.resource_manager,
         extra_fields=options.field,
@@ -83,8 +78,8 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None, filters=N
     else:
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
+    log.debug("Found %d records", len(records))
     rows = formatter.to_csv(records)
-
     writer = csv.writer(output_fh, formatter.headers())
     writer.writerow(formatter.headers())
     writer.writerows(rows)
@@ -120,47 +115,48 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
+            if not isinstance(value, basestring):
+                value = unicode(value)
         vals.append(value)
     return vals
 
 
 class Formatter(object):
-    
-    def __init__(self, resource_manager, **kwargs):
+
+    def __init__(
+            self, resource_manager, extra_fields=(), no_default_fields=None):
+
         self.resource_manager = resource_manager
-        self._id_field = resource_manager.id_field
-        self.fields = resource_manager.report_fields
-        # Make a copy because we modify the values when we strip off the header
-        self.extra_fields = copy.copy(kwargs.get('extra_fields', []))
-        self.no_default_fields = kwargs.get('no_default_fields', False)
-        self.set_headers()
+        # Lookup default fields for resource type.
+        model = resource_manager.resource_type
+        self._id_field = model.id
+        self._date_field = model.date
 
-    def csv_fields(self, record, tag_map):
-        return _get_values(record, self.fields, tag_map)
+        mfields = getattr(model, 'default_report_fields', None)
+        if mfields is None:
+            mfields = [model.id]
+            if model.name != model.id:
+                mfields.append(model.name)
+            if model.date:
+                mfields.append(model.date)
 
-    def set_headers(self):
-        self._headers = []
-        if not self.no_default_fields:
-            self._headers = copy.copy(self.fields)
+        if not no_default_fields:
+            fields = OrderedDict(zip(mfields, mfields))
+        else:
+            fields = OrderedDict()
 
-        for index, field in enumerate(self.extra_fields):
-            header, field_minus_header = field.split('=', 1)
-            self._headers.append(header)
-            self.extra_fields[index] = field_minus_header
+        for index, field in enumerate(extra_fields):
+            # TODO this type coercion should be done at cli input, not here
+            h, cexpr = field.split('=', 1)
+            fields[h] = cexpr
+        self.fields = fields
 
     def headers(self):
-        return self._headers
+        return self.fields.keys()
 
     def extract_csv(self, record):
         tag_map = {t['Key']: t['Value'] for t in record.get('Tags', ())}
-
-        output = []
-        if not self.no_default_fields:
-            output = self.csv_fields(record, tag_map)
-            
-        output = output + _get_values(record, self.extra_fields, tag_map)
-        
-        return output
+        return _get_values(record, self.fields.values(), tag_map)
 
     def uniq_by_id(self, records):
         """Only the first record for each id"""
@@ -176,12 +172,16 @@ class Formatter(object):
     def to_csv(self, records, reverse=True):
         if not records:
             return []
-
         filtered = filter(self.resource_manager.filter_record, records)
         log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
-        if 'CustodianDate' in records[0]:
+
+        # Sort before unique to get the first/latest record
+        date_sort = ('CustodianDate' in records[0] and 'CustodianDate' or
+                     self._date_field)
+        if date_sort:
             filtered.sort(
-                key=lambda r: r['CustodianDate'], reverse=reverse)
+                key=lambda r: r[date_sort], reverse=reverse)
+
         uniq = self.uniq_by_id(filtered)
         log.debug("Uniqued from %d to %d" % (len(filtered), len(uniq)))
         rows = map(self.extract_csv, uniq)

@@ -24,7 +24,7 @@ from c7n.mu import (
     CloudWatchLogSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data
+from common import BaseTest, Config, event_data
 
 
 class PolicyLambdaProvision(BaseTest):

@@ -23,7 +23,7 @@ from c7n.filters import (
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.utils import (
     local_session, set_annotation, chunks, type_schema, worker)
 from c7n.resources.ami import AMI
@@ -37,17 +37,28 @@ actions = ActionRegistry('ebs.actions')
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
-    resource_type = "aws.ec2.snapshot"
-    id_field = 'SnapshotId'
-    report_fields = [
-        'SnapshotId',
-        'VolumeId',
-        'tag:InstanceId',
-        'VolumeSize',
-        'StartTime',
-        'State',
-    ]
-    
+    class resource_type(object):
+        service = 'ec2'
+        type = 'snapshot'
+        enum_spec = (
+            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+        detail_spec = None
+        id = 'SnapshotId'
+        filter_name = 'SnapshotIds'
+        filter_type = 'list'
+        name = 'SnapshotId'
+        date = 'StartTime'
+        dimension = None
+
+        default_report_fields = (
+            'SnapshotId',
+            'VolumeId',
+            'tag:InstanceId',
+            'VolumeSize',
+            'StartTime',
+            'State',
+        )
+
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
@@ -282,18 +293,25 @@ class CopySnapshot(BaseAction):
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve("aws.ec2.volume")):
-        default_namespace = 'AWS/EBS'
+    class resource_type(object):
+        service = 'ec2'
+        type = 'volume'
+        enum_spec = ('describe_volumes', 'Volumes', None)
+        name = id = 'VolumeId'
+        filter_name = 'VolumeIds'
+        filter_type = 'list'
+        date = 'createTime'
+        dimension = 'VolumeId'
+        metrics_namespace = 'AWS/EBS'
         config_type = "AWS::EC::Volume"
+        default_report_fields = (
+            'VolumeId',
+            'Attachments[0].InstanceId',
+            'Size',
+            'VolumeType',
+            'KmsKeyId'
+        )
 
-    id_field = 'VolumeId'
-    report_fields = [
-        'VolumeId',
-        'Attachments[0].InstanceId',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
     filter_registry = filters
     action_registry = actions
 

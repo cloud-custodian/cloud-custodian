@@ -153,10 +153,6 @@ class Filter(object):
         """ Bulk process resources and return filtered set."""
         return filter(self, resources)
 
-    def __call__(self, instance):
-        """ Process an individual resource."""
-        raise NotImplementedError()
-
 
 class Or(Filter):
 

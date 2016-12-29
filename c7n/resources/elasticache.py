@@ -22,7 +22,8 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 
-from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.actions import (
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -46,7 +47,17 @@ TTYPE = re.compile('cache.t')
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.cluster'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'cluster'
+        enum_spec = ('describe_cache_clusters',
+                     'CacheClusters[]', None)
+        name = id = 'CacheClusterId'
+        filter_name = 'CacheClusterId'
+        filter_type = 'scalar'
+        date = 'CacheClusterCreateTime'
+        dimension = 'CacheClusterId'
+
     filter_registry = filters
     action_registry = actions
     _generate_arn = _account_id = None
@@ -305,14 +316,19 @@ class SnapshotElastiCacheCluster(BaseAction):
 class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an Elasticache cluster.
 
-    Looks at the individual clusters and modifies the Replication Group's configuration
-    for Security groups so all nodes get affected equally
+    Looks at the individual clusters and modifies the Replication
+    Group's configuration for Security groups so all nodes get
+    affected equally
+
     """
 
     def process(self, clusters):
         replication_group_map = {}
-        client = local_session(self.manager.session_factory).client('elasticache')
-        groups = super(ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='SecurityGroupId')
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        groups = super(
+            ElasticacheClusterModifyVpcSecurityGroups,
+            self).get_groups(clusters, metadata_key='SecurityGroupId')
         for idx, c in enumerate(clusters):
             # build map of Replication Groups to Security Groups
             replication_group_map[c['ReplicationGroupId']] = groups[idx]
@@ -327,13 +343,31 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 @resources.register('cache-subnet-group')
 class ElastiCacheSubnetGroup(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.subnet-group'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'subnet-group'
+        enum_spec = ('describe_cache_subnet_groups',
+                     'CacheSubnetGroups', None)
+        name = id = 'CacheSubnetGroupName'
+        filter_name = 'CacheSubnetGroupName'
+        filter_type = 'scalar'
+        date = None
+        dimension = None
 
 
 @resources.register('cache-snapshot')
 class ElastiCacheSnapshot(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.snapshot'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'snapshot'
+        enum_spec = ('describe_snapshots', 'Snapshots', None)
+        name = id = 'SnapshotName'
+        filter_name = 'SnapshotName'
+        filter_type = 'scalar'
+        date = 'StartTime'
+        dimension = None
+
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)

@@ -22,11 +22,23 @@ from c7n.query import QueryResourceManager
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
-    resource_type = 'aws.sqs.queue'
-    id_field = 'QueueArn'
-    report_fields = [
-        'QueueArn',
-    ]
+    class resource_type(object):
+        service = 'sqs'
+        type = 'queue'
+        enum_spec = ('list_queues', 'QueueUrls', None)
+        detail_spec = ('get_queue_attributes', 'QueueUrl', 'QueueUrl')
+        id = 'QueueUrl'
+        filter_name = 'QueueNamePrefix'
+        filter_type = 'scalar'
+        name = 'QueueUrl'
+        date = 'CreatedTimestamp'
+        dimension = 'QueueName'
+
+        default_report_fields = (
+            'QueueArn',
+            'CreatedTimestamp',
+            'ApproximateNumberOfMessages',
+        )
 
     def augment(self, resources):
 
