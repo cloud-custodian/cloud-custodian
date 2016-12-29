@@ -355,3 +355,23 @@ def worker(f):
             raise
     functools.update_wrapper(_f, f)
     return _f
+
+
+def reformat_schema(model):
+    """ Reformat schema to be in a more displayable format. """
+    if not hasattr(model, 'schema'):
+        return "Model '{}' does not have a schema".format(model)
+
+    if 'properties' not in model.schema:
+        return "Schema in unexpected format."
+    
+    ret = copy.deepcopy(model.schema['properties'])
+    
+    if 'type' in ret:
+        del(ret['type'])
+
+    for key in model.schema.get('required', []):
+        if key in ret:
+            ret[key]['required'] = True
+
+    return ret

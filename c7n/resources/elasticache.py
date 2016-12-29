@@ -273,6 +273,8 @@ class SnapshotElastiCacheCluster(BaseAction):
                   - snapshot
     """
 
+    schema = type_schema('snapshot')
+
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
             futures = []
@@ -424,6 +426,8 @@ class DeleteElastiCacheSnapshot(BaseAction):
                 actions:
                   - delete
     """
+
+    schema = type_schema('delete')
 
     def process(self, snapshots):
         log.info("Deleting %d ElastiCache snapshots", len(snapshots))

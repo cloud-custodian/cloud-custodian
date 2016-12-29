@@ -312,6 +312,8 @@ class RDSClusterSnapshotDelete(BaseAction):
                   - delete
     """
 
+    schema = type_schema('delete')
+
     def process(self, snapshots):
         log.info("Deleting %d RDS cluster snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
