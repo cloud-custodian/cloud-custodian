@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Cloud-Maid Lambda Entry Point
+Cloud-Custodian Lambda Entry Point
 
 Mostly this serves to load up the policy and dispatch
 an event.
