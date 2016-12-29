@@ -19,6 +19,7 @@ from c7n.utils import chunks, local_session, type_schema
 from c7n.actions import BaseAction
 
 from concurrent.futures import as_completed
+from c7n.utils import chunks
 
 
 @resources.register('dynamodb-table')
@@ -54,26 +55,28 @@ class DeleteTable(BaseAction):
         .. code-block: yaml
 
             policies:
-              - name: delete-tables
+              - name: delete-empty-tables
                 resource: dynamodb-table
+                filters:
+                  - TableSizeBytes: 0
                 actions:
                   - delete
     """
 
     schema = type_schema('delete')
 
-    def delete_table(self, resource):
-        print resource.get('TableName')
+    def delete_table(self, table_set):
         client = local_session(self.manager.session_factory).client('dynamodb')
-        client.delete_table(TableName=resource['TableName'])
+        for t in table_set:
+            client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        for r in resources:
+        for table_set in chunks(resources, 20):
             with self.executor_factory(max_workers=3) as w:
                 futures = []
-                futures.append(w.submit(self.delete_table, r))
+                futures.append(w.submit(self.delete_table, table_set))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception deleting dynamodb table \n %s" % (
+                            "Exception deleting dynamodb table set \n %s" % (
                                 f.exception()))

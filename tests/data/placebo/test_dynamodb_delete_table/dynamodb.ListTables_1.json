@@ -4,20 +4,19 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "IR9IGD8GU14R42G74LJSP42BDBVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "D9QCK6UGKPFLUN2EKFJJLIQ9FVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "IR9IGD8GU14R42G74LJSP42BDBVV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "content-length": "52", 
+                "x-amzn-requestid": "D9QCK6UGKPFLUN2EKFJJLIQ9FVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "35", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "x-amz-crc32": "401386058", 
-                "date": "Wed, 28 Dec 2016 15:42:48 GMT", 
+                "x-amz-crc32": "3248538233", 
+                "date": "Thu, 29 Dec 2016 18:45:09 GMT", 
                 "content-type": "application/x-amz-json-1.0"
             }
         }, 
         "TableNames": [
-            "c7n.DynamoDB.01", 
-            "c7n.DynamoDB.02"
+            "c7n.TestTable.01"
         ]
     }
 }

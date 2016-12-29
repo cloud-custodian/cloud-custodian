@@ -2,10 +2,10 @@
     "status_code": 200, 
     "data": {
         "Table": {
-            "TableArn": "arn:aws:dynamodb:us-east-1:185106417252:table/c7n.DynamoDB.01", 
+            "TableArn": "arn:aws:dynamodb:us-east-1:185106417252:table/c7n.TestTable.01", 
             "AttributeDefinitions": [
                 {
-                    "AttributeName": "Alpha", 
+                    "AttributeName": "c7n.Key", 
                     "AttributeType": "S"
                 }
             ], 
@@ -15,37 +15,37 @@
                 "ReadCapacityUnits": 5
             }, 
             "TableSizeBytes": 0, 
-            "TableName": "c7n.DynamoDB.01", 
+            "TableName": "c7n.TestTable.01", 
             "TableStatus": "ACTIVE", 
             "KeySchema": [
                 {
                     "KeyType": "HASH", 
-                    "AttributeName": "Alpha"
+                    "AttributeName": "c7n.Key"
                 }
             ], 
             "ItemCount": 0, 
             "CreationDateTime": {
-                "hour": 10, 
+                "hour": 13, 
                 "__class__": "datetime", 
                 "month": 12, 
-                "second": 40, 
-                "microsecond": 479000, 
+                "second": 53, 
+                "microsecond": 854000, 
                 "year": 2016, 
-                "day": 28, 
-                "minute": 18
+                "day": 29, 
+                "minute": 26
             }
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "Q60OCJUHV4RCA6HGVR6VGVELI7VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "957ES8FIC49KT1LEDNB01GIV6NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "Q60OCJUHV4RCA6HGVR6VGVELI7VV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "content-length": "434", 
+                "x-amzn-requestid": "957ES8FIC49KT1LEDNB01GIV6NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "440", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "x-amz-crc32": "2114092789", 
-                "date": "Wed, 28 Dec 2016 15:42:49 GMT", 
+                "x-amz-crc32": "1587128859", 
+                "date": "Thu, 29 Dec 2016 18:45:10 GMT", 
                 "content-type": "application/x-amz-json-1.0"
             }
         }
