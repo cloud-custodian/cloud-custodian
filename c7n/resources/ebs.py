@@ -25,8 +25,7 @@ from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    local_session, set_annotation, query_instances, chunks,
-    type_schema, worker)
+    local_session, set_annotation, chunks, type_schema, worker)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
@@ -272,15 +271,15 @@ class CopySnapshot(BaseAction):
                     SourceSnapshotId=r['SnapshotId'],
                     Description=r.get('Description', ''),
                     **params)['SnapshotId']
-                client.create_tags(
-                    Resources=[snapshot_id],
-                    Tags=r['Tags'])
-                r['CopiedSnapshot'] = snapshot_id
+                if r.get('Tags'):
+                    client.create_tags(
+                        Resources=[snapshot_id], Tags=r['Tags'])
+                r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
                 continue
 
-            copy_ids = [r['CopiedSnapshot'] for r in snapshot_set]
+            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
             self.log.debug(
                 "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
@@ -351,9 +350,8 @@ class AttachedInstanceFilter(ValueFilter):
 
     def get_instance_mapping(self, resources):
         instance_ids = [r['Attachments'][0]['InstanceId'] for r in resources]
-        instances = query_instances(
-            local_session(self.manager.session_factory),
-            InstanceIds=instance_ids)
+        instances = self.manager.get_resource_manager(
+            'ec2').get_resources(instance_ids)
         self.log.debug("Queried %d instances for %d volumes" % (
             len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
@@ -380,10 +378,7 @@ class FaultTolerantSnapshots(Filter):
         'type': 'fault-tolerant',
         'tolerant': True}]
     """
-    schema = type_schema(
-        'fault-tolerant',
-        tolerant={'type': 'boolean'})
-
+    schema = type_schema('fault-tolerant', tolerant={'type': 'boolean'})
     check_id = 'H7IgTzjTYb'
 
     def pull_check_results(self):
@@ -457,10 +452,10 @@ class CopyInstanceTags(BaseAction):
             instance_vol_map.setdefault(
                 v['Attachments'][0]['InstanceId'], []).append(v)
 
-        # TODO switch out to instance cache query
-        instance_map = {i['InstanceId']: i for i in query_instances(
-            local_session(self.manager.session_factory),
-            InstanceIds=instance_vol_map.keys())}
+        instance_map = {
+            i['InstanceId']: i for i in
+            self.manager.get_resource_manager('ec2').get_resources(
+                instance_vol_map.keys())}
 
         for i in instance_vol_map:
             try:
@@ -594,9 +589,9 @@ class EncryptInstanceVolumes(BaseAction):
 
         # Query instances to find current instance state
         self.instance_map = {
-            i['InstanceId']: i for i in query_instances(
-                local_session(self.manager.session_factory),
-                InstanceIds=instance_vol_map.keys())}
+            i['InstanceId']: i for i in
+            self.manager.get_resource_manager('ec2').get_resources(
+                instance_vol_map.keys(), cache=False)}
 
         with self.executor_factory(max_workers=10) as w:
             futures = {}

@@ -14,6 +14,7 @@
 from datetime import datetime, timedelta
 import json
 import logging
+import time
 import unittest
 import StringIO
 import zipfile
@@ -149,7 +150,9 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        self.assertEqual(list(mgr.logs(pl)), [])
+        start = 0L
+        end = long(time.time() * 1000)
+        self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data('test_cwe_trail', zdata=True)

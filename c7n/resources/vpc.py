@@ -340,6 +340,16 @@ class UnusedSecurityGroup(SGUsage):
     connections.
 
     Note this filter does not support classic security groups atm.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-groups-unused
+                resource: security-group
+                filters:
+                  - unused
     """
     schema = type_schema('unused')
 
@@ -358,6 +368,16 @@ class UsedSecurityGroup(SGUsage):
 
     This operates as a complement to the unused filter for multi-step
     workflows.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-groups-in-use
+                resource: security-group
+                filters:
+                  - used
     """
     schema = type_schema('used')
 
@@ -379,6 +399,16 @@ class Stale(Filter):
     Security groups only and will implicitly filter security groups.
 
     AWS Docs - https://goo.gl/nSj7VG
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: stale-security-groups
+                resource: security-group
+                filters:
+                  - stale
     """
     schema = type_schema('stale')
 
@@ -409,6 +439,18 @@ class Stale(Filter):
 
 @SecurityGroup.filter_registry.register('default-vpc')
 class SGDefaultVpc(DefaultVpcBase):
+    """Filter that returns any security group that exists within the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-group-default-vpc
+                resource: security-group
+                filters:
+                  - default-vpc
+    """
 
     schema = type_schema('default-vpc')
 
@@ -597,6 +639,19 @@ class SGPermission(Filter):
 
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
+    """Filter security groups by ingress (inbound) port(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-groups-ingress-https
+                resource: security-group
+                filters:
+                  - type: ingress
+                    OnlyPorts: [443]
+    """
 
     ip_permissions_key = "IpPermissions"
     schema = {
@@ -612,6 +667,22 @@ class IPPermission(SGPermission):
 
 @SecurityGroup.filter_registry.register('egress')
 class IPPermissionEgress(SGPermission):
+    """Filter security groups by egress (outbound) port(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-groups-egress-https
+                resource: security-group
+                filters:
+                  - type: egress
+                    Cidr:
+                      value: 24
+                      op: lt
+                      value_type: cidr_size
+    """
 
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
@@ -626,6 +697,23 @@ class IPPermissionEgress(SGPermission):
 
 @SecurityGroup.action_registry.register('delete')
 class Delete(BaseAction):
+    """Action to delete security group(s)
+
+    It is recommended to apply a filter to the delete policy to avoid the
+    deletion of all security groups returned.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-groups-unused-delete
+                resource: security-group
+                filters:
+                  - type: unused
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
@@ -637,7 +725,25 @@ class Delete(BaseAction):
 
 @SecurityGroup.action_registry.register('remove-permissions')
 class RemovePermissions(BaseAction):
+    """Action to remove ingress/egress rule(s) from a security group
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: security-group-revoke-8080
+                resource: security-group
+                filters:
+                  - type: ingress
+                    IpProtocol: tcp
+                    FromPort: 0
+                    GroupName: http-group
+                actions:
+                  - type: remove-permissions
+                    ingress: matched
+
+    """
     schema = type_schema(
         'remove-permissions',
         ingress={'type': 'string', 'enum': ['matched', 'all']},
@@ -686,12 +792,41 @@ class NetworkInterface(QueryResourceManager):
 
 @NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnetFilter(net_filters.SubnetFilter):
+    """Network interface subnet filter
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: network-interface-in-subnet
+                resource: eni
+                filters:
+                  - type: subnet
+                    key: CidrBlock
+                    value: 10.0.2.0/24
+    """
 
     RelatedIdsExpression = "SubnetId"
 
 
 @NetworkInterface.filter_registry.register('security-group')
 class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
+    """Network interface security group filter
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: network-interface-ssh
+                resource: eni
+                filters:
+                  - type: security-group
+                    match-resource: true
+                    key: FromPort
+                    value: 22
+    """
 
     RelatedIdsExpression = "Groups[].GroupId"
 
@@ -707,6 +842,24 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     Note an interface always gets at least one security group, so
     we also allow specification of an isolation/quarantine group
     that can be specified if there would otherwise be no groups.
+
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: network-interface-remove-group
+                resource: eni
+                filters:
+                  - type: security-group
+                    match-resource: true
+                    key: FromPort
+                    value: 22
+                actions:
+                  - type: remove-groups
+                    groups: matched
+                    isolation-group: sg-01ab23c4
     """
 
     def process(self, resources):
@@ -796,6 +949,7 @@ class CustomerGateway(QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "cgw-"
+
 
 @resources.register('internet-gateway')
 class InternetGateway(QueryResourceManager):

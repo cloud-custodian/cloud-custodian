@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cbde498f-bb27-11e6-bcbf-811e0cab1912", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cbde498f-bb27-11e6-bcbf-811e0cab1912", 
+                "date": "Mon, 05 Dec 2016 20:17:07 GMT", 
+                "content-length": "2201", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "nextForwardToken": "f/33014816595730403925425745940524256430317509568003309571", 
+        "events": [
+            {
+                "ingestionTime": 1480435546460, 
+                "timestamp": 1480435544699, 
+                "message": "2016-11-29 11:05:44,699 - INFO - custodian.policy - Provisioning policy lambda related-rds-test"
+            }, 
+            {
+                "ingestionTime": 1480435546460, 
+                "timestamp": 1480435545906, 
+                "message": "2016-11-29 11:05:45,906 - ERROR - custodian.output - Error while executing policy\nTraceback (most recent call last):\n  File \"/path/prefix/cloud-custodian/c7n/policy.py\", line 330, in provision\n    role=self.policy.options.assume_role)\n  File \"/path/prefix/cloud-custodian/c7n/mu.py\", line 221, in publish\n    func, role, s3_uri, qualifier=alias)\n  File \"/path/prefix/cloud-custodian/c7n/mu.py\", line 310, in _create_or_update\n    assert role, \"Lambda function role must be specified\"\nAssertionError: Lambda function role must be specified"
+            }, 
+            {
+                "ingestionTime": 1480435578085, 
+                "timestamp": 1480435573832, 
+                "message": "2016-11-29 11:06:13,832 - INFO - custodian.policy - Running policy related-rds-test resource: rds region:us-east-1 c7n:0.8.21.2"
+            }, 
+            {
+                "ingestionTime": 1480435578085, 
+                "timestamp": 1480435577455, 
+                "message": "2016-11-29 11:06:17,455 - INFO - custodian.resources.rds - Filtered from 1 to 1 rds"
+            }, 
+            {
+                "ingestionTime": 1480435578085, 
+                "timestamp": 1480435577455, 
+                "message": "2016-11-29 11:06:17,455 - INFO - custodian.policy - policy: related-rds-test resource:rds has count:1 time:3.59"
+            }, 
+            {
+                "ingestionTime": 1480435578085, 
+                "timestamp": 1480435577458, 
+                "message": "2016-11-29 11:06:17,458 - INFO - custodian.policy - policy: related-rds-test action: retentionwindow resources: 1 execution_time: 0.00"
+            }
+        ], 
+        "nextBackwardToken": "b/33014815865180291966761062408723755025559804657503174656"
+    }
+}

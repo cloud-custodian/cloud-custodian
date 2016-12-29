@@ -13,3 +13,6 @@ Actions
 
 ``delete``
   Delete AppELB
+
+  .. c7n-schema:: AppELBDeleteAction
+      :module: c7n.resources.appelb

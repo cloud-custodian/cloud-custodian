@@ -57,6 +57,10 @@ class ResourceManager(object):
         """Retrieve a set of resources by id."""
         return []
 
+    def get_resource_manager(self, resource_type, data=None):
+        klass = resources.get(resource_type)
+        return klass(self.ctx, data or {})
+
     def filter_resources(self, resources, event=None):
         original = len(resources)
         if event and event.get('debug', False):
