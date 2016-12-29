@@ -40,7 +40,17 @@ filters.register('marked-for-op', tags.TagActionFilter)
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
 
-    resource_type = "aws.redshift.cluster"
+    class resource_type(object):
+        service = 'redshift'
+        type = 'cluster'
+        enum_spec = ('describe_clusters', 'Clusters', None)
+        detail_spec = None
+        name = id = 'ClusterIdentifier'
+        filter_name = 'ClusterIdentifier'
+        filter_type = 'scalar'
+        date = 'ClusterCreateTime'
+        dimension = 'ClusterIdentifier'
+
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))

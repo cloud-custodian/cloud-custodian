@@ -16,7 +16,7 @@ import unittest
 import logging
 
 from c7n.log import CloudWatchLogHandler
-from .common import BaseTest
+from common import BaseTest
 
 
 class LogTest(BaseTest):

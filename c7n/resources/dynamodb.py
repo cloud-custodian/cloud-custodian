@@ -24,10 +24,17 @@ from concurrent.futures import as_completed
 @resources.register('dynamodb-table')
 class Table(QueryResourceManager):
 
-    resource_type = 'aws.dynamodb.table'
+    class resource_type(object):
+        service = 'dynamodb'
+        type = 'table'
+        enum_spec = ('list_tables', 'TableNames', None)
+        id = 'Table'
+        filter_name = None
+        name = 'TableName'
+        date = 'CreationDateTime'
+        dimension = 'TableName'
 
     def augment(self, resources):
-
         def _augment(resource_set):
             client = local_session(self.session_factory).client('dynamodb')
             return [client.describe_table(TableName=r)['Table']

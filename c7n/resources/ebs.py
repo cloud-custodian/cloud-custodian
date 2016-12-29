@@ -23,7 +23,7 @@ from c7n.filters import (
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.utils import (
     local_session, set_annotation, chunks, type_schema, worker)
 from c7n.resources.ami import AMI
@@ -37,17 +37,28 @@ actions = ActionRegistry('ebs.actions')
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
-    resource_type = "aws.ec2.snapshot"
-    id_field = 'SnapshotId'
-    report_fields = [
-        'SnapshotId',
-        'VolumeId',
-        'tag:InstanceId',
-        'VolumeSize',
-        'StartTime',
-        'State',
-    ]
-    
+    class resource_type(object):
+        service = 'ec2'
+        type = 'snapshot'
+        enum_spec = (
+            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+        detail_spec = None
+        id = 'SnapshotId'
+        filter_name = 'SnapshotIds'
+        filter_type = 'list'
+        name = 'SnapshotId'
+        date = 'StartTime'
+        dimension = None
+
+        default_report_fields = (
+            'SnapshotId',
+            'VolumeId',
+            'tag:InstanceId',
+            'VolumeSize',
+            'StartTime',
+            'State',
+        )
+
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
@@ -260,15 +271,15 @@ class CopySnapshot(BaseAction):
                     SourceSnapshotId=r['SnapshotId'],
                     Description=r.get('Description', ''),
                     **params)['SnapshotId']
-                client.create_tags(
-                    Resources=[snapshot_id],
-                    Tags=r['Tags'])
-                r['CopiedSnapshot'] = snapshot_id
+                if r.get('Tags'):
+                    client.create_tags(
+                        Resources=[snapshot_id], Tags=r['Tags'])
+                r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
                 continue
 
-            copy_ids = [r['CopiedSnapshot'] for r in snapshot_set]
+            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
             self.log.debug(
                 "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
@@ -282,18 +293,25 @@ class CopySnapshot(BaseAction):
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve("aws.ec2.volume")):
-        default_namespace = 'AWS/EBS'
+    class resource_type(object):
+        service = 'ec2'
+        type = 'volume'
+        enum_spec = ('describe_volumes', 'Volumes', None)
+        name = id = 'VolumeId'
+        filter_name = 'VolumeIds'
+        filter_type = 'list'
+        date = 'createTime'
+        dimension = 'VolumeId'
+        metrics_namespace = 'AWS/EBS'
         config_type = "AWS::EC::Volume"
+        default_report_fields = (
+            'VolumeId',
+            'Attachments[0].InstanceId',
+            'Size',
+            'VolumeType',
+            'KmsKeyId'
+        )
 
-    id_field = 'VolumeId'
-    report_fields = [
-        'VolumeId',
-        'Attachments[0].InstanceId',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
     filter_registry = filters
     action_registry = actions
 
@@ -378,7 +396,6 @@ class FaultTolerantSnapshots(Filter):
         if self.data.get('tolerant', True):
             return [r for r in resources if r['VolumeId'] not in flagged]
         return [r for r in resources if r['VolumeId'] in flagged]
-
 
 
 @actions.register('copy-instance-tags')

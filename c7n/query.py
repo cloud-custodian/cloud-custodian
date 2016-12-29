@@ -25,7 +25,6 @@ detail_spec
 import jmespath
 
 from botocore.client import ClientError
-from skew.resources import find_resource_class
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
@@ -42,7 +41,7 @@ class ResourceQuery(object):
     @staticmethod
     def resolve(resource_type):
         if not isinstance(resource_type, type):
-            m = find_resource_class(resource_type).Meta
+            raise ValueError(resource_type)
         else:
             m = resource_type
         return m
@@ -72,7 +71,6 @@ class ResourceQuery(object):
 
     def get(self, resource_type, identity):
         """Get resources by identities
-
         """
         m = self.resolve(resource_type)
         params = {}
