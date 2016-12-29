@@ -92,6 +92,25 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
 
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-delete-unused
+                resource: elb
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - Instances: []
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Unused ELB - No Instances: {op}@{action_date}"
+                    op: delete
+                    days: 7
+    """
 
     batch_size = 1
 
@@ -104,6 +123,22 @@ class TagDelayedAction(tags.TagDelayedAction):
 
 @actions.register('tag')
 class Tag(tags.Tag):
+    """Action to add tag(s) to ELB(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-add-owner-tag
+                resource: elb
+                filters:
+                  - "tag:OwnerName": missing
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
 
     batch_size = 1
 
@@ -117,6 +152,21 @@ class Tag(tags.Tag):
 
 @actions.register('remove-tag')
 class RemoveTag(tags.RemoveTag):
+    """Action to remove tag(s) from ELB(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-remove-old-tag
+                resource: elb
+                filters:
+                  - "tag:OldTagKey": present
+                actions:
+                  - type: remove-tag
+                    key: OldTagKey
+    """
 
     batch_size = 1
 
@@ -130,6 +180,23 @@ class RemoveTag(tags.RemoveTag):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete ELB(s)
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any load balancers.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-delete-unused
+                resource: elb
+                filters:
+                  - Instances: []
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
@@ -146,6 +213,23 @@ class Delete(BaseAction):
 
 @actions.register('set-ssl-listener-policy')
 class SetSslListenerPolicy(BaseAction):
+    """Action to set the ELB SSL listener policy
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-set-listener-policy
+                resource: elb
+                actions:
+                  - type: set-ssl-listener-policy
+                    name: SSLNegotiation-Policy-01
+                    attributes:
+                      - Protocol-SSLv3
+                      - Protocol-TLSv1.1
+                      - DHE-RSA-AES256-SHA256
+    """
 
     schema = type_schema(
         'set-ssl-listener-policy',
@@ -224,18 +308,34 @@ def is_ssl(b):
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+    """ELB security group filter"""
 
     RelatedIdsExpression = "SecurityGroups[]"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
+    """ELB subnet filter"""
 
     RelatedIdsExpression = "Subnets[]"
 
 
 @filters.register('instance')
 class Instance(ValueFilter):
+    """Filter ELB by an associated instance value(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-image-filter
+                resource: elb
+                filters:
+                  - type: instance
+                    key: ImageId
+                    value: ami-01ab23cd
+    """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
 
@@ -265,6 +365,18 @@ class Instance(ValueFilter):
 
 @filters.register('is-ssl')
 class IsSSLFilter(Filter):
+    """Filters ELB that are using a SSL policy
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-using-ssl
+                resource: elb
+                filters:
+                  - type: is-ssl
+    """
 
     schema = type_schema('is-ssl')
 
@@ -277,13 +389,24 @@ class SSLPolicyFilter(Filter):
     """Filter ELBs on the properties of SSLNegotation policies.
     TODO: Only works on custom policies at the moment.
 
-    filters:
-      - type: ssl-policy
+    whitelist: filter all policies containing permitted protocols
+    blacklist: filter all policies containing forbidden protocols
 
-        whitelist: []
-        blacklist:
-        - "Protocol-SSLv2"
-        - "Protocol-SSLv3"
+    Cannot specify both whitelist & blacklist in the same policy. These must
+    be done seperately (seperate policy statements).
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-ssl-policies
+                resource: elb
+                filters:
+                  - type: ssl-policy
+                    blacklist:
+                        - "Protocol-SSLv2"
+                        - "Protocol-SSLv3"
     """
 
     schema = {
@@ -424,7 +547,20 @@ class SSLPolicyFilter(Filter):
 
 @filters.register('healthcheck-protocol-mismatch')
 class HealthCheckProtocolMismatch(Filter):
-    """
+    """Filters ELB that have a healtch check protocol mismatch
+
+    The mismatch occurs if the ELB has a different protocol to check than
+    the associated instances allow to determine health status.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-healthcheck-mismatch
+                resource: elb
+                filters:
+                  - type: healthcheck-protocol-mismatch
     """
 
     schema = type_schema('healthcheck-protocol-mismatch')
@@ -449,6 +585,16 @@ class HealthCheckProtocolMismatch(Filter):
 @filters.register('default-vpc')
 class DefaultVpc(DefaultVpcBase):
     """ Matches if an elb database is in the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elb-default-vpc
+                resource: elb
+                filters:
+                  - type: default-vpc
     """
 
     schema = type_schema('default-vpc')
