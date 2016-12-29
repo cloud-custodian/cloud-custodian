@@ -20,10 +20,42 @@ from c7n.manager import resources
 @resources.register('hostedzone')
 class HostedZone(QueryResourceManager):
 
-    resource_type = 'aws.route53.hostedzone'
+    class resource_type(object):
+        service = 'route53'
+        type = 'hostedzone'
+        enum_spec = ('list_hosted_zones', 'HostedZones', None)
+        detail_spec = ('GetHostedZone', 'Id', None)
+        id = 'Id'
+        filter_name = None
+        name = 'Name'
+        date = None
+        dimension = None
 
 
 @resources.register('healthcheck')
 class HealthCheck(QueryResourceManager):
 
-    resource_type = 'aws.route53.healthcheck'
+    class resource_type(object):
+        service = 'route53'
+        type = 'healthcheck'
+        enum_spec = ('list_health_checks', 'HealthChecks', None)
+        detail_spec = ('GetHealthCheck', 'Id', None)
+        name = id = 'Id'
+        filter_name = None
+        date = None
+        dimension = None
+
+
+@resources.register('rrset')
+class ResourceRecordSet(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'route53'
+        type = 'rrset'
+        enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
+        name = id = 'Name'
+        filter_name = None
+        date = None
+        dimension = None
+
+

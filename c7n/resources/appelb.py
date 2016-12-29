@@ -39,7 +39,7 @@ class AppELB(QueryResourceManager):
     """Resource manager for v2 ELBs (AKA ALBs).
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'elbv2'
         type = 'app-elb'
@@ -52,7 +52,6 @@ class AppELB(QueryResourceManager):
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
 
-    resource_type = Meta
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
@@ -268,7 +267,7 @@ class AppELBTargetGroup(QueryResourceManager):
     """Resource manager for v2 ELB target groups.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'elbv2'
         type = 'app-elb-target-group'
@@ -280,7 +279,6 @@ class AppELBTargetGroup(QueryResourceManager):
         dimension = None
         date = None
 
-    resource_type = Meta
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')
     retry = staticmethod(get_retry(('Throttling',)))

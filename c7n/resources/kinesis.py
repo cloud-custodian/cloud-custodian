@@ -24,7 +24,16 @@ from c7n.utils import local_session, type_schema, chunks
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
 
-    resource_type = "aws.kinesis.stream"
+    class resource_type(object):
+        service = 'kinesis'
+        type = 'stream'
+        enum_spec = ('list_streams', 'StreamNames', None)
+        detail_spec = None
+        name = id = 'StreamName'
+        filter_name = None
+        filter_type = None
+        date = None
+        dimension = 'StreamName'
 
     def augment(self, resources):
 
@@ -64,7 +73,18 @@ class Delete(Action):
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
-    resource_type = "aws.firehose.deliverystream"
+    class resource_type(object):
+        service = 'firehose'
+        type = 'deliverystream'
+        enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', None)
+        detail_spec = (
+            'describe_delivery_stream', 'DeliveryStreamName',
+            'DeliveryStreamDescription')
+        name = id = 'DeliveryStreamName'
+        filter_name = None
+        filter_type = None
+        date = 'CreateTimestamp'
+        dimension = 'DeliveryStreamName'
 
     def augment(self, resources):
 
@@ -110,6 +130,8 @@ class AnalyticsApp(QueryResourceManager):
         name = "ApplicationName"
         id = "ApplicationARN"
         dimension = None
+        filter_name = None
+        filter_type = None
 
     def augment(self, resources):
         client = local_session(

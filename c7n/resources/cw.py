@@ -23,14 +23,22 @@ from c7n.utils import type_schema, local_session
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
 
-    resource_type = 'aws.cloudwatch.alarm'
+    class resource_type(object):
+        service = 'cloudwatch'
+        type = 'alarm'
+        enum_spec = ('describe_alarms', 'MetricAlarms', None)
+        id = 'AlarmArn'
+        filter_name = 'AlarmNames'
+        filter_type = 'list'
+        name = 'AlarmName'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        dimension = None
 
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
 
     class resource_type(object):
-
         service = 'events'
         type = 'event-rule'
         enum_spec = ('list_rules', 'Rules', None)
@@ -44,20 +52,16 @@ class EventRule(QueryResourceManager):
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
 
-    class Meta(object):
-
+    class resource_type(object):
         service = 'logs'
         type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
-
         name = 'logGroupName'
         id = 'arn'
         filter_name = 'logGroupNamePrefix'
         filter_type = 'scalar'
         dimension = 'LogGroupName'
         date = 'creationTime'
-
-    resource_type = Meta
 
 
 @LogGroup.action_registry.register('retention')

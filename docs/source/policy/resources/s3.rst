@@ -11,8 +11,14 @@ Filters
 ``global-grants``
   Check bucket acls for global grants
 
+  .. c7n-schema:: GlobalGrantsFilter
+      :module: c7n.resources.s3
+
 ``missing-policy-statement``
   Find buckets missing a set of named policy statements
+
+  .. c7n-schema:: MissingPolicyStatementFilter
+      :module: c7n.resources.s3
 
 Actions
 -------
@@ -20,13 +26,25 @@ Actions
 ``encrypt-keys``
   Scan all keys in a bucket and optionally encrypt them in place
 
+  .. c7n-schema:: EncryptExtantKeys
+      :module: c7n.resources.s3
+
 ``encryption-policy``
   Attach an encryption required policy to a bucket, this will break
   applications that are not using encryption, including AWS log
   delivery
 
+  .. c7n-schema:: EncryptionRequiredPolicy
+      :module: c7n.resources.s3
+
 ``delete-global-grants``
   Delete global grants from bucket ACLs
 
+  .. c7n-schema:: DeleteGlobalGrants
+      :module: c7n.resources.s3
+
 ``no-op``
   No operation
+
+  .. c7n-schema:: NoOp
+      :module: c7n.resources.s3

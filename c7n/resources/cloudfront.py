@@ -45,6 +45,21 @@ class StreamingDistribution(QueryResourceManager):
 @Distribution.filter_registry.register('metrics')
 @StreamingDistribution.filter_registry.register('metrics')
 class DistributionMetrics(MetricsFilter):
+    """Filter cloudfront distributions based on metric values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudfront-distribution-errors
+                resource: distribution
+                filters:
+                  - type: metrics
+                    name: Requests
+                    value: 3
+                    op: ge
+    """
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,

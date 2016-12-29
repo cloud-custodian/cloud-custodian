@@ -30,7 +30,17 @@ actions = ActionRegistry('cfn.actions')
 @resources.register('cfn')
 class CloudFormation(QueryResourceManager):
 
-    resource_type = "aws.cloudformation.stack"
+    class resource_type(object):
+        service = 'cloudformation'
+        type = 'stack'
+        enum_spec = ('describe_stacks', 'Stacks[]', None)
+        id = 'StackName'
+        filter_name = 'StackName'
+        filter_type = 'scalar'
+        name = 'StackName'
+        date = 'CreationTime'
+        dimension = None
+
     action_registry = actions
     filter_registry = filters
 
