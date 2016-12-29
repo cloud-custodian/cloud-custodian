@@ -299,3 +299,98 @@ class TestRedshiftSnapshot(BaseTest):
         tags = client.describe_tags(ResourceName=arn)['TaggedResources']
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertFalse('maid_status' in tag_map)
+
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+    def test_redshift_remove_matched_security_groups(self):
+        """
+        Test conditions:
+            - running 2 Redshift clusters in default VPC
+            - a default security group with id 'sg-7a3fcb13' exists
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is
+              attached to one of the clusters
+                - translates to 1 cluster marked non-compliant
+
+        Results in 2 clusters with default Security Group attached
+        """
+        session_factory = self.replay_flight_data('test_redshift_remove_matched_security_groups')
+        client = session_factory().client('redshift', region_name='ca-central-1')
+
+        p = self.load_policy(
+            {'name': 'redshift-remove-matched-security-groups',
+             'resource': 'redshift',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+             'actions': [
+                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': 'sg-7a3fcb13'}]
+             },
+        session_factory=session_factory)
+        clean_p = self.load_policy(
+            {'name': 'redshift-verify-remove-matched-security-groups',
+             'resource': 'redshift',
+             'filters': [
+                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}]
+             },
+        session_factory=session_factory)
+
+        resources = p.run()
+
+        waiter = client.get_waiter('cluster_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        # clusters autoscale across AZs, so they get -001, -002, etc appended
+        self.assertIn('test-sg-fail', resources[0]['ClusterIdentifier'])
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        # show that it was indeed a replacement of security groups
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources), 2)
+
+    def test_redshift_add_security_group(self):
+        """
+        Test conditions:
+            - running 2 redshift clusters in default VPC
+            - a default security group with id 'sg-7a3fcb13' exists - attached to both clusters
+            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 1/2
+              clusters
+                - translates to 1 cluster marked to get new group attached
+
+        Results in 1 cluster with default Security Group and PROD-ONLY-Test-Security-Group
+        """
+        session_factory = self.replay_flight_data('test_redshift_add_security_group')
+        client = session_factory().client('redshift', region_name='ca-central-1')
+
+        p = self.load_policy({
+            'name': 'add-sg-to-prod-redshift',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
+                {'type': 'value', 'key': 'ClusterIdentifier', 'value': 'test-sg-fail.*', 'op': 'regex'}
+            ],
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
+            ]
+        },
+            session_factory=session_factory)
+        clean_p = self.load_policy({
+            'name': 'validate-add-sg-to-prod-redshift',
+            'resource': 'redshift',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName', 'value': 'PROD-ONLY-Test-Security-Group'}
+            ]
+        },
+            session_factory=session_factory)
+
+        resources = p.run()
+        waiter = client.get_waiter('cluster_available')
+        waiter.wait()
+        clean_resources = clean_p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test-sg-fail', resources[0]['ClusterIdentifier'])
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 2)
+        self.assertEqual(len(clean_resources), 2)

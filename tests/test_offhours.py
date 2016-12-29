@@ -19,7 +19,7 @@ from dateutil import zoneinfo
 
 from mock import mock
 
-from .common import BaseTest, instance
+from common import BaseTest, instance
 
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time

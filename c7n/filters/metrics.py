@@ -111,7 +111,7 @@ class MetricsFilter(Filter):
 
         ns = self.data.get('namespace')
         if not ns:
-            ns = getattr(self.model, 'default_namespace', None)
+            ns = getattr(self.model, 'metrics_namespace', None)
             if not ns:
                 ns = self.DEFAULT_NAMESPACE[self.model.service]
         self.namespace = ns

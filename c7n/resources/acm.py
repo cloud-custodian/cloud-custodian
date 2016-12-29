@@ -20,7 +20,7 @@ from c7n.utils import local_session
 @resources.register('acm-certificate')
 class Certificate(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'acm'
         enum_spec = ('list_certificates', 'CertificateSummaryList', None)
         id = 'CertificateArn'
@@ -28,8 +28,6 @@ class Certificate(QueryResourceManager):
         date = 'CreatedAt'
         dimension = None
         config_type = "AWS::ACM::Certificate"
-
-    resource_type = Meta
 
     def augment(self, resources):
 

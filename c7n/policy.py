@@ -26,7 +26,14 @@ from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
+from c7n import mu
 from c7n import utils
+from c7n.logs_support import (
+    normalized_log_entries,
+    log_entries_in_range,
+    log_entries_from_s3,
+    log_entries_from_group,
+)
 from c7n.version import version
 
 from c7n.resources import load_resources
@@ -97,9 +104,9 @@ class PolicyExecutionMode(object):
     def provision(self):
         """Provision any resources needed for the policy."""
 
-    def get_logs(self, start, end, period):
+    def get_logs(self, start, end):
         """Retrieve logs for the policy"""
-        raise NotImplementedError("not yet")
+        raise NotImplementedError("subclass responsibility")
 
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
@@ -207,6 +214,41 @@ class PullMode(PolicyExecutionMode):
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
 
+    def get_logs(self, start, end):
+        log_source = self.policy.ctx.output
+        log_gen = ()
+        if self.policy.options.log_group is not None:
+            session = utils.local_session(self.policy.session_factory)
+            log_gen = log_entries_from_group(
+                session,
+                self.policy.options.log_group,
+                start,
+                end,
+            )
+        elif log_source.use_s3():
+            raw_entries = log_entries_from_s3(
+                self.policy.session_factory,
+                log_source,
+                start,
+                end,
+            )
+            # log files can be downloaded out of order, so sort on timestamp
+            # log_gen isn't really a generator once we do this, but oh well
+            log_gen = sorted(
+                normalized_log_entries(raw_entries),
+                key=lambda e: e.get('timestamp', 0),
+            )
+        else:
+            log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
+            with open(log_path) as log_fh:
+                raw_entries = log_fh.readlines()
+                log_gen = normalized_log_entries(raw_entries)
+        return log_entries_in_range(
+            log_gen,
+            start,
+            end,
+        )
+
 
 class LambdaMode(PolicyExecutionMode):
     """A policy that runs/executes in lambda."""
@@ -299,6 +341,15 @@ class LambdaMode(PolicyExecutionMode):
             return manager.publish(
                 PolicyLambda(self.policy), 'current',
                 role=self.policy.options.assume_role)
+
+    def get_logs(self, start, end):
+        manager = mu.LambdaManager(self.policy.session_factory)
+        log_gen = manager.logs(mu.PolicyLambda(self.policy), start, end)
+        return log_entries_in_range(
+            log_gen,
+            start,
+            end,
+        )
 
 
 class PeriodicMode(LambdaMode, PullMode):
@@ -448,6 +499,10 @@ class Policy(object):
         """Query resources and apply policy."""
         mode = self.get_execution_mode()
         return mode.run()
+
+    def get_logs(self, start, end):
+        mode = self.get_execution_mode()
+        return mode.get_logs(start, end)
 
     def get_metrics(self, start, end, period):
         mode = self.get_execution_mode()

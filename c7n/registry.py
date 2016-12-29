@@ -77,7 +77,7 @@ class PluginRegistry(object):
     def load_plugins(self):
         """ Load external plugins.
 
-        Maid is intended to interact with internal and external systems
+        Custodian is intended to interact with internal and external systems
         that are not suitable for embedding into the custodian code base.
         """
         from pkg_resources import iter_entry_points
