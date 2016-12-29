@@ -984,7 +984,7 @@ class RegionCopySnapshot(BaseAction):
     """
 
     schema = type_schema(
-        'copy',
+        'region-copy',
         target_region={'type': 'string'},
         target_key={'type': 'string'},
         copy_tags={'type': 'boolean'},
