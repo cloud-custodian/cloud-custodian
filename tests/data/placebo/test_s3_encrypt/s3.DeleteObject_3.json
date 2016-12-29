@@ -3,8 +3,15 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 204, 
-            "HostId": "4tGUCZfxHXh8peKDdFOEMNWeYnUpdJ9r14sQalR0m3vmKzSalvNn91vf6yZ5zVA5d2cbVdYYjek=", 
-            "RequestId": "513BEA51C0A7956A"
+            "RetryAttempts": 0, 
+            "HostId": "ZQ8SIzH5R61XFmV7P+zodvIlAYTgAzxaPFukcOMlZxCzojN2z2ZS4zQZIhCKXhHt/g2XD863nVQ=", 
+            "RequestId": "0B20195F41881D34", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ZQ8SIzH5R61XFmV7P+zodvIlAYTgAzxaPFukcOMlZxCzojN2z2ZS4zQZIhCKXhHt/g2XD863nVQ=", 
+                "date": "Tue, 20 Dec 2016 23:43:30 GMT", 
+                "x-amz-request-id": "0B20195F41881D34", 
+                "server": "AmazonS3"
+            }
         }
     }
 }

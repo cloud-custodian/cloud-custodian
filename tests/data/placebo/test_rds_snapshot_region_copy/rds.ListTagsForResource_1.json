@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b8767635-ccef-11e6-845f-c54dae0acb3d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b8767635-ccef-11e6-845f-c54dae0acb3d", 
+                "date": "Wed, 28 Dec 2016 11:21:03 GMT", 
+                "content-length": "556", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "mgmt-portal", 
+                "Key": "app"
+            }, 
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }, 
+            {
+                "Value": "staging", 
+                "Key": "env"
+            }
+        ]
+    }
+}

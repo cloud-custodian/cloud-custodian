@@ -1,0 +1,168 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 4, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 34
+                }, 
+                "Name": "c7n-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 7
+                }, 
+                "Name": "c7n-test-front"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 8
+                }, 
+                "Name": "calvin-encryption-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 15, 
+                    "minute": 0
+                }, 
+                "Name": "cf-templates-9c4kee3xbart-us-west-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 56
+                }, 
+                "Name": "custodian-demo"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 20, 
+                    "minute": 40
+                }, 
+                "Name": "custodian-encrypt-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 18
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 31
+                }, 
+                "Name": "scot-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 20, 
+                    "minute": 35
+                }, 
+                "Name": "sphere11-dev"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "9s5g24WzgTFJW2MeZgIo7eBGB4xfn6JY9xm6ggm3ntbHQ+rqtLIjs3bHbx/ELcLmjpnwvKgRgVM=", 
+            "RequestId": "254CD2E7D88562B2", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "9s5g24WzgTFJW2MeZgIo7eBGB4xfn6JY9xm6ggm3ntbHQ+rqtLIjs3bHbx/ELcLmjpnwvKgRgVM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "254CD2E7D88562B2", 
+                "date": "Tue, 20 Dec 2016 23:43:30 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ReplicationGroup": {
+            "Status": "modifying", 
+            "Description": "Demonstrates valid config options or \"correct behavior\"", 
+            "NodeGroups": [
+                {
+                    "Status": "available", 
+                    "NodeGroupMembers": [
+                        {
+                            "CurrentRole": "primary", 
+                            "PreferredAvailabilityZone": "ca-central-1a", 
+                            "CacheNodeId": "0001", 
+                            "ReadEndpoint": {
+                                "Port": 6379, 
+                                "Address": "sg-test-base-001.ewuuco.0001.cac1.cache.amazonaws.com"
+                            }, 
+                            "CacheClusterId": "sg-test-base-001"
+                        }, 
+                        {
+                            "CurrentRole": "replica", 
+                            "PreferredAvailabilityZone": "ca-central-1b", 
+                            "CacheNodeId": "0001", 
+                            "ReadEndpoint": {
+                                "Port": 6379, 
+                                "Address": "sg-test-base-002.ewuuco.0001.cac1.cache.amazonaws.com"
+                            }, 
+                            "CacheClusterId": "sg-test-base-002"
+                        }, 
+                        {
+                            "CurrentRole": "replica", 
+                            "PreferredAvailabilityZone": "ca-central-1b", 
+                            "CacheNodeId": "0001", 
+                            "ReadEndpoint": {
+                                "Port": 6379, 
+                                "Address": "sg-test-base-003.ewuuco.0001.cac1.cache.amazonaws.com"
+                            }, 
+                            "CacheClusterId": "sg-test-base-003"
+                        }
+                    ], 
+                    "NodeGroupId": "0001", 
+                    "PrimaryEndpoint": {
+                        "Port": 6379, 
+                        "Address": "sg-test-base.ewuuco.ng.0001.cac1.cache.amazonaws.com"
+                    }
+                }
+            ], 
+            "ReplicationGroupId": "sg-test-base", 
+            "SnapshotRetentionLimit": 0, 
+            "AutomaticFailover": "enabled", 
+            "SnapshotWindow": "01:00-02:00", 
+            "MemberClusters": [
+                "sg-test-base-001", 
+                "sg-test-base-002", 
+                "sg-test-base-003"
+            ], 
+            "PendingModifiedValues": {}
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "124cb38d-c7c5-11e6-bc0b-0df8dad410b5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "124cb38d-c7c5-11e6-bc0b-0df8dad410b5", 
+                "date": "Wed, 21 Dec 2016 21:33:11 GMT", 
+                "content-length": "2764", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
