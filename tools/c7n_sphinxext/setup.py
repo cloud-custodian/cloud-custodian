@@ -26,5 +26,4 @@ setup(
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={},
-    install_requires=["c7n"],
 )
