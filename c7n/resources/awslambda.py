@@ -25,7 +25,14 @@ from c7n.utils import local_session, type_schema
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
 
-    resource_type = "aws.lambda.function"
+    class resource_type(object):
+        service = 'lambda'
+        type = 'function'
+        enum_spec = ('list_functions', 'Functions', None)
+        name = id = 'FunctionName'
+        filter_name = None
+        date = 'LastModified'
+        dimension = 'FunctionName'
 
 
 @AWSLambda.filter_registry.register('security-group')
@@ -42,6 +49,8 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 @AWSLambda.filter_registry.register('event-source')
 class LambdaEventSource(ValueFilter):
+    # this uses iam policy, it should probably use
+    # event source mapping api
 
     annotation_key = "c7n.EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)

@@ -15,111 +15,23 @@
                         "PrefixListIds": []
                     }
                 ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "108.56.181.242/32"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-6c7fa917"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-6c7fa917"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-9a121ae1"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-28089a4f", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-9a121ae1"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "for quarantine", 
-                "IpPermissions": [], 
-                "GroupName": "quarantine-group", 
-                "VpcId": "vpc-28089a4f", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-98121ae3"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
                 "Description": "for apps", 
                 "IpPermissions": [], 
                 "GroupName": "web-tier", 
-                "VpcId": "vpc-28089a4f", 
+                "VpcId": "vpc-885c83ee", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-99121ae2"
+                "GroupId": "sg-734b600e"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "c52a85b3-160d-493a-9000-3a850a00d572", 
+            "RequestId": "ab2db525-6ed9-46d0-b810-98f567f886a7", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 23 Jul 2016 16:49:02 GMT"
+                "date": "Fri, 16 Dec 2016 22:06:11 GMT"
             }
         }
     }

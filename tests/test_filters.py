@@ -19,7 +19,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from .common import instance, event_data, Bag
+from common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -53,7 +53,6 @@ class TestFilter(unittest.TestCase):
     def test_filter_call(self):
         filter_instance = base_filters.Filter({})
         self.assertIsInstance(filter_instance, base_filters.Filter)
-        self.assertRaises(NotImplementedError, filter_instance, None)
 
 
 class TestOrFilter(unittest.TestCase):

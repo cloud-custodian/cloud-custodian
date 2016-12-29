@@ -14,7 +14,7 @@
 import jmespath
 from unittest import TestCase
 
-from .common import event_data
+from common import event_data
 
 from c7n.cwe import CloudWatchEvents
 

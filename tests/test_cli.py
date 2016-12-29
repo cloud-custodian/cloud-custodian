@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import os
 import shutil
 import sys
 import tempfile
 import yaml
 
-
+from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
 from c7n import cli, version
@@ -92,6 +93,18 @@ class CliTest(BaseTest):
         self.fail('Error: did not raise {}.'.format(exception))
 
 
+class UtilsTest(BaseTest):
+
+    def test_key_val_pair(self):
+        self.assertRaises(
+            ArgumentTypeError,
+            cli._key_val_pair,
+            'invalid option',
+        )
+        param = 'day=today'
+        self.assertIs(cli._key_val_pair(param), param)
+
+
 class VersionTest(CliTest):
 
     def test_version(self):
@@ -108,7 +121,8 @@ class ValidateTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'untag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'untag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(invalid_policies)
@@ -133,7 +147,8 @@ class ValidateTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'tag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(valid_policies)
@@ -217,7 +232,8 @@ class ReportTest(CliTest):
                 'name': 'foo',
                 'resource': 's3',
                 'filters': [{"tag:custodian_tagging": "not-null"}],
-                'actions': [{'type': 'tag', 'tags': ['custodian_cleanup']}],
+                'actions': [{'type': 'tag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
             }]
         }
         yaml_file = self.write_policy_file(valid_policies)
@@ -242,5 +258,26 @@ class LogsTest(CliTest):
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
         self.run_and_expect_exception(
-            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'logs', '-c', yaml_file, '-s', temp_dir],
             AssertionError)
+        p_data = {
+            'name': 'test-policy',
+            'resource': 'rds',
+            'filters': [
+                {
+                    'key': 'GroupName',
+                    'type': 'security-group',
+                    'value': 'default',
+                },
+            ],
+            'actions': [{'days': 10, 'type': 'retention'}],
+        }
+        yaml_file = self.write_policy_file({'policies': [p_data]})
+        output_dir = os.path.join(
+            os.path.dirname(__file__),
+            'data',
+            'logs',
+        )
+        self.run_and_expect_success(
+            ['custodian', 'logs', '-c', yaml_file, '-s', output_dir],
+        )

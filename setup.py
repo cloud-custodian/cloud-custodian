@@ -21,6 +21,6 @@ setup(
     entry_points={
         'console_scripts': [
             'custodian = c7n.cli:main']},
-    install_requires=["boto3", "pyyaml==3.11", "jsonschema", "skew", "ipaddress"],
+    install_requires=["boto3", "pyyaml", "jsonschema", "ipaddress"],
 )
 

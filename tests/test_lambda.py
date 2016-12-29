@@ -1,4 +1,4 @@
-from .common import BaseTest
+from common import BaseTest
 
 
 class LambdaTest(BaseTest):

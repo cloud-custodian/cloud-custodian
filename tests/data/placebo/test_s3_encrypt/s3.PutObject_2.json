@@ -4,8 +4,17 @@
         "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "fmj42d6s5unUfUvK8ce7fM5zfTQVaHweM8Aq+mx+N0quhmufKxYSBgGOtzp3sLdUzWnqNcKmeVs=", 
-            "RequestId": "408624FCCD3A1DBE"
+            "RetryAttempts": 0, 
+            "HostId": "yF7hLPmx64lWHBNJnsVmr2716pDU1iunGuYrWA8herdU9ODpfFu6w7iKZkFEz8lcJHRhDvmloA8=", 
+            "RequestId": "B0E745CEBE8006AD", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "yF7hLPmx64lWHBNJnsVmr2716pDU1iunGuYrWA8herdU9ODpfFu6w7iKZkFEz8lcJHRhDvmloA8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "B0E745CEBE8006AD", 
+                "etag": "\"5d41402abc4b2a76b9719d911017c592\"", 
+                "date": "Tue, 20 Dec 2016 23:43:28 GMT"
+            }
         }
     }
 }

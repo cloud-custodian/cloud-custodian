@@ -25,7 +25,6 @@ detail_spec
 import jmespath
 
 from botocore.client import ClientError
-from skew.resources import find_resource_class
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
@@ -42,7 +41,7 @@ class ResourceQuery(object):
     @staticmethod
     def resolve(resource_type):
         if not isinstance(resource_type, type):
-            m = find_resource_class(resource_type).Meta
+            raise ValueError(resource_type)
         else:
             m = resource_type
         return m
@@ -72,7 +71,6 @@ class ResourceQuery(object):
 
     def get(self, resource_type, identity):
         """Get resources by identities
-
         """
         m = self.resolve(resource_type)
         params = {}
@@ -127,6 +125,8 @@ class QueryResourceManager(ResourceManager):
     __metaclass__ = QueryMeta
 
     resource_type = ""
+    id_field = ""
+    report_fields = []
     retry = None
 
     def __init__(self, data, options):
@@ -172,7 +172,17 @@ class QueryResourceManager(ResourceManager):
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
-    def get_resources(self, ids):
+    def get_resources(self, ids, cache=True):
+        key = {'region': self.config.region,
+               'resource': str(self.__class__.__name__),
+               'q': None}
+        if cache and self._cache.load():
+            resources = self._cache.get(key)
+            if resources is not None:
+                self.log.debug("Using cached results for get_resources")
+                m = self.get_model()
+                id_set = set(ids)
+                return [r for r in resources if r[m.id] in id_set]
         try:
             resources = self.query.get(self.resource_type, ids)
             resources = self.augment(resources)
@@ -188,3 +198,8 @@ class QueryResourceManager(ResourceManager):
         s3 buckets.
         """
         return resources
+
+    def filter_record(self, record):
+        '''Filters records for report formatters'''
+        # Override in subclass if filtering needed.
+        return True

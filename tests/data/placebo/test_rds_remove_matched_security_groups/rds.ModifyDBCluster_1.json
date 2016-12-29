@@ -1,0 +1,95 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBCluster": {
+            "MasterUsername": "custodian", 
+            "ReaderEndpoint": "test-sg-fail-cluster.cluster-ro-ci3evidtom6k.ca-central-1.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-7a3fcb13"
+                }
+            ], 
+            "HostedZoneId": "Z1JG78A3UK1DU3", 
+            "Status": "available", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": {
+                "hour": 21, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 37, 
+                "microsecond": 146000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 58
+            }, 
+            "PreferredBackupWindow": "12:22-12:52", 
+            "DBSubnetGroup": "default", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "thu:06:44-thu:07:14", 
+            "Engine": "aurora", 
+            "Endpoint": "test-sg-fail-cluster.cluster-ci3evidtom6k.ca-central-1.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": {
+                "hour": 17, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 38, 
+                "microsecond": 244000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 58
+            }, 
+            "ClusterCreateTime": {
+                "hour": 17, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 47, 
+                "microsecond": 929000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 57
+            }, 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "test-sg-fail-cluster", 
+            "DbClusterResourceId": "cluster-J6N4HKCO4ZDHQO7JVWE3IMROOY", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": false, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 15, 
+                    "DBInstanceIdentifier": "test-sg-fail-ca-central-1a"
+                }, 
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 15, 
+                    "DBInstanceIdentifier": "test-sg-fail"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:ca-central-1:644160558196:cluster:test-sg-fail-cluster", 
+            "StorageEncrypted": false, 
+            "DatabaseName": "test_sg_db_fail", 
+            "DBClusterParameterGroup": "default.aurora5.6", 
+            "AvailabilityZones": [
+                "ca-central-1a", 
+                "ca-central-1b"
+            ], 
+            "Port": 3306
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f20acfaf-c7c8-11e6-9e36-15419dd28d7d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f20acfaf-c7c8-11e6-9e36-15419dd28d7d", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2914", 
+                "content-type": "text/xml", 
+                "date": "Wed, 21 Dec 2016 22:00:54 GMT"
+            }
+        }
+    }
+}
