@@ -227,3 +227,27 @@ class UtilTest(unittest.TestCase):
             utils.parse_s3('s3://things'),
             ('s3://things', 'things', ''),
         )
+
+    def test_reformat_schema(self):
+        # Not a real schema, just doing a smoke test of the function
+        properties = 'target'
+
+        class FakeResource(object):
+            schema = {
+                'additionalProperties': False,
+                'properties': {
+                    'default': {'type': 'object'},
+                    'key': {'type': 'string'},
+                    'op': {'enum': ['regex',
+                                    'ni',
+                                    'gt',
+                                    'not-in']},
+                    'value': {'oneOf': [{'type': 'array'},
+                                        {'type': 'string'},
+                                        {'type': 'boolean'},
+                                        {'type': 'number'}]},
+                }
+            }
+
+        ret = utils.reformat_schema(FakeResource)
+        self.assertEqual(ret, FakeResource.schema['properties'])

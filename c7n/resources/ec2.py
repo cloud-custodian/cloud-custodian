@@ -30,7 +30,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -45,22 +45,30 @@ actions.register('auto-tag-user', AutoTagUser)
 @resources.register('ec2')
 class EC2(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve("aws.ec2.instance")):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        detail_spec = None
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
         config_type = "AWS::EC2::Instance"
+        shape = "Instance"
 
-    id_field = 'InstanceId'
-    report_fields = [
-        'CustodianDate',
-        'InstanceId',
-        'tag:Name',
-        'InstanceType',
-        'LaunchTime',
-        'VpcId',
-        'PrivateIpAddress',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
+
     filter_registry = filters
     action_registry = actions
 
@@ -832,13 +840,12 @@ class Snapshot(BaseAction):
                 copy_tags = []
 
             tags.extend(copy_tags)
-
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
                 Tags=tags)
-                
+
 
 @actions.register('modify-security-groups')
 class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):

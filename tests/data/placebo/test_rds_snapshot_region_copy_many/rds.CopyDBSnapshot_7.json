@@ -1,0 +1,22 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "1b7f84f7-ccfe-11e6-8344-05bf2038f462", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1b7f84f7-ccfe-11e6-8344-05bf2038f462", 
+                "date": "Wed, 28 Dec 2016 13:04:03 GMT", 
+                "content-length": "300", 
+                "content-type": "text/xml", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Cannot copy more than 5 snapshots across regions", 
+            "Code": "SnapshotQuotaExceeded", 
+            "Type": "Sender"
+        }
+    }
+}

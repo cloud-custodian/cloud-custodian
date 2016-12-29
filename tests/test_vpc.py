@@ -215,7 +215,8 @@ class SecurityGroupTest(BaseTest):
         # Find the ID of the default security group.
         default_sg_id = client.describe_security_groups(Filters=[
             {'Name': 'vpc-id', 'Values': [vpc_id]},
-            {'Name': 'group-name', 'Values': ['default']}])['SecurityGroups'][0]['GroupId']
+            {'Name': 'group-name', 'Values': ['default']}]
+            )['SecurityGroups'][0]['GroupId']
 
         sg1_id = client.create_security_group(
             GroupName='sg1',
@@ -593,19 +594,3 @@ class SecurityGroupTest(BaseTest):
               u'PrefixListIds': [],
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
-
-
-class VpcTest(BaseTest):
-
-    def test_subnets(self):
-        factory = self.replay_flight_data(
-            'test_vpc_subnets_filter')
-        p = self.load_policy({
-            'name': 'empty-vpc-test',
-            'resource': 'vpc',
-            'filters': [
-                {'type': 'subnets',
-                 'value': []}]},
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)

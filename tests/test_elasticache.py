@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tests.common import BaseTest
+from common import BaseTest
 
 
 class TestElastiCacheCluster(BaseTest):
@@ -257,17 +257,16 @@ class TestElastiCacheSnapshot(BaseTest):
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_elasticache_remove_matched_security_groups(self):
-        """
-        Test conditions:
-            - running 2 Elasticache replication group in default VPC with 3 clusters
-                - translates to 6 clusters
-            - a default security group with id 'sg-7a3fcb13' exists
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one replication
-              group
-                - translates to 3 clusters marked non-compliant
-
-        Results in 6 clusters with default Security Group attached
-        """
+        #
+        # Test conditions:
+        #    - running 2 Elasticache replication group in default VPC with 3 clusters
+        #        - translates to 6 clusters
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one replication
+        #      group
+        #        - translates to 3 clusters marked non-compliant
+        #
+        # Results in 6 clusters with default Security Group attached
         session_factory = self.replay_flight_data('test_elasticache_remove_matched_security_groups')
         client = session_factory().client('elasticache', region_name='ca-central-1')
 
@@ -304,15 +303,14 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources), 6)
 
     def test_elasticache_add_security_group(self):
-        """
-        Test conditions:
-            - running Elasticache replication group in default VPC with 3 clusters
-            - a default security group with id 'sg-7a3fcb13' exists
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is not attached
-                - translates to 3 clusters marked to get new group attached
+        # Test conditions:
+        #   - running Elasticache replication group in default VPC with 3 clusters
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is not attached
+        #        - translates to 3 clusters marked to get new group attached
+        #
+        # Results in 3 clusters with default Security Group and PROD-ONLY-Test-Security-Group
 
-        Results in 3 clusters with default Security Group and PROD-ONLY-Test-Security-Group
-        """
         session_factory = self.replay_flight_data('test_elasticache_add_security_group')
         client = session_factory().client('elasticache', region_name='ca-central-1')
 

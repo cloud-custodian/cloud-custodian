@@ -17,8 +17,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.policy import Policy
 from c7n.reports.csvout import Formatter
-from .common import Config
-from .common import load_data
+from common import Config, load_data
 
 
 EC2_POLICY = Policy(
@@ -51,16 +50,15 @@ class TestEC2Report(unittest.TestCase):
             (['minimal'], ['minimal']),
             (['full', 'minimal'], ['full', 'minimal']),
             (['full', 'duplicate', 'minimal'], ['full', 'minimal']),
-            (['full', 'terminated', 'minimal'], ['full', 'minimal'])]
+            (['full', 'terminated', 'minimal'], ['full', 'minimal'])
+        ]
         for rec_ids, row_ids in tests:
             recs = map(lambda x: self.records[x], rec_ids)
             rows = map(lambda x: self.rows[x], row_ids)
             self.assertEqual(formatter.to_csv(recs), rows)
 
     def test_custom_fields(self):
-        """
-        Test the ability to include custom fields.
-        """
+        # Test the ability to include custom fields.
         extra_fields = [
             "custom_field=CustomField",
             "missing_field=MissingField",

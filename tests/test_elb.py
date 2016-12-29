@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .common import BaseTest
+from common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
@@ -199,7 +199,8 @@ class TestDefaultVpc(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['LoadBalancerName'], 'test-load-balancer')
+        self.assertEqual(
+            resources[0]['LoadBalancerName'], 'test-load-balancer')
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
@@ -207,8 +208,10 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_elb_remove_security_groups(self):
         # Test conditions:
         #   - running ELB in default VPC
-        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is attached to test ELB
-        session_factory = self.replay_flight_data('test_elb_remove_security_groups')
+        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is
+        #     attached to test ELB
+        session_factory = self.replay_flight_data(
+            'test_elb_remove_security_groups')
         client = session_factory().client('ec2')
         default_sg_id = client.describe_security_groups(
             GroupNames=[
@@ -219,30 +222,37 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
             {'name': 'elb-modify-security-groups-filter',
              'resource': 'elb',
              'filters': [
-                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+                 {'type': 'security-group', 'key': 'GroupName',
+                  'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
              'actions': [
-                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': default_sg_id}]
+                 {'type': 'modify-security-groups', 'remove': 'matched',
+                  'isolation-group': default_sg_id}]
              },
-        session_factory=session_factory)
+            session_factory=session_factory)
 
         resources = p.run()
         clean_resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['LoadBalancerName'], 'test-load-balancer')
+        self.assertEqual(
+            resources[0]['LoadBalancerName'], 'test-load-balancer')
         self.assertEqual(len(clean_resources), 0)
 
     def test_elb_add_security_group(self):
         # Test conditions:
         #   - running one ELB with 'default' VPC security group attached
-        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is not attached to ELB
-        session_factory = self.replay_flight_data('test_elb_add_security_group')
+        #   - security group named TEST-PROD-ONLY-SG exists in VPC and is not
+        #     attached to ELB
+        session_factory = self.replay_flight_data(
+            'test_elb_add_security_group')
 
         policy = self.load_policy({
             'name': 'add-sg-to-prod-elb',
             'resource': 'elb',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'value', 'key': 'LoadBalancerName', 'value': 'test-load-balancer'}],
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'value', 'key': 'LoadBalancerName',
+                 'value': 'test-load-balancer'}],
             'actions': [
                 {'type': 'modify-security-groups', 'add': 'sg-411b413c'}
             ]
@@ -257,20 +267,24 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_elb_add_security_groups(self):
         # Test conditions:
         #   - running one ELB with 'default' VPC security group attached
-        #   - security groups named TEST-PROD-ONLY-SG, TEST-SG1, and TEST-SG2 exist in VPC - not attached to ELB
+        #   - security groups named TEST-PROD-ONLY-SG, TEST-SG1, and TEST-SG2
+        #     exist in VPC - not attached to ELB
 
-        session_factory = self.replay_flight_data('test_elb_add_security_groups')
+        session_factory = self.replay_flight_data(
+            'test_elb_add_security_groups')
         policy = self.load_policy({
             'name': 'add-sgs-to-prod-elb',
             'resource': 'elb',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'value', 'key': 'LoadBalancerName', 'value': 'test-load-balancer'}],
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'value', 'key': 'LoadBalancerName',
+                 'value': 'test-load-balancer'}],
             'actions': [
-                {'type': 'modify-security-groups', 'add': ['sg-411b413c', 'sg-8a4b64f7', 'sg-5d4a6520']}
-            ]
-        },
-        session_factory=session_factory)
+                {'type': 'modify-security-groups', 'add': [
+                    'sg-411b413c', 'sg-8a4b64f7', 'sg-5d4a6520']}
+            ]},
+            session_factory=session_factory)
 
         resources = policy.run()
         self.assertEqual(len(resources[0]['SecurityGroups']), 1)
@@ -280,8 +294,10 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
     def test_elb_remove_all_security_groups(self):
         # Test conditions:
-        #   - running one ELB with 'default' and 'TEST-PROD-ONLY-SG' VPC security groups attached
-        session_factory = self.replay_flight_data('test_elb_remove_all_security_groups')
+        #   - running one ELB with 'default' and 'TEST-PROD-ONLY-SG' VPC
+        #     security groups attached
+        session_factory = self.replay_flight_data(
+            'test_elb_remove_all_security_groups')
         client = session_factory().client('ec2')
 
         default_sg_id = client.describe_security_groups(
@@ -294,16 +310,18 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
             'name': 'add-sg-to-prod-elb',
             'resource': 'elb',
             'filters': [
-                {'type': 'value', 'key': 'LoadBalancerName', 'value': 'test-load-balancer'}],
+                {'type': 'value', 'key': 'LoadBalancerName',
+                 'value': 'test-load-balancer'}],
             'actions': [
-                {'type': 'modify-security-groups', 'remove': 'all', 'isolation-group': default_sg_id},
-            ]
-        },
-        session_factory=session_factory)
+                {'type': 'modify-security-groups', 'remove': 'all',
+                 'isolation-group': default_sg_id},
+            ]},
+            session_factory=session_factory)
 
         resources = policy.run()
         self.assertEqual(len(resources[0]['SecurityGroups']), 2)
         after_resources = policy.run()
         self.assertEqual(len(after_resources[0]['SecurityGroups']), 1)
         # Check that it is indeed the isolation group on the ELB
-        self.assertEqual(after_resources[0]['SecurityGroups'][0], default_sg_id)
+        self.assertEqual(
+            after_resources[0]['SecurityGroups'][0], default_sg_id)
