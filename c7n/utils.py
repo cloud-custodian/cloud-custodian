@@ -261,21 +261,29 @@ def snapshot_identifier(prefix, db_identifier):
     return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
 
 
-def get_retry(codes=(), max_attempts=8):
-    """Retry a boto3 api call on transient errors.
+def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
+    """Decorator for retry boto3 api call on transient errors.
 
     https://www.awsarchitectureblog.com/2015/03/backoff.html
     https://en.wikipedia.org/wiki/Exponential_backoff
 
-    :param codes: A sequence of retryable error codes
+    :param codes: A sequence of retryable error codes.
+    :param max_attempts: The max number of retries, by default the delay
+           time is proportional to the max number of attempts.
+    :param log_retries: Whether we should log retries, if specified
+           specifies the level at which the retry should be logged.
+    :param _max_delay: The maximum delay for any retry interval *note*
+           this parameter is only exposed for unit testing, as its
+           derived from the number of attempts.
 
-    returns a function for invoking aws client calls that
+    Returns a function for invoking aws client calls that
     retries on retryable error codes.
     """
-    max_delay = 2 ** max_attempts
+    max_delay = max(min_delay, 2) ** max_attempts
 
     def _retry(func, *args, **kw):
-        for idx, delay in enumerate(backoff_delays(1, max_delay, jitter=True)):
+        for idx, delay in enumerate(
+                backoff_delays(min_delay, max_delay, jitter=True)):
             try:
                 return func(*args, **kw)
             except ClientError as e:
@@ -283,6 +291,11 @@ def get_retry(codes=(), max_attempts=8):
                     raise
                 elif idx == max_attempts - 1:
                     raise
+                if log_retries:
+                    worker_log.log(
+                        log_retries,
+                        "retrying %s on error:%s attempt:%d last delay:%0.2f",
+                        func, e.response['Error']['Code'], idx, delay)
             time.sleep(delay)
     return _retry
 

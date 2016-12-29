@@ -260,15 +260,15 @@ class CopySnapshot(BaseAction):
                     SourceSnapshotId=r['SnapshotId'],
                     Description=r.get('Description', ''),
                     **params)['SnapshotId']
-                client.create_tags(
-                    Resources=[snapshot_id],
-                    Tags=r['Tags'])
-                r['CopiedSnapshot'] = snapshot_id
+                if r.get('Tags'):
+                    client.create_tags(
+                        Resources=[snapshot_id], Tags=r['Tags'])
+                r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
                 continue
 
-            copy_ids = [r['CopiedSnapshot'] for r in snapshot_set]
+            copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
             self.log.debug(
                 "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
@@ -378,7 +378,6 @@ class FaultTolerantSnapshots(Filter):
         if self.data.get('tolerant', True):
             return [r for r in resources if r['VolumeId'] not in flagged]
         return [r for r in resources if r['VolumeId'] in flagged]
-
 
 
 @actions.register('copy-instance-tags')
