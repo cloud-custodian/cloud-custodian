@@ -112,7 +112,6 @@ class LaunchConfigFilterBase(object):
 @filters.register('security-group')
 class SecurityGroupFilter(
         net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
-    """Filters ASG based on security group"""
 
     RelatedIdsExpression = ""
 
@@ -130,7 +129,6 @@ class SecurityGroupFilter(
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
-    """Filters ASG based on associated subnet"""
 
     RelatedIdsExpression = ""
 
@@ -528,6 +526,9 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
 class VpcIdFilter(ValueFilter):
     """Filters ASG based on the VpcId
 
+    This filter is available as a ValueFilter as the vpc-id is not natively
+    associated to the results from describing the autoscaling groups.
+
     :example:
 
         .. code-block: yaml
@@ -636,7 +637,7 @@ class CapacityDelta(Filter):
 class Resize(BaseAction):
     """Action to resize the min/max instances in an ASG
 
-    Resizing of scaling groups desired/minimum size is limited to the
+    **Note:** Resizing of scaling groups desired/minimum size is limited to the
     current size of the autoscaling group(s).
 
     :example:
@@ -742,6 +743,10 @@ class RemoveTag(BaseAction):
 @actions.register('mark')
 class Tag(BaseAction):
     """Action to add a tag to an ASG
+
+    The *propagate* parameter can be used to specify that the tag being added
+    will need to be propagated down to each ASG instance associated or simply
+    to the ASG itself.
 
     :example:
 
@@ -1323,7 +1328,7 @@ class UnusedLaunchConfig(Filter):
 
 @LaunchConfig.action_registry.register('delete')
 class LaunchConfigDelete(BaseAction):
-    """Filters all launch configurations that are current not being used
+    """Filters all unused launch configurations
 
     :example:
 
