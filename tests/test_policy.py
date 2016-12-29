@@ -190,6 +190,36 @@ class TestPolicy(BaseTest):
         self.assertTrue(
             isinstance(p.get_resource_manager(), EC2))
 
+    def test_get_logs_from_group(self):
+        p_data = {
+            'name': 'related-rds-test',
+            'resource': 'rds',
+            'filters': [
+                {
+                    'key': 'GroupName',
+                    'type': 'security-group',
+                    'value': 'default',
+                },
+            ],
+            'actions': [{'days': 10, 'type': 'retention'}],
+        }
+        session_factory = self.replay_flight_data('test_logs_from_group')
+        config = {'log_group': 'test-logs'}
+        policy = self.load_policy(p_data, config, session_factory)
+        logs = list(
+            policy.get_logs('2016-11-01 00:00:00', '2016-11-30 11:59:59')
+        )
+        self.assertEqual(len(logs), 6)
+        # entries look reasonable
+        entry = logs[1]
+        self.assertIn('timestamp', entry)
+        self.assertIn('message', entry)
+        # none in range
+        logs = list(
+            policy.get_logs('2016-10-01 00:00:00', '2016-10-31 11:59:59')
+        )
+        self.assertEqual(len(logs), 0)
+
     def xtest_policy_run(self):
         manager.resources.register('dummy', DummyResource)
         self.addCleanup(manager.resources.unregister, 'dummy')

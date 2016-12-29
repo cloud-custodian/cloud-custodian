@@ -40,6 +40,7 @@ import c7n
 
 # Static event mapping to help simplify cwe rules creation
 from c7n.cwe import CloudWatchEvents
+from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
 
@@ -287,7 +288,7 @@ class LambdaManager(object):
                     f['Metrics'] = m
         return results
 
-    def logs(self, func):
+    def logs(self, func, start, end):
         logs = self.session_factory().client('logs')
         group_name = "/aws/lambda/%s" % func.name
         log.info("Fetching logs from group: %s" % group_name)
@@ -306,9 +307,15 @@ class LambdaManager(object):
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
                 return
             raise
+        start = _timestamp_from_string(start)
+        end = _timestamp_from_string(end)
         for s in reversed(log_streams['logStreams']):
             result = logs.get_log_events(
-                logGroupName=group_name, logStreamName=s['logStreamName'])
+                logGroupName=group_name,
+                logStreamName=s['logStreamName'],
+                startTime=start,
+                endTime=end,
+            )
             for e in result['events']:
                 yield e
 
