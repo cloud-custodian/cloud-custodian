@@ -17,6 +17,7 @@ import time
 from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
+from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
@@ -439,6 +440,34 @@ class RDSSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DBSnapshotIdentifier'],
                          'rds:originb-2016-12-28-09-15')
+
+    def test_rds_cross_region_copy_lambda(self):
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'rds-copy-fail',
+             'resource': 'rds-snapshot',
+             'mode': {
+                 'type': 'config-rule'},
+             'actions': [{
+                 'type': 'region-copy',
+                 'target_region': 'us-east-2'}]})
+
+    def test_rds_cross_region_copy_skip_same_region(self):
+        self.change_environment(AWS_DEFAULT_REGION='us-east-2')
+        factory = self.replay_flight_data('test_rds_snapshot_latest')
+        output = self.capture_logging('custodian.actions')
+        p = self.load_policy({
+            'name': 'rds-copy-skip',
+            'resource': 'rds-snapshot',
+             'actions': [{
+                 'type': 'region-copy',
+                 'target_region': 'us-east-2'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertFalse([r for r in resources if 'c7n:CopiedSnapshot' in r])
+        self.assertIn('Source and destination region are the same',
+                      output.getvalue())
 
     def test_rds_cross_region_copy_many(self):
         # preconditions

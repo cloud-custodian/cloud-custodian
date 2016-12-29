@@ -997,8 +997,8 @@ class RegionCopySnapshot(BaseAction):
 
     def process(self, resources):
         if self.data['target_region'] == self.manager.config.region:
-            self.log.info(
-                "Source and destination region are the same, skipping")
+            self.log.warning(
+                "Source and destination region are the same, skipping copy")
             return
         for resource_set in chunks(resources, 20):
             self.process_resource_set(resource_set)
