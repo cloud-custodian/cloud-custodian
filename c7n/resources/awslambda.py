@@ -25,45 +25,32 @@ from c7n.utils import local_session, type_schema
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
 
-    resource_type = "aws.lambda.function"
+    class resource_type(object):
+        service = 'lambda'
+        type = 'function'
+        enum_spec = ('list_functions', 'Functions', None)
+        name = id = 'FunctionName'
+        filter_name = None
+        date = 'LastModified'
+        dimension = 'FunctionName'
 
 
 @AWSLambda.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
-    """Security group filter"""
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
 
 
 @AWSLambda.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
-    """Subnet filter"""
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
 @AWSLambda.filter_registry.register('event-source')
 class LambdaEventSource(ValueFilter):
-    """Filter Lambda functions by event source
-
-    An event source is the entity that publishes events
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: lambda-iot-delete
-                resource: lambda
-                filters:
-                  - type: event-source
-                    value: 'iot.amazonaws.com'
-                    key: ''
-                    value_type: swap
-                    op: in
-                actions:
-                  - type: delete
-    """
+    # this uses iam policy, it should probably use
+    # event source mapping api
 
     annotation_key = "c7n.EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
@@ -155,24 +142,17 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
 
-    It is recommended to apply a filter to the delete function to avoid
-    deletion of all lambda functions.
-
     :example:
 
         .. code-block: yaml
 
             policies:
-              - name: lambda-iot-delete
+              - name: lambda-delete-dotnet-functions
                 resource: lambda
                 filters:
-                  - type: event-source
-                    value: 'iot.amazonaws.com'
-                    key: ''
-                    value_type: swap
-                    op: in
+                  - Runtime: dotnetcore1.0
                 actions:
-                  - type: delete
+                  - delete
     """
     schema = type_schema('delete')
 
