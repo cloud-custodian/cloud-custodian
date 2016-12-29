@@ -26,6 +26,8 @@ actions = ActionRegistry('emr.actions')
 
 @resources.register('emr')
 class EMRCluster(QueryResourceManager):
+    """Resource manager for Elastic MapReduce clusters
+    """
 
     action_registry = actions
 
@@ -85,6 +87,23 @@ class EMRCluster(QueryResourceManager):
 
 @actions.register('terminate')
 class Terminate(BaseAction):
+    """Action to terminate EMR cluster(s)
+
+    It is recommended to apply a filter to the terminate action to avoid
+    termination of all EMR clusters
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-terminate
+                resource: emr
+                query:
+                  - ClusterStates: [STARTING, BOOTSTRAPPING, RUNNING, WAITING]
+                actions:
+                  - terminate
+    """
 
     schema = type_schema('terminate', force={'type': 'boolean'})
     delay = 5
