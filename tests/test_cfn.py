@@ -37,14 +37,3 @@ class TestCFN(BaseTest):
             'resource': 'cfn'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(resources, [])
-
-    def test_value_filter(self):
-        session = self.replay_flight_data('test_cfn_value_filter')
-        policy = self.load_policy({
-            'name': 'cfn-filter-status',
-            'resource': 'cfn',
-            'filters': [{
-                'StackStatus': 'ROLLBACK_COMPLETE'}]}, session_factory=session)
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['StackName'], 'TestStack-2')
