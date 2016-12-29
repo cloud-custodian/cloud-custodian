@@ -95,14 +95,12 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
-    """Filter ELB by security group"""
 
     RelatedIdsExpression = "SecurityGroups[]"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
-    """Filter ELB by associated subnet"""
 
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
@@ -271,21 +269,7 @@ class AppELBTargetGroupFilterBase(object):
 
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
-    """Filter to pull ELBs with matching listeners
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: appelb-https-listener
-                resource: app-elb
-                filters:
-                  - type: listener
-                    key: length([?Protocol=='HTTPS'])
-                    value: 1
-                    op: gte
-    """
+    """Filter ALB based on matching listener attributes"""
 
     schema = type_schema('listener', rinherit=ValueFilter.schema)
 
@@ -334,21 +318,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
 
 @filters.register('target-group')
 class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
-    """Filter ELB by their target group
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: appelb-target-group
-                resource: app-elb
-                filters:
-                  - type: target-group
-                    key: length([?Protocol=='HTTPS'])
-                    value: 1
-                    op: eq
-    """
+    """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
 
