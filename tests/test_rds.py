@@ -410,6 +410,36 @@ class RDSTest(BaseTest):
 
 class RDSSnapshotTest(BaseTest):
 
+    def test_rds_latest_manual(self):
+        # preconditions
+        # one db with manual and automatic snapshots
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_latest')
+        p = self.load_policy({
+            'name': 'rds-latest-snaps',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'type': 'latest', 'automatic': False},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBSnapshotIdentifier'],
+                         'originb')
+
+    def test_rds_latest(self):
+        # preconditions
+        # one db with manual and automatic snapshots
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_latest')
+        p = self.load_policy({
+            'name': 'rds-latest-snaps',
+            'resource': 'rds-snapshot',
+            'filters': ['latest']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBSnapshotIdentifier'],
+                         'rds:originb-2016-12-28-09-15')
+
     def test_rds_cross_region_copy_many(self):
         # preconditions
         # rds snapshot, encrypted in region with kms, and tags

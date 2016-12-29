@@ -43,7 +43,9 @@ Find rds instances that are not encrypted
 
 """
 import functools
+import itertools
 import logging
+import operator
 import re
 
 from distutils.version import LooseVersion
@@ -799,6 +801,25 @@ def _rds_snap_tags(
 
     with executor_factory(max_workers=1) as w:
         return filter(None, (w.map(process_tags, snaps)))
+
+
+@RDSSnapshot.filter_registry.register('latest')
+class LatestSnapshot(Filter):
+    """Return the latest snapshot for each database.
+    """
+    schema = type_schema('latest', automatic={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        results = []
+        if not self.data.get('automatic', True):
+            resources = [r for r in resources if r['SnapshotType'] == 'manual']
+        for db_identifier, snapshots in itertools.groupby(
+                resources, operator.itemgetter('DBInstanceIdentifier')):
+            results.append(
+                sorted(snapshots,
+                       key=operator.itemgetter('SnapshotCreateTime'))[-1])
+        return results
+
 
 
 @RDSSnapshot.filter_registry.register('age')
