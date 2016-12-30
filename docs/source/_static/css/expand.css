@@ -1,0 +1,24 @@
+.toggle .header {
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  color:#eb2a82;
+  cursor:pointer;
+  display:block;
+  font-size:1em;
+  margin-bottom:1em;
+  padding-bottom:0.25em;
+  text-decoration:none
+}
+
+.toggle .header:before {
+  font-size:0.7em;
+  content:"\25BA"
+}
+
+.toggle .header.open:before {
+  font-size:0.7em;
+  content:"\25BC";
+  margin-right:0.5em
+}

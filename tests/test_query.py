@@ -14,6 +14,7 @@
 import logging
 
 from c7n.query import ResourceQuery
+from c7n.resources.ec2 import EC2
 from c7n.resources.vpc import InternetGateway
 
 from common import BaseTest
@@ -24,14 +25,14 @@ class ResourceQueryTest(BaseTest):
     def test_query_filter(self):
         session_factory = self.replay_flight_data('test_query_filter')
         q = ResourceQuery(session_factory)
-        resources = q.filter('aws.ec2.instance')
+        resources = q.filter(EC2.resource_type)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_get(self):
         session_factory = self.replay_flight_data('test_query_get')
         q = ResourceQuery(session_factory)
-        resources = q.get('aws.ec2.instance', ['i-9432cb49'])
+        resources = q.get(EC2.resource_type, ['i-9432cb49'])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 

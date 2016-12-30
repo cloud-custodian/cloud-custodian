@@ -25,13 +25,12 @@ import time
 
 import yaml
 
-from c7n.credentials import SessionFactory
 from c7n.policy import Policy, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
 from c7n.resources import load_resources
-from c7n import mu, schema
+from c7n import schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -139,14 +138,7 @@ def logs(options, policies):
     assert len(policies) == 1, "Only one policy log at a time"
     policy = policies.pop()
 
-    if not policy.is_lambda:
-        log.debug('lambda only atm')
-        return
-
-    session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
-    manager = mu.LambdaManager(session_factory)
-    for e in manager.logs(mu.PolicyLambda(policy)):
+    for e in policy.get_logs(options.start, options.end):
         print("%s: %s" % (
             time.strftime(
                 "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),

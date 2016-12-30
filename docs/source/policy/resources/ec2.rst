@@ -43,28 +43,52 @@ Filters
 Filter by State Transition Filter
   Filter instances by state (see `Instance Lifecycle <http://goo.gl/TZH9Q5>`_)
 
+  .. c7n-schema:: AttachedVolume
+      :module: c7n.resources.ec2
+
 ``image-age``
   Filter on the age of the instance AMI based on the ``ImageId`` ``CreationDate``
 
+  .. c7n-schema:: ImageAge
+      :module: c7n.resources.ec2
+
 ``image``
   Filter on the ImageId of the instance
+
+  .. c7n-schema:: InstanceImage
+      :module: c7n.resources.ec2
 
 ``offhour``
   Filter for
   :py:class:`c7n.resources.ec2.InstanceOffHour`
 
+  .. c7n-schema:: InstanceOffHour
+      :module: c7n.resources.ec2
+
 ``onhour``
   Filter for
   :py:class:`c7n.resources.ec2.InstanceOnHour`
 
+  .. c7n-schema:: InstanceOnHour
+      :module: c7n.resources.ec2
+
 ``ephemeral``
   Filter for instances that have ephemeral drives
+
+  .. c7n-schema:: EphemeralInstanceFilter
+      :module: c7n.resources.ec2
 
 ``instance-uptime``
   Filter based on instance ``LaunchTime`` in days
 
+  .. c7n-schema:: UpTimeFilter
+      :module: c7n.resources.ec2
+
 ``instance-age``
   Filter based on the ``AttachTime`` of the EBS Volumes in days
+
+  .. c7n-schema:: InstanceAgeFilter
+      :module: c7n.resources.ec2
 
 Actions
 -------
@@ -89,6 +113,9 @@ Start
   Start a set of instances (presumably) already stopped, the start action will automatically
   filter instances to those that are already in the correct state.
 
+  .. c7n-schema:: Start
+      :module: c7n.resources.ec2
+
   This example will restart all stopped instances.
 
   .. code-block:: yaml
@@ -102,11 +129,20 @@ Start
 Stop
   Will stop the instances. Stopped instances do not incur EC2 instance costs.
 
+  .. c7n-schema:: Stop
+      :module: c7n.resources.ec2
+
 Terminate
   Will terminate the instances. Use with caution!
 
+  .. c7n-schema:: Terminate
+      :module: c7n.resources.ec2
+
 Snapshot
   Snapshots the instances' attached EBS volumes.
+
+  .. c7n-schema:: Snapshot
+      :module: c7n.resources.ec2
 
   This example will create snapshots for all instances and copy the Owner tag value
   from the instance to the new snapshot.

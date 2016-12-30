@@ -1,0 +1,84 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "launch-wizard-1 created 2016-10-11T08:37:50.939-04:00", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "launch-wizard-1", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-926a56e8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "PrefixListIds": []
+                    }
+                ], 
+                "Description": "SG created to test EC2 Security Group Filters", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "204.63.44.148/32"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": []
+                    }
+                ], 
+                "GroupName": "TEST-PROD-ONLY-SG", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-411b413c"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "11cc7cb4-9b4b-4837-8000-ea18643f2460", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 16 Dec 2016 21:55:04 GMT"
+            }
+        }
+    }
+}
