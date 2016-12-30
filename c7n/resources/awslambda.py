@@ -112,7 +112,8 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
                 resource: lambda
                 filters:
                   - type: cross-account
-                    whitelist: *allowed-accounts
+                    whitelist:
+                      - 'IAM-Policy-Cross-Account-Access'
     """
 
     def process(self, resources, event=None):
