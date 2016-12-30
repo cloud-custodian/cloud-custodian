@@ -46,8 +46,22 @@ class Table(QueryResourceManager):
                 *w.map(_augment, chunks(resources, 20))))
 
 
+class StatusFilter(object):
+    """Filter tables by status"""
+
+    valid_states = ()
+
+    def filter_table_state(self, tables, states=None):
+        states = states or self.valid_states
+        orig_count = len(tables)
+        result = [t for t in tables if t['TableStatus'] in states]
+        self.log.info("%s %d of %d tables" % (
+            self.__class__.__name__, len(result), orig_count))
+        return result
+
+
 @Table.action_registry.register('delete')
-class DeleteTable(BaseAction):
+class DeleteTable(BaseAction, StatusFilter):
     """Action to delete dynamodb tables
 
     :example:
@@ -63,6 +77,7 @@ class DeleteTable(BaseAction):
                   - delete
     """
 
+    valid_status = ('ACTIVE',)
     schema = type_schema('delete')
 
     def delete_table(self, table_set):
@@ -71,6 +86,11 @@ class DeleteTable(BaseAction):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
+        resources = self.filter_table_state(
+            resources, self.valid_status)
+        if not len(resources):
+            return
+
         for table_set in chunks(resources, 20):
             with self.executor_factory(max_workers=3) as w:
                 futures = []

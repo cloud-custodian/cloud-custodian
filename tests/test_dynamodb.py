@@ -54,4 +54,4 @@ class DynamodbTest(BaseTest):
             'actions': [{
                 'type': 'delete'}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(resources[0]['TableName'], 'c7n.TestTable.01')
+        self.assertEqual(resources[0]['TableName'], 'c7n.DynamoDB.01')
