@@ -27,10 +27,6 @@ from c7n.query import ResourceManager
 from c7n.utils import local_session, type_schema
 
 
-filters = FilterRegistry('aws.health.actions')
-actions = ActionRegistry('aws.health.filters')
-
-
 def get_health_events(session_factory):
     session = local_session(session_factory)
     client = session.client('health')
@@ -40,9 +36,7 @@ def get_health_events(session_factory):
 
 @resources.register('health')
 class HealthEvents(ResourceManager):
-
-    filter_registry = filters
-    action_registry = actions
+    """Resource manager for AWS health events"""
 
     class resource_type(object):
         service = 'health'
