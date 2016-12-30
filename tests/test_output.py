@@ -46,7 +46,7 @@ class S3OutputTest(unittest.TestCase):
             ExecutionContext(
                 None,
                 Bag(name="xyz"),
-                Config.empty(output_dir="s3://cloud-maid/policies")))
+                Config.empty(output_dir="s3://cloud-custodian/policies")))
         self.addCleanup(shutil.rmtree, output.root_dir)
 
         return output
@@ -63,7 +63,7 @@ class S3OutputTest(unittest.TestCase):
 
         l.info('hello world')
         output.leave_log()
-        logging.getLogger('maid.s3').info('byebye')
+        logging.getLogger('c7n.s3').info('byebye')
 
         # Reset logging.manager back to nose configured value
         l.manager.disable = v
@@ -103,7 +103,7 @@ class S3OutputTest(unittest.TestCase):
         output.upload()
 
         m.assert_called_with(
-            fh.name, 'cloud-maid',
+            fh.name, 'cloud-custodian',
             'policies/xyz/%s/foo.txt' % output.date_path ,
             extra_args={
                 'ServerSideEncryption': 'AES256'})
@@ -120,7 +120,7 @@ class S3OutputTest(unittest.TestCase):
         output.upload()
 
         m.assert_called_with(
-            fh.name, 'cloud-maid',
+            fh.name, 'cloud-custodian',
             'policies/xyz/%s/foo.txt' % output.date_path,
             extra_args={
                 'ServerSideEncryption': 'AES256'})
