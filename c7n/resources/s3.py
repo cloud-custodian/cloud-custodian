@@ -525,7 +525,7 @@ class ToggleLogging(BucketActionBase):
     """
 
     schema = type_schema(
-        'enable-logging',
+        'toggle-logging',
         enabled={'type': 'boolean'},
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'},
