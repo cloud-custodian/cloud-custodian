@@ -47,28 +47,27 @@ both of these special values are best effort, ie. if no OwnerContact tag is spec
 then `resource-owner` email will not be delivered, and in the case of `event-owner` an
 instance role or system account will not result in an email.
 
+For reference purposes, the jsonschema of the notify action:
 
-For reference purposes the jsonschema of the notify action.
-
-```
-
+```json
 {
-'type': 'object',
-'required': ['type', 'transport', 'to'],
-'properties': {
-  'type': {'enum': ['notify']},
-  'to': {'type': 'array', 'items': {'type': 'string'}},
-  'subject': {'type': 'string'},
-  'template': {'type': 'string'},
-  'transport': {
-   	  'type': 'object',
-	  'required': ['type', 'queue'],
-	  'properties': {
- 	    'queue': {'type': 'string'},
-		'region': {'type': 'string'},
-		'type': {'enum': ['sqs']}}
-		}
-	}
+  "type": "object",
+  "required": ["type", "transport", "to"],
+  "properties": {
+    "type": {"enum": ["notify"]},
+    "to": {"type": "array", "items": {"type": "string"}},
+    "subject": {"type": "string"},
+    "template": {"type": "string"},
+    "transport": {
+      "type": "object",
+      "required": ["type", "queue"],
+      "properties": {
+        "queue": {"type": "string"},
+        "region": {"type": "string"},
+        "type": {"enum": ["sqs"]}
+      }
+    }
+  }
 }
 ```
 
