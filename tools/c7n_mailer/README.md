@@ -35,17 +35,22 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/80101010101/cloud-custodian-message-relay
 ```
 
-So breaking it down, you add an action of type notify. You can specify a template that's
-used to format the email. Customizing templates is describe below.
+So breaking it down, you add an action of type notify. You can specify a
+template that's used to format the email. Customizing templates is describe
+below.
 
-The `to` list specifies the intendend recipient for the email. You can specify either
-an email address, sns topic, or a special value. The special values are either
-`resource-owner` in which case the email will be sent to the listed OwnerContact tag
-on the resource that matched the policy, or `event-owner` for push based/real time policies
-that will send to the user to the that was responsible for the underlying event. *Note*
-both of these special values are best effort, ie. if no OwnerContact tag is specified
-then `resource-owner` email will not be delivered, and in the case of `event-owner` an
-instance role or system account will not result in an email.
+The `to` list specifies the intended recipient for the email. You can specify
+either an email address, sns topic, or a special value. The special values are
+either
+
+- `resource-owner`, in which case the email will be sent to the listed
+  `OwnerContact` tag on the resource that matched the policy, or
+- `event-owner` for push based/real time policies that will send to the user
+  that was responsible for the underlying event.
+
+Both of these special values are best effort, i.e., if no `OwnerContact` tag is
+specified then `resource-owner` email will not be delivered, and in the case of
+`event-owner` an instance role or system account will not result in an email.
 
 For reference purposes, the jsonschema of the notify action:
 
