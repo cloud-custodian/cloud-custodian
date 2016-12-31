@@ -1,21 +1,20 @@
 # Custodian Mailer
 
-A mailer implementation for custodian. Outbound mail delivery
-is still somewhat organization specific, so this at the moment
-serves primarily as an example implementation.
+A mailer implementation for Custodian. Outbound mail delivery is still somewhat
+organization-specific, so this at the moment serves primarily as an example
+implementation.
+
 
 ## Email Message Relay
 
-Subscribes to sqs queue, lookups users, and sends email via ses.
-
-Custodian lambda and instance policies can send to it, sqs queues
-should be cross account enabled for sending between accounts.
+Custodian Mailer subscribes to an SQS queue, looks up users, and sends email
+via SES. Custodian lambda and instance policies can send to it. SQS queues
+should be cross-account enabled for sending between accounts.
 
 
 ## Configuring a policy to send email
 
-Outbound email can be added to any policy by including the notify
-action.
+Outbound email can be added to any policy by including the `notify` action.
 
 ```yaml
 
@@ -35,24 +34,24 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/80101010101/cloud-custodian-message-relay
 ```
 
-So breaking it down, you add an action of type notify. You can specify a
-template that's used to format the email. Customizing templates is describe
-below.
+So breaking it down, you add an action of type `notify`. You can specify a
+template that's used to format the email; customizing templates is described
+[below](#writing-an-email-template).
 
 The `to` list specifies the intended recipient for the email. You can specify
-either an email address, sns topic, or a special value. The special values are
-either
+either an email address, an SNS topic, or a special value. The special values
+are either
 
 - `resource-owner`, in which case the email will be sent to the listed
   `OwnerContact` tag on the resource that matched the policy, or
-- `event-owner` for push based/real time policies that will send to the user
+- `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
 `event-owner` an instance role or system account will not result in an email.
 
-For reference purposes, the jsonschema of the notify action:
+For reference purposes, the JSON Schema of the `notify` action:
 
 ```json
 {
@@ -82,9 +81,9 @@ For reference purposes, the jsonschema of the notify action:
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).
 Drop a file with the `.j2` extension into the
 [`msg-templates`](./msg-templates) directory, and send a pull request to this
-repo. You can then reference it in the notify action as the `template` variable
-by file name minus extension. Templates ending with `.html.j2` are sent as html
-formatted emails, all others are sent as plain text.
+repo. You can then reference it in the `notify` action as the `template`
+variable by file name minus extension. Templates ending with `.html.j2` are
+sent as HTML-formatted emails, all others are sent as plain text.
 
 The following variables are available when rendering templates:
 
@@ -93,7 +92,7 @@ The following variables are available when rendering templates:
 | `recipient` | email address |
 | `resources` | list of resources that matched the policy filters |
 | `event` | for CWE-push-based lambda policies, the event that triggered |
-| `action` | notify action that generated this sqs message |
+| `action` | `notify` action that generated this SQS message |
 | `policy` | policy that triggered this notify action |
 | `account` | short name of the aws account |
 
