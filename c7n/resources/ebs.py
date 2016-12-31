@@ -71,7 +71,7 @@ class SnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: ebs-snapshots-week-old
@@ -116,7 +116,7 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
@@ -148,7 +148,7 @@ class SnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
@@ -211,7 +211,7 @@ class CopySnapshot(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: copy-snapshot-east-west
@@ -322,7 +322,7 @@ class AttachedInstanceFilter(ValueFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: instance-ebs-volumes
@@ -413,7 +413,7 @@ class CopyInstanceTags(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: ebs-copy-instance-tags
@@ -773,7 +773,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-unattached-volumes
