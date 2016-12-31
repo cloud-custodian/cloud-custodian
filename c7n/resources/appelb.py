@@ -107,6 +107,25 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 @actions.register('mark-for-op')
 class AppELBMarkForOpAction(tags.TagDelayedAction):
+    """Action to create a delayed action on an ELB to start at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-failed-mark-for-op
+                resource: app-elb
+                filters:
+                  - "tag:custodian_elb_cleanup": absent
+                  - State: failed
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_elb_cleanup
+                    msg: "AppElb failed: {op}@{action_date}"
+                    op: delete
+                    days: 1
+    """
 
     batch_size = 1
 
@@ -119,6 +138,22 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
 
 @actions.register('tag')
 class AppELBTagAction(tags.Tag):
+    """Action to create tag/tags on an ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-create-required-tag
+                resource: app-elb
+                filters:
+                  - "tag:RequiredTag": absent
+                actions:
+                  - type: tag
+                    key: RequiredTag
+                    value: RequiredValue
+    """
 
     batch_size = 1
 
@@ -131,6 +166,21 @@ class AppELBTagAction(tags.Tag):
 
 @actions.register('remove-tag')
 class AppELBRemoveTagAction(tags.RemoveTag):
+    """Action to remove tag/tags from an ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-delete-expired-tag
+                resource: app-elb
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["ExpiredTag"]
+    """
 
     batch_size = 1
 
@@ -143,6 +193,23 @@ class AppELBRemoveTagAction(tags.RemoveTag):
 
 @actions.register('delete')
 class AppELBDeleteAction(BaseAction):
+    """Action to delete an ELB
+
+    To avoid unwanted deletions of ELB, it is recommended to apply a filter
+    to the rule
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-delete-failed-elb
+                resource: app-elb
+                filters:
+                  - State: failed
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
@@ -202,8 +269,7 @@ class AppELBTargetGroupFilterBase(object):
 
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
-    """
-    """
+    """Filter ALB based on matching listener attributes"""
 
     schema = type_schema('listener', rinherit=ValueFilter.schema)
 
@@ -219,7 +285,20 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 @filters.register('healthcheck-protocol-mismatch')
 class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
-    """
+    """Filter AppELBs with mismatched health check protocols
+
+    A mismatched health check protocol is where the protocol on the target group
+    does not match the load balancer health check protocol
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-healthcheck-mismatch
+                resource: app-elb
+                filters:
+                  - healthcheck-protocol-mismatch
     """
 
     schema = type_schema('healthcheck-protocol-mismatch')
@@ -239,8 +318,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
 
 @filters.register('target-group')
 class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
-    """
-    """
+    """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
 
@@ -255,6 +333,18 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 @filters.register('default-vpc')
 class AppELBDefaultVpcFilter(DefaultVpcBase):
+    """Filter all ELB that exist within the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-in-default-vpc
+                resource: app-elb
+                filters:
+                  - default-vpc
+    """
 
     schema = type_schema('default-vpc')
 
@@ -346,6 +436,7 @@ def _remove_target_group_tags(target_groups, session_factory, tag_keys):
 
 @AppELBTargetGroup.action_registry.register('mark-for-op')
 class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
+    """Action to specify a delayed action on an ELB target group"""
 
     batch_size = 1
 
@@ -358,6 +449,22 @@ class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
 
 @AppELBTargetGroup.action_registry.register('tag')
 class AppELBTargetGroupTagAction(tags.Tag):
+    """Action to create tag/tags on an ELB target group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroup-add-required-tag
+                resource: app-elb-target-group
+                filters:
+                  - "tag:RequiredTag": absent
+                actions:
+                  - type: tag
+                    key: RequiredTag
+                    value: RequiredValue
+    """
 
     batch_size = 1
 
@@ -370,6 +477,21 @@ class AppELBTargetGroupTagAction(tags.Tag):
 
 @AppELBTargetGroup.action_registry.register('remove-tag')
 class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
+    """Action to remove tag/tags from ELB target group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroup-remove-expired-tag
+                resource: app-elb-target-group
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["ExpiredTag"]
+    """
 
     batch_size = 1
 
@@ -382,6 +504,18 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
 class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+    """Filter all application elb target groups within the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroups-default-vpc
+                resource: app-elb-target-group
+                filters:
+                  - default-vpc
+    """
 
     schema = type_schema('default-vpc')
 
