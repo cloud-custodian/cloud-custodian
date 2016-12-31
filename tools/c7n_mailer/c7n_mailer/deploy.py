@@ -76,7 +76,7 @@ def get_archive(config):
 def provision(config, session_factory):
     func_config = dict(
         name='cloud-custodian-mailer',
-        description='Cloud Custodian/Maid Mailer',
+        description='Cloud Custodian Mailer',
         handler='periodic.dispatch',
         runtime='python2.7',
         memory_size=config['memory'],

@@ -227,7 +227,7 @@ class SchemaTest(BaseTest):
                  'filters': [
                      {'tag:aws:autoscaling:groupName': 'absent'},
                      {'type': 'offhour',
-                      'tag': 'maid_downtime',
+                      'tag': 'c7n_downtime',
                       'default_tz': 'et',
                       'offhour': 19}]
                  }]
