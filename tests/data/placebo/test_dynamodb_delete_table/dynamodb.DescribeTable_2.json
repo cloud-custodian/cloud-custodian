@@ -1,0 +1,53 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Table": {
+            "TableArn": "arn:aws:dynamodb:us-east-1:185106417252:table/c7n.DynamoDB.02", 
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "c7n.PrimaryKey.02", 
+                    "AttributeType": "S"
+                }
+            ], 
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0, 
+                "WriteCapacityUnits": 10, 
+                "ReadCapacityUnits": 10
+            }, 
+            "TableSizeBytes": 0, 
+            "TableName": "c7n.DynamoDB.02", 
+            "TableStatus": "CREATING", 
+            "KeySchema": [
+                {
+                    "KeyType": "HASH", 
+                    "AttributeName": "c7n.PrimaryKey.02"
+                }
+            ], 
+            "ItemCount": 0, 
+            "CreationDateTime": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 7, 
+                "microsecond": 688000, 
+                "year": 2016, 
+                "day": 30, 
+                "minute": 23
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9Q36J4HEECT2IRB1ULRN4F5T6FVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9Q36J4HEECT2IRB1ULRN4F5T6FVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "462", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "2446686484", 
+                "date": "Fri, 30 Dec 2016 15:23:08 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

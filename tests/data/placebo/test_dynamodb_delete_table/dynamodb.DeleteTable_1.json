@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TableDescription": {
+            "TableArn": "arn:aws:dynamodb:us-east-1:185106417252:table/c7n.DynamoDB.01", 
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0, 
+                "WriteCapacityUnits": 5, 
+                "ReadCapacityUnits": 5
+            }, 
+            "TableSizeBytes": 0, 
+            "TableName": "c7n.DynamoDB.01", 
+            "TableStatus": "DELETING", 
+            "ItemCount": 0
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5JBU4D6PIETPF86JDF82HE47PBVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5JBU4D6PIETPF86JDF82HE47PBVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "283", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "781155639", 
+                "date": "Fri, 30 Dec 2016 15:23:08 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}
