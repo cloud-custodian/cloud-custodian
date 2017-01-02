@@ -95,6 +95,26 @@ class LambdaEventSource(ValueFilter):
 
 @AWSLambda.filter_registry.register('cross-account')
 class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filters lambda functions with cross-account permissions
+
+    The whitelist parameter can be used to prevent certain accounts from being
+    included in the results (essentially stating that these accounts permissions
+    are allowed to exist)
+
+    This can be useful when combining this filter with the delete action.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-cross-account
+                resource: lambda
+                filters:
+                  - type: cross-account
+                    whitelist:
+                      - 'IAM-Policy-Cross-Account-Access'
+    """
 
     def process(self, resources, event=None):
 
@@ -122,6 +142,18 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 @AWSLambda.action_registry.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-delete-dotnet-functions
+                resource: lambda
+                filters:
+                  - Runtime: dotnetcore1.0
+                actions:
+                  - delete
     """
     schema = type_schema('delete')
 
