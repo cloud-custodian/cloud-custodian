@@ -64,7 +64,7 @@ Links
 #####
 
 - `Docs <http://www.capitalone.io/cloud-custodian/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/quickstart/developer.html>`_
+- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
 
 
 Quick Install
