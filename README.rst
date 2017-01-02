@@ -63,7 +63,8 @@ Features
 Links
 #####
 
-- `Docs <http://www.capitalone.io/cloud-custodian/>`_
+- `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
+- `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
 - `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
 
 
