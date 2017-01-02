@@ -105,11 +105,11 @@ Action = BaseAction
 
 class ModifyVpcSecurityGroupsAction(BaseAction):
     """Common actions for modifying security groups on a resource
-    
+
     Can target either physical groups as a list of group ids or
     symbolic groups like 'matched' or 'all'. 'matched' uses
     the annotations of the 'security-group' interface filter.
-    
+
     Note an interface always gets at least one security group, so
     we mandate the specification of an isolation/quarantine group
     that can be specified if there would otherwise be no groups.
@@ -119,25 +119,33 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         remove: [] | matched
         isolation-group: sg-xyz
     """
-
-    schema = utils.type_schema(
-        'modify-security-groups',
-        **{
-        'add': {'oneOf': [{'type': 'string', 'pattern': '^sg-*'},
-                          {'type': 'array', 'items': {
-                              'pattern': '^sg-*',
-                              'type': 'string'}}]},
-        'remove': {'oneOf': [
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}},
-            {'enum': ['matched', 'all',
-                      {'type': 'string', 'pattern': '^sg-*'}]}]},
-        'isolation-group': {
-            'oneOf': [
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-security-groups']},
+            'add': {'oneOf': [
                 {'type': 'string', 'pattern': '^sg-*'},
-                {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}}]}
+                {'type': 'array', 'items': {
+                    'pattern': '^sg-*',
+                    'type': 'string'}}]},
+            'remove': {'oneOf': [
+                {'type': 'array', 'items': {
+                    'type': 'string', 'pattern': '^sg-*'}},
+                {'enum': [
+                    'matched', 'all',
+                    {'type': 'string', 'pattern': '^sg-*'}]}]},
+            'isolation-group': {'oneOf': [
+                {'type': 'string', 'pattern': '^sg-*'},
+                {'type': 'array', 'items': {
+                    'type': 'string', 'pattern': '^sg-*'}}]}},
+        'oneOf': [
+            {'required': ['isolation-group', 'remove']},
+            {'required': ['add', 'remove']},
+            {'required': ['add']}]
         }
-    )
 
+    # TODO this method can go away, after merging #785
     def validate(self):
         """ Validate the schema for modify-security-groups action
 
@@ -153,7 +161,6 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         'isolation-group': list, string
 
         """
-        # must specify add and remove params
         if 'add' not in self.data and 'remove' not in self.data:
             raise ValueError(
                 "Must specify either 'add' or 'remove' parameters")

@@ -27,16 +27,7 @@ class Certificate(QueryResourceManager):
         name = 'DomainName'
         date = 'CreatedAt'
         dimension = None
+        detail_spec = (
+            "describe_certificate", "CertificateArn",
+            'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
-
-    def augment(self, resources):
-
-        def _augment(r):
-            client = local_session(self.session_factory).client('acm')
-            attrs = client.describe_certificate(
-                CertificateArn=r)['Certificate']
-            r.update(attrs)
-            return r
-
-        with self.executor_factory(max_workers=3) as w:
-            return list(w.map(_augment, resources))

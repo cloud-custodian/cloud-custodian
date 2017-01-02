@@ -26,7 +26,7 @@ class SQS(QueryResourceManager):
         service = 'sqs'
         type = 'queue'
         enum_spec = ('list_queues', 'QueueUrls', None)
-        detail_spec = ('get_queue_attributes', 'QueueUrl', 'QueueUrl')
+        detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
         filter_name = 'QueueNamePrefix'
         filter_type = 'scalar'

@@ -114,7 +114,7 @@ class EC2(QueryResourceManager):
         """
 
         # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in  ec2 instances anyways.
+        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.data.get('mode', {}).get('type', '') in (
                 'cloudtrail', 'ec2-instance-state'):
             return resources

@@ -35,8 +35,7 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 load_resources()
 
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
-if C7N_VALIDATE:
-    C7N_SCHEMA = generate()
+C7N_SCHEMA = generate()
 
 
 class BaseTest(PillTest):

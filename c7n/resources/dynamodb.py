@@ -19,7 +19,6 @@ from c7n.utils import chunks, local_session, type_schema
 from c7n.actions import BaseAction
 
 from concurrent.futures import as_completed
-from c7n.utils import chunks
 
 
 @resources.register('dynamodb-table')
@@ -29,21 +28,12 @@ class Table(QueryResourceManager):
         service = 'dynamodb'
         type = 'table'
         enum_spec = ('list_tables', 'TableNames', None)
+        detail_spec = ("describe_table", "TableName", None, "Table")
         id = 'Table'
         filter_name = None
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
-
-    def augment(self, resources):
-        def _augment(resource_set):
-            client = local_session(self.session_factory).client('dynamodb')
-            return [client.describe_table(TableName=r)['Table']
-                    for r in resource_set]
-
-        with self.executor_factory(max_workers=3) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))
 
 
 class StatusFilter(object):

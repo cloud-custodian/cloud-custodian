@@ -22,6 +22,7 @@ detail_spec
    - aws.cloudformation.stack -> stack resources
    - aws.dymanodb.table ->
 """
+import itertools
 import jmespath
 
 from botocore.client import ClientError
@@ -29,7 +30,7 @@ from botocore.client import ClientError
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.tags import register_tags
-from c7n.utils import local_session, get_retry
+from c7n.utils import local_session, get_retry, chunks
 from c7n.manager import ResourceManager
 
 
@@ -128,6 +129,8 @@ class QueryResourceManager(ResourceManager):
     id_field = ""
     report_fields = []
     retry = None
+    max_workers = 3
+    chunk_size = 20
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -197,7 +200,35 @@ class QueryResourceManager(ResourceManager):
         ie. we want tags by default (rds, elb), and policy, location, acl for
         s3 buckets.
         """
-        return resources
+        model = self.get_model()
+        detail_spec = getattr(model, 'detail_spec', None)
+        if detail_spec is None:
+            return resources
+        detail_op, param_name, param_key, detail_path = detail_spec
+
+        def _augment(resource_set):
+            client = local_session(self.session_factory).client(model.service)
+            op = getattr(client, detail_op)
+            if self.retry:
+                args = op
+                op = self.retry
+            else:
+                args = ()
+            results = []
+            for r in resource_set:
+                kw = {param_name: param_key and r[param_key] or r}
+                response = op(*args, **kw)[detail_path]
+                if param_key is None:
+                    response[model.id] = r
+                    r = response
+                else:
+                    r.update(response)
+                results.append(r)
+            return results
+
+        with self.executor_factory(max_workers=self.max_workers) as w:
+            return list(itertools.chain(
+                *w.map(_augment, chunks(resources, self.chunk_size))))
 
     def filter_record(self, record):
         '''Filters records for report formatters'''
