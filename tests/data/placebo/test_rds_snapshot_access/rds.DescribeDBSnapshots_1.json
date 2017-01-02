@@ -1,0 +1,177 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3360951d-d04f-11e6-a7d6-33920eb31e01", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3360951d-d04f-11e6-a7d6-33920eb31e01", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4975", 
+                "content-type": "text/xml", 
+                "date": "Sun, 01 Jan 2017 18:22:06 GMT"
+            }
+        }, 
+        "DBSnapshots": [
+            {
+                "Engine": "postgres", 
+                "SnapshotCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 55, 
+                    "microsecond": 938000, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 17
+                }, 
+                "AvailabilityZone": "us-east-1a", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:tidx-2016-12-31-23-16", 
+                "PercentProgress": 100, 
+                "MasterUsername": "sinterclaus", 
+                "Encrypted": false, 
+                "LicenseModel": "postgresql-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "DBSnapshotIdentifier": "rds:tidx-2016-12-31-23-16", 
+                "InstanceCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 53, 
+                    "microsecond": 306000, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 16
+                }, 
+                "OptionGroupName": "default:postgres-9-5", 
+                "AllocatedStorage": 5, 
+                "EngineVersion": "9.5.4", 
+                "SnapshotType": "automated", 
+                "Port": 5432, 
+                "DBInstanceIdentifier": "tidx"
+            }, 
+            {
+                "Engine": "postgres", 
+                "SnapshotCreateTime": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 37, 
+                    "microsecond": 779000, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 59
+                }, 
+                "AvailabilityZone": "us-east-1a", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:tidx-2017-01-01-07-59", 
+                "PercentProgress": 100, 
+                "MasterUsername": "sinterclaus", 
+                "Encrypted": false, 
+                "LicenseModel": "postgresql-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "DBSnapshotIdentifier": "rds:tidx-2017-01-01-07-59", 
+                "InstanceCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 53, 
+                    "microsecond": 306000, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 16
+                }, 
+                "OptionGroupName": "default:postgres-9-5", 
+                "AllocatedStorage": 5, 
+                "EngineVersion": "9.5.4", 
+                "SnapshotType": "automated", 
+                "Port": 5432, 
+                "DBInstanceIdentifier": "tidx"
+            }, 
+            {
+                "Engine": "postgres", 
+                "SnapshotCreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 18, 
+                    "microsecond": 607000, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 41
+                }, 
+                "AvailabilityZone": "us-east-1a", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:tidx-pub", 
+                "PercentProgress": 100, 
+                "MasterUsername": "sinterclaus", 
+                "Encrypted": false, 
+                "LicenseModel": "postgresql-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "DBSnapshotIdentifier": "tidx-pub", 
+                "InstanceCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 53, 
+                    "microsecond": 306000, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 16
+                }, 
+                "OptionGroupName": "default:postgres-9-5", 
+                "AllocatedStorage": 5, 
+                "EngineVersion": "9.5.4", 
+                "SnapshotType": "manual", 
+                "Port": 5432, 
+                "DBInstanceIdentifier": "tidx"
+            }, 
+            {
+                "Engine": "postgres", 
+                "SnapshotCreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 9, 
+                    "microsecond": 839000, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 43
+                }, 
+                "AvailabilityZone": "us-east-1a", 
+                "SourceRegion": "us-east-1", 
+                "PercentProgress": 100, 
+                "MasterUsername": "sinterclaus", 
+                "Encrypted": false, 
+                "LicenseModel": "postgresql-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "SourceDBSnapshotIdentifier": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:tidx-2017-01-01-07-59", 
+                "DBSnapshotIdentifier": "tidx-rdx", 
+                "InstanceCreateTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 53, 
+                    "microsecond": 306000, 
+                    "year": 2016, 
+                    "day": 31, 
+                    "minute": 16
+                }, 
+                "OptionGroupName": "default:postgres-9-5", 
+                "AllocatedStorage": 5, 
+                "EngineVersion": "9.5.4", 
+                "SnapshotType": "manual", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:tidx-rdx", 
+                "Port": 5432, 
+                "DBInstanceIdentifier": "tidx"
+            }
+        ]
+    }
+}

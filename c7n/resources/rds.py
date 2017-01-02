@@ -55,7 +55,8 @@ from concurrent.futures import as_completed
 from c7n.actions import (
     ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import (
-    FilterRegistry, Filter, AgeFilter, OPERATORS, FilterValidationError)
+    CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
+    FilterValidationError)
 
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -952,6 +953,43 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
                 ResourceName=arn, TagKeys=tag_keys)
 
 
+@RDSSnapshot.filter_registry.register('cross-account')
+class CrossAccountAccess(CrossAccountAccessFilter):
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(
+                    self.process_resource_set, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access\n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resource_set:
+            attrs = {t['AttributeName']: t['AttributeValues']
+             for t in client.describe_db_snapshot_attributes(
+                DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
+                    'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
+            r['c7n:attributes'] = attrs
+            shared_accounts = set(attrs.get('restore', []))
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+
 @RDSSnapshot.action_registry.register('region-copy')
 class RegionCopySnapshot(BaseAction):
     """Copy a snapshot across regions.
@@ -1056,7 +1094,7 @@ class RegionCopySnapshot(BaseAction):
                 # we need to augment the tag set with the original
                 # resource tags to preserve the common case.
                 rtags = tags and list(tags) or None
-                if tags:
+                if tags and self.data.get('copy_tags', True):
                     rtags.extend(r['Tags'])
                 self.process_resource(target_client, target_key, rtags, r)
 
