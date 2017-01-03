@@ -59,4 +59,4 @@ class CodePipeline(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        print resources[0]
+        self.assertEqual(len(resources[0]['stages']), 2)
