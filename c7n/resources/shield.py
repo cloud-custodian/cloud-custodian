@@ -16,17 +16,27 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('acm-certificate')
-class Certificate(QueryResourceManager):
+@resources.register('shield-protection')
+class ShieldProtection(QueryResourceManager):
 
     class resource_type(object):
-        service = 'acm'
-        enum_spec = ('list_certificates', 'CertificateSummaryList', None)
-        id = 'CertificateArn'
-        name = 'DomainName'
-        date = 'CreatedAt'
+        service = 'shield'
+        enum_spec = ('list_projections', 'Protections', None)
+        id = 'Id'
+        name = 'Name'
         dimension = None
-        detail_spec = (
-            "describe_certificate", "CertificateArn",
-            'CertificateArn', 'Certificate')
-        config_type = "AWS::ACM::Certificate"
+
+
+@resources.register('shield-attack')
+class ShieldAttack(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'shield'
+        enum_spec = ('list_attacks', 'Attacks', None)
+        detail_spec = ('describe_attack', 'AttackId', 'AttackId', 'Attack')
+        id = 'AttackId'
+        date = 'StartTime'
+        dimension = None
+        
+        
+        

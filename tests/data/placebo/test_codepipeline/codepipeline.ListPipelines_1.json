@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "pipelines": [
+            {
+                "updated": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 12, 
+                    "microsecond": 560000, 
+                    "year": 2016, 
+                    "day": 25, 
+                    "minute": 33
+                }, 
+                "version": 1, 
+                "name": "custodian-deploy", 
+                "created": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 12, 
+                    "microsecond": 560000, 
+                    "year": 2016, 
+                    "day": 25, 
+                    "minute": 33
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b4aa90b-d17f-11e6-9ab0-176a1339e03a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b4aa90b-d17f-11e6-9ab0-176a1339e03a", 
+                "content-length": "107", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

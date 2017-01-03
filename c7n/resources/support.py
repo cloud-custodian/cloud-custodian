@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,15 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('acm-certificate')
-class Certificate(QueryResourceManager):
+@resources.register('support-case')
+class SupportCase(QueryResourceManager):
 
     class resource_type(object):
-        service = 'acm'
-        enum_spec = ('list_certificates', 'CertificateSummaryList', None)
-        id = 'CertificateArn'
-        name = 'DomainName'
-        date = 'CreatedAt'
+        service = 'support'
+        enum_spec = ('describe_cases', 'q', None)
+        filter_name = 'caseIdList'
+        filter_type = 'list'
+        id = 'caseId'
+        name = 'displayId'
+        date = 'timeCreated'
         dimension = None
-        detail_spec = (
-            "describe_certificate", "CertificateArn",
-            'CertificateArn', 'Certificate')
-        config_type = "AWS::ACM::Certificate"

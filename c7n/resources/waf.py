@@ -26,3 +26,16 @@ class WAF(QueryResourceManager):
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
+
+
+@resources.register('waf-regional')
+class RegionalWAF(QueryResourceManager):
+
+    class resource_type(object):
+        service = "waf-regional"
+        enum_spec = ("list_web_acls", "WebACLs", None)
+        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
+        name = "Name"
+        id = "WebACLId"
+        dimension = "WebACL"
+

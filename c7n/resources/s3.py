@@ -84,12 +84,8 @@ class S3(QueryResourceManager):
         filter_name = None
         date = 'CreationDate'
         dimension = 'BucketName'
-        default_report_fields = (
-            'Name',
-            'CreationDate',
-        )
+        config_type = 'AWS::S3::Bucket'
 
-    executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
     action_registry = actions
 

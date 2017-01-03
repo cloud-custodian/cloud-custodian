@@ -14,14 +14,9 @@
 """
 Query capability built on skew metamodel
 
-
 tags_spec -> s3, elb, rds
-
-detail_spec
-   - aws.route53.healthcheck -> health check info
-   - aws.cloudformation.stack -> stack resources
-   - aws.dymanodb.table ->
 """
+import functools
 import itertools
 import jmespath
 
@@ -70,7 +65,7 @@ class ResourceQuery(object):
             data = []
         return data
 
-    def get(self, resource_type, identity):
+    def get(self, resource_type, identities):
         """Get resources by identities
         """
         m = self.resolve(resource_type)
@@ -80,16 +75,16 @@ class ResourceQuery(object):
         # Try to formulate server side query
         if m.filter_name:
             if m.filter_type == 'list':
-                params[m.filter_name] = identity
+                params[m.filter_name] = identities
             elif m.filter_type == 'scalar':
-                assert len(identity) == 1, "Scalar server side filter"
-                params[m.filter_name] = identity[0]
+                assert len(identities) == 1, "Scalar server side filter"
+                params[m.filter_name] = identities[0]
         else:
             client_filter = True
 
         resources = self.filter(resource_type, **params)
         if client_filter:
-            resources = [r for r in resources if r[m.id] in identity]
+            resources = [r for r in resources if r[m.id] in identities]
 
         return resources
 
@@ -201,36 +196,56 @@ class QueryResourceManager(ResourceManager):
         s3 buckets.
         """
         model = self.get_model()
-        detail_spec = getattr(model, 'detail_spec', None)
-        if detail_spec is None:
+        if getattr(model, 'detail_spec', None):
+            detail_spec = getattr(model, 'detail_spec', None)
+            _augment = _scalar_augment
+        elif getattr(model, 'batch_detail_spec', None):
+            detail_spec = getattr(model, 'batch_detail_spec', None)
+            _augment = _batch_augment
+        else:
             return resources
-        detail_op, param_name, param_key, detail_path = detail_spec
-
-        def _augment(resource_set):
-            client = local_session(self.session_factory).client(model.service)
-            op = getattr(client, detail_op)
-            if self.retry:
-                args = op
-                op = self.retry
-            else:
-                args = ()
-            results = []
-            for r in resource_set:
-                kw = {param_name: param_key and r[param_key] or r}
-                response = op(*args, **kw)[detail_path]
-                if param_key is None:
-                    response[model.id] = r
-                    r = response
-                else:
-                    r.update(response)
-                results.append(r)
-            return results
-
+        _augment = functools.partial(_augment, self, model, detail_spec)
         with self.executor_factory(max_workers=self.max_workers) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, self.chunk_size))))
+            results = list(w.map(_augment, chunks(resources, self.chunk_size)))
+            return list(itertools.chain(*results))
 
-    def filter_record(self, record):
-        '''Filters records for report formatters'''
-        # Override in subclass if filtering needed.
-        return True
+
+def _batch_augment(manager, model, detail_spec, resource_set):
+    detail_op, param_name, param_key, detail_path = detail_spec
+    client = local_session(manager.session_factory).client(model.service)
+    op = getattr(client, detail_op)
+    if manager.retry:
+        args = (op,)
+        op = manager.retry
+    else:
+        args = ()
+    kw = {param_name: [param_key and r[param_key] or r for r in resource_set]}
+    response = op(*args, **kw)
+    return response[detail_path]
+
+
+def _scalar_augment(manager, model, detail_spec, resource_set):
+    detail_op, param_name, param_key, detail_path = detail_spec
+    client = local_session(manager.session_factory).client(model.service)
+    op = getattr(client, detail_op)
+    if manager.retry:
+        args = (op,)
+        op = manager.retry
+    else:
+        args = ()
+    results = []
+    for r in resource_set:
+        kw = {param_name: param_key and r[param_key] or r}
+        response = op(*args, **kw)
+        if detail_path:
+            response = response[detail_path]
+        else:
+            response.pop('ResponseMetadata')
+        if param_key is None:
+            response[model.id] = r
+            r = response
+        else:
+            r.update(response)
+        results.append(r)
+    return results
+

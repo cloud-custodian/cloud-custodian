@@ -340,7 +340,7 @@ class EBS(QueryResourceManager):
         date = 'createTime'
         dimension = 'VolumeId'
         metrics_namespace = 'AWS/EBS'
-        config_type = "AWS::EC::Volume"
+        config_type = "AWS::EC2::Volume"
         default_report_fields = (
             'VolumeId',
             'Attachments[0].InstanceId',
