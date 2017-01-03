@@ -14,10 +14,13 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.utils import get_retry
 
 
 @resources.register('codecommit')
 class CodeRepository(QueryResourceManager):
+
+    retry = staticmethod(get_retry(('Throttling',)))
 
     class resource_type(object):
         service = 'codecommit'
@@ -46,6 +49,8 @@ class CodeBuildProject(QueryResourceManager):
 
 @resources.register('codepipeline')
 class CodeDeployPipeline(QueryResourceManager):
+
+    retry = staticmethod(get_retry(('Throttling',)))
 
     class resource_type(object):
         service = 'codepipeline'

@@ -215,7 +215,7 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     client = local_session(manager.session_factory).client(model.service)
     op = getattr(client, detail_op)
     if manager.retry:
-        args = op
+        args = (op,)
         op = manager.retry
     else:
         args = ()
@@ -229,7 +229,7 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
     client = local_session(manager.session_factory).client(model.service)
     op = getattr(client, detail_op)
     if manager.retry:
-        args = op
+        args = (op,)
         op = manager.retry
     else:
         args = ()

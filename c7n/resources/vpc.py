@@ -238,7 +238,8 @@ class SecurityGroupPatch(object):
                 [{'Key': k, 'Value': v}
                  for k, v in tag_delta['updated'].items()])
         if tags:
-            self.retry(client.create_tags, Resources=[group['GroupId']], Tags=tags)
+            self.retry(
+                client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
     def process_rules(self, client, rule_type, group, delta):
         key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
@@ -864,7 +865,8 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        groups = super(InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
+        groups = super(
+            InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
         for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
