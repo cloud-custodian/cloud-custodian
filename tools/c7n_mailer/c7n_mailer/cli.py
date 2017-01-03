@@ -10,7 +10,7 @@ from c7n_mailer import deploy, utils
 
 CONFIG_SCHEMA = {
     'type': 'object',
-    'addtionalProperties': False,
+    'additionalProperties': False,
     'required': ['queue_url', 'ldap_bind_user', 'ldap_bind_password', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
