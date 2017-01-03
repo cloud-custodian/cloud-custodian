@@ -150,9 +150,6 @@ class EC2(QueryResourceManager):
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
 
-    def filter_record(self, record):
-        return record['State']['Name'] != 'terminated'
-
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):

@@ -50,6 +50,7 @@ class Redshift(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
+        config_type = "AWS::Redshift::Cluster"
 
     filter_registry = filters
     action_registry = actions
@@ -483,7 +484,8 @@ class RemoveTag(tags.RemoveTag):
 class TagTrim(tags.TagTrim):
     """Action to remove tags from a redshift cluster
 
-    This can be used to prevent reaching the ceiling limit of tags on a resource
+    This can be used to prevent reaching the ceiling limit of tags on a
+    resource
 
     :example:
 
@@ -525,6 +527,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+        config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')
@@ -556,7 +559,6 @@ class RedshiftSnapshot(QueryResourceManager):
         return self._generate_arn
 
     class resource_type(object):
-
         service = 'redshift'
         type = 'redshift-snapshot'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
@@ -565,6 +567,7 @@ class RedshiftSnapshot(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'SnapshotCreateTime'
+        config_type = "AWS::Redshift::ClusterSnapshot"
 
 
 @actions.register('modify-security-groups')
@@ -573,8 +576,8 @@ class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('redshift')
-        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(clusters, metadata_key='VpcSecurityGroupId')
-
+        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(
+            clusters, metadata_key='VpcSecurityGroupId')
         for idx, c in enumerate(clusters):
             client.modify_cluster(
                 ClusterIdentifier=c['ClusterIdentifier'],

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('waf')
-class WAF(QueryResourceManager):
+@resources.register('directconnect')
+class DirectConnect(QueryResourceManager):
 
     class resource_type(object):
-        service = "waf"
-        enum_spec = ("list_web_acls", "WebACLs", None)
-        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
-        name = "Name"
-        id = "WebACLId"
-        dimension = "WebACL"
+        service = 'directconnect'
+        enum_spec = ('describe_connections', 'connections', None)
+        id = 'connectionId'
+        name = 'connectionName'
+        filter_name = 'connectionId'
+        dimension = None
 
 

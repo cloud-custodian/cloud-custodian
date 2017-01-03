@@ -1,3 +1,5 @@
+
+
 # Copyright 2016 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,27 +18,30 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('shield-protection')
-class ShieldProtection(QueryResourceManager):
+@resources.register('identity-pool')
+class CognitoIdentityPool(QueryResourceManager):
 
     class resource_type(object):
-        service = 'shield'
-        enum_spec = ('list_projections', 'Protections', None)
+        service = 'cognito-identity'
+        enum_spec = ('list_identity_pools', 'IdentityPools', None)
+        detail_spec = (
+            'describe_identity_pool', 'IdentityPoolId', 'IdentityPoolId')
+        id = 'IdentityPoolId'
+        name = 'IdentityPoolName'
+        filter_name = None
+        dimension = None
+
+
+@resources.register('user-pool')
+class CognitoUserPool(QueryResourceManager):
+
+    class resource_type(object):
+        service = "cognito-idp"
+        enum_spec = ('list_user_pools', 'UserPools', None)
+        detail_spec = (
+            'describe_user_pool', 'UserPoolId', 'Id', 'UserPool')
         id = 'Id'
         name = 'Name'
+        filter_name = None
         dimension = None
-
-
-@resources.register('shield-attack')
-class ShieldAttack(QueryResourceManager):
-
-    class resource_type(object):
-        service = 'shield'
-        enum_spec = ('list_attacks', 'Attacks', None)
-        detail_spec = ('describe_attack', 'AttackId', 'AttackId', 'Attack')
-        id = 'AttackId'
-        date = 'StartTime'
-        dimension = None
-        
-        
         

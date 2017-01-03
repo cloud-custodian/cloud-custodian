@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session
 
 
 @resources.register('snowball-cluster')
 class SnowballCluster(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'snowball'
         enum_spec = ('list_clusters', 'ClusterListEntries', None)
+        detail_spec = (
+            'describe_cluster', 'ClusterId', 'ClusterId', 'ClusterMetadata')
         id = 'ClusterId'
         name = 'Description'
         date = 'CreationDate'
@@ -32,9 +33,11 @@ class SnowballCluster(QueryResourceManager):
 @resources.register('snowball')
 class Snowball(QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'snowball'
         enum_spec = ('list_jobs', 'JobListEntries', None)
+        detail_spec = (
+            'describe_job', 'JobId', 'JobId', 'JobMetadata')
         id = 'JobId'
         name = 'Description'
         date = 'CreationDate'

@@ -90,3 +90,28 @@ class DeleteTable(BaseAction, StatusFilter):
                         self.log.error(
                             "Exception deleting dynamodb table set \n %s" % (
                                 f.exception()))
+
+
+@resources.register('dynamodb-stream')
+class Stream(QueryResourceManager):
+
+    # Note stream management takes place on the table resource
+
+    class resource_type(object):
+        service = 'dynamodbstreams'
+        # Note max rate of 5 calls per second
+        enum_spec = ('list_streams', 'Streams', None)
+        # Note max rate of 10 calls per second.
+        detail_spec = (
+            "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
+        id = 'StreamArn'
+
+        # TODO, we default to filtering by id, but the api takes table names, which
+        # require additional client side filtering as multiple streams may be present
+        # per table.
+        # filter_name = 'TableName'
+        filter_name = None
+
+        name = 'TableName'
+        date = 'CreationDateTime'
+        dimension = 'TableName'

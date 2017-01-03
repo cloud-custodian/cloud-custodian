@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('waf')
-class WAF(QueryResourceManager):
+@resources.register('cloudtrail')
+class CloudTrail(QueryResourceManager):
 
     class resource_type(object):
-        service = "waf"
-        enum_spec = ("list_web_acls", "WebACLs", None)
-        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
-        name = "Name"
-        id = "WebACLId"
-        dimension = "WebACL"
-
-
+        service = 'cloudtrail'
+        enum_spec = ('describe_trails', 'trailList', None)
+        #
+        #detail_spec = (
+        #    'get_event_selectors', 'TrailName', 'TrailArn', None)
+        filter_name = 'trailNameList'
+        filter_type = 'list'
+        id = 'TrailArn'
+        name = 'Name'
+        dimension = None
+        config_type = "AWS::CloudTrail::Trail"

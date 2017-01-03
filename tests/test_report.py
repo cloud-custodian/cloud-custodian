@@ -50,7 +50,6 @@ class TestEC2Report(unittest.TestCase):
             (['minimal'], ['minimal']),
             (['full', 'minimal'], ['full', 'minimal']),
             (['full', 'duplicate', 'minimal'], ['full', 'minimal']),
-            (['full', 'terminated', 'minimal'], ['full', 'minimal'])
         ]
         for rec_ids, row_ids in tests:
             recs = map(lambda x: self.records[x], rec_ids)

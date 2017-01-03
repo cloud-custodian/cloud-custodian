@@ -14,7 +14,6 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks
 
 
 @resources.register('codecommit')
@@ -23,22 +22,13 @@ class CodeRepository(QueryResourceManager):
     class resource_type(object):
         service = 'codecommit'
         enum_spec = ('list_repositories', 'repositories', None)
+        batch_detail_spec = (
+            'batch_get_repositories', 'repositoryNames', 'repositoryName',
+            'repositories')
         id = 'repositoryId'
         name = 'repositoryName'
         date = 'creationDate'
         dimension = None
-
-    def augment(self, resources):
-        def _augment(resource_set):
-            client = local_session(
-                self.session_factory).client('codecommit')
-            repo_infos = client.batch_get_repositories(
-                RepositoryNames=[r['repositoryName'] for r in resource_set]
-            )['repositories']
-            return repo_infos
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(w.map(_augment, chunks(resources, 200)))
 
 
 @resources.register('codebuild')
@@ -47,20 +37,11 @@ class CodeBuildProject(QueryResourceManager):
     class resource_type(object):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
+        batch_detail_spec = (
+            'batch_get_projects', 'names', None, 'projects')
         name = id = 'project'
         date = 'created'
         dimension = None
-
-    def augment(self, resources):
-        def _augment(resource_set):
-            client = local_session(
-                self.session_factory).client('codebuild')
-            repo_infos = client.batch_get_projects(
-                names=resource_set)['projects']
-            return repo_infos
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(w.map(_augment, chunks(resources, 200)))
 
 
 @resources.register('codepipeline')
@@ -69,20 +50,10 @@ class CodeDeployPipeline(QueryResourceManager):
     class resource_type(object):
         service = 'codepipeline'
         enum_spec = ('list_pipelines', 'pipelines', None)
+        detail_spec = ('get_pipeline', 'name', 'name', 'pipeline')
+        dimension = filter_name = None
         name = id = 'name'
         date = 'created'
-        dimension = None
 
-    def augment(self, resources):
-
-        def _augment(r):
-            client = local_session(self.session_factory).client('codepipeline')
-            attrs = client.get_pipeline(
-                Name=r['name'])['pipeline']
-            r.update(attrs)
-            return r
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(w.map(_augment, resources))
 
 
