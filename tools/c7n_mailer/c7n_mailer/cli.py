@@ -10,20 +10,33 @@ from c7n_mailer import deploy, utils
 
 CONFIG_SCHEMA = {
     'type': 'object',
-    'addtionalProperties': False,
+    'additionalProperties': False,
     'required': ['queue_url', 'ldap_bind_user', 'ldap_bind_password', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
-        'profile': {'type': 'string'},
+        'from_address': {'type': 'string'},
+        'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
+
+        # Standard Lambda Function Config
         'region': {'type': 'string'},
         'role': {'type': 'string'},
         'memory': {'type': 'integer'},
-        'cache': {'type': 'string'},
+        'timeout': {'type': 'integer'},
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
         'security_groups': {'type': 'array', 'items': {'type': 'string'}},
+
+        # Mailer Infrastructure Config
+        'cache': {'type': 'string'},
+        'ldap_uri': {'type': 'string'},
+        'ldap_bind_dn': {'type': 'string'},
         'ldap_bind_user': {'type': 'string'},
         'ldap_bind_password': {'type': 'string'},
         'cross_accounts': {'type': 'object'},
+
+        # SDK Config
+        'profile': {'type': 'string'},
+        'http_proxy': {'type': 'string'},
+        'https_proxy': {'type': 'string'},
     }
 }
 
