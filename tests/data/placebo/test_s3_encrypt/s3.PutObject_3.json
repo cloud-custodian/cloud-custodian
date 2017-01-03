@@ -4,8 +4,17 @@
         "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "HostId": "6/33M6XEsl5VvWJ9snNKmUMipSHIv9jf5+5GGMoKoxVuCSg9i5Bk2SEgmNc85eoKepJO2GelaOQ=", 
-            "RequestId": "0498255175437C78"
+            "RetryAttempts": 0, 
+            "HostId": "AdqGBLkDGkx8gb3LpIYQF0VAYtekaSRA7TPVC0yT9u9Scwzxmt/JNSLfGne0XUWLPjB0TlH27Xs=", 
+            "RequestId": "E8536A40CBDA2D31", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "AdqGBLkDGkx8gb3LpIYQF0VAYtekaSRA7TPVC0yT9u9Scwzxmt/JNSLfGne0XUWLPjB0TlH27Xs=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "E8536A40CBDA2D31", 
+                "etag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "date": "Tue, 20 Dec 2016 23:43:28 GMT"
+            }
         }
     }
 }

@@ -41,8 +41,7 @@ It integrates with lambda and cloudwatch events to provide for
 real time enforcement of policies with builtin provisioning of the lambdas, or
 as a simple cron job on a server to execute against large existing fleets.
 
-“Engineering the Next Generation of Cloud Governance” by @drewfirment
-https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60#.5cuxnz2eh
+“`Engineering the Next Generation of Cloud Governance <https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60>`_” by @drewfirment
 
 
 Features
@@ -64,8 +63,9 @@ Features
 Links
 #####
 
-- `Docs <http://www.capitalone.io/cloud-custodian/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/quickstart/developer.html>`_
+- `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
+- `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
+- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
 
 
 Quick Install
@@ -162,9 +162,12 @@ Agreement indicating agreement to the license terms below. Except for
 the license granted in this Agreement to Capital One and to recipients
 of software distributed by Capital One, You reserve all right, title,
 and interest in and to Your Contributions; this Agreement does not
-impact Your rights to use Your own Contributions for any other purpose
+impact Your rights to use Your own Contributions for any other purpose.
 
-`Download the Agreement <https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform>`_
+`Sign the Individual Agreement <https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform>`_
+
+`Sign the Corporate Agreement <https://docs.google.com/forms/d/e/1FAIpQLSeAbobIPLCVZD_ccgtMWBDAcN68oqbAJBQyDTSAQ1AkYuCp_g/viewform?usp=send_form>`_
+
 
 Code of Conduct
 ###############

@@ -27,7 +27,7 @@ log = logging.getLogger('custodian.mailer')
 
 
 class MessageIterator(object):
-    # Copied from custodian/maid to avoid runtime library dependency
+    # Copied from custodian to avoid runtime library dependency
     msg_attributes = ['sequence_id', 'op', 'ser']
 
     def __init__(self, client, queue_url, limit=0, timeout=10):

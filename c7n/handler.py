@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Cloud-Maid Lambda Entry Point
+Cloud-Custodian Lambda Entry Point
 
 Mostly this serves to load up the policy and dispatch
 an event.
@@ -62,14 +62,16 @@ class Config(dict):
 
 
 def dispatch_event(event, context):
-    event['debug'] = True
-    if event['debug']:
-        log.info("Processing event\n %s", format_event(event))
 
     error = event.get('detail', {}).get('errorCode')
     if error:
         log.debug("Skipping failed operation: %s" % error)
         return
+
+    event['debug'] = True
+    if event['debug']:
+        log.info("Processing event\n %s", format_event(event))
+
     policies = load(Config.empty(), 'config.json', format='json')
     for p in policies:
         p.push(event, context)

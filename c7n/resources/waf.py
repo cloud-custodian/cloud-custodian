@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
-
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks
 
 
 @resources.register('waf')
@@ -25,17 +22,7 @@ class WAF(QueryResourceManager):
     class resource_type(object):
         service = "waf"
         enum_spec = ("list_web_acls", "WebACLs", None)
+        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
-
-    def augment(self, resources):
-        def _augment(resource_set):
-            client = local_session(self.session_factory).client('waf')
-            return [client.get_web_acl(
-                WebACLId=r['WebACLId'])['WebACL'] for r in resource_set]
-
-        with self.executor_factory(max_workers=3) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))
-

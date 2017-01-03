@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "GWzXXMd2CG/Sebk1h8Kv45cdiaSgAxBBqrkYBWSHpx+pmbeuTFW/zOg/FUn9tfiQ41yLc8Ji5fQ=", 
+            "RequestId": "21BC8FD9E5EAFF19", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "GWzXXMd2CG/Sebk1h8Kv45cdiaSgAxBBqrkYBWSHpx+pmbeuTFW/zOg/FUn9tfiQ41yLc8Ji5fQ=", 
+                "date": "Tue, 04 Oct 2016 15:25:52 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "21BC8FD9E5EAFF19", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

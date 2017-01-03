@@ -14,7 +14,7 @@
 import jmespath
 from unittest import TestCase
 
-from .common import event_data
+from common import event_data
 
 from c7n.cwe import CloudWatchEvents
 
@@ -28,6 +28,37 @@ class CloudWatchEventsFacadeTest(TestCase):
             CloudWatchEvents.get_ids(
                 {'detail': event_data('event-cloud-trail-run-instances.json')},
                 {'type': 'cloudtrail', 'events': ['RunInstances']}),
+            ['i-784cdacd', u'i-7b4cdace'])
+
+    def test_get_ids_multiple_events(self):
+        d = event_data('event-cloud-trail-run-instances.json')
+        d['eventName'] = 'StartInstances'
+
+        self.assertEqual(
+            CloudWatchEvents.get_ids(
+                {'detail': d},
+                {'type': 'cloudtrail', 'events': [
+                    # wrong event name
+                    {'source': 'ec2.amazonaws.com',
+                     'event': 'CreateTags',
+                     'ids': 'requestParameters.resourcesSet.items[].resourceId'},
+                    # wrong event source
+                    {'source': 'ecs.amazonaws.com',
+                     'event': 'StartInstances',
+                     'ids': 'responseElements.instancesSet.items'},
+                    # matches no resource ids
+                    {'source': 'ec2.amazonaws.com',
+                     'event': 'StartInstances',
+                     'ids': 'responseElements.instancesSet2.items[].instanceId'},
+                    # correct
+                    {'source': 'ec2.amazonaws.com',
+                     'event': 'StartInstances',
+                     'ids': 'responseElements.instancesSet.items[].instanceId'},
+                    # we don't fall off the end
+                    {'source': 'ec2.amazonaws.com',
+                     'event': 'StartInstances',
+                     'ids': 'responseElements.instancesSet.items[]'},
+                    ]}),
             ['i-784cdacd', u'i-7b4cdace'])
 
     def test_ec2_state(self):
@@ -47,12 +78,12 @@ class CloudWatchEventsFacadeTest(TestCase):
 
     def test_custom_event(self):
         d = {'detail': event_data('event-cloud-trail-run-instances.json')}
-        d['detail']['eventName'] = 'something-unique'
+        d['detail']['eventName'] = 'StartInstances'
         self.assertEqual(
             CloudWatchEvents.get_ids(
                 d,
                 {'type': 'cloudtrail', 'events': [{
-                     'event': 'RunInstances',
+                     'event': 'StartInstances',
                      'ids': 'responseElements.instancesSet.items[].instanceId',
                      'source': 'ec2.amazonaws.com'}]}),
             ['i-784cdacd', u'i-7b4cdace'])

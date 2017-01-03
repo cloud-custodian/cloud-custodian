@@ -131,6 +131,14 @@ def resource_format(resource, resource_type):
         return "name: %s date: %s" % (
             resource['SnapshotId'],
             resource['StartTime'])
+    elif resource_type == 'subnet':
+        return "%s %s %s %s %s %s" %(
+            resource['SubnetId'],
+            resource['VpcId'],
+            resource['AvailabilityZone'],
+            resource['State'],
+            resource['CidrBlock'],
+            resource['AvailableIpAddressCount'])
     else:
         print "Unknown resource type", resource_type
         return "%s" % format_struct(resource)

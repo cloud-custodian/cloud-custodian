@@ -22,7 +22,8 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import (
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -46,7 +47,17 @@ TTYPE = re.compile('cache.t')
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.cluster'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'cluster'
+        enum_spec = ('describe_cache_clusters',
+                     'CacheClusters[]', None)
+        name = id = 'CacheClusterId'
+        filter_name = 'CacheClusterId'
+        filter_type = 'scalar'
+        date = 'CacheClusterCreateTime'
+        dimension = 'CacheClusterId'
+
     filter_registry = filters
     action_registry = actions
     _generate_arn = _account_id = None
@@ -87,6 +98,20 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
+    """Filters elasticache clusters based on their associated subnet
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-in-subnet-x
+                resource: cache-cluster
+                filters:
+                  - type: subnet
+                    key: SubnetId
+                    value: subnet-12ab34cd
+    """
 
     RelatedIdsExpression = ""
 
@@ -108,6 +133,25 @@ class SubnetFilter(net_filters.SubnetFilter):
 # added mark-for-op
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-mark-tag-compliance
+                resource: cache-cluster
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Cluster does not have valid OwnerName tag: {op}@{action_date}"
+                    op: delete
+                    days: 7
+    """
 
     batch_size = 1
 
@@ -123,6 +167,21 @@ class TagDelayedAction(tags.TagDelayedAction):
 @actions.register('remove-tag')
 @actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
+    """Action to remove tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-remove-tags
+                resource: cache-cluster
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
 
     concurrency = 2
     batch_size = 5
@@ -138,6 +197,28 @@ class RemoveTag(tags.RemoveTag):
 
 @actions.register('delete')
 class DeleteElastiCacheCluster(BaseAction):
+    """Action to delete an elasticache cluster
+
+    To prevent unwanted deletion of elasticache clusters, it is recommended
+    to include a filter
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-delete-stale-clusters
+                resource: cache-cluster
+                filters:
+                  - type: value
+                    value_type: age
+                    key: CacheClusterCreateTime
+                    op: ge
+                    value: 90
+                actions:
+                  - type: delete
+                    skip-snapshot: false
+    """
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'}})
@@ -185,6 +266,25 @@ class DeleteElastiCacheCluster(BaseAction):
 
 @actions.register('snapshot')
 class SnapshotElastiCacheCluster(BaseAction):
+    """Action to snapshot an elasticache cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-cluster-snapshot
+                resource: cache-cluster
+                filters:
+                  - type: value
+                    key: CacheClusterStatus
+                    op: not-in
+                    value: ["deleted","deleting","creating"]
+                actions:
+                  - snapshot
+    """
+
+    schema = type_schema('snapshot')
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -212,16 +312,62 @@ class SnapshotElastiCacheCluster(BaseAction):
             CacheClusterId=cluster['CacheClusterId'])
 
 
+@actions.register('modify-security-groups')
+class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on an Elasticache cluster.
+
+    Looks at the individual clusters and modifies the Replication
+    Group's configuration for Security groups so all nodes get
+    affected equally
+
+    """
+
+    def process(self, clusters):
+        replication_group_map = {}
+        client = local_session(
+            self.manager.session_factory).client('elasticache')
+        groups = super(
+            ElasticacheClusterModifyVpcSecurityGroups,
+            self).get_groups(clusters, metadata_key='SecurityGroupId')
+        for idx, c in enumerate(clusters):
+            # build map of Replication Groups to Security Groups
+            replication_group_map[c['ReplicationGroupId']] = groups[idx]
+
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_replication_group(
+                ReplicationGroupId=r,
+                SecurityGroupIds=replication_group_map[r]
+            )
+
+
 @resources.register('cache-subnet-group')
 class ElastiCacheSubnetGroup(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.subnet-group'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'subnet-group'
+        enum_spec = ('describe_cache_subnet_groups',
+                     'CacheSubnetGroups', None)
+        name = id = 'CacheSubnetGroupName'
+        filter_name = 'CacheSubnetGroupName'
+        filter_type = 'scalar'
+        date = None
+        dimension = None
 
 
 @resources.register('cache-snapshot')
 class ElastiCacheSnapshot(QueryResourceManager):
 
-    resource_type = 'aws.elasticache.snapshot'
+    class resource_type(object):
+        service = 'elasticache'
+        type = 'snapshot'
+        enum_spec = ('describe_snapshots', 'Snapshots', None)
+        name = id = 'SnapshotName'
+        filter_name = 'SnapshotName'
+        filter_type = 'scalar'
+        date = 'StartTime'
+        dimension = None
+
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -257,6 +403,20 @@ class ElastiCacheSnapshot(QueryResourceManager):
 
 @ElastiCacheSnapshot.filter_registry.register('age')
 class ElastiCacheSnapshotAge(AgeFilter):
+    """Filters elasticache snapshots based on their age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-stale-snapshots
+                resource: cache-snapshot
+                filters:
+                  - type: age
+                    days: 30
+                    op: ge
+    """
 
     schema = type_schema(
         'age', days={'type': 'number'},
@@ -281,6 +441,27 @@ class ElastiCacheSnapshotAge(AgeFilter):
 
 @ElastiCacheSnapshot.action_registry.register('delete')
 class DeleteElastiCacheSnapshot(BaseAction):
+    """Action to delete elasticache snapshots
+
+    To prevent unwanted deletion of elasticache snapshots, it is recommended to
+    apply a filter
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-stale-snapshots
+                resource: cache-snapshot
+                filters:
+                  - type: age
+                    days: 30
+                    op: ge
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
 
     def process(self, snapshots):
         log.info("Deleting %d ElastiCache snapshots", len(snapshots))
@@ -305,6 +486,27 @@ class DeleteElastiCacheSnapshot(BaseAction):
 # added mark-for-op
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
+    """Action to specify a delayed action on an elasticache snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elasticache-stale-snapshots
+                resource: cache-snapshot
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - type: age
+                    days: 23
+                    op: eq
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    op: delete
+                    days: 7
+                    msg: "Expiring snapshot {op}@{action_date}"
+    """
 
     batch_size = 1
 
@@ -320,6 +522,21 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
 @ElastiCacheSnapshot.action_registry.register('unmark')
 class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
+    """Action to remove tag(s) from an elasticache snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cache-snapshot-remove-tags
+                resource: cache-snapshot
+                filters:
+                  - "tag:UnusedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["UnusedTag"]
+    """
 
     concurrency = 2
     batch_size = 5

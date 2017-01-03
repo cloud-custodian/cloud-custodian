@@ -23,14 +23,22 @@ from c7n.utils import type_schema, local_session
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
 
-    resource_type = 'aws.cloudwatch.alarm'
+    class resource_type(object):
+        service = 'cloudwatch'
+        type = 'alarm'
+        enum_spec = ('describe_alarms', 'MetricAlarms', None)
+        id = 'AlarmArn'
+        filter_name = 'AlarmNames'
+        filter_type = 'list'
+        name = 'AlarmName'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        dimension = None
 
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
 
     class resource_type(object):
-
         service = 'events'
         type = 'event-rule'
         enum_spec = ('list_rules', 'Rules', None)
@@ -44,12 +52,10 @@ class EventRule(QueryResourceManager):
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
 
-    class Meta(object):
-
+    class resource_type(object):
         service = 'logs'
         type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
-
         name = 'logGroupName'
         id = 'arn'
         filter_name = 'logGroupNamePrefix'
@@ -57,14 +63,24 @@ class LogGroup(QueryResourceManager):
         dimension = 'LogGroupName'
         date = 'creationTime'
 
-    resource_type = Meta
-
 
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
+    """Action to set the retention period (in days) for CloudWatch log groups
 
-    schema = type_schema(
-        'retention', days={'type': 'integer'})
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-set-log-group-retention
+                resource: log-group
+                actions:
+                  - type: retention
+                    days: 200
+    """
+
+    schema = type_schema('retention', days={'type': 'integer'})
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -77,6 +93,21 @@ class Retention(BaseAction):
 
 @LogGroup.action_registry.register('delete')
 class Delete(BaseAction):
+    """
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-log-group
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 182.5
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 
@@ -88,6 +119,19 @@ class Delete(BaseAction):
 
 @LogGroup.filter_registry.register('last-write')
 class LastWriteDays(Filter):
+    """Filters CloudWatch log groups by last write
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-stale-groups
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 60
+    """
 
     schema = type_schema(
         'last-write', days={'type': 'number'})

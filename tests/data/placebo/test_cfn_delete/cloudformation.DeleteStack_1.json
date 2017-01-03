@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99", 
+                "date": "Tue, 20 Dec 2016 12:40:30 GMT", 
+                "content-length": "212", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

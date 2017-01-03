@@ -17,7 +17,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter, Filter, OPERATORS
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
 from c7n.resources.ec2 import EC2
@@ -34,9 +34,18 @@ actions = ActionRegistry('ami.actions')
 @resources.register('ami')
 class AMI(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.ec2.image')):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'image'
+        enum_spec = (
+            'describe_images', 'Images', {'Owners': ['self']})
+        detail_spec = None
+        id = 'ImageId'
+        filter_name = 'ImageIds'
+        filter_type = 'list'
+        name = 'Name'
+        dimension = None
         date = 'CreationDate'
-        taggable = True
 
     filter_registry = filters
     action_registry = actions
@@ -44,6 +53,24 @@ class AMI(QueryResourceManager):
 
 @actions.register('deregister')
 class Deregister(BaseAction):
+    """Action to deregister AMI
+
+    To prevent deregistering all AMI, it is advised to use in conjunction with
+    a filter (such as image-age)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ami-deregister-old
+                resource: ami
+                filters:
+                  - type: image-age
+                    days: 90
+                actions:
+                  - deregister
+    """
 
     schema = type_schema('deregister')
 
@@ -58,11 +85,31 @@ class Deregister(BaseAction):
 
 @actions.register('remove-launch-permissions')
 class RemoveLaunchPermissions(BaseAction):
+    """Action to remove the ability to launch an instance from an AMI
+
+    This action will remove any launch permissions granted to other
+    AWS accounts from the image, leaving only the owner capable of
+    launching it
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ami-remove-launch-permissions
+                resource: ami
+                filters:
+                  - type: image-age
+                    days: 60
+                actions:
+                  - remove-launch-permissions
+
+    """
 
     schema = type_schema('remove-launch-permissions')
 
     def process(self, images):
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_image, images))
 
     def process_image(self, image):
@@ -73,6 +120,19 @@ class RemoveLaunchPermissions(BaseAction):
 
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
+    """Filters images based on the age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ami-remove-launch-permissions
+                resource: ami
+                filters:
+                  - type: image-age
+                    days: 30
+    """
 
     date_attribute = "CreationDate"
     schema = type_schema(
@@ -83,6 +143,22 @@ class ImageAgeFilter(AgeFilter):
 
 @filters.register('unused')
 class ImageUnusedFilter(Filter):
+    """Filters images based on usage
+
+    true: image has no instances spawned from it
+    false: image has instances spawned from it
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: ami-unused
+                resource: ami
+                filters:
+                  - type: unused
+                    value: true
+    """
 
     schema = type_schema('unused', value={'type': 'boolean'})
 

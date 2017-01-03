@@ -37,11 +37,6 @@ Actions:
    delivery.
 
 """
-from botocore.client import Config
-from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import SSLError
-from concurrent.futures import as_completed
-
 import functools
 import json
 import itertools
@@ -51,21 +46,21 @@ import os
 import time
 import ssl
 
+from botocore.client import Config
+from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
+from concurrent.futures import as_completed
+
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
-"""
-TODO:
- - How does replication status effect in place encryption.
- - Test glacier support
-"""
 
 log = logging.getLogger('custodian.s3')
 
@@ -80,10 +75,19 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    #resource_type = "aws.s3.bucket"
-
-    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+    class resource_type(object):
+        service = 's3'
+        type = 'bucket'
+        enum_spec = ('list_buckets', 'Buckets[]', None)
+        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        name = id = 'Name'
+        filter_name = None
+        date = 'CreationDate'
         dimension = 'BucketName'
+        default_report_fields = (
+            'Name',
+            'CreationDate',
+        )
 
     executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
@@ -180,11 +184,15 @@ def bucket_client(session, b, kms=False):
         region = 'us-east-1'
     else:
         region = location['LocationConstraint'] or 'us-east-1'
+
     if kms:
-        # Need v4 signature for aws:kms crypto
-        config = Config(signature_version='s3v4', read_timeout=200)
+        # Need v4 signature for aws:kms crypto, else let the sdk decide
+        # based on region support.
+        config = Config(
+            signature_version='s3v4',
+            read_timeout=200, connect_timeout=120)
     else:
-        config = Config(read_timeout=200)
+        config = Config(read_timeout=200, connect_timeout=120)
     return session.client('s3', region_name=region, config=config)
 
 
@@ -197,7 +205,6 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
             if (t['Key'] not in new_tags and
                     not t['Key'].startswith('aws') and
                     t['Key'] not in remove_tags):
-
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
         try:
@@ -205,7 +212,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
             log.exception(
-                'Exception tagging bucket %s: %s', (bucket['Name'], e))
+                'Exception tagging bucket %s: %s', bucket['Name'], e)
             continue
 
 
@@ -224,6 +231,19 @@ class S3Metrics(MetricsFilter):
 
 @filters.register('cross-account')
 class S3CrossAccountFilter(CrossAccountAccessFilter):
+    """Filters cross-account access to S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-acl
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: cross-account
+    """
 
     def get_accounts(self):
         """add in elb access by default
@@ -248,6 +268,20 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
 
 @filters.register('global-grants')
 class GlobalGrantsFilter(Filter):
+    """Filters for all S3 buckets that have global-grants
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-delete-global-grants
+                resource: s3
+                filters:
+                  - type: global-grants
+                actions:
+                  - delete-global-grants
+    """
 
     schema = type_schema('global-grants', permissions={
         'type': 'array', 'items': {
@@ -294,7 +328,20 @@ class BucketActionBase(BaseAction):
 
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
-    """Find buckets with set of named policy statements."""
+    """Find buckets with set of named policy statements.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-bucket-has-statement
+                resource: s3
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+    """
     schema = type_schema(
         'has-statement',
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
@@ -320,7 +367,20 @@ class HasStatementFilter(Filter):
 @filters.register('missing-statement')
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):
-    """Find buckets missing a set of named policy statements."""
+    """Find buckets missing a set of named policy statements.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-bucket-missing-statement
+                resource: s3
+                filters:
+                  - type: missing-statement
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+    """
 
     schema = type_schema(
         'missing-policy-statement',
@@ -355,6 +415,24 @@ class NoOp(BucketActionBase):
 
 @actions.register('remove-statements')
 class RemovePolicyStatement(BucketActionBase):
+    """Action to remove policy statements from S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-remove-encrypt-put
+                resource: s3
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - RequireEncryptedPutObject
+                actions:
+                  - type: remove-statements
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+    """
 
     schema = type_schema(
         'remove-statements',
@@ -391,9 +469,26 @@ class RemovePolicyStatement(BucketActionBase):
 
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
+    """Action to enable/disable versioning on a S3 bucket
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-versioning
+                resource: s3
+                filter:
+                  - type: value
+                    key: Versioning
+                    value: Disabled
+                actions:
+                  - type: toggle-versioning
+                    enabled: true
+    """
 
     schema = type_schema(
-        'enable-versioning',
+        'toggle-versioning',
         enabled={'type': 'boolean'})
 
     # mfa delete enablement looks like it needs the serial and a current token.
@@ -415,9 +510,74 @@ class ToggleVersioning(BucketActionBase):
                     Bucket=r['Name'],
                     VersioningConfiguration={'Status': 'Suspended'})
 
+@actions.register('toggle-logging')
+class ToggleLogging(BucketActionBase):
+    """Action to enable/disable logging on a S3 bucket.
+    Target bucket ACL must allow for WRITE and READ_ACP Permissions
+    Not specifying a target_prefix will default to the current bucket name.
+    http://goo.gl/PiWWU2
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-logging
+                resource: s3
+                filter:
+                  - "tag:Testing": present
+                actions:
+                  - type: toggle-logging
+                    target_bucket: log-bucket
+                    target_prefix: logs123
+    """
+
+    schema = type_schema(
+        'toggle-logging',
+        enabled={'type': 'boolean'},
+        target_bucket={'type': 'string'},
+        target_prefix={'type': 'string'},
+    )
+
+    def process(self, resources):
+        enabled = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resources:
+            target_prefix = self.data.get('target_prefix', r['Name'])
+            if 'TargetBucket' in r['Logging']:
+                r['Logging'] = {'Status': 'Enabled'}
+            else:
+                r['Logging'] = {'Status': 'Disabled'}
+            if enabled and (r['Logging']['Status'] == 'Disabled'):
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={
+                        'LoggingEnabled': {
+                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetPrefix': target_prefix}})
+                continue
+            if not enabled and r['Logging']['Status'] == 'Enabled':
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={})
+                continue
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
+    """Action attaches lambda encryption policy to S3 bucket
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-logging-buckets
+                resource: s3
+                filters:
+                  - type: missing-policy-statement
+                actions:
+                  - attach-encrypt
+    """
     schema = type_schema(
         'attach-encrypt', role={'type': 'string'})
 
@@ -494,6 +654,22 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 @actions.register('encryption-policy')
 class EncryptionRequiredPolicy(BucketActionBase):
+    """Action to apply an encryption policy to S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enforce-encryption
+                resource: s3
+                mode:
+                  type: cloudtrail
+                  events:
+                    - CreateBucket
+                actions:
+                  - encryption-policy
+    """
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
     schema = type_schema('encryption-policy')
@@ -761,6 +937,20 @@ class ScanBucket(BucketActionBase):
 
 @actions.register('encrypt-keys')
 class EncryptExtantKeys(ScanBucket):
+    """Action to encrypt unencrypted S3 objects
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-encrypt-objects
+                resource: s3
+                actions:
+                  - type: encrypt-keys
+                    crypto: aws:kms
+                    key-id: 9c3983be-c6cf-11e6-9d9d-cec0c932ce01
+    """
 
     permissions = (
         "s3:GetObject",
@@ -771,14 +961,24 @@ class EncryptExtantKeys(ScanBucket):
 
     schema = {
         'type': 'object',
-        'additonalProperties': False,
+        'additionalProperties': False,
         'properties': {
+            'type': {'enum': ['encrypt-keys']},
             'report-only': {'type': 'boolean'},
             'glacier': {'type': 'boolean'},
             'large': {'type': 'boolean'},
-            'crypto': {'enum': ['AES256', 'aws:kms']}
+            'crypto': {'enum': ['AES256', 'aws:kms']},
+            'key-id': {'type': 'string'}
+            },
+        'dependencies': {
+            'key-id': {
+              'properties': {
+                'crypto': {'pattern': 'aws:kms'}
+              },
+              'required': ['crypto']
             }
         }
+    }
 
     metrics = [
         ('Total Keys', {'Scope': 'Account'}),
@@ -858,6 +1058,7 @@ class EncryptExtantKeys(ScanBucket):
             storage_class == 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
+        key_id = self.data.get('key-id')
         # Note on copy we lose individual object acl grants
         params = {'Bucket': bucket_name,
                   'Key': k,
@@ -865,6 +1066,9 @@ class EncryptExtantKeys(ScanBucket):
                   'MetadataDirective': 'COPY',
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
+
+        if key_id and crypto_method is 'aws:kms':
+            params['SSEKMSKeyId'] = key_id
 
         if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
                 'large', True):
@@ -961,6 +1165,16 @@ class LogTarget(Filter):
       - s3 (Access Log)
       - cfn (Template writes)
       - cloudtrail
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-log-bucket
+                resource: s3
+                filters:
+                  - type: is-log-target
     """
 
     schema = type_schema('is-log-target', value={'type': 'boolean'})
@@ -1067,6 +1281,20 @@ def _query_elb_attrs(session_factory, elb_set):
 
 @actions.register('delete-global-grants')
 class DeleteGlobalGrants(BucketActionBase):
+    """Deletes global grants associated to a S3 bucket
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-delete-global-grants
+                resource: s3
+                filters:
+                  - type: global-grants
+                actions:
+                  - delete-global-grants
+    """
 
     schema = type_schema(
         'delete-global-grants',
@@ -1121,6 +1349,23 @@ class DeleteGlobalGrants(BucketActionBase):
 
 @actions.register('tag')
 class BucketTag(Tag):
+    """Action to create tags on a S3 bucket
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-tag-region
+                resource: s3
+                region: us-east-1
+                filters:
+                  - "tag:RegionName": absent
+                actions:
+                  - type: tag
+                    key: RegionName
+                    value: us-east-1
+    """
 
     def process_resource_set(self, resource_set, tags):
         modify_bucket_tags(self.manager.session_factory, resource_set, tags)
@@ -1128,6 +1373,24 @@ class BucketTag(Tag):
 
 @actions.register('mark-for-op')
 class MarkBucketForOp(TagDelayedAction):
+    """Action schedules custodian to perform an action at a certain date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-encrypt
+                resource: s3
+                filters:
+                  - type: missing-statement
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+                actions:
+                  - type: mark-for-op
+                    op: attach-encrypt
+                    days: 7
+    """
 
     schema = type_schema(
         'mark-for-op', rinherit=TagDelayedAction.schema)
@@ -1138,9 +1401,24 @@ class MarkBucketForOp(TagDelayedAction):
 
 @actions.register('unmark')
 class RemoveBucketTag(RemoveTag):
+    """Removes tag/tags from a S3 object
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-remove-owner-tag
+                resource: s3
+                filters:
+                  - "tag:BucketOwner": present
+                actions:
+                  - type: unmark
+                    tags: ['BucketOwner']
+    """
 
     schema = type_schema(
-        'remove-tag', aliases=('unmark'), key={'type': 'string'})
+        'unmark', aliases=('remove-tag'), tags={'type': 'array'})
 
     def process_resource_set(self, resource_set, tags):
         modify_bucket_tags(
@@ -1149,10 +1427,26 @@ class RemoveBucketTag(RemoveTag):
 
 @actions.register('delete')
 class DeleteBucket(ScanBucket):
+    """Action deletes a S3 bucket
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-unencrypted-buckets
+                resource: s3
+                filters:
+                  - type: missing-statement
+                    statement_ids:
+                      - RequiredEncryptedPutObject
+                actions:
+                  - type: delete
+                    remove-contents: true
+    """
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
-    from c7n.executor import MainThreadExecutor
-    executor_factory = MainThreadExecutor
+
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
@@ -1174,7 +1468,7 @@ class DeleteBucket(ScanBucket):
         Disable versioning on the bucket, so deletes don't
         generate fresh deletion markers.
         """
-        client = local_session(self.manager).client('s3')
+        client = local_session(self.manager.session_factory).client('s3')
 
         # Suspend versioning, so we don't get new delete markers
         # as we walk and delete versions

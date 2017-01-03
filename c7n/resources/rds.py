@@ -43,16 +43,21 @@ Find rds instances that are not encrypted
 
 """
 import functools
+import itertools
 import logging
+import operator
 import re
-
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
-from c7n.filters import FilterRegistry, Filter, AgeFilter, OPERATORS
+from c7n.actions import (
+    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
+from c7n.filters import (
+    CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
+    FilterValidationError)
+
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -61,8 +66,6 @@ from c7n.utils import (
     local_session, type_schema, get_account_id,
     get_retry, chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
-
-from skew.resources.aws import rds
 
 log = logging.getLogger('custodian.rds')
 
@@ -79,9 +82,29 @@ class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
     """
 
-    class resource_type(rds.DBInstance.Meta):
+    class resource_type(object):
+        service = 'rds'
+        type = 'db'
+        enum_spec = ('describe_db_instances', 'DBInstances', None)
+        id = 'DBInstanceIdentifier'
+        name = 'Endpoint.Address'
         filter_name = 'DBInstanceIdentifier'
+        filter_type = 'scalar'
+        date = 'InstanceCreateTime'
+        dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+
+        default_report_fields = (
+            'DBInstanceIdentifier',
+            'DBName',
+            'Engine',
+            'EngineVersion',
+            'MultiAZ',
+            'AllocatedStorage',
+            'StorageEncrypted',
+            'PubliclyAccessible',
+            'InstanceCreateTime',
+        )
 
     filter_registry = filters
     action_registry = actions
@@ -241,6 +264,16 @@ def _get_available_engine_upgrades(client, major=False):
 @filters.register('default-vpc')
 class DefaultVpc(Filter):
     """ Matches if an rds database is in the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: default-vpc-rds
+                resource: rds
+                filters:
+                  - default-vpc
     """
 
     schema = type_schema('default-vpc')
@@ -283,7 +316,22 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
+    """Mark a RDS instance for specific custodian action
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: mark-for-delete
+                resource: rds
+                filters:
+                  - type: default-vpc
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema)
 
@@ -292,15 +340,36 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process(self, dbs):
         return super(TagDelayedAction, self).process(dbs)
 
-    def process_resource_set(self, dbs, ts):
+    def process_resource_set(self, dbs, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
             arn = self.manager.generate_arn(db['DBInstanceIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
 @actions.register('auto-patch')
 class AutoPatch(BaseAction):
+    """Toggle AutoMinorUpgrade flag on RDS instance
+
+    'window' parameter needs to be in the format 'ddd:hh:mm-ddd:hh:mm' and
+    have at least 30 minutes between start & end time.
+    If 'window' is not specified, AWS will assign a random maintenance window
+    to each instance selected.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: enable-rds-autopatch
+                resource: rds
+                filters:
+                  - AutoMinorVersionUpgrade: false
+                actions:
+                  - type: auto-patch
+                    minor: true
+                    window: Mon:23:00-Tue:01:00
+    """
 
     schema = type_schema(
         'auto-patch',
@@ -330,6 +399,17 @@ class UpgradeAvailable(Filter):
     This will also annotate the rds instance with 'target_engine' which is
     the most recent version of the engine available
 
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-upgrade-available
+                resource: rds
+                filters:
+                  - upgrade-available
+                    major: false
+
     """
 
     schema = type_schema('upgrade-available',
@@ -358,6 +438,27 @@ class UpgradeAvailable(Filter):
 
 @actions.register('upgrade')
 class UpgradeMinor(BaseAction):
+    """Upgrades a RDS instance to the latest major/minor version available
+
+    Use of the 'immediate' flag (default False) will automatically upgrade
+    the RDS engine disregarding the existing maintenance window.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: upgrade-rds-minor
+                resource: rds
+                filters:
+                  - name: upgrade-available
+                    major: false
+                actions:
+                  - type: upgrade
+                    major: false
+                    immediate: false
+
+    """
 
     schema = type_schema(
         'upgrade', major={'type': 'boolean'}, immediate={'type': 'boolean'})
@@ -390,6 +491,22 @@ class UpgradeMinor(BaseAction):
 @actions.register('tag')
 @actions.register('mark')
 class Tag(tags.Tag):
+    """Mark/tag a RDS instance with a key/value
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-owner-tag
+                resource: rds
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
 
     concurrency = 2
     batch_size = 5
@@ -405,6 +522,21 @@ class Tag(tags.Tag):
 @actions.register('remove-tag')
 @actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
+    """Removes a tag or set of tags from RDS instances
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-unmark-instances
+                resource: rds
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: unmark
+                    tags: ["ExpiredTag"]
+    """
 
     concurrency = 2
     batch_size = 5
@@ -430,6 +562,24 @@ class TagTrim(tags.TagTrim):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Deletes selected RDS instances
+
+    This will delete RDS instances. It is recommended to apply with a filter
+    to avoid deleting all RDS instances in the account.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-delete
+                resource: rds
+                filters:
+                  - default-vpc
+                actions:
+                  - type: delete
+                    skip-snapshot: true
+    """
 
     schema = {
         'type': 'object',
@@ -465,10 +615,20 @@ class Delete(BaseAction):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Creates a manual snapshot of a RDS instance
 
-    schema = {'properties': {
-        'type': {
-            'enum': ['snapshot']}}}
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot
+                resource: rds
+                actions:
+                  - snapshot
+    """
+
+    schema = type_schema('snapshot')
 
     def process(self, dbs):
         with self.executor_factory(max_workers=3) as w:
@@ -498,6 +658,25 @@ class Snapshot(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
+    """Sets the 'BackupRetentionPeriod' value for automated snapshots
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: value
+                    key: BackupRetentionPeriod
+                    value: 7
+                    op: lt
+                actions:
+                  - type: retention
+                    days: 7
+                    copy-tags: true
+    """
 
     date_attribute = "BackupRetentionPeriod"
     schema = type_schema(
@@ -567,7 +746,6 @@ class RDSSnapshot(QueryResourceManager):
     """
 
     class resource_type(object):
-
         service = 'rds'
         type = 'rds-snapshot'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
@@ -597,7 +775,8 @@ class RDSSnapshot(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot', separator=':')
+                account_id=self.account_id, resource_type='snapshot',
+                separator=':')
         return self._generate_arn
 
     def augment(self, snaps):
@@ -630,8 +809,42 @@ def _rds_snap_tags(
         return filter(None, (w.map(process_tags, snaps)))
 
 
+@RDSSnapshot.filter_registry.register('latest')
+class LatestSnapshot(Filter):
+    """Return the latest snapshot for each database.
+    """
+    schema = type_schema('latest', automatic={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        results = []
+        if not self.data.get('automatic', True):
+            resources = [r for r in resources if r['SnapshotType'] == 'manual']
+        for db_identifier, snapshots in itertools.groupby(
+                resources, operator.itemgetter('DBInstanceIdentifier')):
+            results.append(
+                sorted(snapshots,
+                       key=operator.itemgetter('SnapshotCreateTime'))[-1])
+        return results
+
+
 @RDSSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
+    """Filters RDS snapshots based on age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-expired
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
 
     schema = type_schema(
         'age', days={'type': 'number'},
@@ -642,6 +855,24 @@ class RDSSnapshotAge(AgeFilter):
 
 @RDSSnapshot.action_registry.register('tag')
 class RDSSnapshotTag(tags.Tag):
+    """Action to tag a RDS snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-add-owner
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 7
+                    op: le
+                actions:
+                  - type: tag
+                    key: rds_owner
+                    value: rds_owner_name
+    """
 
     concurrency = 2
     batch_size = 5
@@ -656,6 +887,24 @@ class RDSSnapshotTag(tags.Tag):
 
 @RDSSnapshot.action_registry.register('mark-for-op')
 class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
+    """Mark RDS snapshot resource for an operation at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-stale-snapshots
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 21
+                    op: eq
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
 
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema,
@@ -673,6 +922,22 @@ class RDSSnapshotTagDelayedAction(tags.TagDelayedAction):
 @RDSSnapshot.action_registry.register('remove-tag')
 @RDSSnapshot.action_registry.register('unmark')
 class RDSSnapshotRemoveTag(tags.RemoveTag):
+    """Removes a tag/set of tags from a RDS snapshot resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-unmark
+                resource: rds-snapshot
+                filters:
+                  - "tag:rds_owner": present
+                actions:
+                  - type: remove-tag
+                    tags:
+                      - rds_owner
+    """
 
     concurrency = 2
     batch_size = 5
@@ -686,8 +951,172 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
                 ResourceName=arn, TagKeys=tag_keys)
 
 
+@RDSSnapshot.filter_registry.register('cross-account')
+class CrossAccountAccess(CrossAccountAccessFilter):
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(
+                    self.process_resource_set, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access\n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resource_set:
+            attrs = {t['AttributeName']: t['AttributeValues']
+             for t in client.describe_db_snapshot_attributes(
+                DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
+                    'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
+            r['c7n:attributes'] = attrs
+            shared_accounts = set(attrs.get('restore', []))
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+
+@RDSSnapshot.action_registry.register('region-copy')
+class RegionCopySnapshot(BaseAction):
+    """Copy a snapshot across regions.
+
+    Note there is a max in flight for cross region rds snapshots
+    of 5 per region. This action will attempt to retry automatically
+    for an hr.
+
+    Example::
+
+      - name: copy-encrypted-snapshots
+        description: |
+          copy snapshots under 1 day old to dr region with kms
+        resource: rdb-snapshot
+        region: us-east-1
+        filters:
+         - Status: available
+         - type: value
+           key: SnapshotCreateTime
+           value_type: age
+           value: 1
+           op: less-than
+        actions:
+          - type: region-copy
+            target_region: us-east-2
+            target_key: arn:aws:kms:us-east-2:0000:key/cb291f53-c9cf61
+            copy_tags: true
+            tags:
+              - OriginRegion: us-east-1
+    """
+
+    schema = type_schema(
+        'region-copy',
+        target_region={'type': 'string'},
+        target_key={'type': 'string'},
+        copy_tags={'type': 'boolean'},
+        tags={'type': 'object'},
+        required=('target_region',))
+
+    min_delay = 120
+    max_attempts = 30
+
+    def validate(self):
+        if self.data.get('target_region') and self.manager.data.get('mode'):
+            raise FilterValidationError(
+                "cross region snapshot may require waiting for "
+                "longer then lambda runtime allows")
+        return self
+
+    def process(self, resources):
+        if self.data['target_region'] == self.manager.config.region:
+            self.log.warning(
+                "Source and destination region are the same, skipping copy")
+            return
+        for resource_set in chunks(resources, 20):
+            self.process_resource_set(resource_set)
+
+    def process_resource(self, target, key, tags, snapshot):
+        p = {}
+        if key:
+            p['KmsKeyId'] = key
+        p['TargetDBSnapshotIdentifier'] = snapshot[
+            'DBSnapshotIdentifier'].replace(':', '-')
+        p['SourceRegion'] = self.manager.config.region
+        p['SourceDBSnapshotIdentifier'] = snapshot['DBSnapshotArn']
+
+        if self.data.get('copy_tags', True):
+            p['CopyTags'] = True
+        if tags:
+            p['Tags'] = tags
+
+        retry = get_retry(
+            ('SnapshotQuotaExceeded',),
+            # TODO make this configurable, class defaults to 1hr
+            min_delay=self.min_delay,
+            max_attempts=self.max_attempts,
+            log_retries=logging.DEBUG)
+        try:
+            result = retry(target.copy_db_snapshot, **p)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DBSnapshotAlreadyExists':
+                self.log.warning(
+                    "Snapshot %s already exists in target region",
+                    snapshot['DBSnapshotIdentifier'])
+                return
+            raise
+        snapshot['c7n:CopiedSnapshot'] = result[
+            'DBSnapshot']['DBSnapshotArn']
+
+    def process_resource_set(self, resource_set):
+        target_client = self.manager.session_factory(
+            region=self.data['target_region']).client('rds')
+        target_key = self.data.get('target_key')
+        tags = [{'Key': k, 'Value': v} for k, v
+                in self.data.get('tags', {}).items()]
+        source_client = local_session(
+            self.manager.session_factory).client('rds')
+
+        for snapshot_set in chunks(resource_set, 5):
+            for r in snapshot_set:
+                # If tags are supplied, copy tags are ignored, and
+                # we need to augment the tag set with the original
+                # resource tags to preserve the common case.
+                rtags = tags and list(tags) or None
+                if tags and self.data.get('copy_tags', True):
+                    rtags.extend(r['Tags'])
+                self.process_resource(target_client, target_key, rtags, r)
+
+
 @RDSSnapshot.action_registry.register('delete')
 class RDSSnapshotDelete(BaseAction):
+    """Deletes a RDS snapshot resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-delete-stale
+                resource: rds-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
 
     def process(self, snapshots):
         log.info("Deleting %d rds snapshots", len(snapshots))
@@ -710,6 +1139,33 @@ class RDSSnapshotDelete(BaseAction):
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
 
 
+@actions.register('modify-security-groups')
+class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    def process(self, rds_instances):
+        replication_group_map = {}
+        client = local_session(self.manager.session_factory).client('rds')
+        groups = super(RDSModifyVpcSecurityGroups, self).get_groups(
+            rds_instances, metadata_key='VpcSecurityGroupId')
+
+        # either build map for DB cluster or modify DB instance directly
+        for idx, i in enumerate(rds_instances):
+            if i.get('DBClusterIdentifier'):
+                # build map of Replication Groups to Security Groups
+                replication_group_map[i['DBClusterIdentifier']] = groups[idx]
+            else:
+                client.modify_db_instance(
+                    DBInstanceIdentifier=i['DBInstanceIdentifier'],
+                    VpcSecurityGroupIds=groups[idx])
+
+        # handle DB cluster, if necessary
+        for idx, r in enumerate(replication_group_map.keys()):
+            client.modify_db_cluster(
+                DBClusterIdentifier=r,
+                VpcSecurityGroupIds=replication_group_map[r]
+            )
+
+
 @resources.register('rds-subnet-group')
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
@@ -724,3 +1180,4 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+

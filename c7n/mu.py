@@ -19,7 +19,6 @@ docs/lambda.rst
 
 import abc
 import base64
-from datetime import datetime
 import inspect
 import fnmatch
 import hashlib
@@ -41,10 +40,15 @@ import c7n
 
 # Static event mapping to help simplify cwe rules creation
 from c7n.cwe import CloudWatchEvents
+from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
+RUNTIME = 'python{}.{}'.format(
+    sys.version_info.major,
+    sys.version_info.minor,
+)
 
 
 class PythonPackageArchive(object):
@@ -52,6 +56,8 @@ class PythonPackageArchive(object):
 
     Packages up a virtualenv and a source package directory per lambda's
     directory structure.
+
+    See http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python
     """
 
     def __init__(self, src_path, virtualenv_dir=None, skip=None,
@@ -111,18 +117,29 @@ class PythonPackageArchive(object):
                     self.add_file(f_path, dest_path)
 
         # Library Source
-        venv_lib_path = os.path.join(
-            self.virtualenv_dir, 'lib', 'python2.7', 'site-packages')
+        venv_lib_paths = (
+            os.path.join(
+                self.virtualenv_dir,
+                'lib', RUNTIME, 'site-packages',
+            ),
+            os.path.join(
+                self.virtualenv_dir,
+                'lib64', RUNTIME, 'site-packages',
+            ),
+        )
 
-        for root, dirs, files in os.walk(venv_lib_path):
-            if self.lib_filter:
-                dirs, files = self.lib_filter(root, dirs, files)
-            arc_prefix = os.path.relpath(root, venv_lib_path)
-            files = self.filter_files(files)
-            for f in files:
-                f_path = os.path.join(root, f)
-                dest_path = os.path.join(arc_prefix, f)
-                self.add_file(f_path, dest_path)
+        for venv_lib_path in venv_lib_paths:
+            if not os.path.exists(venv_lib_path):
+                continue
+            for root, dirs, files in os.walk(venv_lib_path):
+                if self.lib_filter:
+                    dirs, files = self.lib_filter(root, dirs, files)
+                arc_prefix = os.path.relpath(root, venv_lib_path)
+                files = self.filter_files(files)
+                for f in files:
+                    f_path = os.path.join(root, f)
+                    dest_path = os.path.join(arc_prefix, f)
+                    self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)
@@ -177,7 +194,7 @@ def custodian_archive(skip=None):
     """Create a lambda code archive for running custodian."""
 
     # Some aggressive shrinking
-    required = ["concurrent", "yaml", "pkg_resources", "skew", "ipaddress.py"]
+    required = ["pkg_resources", "ipaddress.py"]
     host_platform = platform.uname()[0]
 
     def lib_filter(root, dirs, files):
@@ -271,7 +288,7 @@ class LambdaManager(object):
                     f['Metrics'] = m
         return results
 
-    def logs(self, func):
+    def logs(self, func, start, end):
         logs = self.session_factory().client('logs')
         group_name = "/aws/lambda/%s" % func.name
         log.info("Fetching logs from group: %s" % group_name)
@@ -290,9 +307,15 @@ class LambdaManager(object):
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
                 return
             raise
+        start = _timestamp_from_string(start)
+        end = _timestamp_from_string(end)
         for s in reversed(log_streams['logStreams']):
             result = logs.get_log_events(
-                logGroupName=group_name, logStreamName=s['logStreamName'])
+                logGroupName=group_name,
+                logStreamName=s['logStreamName'],
+                startTime=start,
+                endTime=end,
+            )
             for e in result['events']:
                 yield e
 

@@ -63,8 +63,23 @@ class Key(KeyBase, QueryResourceManager):
 
     resource_type = Meta
 
+
 @Key.filter_registry.register('key-rotation-status')
 class KeyRotationStatus(ValueFilter):
+    """Filters KMS keys by the rotation status
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: kms-key-disabled-rotation
+                resource: kms-key
+                filters:
+                  - type: key-rotation-status
+                    key: KeyRotationEnabled
+                    value: false
+    """
 
     schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
 
@@ -78,7 +93,8 @@ class KeyRotationStatus(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
                 r for r in resources if 'KeyRotationEnabled' not in r]
-            self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
+            self.log.debug(
+                "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
         return [r for r in resources if self.match(r['KeyRotationEnabled'])]
@@ -87,6 +103,18 @@ class KeyRotationStatus(ValueFilter):
 @Key.filter_registry.register('cross-account')
 @KeyAlias.filter_registry.register('cross-account')
 class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filter KMS keys which have cross account permissions
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: kms-key-cross-account
+                resource: kms-key
+                filters:
+                  - type: cross-account
+    """
 
     def process(self, resources, event=None):
         def _augment(r):
@@ -108,6 +136,21 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
 
 @KeyAlias.filter_registry.register('grant-count')
 class GrantCount(Filter):
+    """Filters KMS key grants
+
+    This can be used to ensure issues around grant limits are monitored
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: kms-grants
+                resource: kms
+                filters:
+                  - type: grant-count
+                    min: 100
+    """
 
     schema = type_schema(
         'grant-count', min={'type': 'integer', 'minimum': 0})
