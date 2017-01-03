@@ -99,10 +99,10 @@ def log_entries_from_s3(session_factory, output, start, end):
         start.strftime('%Y/%m/%d/00'),
         log_filename,
     )
-    p = client.get_paginator('list_objects').paginate(
+    p = client.get_paginator('list_objects_v2').paginate(
         Bucket=output.bucket,
         Prefix=key_prefix + '/',
-        Marker=marker,
+        StartAfter=marker,
     )
     with ThreadPoolExecutor(max_workers=20) as w:
         for key_set in p:

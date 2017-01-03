@@ -215,10 +215,10 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     marker = key_prefix.strip("/") + "/" + start_date.strftime(
          '%Y/%m/%d/00') + "/resources.json.gz"
 
-    p = s3.get_paginator('list_objects').paginate(
+    p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        Marker=marker
+        StartAfter=marker,
     )
 
     with ThreadPoolExecutor(max_workers=20) as w:
