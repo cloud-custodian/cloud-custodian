@@ -601,23 +601,11 @@ class NormalizeTag(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        if self.data.get('action') == 'lower':
-            new_value = tag_value.lower()
-        elif self.data.get('action') == 'upper':
-            new_value = tag_value.upper()
-        elif self.data.get('action') == 'title':
-            new_value = tag_value.title()
-        elif self.data.get('action') == 'strip' and self.data.get('value'):
-            new_value = tag_value.strip(self.data.get('value'))
-        else:
-            self.log.error(
-                "%s is an invalid action type" % (self.data.get('action')))
-
         self.create_tag(
             c,
             [r[self.id_key] for r in resource_set if len(
                 r.get('Tags', [])) < 50],
-            key, new_value)
+            key, tag_value)
 
     def create_set(self, instances):
         key = self.data.get('key', None)
@@ -649,8 +637,18 @@ class NormalizeTag(Action):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for r in resource_set:
-                futures.append(
-                    w.submit(self.process_transform, r, resource_set[r]))
+                new_value = False
+                if self.data.get('action') == 'lower' and not r.islower():
+                    new_value = r.lower()
+                elif self.data.get('action') == 'upper' and not r.isupper():
+                    new_value = r.upper()
+                elif self.data.get('action') == 'title' and not r.istitle():
+                    new_value = r.title()
+                elif self.data.get('action') == 'strip' and self.data.get('value') and self.data.get('value') in r:
+                    new_value = r.strip(self.data.get('value'))
+                if new_value:
+                    futures.append(
+                        w.submit(self.process_transform, new_value, resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
