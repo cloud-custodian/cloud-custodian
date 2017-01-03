@@ -24,7 +24,7 @@ class HostedZone(QueryResourceManager):
         service = 'route53'
         type = 'hostedzone'
         enum_spec = ('list_hosted_zones', 'HostedZones', None)
-        detail_spec = ('GetHostedZone', 'Id', None)
+        # detail_spec = ('get_hosted_zone', 'Id', 'Id', None)
         id = 'Id'
         filter_name = None
         name = 'Name'
@@ -39,7 +39,6 @@ class HealthCheck(QueryResourceManager):
         service = 'route53'
         type = 'healthcheck'
         enum_spec = ('list_health_checks', 'HealthChecks', None)
-        detail_spec = ('GetHealthCheck', 'Id', None)
         name = id = 'Id'
         filter_name = None
         date = None

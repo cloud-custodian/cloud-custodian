@@ -46,15 +46,15 @@ class S3OutputTest(unittest.TestCase):
             ExecutionContext(
                 None,
                 Bag(name="xyz"),
-                Config.empty(output_dir="s3://cloud-maid/policies")))
+                Config.empty(output_dir="s3://cloud-custodian/policies")))
         self.addCleanup(shutil.rmtree, output.root_dir)
 
         return output
-        
+
     def test_join_leave_log(self):
         output = self.get_s3_output()
         output.join_log()
-        
+
         l = logging.getLogger('custodian.s3')
 
         # recent versions of nose mess with the logging manager
@@ -63,11 +63,11 @@ class S3OutputTest(unittest.TestCase):
 
         l.info('hello world')
         output.leave_log()
-        logging.getLogger('maid.s3').info('byebye')
+        logging.getLogger('c7n.s3').info('byebye')
 
         # Reset logging.manager back to nose configured value
         l.manager.disable = v
-        
+
         with open(os.path.join(output.root_dir, "custodian-run.log")) as fh:
             content = fh.read().strip()
             self.assertTrue(content.endswith('hello world'))
@@ -89,21 +89,21 @@ class S3OutputTest(unittest.TestCase):
 
                 with gzip.open(os.path.join(root, f)) as fh:
                     self.assertEqual(fh.read(), 'abc')
-                    
+
     def test_upload(self):
         output = self.get_s3_output()
         self.assertEqual(output.key_prefix, "/policies/xyz")
 
         with open(os.path.join(output.root_dir, 'foo.txt'), 'w') as fh:
             fh.write('abc')
-            
+
         output.transfer = mock.MagicMock()
         output.transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
-        
+
         m.assert_called_with(
-            fh.name, 'cloud-maid',
+            fh.name, 'cloud-custodian',
             'policies/xyz/%s/foo.txt' % output.date_path ,
             extra_args={
                 'ServerSideEncryption': 'AES256'})
@@ -113,21 +113,14 @@ class S3OutputTest(unittest.TestCase):
 
         with open(os.path.join(output.root_dir, 'foo.txt'), 'w') as fh:
             fh.write('abc')
-            
+
         output.transfer = mock.MagicMock()
         output.transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
-        
+
         m.assert_called_with(
-            fh.name, 'cloud-maid',
+            fh.name, 'cloud-custodian',
             'policies/xyz/%s/foo.txt' % output.date_path,
             extra_args={
                 'ServerSideEncryption': 'AES256'})
-        
-                
-            
-        
-
-        
-        

@@ -37,8 +37,10 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 ghpages:
-	-git checkout gh-pages && \
-	cp -r docs/build/html/* ./docs/ && \
+	git checkout gh-pages && \
+	mv docs/build/html new-docs && \
+	rm -rf docs && \
+	mv new-docs docs && \
 	git add -u && \
 	git add -A && \
 	git commit -m "Updated generated Sphinx documentation"

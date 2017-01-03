@@ -18,3 +18,5 @@ cache/
 policies/
 local/
 *~
+share/
+out/

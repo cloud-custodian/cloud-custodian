@@ -27,6 +27,7 @@ class NotifyTest(BaseTest):
             'filters': [{'tag:Testing': 'Testing123'}],
             'actions': [
                 {'type': 'notify',
+                 'to': ['someon@example.com'],
                  'transport' : {
                      'type': 'sqs',
                      'queue': 'https://sqs.us-west-2.amazonaws.com/619193117841/custodian-messages',

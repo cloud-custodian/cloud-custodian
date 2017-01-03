@@ -18,8 +18,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    Filter, FilterRegistry, AgeFilter, ValueFilter, ANNOTATION_KEY,
-    FilterValidationError, OPERATORS)
+    CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
+    ANNOTATION_KEY, FilterValidationError, OPERATORS)
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -71,7 +71,7 @@ class SnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: ebs-snapshots-week-old
@@ -108,6 +108,43 @@ def _filter_ami_snapshots(self, snapshots):
     return matches
 
 
+@Snapshot.filter_registry.register('cross-account')
+class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for resource_set in chunks(resources, 50):
+                futures.append(w.submit(
+                    self.process_resource_set, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access \n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('ec2')
+        results = []
+        for r in resource_set:
+            attrs = self.manager.retry(
+                client.describe_snapshot_attribute,
+                SnapshotId=r['SnapshotId'],
+                Attribute='createVolumePermission')['CreateVolumePermissions']
+            shared_accounts = {
+                g.get('Group') or g.get('UserId') for g in attrs}
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
     """Filter to remove snapshots of AMIs from results
@@ -116,7 +153,7 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
@@ -148,7 +185,7 @@ class SnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
@@ -211,7 +248,7 @@ class CopySnapshot(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: copy-snapshot-east-west
@@ -303,7 +340,7 @@ class EBS(QueryResourceManager):
         date = 'createTime'
         dimension = 'VolumeId'
         metrics_namespace = 'AWS/EBS'
-        config_type = "AWS::EC::Volume"
+        config_type = "AWS::EC2::Volume"
         default_report_fields = (
             'VolumeId',
             'Attachments[0].InstanceId',
@@ -322,7 +359,7 @@ class AttachedInstanceFilter(ValueFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: instance-ebs-volumes
@@ -413,7 +450,7 @@ class CopyInstanceTags(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: ebs-copy-instance-tags
@@ -773,7 +810,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block: yaml
 
             policies:
               - name: delete-unattached-volumes
