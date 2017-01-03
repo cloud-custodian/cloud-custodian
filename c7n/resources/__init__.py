@@ -24,6 +24,7 @@ def load_resources():
     import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
+    import c7n.resources.batch
     import c7n.resources.cfn
     import c7n.resources.cloudfront
     import c7n.resources.cloudsearch
@@ -47,9 +48,11 @@ def load_resources():
     import c7n.resources.iam
     import c7n.resources.kinesis
     import c7n.resources.kms
-    import c7n.resources.redshift
+    import c7n.resources.ml
+    import c7n.resources.opsworks
     import c7n.resources.rds
     import c7n.resources.rdscluster
+    import c7n.resources.redshift
     import c7n.resources.route53
     import c7n.resources.s3
     import c7n.resources.shield

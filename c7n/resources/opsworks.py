@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,28 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('acm-certificate')
-class Certificate(QueryResourceManager):
+@resources.register('opswork-stack')
+class OpsworkStack(QueryResourceManager):
 
     class resource_type(object):
-        service = 'acm'
-        enum_spec = ('list_certificates', 'CertificateSummaryList', None)
-        id = 'CertificateArn'
-        name = 'DomainName'
+        service = 'opsworks'
+        enum_spec = ('describe_stacks', 'Stacks', None)
+        filter_name = 'StackIds'
+        filter_type = 'list'
+        id = 'StackId'
+        name = 'Name'
+        date = 'CreatedAt'
+        dimension = "StackId"
+
+
+@resources.register('opswork-cm')
+class OpsworksCM(QueryResourceManager):
+
+    class resource_type(object):
+        service = "opsworkscm"
+        enum_spec = ('describe_servers', 'Servers', None)
+        filter_name = 'ServerName'
+        filter_type = 'scalar'
+        name = id = 'ServerName'
         date = 'CreatedAt'
         dimension = None
-        detail_spec = (
-            "describe_certificate", "CertificateArn",
-            'CertificateArn', 'Certificate')
-        config_type = "AWS::ACM::Certificate"
