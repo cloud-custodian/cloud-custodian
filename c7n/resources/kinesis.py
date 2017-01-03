@@ -72,6 +72,8 @@ class DeliveryStream(QueryResourceManager):
 @DeliveryStream.action_registry.register('delete')
 class FirehoseDelete(Action):
 
+    schema = type_schema('delete')
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('firehose')
         creating = [r['DeliveryStreamName'] for r in resources
@@ -104,6 +106,8 @@ class AnalyticsApp(QueryResourceManager):
 
 @AnalyticsApp.action_registry.register('delete')
 class AppDelete(Action):
+
+    schema = type_schema('delete')
 
     def process(self, resources):
         client = local_session(

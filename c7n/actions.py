@@ -145,59 +145,6 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
             {'required': ['add']}]
         }
 
-    # TODO this method can go away, after merging #785
-    def validate(self):
-        """ Validate the schema for modify-security-groups action
-
-        Must specify 'add' or 'remove' parameters.
-
-        If 'remove' is specified, one of 'add' or 'isolation-group' must also
-        be specified in the event that the 'remove' operation marks all extant
-        security groups on the interface for removal.
-
-        Valid input types:
-        'add': list, string
-        'remove': list, string, keywords: 'matched' or 'all'
-        'isolation-group': list, string
-
-        """
-        if 'add' not in self.data and 'remove' not in self.data:
-            raise ValueError(
-                "Must specify either 'add' or 'remove' parameters")
-        if 'remove' in self.data:
-            # need 'add' or 'isolation-group'
-            if 'isolation-group' not in self.data and 'add' not in self.data:
-                raise ValueError(
-                    "Must specify 'isolation-group' or 'add\' parameters "
-                    "when using the 'remove' action")
-            # type validation
-            if isinstance(self.data['remove'], basestring):
-                if ('sg-' not in self.data['remove'] and
-                    'all' not in self.data['remove'] and
-                    'matched' not in self.data['remove']):
-                    raise ValueError(
-                        "Must specify valid input for the 'remove' parameter")
-            if isinstance(self.data['remove'], list) and any(
-                    'sg-' not in g for g in self.data['remove']):
-                raise ValueError(
-                    "Must specify valid security group ids "
-                    "for the 'remove' parameter")
-        # type validations: str with 'sg-' or list with all 'sg-' strs
-        if 'add' in self.data:
-            if isinstance(self.data['add'], basestring) and 'sg-' not in self.data['add']:
-                raise ValueError('Must specify a valid security group id for the \'add\' parameter')
-            if isinstance(self.data['add'], list) and any('sg-' not in g for g in self.data['add']):
-                raise ValueError('Must specify valid security group ids for the \'add\' parameter')
-        if 'isolation-group' in self.data:
-            if isinstance(self.data['isolation-group'], basestring) and 'sg-' not in self.data['isolation-group']:
-                raise ValueError('Must specify a valid security group id for the \'isolation-group\' parameter')
-            if isinstance(self.data['isolation-group'], list) and any('sg-' not in g for g in self.data['isolation-group']):
-                raise ValueError(
-                    "Must specify valid security group ids "
-                    "for the 'isolation-group' parameter")
-
-        return self
-
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
 

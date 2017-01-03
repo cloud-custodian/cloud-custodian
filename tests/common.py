@@ -61,7 +61,7 @@ class BaseTest(PillTest):
         if validate:
             errors = schema_validate({'policies': [data]}, C7N_SCHEMA)
             if errors:
-                self.fail("Loaded policy is not valid %s" % errors[0])
+                raise errors[0]
 
         config = config or {}
         temp_dir = tempfile.mkdtemp()

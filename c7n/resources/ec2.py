@@ -580,6 +580,13 @@ class Resize(BaseAction, StateTransitionFilter):
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
     """
+
+    schema = type_schema(
+        'resize',
+        **{'restart': {'type': 'boolean'},
+           'type-map': {'type': 'object'},
+           'default': {'type': 'string'}})
+
     valid_origin_states = ('running', 'stopped')
 
     def process(self, resources):

@@ -625,7 +625,7 @@ class CapacityDelta(Filter):
                   - capacity-delta
     """
 
-    schema = type_schema('size-delta')
+    schema = type_schema('capacity-delta')
 
     def process(self, asgs, event=None):
         return [a for a in asgs
@@ -771,7 +771,9 @@ class Tag(BaseAction):
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
-        propagate={'type': 'boolean'})
+        propagate={'type': 'boolean'},
+        aliases=('mark',)
+    )
 
     batch_size = 1
 

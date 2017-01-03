@@ -628,9 +628,7 @@ class Snapshot(BaseAction):
                   - snapshot
     """
 
-    schema = {'properties': {
-        'type': {
-            'enum': ['snapshot']}}}
+    schema = type_schema('snapshot')
 
     def process(self, dbs):
         with self.executor_factory(max_workers=3) as w:

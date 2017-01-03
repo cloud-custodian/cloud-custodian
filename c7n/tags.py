@@ -262,7 +262,14 @@ class Tag(Action):
         tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
+        tag={'type': 'string'},
         )
+
+    def validate(self):
+        if self.data.get('key') and self.data.get('tag'):
+            raise FilterValidationError(
+                "Can't specify both key and tag, choose one")
+        return self
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id

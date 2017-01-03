@@ -15,6 +15,7 @@ import mock
 from json import dumps
 from jsonschema.exceptions import best_match
 
+from c7n.manager import resources
 from c7n.schema import Validator, validate, generate, specific_error
 from common import BaseTest
 
@@ -31,6 +32,17 @@ class SchemaTest(BaseTest):
     def setUp(self):
         if not self.validator:
             self.validator = Validator(generate())
+
+    def test_schema_plugin_name_mismatch(self):
+        for k, v in resources.items():
+            for fname, f in v.filter_registry.items():
+                if fname in ('or', 'and'):
+                    continue
+                self.assertIn(
+                    fname, f.schema['properties']['type']['enum'])
+            for aname, a in v.action_registry.items():
+                self.assertIn(
+                    aname, a.schema['properties']['type']['enum'])
 
     def test_schema(self):
         try:
