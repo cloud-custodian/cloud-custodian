@@ -47,6 +47,22 @@ class CloudFormation(QueryResourceManager):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete cloudformation stacks
+
+    It is recommended to use a filter to avoid unwanted deletion of stacks
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudformation-delete-failed-stacks
+                resource: cfn
+                filters:
+                  - StackStatus: ROLLBACK_COMPLETE
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
 

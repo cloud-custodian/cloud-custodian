@@ -114,7 +114,7 @@ class EC2(QueryResourceManager):
         """
 
         # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in  ec2 instances anyways.
+        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.data.get('mode', {}).get('type', '') in (
                 'cloudtrail', 'ec2-instance-state'):
             return resources
@@ -149,9 +149,6 @@ class EC2(QueryResourceManager):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
-
-    def filter_record(self, record):
-        return record['State']['Name'] != 'terminated'
 
 
 @filters.register('security-group')
@@ -580,6 +577,13 @@ class Resize(BaseAction, StateTransitionFilter):
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
     """
+
+    schema = type_schema(
+        'resize',
+        **{'restart': {'type': 'boolean'},
+           'type-map': {'type': 'object'},
+           'default': {'type': 'string'}})
+
     valid_origin_states = ('running', 'stopped')
 
     def process(self, resources):

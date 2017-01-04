@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SnapshotId": "snap-07459fee", 
+        "CreateVolumePermissions": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c281f9f9-682b-4ffa-8e0b-2f76dc2757d0", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 01 Jan 2017 18:01:31 GMT"
+            }
+        }
+    }
+}

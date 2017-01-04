@@ -172,18 +172,16 @@ class Formatter(object):
     def to_csv(self, records, reverse=True):
         if not records:
             return []
-        filtered = filter(self.resource_manager.filter_record, records)
-        log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
 
         # Sort before unique to get the first/latest record
         date_sort = ('CustodianDate' in records[0] and 'CustodianDate' or
                      self._date_field)
         if date_sort:
-            filtered.sort(
+            records.sort(
                 key=lambda r: r[date_sort], reverse=reverse)
 
-        uniq = self.uniq_by_id(filtered)
-        log.debug("Uniqued from %d to %d" % (len(filtered), len(uniq)))
+        uniq = self.uniq_by_id(records)
+        log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         rows = map(self.extract_csv, uniq)
         return rows
 
@@ -217,10 +215,10 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     marker = key_prefix.strip("/") + "/" + start_date.strftime(
          '%Y/%m/%d/00') + "/resources.json.gz"
 
-    p = s3.get_paginator('list_objects').paginate(
+    p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        Marker=marker
+        StartAfter=marker,
     )
 
     with ThreadPoolExecutor(max_workers=20) as w:
@@ -230,7 +228,8 @@ def record_set(session_factory, bucket, key_prefix, start_date):
             keys = [k for k in key_set['Contents']
                     if k['Key'].endswith('resources.json.gz')]
             key_count += len(keys)
-            futures = map(lambda k: w.submit(get_records, bucket, k, session_factory), keys)
+            futures = map(lambda k: w.submit(
+                get_records, bucket, k, session_factory), keys)
 
             for f in as_completed(futures):
                 records.extend(f.result())

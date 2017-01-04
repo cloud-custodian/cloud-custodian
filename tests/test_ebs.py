@@ -24,11 +24,34 @@ from c7n.executor import MainThreadExecutor
 logging.basicConfig(level=logging.DEBUG)
 
 
+class SnapshotAccessTest(BaseTest):
+
+    def test_snapshot_access(self):
+        # pre conditions, 2 snapshots one shared to a separate account, and one
+        # shared publicly. 2 non matching volumes, one not shared, one shared
+        # explicitly to its own account.
+        self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_ebs_cross_account')
+        p = self.load_policy({
+            'name': 'snap-copy',
+            'resource': 'ebs-snapshot',
+            'filters': ['cross-account'],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {r['SnapshotId']: r['c7n:CrossAccountViolations']
+             for r in resources},
+            {'snap-7f9496cf': ['619193117841'],
+             'snap-af0eb71b': ['all']})
+
+
 class SnapshotCopyTest(BaseTest):
 
     def test_snapshot_copy(self):
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
-        # DEFAULT_REGION needs to be set to west for recording
+        self.change_environment(AWS_DEFAULT_REGION='us-west-2')
+
         factory = self.replay_flight_data('test_ebs_snapshot_copy')
         p = self.load_policy({
             'name': 'snap-copy',
@@ -41,16 +64,13 @@ class SnapshotCopyTest(BaseTest):
                  'target_key': '82645407-2faa-4d93-be71-7d6a8d59a5fc'}]
             }, session_factory=factory)
         resources = p.run()
-        # If test region is target region aka us-east-1, then the action
-        # skips, and so does the test
-        if factory().region_name == 'us-east-1':
-            return
 
         self.assertEqual(len(resources), 1)
         client = factory(region="us-east-1").client('ec2')
         tags = client.describe_tags(
             Filters=[{'Name': 'resource-id',
-                       'Values': [resources[0]['CopiedSnapshot']]}])['Tags']
+                      'Values': [resources[0][
+                          'c7n:CopiedSnapshot']]}])['Tags']
         tags = {t['Key']: t['Value'] for t in tags}
         self.assertEqual(tags['ASV'], 'RoadKill')
 
@@ -61,7 +81,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
         # DEFAULT_REGION needs to be set to west for recording
         factory = self.replay_flight_data('test_ebs_ami_snapshot_filter')
-        
+
         #first case should return only resources that are ami snapshots
         p = self.load_policy({
             'name': 'ami-snap-filter',
@@ -72,7 +92,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
-        
+
         #second case should return resources that are NOT ami snapshots
         policy = self.load_policy({
             'name': 'non-ami-snap-filter',
@@ -84,7 +104,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 2)
 
-        
+
 class SnapshotTrimTest(BaseTest):
 
     def test_snapshot_trim(self):
