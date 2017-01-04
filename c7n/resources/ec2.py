@@ -20,7 +20,9 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import (
+    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+)
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
@@ -28,7 +30,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -43,8 +45,29 @@ actions.register('auto-tag-user', AutoTagUser)
 @resources.register('ec2')
 class EC2(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve("aws.ec2.instance")):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        detail_spec = None
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
         config_type = "AWS::EC2::Instance"
+        shape = "Instance"
+
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
 
     filter_registry = filters
     action_registry = actions
@@ -91,7 +114,7 @@ class EC2(QueryResourceManager):
         """
 
         # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in  ec2 instances anyways.
+        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.data.get('mode', {}).get('type', '') in (
                 'cloudtrail', 'ec2-instance-state'):
             return resources
@@ -554,6 +577,13 @@ class Resize(BaseAction, StateTransitionFilter):
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
     """
+
+    schema = type_schema(
+        'resize',
+        **{'restart': {'type': 'boolean'},
+           'type-map': {'type': 'object'},
+           'default': {'type': 'string'}})
+
     valid_origin_states = ('running', 'stopped')
 
     def process(self, resources):
@@ -814,12 +844,37 @@ class Snapshot(BaseAction):
                 copy_tags = []
 
             tags.extend(copy_tags)
-
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
                 Tags=tags)
+
+
+@actions.register('modify-security-groups')
+class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on an instance."""
+
+    def process(self, instances):
+        if not len(instances):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        # handle multiple ENIs
+        interfaces = []
+        for i in instances:
+            for eni in i['NetworkInterfaces']:
+                if i.get('c7n.matched-security-groups'):
+                    eni['c7n.matched-security-groups'] = i['c7n.matched-security-groups']
+                interfaces.append(eni)
+
+        groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
+
+        for idx, i in enumerate(interfaces):
+            client.modify_network_interface_attribute(
+                NetworkInterfaceId=i['NetworkInterfaceId'],
+                Groups=groups[idx])
 
 
 # Valid EC2 Query Filters

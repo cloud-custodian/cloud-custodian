@@ -18,17 +18,22 @@
 
 def load_resources():
     import c7n.resources.account
-    import c7n.resources.ami
     import c7n.resources.acm
+    import c7n.resources.ami
     import c7n.resources.apigw
     import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
+    import c7n.resources.batch
     import c7n.resources.cfn
     import c7n.resources.cloudfront
     import c7n.resources.cloudsearch
+    import c7n.resources.cloudtrail
+    import c7n.resources.code
+    import c7n.resources.cognito
     import c7n.resources.cw
     import c7n.resources.directory
+    import c7n.resources.directconnect
     import c7n.resources.dynamodb
     import c7n.resources.ebs
     import c7n.resources.ec2
@@ -43,14 +48,19 @@ def load_resources():
     import c7n.resources.iam
     import c7n.resources.kinesis
     import c7n.resources.kms
-    import c7n.resources.redshift
+    import c7n.resources.ml
+    import c7n.resources.opsworks
     import c7n.resources.rds
     import c7n.resources.rdscluster
+    import c7n.resources.redshift
     import c7n.resources.route53
     import c7n.resources.s3
+    import c7n.resources.shield
     import c7n.resources.simpledb
+    import c7n.resources.snowball
     import c7n.resources.sns
     import c7n.resources.sqs
+    import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
 

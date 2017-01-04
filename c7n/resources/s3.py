@@ -37,11 +37,6 @@ Actions:
    delivery.
 
 """
-from botocore.client import Config
-from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import SSLError
-from concurrent.futures import as_completed
-
 import functools
 import json
 import itertools
@@ -51,21 +46,21 @@ import os
 import time
 import ssl
 
+from botocore.client import Config
+from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
+from concurrent.futures import as_completed
+
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
-"""
-TODO:
- - How does replication status effect in place encryption.
- - Test glacier support
-"""
 
 log = logging.getLogger('custodian.s3')
 
@@ -80,12 +75,17 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    #resource_type = "aws.s3.bucket"
-
-    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+    class resource_type(object):
+        service = 's3'
+        type = 'bucket'
+        enum_spec = ('list_buckets', 'Buckets[]', None)
+        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        name = id = 'Name'
+        filter_name = None
+        date = 'CreationDate'
         dimension = 'BucketName'
+        config_type = 'AWS::S3::Bucket'
 
-    executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
     action_registry = actions
 
@@ -180,11 +180,15 @@ def bucket_client(session, b, kms=False):
         region = 'us-east-1'
     else:
         region = location['LocationConstraint'] or 'us-east-1'
+
     if kms:
-        # Need v4 signature for aws:kms crypto
-        config = Config(signature_version='s3v4', read_timeout=200)
+        # Need v4 signature for aws:kms crypto, else let the sdk decide
+        # based on region support.
+        config = Config(
+            signature_version='s3v4',
+            read_timeout=200, connect_timeout=120)
     else:
-        config = Config(read_timeout=200)
+        config = Config(read_timeout=200, connect_timeout=120)
     return session.client('s3', region_name=region, config=config)
 
 
@@ -204,7 +208,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
             log.exception(
-                'Exception tagging bucket %s: %s', (bucket['Name'], e))
+                'Exception tagging bucket %s: %s', bucket['Name'], e)
             continue
 
 
@@ -480,7 +484,7 @@ class ToggleVersioning(BucketActionBase):
     """
 
     schema = type_schema(
-        'enable-versioning',
+        'toggle-versioning',
         enabled={'type': 'boolean'})
 
     # mfa delete enablement looks like it needs the serial and a current token.
@@ -502,6 +506,57 @@ class ToggleVersioning(BucketActionBase):
                     Bucket=r['Name'],
                     VersioningConfiguration={'Status': 'Suspended'})
 
+@actions.register('toggle-logging')
+class ToggleLogging(BucketActionBase):
+    """Action to enable/disable logging on a S3 bucket.
+    Target bucket ACL must allow for WRITE and READ_ACP Permissions
+    Not specifying a target_prefix will default to the current bucket name.
+    http://goo.gl/PiWWU2
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-logging
+                resource: s3
+                filter:
+                  - "tag:Testing": present
+                actions:
+                  - type: toggle-logging
+                    target_bucket: log-bucket
+                    target_prefix: logs123
+    """
+
+    schema = type_schema(
+        'toggle-logging',
+        enabled={'type': 'boolean'},
+        target_bucket={'type': 'string'},
+        target_prefix={'type': 'string'},
+    )
+
+    def process(self, resources):
+        enabled = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resources:
+            target_prefix = self.data.get('target_prefix', r['Name'])
+            if 'TargetBucket' in r['Logging']:
+                r['Logging'] = {'Status': 'Enabled'}
+            else:
+                r['Logging'] = {'Status': 'Disabled'}
+            if enabled and (r['Logging']['Status'] == 'Disabled'):
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={
+                        'LoggingEnabled': {
+                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetPrefix': target_prefix}})
+                continue
+            if not enabled and r['Logging']['Status'] == 'Enabled':
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={})
+                continue
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
@@ -889,6 +944,8 @@ class EncryptExtantKeys(ScanBucket):
                 resource: s3
                 actions:
                   - type: encrypt-keys
+                    crypto: aws:kms
+                    key-id: 9c3983be-c6cf-11e6-9d9d-cec0c932ce01
     """
 
     permissions = (
@@ -900,14 +957,24 @@ class EncryptExtantKeys(ScanBucket):
 
     schema = {
         'type': 'object',
-        'additonalProperties': False,
+        'additionalProperties': False,
         'properties': {
+            'type': {'enum': ['encrypt-keys']},
             'report-only': {'type': 'boolean'},
             'glacier': {'type': 'boolean'},
             'large': {'type': 'boolean'},
-            'crypto': {'enum': ['AES256', 'aws:kms']}
+            'crypto': {'enum': ['AES256', 'aws:kms']},
+            'key-id': {'type': 'string'}
+            },
+        'dependencies': {
+            'key-id': {
+              'properties': {
+                'crypto': {'pattern': 'aws:kms'}
+              },
+              'required': ['crypto']
             }
         }
+    }
 
     metrics = [
         ('Total Keys', {'Scope': 'Account'}),
@@ -987,6 +1054,7 @@ class EncryptExtantKeys(ScanBucket):
             storage_class == 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
+        key_id = self.data.get('key-id')
         # Note on copy we lose individual object acl grants
         params = {'Bucket': bucket_name,
                   'Key': k,
@@ -994,6 +1062,9 @@ class EncryptExtantKeys(ScanBucket):
                   'MetadataDirective': 'COPY',
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
+
+        if key_id and crypto_method is 'aws:kms':
+            params['SSEKMSKeyId'] = key_id
 
         if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
                 'large', True):

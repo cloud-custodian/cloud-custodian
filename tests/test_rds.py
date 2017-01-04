@@ -11,9 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
+import time
+
 from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
+from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
@@ -406,7 +410,148 @@ class RDSTest(BaseTest):
 
 
 class RDSSnapshotTest(BaseTest):
-    
+
+    def test_rds_snapshot_access(self):
+        factory = self.replay_flight_data('test_rds_snapshot_access')
+        p = self.load_policy({
+            'name': 'rds-snap-access',
+            'resource': 'rds-snapshot',
+            'filters': ['cross-account'],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {r['DBSnapshotIdentifier']: r['c7n:CrossAccountViolations']
+             for r in resources},
+            {'tidx-pub': ['all'], 'tidx-rdx': ['619193117841']})
+
+    def test_rds_latest_manual(self):
+        # preconditions
+        # one db with manual and automatic snapshots
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_latest')
+        p = self.load_policy({
+            'name': 'rds-latest-snaps',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'type': 'latest', 'automatic': False},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBSnapshotIdentifier'],
+                         'originb')
+
+    def test_rds_latest(self):
+        # preconditions
+        # one db with manual and automatic snapshots
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_latest')
+        p = self.load_policy({
+            'name': 'rds-latest-snaps',
+            'resource': 'rds-snapshot',
+            'filters': ['latest']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBSnapshotIdentifier'],
+                         'rds:originb-2016-12-28-09-15')
+
+    def test_rds_cross_region_copy_lambda(self):
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'rds-copy-fail',
+             'resource': 'rds-snapshot',
+             'mode': {
+                 'type': 'config-rule'},
+             'actions': [{
+                 'type': 'region-copy',
+                 'target_region': 'us-east-2'}]})
+
+    def test_rds_cross_region_copy_skip_same_region(self):
+        self.change_environment(AWS_DEFAULT_REGION='us-east-2')
+        factory = self.replay_flight_data('test_rds_snapshot_latest')
+        output = self.capture_logging('custodian.actions')
+        p = self.load_policy({
+            'name': 'rds-copy-skip',
+            'resource': 'rds-snapshot',
+             'actions': [{
+                 'type': 'region-copy',
+                 'target_region': 'us-east-2'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertFalse([r for r in resources if 'c7n:CopiedSnapshot' in r])
+        self.assertIn('Source and destination region are the same',
+                      output.getvalue())
+
+    def test_rds_cross_region_copy_many(self):
+        # preconditions
+        # rds snapshot, encrypted in region with kms, and tags
+        # in this scenario we have 9 snapshots in source region,
+        # 3 snaps already in target region, 6 to copy, which means
+        # we will hit transfer limits.
+        factory = self.replay_flight_data(
+            'test_rds_snapshot_region_copy_many')
+
+        # no sleep till, beastie boys ;-)
+        def brooklyn(delay):
+            return
+
+        output = self.capture_logging('c7n.worker', level=logging.DEBUG)
+        self.patch(time, 'sleep', brooklyn)
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy({
+            'name': 'rds-snapshot-region-copy',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'DBInstanceIdentifier': "originb"}],
+            'actions': [
+                {'type': 'region-copy',
+                 'target_region': 'us-east-2',
+                 'tags': {'migrated_from': 'us-east-1'},
+                 'target_key': 'cb291f53-f3ab-4e64-843e-47b0a7c9cf61'}
+                ]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 9)
+        self.assertEqual(
+            6, len([r for r in resources if 'c7n:CopiedSnapshot' in r]))
+        self.assertEqual(output.getvalue().count('retrying'), 2)
+
+    def test_rds_cross_region_copy(self):
+        # preconditions
+        # rds snapshot, encrypted in region with kms, and tags
+        factory = self.replay_flight_data('test_rds_snapshot_region_copy')
+        client = factory().client('rds', region_name='us-east-2')
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy({
+            'name': 'rds-snapshot-region-copy',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'DBSnapshotIdentifier': "rds:originb-2016-12-28-09-15"}],
+            'actions': [
+                {'type': 'region-copy',
+                 'target_region': 'us-east-2',
+                 'tags': {'migrated_from': 'us-east-1'},
+                 'target_key': 'cb291f53-f3ab-4e64-843e-47b0a7c9cf61'}
+                ]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        snapshots = client.describe_db_snapshots(
+            DBSnapshotIdentifier=resources[
+                0]['c7n:CopiedSnapshot'].rsplit(':', 1)[1])['DBSnapshots']
+        self.assertEqual(len(snapshots), 1)
+        self.assertEqual(snapshots[0]['DBInstanceIdentifier'], 'originb')
+        tags = {t['Key']: t['Value'] for t in client.list_tags_for_resource(
+            ResourceName=resources[0]['c7n:CopiedSnapshot'])['TagList']}
+        self.assertEqual(
+            {'migrated_from': 'us-east-1',
+             'app': 'mgmt-portal',
+             'env': 'staging',
+             'workload-type': 'other'},
+            tags)
+
     def test_rds_snapshot_tag_filter(self):
         factory = self.replay_flight_data('test_rds_snapshot_tag_filter')
         client = factory().client('rds')
@@ -424,7 +569,6 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('maid_status' in tag_map)
         self.assertTrue('delete@' in tag_map['maid_status'])
-
 
     def test_rds_snapshot_age_filter(self):
         factory = self.replay_flight_data('test_rds_snapshot_age_filter')
@@ -445,7 +589,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_rds_snapshot_tag(self):
         factory = self.replay_flight_data('test_rds_snapshot_mark')
         client = factory().client('rds')
@@ -464,7 +608,7 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('test-key' in tag_map)
         self.assertTrue('test-value' in tag_map['test-key'])
-                
+
     def test_rds_snapshot_mark(self):
         factory = self.replay_flight_data('test_rds_snapshot_mark')
         client = factory().client('rds')
@@ -482,7 +626,7 @@ class RDSSnapshotTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('maid_status' in tag_map)
-        
+
     def test_rds_snapshot_unmark(self):
         factory = self.replay_flight_data('test_rds_snapshot_unmark')
         client = factory().client('rds')
@@ -497,4 +641,111 @@ class RDSSnapshotTest(BaseTest):
             resources[0]['DBSnapshotIdentifier'])
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
-        self.assertFalse('maid_status' in tag_map)        
+        self.assertFalse('maid_status' in tag_map)
+
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+    def test_rds_remove_matched_security_groups(self):
+        #
+        # Test conditions:
+        #    - running 2 Aurora DB clusters in default VPC with 2 instances
+        #      each.
+        #        - translates to 4 actual instances
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to one set of DB instances
+        #        - translates to 2 instances marked non-compliant
+        #
+        # Results in 4 DB Instances with default Security Group attached
+
+        session_factory = self.replay_flight_data(
+            'test_rds_remove_matched_security_groups')
+        p = self.load_policy(
+            {'name': 'rds-remove-matched-security-groups',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'security-group',
+                  'key': 'GroupName',
+                  'value': '(.*PROD-ONLY.*)',
+                  'op': 'regex'}],
+             'actions': [
+                 {'type': 'modify-security-groups',
+                  'remove': 'matched',
+                  'isolation-group': 'sg-7a3fcb13'}]
+             },
+            session_factory=session_factory)
+        clean_p = self.load_policy(
+            {'name': 'rds-verify-remove-matched-security-groups',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'security-group',
+                  'key': 'GroupName',
+                  'value': 'default'}]
+             },
+            session_factory=session_factory)
+
+        resources = p.run()
+        clean_resources = clean_p.run()
+
+        # clusters autoscale across AZs, so they get -001, -002, etc appended
+        self.assertIn('test-sg-fail', resources[0]['DBInstanceIdentifier'])
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        # show that it was indeed a replacement of security groups
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources), 4)
+
+    def test_rds_add_security_group(self):
+        #
+        # Test conditions:
+        #   - running 2 Aurora DB clusters in default VPC with 2 instances each
+        #        - translates to 4 actual instances
+        #    - a default security group with id 'sg-7a3fcb13' exists -
+        #      attached to all instances
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to 2/4 instances
+        #        - translates to 2 instances marked to get new group attached
+        #
+        # Results in 4 instances with default Security Group and
+        # PROD-ONLY-Test-Security-Group
+        session_factory = self.replay_flight_data(
+            'test_rds_add_security_group')
+        p = self.load_policy({
+            'name': 'add-sg-to-prod-rds',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'value',
+                 'key': 'DBInstanceIdentifier',
+                 'value': 'test-sg-fail.*', 'op': 'regex'}
+            ],
+            'actions': [
+                {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
+            ]
+        },
+            session_factory=session_factory)
+
+        clean_p = self.load_policy({
+            'name': 'validate-add-sg-to-prod-rds',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'PROD-ONLY-Test-Security-Group'}
+            ]
+        },
+            session_factory=session_factory)
+
+        resources = p.run()
+        clean_resources = clean_p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertIn('test-sg-fail', resources[0]['DBInstanceIdentifier'])
+        self.assertEqual(len(resources[0]['VpcSecurityGroups']), 1)
+        self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 2)
+        self.assertEqual(len(clean_resources), 4)
+

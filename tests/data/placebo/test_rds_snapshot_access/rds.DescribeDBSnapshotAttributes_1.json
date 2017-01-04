@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBSnapshotAttributesResult": {
+            "DBSnapshotIdentifier": "rds:tidx-2016-12-31-23-16", 
+            "DBSnapshotAttributes": [
+                {
+                    "AttributeName": "restore", 
+                    "AttributeValues": []
+                }
+            ]
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "341b31d6-d04f-11e6-b659-ed6e259ccfdb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "341b31d6-d04f-11e6-b659-ed6e259ccfdb", 
+                "date": "Sun, 01 Jan 2017 18:22:07 GMT", 
+                "content-length": "656", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

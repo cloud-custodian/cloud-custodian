@@ -1,0 +1,99 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBCluster": {
+            "MasterUsername": "custodian", 
+            "ReaderEndpoint": "test-sg-base-cluster.cluster-ro-ci3evidtom6k.ca-central-1.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-7a3fcb13"
+                }, 
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-6360920a"
+                }
+            ], 
+            "HostedZoneId": "Z1JG78A3UK1DU3", 
+            "Status": "available", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": {
+                "hour": 22, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 52, 
+                "microsecond": 473000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 10
+            }, 
+            "PreferredBackupWindow": "13:03-13:33", 
+            "DBSubnetGroup": "default", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "mon:12:04-mon:12:34", 
+            "Engine": "aurora", 
+            "Endpoint": "test-sg-base-cluster.cluster-ci3evidtom6k.ca-central-1.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": {
+                "hour": 17, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 35, 
+                "microsecond": 840000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 57
+            }, 
+            "ClusterCreateTime": {
+                "hour": 17, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 46, 
+                "microsecond": 696000, 
+                "year": 2016, 
+                "day": 21, 
+                "minute": 56
+            }, 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "test-sg-base-cluster", 
+            "DbClusterResourceId": "cluster-KEVD6RBD7FUFW2GOBESH5A4HKM", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 15, 
+                    "DBInstanceIdentifier": "test-sg-base"
+                }, 
+                {
+                    "IsClusterWriter": false, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 15, 
+                    "DBInstanceIdentifier": "test-sg-base-ca-central-1a"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:ca-central-1:644160558196:cluster:test-sg-base-cluster", 
+            "StorageEncrypted": false, 
+            "DatabaseName": "test_sg_db_base", 
+            "DBClusterParameterGroup": "default.aurora5.6", 
+            "AvailabilityZones": [
+                "ca-central-1a", 
+                "ca-central-1b"
+            ], 
+            "Port": 3306
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6c85fb98-c7ca-11e6-9d16-479c7f27be3b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6c85fb98-c7ca-11e6-9d16-479c7f27be3b", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3086", 
+                "content-type": "text/xml", 
+                "date": "Wed, 21 Dec 2016 22:11:29 GMT"
+            }
+        }
+    }
+}

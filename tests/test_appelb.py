@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .common import BaseTest
+from common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import AppELB, AppELBTargetGroup
+
 
 class AppELBTest(BaseTest):
 
@@ -78,7 +79,9 @@ class AppELBTest(BaseTest):
             'name': 'appelb-is-https-filter',
             'resource': 'app-elb',
             'filters': [
-                {'type': 'listener', 'key': "length([?Protocol=='HTTPS'])", 'value': 1, 'op': 'gte'}
+                {'type': 'listener',
+                 'key': "length([?Protocol=='HTTPS'])", 'value': 1,
+                 'op': 'gte'}
             ]},
             session_factory=session_factory)
         resources = p.run()
@@ -86,12 +89,15 @@ class AppELBTest(BaseTest):
 
     def test_appelb_target_group_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_instance_count_non_zero')
+        session_factory = self.replay_flight_data(
+            'test_appelb_instance_count_non_zero')
         p = self.load_policy({
             'name': 'appelb-target-group-filter',
             'resource': 'app-elb',
             'filters': [
-                {'type': 'target-group', 'key': "length([?Protocol=='HTTP'])", 'value': 1, 'op': 'eq'}
+                {'type': 'target-group',
+                 'key': "length([?Protocol=='HTTP'])", 'value': 1,
+                 'op': 'eq'}
             ]},
             session_factory=session_factory)
         resources = p.run()
@@ -99,12 +105,16 @@ class AppELBTest(BaseTest):
 
     def test_appelb_instance_count_filter_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_instance_count_zero')
+        session_factory = self.replay_flight_data(
+            'test_appelb_instance_count_zero')
         p = self.load_policy({
             'name': 'appelb-instance-count-filter-zero',
             'resource': 'app-elb',
             'filters': [
-                {'type': 'target-group', 'key': "max([].length(TargetHealthDescriptions))", 'value': 0, 'op': 'eq'}
+                {'type': 'target-group',
+                 'key': "max([].length(TargetHealthDescriptions))",
+                 'value': 0,
+                 'op': 'eq'}
             ]},
             session_factory=session_factory)
         resources = p.run()
@@ -112,12 +122,16 @@ class AppELBTest(BaseTest):
 
     def test_appelb_instance_count_filter_non_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_instance_count_non_zero')
+        session_factory = self.replay_flight_data(
+            'test_appelb_instance_count_non_zero')
         p = self.load_policy({
             'name': 'appelb-instance-count-filter-non-zero',
             'resource': 'app-elb',
             'filters': [
-                {'type': 'target-group', 'key': "max([].length(TargetHealthDescriptions))", 'value': 0, 'op': 'gt'}
+                {'type': 'target-group',
+                 'key': "max([].length(TargetHealthDescriptions))",
+                 'value': 0,
+                 'op': 'gt'}
             ]},
             session_factory=session_factory)
         resources = p.run()
@@ -159,7 +173,8 @@ class AppELBTest(BaseTest):
 
     def test_appelb_mark_for_delete(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_mark_for_delete')
+        session_factory = self.replay_flight_data(
+            'test_appelb_mark_for_delete')
         p = self.load_policy({
             'name': 'appelb-mark-for-delete',
             'resource': 'app-elb',
@@ -196,7 +211,8 @@ class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
     def test_appelb_healthcheck_protocol_mismatch_filter_good(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_healthcheck_protocol_mismatch_good')
+        session_factory = self.replay_flight_data(
+            'test_appelb_healthcheck_protocol_mismatch_good')
         p = self.load_policy({
             'name': 'appelb-healthcheck-protocol-mismatch-good',
             'resource': 'app-elb',
@@ -207,7 +223,8 @@ class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
     def test_appelb_healthcheck_protocol_mismatch_filter_bad(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_healthcheck_protocol_mismatch_bad')
+        session_factory = self.replay_flight_data(
+            'test_appelb_healthcheck_protocol_mismatch_bad')
         p = self.load_policy({
             'name': 'appelb-healthcheck-protocol-mismatch-bad',
             'resource': 'app-elb',
@@ -221,7 +238,8 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_simple(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_target_group_simple')
+        session_factory = self.replay_flight_data(
+            'test_appelb_target_group_simple')
         p = self.load_policy({
             'name': 'appelb-target-group-simple',
             'resource': 'app-elb-target-group'},
@@ -231,7 +249,8 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_simple_filter(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_target_group_simple')
+        session_factory = self.replay_flight_data(
+            'test_appelb_target_group_simple')
         p = self.load_policy({
             'name': 'appelb-target-group-simple-filter',
             'resource': 'app-elb-target-group',
@@ -245,7 +264,8 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_default_vpc(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_target_group_default_vpc')
+        session_factory = self.replay_flight_data(
+            'test_appelb_target_group_default_vpc')
         p = self.load_policy({
             'name': 'appelb-target-group-default-vpc',
             'resource': 'app-elb-target-group',

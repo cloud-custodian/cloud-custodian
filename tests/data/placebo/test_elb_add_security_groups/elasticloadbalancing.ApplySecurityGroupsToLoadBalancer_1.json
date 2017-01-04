@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            "sg-8a4b64f7", 
+            "sg-5d4a6520", 
+            "sg-411b413c", 
+            "sg-6c7fa917"
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9d1d8efd-c5f8-11e6-b2c5-776400e347c1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9d1d8efd-c5f8-11e6-b2c5-776400e347c1", 
+                "date": "Mon, 19 Dec 2016 14:37:05 GMT", 
+                "content-length": "534", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

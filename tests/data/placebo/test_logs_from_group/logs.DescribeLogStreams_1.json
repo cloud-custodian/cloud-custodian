@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "logStreams": [
+            {
+                "firstEventTimestamp": 1480435544699, 
+                "lastEventTimestamp": 1480435577458, 
+                "creationTime": 1480435546329, 
+                "uploadSequenceToken": "49564721826764082027203199552804051000902810977582449170", 
+                "logStreamName": "related-rds-test", 
+                "lastIngestionTime": 1480435578085, 
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-logs:log-stream:related-rds-test", 
+                "storedBytes": 751
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cbcc47e5-bb27-11e6-bde3-b7707bca8cf7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cbcc47e5-bb27-11e6-bde3-b7707bca8cf7", 
+                "date": "Mon, 05 Dec 2016 20:17:07 GMT", 
+                "content-length": "382", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

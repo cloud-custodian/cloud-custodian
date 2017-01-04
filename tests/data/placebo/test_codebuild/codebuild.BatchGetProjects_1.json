@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "projectsNotFound": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d1540e45-d17e-11e6-bf7e-ed90c49d68aa", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d1540e45-d17e-11e6-bf7e-ed90c49d68aa", 
+                "date": "Tue, 03 Jan 2017 06:35:28 GMT", 
+                "content-length": "778", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "projects": [
+            {
+                "name": "custodian-build-python", 
+                "serviceRole": "arn:aws:iam::619193117841:role/service-role/codebuild-custodian-build-python-service-role", 
+                "tags": [], 
+                "artifacts": {
+                    "namespaceType": "NONE", 
+                    "packaging": "NONE", 
+                    "type": "S3", 
+                    "location": "custodian-deploy", 
+                    "name": "build"
+                }, 
+                "lastModified": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 7, 
+                    "microsecond": 301000, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 29
+                }, 
+                "timeoutInMinutes": 60, 
+                "created": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 7, 
+                    "microsecond": 301000, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 29
+                }, 
+                "environment": {
+                    "computeType": "BUILD_GENERAL1_SMALL", 
+                    "image": "aws/codebuild/python:2.7.12", 
+                    "type": "LINUX_CONTAINER", 
+                    "environmentVariables": []
+                }, 
+                "source": {
+                    "type": "GITHUB", 
+                    "location": "https://github.com/kapilt/cloud-custodian.git", 
+                    "auth": {
+                        "type": "OAUTH"
+                    }
+                }, 
+                "encryptionKey": "arn:aws:kms:us-east-1:619193117841:alias/aws/s3", 
+                "arn": "arn:aws:codebuild:us-east-1:619193117841:project/custodian-build-python"
+            }
+        ]
+    }
+}
