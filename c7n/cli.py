@@ -22,6 +22,11 @@ import traceback
 
 from dateutil.parser import parse as date_parse
 
+try:
+    from setproctitle import setproctitle
+except ImportError:
+    setproctitle = lambda t: None
+
 DEFAULT_REGION = 'us-east-1'
 
 
@@ -179,6 +184,7 @@ def setup_parser():
     version.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose Logging")
+    version.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
     validate_desc = (
         "Validate config files against the custodian jsonschema")
@@ -221,7 +227,6 @@ def cmd_version(options):
     from c7n.version import version
     print(version)
 
-
 def main():
     parser = setup_parser()
     options = parser.parse_args()
@@ -239,6 +244,7 @@ def main():
             command = getattr(
                 importlib.import_module(command.rsplit('.', 1)[0]),
                 command.rsplit('.', 1)[-1])
+        setproctitle(' '.join([sys.argv[0], options.subparser]))
         command(options)
     except Exception:
         if not options.debug:
