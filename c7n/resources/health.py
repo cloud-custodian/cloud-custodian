@@ -11,41 +11,121 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cStringIO import StringIO
-import csv
-import datetime
-from datetime import timedelta
-from dateutil.parser import parse
-from dateutil.tz import tzutc
-import time
-from botocore.exceptions import ClientError
 
-from c7n.actions import BaseAction, ActionRegistry
-from c7n.filters import ValueFilter, Filter, OPERATORS, FilterRegistry
+from c7n.actions import (
+    ActionRegistry, BaseAction
+)
+from c7n.filters import (
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
+)
+
+from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.query import ResourceManager
-from c7n.utils import local_session, type_schema
+
+from c7n import utils
+from c7n.utils import type_schema
+
+filters = FilterRegistry('health.actions')
+actions = ActionRegistry('health.filters')
 
 
-def get_health_events(session_factory):
-    session = local_session(session_factory)
-    client = session.client('health')
-    p = client.get_paginator('describe_events')
-    return [e['events'] for e in p.paginate()]
-
-
-@resources.register('health')
-class HealthEvents(ResourceManager):
-    """Resource manager for AWS health events"""
+@resources.register('health-events')
+class HealthEvents(QueryResourceManager):
+    """Query resource manager for AWS health events"""
 
     class resource_type(object):
         service = 'health'
+        type = 'event'
+        enum_spec = ('describe_events', 'events', None)
+        name = 'eventTypeCode'
+        id = 'arn'
+        filter_name = None
+        filter_type = None
+        dimension = None
+        date = 'startTime'
+        config_type = 'AWS::Health::Event'
+
+    filter_registry = filters
+    action_registry = actions
+
+    def __init__(self, ctx, data):
+        super(HealthEvents, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
 
     def get_model(self):
         return self.resource_type
 
-    def resources(self):
-        return self.filter_resources([get_health_events(self.session_factory)])
+    def resource_query(self):
+        qf = {}
+        for q in self.queries:
+            qd = q.query()
+            print qd
+            if qd['Name'] in qf:
+                for qv in qf[qd['Name']]:
+                    if qv in qf[qd['Name']]:
+                        continue
+                    qf[qd['Name']].append(qv)
+            else:
+                qf[qd['Name']] = []
+                for qv in qd['Values']:
+                    qf[qd['Name']].append(qv)
+        return qf
 
-    def get_resources(self, resource_ids):
-        return [get_health_events(self.session_factory)]
+    def resources(self, query=None):
+        q = self.resource_query()
+        if q is not None:
+            query = query or {}
+            query['filter'] = q
+        return super(HealthEvents, self).resources(query=query)
+
+
+HEALTH_VALID_FILTERS = {
+    'availability-zone': str,
+    'eventTypeCategory': {'issue', 'accountNotification', 'scheduledChange'},
+    'regions': str,
+    'services': str,
+    'eventStatusCodes': {'open', 'closed', 'upcoming'},
+    'eventTypeCodes': str
+}
+
+
+class QueryFilter(object):
+
+    @classmethod
+    def parse(cls, data):
+        results = []
+        for d in data:
+            if not isinstance(d, dict):
+                raise ValueError(
+                    "Health Query Filter Invalid structure %s" % d)
+            results.append(cls(d).validate())
+        return results
+
+    def __init__(self, data):
+        self.data = data
+        self.key = None
+        self.value = None
+
+    def validate(self):
+        if not len(self.data.keys()) == 1:
+            raise ValueError(
+                "Health Query Filter Invalid %s" % self.data)
+        self.key = self.data.keys()[0]
+        self.value = self.data.values()[0]
+
+        if self.key not in HEALTH_VALID_FILTERS:
+            raise ValueError(
+                "Health Query Filter invalid filter name %s" % (self.data))
+
+        if self.value is None:
+            raise ValueError(
+                "Health Query Filters must have a value, use tag-key"
+                " w/ tag name as value for tag present checks"
+                " %s" % self.data)
+        return self
+
+    def query(self):
+        value = self.value
+        if isinstance(self.value, basestring):
+            value = [self.value]
+        return {'Name': self.key, 'Values': value}

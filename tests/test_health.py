@@ -17,11 +17,19 @@ from c7n.executor import MainThreadExecutor
 
 class HealthResource(BaseTest):
 
-    def test_resource(self):
-        session_factory = self.replay_flight_data('test_health_resources')
+    def test_health_query(self):
+        session_factory = self.replay_flight_data('test_health_query')
         p = self.load_policy({
-            'name': 'health-events',
-            'resource': 'health'
-        }, session_factory=session_factory)
+            'name': 'account-health-query',
+            'resource': 'health-events'}, session_factory=session_factory)
         resources = p.run()
-        self.assertGreater(len(resources), 0)
+        self.assertEqual(len(resources), 10)
+
+    def test_health_resource_query(self):
+        session_factory = self.replay_flight_data('test_health_resource_query')
+        p = self.load_policy({
+            'name': 'account-health-ec2-query',
+            'resource': 'health-events',
+            'query': [{'services': 'EC2'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 5)
