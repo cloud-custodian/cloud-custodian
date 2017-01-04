@@ -50,7 +50,8 @@ class HealthEvents(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [{'eventStatusCodes': 'open'}]))
 
     def get_model(self):
         return self.resource_type
