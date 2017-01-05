@@ -202,7 +202,10 @@ def check_cross_account(policy_text, allowed_accounts):
                         violations.append(s)
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
-            v = s['Condition']['ArnLike']['aws:SourceArn']
+            for k in ('aws:SourceArn', 'AWS:SourceArn'):
+                v = s['Condition']['ArnLike'].get(k)
+                if v:
+                    break
             v = isinstance(v, basestring) and (v,) or v
             principal_ok = True
             for arn in v:
