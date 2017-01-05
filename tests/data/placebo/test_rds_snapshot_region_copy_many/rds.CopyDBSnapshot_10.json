@@ -1,0 +1,22 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "abd0b4f5-ccfe-11e6-8344-05bf2038f462", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "abd0b4f5-ccfe-11e6-8344-05bf2038f462", 
+                "date": "Wed, 28 Dec 2016 13:08:05 GMT", 
+                "content-length": "364", 
+                "content-type": "text/xml", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Cannot create the snapshot because a snapshot with the identifier rds-originb-2016-12-27-09-14 already exists.", 
+            "Code": "DBSnapshotAlreadyExists", 
+            "Type": "Sender"
+        }
+    }
+}

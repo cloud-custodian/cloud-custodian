@@ -23,46 +23,100 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.iam.group')):
+    class resource_type(object):
+        service = 'iam'
+        type = 'group'
+        enum_spec = ('list_groups', 'Groups', None)
+        detail_spec = None
+        id = 'GroupId'
+        name = 'GroupName'
+        filter_name = None
+        date = 'CreateDate'
+        dimension = None
         config_type = "AWS::IAM::Group"
 
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.iam.role')):
+    class resource_type(object):
+        service = 'iam'
+        type = 'role'
+        enum_spec = ('list_roles', 'Roles', None)
+        detail_spec = None
+        id = 'RoleId'
+        filter_name = None
+        name = 'RoleName'
+        date = 'CreateDate'
+        dimension = None
         config_type = "AWS::IAM::Role"
 
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.iam.user')):
+    class resource_type(object):
+        service = 'iam'
+        type = 'user'
+        enum_spec = ('list_users', 'Users', None)
+        id = 'UserId'
+        filter_name = None
+        name = 'UserName'
+        date = 'CreateDate'
+        dimension = None
         config_type = "AWS::IAM::User"
 
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve('aws.iam.policy')):
+    class resource_type(object):
+        service = 'iam'
+        type = 'policy'
+        enum_spec = ('list_policies', 'Policies', None)
+        id = 'PolicyId'
+        filter_name = None
+        name = 'PolicyName'
+        date = 'CreateDate'
+        dimension = None
         config_type = "AWS::IAM::Policy"
 
 
 @resources.register('iam-profile')
 class InstanceProfile(QueryResourceManager):
-    resource_type = 'aws.iam.instance-profile'
+
+    class resource_type(object):
+        service = 'iam'
+        type = 'instance-profile'
+        enum_spec = ('list_instance_profiles', 'InstanceProfiles', None)
+        id = 'InstanceProfileId'
+        filter_name = None
+        name = 'InstanceProfileId'
+        date = 'CreateDate'
+        dimension = None
 
 
 @resources.register('iam-certificate')
 class ServerCertificate(QueryResourceManager):
-    resource_type = 'aws.iam.server-certificate'
+
+    class resource_type(object):
+        service = 'iam'
+        type = 'server-certificate'
+        enum_spec = ('list_server_certificates',
+                     'ServerCertificateMetadataList',
+                     None)
+        id = 'ServerCertificateId'
+        filter_name = None
+        name = 'ServerCertificateName'
+        date = 'Expiration'
+        dimension = None
 
 
 class IamRoleUsage(Filter):

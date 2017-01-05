@@ -37,11 +37,6 @@ Actions:
    delivery.
 
 """
-from botocore.client import Config
-from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import SSLError
-from concurrent.futures import as_completed
-
 import functools
 import json
 import itertools
@@ -51,21 +46,21 @@ import os
 import time
 import ssl
 
+from botocore.client import Config
+from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import SSLError
+from concurrent.futures import as_completed
+
 from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
 
-"""
-TODO:
- - How does replication status effect in place encryption.
- - Test glacier support
-"""
 
 log = logging.getLogger('custodian.s3')
 
@@ -80,22 +75,17 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(QueryResourceManager):
 
-    #resource_type = "aws.s3.bucket"
-    report_fields = [
-        'Name',
-        'CreationDate',
-        # s3 formatter is used for multiple s3 rules.
-        # the buckets may not have any global permissions
-        'list:GlobalPermissions',
-        'tag:OwnerContact',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-    ]
-
-    class resource_type(ResourceQuery.resolve("aws.s3.bucket")):
+    class resource_type(object):
+        service = 's3'
+        type = 'bucket'
+        enum_spec = ('list_buckets', 'Buckets[]', None)
+        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        name = id = 'Name'
+        filter_name = None
+        date = 'CreationDate'
         dimension = 'BucketName'
+        config_type = 'AWS::S3::Bucket'
 
-    executor_factory = executor.ThreadPoolExecutor
     filter_registry = filters
     action_registry = actions
 
@@ -218,7 +208,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})
         except ClientError as e:
             log.exception(
-                'Exception tagging bucket %s: %s', (bucket['Name'], e))
+                'Exception tagging bucket %s: %s', bucket['Name'], e)
             continue
 
 
@@ -516,6 +506,57 @@ class ToggleVersioning(BucketActionBase):
                     Bucket=r['Name'],
                     VersioningConfiguration={'Status': 'Suspended'})
 
+@actions.register('toggle-logging')
+class ToggleLogging(BucketActionBase):
+    """Action to enable/disable logging on a S3 bucket.
+    Target bucket ACL must allow for WRITE and READ_ACP Permissions
+    Not specifying a target_prefix will default to the current bucket name.
+    http://goo.gl/PiWWU2
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-logging
+                resource: s3
+                filter:
+                  - "tag:Testing": present
+                actions:
+                  - type: toggle-logging
+                    target_bucket: log-bucket
+                    target_prefix: logs123
+    """
+
+    schema = type_schema(
+        'toggle-logging',
+        enabled={'type': 'boolean'},
+        target_bucket={'type': 'string'},
+        target_prefix={'type': 'string'},
+    )
+
+    def process(self, resources):
+        enabled = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('s3')
+        for r in resources:
+            target_prefix = self.data.get('target_prefix', r['Name'])
+            if 'TargetBucket' in r['Logging']:
+                r['Logging'] = {'Status': 'Enabled'}
+            else:
+                r['Logging'] = {'Status': 'Disabled'}
+            if enabled and (r['Logging']['Status'] == 'Disabled'):
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={
+                        'LoggingEnabled': {
+                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetPrefix': target_prefix}})
+                continue
+            if not enabled and r['Logging']['Status'] == 'Enabled':
+                client.put_bucket_logging(
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={})
+                continue
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
@@ -918,7 +959,7 @@ class EncryptExtantKeys(ScanBucket):
         'type': 'object',
         'additionalProperties': False,
         'properties': {
-            'type': {'pattern': 'encrypt-keys'},
+            'type': {'enum': ['encrypt-keys']},
             'report-only': {'type': 'boolean'},
             'glacier': {'type': 'boolean'},
             'large': {'type': 'boolean'},

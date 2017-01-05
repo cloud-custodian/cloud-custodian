@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'c7n_sphinxext.c7n_schema',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -287,3 +288,8 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# This adds in our expand/collapse JS/CSS
+def setup(app):
+    app.add_javascript('js/expand.js')
+    app.add_stylesheet('css/expand.css')

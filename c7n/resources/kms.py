@@ -63,6 +63,7 @@ class Key(KeyBase, QueryResourceManager):
 
     resource_type = Meta
 
+
 @Key.filter_registry.register('key-rotation-status')
 class KeyRotationStatus(ValueFilter):
     """Filters KMS keys by the rotation status
@@ -92,7 +93,8 @@ class KeyRotationStatus(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
                 r for r in resources if 'KeyRotationEnabled' not in r]
-            self.log.debug("Querying %d kms-keys' rotation status" % len(query_resources))
+            self.log.debug(
+                "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
         return [r for r in resources if self.match(r['KeyRotationEnabled'])]

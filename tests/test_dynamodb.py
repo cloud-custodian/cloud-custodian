@@ -13,6 +13,8 @@
 # limitations under the License.
 from common import BaseTest
 
+from c7n.resources.dynamodb import DeleteTable
+from c7n.executor import MainThreadExecutor
 
 class DynamodbTest(BaseTest):
 
@@ -40,3 +42,16 @@ class DynamodbTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_delete_tables(self):
+        session_factory = self.replay_flight_data('test_dynamodb_delete_table')
+        self.patch(DeleteTable, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'delete-empty-tables',
+            'resource': 'dynamodb-table',
+            'filters': [{
+                'TableSizeBytes': 0}],
+            'actions': [{
+                'type': 'delete'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['TableName'], 'c7n.DynamoDB.01')

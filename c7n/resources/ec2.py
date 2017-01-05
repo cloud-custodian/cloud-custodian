@@ -30,7 +30,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ResourceQuery
+from c7n.query import QueryResourceManager
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -45,22 +45,30 @@ actions.register('auto-tag-user', AutoTagUser)
 @resources.register('ec2')
 class EC2(QueryResourceManager):
 
-    class resource_type(ResourceQuery.resolve("aws.ec2.instance")):
+    class resource_type(object):
+        service = 'ec2'
+        type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        detail_spec = None
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
         config_type = "AWS::EC2::Instance"
+        shape = "Instance"
 
-    id_field = 'InstanceId'
-    report_fields = [
-        'CustodianDate',
-        'InstanceId',
-        'tag:Name',
-        'InstanceType',
-        'LaunchTime',
-        'VpcId',
-        'PrivateIpAddress',
-        'tag:ASV',
-        'tag:CMDBEnvironment',
-        'tag:OwnerContact',
-    ]
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
+
     filter_registry = filters
     action_registry = actions
 
@@ -106,7 +114,7 @@ class EC2(QueryResourceManager):
         """
 
         # First if we're in event based lambda go ahead and skip this,
-        # tags can't be trusted in  ec2 instances anyways.
+        # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.data.get('mode', {}).get('type', '') in (
                 'cloudtrail', 'ec2-instance-state'):
             return resources
@@ -141,9 +149,6 @@ class EC2(QueryResourceManager):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
-
-    def filter_record(self, record):
-        return record['State']['Name'] != 'terminated'
 
 
 @filters.register('security-group')
@@ -572,6 +577,13 @@ class Resize(BaseAction, StateTransitionFilter):
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
     """
+
+    schema = type_schema(
+        'resize',
+        **{'restart': {'type': 'boolean'},
+           'type-map': {'type': 'object'},
+           'default': {'type': 'string'}})
+
     valid_origin_states = ('running', 'stopped')
 
     def process(self, resources):
@@ -832,13 +844,12 @@ class Snapshot(BaseAction):
                 copy_tags = []
 
             tags.extend(copy_tags)
-
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
                 Tags=tags)
-                
+
 
 @actions.register('modify-security-groups')
 class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):

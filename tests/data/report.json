@@ -90,10 +90,7 @@
         "InstanceType-1",
         "LaunchTime-1",
         "VpcId-1",
-        "PrivateIpAddress-1",
-        "ASV-1",
-        "CMDBEnvironment-1",
-        "OwnerContact-1"
+        "PrivateIpAddress-1"
       ],
       "minimal": [
         "2015-12-22",
@@ -101,9 +98,6 @@
         "",
         "InstanceType-2",
         "LaunchTime-2",
-        "",
-        "",
-        "",
         "",
         ""
       ],
@@ -115,9 +109,6 @@
         "LaunchTime-1",
         "VpcId-1",
         "PrivateIpAddress-1",
-        "ASV-1",
-        "CMDBEnvironment-1",
-        "OwnerContact-1",
 	"CustomValue",
 	"",
 	"Custom-1"
@@ -172,18 +163,22 @@
     ],
     "rows": {
       "full": [
-        "AutoScalingGroupName-1",
-        "3",
-        "ASV-1",
-        "CMDBEnvironment-1",
-        "OwnerContact-1"
+          "AutoScalingGroupName-1",
+	  "",
+	  "",
+          "3",
+	  "",
+	  "",
+	  ""
       ],
       "minimal": [
-        "AutoScalingGroupName-2",
-        "0",
-        "",
-        "",
-        ""
+          "AutoScalingGroupName-2",
+	  "",
+	  "",
+          "0",
+          "",
+          "",
+          ""
       ]
     }
   }

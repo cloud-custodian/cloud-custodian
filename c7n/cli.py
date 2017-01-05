@@ -19,7 +19,7 @@ import os
 import pdb
 import sys
 import traceback
-
+from datetime import datetime
 from dateutil.parser import parse as date_parse
 
 DEFAULT_REGION = 'us-east-1'
@@ -117,6 +117,23 @@ def _metrics_options(p):
     p.add_argument('--period', type=int, default=60*24*24)
 
 
+def _logs_options(p):
+    """ Add options specific to logs subcommand. """
+    _default_options(p, blacklist=['cache'])
+
+    # default time range is 0 to "now" (to include all log entries)
+    p.add_argument(
+        '--start',
+        default='the beginning',  # invalid, will result in 0
+        help='Start date and/or time',
+    )
+    p.add_argument(
+        '--end',
+        default=datetime.now().strftime('%c'),
+        help='End date and/or time',
+    )
+
+
 def _schema_options(p):
     """ Add options specific to schema subcommand. """
 
@@ -165,7 +182,7 @@ def setup_parser():
     logs = subs.add_parser(
         'logs', help=logs_desc, description=logs_desc)
     logs.set_defaults(command="c7n.commands.logs")
-    _default_options(logs, blacklist=['cache'])
+    _logs_options(logs)
 
     metrics_desc = "Retrieve metrics for policies from CloudWatch Metrics"
     metrics = subs.add_parser(

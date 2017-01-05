@@ -14,30 +14,30 @@
 from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session
 
 
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
-    resource_type = 'aws.sns.topic'
-    id_field = 'TopicArn'
-    report_fields = [
-        'TopicArn',
-    ]
-
-    def augment(self, resources):
-
-        def _augment(r):
-            client = local_session(self.session_factory).client('sns')
-            attrs = client.get_topic_attributes(
-                TopicArn=r['TopicArn'])['Attributes']
-            r.update(attrs)
-            return r
-
-        self.log.debug("retrieving details for %d topics" % len(resources))
-        with self.executor_factory(max_workers=4) as w:
-            return list(w.map(_augment, resources))
+    class resource_type(object):
+        service = 'sns'
+        type = 'topic'
+        enum_spec = ('list_topics', 'Topics', None)
+        detail_spec = (
+            'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
+        id = 'TopicArn'
+        filter_name = None
+        filter_type = None
+        name = 'DisplayName'
+        date = None
+        dimension = 'TopicName'
+        default_report_fields = (
+            'TopicArn',
+            'DisplayName',
+            'SubscriptionsConfirmed',
+            'SubscriptionsPending',
+            'SubscriptionsDeleted'
+            )
 
 
 SNS.filter_registry.register('cross-account', CrossAccountAccessFilter)

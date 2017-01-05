@@ -14,6 +14,7 @@
 from datetime import datetime, timedelta
 import json
 import logging
+import time
 import unittest
 import StringIO
 import zipfile
@@ -23,7 +24,7 @@ from c7n.mu import (
     CloudWatchLogSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data
+from common import BaseTest, Config, event_data
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -149,7 +150,9 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        self.assertEqual(list(mgr.logs(pl)), [])
+        start = 0L
+        end = long(time.time() * 1000)
+        self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data('test_cwe_trail', zdata=True)
@@ -223,19 +226,19 @@ class PolicyLambdaProvision(BaseTest):
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'Description': 'cloud-maid lambda policy',
-             'FunctionName': 'maid-ec2-encrypted-vol',
-             'Handler': 'maid_policy.run',
+            {'Description': 'cloud-custodian lambda policy',
+             'FunctionName': 'c7n-ec2-encrypted-vol',
+             'Handler': 'c7n_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="maid-ec2-encrypted-vol")
+        result = events.list_rules(NamePrefix="c7n-ec2-encrypted-vol")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "maid-ec2-encrypted-vol"})
+             "Name": "c7n-ec2-encrypted-vol"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
@@ -259,18 +262,18 @@ class PolicyLambdaProvision(BaseTest):
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'maid-asg-spin-detector',
-             'Handler': 'maid_policy.run',
+            {'FunctionName': 'c7n-asg-spin-detector',
+             'Handler': 'c7n_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="maid-asg-spin-detector")
+        result = events.list_rules(NamePrefix="c7n-asg-spin-detector")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "maid-asg-spin-detector"})
+             "Name": "c7n-asg-spin-detector"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
@@ -295,20 +298,20 @@ class PolicyLambdaProvision(BaseTest):
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'maid-periodic-ec2-checker',
-             'Handler': 'maid_policy.run',
+            {'FunctionName': 'c7n-periodic-ec2-checker',
+             'Handler': 'c7n_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="maid-periodic-ec2-checker")
+        result = events.list_rules(NamePrefix="c7n-periodic-ec2-checker")
         self.assert_items(
             result['Rules'][0],
             {
                 "State": "ENABLED",
                 "ScheduleExpression": "rate(1 day)",
-                "Name": "maid-periodic-ec2-checker"})
+                "Name": "c7n-periodic-ec2-checker"})
         mgr.remove(pl)
 
 

@@ -1,16 +1,16 @@
 {
     "status_code": 200, 
     "data": {
-        "Subnets": [], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a7dd7497-183d-4b33-a77e-3cd4ad01cfca", 
+            "RequestId": "4af9eee9-8882-47ae-a929-f5e5ceebb3dd", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 29 Jul 2016 17:53:41 GMT"
+                "date": "Thu, 05 Jan 2017 02:25:39 GMT"
             }
         }
     }
