@@ -552,15 +552,15 @@ def process_bucket_partitions(
                 for s in list(s_prefix_set):
                     if strategy.is_depth_exceeded(prefix):
                         invoke(process_bucket_iterator,
-                            account_info, bucket, s)
+                               account_info, bucket, s)
                         s_prefix_set.remove(s)
 
                 if not s_prefix_set:
                     continue
                 invoke(process_bucket_partitions,
-                    account_info, bucket,
-                    prefix_set=s_prefix_set, partition=partition,
-                    strategy=strategy, limit=limit)
+                       account_info, bucket,
+                       prefix_set=s_prefix_set, partition=partition,
+                       strategy=strategy, limit=limit)
             prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD-1]
 
     if keyset:
