@@ -112,7 +112,6 @@ def reset(dbpath):
         click.echo('Invalid input :(')
 
 
-
 @cli.command()
 def workers():
     counter = Counter()
