@@ -18,7 +18,7 @@ from common import BaseTest
 class NotifyTest(BaseTest):
 
     def test_sns_notify(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_sns_notify_action')
         client = session_factory().client('sns')
         topic = client.create_topic(Name='c7n-notify-test')['TopicArn']
