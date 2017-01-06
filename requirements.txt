@@ -2,6 +2,4 @@ boto3>=1.4.0
 botocore>=1.4.34
 ipaddress>=1.0.16
 jsonschema>=2.5.1
-PyYAML==3.11
-setproctitle==1.1.10
-skew>=0.16.1
+PyYAML>=3.12
