@@ -269,7 +269,7 @@ class LambdaMode(PolicyExecutionMode):
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
             raise ValueError("Unknown push event mode %s" % self.data)
-        self.policy.log.info('Found resource ids: %s' % resource_ids)
+        self.policy.log.info('Found resource ids: %s' % (resource_ids,))
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:
