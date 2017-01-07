@@ -591,7 +591,6 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -602,14 +601,16 @@ class Delete(BaseAction):
             else:
                 params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
                     'Final', db['DBInstanceIdentifier'])
+            self.log.info(
+                "Deleting rds: %s snapshot: %s",
+                db['DBInstanceIdentifier'],
+                params.get('FinalDBSnapshotIdentifier', False))
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidDBInstanceState":
                     continue
                 raise
-
-            self.log.info("Deleted rds: %s", db['DBInstanceIdentifier'])
         return dbs
 
 
@@ -800,7 +801,9 @@ def _rds_snap_tags(
                 client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
-                log.warning("Exception getting rds snapshot:%s tags  \n %s", e)
+                log.error(
+                    "Exception getting rds snapshot:%s tags  \n %s",
+                    snap['DBSnapshotIdentifier'], e)
             return None
         snap['Tags'] = tag_list or []
         return snap
