@@ -345,15 +345,22 @@ class Notify(EventAction):
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
             'transport': {
-                'type': 'object',
-                'required': ['type', 'queue'],
-                'properties': {
-                    'queue': {'type': 'string'},
-                    'region': {'type': 'string'},
-                    'type': {'enum': ['sqs']}}
+                'oneOf': [
+                    {'type': 'object',
+                     'required': ['type', 'queue'],
+                     'properties': {
+                         'queue': {'type': 'string'},
+                         'type': {'enum': ['sqs']}}},
+                    {'type': 'object',
+                     'required': ['type', 'topic'],
+                     'properties': {
+                         'topic': {'type': 'string'},
+                         'type': {'enum': ['sns']},
+                         }}]
             }
         }
     }
+
     batch_size = 250
 
     def process(self, resources, event=None):
@@ -375,6 +382,17 @@ class Notify(EventAction):
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)
+        elif self.data['transport']['type'] == 'sns':
+            return self.send_sns(message)
+
+    def send_sns(self, message):
+        topic = self.data['transport']['topic']
+        region = topic.split(':', 5)[3]
+        client = self.manager.session_factory(region=region).client('sns')
+        client.publish(
+            TopicArn=topic,
+            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
+            )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
