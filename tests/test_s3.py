@@ -115,6 +115,33 @@ class BucketMetrics(BaseTest):
 
 class BucketDelete(BaseTest):
 
+    def test_delete_replicated_bucket(self):
+        # the iam setup is a little for replication to duplicate in a test
+        # preconditions - custodian-replicated and custodian-replicated-west
+        # buckets setup with replication, we're deleting the custodian-replicated
+        # bucket (source).
+        bname = 'custodian-replicated'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3, 'S3_AUGMENT_TABLE',
+            [('get_bucket_replication', 'Replication', None, None),
+             ('get_bucket_versioning', 'Versioning', None, None)])
+        session_factory = self.replay_flight_data(
+            'test_s3_delete_replicated_bucket')
+        p = self.load_policy({
+            'name': 's3-delete-bucket',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'delete', 'remove-contents': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        session = session_factory()
+        client = session.client('s3')
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertFalse(bname in buckets)
+
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',

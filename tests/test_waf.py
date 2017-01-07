@@ -15,6 +15,3 @@ class WAFTest(BaseTest):
             resources[0]['WebACLId'], '1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf')
         self.assertEqual(
             resources[0]['DefaultAction'], {'Type': 'BLOCK'})
-
-        
-        
