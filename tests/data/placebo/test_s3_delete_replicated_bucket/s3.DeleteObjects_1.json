@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Deleted": [
+            {
+                "VersionId": "oR8cvbTYzIpUi3qOPDvSIuLUxQGrqmbh", 
+                "Key": "Screen Shot 2017-01-04 at 8.13.36 PM.png"
+            }, 
+            {
+                "VersionId": ".PII_WPyK1JAkmhhT_mV2JmdrKoO7p9X", 
+                "Key": "Screen Shot 2017-01-04 at 8.13.42 PM.png"
+            }, 
+            {
+                "VersionId": "Pxh5frwAbmN9GSSibyt7_6xI5IPUuFEi", 
+                "Key": "Screen Shot 2017-01-04 at 8.13.36 PM.png"
+            }, 
+            {
+                "VersionId": "rjCBi3AfMJdXq.OFXCcHSyQ4yx6GalvG", 
+                "Key": "Screen Shot 2017-01-04 at 8.13.42 PM.png"
+            }, 
+            {
+                "VersionId": "y70jHWgNr.kdCIrzCeJGM7wxgkWcpLfh", 
+                "Key": "Screen Shot 2017-01-04 at 8.18.46 PM.png"
+            }, 
+            {
+                "VersionId": "X2OhbdfpBlhB0Cjb_0p0SL_U0a2ktkSG", 
+                "Key": "Screen Shot 2017-01-04 at 8.18.46 PM.png"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "bUcWcwqdAgJ+2KyRunvJNym8QfKtt0O3Ik5YewzKPqCUwOsch7/GsYMNupQpAXFLWJ3s6iyOZ3Q=", 
+            "RequestId": "9CA7E558B1AFA628", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "bUcWcwqdAgJ+2KyRunvJNym8QfKtt0O3Ik5YewzKPqCUwOsch7/GsYMNupQpAXFLWJ3s6iyOZ3Q=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "connection": "close", 
+                "x-amz-request-id": "9CA7E558B1AFA628", 
+                "date": "Sat, 07 Jan 2017 20:17:20 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
