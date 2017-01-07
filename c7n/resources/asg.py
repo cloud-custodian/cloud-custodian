@@ -206,7 +206,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         return set([e['LoadBalancerName'] for e in manager.resources()])
 
     def get_appelb_target_groups(self):
-        manager = self.manager.get_resource_manager('app-elb')   
+        manager = self.manager.get_resource_manager('app-elb-target-group')
         return set([a['TargetGroupArn'] for a in manager.resources()])
 
     def get_images(self):
