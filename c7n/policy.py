@@ -88,6 +88,9 @@ class PolicyCollection(object):
     def __contains__(self, policy_name):
         return policy_name in [p['name'] for p in self.data['policies']]
 
+    def __len__(self):
+        return len(self.data.get('policies', []))
+
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""
@@ -268,8 +271,8 @@ class LambdaMode(PolicyExecutionMode):
         mode = self.policy.data.get('mode', {})
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
-            raise ValueError("Unknown push event mode %s" % self.data)
-        self.policy.log.info('Found resource ids: %s' % resource_ids)
+            raise ValueError("Unknown push event mode %s", self.data)
+        self.policy.log.info('Found resource ids: %s', resource_ids)
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:

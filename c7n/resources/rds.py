@@ -277,28 +277,16 @@ class DefaultVpc(Filter):
     """
 
     schema = type_schema('default-vpc')
-
-    vpcs = None
     default_vpc = None
 
-    def __call__(self, rdb):
-        vpc_id = rdb['DBSubnetGroup']['VpcId']
-        if self.vpcs is None:
-            self.vpcs = set((vpc_id,))
-            query_vpc = vpc_id
-        else:
-            query_vpc = vpc_id not in self.vpcs and vpc_id or None
+    def process(self, resources, event=None):
+        for v in self.manager.get_resource_manager('vpc').resources():
+            if v['IsDefault']:
+                self.default_vpc = v['VpcId']
+        return super(DefaultVpc, self).process(resources)
 
-        if query_vpc:
-            client = local_session(self.manager.session_factory).client('ec2')
-            self.log.debug("querying vpc %s", vpc_id)
-            vpcs = [v['VpcId'] for v
-                    in client.describe_vpcs(VpcIds=[vpc_id])['Vpcs']
-                    if v['IsDefault']]
-            if not vpcs:
-                return []
-            self.default_vpc = vpcs.pop()
-        return vpc_id == self.default_vpc and True or False
+    def __call__(self, rdb):
+        return rdb['DBSubnetGroup']['VpcId'] == self.default_vpc
 
 
 @filters.register('security-group')
@@ -591,7 +579,6 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -602,14 +589,16 @@ class Delete(BaseAction):
             else:
                 params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
                     'Final', db['DBInstanceIdentifier'])
+            self.log.info(
+                "Deleting rds: %s snapshot: %s",
+                db['DBInstanceIdentifier'],
+                params.get('FinalDBSnapshotIdentifier', False))
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidDBInstanceState":
                     continue
                 raise
-
-            self.log.info("Deleted rds: %s", db['DBInstanceIdentifier'])
         return dbs
 
 
@@ -800,7 +789,9 @@ def _rds_snap_tags(
                 client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
-                log.warning("Exception getting rds snapshot:%s tags  \n %s", e)
+                log.error(
+                    "Exception getting rds snapshot:%s tags  \n %s",
+                    snap['DBSnapshotIdentifier'], e)
             return None
         snap['Tags'] = tag_list or []
         return snap

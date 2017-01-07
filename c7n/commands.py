@@ -43,6 +43,14 @@ def policy_command(f):
         load_resources()
         collection = policy_load(options, options.config)
         policies = collection.filter(options.policy_filter)
+        
+        if options.policy_filter and len(policies) == 0 and len(collection) > 0:
+            eprint("Warning: no policies matched the filter ({})".format(options.policy_filter))
+            eprint("  Policies:")
+            for policy in collection.policies():
+                eprint("    - ", policy.name)
+            eprint()
+
         return f(options, policies)
 
     return _load_policies
@@ -56,9 +64,8 @@ def validate(options):
     if len(options.configs) < 1:
         # no configs to test
         # We don't have the parser object, so fake ArgumentParser.error
-        print('custodian validate: error: no config files specified',
-              file=sys.stderr)
-        sys.exit(2)
+        eprint('Error: no config files specified')
+        sys.exit(1)
     used_policy_names = set()
     schm = schema.generate()
     errors = []
@@ -123,7 +130,14 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
-    assert len(policies) == 1, "Only one policy report at a time"
+    if len(policies) == 0:
+        eprint("Error: No policy supplied")
+        sys.exit(1)
+
+    if len(policies) > 1:
+        eprint("Error: Report subcommand can only operate on one policy")
+        sys.exit(1)
+    
     policy = policies.pop()
     d = datetime.now()
     delta = timedelta(days=options.days)
@@ -135,7 +149,14 @@ def report(options, policies):
 
 @policy_command
 def logs(options, policies):
-    assert len(policies) == 1, "Only one policy log at a time"
+    if len(policies) == 0:
+        eprint("Error: No policy supplied")
+        sys.exit(1)
+
+    if len(policies) > 1:
+        eprint("Error: Log subcommand can only operate on one policy")
+        sys.exit(1)
+
     policy = policies.pop()
 
     for e in policy.get_logs(options.start, options.end):
@@ -196,8 +217,8 @@ def schema_cmd(options):
     #
     resource = components[0].lower()
     if resource not in resource_mapping:
-        print('{} is not a valid resource'.format(resource), file=sys.stderr)
-        sys.exit(2)
+        eprint('Error: {} is not a valid resource'.format(resource))
+        sys.exit(1)
 
     if len(components) == 1:
         del(resource_mapping[resource]['classes'])
@@ -210,9 +231,9 @@ def schema_cmd(options):
     #
     category = components[1].lower()
     if category not in ('actions', 'filters'):
-        print(("Valid choices are 'actions' and 'filters'."
-               " You supplied '{}'").format(category), file=sys.stderr)
-        sys.exit(2)
+        eprint(("Error: Valid choices are 'actions' and 'filters'."
+                " You supplied '{}'").format(category))
+        sys.exit(1)
 
     if len(components) == 2:
         output = "No {} available for resource {}.".format(category, resource)
@@ -227,9 +248,9 @@ def schema_cmd(options):
     #
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
-        print('{} is not in the {} list for resource {}'.format(
-            item, category, resource), file=sys.stderr)
-        sys.exit(2)
+        eprint('Error: {} is not in the {} list for resource {}'.format(
+                item, category, resource))
+        sys.exit(1)
 
     if len(components) == 3:
         cls = resource_mapping[resource]['classes'][category][item]
@@ -255,18 +276,16 @@ def schema_cmd(options):
         return
 
     # We received too much (e.g. s3.actions.foo.bar)
-    print("Invalid selector '{}'.  Max of 3 components in the "
-          "format RESOURCE.CATEGORY.ITEM".format(options.resource),
-          file=sys.stderr)
-    sys.exit(2)
+    eprint("Invalid selector '{}'.  Max of 3 components in the "
+           "format RESOURCE.CATEGORY.ITEM".format(options.resource))
+    sys.exit(1)
 
 
 def _metrics_get_endpoints(options):
     """ Determine the start and end dates based on user-supplied options. """
     if bool(options.start) ^ bool(options.end):
-        print('Error: --start and --end must be specified together',
-              file=sys.stderr)
-        sys.exit(2)
+        eprint('Error: --start and --end must be specified together')
+        sys.exit(1)
 
     if options.start and options.end:
         start = options.start
@@ -286,3 +305,7 @@ def metrics_cmd(options, policies):
         log.info('Getting %s metrics', p)
         data[p.name] = p.get_metrics(start, end, options.period)
     print(dumps(data, indent=2))
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
