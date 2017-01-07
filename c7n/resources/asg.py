@@ -1077,6 +1077,8 @@ class MarkForOp(Tag):
 class Suspend(BaseAction):
     """Action to suspend ASG processes and instances
 
+    AWS ASG suspend/resume and process docs https://goo.gl/XYtKQ8
+
     :example:
 
         .. code-block: yaml
@@ -1090,7 +1092,24 @@ class Suspend(BaseAction):
                   - type: suspend
     """
 
-    schema = type_schema('suspend')
+    ASG_PROCESSES = [
+        "Launch",
+        "Terminate",
+        "HealthCheck",
+        "ReplaceUnhealthy",
+        "AZRebalance",
+        "AlarmNotification",
+        "ScheduledActions",
+        "AddToLoadBalancer"]
+
+    schema = type_schema(
+        'suspend',
+        exclude={
+            'type': 'array',
+            'title': 'ASG Processes to not suspend',
+            'items': {'enum': ASG_PROCESSES}})
+
+    ASG_PROCESSES = set(ASG_PROCESSES)
 
     def process(self, asgs):
         original_count = len(asgs)
@@ -1108,9 +1127,13 @@ class Suspend(BaseAction):
         """
         session = local_session(self.manager.session_factory)
         asg_client = session.client('autoscaling')
+        processes = list(self.ASG_PROCESSES.difference(
+            self.data.get('exclude', ())))
+
         try:
             self.manager.retry(
                 asg_client.suspend_processes,
+                ScalingProcesses=processes,
                 AutoScalingGroupName=asg['AutoScalingGroupName'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'ValidationError':
