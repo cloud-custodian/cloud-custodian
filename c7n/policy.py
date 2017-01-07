@@ -88,6 +88,9 @@ class PolicyCollection(object):
     def __contains__(self, policy_name):
         return policy_name in [p['name'] for p in self.data['policies']]
 
+    def __len__(self):
+        return len(self.data.get('policies', []))
+
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""
