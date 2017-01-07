@@ -154,8 +154,8 @@ def assemble_bucket(item):
                 continue
             else:
                 log.warning(
-                    "Bucket:%s unable to invoke method:%s error:%s " % (
-                        b['Name'], m, e.response['Error']['Message']))
+                    "Bucket:%s unable to invoke method:%s error:%s ",
+                        b['Name'], m, e.response['Error']['Message'])
                 return None
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
@@ -465,7 +465,9 @@ class RemovePolicyStatement(BucketActionBase):
 
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
-    """Action to enable/disable versioning on a S3 bucket
+    """Action to enable/suspend versioning on a S3 bucket
+
+    Note versioning can never be disabled only suspended.
 
     :example:
 
@@ -477,7 +479,7 @@ class ToggleVersioning(BucketActionBase):
                 filter:
                   - type: value
                     key: Versioning
-                    value: Disabled
+                    value: Suspended
                 actions:
                   - type: toggle-versioning
                     enabled: true
@@ -509,6 +511,7 @@ class ToggleVersioning(BucketActionBase):
 @actions.register('toggle-logging')
 class ToggleLogging(BucketActionBase):
     """Action to enable/disable logging on a S3 bucket.
+
     Target bucket ACL must allow for WRITE and READ_ACP Permissions
     Not specifying a target_prefix will default to the current bucket name.
     http://goo.gl/PiWWU2

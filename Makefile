@@ -37,7 +37,7 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 ghpages:
-	git checkout gh-pages && \
+	-git checkout gh-pages && \
 	mv docs/build/html new-docs && \
 	rm -rf docs && \
 	mv new-docs docs && \
