@@ -264,7 +264,7 @@ def _get_available_engine_upgrades(client, major=False):
 
 
 @filters.register('default-vpc')
-class RDSDefaultVpc(net_filters.DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
 
     :example:
