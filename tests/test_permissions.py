@@ -17,6 +17,9 @@ class PolicyPermissions(BaseTest):
             ctx = self.get_context(config=cfg, policy=p)
 
             mgr = v(ctx, p)
+            perms = mgr.get_permissions()
+            if not perms:
+                missing.append(k)
 
             for n, a in v.action_registry.items():
                 p['actions'] = [n]
