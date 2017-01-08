@@ -91,6 +91,13 @@ class PolicyCollection(object):
     def __len__(self):
         return len(self.data.get('policies', []))
 
+    def resource_types(self):
+        """resource types used by the collection."""
+        rtypes = set()
+        for p in self:
+            rtypes.add(p.resource_type)
+        return rtypes
+
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""
@@ -510,6 +517,24 @@ class Policy(object):
     def get_metrics(self, start, end, period):
         mode = self.get_execution_mode()
         return mode.get_metrics(start, end, period)
+
+    def get_permissions(self):
+        """get permissions needed by this policy"""
+        permissions = set()
+        permissions.update(self.resource_manager.get_permissions())
+        for f in self.resource_manager.filters:
+            permissions.update(f.get_permissions())
+        for a in self.resource_manager.actions:
+            permissions.update(a.get_permissions())
+        return permissions
+
+    def validate(self):
+        """validate settings, else raise validation error"""
+        for f in self.filters:
+            f.validate()
+        for a in self.actions:
+            a.validate()
+        self.get_execution_mode().validate()
 
     def __call__(self):
         """Run policy in default mode"""

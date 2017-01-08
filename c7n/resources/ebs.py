@@ -111,6 +111,8 @@ def _filter_ami_snapshots(self, snapshots):
 @Snapshot.filter_registry.register('cross-account')
 class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
+    permissions = ('ec2:DescribeSnapshotAttribute',)
+
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
         results = []
@@ -167,6 +169,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
+    permissions = AMI.get_permissions()
 
     def validate(self):
         if self.data.get('skip-ami-snapshots', not True or False):
@@ -200,6 +203,7 @@ class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
+    permissions = ('ec2.DeleteSnapshot',)
 
     def process(self, snapshots):
         self.image_snapshots = snaps = set()
@@ -270,6 +274,8 @@ class CopySnapshot(BaseAction):
         target_key={'type': 'string'},
         encrypted={'type': 'boolean'},
     )
+    permissions = (
+        'ec2:CreateTags', 'ec2:CopySnapshot', 'ec2:DescribeSnapshots')
 
     def validate(self):
         if self.data.get('encrypted', True):
@@ -370,6 +376,9 @@ class AttachedInstanceFilter(ValueFilter):
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ec2').get_permissions()
+
     def process(self, resources, event=None):
         original_count = len(resources)
         resources = [r for r in resources if r.get('Attachments')]
@@ -417,6 +426,8 @@ class FaultTolerantSnapshots(Filter):
     """
     schema = type_schema('fault-tolerant', tolerant={'type': 'boolean'})
     check_id = 'H7IgTzjTYb'
+    permissions = ('support:RefreshTrustedAdvisorCheck',
+                   'support:DescribeTrustedAdvisorCheckResult')
 
     def pull_check_results(self):
         result = set()
@@ -468,6 +479,11 @@ class CopyInstanceTags(BaseAction):
     schema = type_schema(
         'copy-instance-tags',
         tags={'type': 'array', 'items': {'type': 'string'}})
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('ec2').get_permissions()
+        perms.append('ec2:CreateTags')
+        return perms
 
     def process(self, volumes):
         volumes = [v for v in volumes if v['Attachments']]
@@ -599,6 +615,16 @@ class EncryptInstanceVolumes(BaseAction):
         key={'type': 'string'},
         delay={'type': 'number'},
         verbose={'type': 'boolean'})
+
+    permissions = (
+        'ec2:CopySnapshot',
+        'ec2:CreateSnapshot',
+        'ec2:CreateVolume',
+        'ec2:DescribeInstances',
+        'ec2:DescribeSnapshots',
+        'ec2:DescribeVolumes',
+        'ec2:StopInstances',
+        'ec2:StartInstances')
 
     def validate(self):
         key = self.data.get('key')
@@ -822,6 +848,8 @@ class Delete(BaseAction):
                   - delete
     """
     schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = (
+        'ec2:DetachVolume', 'ec2:DeleteVolume', 'ec2:DescribeVolumes')
 
     def process(self, volumes):
         with self.executor_factory(max_workers=3) as w:

@@ -113,6 +113,14 @@ def validate(options):
 
 
 @policy_command
+def access(options, policies):
+    permissions = set()
+    for p in policies:
+        permissions.update(p.get_permissions())
+    pprint.pprint(sorted(list(permissions)))
+
+
+@policy_command
 def run(options, policies):
     exit_code = 0
     for policy in policies:

@@ -53,12 +53,18 @@ class ResourceManager(object):
         """return ids that match this resource type's id format."""
         return ids
 
+    @classmethod
+    def get_permissions(cls):
+        return ()
+
     def get_resources(self, resource_ids):
         """Retrieve a set of resources by id."""
         return []
 
     def get_resource_manager(self, resource_type, data=None):
         klass = resources.get(resource_type)
+        if klass is None:
+            raise ValueError(resource_type)
         return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):

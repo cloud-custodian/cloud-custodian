@@ -44,4 +44,3 @@ class CognitoUserPool(QueryResourceManager):
         name = 'Name'
         filter_name = None
         dimension = None
-        

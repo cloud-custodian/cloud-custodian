@@ -58,7 +58,7 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager).validate()
 
 
-class BaseAction(object):
+class Action(object):
 
     permissions = ()
     metrics = ()
@@ -66,13 +66,16 @@ class BaseAction(object):
     log = logging.getLogger("custodian.actions")
 
     executor_factory = ThreadPoolExecutor
-
+    permissions = ()
     schema = {'type': 'object'}
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
+
+    def get_permissions(self):
+        return self.permissions
 
     def validate(self):
         return self
@@ -84,9 +87,6 @@ class BaseAction(object):
     def process(self, resources):
         raise NotImplemented(
             "Base action class does not implement behavior")
-
-    def get_permissions(self):
-        return self.permissions
 
     def _run_api(self, cmd, *args, **kw):
         try:
@@ -100,10 +100,10 @@ class BaseAction(object):
                         self.__class__.__name__.lower()))
             raise
 
-Action = BaseAction
+BaseAction = Action
 
 
-class ModifyVpcSecurityGroupsAction(BaseAction):
+class ModifyVpcSecurityGroupsAction(Action):
     """Common actions for modifying security groups on a resource
 
     Can target either physical groups as a list of group ids or
@@ -273,6 +273,13 @@ class LambdaInvoke(EventAction):
         batch_size={'type': 'integer'},
         required=('function',))
 
+    def get_permissions(self):
+        if self.data.get('async', True):
+            return ('lambda:InvokeAsync',)
+        return ('lambda:Invoke',)
+
+    permissions = ('lambda:InvokeFunction',)
+
     def process(self, resources, event=None):
         client = utils.local_session(
             self.manager.session_factory).client('lambda')
@@ -362,6 +369,13 @@ class Notify(EventAction):
     }
 
     batch_size = 250
+
+    def get_permissions(self):
+        if self.data.get('transport', {}).get('type') == 'sns':
+            return ('sns:Publish',)
+        if self.data.get('transport', {'type': 'sqs'}).get('type') == 'sqs':
+            return ('sqs:SendMessage',)
+        return ()
 
     def process(self, resources, event=None):
         aliases = self.manager.session_factory().client(
@@ -455,6 +469,10 @@ class AutoTagUser(EventAction):
            'tag': {'type': 'string'},
            }
     )
+
+    def get_permissions(self):
+        return self.manager.action_registry.get(
+            'tag')({}, self.manager).get_permissions()
 
     def validate(self):
         if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':

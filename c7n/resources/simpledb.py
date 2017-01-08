@@ -29,6 +29,8 @@ class SimpleDB(QueryResourceManager):
         id = name = "DomainName"
         dimension = None
 
+    permissions = ('sdb:DomainMetadata',)
+
     def augment(self, resources):
         def _augment(resource_set):
             client = local_session(self.session_factory).client('sdb')
@@ -49,6 +51,7 @@ class SimpleDB(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ('sdb:DeleteDomain',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('sdb')

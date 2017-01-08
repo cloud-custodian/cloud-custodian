@@ -15,7 +15,6 @@
 import argparse
 import importlib
 import logging
-import os
 import pdb
 import sys
 import traceback
@@ -220,6 +219,14 @@ def setup_parser():
         help="Interactive cli docs for policy authors")
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
+
+    #access_desc = ("Show permissions needed to execute the policies")
+    #access = subs.add_parser(
+    #    'access', description=access_desc, help=access_desc)
+    #access.set_defaults(command='c7n.commands.access')
+    #_default_options(access)
+    #access.add_argument(
+    #    '-m', '--access', default=False, action='store_true')
 
     run_desc = ("Execute the policies in a config file")
     run = subs.add_parser("run", description=run_desc, help=run_desc)
