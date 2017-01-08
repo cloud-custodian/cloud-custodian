@@ -91,6 +91,7 @@ class PolicyCollection(object):
     def __len__(self):
         return len(self.data.get('policies', []))
 
+    @property
     def resource_types(self):
         """resource types used by the collection."""
         rtypes = set()

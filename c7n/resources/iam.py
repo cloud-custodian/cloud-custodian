@@ -224,6 +224,7 @@ class IamRoleInlinePolicy(Filter):
     """
 
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListRolePolicies',)
 
     def _inline_policies(self, client, resource):
         return len(client.list_role_policies(
@@ -245,6 +246,7 @@ class IamRoleInlinePolicy(Filter):
 class UsedIamPolicies(Filter):
 
     schema = type_schema('used')
+    permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] > 0]
@@ -254,6 +256,7 @@ class UsedIamPolicies(Filter):
 class UnusedIamPolicies(Filter):
 
     schema = type_schema('unused')
+    permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] == 0]

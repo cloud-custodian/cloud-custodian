@@ -68,4 +68,6 @@ class SQS(QueryResourceManager):
             return filter(None, w.map(_augment, resources))
 
 
-SQS.filter_registry.register('cross-account', CrossAccountAccessFilter)
+@SQS.filter_registry.register('cross-account')
+class SQSCrossAccount(CrossAccountAccessFilter):
+    permissions = ('sqs:GetQueueAttributes',)

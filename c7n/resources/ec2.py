@@ -243,6 +243,9 @@ class AttachedVolume(ValueFilter):
         **{'operator': {'enum': ['and', 'or']},
            'skip-devices': {'type': 'array', 'items': {'type': 'string'}}})
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ebs').get_permissions()
+
     def process(self, resources, event=None):
         self.volume_map = self.get_volume_mapping(resources)
         self.skip = self.data.get('skip-devices', [])
@@ -252,16 +255,15 @@ class AttachedVolume(ValueFilter):
 
     def get_volume_mapping(self, resources):
         volume_map = {}
-        ec2 = utils.local_session(self.manager.session_factory).client('ec2')
-        for instance_set in utils.chunks(
-                [i['InstanceId'] for i in resources], 200):
-            self.log.debug("Processing %d instance of %d" % (
-                len(instance_set), len(resources)))
-            results = ec2.describe_volumes(
-                Filters=[
-                    {'Name': 'attachment.instance-id',
-                     'Values': instance_set}])
-            for v in results['Volumes']:
+        manager = self.manager.get_resource_manager('ebs')
+        for instance_set in utils.chunks(resources, 200):
+            volume_ids = []
+            for i in instance_set:
+                for bd in i.get('BlockDeviceMappings', ()):
+                    if 'Ebs' not in bd:
+                        continue
+                    volume_ids.append(bd['Ebs']['VolumeId'])
+            for v in manager.get_resources(volume_ids):
                 volume_map.setdefault(
                     v['Attachments'][0]['InstanceId'], []).append(v)
         return volume_map

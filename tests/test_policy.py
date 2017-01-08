@@ -121,6 +121,18 @@ class PolicyPermissions(BaseTest):
                     missing.append("%s.filters.%s" % (
                         k, n))
 
+                if n in ('event', 'value', 'tag-count',
+                         'marked-for-op', 'offhour', 'onhour', 'age',
+                         'state-age', 'egress', 'ingress',
+                         'capacity-delta', 'is-ssl', 'global-grants',
+                         'missing-policy-statement', 'missing-statement',
+                         'healthcheck-protocol-mismatch', 'image-age',
+                         'has-statement',
+                         'instance-age', 'ephemeral', 'instance-uptime'):
+                    continue
+                if not perms:
+                    missing.append("%s.filters.%s" % (
+                        k, n))
         if missing:
             self.fail("Missing permissions %d on \n\t%s" % (
                 len(missing),
@@ -133,14 +145,20 @@ class TestPolicy(BaseTest):
         policy = self.load_policy({
             'name': 'ec2-utilization',
             'resource': 'ec2',
+            'tags': ['abc'],
             'filters': [
                 {'type': 'metrics',
                  'name': 'CPUUtilization',
                  'days': 3,
-                 'value': 1.5}
-            ]})
+                 'value': 1.5}],
+            'actions': ['stop']})
         policy.validate()
-        
+        self.assertEqual(policy.tags, ['abc'])
+        self.assertFalse(policy.is_lambda)
+        self.assertEqual(
+            repr(policy),
+            "<Policy resource: ec2 name: ec2-utilization>")
+
     def test_policy_name_filtering(self):
 
         collection = self.load_policy_set(
@@ -156,6 +174,9 @@ class TestPolicy(BaseTest):
                 {'name': 'ec2-tag-compliance-remove',
                  'resource': 'ec2'}]},
             )
+        self.assertEqual(collection.resource_types,
+                         set(('s3', 'ec2')))
+        self.assertTrue('s3-remediate' in collection)
         self.assertEqual(
             [p.name for p in collection.policies('s3*')],
             ['s3-remediate', 's3-global-grants'])

@@ -147,7 +147,8 @@ def _rds_tags(
         arn = generator(db[model.id])
         tag_list = None
         try:
-            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+            tag_list = retry(client.list_tags_for_resource,
+                             ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBInstanceNotFound']:
                 log.warning("Exception getting rds tags  \n %s", e)
@@ -263,7 +264,7 @@ def _get_available_engine_upgrades(client, major=False):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(Filter):
+class RDSDefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
 
     :example:
@@ -276,18 +277,10 @@ class DefaultVpc(Filter):
                 filters:
                   - default-vpc
     """
-
     schema = type_schema('default-vpc')
-    default_vpc = None
-
-    def process(self, resources, event=None):
-        for v in self.manager.get_resource_manager('vpc').resources():
-            if v['IsDefault']:
-                self.default_vpc = v['VpcId']
-        return super(DefaultVpc, self).process(resources)
 
     def __call__(self, rdb):
-        return rdb['DBSubnetGroup']['VpcId'] == self.default_vpc
+        return self.match(rdb['DBSubnetGroup']['VpcId'])
 
 
 @filters.register('security-group')
@@ -820,6 +813,7 @@ class LatestSnapshot(Filter):
     """Return the latest snapshot for each database.
     """
     schema = type_schema('latest', automatic={'type': 'boolean'})
+    permissions = ('rds:DescribeDBSnapshots',)
 
     def process(self, resources, event=None):
         results = []
@@ -959,6 +953,8 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
 
 @RDSSnapshot.filter_registry.register('cross-account')
 class CrossAccountAccess(CrossAccountAccessFilter):
+
+    permissions = ('rds:DescribeDBSnapshotAttributes',)
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()

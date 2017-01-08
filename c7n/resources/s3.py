@@ -246,6 +246,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
+    permissions = ('s3:GetBucketPolicy',)
 
     def get_accounts(self):
         """add in elb access by default
