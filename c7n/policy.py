@@ -530,11 +530,10 @@ class Policy(object):
 
     def validate(self):
         """validate settings, else raise validation error"""
-        for f in self.filters:
+        for f in self.resource_manager.filters:
             f.validate()
-        for a in self.actions:
+        for a in self.resource_manager.actions:
             a.validate()
-        self.get_execution_mode().validate()
 
     def __call__(self):
         """Run policy in default mode"""
