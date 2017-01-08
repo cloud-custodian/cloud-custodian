@@ -66,6 +66,11 @@ class ELB(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
 
+    @classmethod
+    def get_permissions(cls):
+        return ('elasticloadbalancing:DescribeLoadBalancers',
+                'elasticloadbalancing:DescribeTags')
+
     def augment(self, resources):
         _elb_tags(
             resources, self.session_factory, self.executor_factory, self.retry)
@@ -124,6 +129,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     """
 
     batch_size = 1
+    permissions = ('elasticloadbalancing:AddTags',)
 
     def process_resource_set(self, resource_set, tags):
         client = local_session(self.manager.session_factory).client('elb')
@@ -152,6 +158,7 @@ class Tag(tags.Tag):
     """
 
     batch_size = 1
+    permissions = ('elasticloadbalancing:AddTags',)
 
     def process_resource_set(self, resource_set, tags):
         client = local_session(
@@ -180,6 +187,7 @@ class RemoveTag(tags.RemoveTag):
     """
 
     batch_size = 1
+    permissions = ('elasticloadbalancing:RemoveTags',)
 
     def process_resource_set(self, resource_set, tag_keys):
         client = local_session(
@@ -210,6 +218,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('elasticloadbalancing:DeleteLoadBalancer',)
 
     def process(self, load_balancers):
         with self.executor_factory(max_workers=2) as w:
@@ -247,6 +256,10 @@ class SetSslListenerPolicy(BaseAction):
         name={'type': 'string'},
         attributes={'type': 'array', 'items': {'type': 'string'}},
         required=['name', 'attributes'])
+
+    permissions = (
+        'elasticloadbalancing:CreateLoadBalancerPolicy',
+        'elasticloadbalancing:SetLoadBalancerPoliciesOfListener')
 
     def process(self, load_balancers):
         with self.executor_factory(max_workers=3) as w:
@@ -301,9 +314,12 @@ class SetSslListenerPolicy(BaseAction):
 class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify VPC security groups on an ELB."""
 
+    permissions = ('elasticloadbalancing:ApplySecurityGroupsToLoadBalancer',)
+
     def process(self, load_balancers):
         client = local_session(self.manager.session_factory).client('elb')
-        groups = super(ELBModifyVpcSecurityGroups, self).get_groups(load_balancers, 'SecurityGroups')
+        groups = super(ELBModifyVpcSecurityGroups, self).get_groups(
+            load_balancers, 'SecurityGroups')
         for idx, l in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancer(
                 LoadBalancerName=l['LoadBalancerName'],
@@ -349,8 +365,10 @@ class Instance(ValueFilter):
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
-
     annotate = False
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ec2').get_permissions()
 
     def process(self, resources, event=None):
         self.elb_instances = {}
@@ -370,7 +388,7 @@ class Instance(ValueFilter):
                 matched.append(instance)
         if not matched:
             return False
-        elb['MatchedInstances'] = matched
+        elb['c7n:MatchedInstances'] = matched
         return True
 
 
@@ -433,6 +451,7 @@ class SSLPolicyFilter(Filter):
             'blacklist': {'type': 'array', 'items': {'type': 'string'}}
             }
         }
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerPolicies",)
 
     def validate(self):
         if 'whitelist' in self.data and 'blacklist' in self.data:
@@ -461,12 +480,14 @@ class SSLPolicyFilter(Filter):
         if blacklist:
             for elb, active_policies in active_policy_attribute_tuples:
                 if len(blacklist.intersection(active_policies)) > 0:
-                    elb["ProhibitedPolicies"] = list(blacklist.intersection(active_policies))
+                    elb["ProhibitedPolicies"] = list(
+                        blacklist.intersection(active_policies))
                     invalid_elbs.append(elb)
         elif whitelist:
             for elb, active_policies in active_policy_attribute_tuples:
                 if len(set(active_policies).difference(whitelist)) > 0:
-                    elb["ProhibitedPolicies"] = list(set(active_policies).difference(whitelist))
+                    elb["ProhibitedPolicies"] = list(
+                        set(active_policies).difference(whitelist))
                     invalid_elbs.append(elb)
         return invalid_elbs
 

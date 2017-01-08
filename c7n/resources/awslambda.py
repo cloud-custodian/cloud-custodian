@@ -54,6 +54,7 @@ class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n.EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
+    permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
         def _augment(r):
@@ -115,6 +116,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
                     whitelist:
                       - 'IAM-Policy-Cross-Account-Access'
     """
+    permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
 
@@ -156,6 +158,7 @@ class Delete(BaseAction):
                   - delete
     """
     schema = type_schema('delete')
+    permissions = ("lambda:DeleteFunction",)
 
     def process(self, functions):
         client = local_session(self.manager.session_factory).client('lambda')

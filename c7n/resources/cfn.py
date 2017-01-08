@@ -65,6 +65,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ("cloudformation:DeleteStack",)
 
     def process(self, stacks):
         with self.executor_factory(max_workers=10) as w:

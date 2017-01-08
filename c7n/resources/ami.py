@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
@@ -73,6 +74,7 @@ class Deregister(BaseAction):
     """
 
     schema = type_schema('deregister')
+    permissions = ('ec2:DeregisterImage',)
 
     def process(self, images):
         with self.executor_factory(max_workers=10) as w:
@@ -107,6 +109,7 @@ class RemoveLaunchPermissions(BaseAction):
     """
 
     schema = type_schema('remove-launch-permissions')
+    permissions = ('ec2:ResetImageAttribute',)
 
     def process(self, images):
         with self.executor_factory(max_workers=2) as w:
@@ -161,6 +164,10 @@ class ImageUnusedFilter(Filter):
     """
 
     schema = type_schema('unused', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return list(itertools.chain([
+            m.get_permissions() for m in (ASG, LaunchConfig)]))
 
     def _pull_asg_images(self):
         asg_manager = ASG(self.manager.ctx, {})

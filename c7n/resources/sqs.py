@@ -40,6 +40,12 @@ class SQS(QueryResourceManager):
             'ApproximateNumberOfMessages',
         )
 
+    @classmethod
+    def get_permissions(cls):
+        perms = super(SQS, cls).get_permissions()
+        perms.append('sqs:GetQueueAttributes')
+        return perms
+
     def augment(self, resources):
 
         def _augment(r):
@@ -62,4 +68,6 @@ class SQS(QueryResourceManager):
             return filter(None, w.map(_augment, resources))
 
 
-SQS.filter_registry.register('cross-account', CrossAccountAccessFilter)
+@SQS.filter_registry.register('cross-account')
+class SQSCrossAccount(CrossAccountAccessFilter):
+    permissions = ('sqs:GetQueueAttributes',)

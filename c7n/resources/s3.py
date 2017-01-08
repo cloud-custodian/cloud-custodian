@@ -93,6 +93,12 @@ class S3(QueryResourceManager):
         super(S3, self).__init__(ctx, data)
         self.log_dir = ctx.log_dir
 
+    @classmethod
+    def get_permissions(cls):
+        perms = ["s3:ListAllMyBuckets"]
+        perms.extend([n[0] for n in S3_AUGMENT_TABLE])
+        return perms
+
     def augment(self, buckets):
         with self.executor_factory(
                 max_workers=min((10, len(buckets)))) as w:
@@ -240,6 +246,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
+    permissions = ('s3:GetBucketPolicy',)
 
     def get_accounts(self):
         """add in elb access by default
@@ -404,6 +411,7 @@ class MissingPolicyStatementFilter(Filter):
 class NoOp(BucketActionBase):
 
     schema = type_schema('no-op')
+    permissions = ('s3:ListAllMyBuckets',)
 
     def process(self, buckets):
         return None
@@ -433,6 +441,7 @@ class RemovePolicyStatement(BucketActionBase):
     schema = type_schema(
         'remove-statements',
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
@@ -488,6 +497,7 @@ class ToggleVersioning(BucketActionBase):
     schema = type_schema(
         'toggle-versioning',
         enabled={'type': 'boolean'})
+    permissions = ("s3:PutBucketVersioning",)
 
     # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
@@ -507,6 +517,7 @@ class ToggleVersioning(BucketActionBase):
                 client.put_bucket_versioning(
                     Bucket=r['Name'],
                     VersioningConfiguration={'Status': 'Suspended'})
+
 
 @actions.register('toggle-logging')
 class ToggleLogging(BucketActionBase):
@@ -535,8 +546,8 @@ class ToggleLogging(BucketActionBase):
         'toggle-logging',
         enabled={'type': 'boolean'},
         target_bucket={'type': 'string'},
-        target_prefix={'type': 'string'},
-    )
+        target_prefix={'type': 'string'})
+    permissions = ("s3:PutBucketLogging",)
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
@@ -561,6 +572,7 @@ class ToggleLogging(BucketActionBase):
                     BucketLoggingStatus={})
                 continue
 
+
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
@@ -579,6 +591,13 @@ class AttachLambdaEncrypt(BucketActionBase):
     """
     schema = type_schema(
         'attach-encrypt', role={'type': 'string'})
+
+    permissions = (
+        "s3:PutBucketNotification", "s3:GetBucketNotification",
+        # lambda manager uses quite a few perms to provision lambdas
+        # and event sources, hard to disamgibuate punt for now.
+        "lambda:*",
+    )
 
     def __init__(self, data=None, manager=None):
         self.data = data or {}
@@ -983,6 +1002,16 @@ class EncryptExtantKeys(ScanBucket):
         ('Total Keys', {'Scope': 'Account'}),
         ('Unencrypted', {'Scope': 'Account'})]
 
+    def get_permissions(self):
+        perms = ("s3:GetObject", "s3:GetObjectVersion")
+        if self.data.get('report-only'):
+            perms += ('s3:DeleteObject', 's3:DeleteObjectVersion',
+                      's3:PutObject',
+                      's3:AbortMultipartUpload',
+                      's3:ListBucket',
+                      's3:ListBucketVersions')
+        return perms
+
     def process(self, buckets):
         t = time.time()
         results = super(EncryptExtantKeys, self).process(buckets)
@@ -1177,7 +1206,11 @@ class LogTarget(Filter):
     """
 
     schema = type_schema('is-log-target', value={'type': 'boolean'})
-    executor_factory = executor.MainThreadExecutor
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('elb').get_permissions()
+        perms += ('elasticloadbalancing:DescribeLoadBalancerAttributes',)
+        return perms
 
     def process(self, buckets, event=None):
         log_buckets = set()
@@ -1223,25 +1256,7 @@ class LogTarget(Filter):
 
     def get_elb_bucket_locations(self):
         session = local_session(self.manager.session_factory)
-        client = session.client('elb')
-
-        # Try to use the cache if it exists
-        elbs = self.manager._cache.get(
-            {'region': self.manager.config.region, 'resource': 'elb'})
-
-        # Sigh, post query refactor reuse, we can't save our cache here
-        # as that resource manager does extra lookups on tags. Not
-        # worth paginating, since with cache usage we have full set in
-        # mem.
-        if elbs is None:
-            p = client.get_paginator('describe_load_balancers')
-            results = p.paginate()
-            elbs = results.build_full_result().get(
-                'LoadBalancerDescriptions', ())
-            self.log.info("Queried %d elbs", len(elbs))
-        else:
-            self.log.info("Using %d cached elbs", len(elbs))
-
+        elbs = self.manager.get_resource_manager('elb').resources()
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
 
@@ -1298,6 +1313,8 @@ class DeleteGlobalGrants(BucketActionBase):
     schema = type_schema(
         'delete-global-grants',
         grantees={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('s3:PutBucketAcl',)
 
     def process(self, buckets):
         with self.executor_factory(max_workers=5) as w:

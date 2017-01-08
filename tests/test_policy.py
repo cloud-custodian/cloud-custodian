@@ -21,7 +21,7 @@ from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 
-from common import BaseTest, Config
+from common import BaseTest, Config, Bag
 
 
 class DummyResource(manager.ResourceManager):
@@ -55,7 +55,109 @@ class DummyResource(manager.ResourceManager):
         return [_a(p1), _a(p2)]
 
 
+class PolicyPermissions(BaseTest):
+
+    def test_policy_detail_spec_permissions(self):
+        policy = self.load_policy({
+            'name': 'kinesis-delete',
+            'resource': 'kinesis',
+            'actions': ['delete']})
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            set(('kinesis:DescribeStream',
+                 'kinesis:ListStreams',
+                 'kinesis:DeleteStream')))
+
+    def test_policy_manager_custom_permissions(self):
+        policy = self.load_policy({
+            'name': 'ec2-utilization',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'days': 3,
+                 'value': 1.5}
+            ]})
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            set(('ec2:DescribeInstances',
+                 'ec2:DescribeTags',
+                 'cloudwatch:GetMetricStatistics')))
+
+    def test_resource_permissions(self):
+        self.capture_logging('c7n.cache')
+        missing = []
+        cfg = Config.empty()
+        for k, v in manager.resources.items():
+            self.assertTrue(v.get_permissions())
+
+            p = Bag({'name': 'permcheck', 'resource': k})
+            ctx = self.get_context(config=cfg, policy=p)
+
+            mgr = v(ctx, p)
+            perms = mgr.get_permissions()
+            if not perms:
+                missing.append(k)
+
+            for n, a in v.action_registry.items():
+                p['actions'] = [n]
+                perms = a({}, mgr).get_permissions()
+                found = bool(perms)
+                if not isinstance(perms, (list, tuple, set)):
+                    found = False
+
+                if not found:
+                    missing.append("%s.actions.%s" % (
+                        k, n))
+
+            for n, f in v.filter_registry.items():
+                if n in ('and', 'or'):
+                    continue
+                p['filters'] = [n]
+                perms = f({}, mgr).get_permissions()
+                if not isinstance(perms, (tuple, list, set)):
+                    missing.append("%s.filters.%s" % (
+                        k, n))
+
+                if n in ('event', 'value', 'tag-count',
+                         'marked-for-op', 'offhour', 'onhour', 'age',
+                         'state-age', 'egress', 'ingress',
+                         'capacity-delta', 'is-ssl', 'global-grants',
+                         'missing-policy-statement', 'missing-statement',
+                         'healthcheck-protocol-mismatch', 'image-age',
+                         'has-statement',
+                         'instance-age', 'ephemeral', 'instance-uptime'):
+                    continue
+                if not perms:
+                    missing.append("%s.filters.%s" % (
+                        k, n))
+        if missing:
+            self.fail("Missing permissions %d on \n\t%s" % (
+                len(missing),
+                "\n\t".join(sorted(missing))))
+
+
 class TestPolicy(BaseTest):
+
+    def test_policy_validation(self):
+        policy = self.load_policy({
+            'name': 'ec2-utilization',
+            'resource': 'ec2',
+            'tags': ['abc'],
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'days': 3,
+                 'value': 1.5}],
+            'actions': ['stop']})
+        policy.validate()
+        self.assertEqual(policy.tags, ['abc'])
+        self.assertFalse(policy.is_lambda)
+        self.assertEqual(
+            repr(policy),
+            "<Policy resource: ec2 name: ec2-utilization>")
 
     def test_policy_name_filtering(self):
 
@@ -72,6 +174,9 @@ class TestPolicy(BaseTest):
                 {'name': 'ec2-tag-compliance-remove',
                  'resource': 'ec2'}]},
             )
+        self.assertEqual(collection.resource_types,
+                         set(('s3', 'ec2')))
+        self.assertTrue('s3-remediate' in collection)
         self.assertEqual(
             [p.name for p in collection.policies('s3*')],
             ['s3-remediate', 's3-global-grants'])

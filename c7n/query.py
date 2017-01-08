@@ -116,6 +116,10 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
+def _napi(op_name):
+    return op_name.title().replace('_', '')
+
+
 class QueryResourceManager(ResourceManager):
 
     __metaclass__ = QueryMeta
@@ -126,6 +130,7 @@ class QueryResourceManager(ResourceManager):
     retry = None
     max_workers = 3
     chunk_size = 20
+    permissions = ()
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -142,6 +147,17 @@ class QueryResourceManager(ResourceManager):
         if id_prefix is not None:
             return [i for i in ids if i.startswith(id_prefix)]
         return ids
+
+    @classmethod
+    def get_permissions(cls):
+        perms = []
+        m = cls.get_model()
+        perms.append('%s:%s' % (m.service, _napi(m.enum_spec[0])))
+        if getattr(m, 'detail_spec', None):
+            perms.append("%s:%s" % (m.service, _napi(m.detail_spec[0])))
+        if getattr(cls, 'permissions', None):
+            perms.extend(cls.permissions)
+        return perms
 
     def resources(self, query=None):
         key = {'region': self.config.region,

@@ -37,6 +37,7 @@ class KinesisStream(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ("kinesis:DeleteStream",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
@@ -73,6 +74,7 @@ class DeliveryStream(QueryResourceManager):
 class FirehoseDelete(Action):
 
     schema = type_schema('delete')
+    permissions = ("firehose:DeleteDeliveryStream",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('firehose')
@@ -108,6 +110,7 @@ class AnalyticsApp(QueryResourceManager):
 class AppDelete(Action):
 
     schema = type_schema('delete')
+    permissions = ("kinesisanalytics:DeleteApplication",)
 
     def process(self, resources):
         client = local_session(

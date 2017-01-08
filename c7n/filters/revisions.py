@@ -43,6 +43,8 @@ class Diff(Filter):
         # For date selectors allow value specification
         selector_value={'type': 'string'})
 
+    permissions = ('config:GetResourceConfigHistory',)
+
     selector_value = mode = parser = resource_shape = None
 
     def validate(self):

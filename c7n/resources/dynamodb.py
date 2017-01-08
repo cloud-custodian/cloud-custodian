@@ -69,6 +69,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
     valid_status = ('ACTIVE',)
     schema = type_schema('delete')
+    permissions = ("dynamodb:DeleteTable",)
 
     def delete_table(self, table_set):
         client = local_session(self.manager.session_factory).client('dynamodb')

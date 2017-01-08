@@ -72,6 +72,9 @@ class EC2(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
 
+    # if we have to do a fallback scenario where tags don't come in describe
+    permissions = ('ec2:DescribeTags',)
+
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
@@ -179,7 +182,8 @@ class StateTransitionAge(AgeFilter):
     """
     RE_PARSE_AGE = re.compile("\(.*?\)")
 
-    # this filter doesn't use date_attribute, but needs to define it to pass AgeFilter's validate method
+    # this filter doesn't use date_attribute, but needs to define it
+    # to pass AgeFilter's validate method
     date_attribute = "dummy"
 
     schema = type_schema(
@@ -239,6 +243,9 @@ class AttachedVolume(ValueFilter):
         **{'operator': {'enum': ['and', 'or']},
            'skip-devices': {'type': 'array', 'items': {'type': 'string'}}})
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ebs').get_permissions()
+
     def process(self, resources, event=None):
         self.volume_map = self.get_volume_mapping(resources)
         self.skip = self.data.get('skip-devices', [])
@@ -248,16 +255,15 @@ class AttachedVolume(ValueFilter):
 
     def get_volume_mapping(self, resources):
         volume_map = {}
-        ec2 = utils.local_session(self.manager.session_factory).client('ec2')
-        for instance_set in utils.chunks(
-                [i['InstanceId'] for i in resources], 200):
-            self.log.debug("Processing %d instance of %d" % (
-                len(instance_set), len(resources)))
-            results = ec2.describe_volumes(
-                Filters=[
-                    {'Name': 'attachment.instance-id',
-                     'Values': instance_set}])
-            for v in results['Volumes']:
+        manager = self.manager.get_resource_manager('ebs')
+        for instance_set in utils.chunks(resources, 200):
+            volume_ids = []
+            for i in instance_set:
+                for bd in i.get('BlockDeviceMappings', ()):
+                    if 'Ebs' not in bd:
+                        continue
+                    volume_ids.append(bd['Ebs']['VolumeId'])
+            for v in manager.get_resources(volume_ids):
                 volume_map.setdefault(
                     v['Attachments'][0]['InstanceId'], []).append(v)
         return volume_map
@@ -277,10 +283,8 @@ class AttachedVolume(ValueFilter):
 class InstanceImageBase(object):
 
     def get_image_mapping(self, resources):
-        ec2 = utils.local_session(self.manager.session_factory).client('ec2')
-        image_ids = set([i['ImageId'] for i in resources])
-        results = ec2.describe_images(ImageIds=list(image_ids))
-        return {i['ImageId']: i for i in results['Images']}
+        return {i['ImageId']: i for i in
+                self.manager.get_resource_manager('ami').resources()}
 
 
 @filters.register('image-age')
@@ -309,6 +313,9 @@ class ImageAge(AgeFilter, InstanceImageBase):
         op={'type': 'string', 'enum': OPERATORS.keys()},
         days={'type': 'number'})
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ami').get_permissions()
+
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
         return super(ImageAge, self).process(resources, event)
@@ -325,6 +332,9 @@ class ImageAge(AgeFilter, InstanceImageBase):
 class InstanceImage(ValueFilter, InstanceImageBase):
 
     schema = type_schema('image', rinherit=ValueFilter.schema)
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
         self.image_map = self.get_image_mapping(resources)
@@ -519,6 +529,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('stopped',)
     schema = type_schema('start')
+    permissions = ('ec2:StartInstances',)
     batch_size = 10
 
     def _filter_ec2_with_volumes(self, instances):
@@ -585,6 +596,12 @@ class Resize(BaseAction, StateTransitionFilter):
            'default': {'type': 'string'}})
 
     valid_origin_states = ('running', 'stopped')
+
+    def get_permissions(self):
+        perms = ('ec2:DescribeInstances', 'ec2:ModifyInstanceAttribute')
+        if self.data.get('restart', False):
+            perms += ('ec2:StopInstances', 'ec2:StartInstances')
+        return perms
 
     def process(self, resources):
         stopped_instances = self.filter_instance_state(
@@ -658,6 +675,12 @@ class Stop(BaseAction, StateTransitionFilter):
     schema =  type_schema(
         'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
 
+    def get_permissions(self):
+        perms = ('ec2:StopInstances',)
+        if self.data.get('terminate-ephemeral', False):
+            perms += ('ec2:TerminateInstances',)
+        return perms
+
     def split_on_storage(self, instances):
         ephemeral = []
         persistent = []
@@ -729,6 +752,12 @@ class Terminate(BaseAction, StateTransitionFilter):
 
     schema = type_schema('terminate', force={'type': 'boolean'})
 
+    def get_permissions(self):
+        permissions = ("ec2:TerminateInstances",)
+        if self.data.get('force'):
+            permissions += ('ec2:ModifyInstanceAttribute',)
+        return permissions
+
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
@@ -786,6 +815,7 @@ class Snapshot(BaseAction):
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
+    permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def process(self, resources):
         for resource in resources:
@@ -855,6 +885,8 @@ class Snapshot(BaseAction):
 class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
+    permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+
     def process(self, instances):
         if not len(instances):
             return
@@ -866,7 +898,8 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         for i in instances:
             for eni in i['NetworkInterfaces']:
                 if i.get('c7n.matched-security-groups'):
-                    eni['c7n.matched-security-groups'] = i['c7n.matched-security-groups']
+                    eni['c7n.matched-security-groups'] = i[
+                        'c7n.matched-security-groups']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
