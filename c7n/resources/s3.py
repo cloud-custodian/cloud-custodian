@@ -154,8 +154,8 @@ def assemble_bucket(item):
                 continue
             else:
                 log.warning(
-                    "Bucket:%s unable to invoke method:%s error:%s " % (
-                        b['Name'], m, e.response['Error']['Message']))
+                    "Bucket:%s unable to invoke method:%s error:%s ",
+                        b['Name'], m, e.response['Error']['Message'])
                 return None
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
@@ -465,7 +465,9 @@ class RemovePolicyStatement(BucketActionBase):
 
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
-    """Action to enable/disable versioning on a S3 bucket
+    """Action to enable/suspend versioning on a S3 bucket
+
+    Note versioning can never be disabled only suspended.
 
     :example:
 
@@ -477,7 +479,7 @@ class ToggleVersioning(BucketActionBase):
                 filter:
                   - type: value
                     key: Versioning
-                    value: Disabled
+                    value: Suspended
                 actions:
                   - type: toggle-versioning
                     enabled: true
@@ -509,6 +511,7 @@ class ToggleVersioning(BucketActionBase):
 @actions.register('toggle-logging')
 class ToggleLogging(BucketActionBase):
     """Action to enable/disable logging on a S3 bucket.
+
     Target bucket ACL must allow for WRITE and READ_ACP Permissions
     Not specifying a target_prefix will default to the current bucket name.
     http://goo.gl/PiWWU2
@@ -1466,6 +1469,10 @@ class DeleteBucket(ScanBucket):
         """
         client = local_session(self.manager.session_factory).client('s3')
 
+        # Stop replication so we can suspend versioning
+        if b.get('Replication') is not None:
+            client.delete_bucket_replication(Bucket=b['Name'])
+
         # Suspend versioning, so we don't get new delete markers
         # as we walk and delete versions
         if (self.get_bucket_style(b) == 'versioned'
@@ -1474,6 +1481,7 @@ class DeleteBucket(ScanBucket):
             client.put_bucket_versioning(
                 Bucket=b['Name'],
                 VersioningConfiguration={'Status': 'Suspended'})
+
         # Clear our multi-part uploads
         uploads = client.get_paginator('list_multipart_uploads')
         for p in uploads.paginate(Bucket=b['Name']):
@@ -1485,10 +1493,10 @@ class DeleteBucket(ScanBucket):
 
     def process(self, buckets):
         # might be worth sanity checking all our permissions
-        # on the bucket up front before disabling versioning.
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_delete_enablement, buckets))
+        # on the bucket up front before disabling versioning/replication.
         if self.data.get('remove-contents', True):
+            with self.executor_factory(max_workers=3) as w:
+                list(w.map(self.process_delete_enablement, buckets))
             self.empty_buckets(buckets)
         with self.executor_factory(max_workers=3) as w:
             results = w.map(self.delete_bucket, buckets)
