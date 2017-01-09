@@ -492,14 +492,13 @@ class UserPolicy(ValueFilter):
     schema = type_schema('policy', rinherit=ValueFilter.schema)
 
     def user_policies(self, resource):
-        if 'c7n.AttachedPolicies' in resource:
-            return
+        if 'c7n:Policies' not in resource:
+            resource['c7n:Policies'] = []
         client = local_session(self.manager.session_factory).client('iam')
         aps = client.list_attached_user_policies(
             UserName=resource['UserName'])['AttachedPolicies']
-        resource['c7n.AttachedPolicies'] = []
         for ap in aps:
-            resource['c7n.AttachedPolicies'].append(
+            resource['c7n:Policies'].append(
                 client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
 
     def process(self, resources, event=None):
@@ -510,10 +509,10 @@ class UserPolicy(ValueFilter):
 
         matched = []
         for r in resources:
-            for p in r['c7n.AttachedPolicies']:
-                if self.match(p):
+            for p in r['c7n:Policies']:
+                print p
+                if self.match(p) and r not in matched:
                     matched.append(r)
-                    break
         return matched
 
 
@@ -523,10 +522,8 @@ class UserAccessKey(ValueFilter):
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
 
     def user_keys(self, resource):
-        if 'c7n.AccessKeys' in resource:
-            return
         client = local_session(self.manager.session_factory).client('iam')
-        resource['c7n.AccessKeys'] = client.list_access_keys(
+        resource['c7n:AccessKeys'] = client.list_access_keys(
             UserName=resource['UserName'])['AccessKeyMetadata']
 
     def process(self, resources, event=None):
@@ -537,7 +534,7 @@ class UserAccessKey(ValueFilter):
 
         matched = []
         for r in resources:
-            for k in r['c7n.AccessKeys']:
+            for k in r['c7n:AccessKeys']:
                 if self.match(k):
                     matched.append(r)
         return matched

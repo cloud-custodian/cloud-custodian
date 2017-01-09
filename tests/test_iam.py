@@ -186,7 +186,7 @@ class IamUserFilterUsage(BaseTest):
 
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
-            'test_iam_user_policy')
+            'test_iam_user_admin_policy')
         self.patch(
             UserPolicy, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -194,16 +194,14 @@ class IamUserFilterUsage(BaseTest):
             'resource': 'iam-user',
             'filters': [{
                 'type': 'policy',
-                'key': 'CreateDate',
-                'value': 10,
-                'op': 'gt',
-                'value_type': 'age'}]}, session_factory=session_factory)
+                'key': 'PolicyName',
+                'value': 'AdministratorAccess'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
-    def test_iam_user_created_filter(self):
+    def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data(
-            'test_iam_user_access_key_created')
+            'test_iam_user_access_key_active')
         self.patch(
             UserAccessKey, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -211,10 +209,8 @@ class IamUserFilterUsage(BaseTest):
             'resource': 'iam-user',
             'filters': [{
                 'type': 'access-key',
-                'key': 'CreateDate',
-                'value': 10,
-                'op': 'gt',
-                'value_type': 'age'}]}, session_factory=session_factory)
+                'key': 'Status',
+                'value': 'Active'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
