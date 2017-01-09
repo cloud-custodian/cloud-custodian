@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,24 +16,19 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
-@resources.register('shield-protection')
-class ShieldProtection(QueryResourceManager):
+@resources.register('step-machine')
+class StepFunction(QueryResourceManager):
+    """AWS Step Functions State Machine"""
 
     class resource_type(object):
-        service = 'shield'
-        enum_spec = ('list_projections', 'Protections', None)
-        id = 'Id'
-        name = 'Name'
+        service = 'stepfunctions'
+        enum_spec = ('list_state_machines', 'stateMachines', None)
+        id = 'stateMachineArn'
+        name = 'name'
+        date = 'creationDate'
         dimension = None
+        detail_spec = (
+            "describe_state_machine", "stateMachineArn",
+            'stateMachineArn', None)
 
 
-@resources.register('shield-attack')
-class ShieldAttack(QueryResourceManager):
-
-    class resource_type(object):
-        service = 'shield'
-        enum_spec = ('list_attacks', 'Attacks', None)
-        detail_spec = ('describe_attack', 'AttackId', 'AttackId', 'Attack')
-        id = 'AttackId'
-        date = 'StartTime'
-        dimension = None

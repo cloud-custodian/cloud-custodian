@@ -774,6 +774,7 @@ class Terminate(BaseAction, StateTransitionFilter):
                 InstanceIds=[i['InstanceId'] for i in instances])
 
     def disable_deletion_protection(self, instances):
+
         @utils.worker
         def process_instance(i):
             client = utils.local_session(

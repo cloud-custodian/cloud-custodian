@@ -186,7 +186,8 @@ def _db_instance_eligible_for_backup(resource):
             "DB instance %s is a postgres read-replica",
             db_instance_id)
         return False
-    # DB Backups not supported on a read replica running a mysql version before 5.6
+    # DB Backups not supported on a read replica running a mysql
+    # version before 5.6
     if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
             resource.get('Engine', '') == 'mysql'):
         engine_version = resource.get('EngineVersion', '')
@@ -218,7 +219,8 @@ def _db_instance_eligible_for_final_snapshot(resource):
             db_instance_id)
         return False
 
-    # FinalDBSnapshotIdentifier can not be specified when deleting a replica instance
+    # FinalDBSnapshotIdentifier can not be specified when deleting a
+    # replica instance
     if resource.get('ReadReplicaSourceDBInstanceIdentifier', ''):
         log.debug(
             "DB instance %s is a read-replica",

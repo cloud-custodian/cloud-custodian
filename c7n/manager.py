@@ -78,9 +78,9 @@ class ResourceManager(object):
             rcount = len(resources)
             resources = f.process(resources, event)
             if event and event.get('debug', False):
-                self.log.info(
+                self.log.debug(
                     "applied filter %s %d->%d", f, rcount, len(resources))
-        self.log.info("Filtered from %d to %d %s" % (
+        self.log.debug("Filtered from %d to %d %s" % (
             original, len(resources), self.__class__.__name__.lower()))
         return resources
 

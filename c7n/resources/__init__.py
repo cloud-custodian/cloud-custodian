@@ -44,7 +44,9 @@ def load_resources():
     import c7n.resources.elasticsearch
     import c7n.resources.elb
     import c7n.resources.emr
+    import c7n.resources.gamelift
     import c7n.resources.glacier
+    import c7n.resources.hsm
     import c7n.resources.iam
     import c7n.resources.kinesis
     import c7n.resources.kms
@@ -55,10 +57,12 @@ def load_resources():
     import c7n.resources.redshift
     import c7n.resources.route53
     import c7n.resources.s3
+    import c7n.resources.sfn
     import c7n.resources.shield
     import c7n.resources.simpledb
     import c7n.resources.snowball
     import c7n.resources.sns
+    import c7n.resources.storagegw
     import c7n.resources.sqs
     import c7n.resources.support
     import c7n.resources.vpc
