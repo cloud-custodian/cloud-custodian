@@ -56,6 +56,12 @@ class AppELB(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
 
+    @classmethod
+    def get_permissions(cls):
+        # override as the service is not the iam prefix
+        return ("elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeTags")
+
     def augment(self, albs):
         _describe_appelb_tags(
             albs, self.session_factory,
@@ -128,6 +134,7 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
     """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_appelb_tags(
@@ -156,6 +163,7 @@ class AppELBTagAction(tags.Tag):
     """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_appelb_tags(
@@ -183,6 +191,7 @@ class AppELBRemoveTagAction(tags.RemoveTag):
     """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:RemoveTags",)
 
     def process_resource_set(self, resource_set, tag_keys):
         _remove_appelb_tags(
@@ -212,6 +221,7 @@ class AppELBDeleteAction(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ("elasticloadbalancing:DeleteLoadBalancer",)
 
     def process(self, load_balancers):
         with self.executor_factory(max_workers=2) as w:
@@ -225,6 +235,8 @@ class AppELBDeleteAction(BaseAction):
 class AppELBListenerFilterBase(object):
     """ Mixin base class for filters that query LB listeners.
     """
+    permissions = ("elasticloadbalancing:DescribeListeners",)
+
     def initialize(self, albs):
         def _process_listeners(alb):
             client = local_session(
@@ -241,6 +253,7 @@ class AppELBListenerFilterBase(object):
 class AppELBAttributeFilterBase(object):
     """ Mixin base class for filters that query LB attributes.
     """
+
     def initialize(self, albs):
         def _process_attributes(alb):
             if 'Attributes' not in alb:
@@ -257,6 +270,7 @@ class AppELBAttributeFilterBase(object):
 class AppELBTargetGroupFilterBase(object):
     """ Mixin base class for filters that query LB target groups.
     """
+
     def initialize(self, albs):
         self.target_group_map = defaultdict(list)
 
@@ -272,6 +286,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
     """Filter ALB based on matching listener attributes"""
 
     schema = type_schema('listener', rinherit=ValueFilter.schema)
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
 
     def process(self, albs, event=None):
         self.initialize(albs)
@@ -302,6 +317,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
     """
 
     schema = type_schema('healthcheck-protocol-mismatch')
+    permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):
         def _healthcheck_protocol_mismatch(alb):
@@ -321,6 +337,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
+    permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):
         self.initialize(albs)
@@ -375,6 +392,12 @@ class AppELBTargetGroup(QueryResourceManager):
 
     filter_registry.register('tag-count', tags.TagCountFilter)
     filter_registry.register('marked-for-op', tags.TagActionFilter)
+
+    @classmethod
+    def get_permissions(cls):
+        # override as the service is not the iam prefix
+        return ("elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTags")
 
     def augment(self, target_groups):
         def _describe_target_group_health(target_group):
@@ -439,6 +462,7 @@ class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an ELB target group"""
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_target_group_tags(
@@ -467,6 +491,7 @@ class AppELBTargetGroupTagAction(tags.Tag):
     """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_target_group_tags(
@@ -494,6 +519,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
     """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:RemoveTags",)
 
     def process_resource_set(self, resource_set, tag_keys):
         _remove_target_group_tags(

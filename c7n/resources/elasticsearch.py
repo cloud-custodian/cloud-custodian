@@ -52,6 +52,7 @@ class ElasticSearchDomain(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ('es:DeleteElastisearchDomain',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('es')

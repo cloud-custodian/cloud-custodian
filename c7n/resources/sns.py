@@ -40,4 +40,7 @@ class SNS(QueryResourceManager):
             )
 
 
-SNS.filter_registry.register('cross-account', CrossAccountAccessFilter)
+@SNS.filter_registry.register('cross-account')
+class SNSCrossAccount(CrossAccountAccessFilter):
+    permissions = ('sns:GetTopicAttributes',)
+

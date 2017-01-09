@@ -62,6 +62,7 @@ class ElastiCacheCluster(QueryResourceManager):
     action_registry = actions
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
+    permissions = ('elasticache:ListTagsForResource',)
 
     @property
     def account_id(self):
@@ -152,7 +153,7 @@ class TagDelayedAction(tags.TagDelayedAction):
                     op: delete
                     days: 7
     """
-
+    permission = ('elasticache:AddTagsToResource',)
     batch_size = 1
 
     def process_resource_set(self, clusters, tags):
@@ -185,6 +186,7 @@ class RemoveTag(tags.RemoveTag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('elasticache:RemoveTagsFromResource',)
 
     def process_resource_set(self, clusters, tag_keys):
         client = local_session(
@@ -222,6 +224,8 @@ class DeleteElastiCacheCluster(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'}})
+    permissions = ('elasticache:DeleteCacheCluster',
+                   'elasticache:DeleteReplicationGroup')
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
@@ -285,6 +289,7 @@ class SnapshotElastiCacheCluster(BaseAction):
     """
 
     schema = type_schema('snapshot')
+    permissions = ('elasticache:CreateSnapshot',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -321,6 +326,7 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     affected equally
 
     """
+    permissions = ('elasticache:ModifyReplicationGroup',)
 
     def process(self, clusters):
         replication_group_map = {}
@@ -336,8 +342,7 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         for idx, r in enumerate(replication_group_map.keys()):
             client.modify_replication_group(
                 ReplicationGroupId=r,
-                SecurityGroupIds=replication_group_map[r]
-            )
+                SecurityGroupIds=replication_group_map[r])
 
 
 @resources.register('cache-subnet-group')
@@ -368,6 +373,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
         date = 'StartTime'
         dimension = None
 
+    permissions = ('elasticache:ListTagsForResource',)
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -462,6 +468,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('elasticache:DeleteSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d ElastiCache snapshots", len(snapshots))
@@ -509,6 +516,7 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
     """
 
     batch_size = 1
+    permissions = ('elasticache:AddTagsToResource',)
 
     def process_resource_set(self, snapshots, tags):
         client = local_session(
@@ -540,6 +548,7 @@ class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('elasticache:RemoveTagsFromResource',)
 
     def process_resource_set(self, snapshots, tag_keys):
         client = local_session(

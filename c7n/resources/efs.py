@@ -33,6 +33,9 @@ class ElasticFileSystem(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ('efs:DescribeMountTargets',
+                   'efs:DeleteMountTargets',
+                   'efs:DeleteFileSystem')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')

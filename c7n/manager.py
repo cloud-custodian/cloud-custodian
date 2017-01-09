@@ -53,12 +53,18 @@ class ResourceManager(object):
         """return ids that match this resource type's id format."""
         return ids
 
+    @classmethod
+    def get_permissions(cls):
+        return ()
+
     def get_resources(self, resource_ids):
         """Retrieve a set of resources by id."""
         return []
 
     def get_resource_manager(self, resource_type, data=None):
         klass = resources.get(resource_type)
+        if klass is None:
+            raise ValueError(resource_type)
         return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):
@@ -72,9 +78,9 @@ class ResourceManager(object):
             rcount = len(resources)
             resources = f.process(resources, event)
             if event and event.get('debug', False):
-                self.log.info(
+                self.log.debug(
                     "applied filter %s %d->%d", f, rcount, len(resources))
-        self.log.info("Filtered from %d to %d %s" % (
+        self.log.debug("Filtered from %d to %d %s" % (
             original, len(resources), self.__class__.__name__.lower()))
         return resources
 

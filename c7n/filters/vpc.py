@@ -44,13 +44,14 @@ class DefaultVpcBase(Filter):
     """Filter to resources in a default vpc."""
     vpcs = None
     default_vpc = None
+    permissions = ('ec2:DescribeVpcs',)
 
     def match(self, vpc_id):
         if self.default_vpc is None:
             self.log.debug("querying default vpc %s" % vpc_id)
             client = local_session(self.manager.session_factory).client('ec2')
             vpcs = [v['VpcId'] for v
-                    in client.describe_vpcs(VpcIds=[vpc_id])['Vpcs']
+                    in client.describe_vpcs()['Vpcs']
                     if v['IsDefault']]
             if vpcs:
                 self.default_vpc = vpcs.pop()

@@ -1,0 +1,76 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 12, 
+                    "minute": 37
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 57
+                }, 
+                "Name": "custodian-replicated-west"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 19
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "baNNmcBCk/SMEngXEhcTJaqfxp/Sj/1uzqFYpxINryzh8FfniScojeXsupoOhDVcHpvCoQEfztA=", 
+            "RequestId": "2069D883CC82807D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "baNNmcBCk/SMEngXEhcTJaqfxp/Sj/1uzqFYpxINryzh8FfniScojeXsupoOhDVcHpvCoQEfztA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "2069D883CC82807D", 
+                "date": "Sat, 07 Jan 2017 20:17:22 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

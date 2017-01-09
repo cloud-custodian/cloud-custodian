@@ -81,6 +81,7 @@ class Retention(BaseAction):
     """
 
     schema = type_schema('retention', days={'type': 'integer'})
+    permissions = ('logs:PutRetentionPolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -110,6 +111,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('logs:DeleteLogGroup',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -135,6 +137,7 @@ class LastWriteDays(Filter):
 
     schema = type_schema(
         'last-write', days={'type': 'number'})
+    permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
         self.date_threshold = datetime.utcnow() - timedelta(

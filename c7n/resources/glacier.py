@@ -51,6 +51,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
                       - permitted-account-01
                       - permitted-account-02
     """
+    permissions = ('glacier:GetVaultAccessPolicy',)
 
     def process(self, resources, event=None):
         def _augment(r):

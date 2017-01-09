@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Status": "Enabled", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "p+mi4q/XyPXAe264N71ldZx9f241YQeGnOLIxWNGfiNA3Y+e4iMMkrJ+toB5PHxeBENqpkNUHgM=", 
+            "RequestId": "6BBE4E222FADDF0C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "p+mi4q/XyPXAe264N71ldZx9f241YQeGnOLIxWNGfiNA3Y+e4iMMkrJ+toB5PHxeBENqpkNUHgM=", 
+                "date": "Sat, 07 Jan 2017 20:17:15 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "6BBE4E222FADDF0C", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
