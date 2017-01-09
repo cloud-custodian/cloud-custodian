@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,4 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version = "0.8.22.0"
+from c7n.manager import resources
+from c7n.query import QueryResourceManager
+
+
+@resources.register('storage-gateway')
+class StorageGateway(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'storagegateway'
+        enum_spec = ('list_gateways', 'Gateways', None)
+        id = 'GatewayArn'
+        name = 'GatewayName'
+        dimension = None
+        

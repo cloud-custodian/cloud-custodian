@@ -178,7 +178,7 @@ class PullMode(PolicyExecutionMode):
             self.policy.log.info(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region,
+                self.policy.options.region or 'default',
                 version)
 
             s = time.time()

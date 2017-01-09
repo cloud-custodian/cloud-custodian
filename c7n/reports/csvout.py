@@ -130,7 +130,7 @@ class Formatter(object):
         # Lookup default fields for resource type.
         model = resource_manager.resource_type
         self._id_field = model.id
-        self._date_field = model.date
+        self._date_field = getattr(model, 'date', None)
 
         mfields = getattr(model, 'default_report_fields', None)
         if mfields is None:

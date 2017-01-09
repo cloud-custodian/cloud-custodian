@@ -150,7 +150,7 @@ def _schema_options(p):
 def _dryrun_option(p):
     p.add_argument(
         "-d", "--dryrun", action="store_true",
-        help="Don't change infrastructure but verify access.")
+        help="Don't execute actions but filter resources")
 
 
 def _key_val_pair(value):
