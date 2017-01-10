@@ -138,7 +138,7 @@ class MetricsFilter(Filter):
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.dimension]}]
-        
+
     def process_resource_set(self, resource_set):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -169,7 +169,7 @@ class MetricsFilter(Filter):
                 percent = (collected_metrics[key][0][self.statistics] / 
                     r[self.data.get('percent_of_attr')]) * 100
                 if self.op(percent, self.value):
-                    matched.append(r)                                    
+                    matched.append(r)                                
             if self.op(collected_metrics[key][0][self.statistics], self.value) and not self.data.get('percent_of_attr'):
                 matched.append(r)
         return matched
