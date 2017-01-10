@@ -62,6 +62,7 @@ class MetricsFilter(Filter):
         op={'type': 'string', 'enum': OPERATORS.keys()},
         value={'type': 'number'},
         period={'type': 'number'},
+        percent_of_attr={'type': 'string'},
         required=('value', 'name'))
 
     permissions = ("cloudwatch:GetMetricStatistics",)
@@ -137,7 +138,7 @@ class MetricsFilter(Filter):
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.dimension]}]
-
+        
     def process_resource_set(self, resource_set):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -164,6 +165,11 @@ class MetricsFilter(Filter):
                     Dimensions=dimensions)['Datapoints']
             if len(collected_metrics[key]) == 0:
                 continue
-            if self.op(collected_metrics[key][0][self.statistics], self.value):
+            if self.data.get('percent_of_attr'):
+                percent = (collected_metrics[key][0][self.statistics] / 
+                    r[self.data.get('percent_of_attr')]) * 100
+                if self.op(percent, self.value):
+                    matched.append(r)                                    
+            if self.op(collected_metrics[key][0][self.statistics], self.value) and not self.data.get('percent_of_attr'):
                 matched.append(r)
         return matched
