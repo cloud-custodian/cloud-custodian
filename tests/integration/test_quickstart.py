@@ -4,12 +4,26 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import json
 import os
 import subprocess
 import tempfile
 from unittest import TestCase
 
 import boto3
+
+
+def load_images_for_region(region):
+    # Uses a catalog downloaded from:
+    #   http://cloud-images.ubuntu.com/releases/streams/v1/
+    ourdir = os.path.join(os.path.dirname(__file__))
+    filename = os.path.join(ourdir, 'com.ubuntu.cloud:released:aws.json')
+    products = json.load(open(filename))['products']
+    product_id = sorted(products.keys())[-1]
+    versions = products[product_id]['versions']
+    version_id = sorted(versions.keys())[-1]
+    items = versions[version_id]['items'].items()
+    return sorted(v for k,v in items if v['crsn'] == region)
 
 
 class TestQuickstart(TestCase):
@@ -26,16 +40,24 @@ class TestQuickstart(TestCase):
 
     def test_example_works(self):
 
+        session = boto3.session.Session()
+
+        # find an AMI
+        images_for_region = load_images_for_region(session.region_name)
+        images = [i for i in images_for_region if i['virt'] == 'hvm']
+        assert images, "No suitable AMIs available"
+        image_id = images[0]['id']
+
         # setup
-        api = boto3.client('ec2')
+        api = session.client('ec2')
         instance_id = api.run_instances(
-            ImageId='ami-1e299d7e',
-            InstanceType='t2.micro',
+            ImageId=image_id,
+            InstanceType='t2.nano',
             MinCount=1,
             MaxCount=1,
         )['Instances'][0]['InstanceId']
 
-        ec2 = boto3.resource('ec2')
+        ec2 = session.resource('ec2')
         instance = ec2.Instance(instance_id)
         instance.wait_until_exists()
         instance.create_tags(Tags=[{'Key': 'Custodian', 'Value': ''}])
