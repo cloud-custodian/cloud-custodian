@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -17,7 +20,8 @@ class TestQuickstart(TestCase):
         f = tempfile.NamedTemporaryFile(suffix='-custodian.yml', dir=tempdir)
         filepath = os.path.join(tempdir, f.name)
         open(filepath, 'w+').write(policy)
-        subprocess.call('custodian run -c {} -s {}'.format(filepath, tempdir), shell=True)
+        cmd = 'custodian run -c {} -s {}'.format(filepath, tempdir),
+        subprocess.call(cmd, shell=True)
 
 
     def test_example_works(self):
