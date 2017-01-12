@@ -13,7 +13,6 @@
 # limitations under the License.
 import json
 import os
-import sys
 
 from c7n.mu import (
     CloudWatchEventSource,
@@ -35,7 +34,7 @@ def dispatch(event, context):
 
 def get_archive(config):
 
-    required = ['ldap', 'jinja2', 'markupsafe']
+    required = ['ldap3', 'pyasn1', 'jinja2', 'markupsafe']
     remove = ['_yaml.so', 'c7n.egg-link']
 
     def lib_filter(root, dirs, files):

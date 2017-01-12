@@ -23,7 +23,12 @@ def format_struct(struct):
 
 def setup_defaults(config):
     config.setdefault('region', 'us-east-1')
-    config.setdefault('from_address', 'custodan@example.com')
     config.setdefault('memory', 1024)
     config.setdefault('timeout', 300)
-
+    config.setdefault('subnets', None)
+    config.setdefault('security_groups', None)
+    config.setdefault('contact_tags', [])
+    config.setdefault('ldap_uri', None)
+    config.setdefault('ldap_bind_dn', None)
+    config.setdefault('ldap_bind_user', None)
+    config.setdefault('ldap_bind_password', None)
