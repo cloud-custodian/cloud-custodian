@@ -183,7 +183,7 @@ class RemoveTag(tags.RemoveTag):
                   - "tag:OldTagKey": present
                 actions:
                   - type: remove-tag
-                    key: OldTagKey
+                    tags: [OldTagKey1, OldTagKey2]
     """
 
     batch_size = 1
