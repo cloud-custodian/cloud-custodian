@@ -27,8 +27,8 @@ from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (UserMfaDevice,
                                UsedIamPolicies, UnusedIamPolicies,
-                               UsedInstanceProfiles,
-                               UnusedInstanceProfiles,
+                               UsedInstanceProfiles, UserAttachedPolicy,
+                               UnusedInstanceProfiles, UserAccessKey,
                                UsedIamRole, UnusedIamRole,
                                IamGroupUsers,
                                UserCredentialReport,
@@ -232,6 +232,21 @@ class IamPolicyFilterUsage(BaseTest):
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 203)
+
+    def test_iam_user_attached_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_attached_policy')
+        self.patch(
+            UserAttachedPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-attached-profiles',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'policy',
+                'attached': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue(resources[0]['UserName'], 'alphabet_soup')
 
 
 class IamGroupFilterUsage(BaseTest):

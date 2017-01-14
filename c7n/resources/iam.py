@@ -184,6 +184,18 @@ class IamRoleUsage(Filter):
 
 @Role.filter_registry.register('used')
 class UsedIamRole(IamRoleUsage):
+    """Filters out all unused IAM roles
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-used-roles
+                resource: iam-role
+                filters:
+                  - used
+    """
 
     schema = type_schema('used')
 
@@ -200,6 +212,18 @@ class UsedIamRole(IamRoleUsage):
 
 @Role.filter_registry.register('unused')
 class UnusedIamRole(IamRoleUsage):
+    """Filters out all in use IAM roles
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-unused-roles
+                resource: iam-role
+                filters:
+                  - unused
+    """
 
     schema = type_schema('unused')
 
@@ -219,8 +243,21 @@ class IamRoleInlinePolicy(Filter):
     """
         Filter IAM roles that have an inline-policy attached
 
+        Inline policies are policies that are embedded to a single role
+
         True: Filter roles that have an inline-policy
         False: Filter roles that do not have an inline-policy
+
+        :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-role-inline-policy
+                resource: iam-role
+                filters:
+                  - type: has-inline-policy
+                    value: true
     """
 
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
@@ -244,6 +281,18 @@ class IamRoleInlinePolicy(Filter):
 
 @Policy.filter_registry.register('used')
 class UsedIamPolicies(Filter):
+    """Filters out all unused IAM policies
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-policies-inuse
+                resource: iam-policy
+                filters:
+                  - used
+    """
 
     schema = type_schema('used')
     permissions = ('iam:ListPolicies',)
@@ -254,6 +303,18 @@ class UsedIamPolicies(Filter):
 
 @Policy.filter_registry.register('unused')
 class UnusedIamPolicies(Filter):
+    """Filters out all in use IAM policies
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-policies-unused
+                resource: iam-policy
+                filters:
+                  - unused
+    """
 
     schema = type_schema('unused')
     permissions = ('iam:ListPolicies',)
@@ -269,6 +330,18 @@ class UnusedIamPolicies(Filter):
 
 @InstanceProfile.filter_registry.register('used')
 class UsedInstanceProfiles(IamRoleUsage):
+    """Filters out all unused IAM instance profiles
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-instance-profile-used
+                resource: iam-profile
+                filters:
+                  - used
+    """
 
     schema = type_schema('used')
 
@@ -286,6 +359,18 @@ class UsedInstanceProfiles(IamRoleUsage):
 
 @InstanceProfile.filter_registry.register('unused')
 class UnusedInstanceProfiles(IamRoleUsage):
+    """Filters out all in use IAM instance profiles
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-instance-profile-unused
+                resource: iam-profile
+                filters:
+                  - unused
+    """
 
     schema = type_schema('unused')
 
@@ -498,7 +583,8 @@ class UserCredentialReport(Filter):
 
 @User.filter_registry.register('policy')
 class UserAttachedPolicy(Filter):
-
+    """Filters users that have policies attached"""
+    
     schema = type_schema('policy')
     permissions = ('iam:ListAttachedUserPolicies',)
 
@@ -506,27 +592,39 @@ class UserAttachedPolicy(Filter):
 
         def _user_policies(resource):
             client = local_session(self.manager.session_factory).client('iam')
-            resource['AttachedPolicies'] = client.list_attached_user_policies(
+            resource['c7n.UserPolicies'] = client.list_attached_user_policies(
                 UserName=resource['UserName'])['AttachedPolicies']
 
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AttachedPolicies' not in r]
             self.log.debug(
-                "Querying %d users policies" % len(query_resources))
-            list(w.map(_user_policies, query_resources))
+                "Querying %d users policies" % len(resources))
+            list(w.map(_user_policies, resources))
 
-        matched = []
-        for r in resources:
-            for p in r['AttachedPolicies']:
-                if self.match(p):
-                    matched.append(r)
-                    break
-        return matched
+        results = []
+        if self.data.get('attached', True):
+            return [r for r in resources if r['c7n.UserPolicies']]
+
+        return [r for r in resources if not r['c7n.UserPolicies']]
 
 
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
+    """Filters user access keys based on provided values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-user-old-keys
+                resource: iam-user
+                filters:
+                  - type: access-key
+                    key: CreateDate
+                    value: 10
+                    op: ge
+                    value_type: age
+    """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
@@ -535,19 +633,19 @@ class UserAccessKey(ValueFilter):
 
         def _user_keys(resource):
             client = local_session(self.manager.session_factory).client('iam')
-            resource['AccessKeys'] = client.list_access_keys(
+            resource['c7n.AccessKeys'] = client.list_access_keys(
                 UserName=resource['UserName'])['AccessKeyMetadata']
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
-                r for r in resources if 'AccessKeys' not in r]
+                r for r in resources if 'c7n.AccessKeys' not in r]
             self.log.debug(
                 "Querying %d users' api keys" % len(query_resources))
             list(w.map(_user_keys, query_resources))
 
         matched = []
         for r in resources:
-            for p in r['AccessKeys']:
+            for p in r['c7n.AccessKeys']:
                 if self.match(p):
                     matched.append(r)
                     break
@@ -557,6 +655,21 @@ class UserAccessKey(ValueFilter):
 # Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
+    """Filters users that have/do not have a mfa device associated to their account
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-user-no-mfa-device
+                resource: iam-user
+                filters:
+                  - type: mfa-device
+                    key: MFADevices
+                    value: []
+
+    """
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
     permissions = ('iam:ListMfaDevices',)
@@ -636,6 +749,17 @@ class IamGroupUsers(Filter):
 
         True: Filter all IAM groups with users assigned to it
         False: Filter all IAM groups without any users assigned to it
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: iam-groups-with-users
+                    resource: iam-group
+                    filters:
+                      - type: has-users
+                        value: true
     """
     schema = type_schema('has-users', value={'type': 'boolean'})
     permissions = ('iam:GetGroup',)
@@ -658,6 +782,17 @@ class IamGroupInlinePolicy(Filter):
 
         True: Filter all groups that have an inline-policy attached
         False: Filter all groups that do not have an inline-policy attached
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: iam-groups-with-inline-policies
+                    resource: iam-group
+                    filters:
+                      - type: has-inline-policy
+                        value: true
     """
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
     permissions = ('iam:ListGroupPolicies',)
