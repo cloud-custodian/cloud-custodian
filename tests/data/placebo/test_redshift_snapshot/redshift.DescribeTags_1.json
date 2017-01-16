@@ -1,40 +1,40 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "TaggedResources": [
             {
-                "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:test-cluster", 
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
                 "Tag": {
-                    "Value": "T11", 
+                    "Value": "T11",
                     "Key": "T1"
                 }
-            }, 
+            },
             {
-                "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:test-cluster", 
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
                 "Tag": {
-                    "Value": "T22", 
+                    "Value": "T22",
                     "Key": "T2"
                 }
-            }, 
+            },
             {
-                "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:test-cluster", 
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
                 "Tag": {
-                    "Value": "T33", 
+                    "Value": "T33",
                     "Key": "T3"
                 }
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d37db81e-db7f-11e6-bcee-b782993fedd5", 
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "d37db81e-db7f-11e6-bcee-b782993fedd5",
             "HTTPHeaders": {
-                "x-amzn-requestid": "d37db81e-db7f-11e6-bcee-b782993fedd5", 
-                "date": "Mon, 16 Jan 2017 00:07:53 GMT", 
-                "content-length": "1116", 
+                "x-amzn-requestid": "d37db81e-db7f-11e6-bcee-b782993fedd5",
+                "date": "Mon, 16 Jan 2017 00:07:53 GMT",
+                "content-length": "1116",
                 "content-type": "text/xml"
             }
         }

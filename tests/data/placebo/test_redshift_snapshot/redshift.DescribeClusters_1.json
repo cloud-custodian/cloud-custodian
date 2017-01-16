@@ -11,10 +11,10 @@
                         "VpcSecurityGroupId": "sg-6c7fa917"
                     }
                 ],
-                "ClusterPublicKey": "ssh-rsa AAAAB3N Amazon-Redshift\n", 
+                "ClusterPublicKey": "ssh-rsa AAAAB3N Amazon-Redshift\n",
                 "NumberOfNodes": 1,
                 "PendingModifiedValues": {},
-                "VpcId": "vpc-d2d616b5",
+                "VpcId": "vpc-45678",
                 "ClusterVersion": "1.0",
                 "Tags": [
                     {
@@ -70,7 +70,7 @@
                 "NodeType": "dc1.large",
                 "Encrypted": true,
                 "ClusterRevisionNumber": "1161",
-                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/e39ed135-2a46-4d5e-8c05-41b8d900d0c7",
+                "KmsKeyId": "arn:aws:kms:us-east-1:111111:key/K1",
                 "ClusterStatus": "available"
             }
         ],
