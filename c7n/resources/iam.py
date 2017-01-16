@@ -273,14 +273,16 @@ class AllowAllIamPolicies(Filter):
 
     The policy will trigger on the following IAM policy (statement).
     For example:
-    {
-        'Version': '2012-10-17',
-        'Statement': [{
-            'Action': '*',
-            'Resource': '*',
-            'Effect': 'Allow'
-        }]
-    }
+
+    .. code-block: json
+     {
+         'Version': '2012-10-17',
+         'Statement': [{
+             'Action': '*',
+             'Resource': '*',
+             'Effect': 'Allow'
+         }]
+     }
 
     Additionally, the policy checks if the statement has no 'Condition' or
     'NotAction'
@@ -291,8 +293,6 @@ class AllowAllIamPolicies(Filter):
     .. code-block: yaml
 
      - name: iam-no-used-all-all-policy
-       description: |
-         Verify that used policies have no allow-all
        resource: iam-policy
        filters:
          - type: used
@@ -301,8 +301,8 @@ class AllowAllIamPolicies(Filter):
     Note that scanning and getting all policies and all statements can take
     a while. Use it sparingly or combine it with filters such as 'used' as
     above.
-    """
 
+    """
     schema = type_schema('has-allow-all')
     permissions = ('iam:ListPolicies', 'iam:ListPolicyVersions')
 
