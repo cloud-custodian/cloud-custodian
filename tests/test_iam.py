@@ -27,6 +27,7 @@ from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (UserMfaDevice,
                                UsedIamPolicies, UnusedIamPolicies,
+                               AllowAllIamPolicies,
                                UsedInstanceProfiles,
                                UnusedInstanceProfiles,
                                UsedIamRole, UnusedIamRole,
@@ -233,6 +234,23 @@ class IamPolicyFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 203)
 
+class IamPolicyHasAllowAll(BaseTest):
+
+    def test_iam_has_allow_all_policies(self):
+        session_factory = self.replay_flight_data('test_iam_policy_allow_all')
+        self.patch(
+            UnusedIamPolicies, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-has-allow-all',
+            'resource': 'iam-policy',
+            'filters': [
+                {'type': 'value',
+                'key': 'PolicyName',
+                'value': 'AdministratorAccess'},
+                'has-allow-all'
+            ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 class IamGroupFilterUsage(BaseTest):
 
