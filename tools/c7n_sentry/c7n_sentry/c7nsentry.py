@@ -328,7 +328,6 @@ def get_function(session_factory, name, role,
 
     # Lazy import to avoid runtime dependency
     import inspect
-    import os
 
     import c7n
     from c7n.mu import (
@@ -440,9 +439,9 @@ def orgreplay(options):
         for a in accounts:
             futures[w.submit(process_account, a)] = a
         for f in as_completed(futures):
-            if f.exception():
-                log.error("Error processing account %s: %s",
-                          a['name'], f.exception())
+            exc = f.exception()
+            if exc:
+                log.error("Error processing account %s: %r", a['name'], exc)
 
 
 def setup_parser():
