@@ -159,4 +159,38 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_underutilized_ec2(self):
+        session_factory = self.replay_flight_data('test_account_underutilized_ec2')
+        p = self.load_policy({
+            'name': 'underutilized-ec2',
+            'resource': 'account',
+            'filters': [{
+                'type': 'underutilized-ec2-instance',
+                'max_cpu': 0,
+                'refresh': 0}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 6)
 
+    def test_underutilized_ec2_savings_check(self):
+        session_factory = self.replay_flight_data('test_account_underutilized_ec2')
+        p = self.load_policy({
+            'name': 'underutilized-ec2',
+            'resource': 'account',
+            'filters': [{
+                'type': 'underutilized-ec2-instance',
+                'min_savings': 40.0}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 4)
+
+    def test_underutilized_ec2_instance_type(self):
+        session_factory = self.replay_flight_data('test_account_underutilized_ec2')
+        p = self.load_policy({
+            'name': 'underutilized-ec2',
+            'resource': 'account',
+            'filters': [{
+                'type': 'underutilized-ec2-instance',
+                'instance_types': ['r3.large', 't2.medium'],
+                'max_cpu': 4.0,
+                'max_network': 0.02}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
