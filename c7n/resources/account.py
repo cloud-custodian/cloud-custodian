@@ -406,22 +406,22 @@ class UnderutilisedEc2(Filter):
 
     schema:
     :param: max_cpu: float value which meets the filter condition if the
-        average CPU value returned by trusted advisor for a flagged resource
-        is less than this value.
+    average CPU value returned by trusted advisor for a flagged resource
+    is less than this value.
     :param: max_network: float value which meets the filter condition if
-        the average network IO in megabytes returned by trusted advisor for a
-        flagged resource is less than this value.
+    the average network IO in megabytes returned by trusted advisor for a
+    flagged resource is less than this value.
     :param: min_savings: float value which meets the filter condition if
-        the resource value is greater than the filter parameter value entered.
+    the resource value is greater than the filter parameter value entered.
     :param: max_low_utilization_days: integer value, if the returned number of
-        low utilization days for a flagged resource is greater than this
-        value the filter condition is met.
+    low utilization days for a flagged resource is greater than this
+    value the filter condition is met.
     :param: instance_types: array of strings, if the trusted advisor returned
-        flagged resource instance type is in this list the filter condition
-        is met.
+    flagged resource instance type is in this list the filter condition
+    is met.
     :param: refresh_period: integer value, max days ago before the trusted
-        advisor check is re-run, ensures check results are recent enough to be
-        relevant.
+    advisor check is re-run, ensures check results are recent enough to be
+    relevant.
 
     :example:
 
