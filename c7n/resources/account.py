@@ -179,9 +179,9 @@ class ConfigEnabled(Filter):
                       )['ConfigurationRecordersStatus']}
             resources[0]['c7n:config_status'] = status
             recorders = [r for r in recorders
-                         if status[r['name']]['recording']
-                         and status[r['name']]['lastStatus'].lower() in (
-                             'pending', 'success')]
+                         if status[r['name']]['recording'] and
+                         status[r['name']]['lastStatus'].lower() in
+                         ('pending', 'success')]
         if channels and recorders:
             return []
         return resources
@@ -287,7 +287,8 @@ class AccountPasswordPolicy(ValueFilter):
     def process(self, resources, event=None):
         if not resources[0].get('c7n:password_policy'):
             client = local_session(self.manager.session_factory).client('iam')
-            policy = client.get_account_password_policy().get('PasswordPolicy', {})
+            password_policy = client.get_account_password_policy()
+            policy = password_policy.get('PasswordPolicy', {})
             resources[0]['c7n:password_policy'] = policy
         if self.match(resources[0]['c7n:password_policy']):
             return resources
@@ -367,9 +368,9 @@ class ServiceLimit(Filter):
             checkId=self.check_id, language='en')['result']
 
         resources[0]['c7n:ServiceLimits'] = checks
-        delta = timedelta(self.data.get('refresh_period', 1))
+        delta_days = timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(checks['timestamp'])
-        if datetime.now(tz=tzutc()) - delta > check_date:
+        if datetime.now(tz=tzutc()) - delta_days > check_date:
             client.refresh_trusted_advisor_check(checkId=self.check_id)
         threshold = self.data.get('threshold')
 
