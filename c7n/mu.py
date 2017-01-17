@@ -219,6 +219,7 @@ def custodian_archive(skip=None):
 class LambdaManager(object):
     """ Provides CRUD operations around lambda functions
     """
+
     def __init__(self, session_factory, s3_asset_path=None):
         self.session_factory = session_factory
         self.client = self.session_factory().client('lambda')
@@ -916,7 +917,8 @@ class BucketNotification(object):
         lambda_client = self.session.client('lambda')
         try:
             response = lambda_client.remove_permission(
-                FunctionName=func['FunctionName'], StatementId=self.bucket['Name'])
+                FunctionName=func['FunctionName'],
+                StatementId=self.bucket['Name'])
             log.debug("Removed lambda permission result: %s" % response)
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceNotFoundException':

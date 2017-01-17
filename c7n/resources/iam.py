@@ -17,6 +17,7 @@ import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+import itertools
 import time
 from botocore.exceptions import ClientError
 
@@ -121,6 +122,13 @@ class ServerCertificate(QueryResourceManager):
 
 class IamRoleUsage(Filter):
 
+    def get_permissions(self):
+        perms = list(itertools.chain([
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ['lambda', 'launch-config', 'ec2']]))
+        perms.extend(['ecs:DescribeClusters', 'ecs:DescribeServices'])
+        return perms
+
     def service_role_usage(self):
         results = set()
         results.update(self.scan_lambda_roles())
@@ -136,8 +144,7 @@ class IamRoleUsage(Filter):
         return results
 
     def scan_lambda_roles(self):
-        from c7n.resources.awslambda import AWSLambda
-        manager = AWSLambda(self.manager.ctx, {})
+        manager = self.manager.get_resource_manager('lambda')
         return [r['Role'] for r in manager.resources() if 'Role' in r]
 
     def scan_ecs_roles(self):
@@ -153,16 +160,12 @@ class IamRoleUsage(Filter):
         return results
 
     def scan_asg_roles(self):
-        from c7n.resources.asg import LaunchConfig
-        manager = LaunchConfig(self.manager.ctx, {
-            'resource': 'launch-config'})
+        manager = self.manager.get_resource_manager('launch-config')
         return [r['IamInstanceProfile'] for r in manager.resources()
                 if 'IamInstanceProfile' in r]
 
     def scan_ec2_roles(self):
-        from c7n.resources.ec2 import EC2
-        manager = EC2(self.manager.ctx, {})
-
+        manager = self.manager.get_resource_manager('ec2')
         results = []
         for e in manager.resources():
             if 'Instances' not in e:
@@ -190,8 +193,8 @@ class UsedIamRole(IamRoleUsage):
         for r in resources:
             if r['Arn'] in roles or r['RoleName'] in roles:
                 results.append(r)
-        self.log.info("%d of %d iam roles currently used." % (
-            len(results), len(resources)))
+        self.log.info(
+            "%d of %d iam roles currently used.", len(results), len(resources))
         return results
 
 
@@ -206,8 +209,8 @@ class UnusedIamRole(IamRoleUsage):
         for r in resources:
             if r['Arn'] not in roles or r['RoleName'] not in roles:
                 results.append(r)
-        self.log.info("%d of %d iam roles not currently used." % (
-            len(results), len(resources)))
+        self.log.info("%d of %d iam roles not currently used.",
+                      len(results), len(resources))
         return results
 
 
@@ -219,7 +222,9 @@ class IamRoleInlinePolicy(Filter):
         True: Filter roles that have an inline-policy
         False: Filter roles that do not have an inline-policy
     """
+
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListRolePolicies',)
 
     def _inline_policies(self, client, resource):
         return len(client.list_role_policies(
@@ -241,6 +246,7 @@ class IamRoleInlinePolicy(Filter):
 class UsedIamPolicies(Filter):
 
     schema = type_schema('used')
+    permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] > 0]
@@ -250,6 +256,7 @@ class UsedIamPolicies(Filter):
 class UnusedIamPolicies(Filter):
 
     schema = type_schema('unused')
+    permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] == 0]
@@ -390,6 +397,9 @@ class UserCredentialReport(Filter):
         ('cert_1_', 'certs'),
         ('cert_2_', 'certs'))
 
+    permissions = ('iam:GenerateCredentialReport',
+                   'iam:GetCredentialReport')
+
     def get_value_or_schema_default(self, k):
         if k in self.data:
             return self.data[k]
@@ -490,6 +500,7 @@ class UserCredentialReport(Filter):
 class UserAttachedPolicy(Filter):
 
     schema = type_schema('policy')
+    permissions = ('iam:ListAttachedUserPolicies',)
 
     def process(self, resources, event=None):
 
@@ -518,6 +529,7 @@ class UserAttachedPolicy(Filter):
 class UserAccessKey(ValueFilter):
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListAccessKeys',)
 
     def process(self, resources, event=None):
 
@@ -547,6 +559,7 @@ class UserAccessKey(ValueFilter):
 class UserMfaDevice(ValueFilter):
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListMfaDevices',)
 
     def __init__(self, *args, **kw):
         super(UserMfaDevice, self).__init__(*args, **kw)
@@ -579,6 +592,8 @@ class UserRemoveAccessKey(BaseAction):
 
     schema = type_schema(
         'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
+    permissions = ('iam:ListAccessKeys', 'iam:UpdateAccessKey',
+                   'iam:DeleteAccssKey')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -623,6 +638,7 @@ class IamGroupUsers(Filter):
         False: Filter all IAM groups without any users assigned to it
     """
     schema = type_schema('has-users', value={'type': 'boolean'})
+    permissions = ('iam:GetGroup',)
 
     def _user_count(self, client, resource):
         return len(client.get_group(GroupName=resource['GroupName'])['Users'])
@@ -644,6 +660,7 @@ class IamGroupInlinePolicy(Filter):
         False: Filter all groups that do not have an inline-policy attached
     """
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListGroupPolicies',)
 
     def _inline_policies(self, client, resource):
         return len(client.list_group_policies(

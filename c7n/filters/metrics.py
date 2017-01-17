@@ -64,6 +64,8 @@ class MetricsFilter(Filter):
         period={'type': 'number'},
         required=('value', 'name'))
 
+    permissions = ("cloudwatch:GetMetricStatistics",)
+
     MAX_QUERY_POINTS = 50850
     MAX_RESULT_POINTS = 1440
 

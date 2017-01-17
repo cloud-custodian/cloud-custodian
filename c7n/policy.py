@@ -88,6 +88,17 @@ class PolicyCollection(object):
     def __contains__(self, policy_name):
         return policy_name in [p['name'] for p in self.data['policies']]
 
+    def __len__(self):
+        return len(self.data.get('policies', []))
+
+    @property
+    def resource_types(self):
+        """resource types used by the collection."""
+        rtypes = set()
+        for p in self:
+            rtypes.add(p.resource_type)
+        return rtypes
+
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""
@@ -167,7 +178,7 @@ class PullMode(PolicyExecutionMode):
             self.policy.log.info(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region,
+                self.policy.options.region or 'default',
                 version)
 
             s = time.time()
@@ -268,8 +279,8 @@ class LambdaMode(PolicyExecutionMode):
         mode = self.policy.data.get('mode', {})
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
-            raise ValueError("Unknown push event mode %s" % self.data)
-        self.policy.log.info('Found resource ids: %s' % resource_ids)
+            raise ValueError("Unknown push event mode %s", self.data)
+        self.policy.log.info('Found resource ids: %s', resource_ids)
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:
@@ -507,6 +518,23 @@ class Policy(object):
     def get_metrics(self, start, end, period):
         mode = self.get_execution_mode()
         return mode.get_metrics(start, end, period)
+
+    def get_permissions(self):
+        """get permissions needed by this policy"""
+        permissions = set()
+        permissions.update(self.resource_manager.get_permissions())
+        for f in self.resource_manager.filters:
+            permissions.update(f.get_permissions())
+        for a in self.resource_manager.actions:
+            permissions.update(a.get_permissions())
+        return permissions
+
+    def validate(self):
+        """validate settings, else raise validation error"""
+        for f in self.resource_manager.filters:
+            f.validate()
+        for a in self.resource_manager.actions:
+            a.validate()
 
     def __call__(self):
         """Run policy in default mode"""

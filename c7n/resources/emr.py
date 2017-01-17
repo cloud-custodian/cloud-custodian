@@ -44,6 +44,11 @@ class EMRCluster(QueryResourceManager):
         super(EMRCluster, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
 
+    @classmethod
+    def get_permissions(cls):
+        return ("elasticmapreduce:ListClusters",
+                "elasticmapreduce:DescribeCluster")
+
     def get_resources(self, ids):
         # no filtering by id set supported at the api
         client = local_session(self.session_factory).client('emr')
@@ -105,6 +110,7 @@ class Terminate(BaseAction):
     """
 
     schema = type_schema('terminate', force={'type': 'boolean'})
+    permissions = ("elasticmapreduce:TerminateJobFlows",)
     delay = 5
 
     def process(self, emrs):

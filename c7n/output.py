@@ -120,9 +120,9 @@ class LogOutput(object):
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        self.leave_log()
         if exc_type is not None:
             log.exception("Error while executing policy")
-        self.leave_log()
 
     def join_log(self):
         self.handler = self.get_handler()
