@@ -167,7 +167,7 @@ class AccountTests(BaseTest):
             'filters': [{
                 'type': 'underutilized-ec2-instance',
                 'max_cpu': 0,
-                'refresh': 0}]}, session_factory=session_factory)
+                'refresh_period': 0}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
 
