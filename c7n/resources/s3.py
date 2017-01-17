@@ -1407,6 +1407,7 @@ class MarkBucketForOp(TagDelayedAction):
                     op: attach-encrypt
                     days: 7
     """
+    batch_size = 5
 
     schema = type_schema(
         'mark-for-op', rinherit=TagDelayedAction.schema)
@@ -1432,7 +1433,6 @@ class RemoveBucketTag(RemoveTag):
                   - type: unmark
                     tags: ['BucketOwner']
     """
-
     schema = type_schema(
         'unmark', aliases=('remove-tag'), tags={'type': 'array'})
 
