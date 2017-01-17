@@ -396,3 +396,137 @@ class ServiceLimit(Filter):
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
         return []
+
+
+@filters.register('underutilized-ec2-instance')
+class UnderutilisedEc2(Filter):
+    """
+    Trusted Advisor check to see if there exists any EC2 instances that are
+    not fully using computational and network resources.
+
+    schema:
+    :param: max_cpu: float value which meets the filter condition if the
+        average CPU value returned by trusted advisor for a flagged resource
+        is less than this value.
+    :param: max_network: float value which meets the filter condition if
+        the average network IO in megabytes returned by trusted advisor for a
+        flagged resource is less than this value.
+    :param: min_savings: float value which meets the filter condition if
+        the resource value is greater than the filter parameter value entered.
+    :param: max_low_utilization_days: integer value, if the returned number of
+        low utilization days for a flagged resource is greater than this
+        value the filter condition is met.
+    :param: instance_types: array of strings, if the trusted advisor returned
+        flagged resource instance type is in this list the filter condition
+        is met.
+    :param: refresh_period: integer value, max days ago before the trusted
+        advisor check is re-run, ensures check results are recent enough to be
+        relevant.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: underutilized-ec2
+                resource: account
+                filters:
+                  - type: underutilized-ec2-instance
+                    savings_threshold: 20.0
+                    instance_types:
+                      - r3.large
+                      - t2.medium
+    """
+
+    schema = type_schema(
+        'underutilized-ec2-instance',
+        max_cpu={'type': 'number'},
+        max_network={'type': 'number'},
+        min_savings={'type': 'number'},
+        max_low_utilization_days={'type': 'integer'},
+        instance_types={'type': 'array', 'items': {'type': 'string'}},
+        refresh_period={'type': 'integer'}
+    )
+
+    permissions = ('support:DescribeTrustedAdvisorCheckResult',)
+    check_id = 'Qch7DwouX1'
+
+    metadata_fields = ('availability zone', 'id', 'name', 'instance type',
+                       'estimated monthly savings', 'day 1', 'day 2', 'day 3',
+                       'day 4', 'day 5', 'day 6', 'day 7', 'day 8', 'day 9',
+                       'day 10', 'day 11', 'day 12', 'day 13', 'day 14',
+                       'average CPU', 'average network io',
+                       'low utilization days')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('support')
+        checks = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en'
+        )['result']
+
+        delta_days = timedelta(self.data.get('refresh_period', 1))
+        check_date = parse_date(checks['timestamp'])
+        if datetime.now(tz=tzutc()) - delta_days > check_date:
+            client.refresh_trusted_advisor_check(checkId=self.check_id)
+
+        # query filter parameters
+        filter_params = {
+            'max_cpu': self.data.get('max_cpu'),
+            'max_network': self.data.get('max_network'),
+            'max_low_use_days': self.data.get('max_low_utilization_days'),
+            'min_savings': self.data.get('min_savings'),
+            'instance_types': self.data.get('instance_types'),
+        }
+
+        exceeded = []
+        for resource in checks['flaggedResources']:
+            resource_data = dict(zip(self.metadata_fields,
+                                     resource['metadata']))
+            if self.is_ec2_underutilised(filter_params, resource_data) or \
+               self.no_filter(filter_params):
+                exceeded.append(resource_data)
+
+        return exceeded if exceeded else []
+
+    @staticmethod
+    def no_filter(filter_params):
+        return filter_params['max_cpu'] is None and \
+            filter_params['max_network'] is None and \
+            filter_params['max_low_use_days'] is None and \
+            filter_params['instance_types'] is None and \
+            filter_params['min_savings'] is None
+
+    @staticmethod
+    def is_ec2_underutilised(filter_params, resource_data):
+        """
+        Method compares the filter constraints against a passed resources
+        values and if the resource meets the criteria of the filter it
+        returns True, otherwise false.
+        """
+
+        instance_types = filter_params['instance_types']
+        resource_inst_type = resource_data['instance type']
+        if instance_types and resource_inst_type not in instance_types:
+            return False
+
+        max_cpu = filter_params['max_cpu']
+        resource_cpu = resource_data['average CPU'].replace('%', '')
+        if max_cpu and float(resource_cpu) > max_cpu:
+            return False
+
+        max_network = filter_params['max_network']
+        resource_network = resource_data['average network io']
+        resource_network = resource_network.replace('MB', '')
+        if max_network and float(resource_network) > max_network:
+            return False
+
+        min_savings = filter_params['min_savings']
+        resource_savings = resource_data['estimated monthly savings']
+        resource_savings = resource_savings.replace('$', '')
+        if min_savings and float(resource_savings) < min_savings:
+            return False
+
+        max_low_use_days = filter_params['max_low_use_days']
+        low_use = resource_data['low utilization days']
+        low_use = low_use.replace(' days', '')
+        return not(max_low_use_days and int(low_use) > max_low_use_days)
