@@ -25,7 +25,7 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, chunks
 
 
 @resources.register('iam-group')
@@ -502,21 +502,23 @@ class UserPolicy(ValueFilter):
     schema = type_schema('policy', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAttachedUserPolicies',)
 
-    def user_policies(self, resource):
-        if 'c7n:Policies' not in resource:
-            resource['c7n:Policies'] = []
+    def user_policies(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
-        aps = client.list_attached_user_policies(
-            UserName=resource['UserName'])['AttachedPolicies']
-        for ap in aps:
-            resource['c7n:Policies'].append(
-                client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+        for u in user_set:
+            if 'c7n:Policies' not in u:
+                u['c7n:Policies'] = []
+            aps = client.list_attached_user_policies(
+                UserName=u['UserName'])['AttachedPolicies']
+            for ap in aps:
+                u['c7n:Policies'].append(
+                    client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
 
     def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
                 "Querying %d users policies" % len(resources))
-            list(w.map(self.user_policies, resources))
+            list(w.map(self.user_policies, user_set))
 
         matched = []
         for r in resources:
@@ -533,16 +535,18 @@ class UserAccessKey(ValueFilter):
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
 
-    def user_keys(self, resource):
+    def user_keys(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
-        resource['c7n:AccessKeys'] = client.list_access_keys(
-            UserName=resource['UserName'])['AccessKeyMetadata']
+        for u in user_set:
+            u['c7n:AccessKeys'] = client.list_access_keys(
+                UserName=u['UserName'])['AccessKeyMetadata']
 
     def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
                 "Querying %d users' api keys" % len(resources))
-            list(w.map(self.user_keys, resources))
+            list(w.map(self.user_keys, user_set))
 
         matched = []
         for r in resources:
