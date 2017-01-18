@@ -1432,6 +1432,7 @@ class RemoveBucketTag(RemoveTag):
                   - type: unmark
                     tags: ['BucketOwner']
     """
+    
     schema = type_schema(
         'unmark', aliases=('remove-tag'), tags={'type': 'array'})
 
