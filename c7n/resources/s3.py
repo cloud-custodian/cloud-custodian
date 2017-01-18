@@ -1407,7 +1407,6 @@ class MarkBucketForOp(TagDelayedAction):
                     op: attach-encrypt
                     days: 7
     """
-    batch_size = 5
 
     schema = type_schema(
         'mark-for-op', rinherit=TagDelayedAction.schema)
