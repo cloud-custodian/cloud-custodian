@@ -227,8 +227,8 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         level, logger = 'ERROR', None
 
     for f in reversed(error['stacktrace']['frames']):
+        culprit = "%s.%s" % (f['module'], f['function'])
         if f['module'].startswith('c7n'):
-            culprit = "%s.%s" % (f['module'], f['function'])
             break
 
     breadcrumbs = None
