@@ -498,6 +498,20 @@ class UserCredentialReport(Filter):
 
 @User.filter_registry.register('policy')
 class UserPolicy(ValueFilter):
+    """Filter IAM users based on attached policy values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-admin-access
+                resource: iam-user
+                filters:
+                  - type: policy
+                    key: 'PolicyName'
+                    value: 'AdministratorAccess'
+    """
 
     schema = type_schema('policy', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAttachedUserPolicies',)
@@ -531,6 +545,20 @@ class UserPolicy(ValueFilter):
 
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
+    """Filter IAM users based on access-key values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-active-keys
+                resource: iam-user
+                filters:
+                  - type: access-key
+                    key: 'Status'
+                    value: 'Active'
+    """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
