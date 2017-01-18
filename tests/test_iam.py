@@ -195,7 +195,8 @@ class IamUserFilterUsage(BaseTest):
             'filters': [{
                 'type': 'policy',
                 'key': 'PolicyName',
-                'value': 'AdministratorAccess'}]}, session_factory=session_factory)
+                'value': 'AdministratorAccess'}]},
+            session_factory=session_factory)
         resources = p.run()
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
