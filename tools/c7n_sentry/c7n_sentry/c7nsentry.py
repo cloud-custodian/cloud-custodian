@@ -76,7 +76,7 @@ sqs = logs = config = None
 
 VERSION = "0.1"
 
-log = logging.getLogger("cwl2sentry")
+log = logging.getLogger("c7n-sentry")
 
 
 def init():
@@ -102,12 +102,12 @@ def process_log_event(event, context):
     serialized = event['awslogs'].pop('data')
     data = json.loads(zlib.decompress(
         base64.b64decode(serialized), 16+zlib.MAX_WBITS))
-    msg = get_sentry_message(data)
+    msg = get_sentry_message(config, data)
     if msg is None:
         return
     if config['sentry_dsn']:
         # Deliver directly to sentry
-        send_sentry_message(config, msg)
+        send_sentry_message(config['sentry_dsn'], msg)
     elif config['sentry_sqs']:
         # Delivery indirectly via sqs
         sqs.send_message(
@@ -317,24 +317,22 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
         'stacktrace': data}
 
 
-def get_function(session_factory, name, role,
+def get_function(session_factory, name, handler, role,
                  log_groups,
                  project, account_name, account_id,
+                 sentry_dsn,
                  pattern="Traceback"):
     """Lambda function provisioning.
 
     Self contained within the component, to allow for easier reuse.
     """
-
     # Lazy import to avoid runtime dependency
-    import inspect
-
-    import c7n
     from c7n.mu import (
         LambdaFunction, PythonPackageArchive, CloudWatchLogSubscription)
 
     config = dict(
         name=name,
+        handler=handler,
         runtime='python2.7',
         memory_size=512,
         timeout=15,
@@ -345,18 +343,22 @@ def get_function(session_factory, name, role,
                 session_factory, log_groups, pattern)])
 
     archive = PythonPackageArchive(
-        # Directory to lambda file
-        os.path.join(
-            os.path.dirname(inspect.getabsfile(c7n)), 'ufuncs', 'cwl2sentry.py'),
-        # Don't include virtualenv deps
+        os.path.dirname(__file__),
+        skip='*.pyc',
         lib_filter=lambda x, y, z: ([], []))
+
     archive.create()
     archive.add_contents(
         'config.json', json.dumps({
             'project': project,
             'account_name': account_name,
-            'account_id': account_id
+            'account_id': account_id,
+            'sentry_dsn': sentry_dsn,
         }))
+    archive.add_contents(
+        'handler.py',
+        'from c7n_sentry.c7nsentry import process_log_event'
+    )
     archive.close()
 
     return LambdaFunction(config, archive)
@@ -430,6 +432,9 @@ def orgreplay(options):
                                     a['name'], r, b.log_group)
                             continue
 
+    return [process_account(a) for a in accounts]
+
+
     with ThreadPoolExecutor(max_workers=3) as w:
         futures = {}
         for a in accounts:
@@ -440,15 +445,48 @@ def orgreplay(options):
                 log.error("Error processing account %s: %r", a['name'], exc)
 
 
+def deploy(options):
+    from common import get_accounts
+    for account in get_accounts(options):
+        for region_name in options.regions:
+            for fname, config in account['config_files'].items():
+                for policy in config.get('policies', ()):
+                    if policy.get('mode'):
+                        deploy_one(
+                            region_name, account, policy, options.sentry_dsn)
+
+
+def deploy_one(region_name, account, policy, sentry_dsn):
+    from c7n.mu import LambdaManager
+    session_factory = lambda: boto3.Session(region_name=region_name)
+    log_group_name = '/aws/lambda/custodian-{}'.format(policy['name'])
+    arn = 'arn:aws:logs:{}:{}:log-group:{}:*'.format(
+        region_name, account['account_id'], log_group_name)
+    function = get_function(
+        session_factory=session_factory,
+        name='cloud-custodian-sentry',
+        handler='handler.process_log_event',
+        role=account['role'],
+        log_groups=[{'logGroupName': log_group_name, 'arn': arn}],
+        project=None,
+        account_name=account['name'],
+        account_id=account['account_id'],
+        sentry_dsn=sentry_dsn,
+    )
+    log.info("Deploying lambda for {} in {}".format(
+        log_group_name, region_name))
+    LambdaManager(session_factory).publish(function)
+
+
 def setup_parser():
-    from common import setup_parser as orgparser
+    from common import setup_parser as common_parser
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', default=False, action="store_true")
     subs = parser.add_subparsers()
 
     cmd_orgreplay = subs.add_parser('orgreplay')
-    orgparser(cmd_orgreplay)
+    common_parser(cmd_orgreplay)
     cmd_orgreplay.set_defaults(command=orgreplay)
     cmd_orgreplay.add_argument('--profile')
     #cmd_orgreplay.add_argument('--role')
@@ -459,6 +497,12 @@ def setup_parser():
                                default=os.environ.get('SENTRY_DSN'))
     cmd_orgreplay.add_argument('--sentry-token',
                                default=os.environ.get('SENTRY_TOKEN'))
+
+    cmd_deploy = subs.add_parser('deploy')
+    common_parser(cmd_deploy)
+    cmd_deploy.add_argument('--sentry-dsn',
+                            default=os.environ.get('SENTRY_DSN'))
+    cmd_deploy.set_defaults(command=deploy)
 
     return parser
 
