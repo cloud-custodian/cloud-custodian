@@ -53,8 +53,7 @@ class HealthEvents(QueryResourceManager):
         self.queries = QueryFilter.parse(
             self.data.get('query', [{'eventStatusCodes': 'open'}]))
 
-    def get_model(self):
-        return self.resource_type
+    permissions = ('health:DescribeEvents',)
 
     def resource_query(self):
         qf = {}
