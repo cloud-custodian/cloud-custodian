@@ -35,6 +35,13 @@ class Table(QueryResourceManager):
         date = 'CreationDateTime'
         dimension = 'TableName'
 
+        default_report_fields = (
+            'Table',
+            'TableName',
+            'CreationDateTime',
+        )
+
+
 
 class StatusFilter(object):
     """Filter tables by status"""
