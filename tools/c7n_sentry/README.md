@@ -15,21 +15,29 @@ including lambdas.
 (cloud-custodian) $ pip install tools/c7n_sentry
 [...]
 (cloud-custodian) $ c7n-sentry
-usage: c7n-sentry [-h] [--verbose] {orgreplay} ...
+usage: c7n-sentry [-h] [--verbose] {deploy,orgreplay} ...
 c7n-sentry: error: too few arguments
 (cloud-custodian) $
 ```
 
-
-# Run Locally
+You can use `c7n-sentry orgreplay` from your laptop or a cron job to replay
+logs and send exceptions to Sentry.
 
 ```
 (cloud-custodian) $ export SENTRY_DSN=foo
 (cloud-custodian) $ export SENTRY_TOKEN=deadbeef
-(cloud-custodian) $ c7n-sentry --verbose orgreplay -c config.json --sentry-org=yours
+(cloud-custodian) $ c7n-sentry orgreplay -c config.json --sentry-org=yours
 ```
 
-Where `config.json` looks something like this:
+You can use `c7n-sentry deploy` to install a Lambda function that will
+log exceptions to Sentry as they occur.
+
+```
+(cloud-custodian) $ export SENTRY_DSN=foo
+(cloud-custodian) $ c7n-sentry deploy -c config.json --sentry-org=yours
+```
+
+Either way, `config.json` looks something like this:
 
 ```json
 {
@@ -40,19 +48,18 @@ Where `config.json` looks something like this:
             "": {
                 "policies": [
                     {
-                        "mode": "",
+                        "mode": "must by non-empty, but value is arbitrary",
                         "name": "foo"
                     }
                 ]
             }
         },
-        "role": ""
+        "role": "arn:aws:iam::123456789012:required/for/realtime"
     }
 }
 ```
 
-Both `name` and `account_id` refer to your AWS account. Empty values are
-optional, though some keys are required even if the value doesn't matter. The
-crucial bit is `name` under `policies`: we are going to look for a Lambda named
+Both `name` and `account_id` refer to your AWS account. The crucial bit is
+`name` under `policies`: we are going to look for a Lambda named
 `custodian-foo` and replay the CloudWatch logs for that Lambda, sending any
 Python exceptions we discover over to Sentry.

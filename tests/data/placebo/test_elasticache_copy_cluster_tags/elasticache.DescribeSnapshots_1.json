@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0bf4a5d5-cd4c-11e6-ac59-75619cc9ad68", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0bf4a5d5-cd4c-11e6-ac59-75619cc9ad68", 
+                "date": "Wed, 28 Dec 2016 22:21:57 GMT", 
+                "content-length": "1679", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Engine": "redis", 
+                "CacheParameterGroupName": "default.redis3.2", 
+                "VpcId": "vpc-e026fb84", 
+                "CacheClusterId": "test-tags", 
+                "SnapshotRetentionLimit": 0, 
+                "NumCacheNodes": 1, 
+                "SnapshotName": "test-tags-backup", 
+                "CacheClusterCreateTime": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 23, 
+                    "microsecond": 3000, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 10
+                }, 
+                "AutoMinorVersionUpgrade": true, 
+                "PreferredAvailabilityZone": "us-west-2a", 
+                "SnapshotStatus": "available", 
+                "SnapshotSource": "manual", 
+                "SnapshotWindow": "11:00-12:00", 
+                "EngineVersion": "3.2.4", 
+                "NodeSnapshots": [
+                    {
+                        "CacheSize": "3 MB", 
+                        "SnapshotCreateTime": {
+                            "hour": 22, 
+                            "__class__": "datetime", 
+                            "month": 12, 
+                            "second": 1, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 28, 
+                            "minute": 12
+                        }, 
+                        "CacheNodeId": "0001", 
+                        "CacheNodeCreateTime": {
+                            "hour": 21, 
+                            "__class__": "datetime", 
+                            "month": 12, 
+                            "second": 23, 
+                            "microsecond": 3000, 
+                            "year": 2016, 
+                            "day": 27, 
+                            "minute": 10
+                        }
+                    }
+                ], 
+                "CacheSubnetGroupName": "test-subnet", 
+                "Port": 6379, 
+                "PreferredMaintenanceWindow": "mon:09:00-mon:10:00", 
+                "CacheNodeType": "cache.r3.large"
+            }
+        ]
+    }
+}

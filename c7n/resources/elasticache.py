@@ -489,7 +489,6 @@ class DeleteElastiCacheSnapshot(BaseAction):
         for s in snapshots_set:
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
-
 # added mark-for-op
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
@@ -525,6 +524,62 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
             arn = self.manager.generate_arn(snapshot['SnapshotName'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
+
+@ElastiCacheSnapshot.action_registry.register('copy-cluster-tags')
+class CopyClusterTags(BaseAction):
+    """
+    Copy specified tags from Elasticache cluster to Snapshot
+    :example:
+
+        .. code-block: yaml
+
+            - name: elasticache-test
+              resource: cache-snapshot
+              filters:
+                 - type: value
+                   key: SnapshotName
+                   op: in
+                   value:
+                    - test-tags-backup
+              actions:
+                - type: copy-cluster-tags
+                  tags:
+                    - tag1
+                    - tag2
+    """
+
+    schema = type_schema(
+        'copy-cluster-tags',
+        tags={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+        required = ('tags',))
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('cache-cluster').get_permissions()
+        perms.append('elasticache:AddTagsToResource')
+        return perms
+
+    def process(self, snapshots):
+        log.info("Modifying %d ElastiCache snapshots", len(snapshots))
+        client = local_session(self.manager.session_factory).client('elasticache')
+        clusters = {
+            cluster['CacheClusterId']: cluster for cluster in
+            ElastiCacheCluster(self.manager.ctx, {}).resources()
+        }
+        for s in snapshots:
+            if s['CacheClusterId'] in clusters:
+                continue
+
+            arn = self.manager.generate_arn(s['SnapshotName'])
+            tags_cluster = clusters[s['CacheClusterId']]['Tags']
+            only_tags = self.data.get('tags', [])  # Specify tags to copy
+            extant_tags = {t['Key']: t['Value'] for t in s.get('Tags', ())}
+            copy_tags = []
+
+            for t in tags_cluster:
+                if t['Key'] in only_tags and t['Value'] != extant_tags.get(t['Key'], ""):
+                    copy_tags.append(t)
+            self.retry(
+                client.add_tags_to_resource, ResourceName=arn, Tags=copy_tags)
 
 # added unmark
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
