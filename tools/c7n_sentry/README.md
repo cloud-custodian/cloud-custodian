@@ -8,3 +8,51 @@ to sentry.
 Useful for any python code logging to cloud watch logs
 including lambdas.
 
+
+# Install
+
+```
+(cloud-custodian) $ pip install tools/c7n_sentry
+[...]
+(cloud-custodian) $ c7n-sentry
+usage: c7n-sentry [-h] [--verbose] {orgreplay} ...
+c7n-sentry: error: too few arguments
+(cloud-custodian) $
+```
+
+
+# Run Locally
+
+```
+(cloud-custodian) $ export SENTRY_DSN=foo
+(cloud-custodian) $ export SENTRY_TOKEN=deadbeef
+(cloud-custodian) $ c7n-sentry --verbose orgreplay -c config.json --sentry-org=yours
+```
+
+Where `config.json` looks something like this:
+
+```json
+{
+    "": {
+        "name": "your-aws-account-name",
+        "account_id": "0123456789",
+        "config_files": {
+            "": {
+                "policies": [
+                    {
+                        "mode": "",
+                        "name": "foo"
+                    }
+                ]
+            }
+        },
+        "role": ""
+    }
+}
+```
+
+Both `name` and `account_id` refer to your AWS account. Empty values are
+optional, though some keys are required even if the value doesn't matter. The
+crucial bit is `name` under `policies`: we are going to look for a Lambda named
+`custodian-foo` and replay the CloudWatch logs for that Lambda, sending any
+Python exceptions we discover over to Sentry.
