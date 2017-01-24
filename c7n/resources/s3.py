@@ -607,7 +607,7 @@ class AttachLambdaEncrypt(BucketActionBase):
         if (not getattr(self.manager.config, 'dryrun', True) and
                 not self.data.get('role', self.manager.config.assume_role)):
             raise ValueError(
-                "attach-encrypt: role must be specified either"
+                "attach-encrypt: role must be specified either "
                 "via assume or in config")
         return self
 

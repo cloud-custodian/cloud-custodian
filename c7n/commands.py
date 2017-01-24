@@ -42,6 +42,11 @@ def policy_command(f):
     def _load_policies(options):
         load_resources()
         collection = policy_load(options, options.config)
+        
+        if collection is None:
+            eprint('Error: empty policy file.  Nothing to do.')
+            sys.exit(1)
+
         policies = collection.filter(options.policy_filter)
         
         if options.policy_filter and len(policies) == 0 and len(collection) > 0:
@@ -133,7 +138,8 @@ def run(options, policies):
             log.exception(
                 "Error while executing policy %s, continuing" % (
                     policy.name))
-    sys.exit(exit_code)
+    if exit_code != 0:
+        sys.exit(exit_code)
 
 
 @policy_command
