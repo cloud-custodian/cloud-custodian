@@ -227,8 +227,8 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         level, logger = 'ERROR', None
 
     for f in reversed(error['stacktrace']['frames']):
+        culprit = "%s.%s" % (f['module'], f['function'])
         if f['module'].startswith('c7n'):
-            culprit = "%s.%s" % (f['module'], f['function'])
             break
 
     breadcrumbs = None
@@ -328,7 +328,6 @@ def get_function(session_factory, name, role,
 
     # Lazy import to avoid runtime dependency
     import inspect
-    import os
 
     import c7n
     from c7n.mu import (
@@ -388,25 +387,21 @@ def orgreplay(options):
         if team_name not in teams:
 
             log.info("creating org team %s", team_name)
-            result = spost(
+            spost(
                 endpoint + "organizations/%s/teams/" % options.sentry_org,
                 json={'name': team_name})
             teams.add(team_name)
 
         if a['name'] not in projects:
             log.info("creating account project %s", a['name'])
-            result = spost(endpoint + "teams/%s/%s/projects/" % (
+            spost(endpoint + "teams/%s/%s/projects/" % (
                 options.sentry_org, team_name),
                   json={'name': a['name']})
-
-        result = sget(endpoint + "projects/%s/%s/keys/" % (
-            options.sentry_org, a['name'])).json()
-        dsn = result[0]['dsn']['secret']
 
         bagger = partial(
             Bag,
             profile=options.profile, role=None, log_streams=None,
-            start=options.start, end=options.end, sentry_dsn=dsn,
+            start=options.start, end=options.end, sentry_dsn=options.sentry_dsn,
             account_id=a['account_id'],
             account_name=a['name'])
 
@@ -440,9 +435,9 @@ def orgreplay(options):
         for a in accounts:
             futures[w.submit(process_account, a)] = a
         for f in as_completed(futures):
-            if f.exception():
-                log.error("Error processing account %s: %s",
-                          a['name'], f.exception())
+            exc = f.exception()
+            if exc:
+                log.error("Error processing account %s: %r", a['name'], exc)
 
 
 def setup_parser():

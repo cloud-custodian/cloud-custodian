@@ -262,6 +262,77 @@ class UnusedIamPolicies(Filter):
         return [r for r in resources if r['AttachmentCount'] == 0]
 
 
+@Policy.filter_registry.register('has-allow-all')
+class AllowAllIamPolicies(Filter):
+    """Check if IAM policy resource(s) have allow-all IAM policy statement block.
+
+    This allows users to implement CIS AWS check 1.24 which states that no
+    policy must exist with the following requirements.
+
+    Policy must have 'Action' and Resource = '*' with 'Effect' = 'Allow'
+
+    The policy will trigger on the following IAM policy (statement).
+    For example:
+
+    .. code-block: json
+     {
+         'Version': '2012-10-17',
+         'Statement': [{
+             'Action': '*',
+             'Resource': '*',
+             'Effect': 'Allow'
+         }]
+     }
+
+    Additionally, the policy checks if the statement has no 'Condition' or
+    'NotAction'
+
+    For example, if the user wants to check all used policies and filter on
+    allow all:
+
+    .. code-block: yaml
+
+     - name: iam-no-used-all-all-policy
+       resource: iam-policy
+       filters:
+         - type: used
+         - type: has-allow-all
+
+    Note that scanning and getting all policies and all statements can take
+    a while. Use it sparingly or combine it with filters such as 'used' as
+    above.
+
+    """
+    schema = type_schema('has-allow-all')
+    permissions = ('iam:ListPolicies', 'iam:ListPolicyVersions')
+
+    def has_allow_all_policy(self, client, resource):
+        statements = client.get_policy_version(
+            PolicyArn=resource['Arn'],
+            VersionId=resource['DefaultVersionId']
+        )['PolicyVersion']['Document']['Statement']
+        if isinstance(statements, dict):
+            statements = [statements]
+
+        for s in statements:
+            if ('Condition' not in s and
+                    'Action' in s and
+                    isinstance(s['Action'], basestring) and
+                    s['Action'] == "*" and
+                    isinstance(s['Resource'], basestring) and
+                    s['Resource'] == "*" and
+                    s['Effect'] == "Allow"):
+                return True
+        return False
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        results = [r for r in resources if self.has_allow_all_policy(c, r)]
+        self.log.info(
+            "%d of %d iam policies have allow all.",
+            len(results), len(resources))
+        return results
+
 ###############################
 #    IAM Instance Profiles    #
 ###############################
