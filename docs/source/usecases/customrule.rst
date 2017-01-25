@@ -6,7 +6,8 @@ rules
 <http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config_develop-rules.html>`_.
 In this doc we'll look at how we would deploy the :ref:`quickstart
 <quickstart>` example using Config. Before you proceed, make sure you've
-terminated any EC2 instance left over from the quickstart.
+removed the ``Custodian`` tag from any EC2 instance left over from the
+quickstart.
 
 First, modify ``custodian.yml`` to specify a mode type of ``config-rule``:
 
@@ -38,8 +39,8 @@ That should give you log output like this::
 
 Go check the AWS console to see the Lambda as well as the Config rule that
 Custodian created. The Config rule should be listed as "Compliant" or "No
-results reported" (if not, be sure you terminated any instance left over from
-the quickstart).
+results reported" (if not, be sure you removed the ``Custodian`` tag from any
+instance left over from the quickstart).
 
 Now for the fun part! With your new policy installed, go ahead and create an
 EC2 instance with a ``Custodian`` tag (any non-empty value), and wait (events
