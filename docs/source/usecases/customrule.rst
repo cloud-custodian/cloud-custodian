@@ -9,7 +9,9 @@ In this doc we'll look at how we would deploy the :ref:`quickstart
 removed the ``Custodian`` tag from any EC2 instance left over from the
 quickstart.
 
-First, modify ``custodian.yml`` to specify a mode type of ``config-rule``:
+First, modify ``custodian.yml`` to specify a mode type of ``config-rule``.
+You'll also need the ARN of an IAM role to assume when running the Lambda that
+Custodian is going to install for you.
 
 .. code-block:: yaml
 
@@ -17,20 +19,18 @@ First, modify ``custodian.yml`` to specify a mode type of ``config-rule``:
       - name: my-first-policy
         mode:
             type: config-rule
+            role: arn:aws:iam::123456789012:role/some-role
         resource: ec2
         filters:
           - "tag:Custodian": present
         actions:
           - stop
 
-You'll need one additional piece of information in order to deploy the policy:
-the ARN of an IAM role to assume when running the Lambda that Custodian is
-going to install for you. We specify this with an additional argument when
-deploying the policy:
+Now deploy the policy:
 
 .. code-block:: bash
 
-    custodian run -c custodian.yml -s . --assume=arn:aws:iam::123456789012:role/some-role
+    custodian run -c custodian.yml -s .
 
 That should give you log output like this::
 
