@@ -339,7 +339,6 @@ class Snapshot(BaseAction):
     def process_cluster_snapshot(self, cluster):
         c = local_session(self.manager.session_factory).client('redshift')
         cluster_tags = cluster.get('Tags')
-        c = local_session(self.manager.session_factory).client('redshift')
         c.create_cluster_snapshot(
             SnapshotIdentifier=snapshot_identifier(
                 'Backup',
