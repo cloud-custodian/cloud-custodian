@@ -48,7 +48,6 @@ def get_connection(ldap_uri, bind_user, bind_password):
 def get_user(eid, bind_user=None, bind_password=None,
              manager=True, ldap_uri=None, base_dn=None):
 
-    assert ldap_uri and base_dn, "Ldap config required"
     global CONN
     if CONN is None:
         CONN = get_connection(ldap_uri, bind_user, bind_password)

@@ -27,13 +27,13 @@ c7n-mailer: error: argument -c/--config is required
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
 [Mu](http://www.capitalone.io/cloud-custodian/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
-schema](./c7n_mailer/cli.py#L11-L28) to which the file must conform, here is
+schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 [an example config](./example.yml), and here is a description of the options:
 
 | Required? | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
 | &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
-|           | `from_address`       | string           | default from address                |
+| &#x2705;  | `from_address`       | string           | default from address                |
 |           | `contact_tags`       | array of strings | tags that we should look at for address information |
 
 
@@ -56,8 +56,8 @@ schema](./c7n_mailer/cli.py#L11-L28) to which the file must conform, here is
 |           | `cache`              | string           | memcached for caching ldap lookups  |
 |           | `cross_accounts`     | object           | account to assume back into for sending to SNS topics |
 |           | `ldap_bind_dn`       | string           | ldap server for resolving users     |
-| &#x2705;  | `ldap_bind_user`     | string           | ldap server for resolving users     |
-| &#x2705;  | `ldap_bind_password` | string           | ldap server for resolving users     |
+|           | `ldap_bind_user`     | string           | ldap server for resolving users     |
+|           | `ldap_bind_password` | string           | ldap server for resolving users     |
 |           | `ldap_uri`           | string           | ldap server for resolving users     |
 
 
