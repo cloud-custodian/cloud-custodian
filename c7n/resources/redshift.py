@@ -336,14 +336,14 @@ class Snapshot(BaseAction):
                         "Exception creating Redshift snapshot  \n %s",
                         f.exception())
         return clusters
-
     def process_cluster_snapshot(self, cluster):
         c = local_session(self.manager.session_factory).client('redshift')
+        cluster_tags = cluster.get('Tags')
         c.create_cluster_snapshot(
             SnapshotIdentifier=snapshot_identifier(
                 'Backup',
                 cluster['ClusterIdentifier']),
-            ClusterIdentifier=cluster['ClusterIdentifier'])
+            ClusterIdentifier=cluster['ClusterIdentifier'],Tags=cluster_tags)
 
 
 @actions.register('enable-vpc-routing')

@@ -1,30 +1,40 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "TaggedResources": [
             {
-                "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:c7n", 
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
                 "Tag": {
-                    "Value": "", 
-                    "Key": "testKey"
+                    "Value": "T11",
+                    "Key": "T1"
                 }
-            },{
-                "ResourceType": "cluster", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:c7n", 
+            },
+            {
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
                 "Tag": {
-                    "Value": "Resource does not meet policy: delete@12/12/2012", 
-                    "Key": "maid_status"
+                    "Value": "T22",
+                    "Key": "T2"
+                }
+            },
+            {
+                "ResourceType": "cluster",
+                "ResourceName": "arn:aws:redshift:us-east-1:111111:cluster:test-cluster",
+                "Tag": {
+                    "Value": "T33",
+                    "Key": "T3"
                 }
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "3aa9f95b-7e75-11e6-af9b-793ba9d7f410", 
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "d37db81e-db7f-11e6-bcee-b782993fedd5",
             "HTTPHeaders": {
-                "x-amzn-requestid": "3aa9f95b-7e75-11e6-af9b-793ba9d7f410", 
-                "date": "Mon, 19 Sep 2016 14:27:43 GMT", 
-                "content-length": "558", 
+                "x-amzn-requestid": "d37db81e-db7f-11e6-bcee-b782993fedd5",
+                "date": "Mon, 16 Jan 2017 00:07:53 GMT",
+                "content-length": "1116",
                 "content-type": "text/xml"
             }
         }
