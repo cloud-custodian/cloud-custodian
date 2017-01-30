@@ -11,15 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import functools
 import itertools
 
+from botocore.exceptions import ClientError
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema
 from c7n.actions import BaseAction
+from c7n.utils import (
+    local_session, get_account_id, generate_arn,
+    get_retry, chunks, snapshot_identifier, type_schema)
 
 from concurrent.futures import as_completed
 
+filters = FilterRegistry('dynamodb-table.filters')
 
 @resources.register('dynamodb-table')
 class Table(QueryResourceManager):
@@ -35,7 +42,61 @@ class Table(QueryResourceManager):
         date = 'CreationDateTime'
         dimension = 'TableName'
 
+    filter_registry = filters
+    _generate_arn = _account_id = None
+    retry = staticmethod(get_retry(('Throttled',)))
+    #permissions = ('dynamodb:ListTagsOfResource')
+    
+    @property
+    def account_id(self):
+        if self._account_id is None:
+            session = local_session(self.session_factory)
+            self._account_id = get_account_id(session)
+        return self._account_id
+    
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                'dynamodb',
+                region=self.config.region,
+                account_id=self.account_id,
+                separator=':')
+        return self._generate_arn
+    
+    def augment(self, tables):
+        filter(None, _dynamodb_table_tags(
+            self.get_model(),
+            tables, self.session_factory, self.executor_factory,
+            self.generate_arn, self.retry))
+        return tables
 
+
+def _dynamodb_table_tags(
+        model, tables, session_factory, executor_factory, generator, retry):
+    """ Augment DynamoDB tables with their respective tags
+    """
+
+    def process_tags(table):
+        client = local_session(session_factory).client('dynamodb')
+        arn = generator(table)
+        tag_list = None
+        try:
+            tag_list = retry(
+                client.list_tags_of_resource,
+                ResourceArn=arn)['Tags']
+        except ClientError as e:
+            log.warning("Exception getting DynamoDB tags  \n %s", e)
+            return None
+
+        table['Tags'] = tag_list
+        return table
+
+    with executor_factory(max_workers=1) as w:
+        return list(w.map(process_tags, tables))
+    
+    
 class StatusFilter(object):
     """Filter tables by status"""
 
