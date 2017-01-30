@@ -37,6 +37,3 @@ class ShieldAttack(QueryResourceManager):
         id = 'AttackId'
         date = 'StartTime'
         dimension = None
-        
-        
-        

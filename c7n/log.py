@@ -34,7 +34,7 @@ import time
 
 try:
     import Queue
-except ImportError:
+except ImportError:  # pragma: no cover
     import queue as Queue
 
 from c7n.utils import get_retry

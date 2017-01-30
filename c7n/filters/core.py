@@ -138,12 +138,15 @@ class Filter(object):
     log = logging.getLogger('custodian.filters')
 
     metrics = ()
-
+    permissions = ()
     schema = {'type': 'object'}
 
     def __init__(self, data, manager=None):
         self.data = data
         self.manager = manager
+
+    def get_permissions(self):
+        return self.permissions
 
     def validate(self):
         """validate filter config, return validation error or self"""

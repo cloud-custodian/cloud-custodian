@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from common import BaseTest
+from c7n.filters import FilterValidationError
+from nose.tools import raises
 
 
 class NetworkInterfaceTest(BaseTest):
@@ -666,3 +668,16 @@ class SecurityGroupTest(BaseTest):
               u'PrefixListIds': [],
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
+
+    @raises(FilterValidationError)
+    def test_egress_validation_error(self):
+        self.load_policy({
+            'name': 'sg-find2',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'egress',
+                 'InvalidKey': True},
+                {'GroupName': 'sg2'}]
+            }, session_factory=None)
+        self.fail("Validation error should have been thrown")
+

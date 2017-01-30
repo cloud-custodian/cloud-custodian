@@ -12,12 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from common import BaseTest
 
 
 class NotifyTest(BaseTest):
 
+    def test_sns_notify(self):
+        session_factory = self.replay_flight_data(
+            'test_sns_notify_action')
+        client = session_factory().client('sns')
+        topic = client.create_topic(Name='c7n-notify-test')['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=topic)
+
+        policy = self.load_policy({
+            'name': 'notify-sns',
+            'resource': 'sns',
+            'filters': [
+                {'TopicArn': topic}],
+            'actions': [{
+                'type': 'notify',
+                'to': ['noone@example.com'],
+                'transport': {
+                    'type': 'sns',
+                    'topic': topic}}]
+            }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        
     def test_notify(self):
         session_factory = self.replay_flight_data(
             "test_notify_action", zdata=True)

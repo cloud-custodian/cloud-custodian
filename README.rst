@@ -110,7 +110,7 @@ First a policy file needs to be created in YAML format, as an example::
 
   - name: tag-compliance
     resource: ec2
-    description:
+    description: |
       Schedule a resource that does not meet tag compliance policies
       to be stopped in four days.
     filters:

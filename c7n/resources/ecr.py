@@ -47,6 +47,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
                       expr: "accounts.*.accountNumber"
                       url: *accounts_url
     """
+    permissions = ('ecr:GetRepositoryPolicy',)
 
     def process(self, resources, event=None):
 

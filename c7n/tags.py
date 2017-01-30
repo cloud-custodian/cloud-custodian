@@ -91,6 +91,8 @@ class TagTrim(Action):
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
+    permissions = ('ec2:DeleteTags',)
+
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
@@ -265,6 +267,8 @@ class Tag(Action):
         tag={'type': 'string'},
         )
 
+    permissions = ('ec2:CreateTags',)
+
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
             raise FilterValidationError(
@@ -332,6 +336,8 @@ class RemoveTag(Action):
         'untag', aliases=('unmark', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
 
+    permissions = ('ec2:DeleteTags',)
+
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
@@ -373,6 +379,8 @@ class RenameTag(Action):
         'rename-tag',
         old_key={'type': 'string'},
         new_key={'type': 'string'})
+
+    permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
     def delete_tag(self, client, ids, key, value):
         client.delete_tags(
@@ -479,6 +487,8 @@ class TagDelayedAction(Action):
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
 
+    permissions = ('ec2:CreateTags',)
+
     batch_size = 200
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
@@ -579,6 +589,8 @@ class NormalizeTag(Action):
                 'items': {
                     'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
         value={'type': 'string'})
+
+    permissions = ('ec2:CreateTags',)
 
     def create_tag(self, client, ids, key, value):
 

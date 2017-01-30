@@ -27,7 +27,7 @@ class ComputeEnvironment(QueryResourceManager):
         id = name = "computeEnvironmentName"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
-        
+
 
 @resources.register('batch-definition')
 class JobDefinition(QueryResourceManager):

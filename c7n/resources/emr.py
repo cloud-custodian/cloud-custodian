@@ -36,6 +36,7 @@ class EMRCluster(QueryResourceManager):
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
+        date = "Status.Timeline.CreationDateTime"
         filter_name = None
 
     action_registry = actions
@@ -43,6 +44,11 @@ class EMRCluster(QueryResourceManager):
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(self.data.get('query', []))
+
+    @classmethod
+    def get_permissions(cls):
+        return ("elasticmapreduce:ListClusters",
+                "elasticmapreduce:DescribeCluster")
 
     def get_resources(self, ids):
         # no filtering by id set supported at the api
@@ -105,6 +111,7 @@ class Terminate(BaseAction):
     """
 
     schema = type_schema('terminate', force={'type': 'boolean'})
+    permissions = ("elasticmapreduce:TerminateJobFlows",)
     delay = 5
 
     def process(self, emrs):

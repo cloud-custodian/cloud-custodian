@@ -62,6 +62,7 @@ class ElastiCacheCluster(QueryResourceManager):
     action_registry = actions
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
+    permissions = ('elasticache:ListTagsForResource',)
 
     @property
     def account_id(self):
@@ -152,7 +153,7 @@ class TagDelayedAction(tags.TagDelayedAction):
                     op: delete
                     days: 7
     """
-
+    permission = ('elasticache:AddTagsToResource',)
     batch_size = 1
 
     def process_resource_set(self, clusters, tags):
@@ -185,6 +186,7 @@ class RemoveTag(tags.RemoveTag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('elasticache:RemoveTagsFromResource',)
 
     def process_resource_set(self, clusters, tag_keys):
         client = local_session(
@@ -222,6 +224,8 @@ class DeleteElastiCacheCluster(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'}})
+    permissions = ('elasticache:DeleteCacheCluster',
+                   'elasticache:DeleteReplicationGroup')
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
@@ -285,6 +289,7 @@ class SnapshotElastiCacheCluster(BaseAction):
     """
 
     schema = type_schema('snapshot')
+    permissions = ('elasticache:CreateSnapshot',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -321,6 +326,7 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     affected equally
 
     """
+    permissions = ('elasticache:ModifyReplicationGroup',)
 
     def process(self, clusters):
         replication_group_map = {}
@@ -336,8 +342,7 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         for idx, r in enumerate(replication_group_map.keys()):
             client.modify_replication_group(
                 ReplicationGroupId=r,
-                SecurityGroupIds=replication_group_map[r]
-            )
+                SecurityGroupIds=replication_group_map[r])
 
 
 @resources.register('cache-subnet-group')
@@ -368,6 +373,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
         date = 'StartTime'
         dimension = None
 
+    permissions = ('elasticache:ListTagsForResource',)
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -462,6 +468,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('elasticache:DeleteSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d ElastiCache snapshots", len(snapshots))
@@ -481,7 +488,6 @@ class DeleteElastiCacheSnapshot(BaseAction):
         c = local_session(self.manager.session_factory).client('elasticache')
         for s in snapshots_set:
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
-
 
 # added mark-for-op
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
@@ -509,6 +515,7 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
     """
 
     batch_size = 1
+    permissions = ('elasticache:AddTagsToResource',)
 
     def process_resource_set(self, snapshots, tags):
         client = local_session(
@@ -517,6 +524,62 @@ class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
             arn = self.manager.generate_arn(snapshot['SnapshotName'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
+
+@ElastiCacheSnapshot.action_registry.register('copy-cluster-tags')
+class CopyClusterTags(BaseAction):
+    """
+    Copy specified tags from Elasticache cluster to Snapshot
+    :example:
+
+        .. code-block: yaml
+
+            - name: elasticache-test
+              resource: cache-snapshot
+              filters:
+                 - type: value
+                   key: SnapshotName
+                   op: in
+                   value:
+                    - test-tags-backup
+              actions:
+                - type: copy-cluster-tags
+                  tags:
+                    - tag1
+                    - tag2
+    """
+
+    schema = type_schema(
+        'copy-cluster-tags',
+        tags={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+        required = ('tags',))
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('cache-cluster').get_permissions()
+        perms.append('elasticache:AddTagsToResource')
+        return perms
+
+    def process(self, snapshots):
+        log.info("Modifying %d ElastiCache snapshots", len(snapshots))
+        client = local_session(self.manager.session_factory).client('elasticache')
+        clusters = {
+            cluster['CacheClusterId']: cluster for cluster in
+            ElastiCacheCluster(self.manager.ctx, {}).resources()
+        }
+        for s in snapshots:
+            if s['CacheClusterId'] in clusters:
+                continue
+
+            arn = self.manager.generate_arn(s['SnapshotName'])
+            tags_cluster = clusters[s['CacheClusterId']]['Tags']
+            only_tags = self.data.get('tags', [])  # Specify tags to copy
+            extant_tags = {t['Key']: t['Value'] for t in s.get('Tags', ())}
+            copy_tags = []
+
+            for t in tags_cluster:
+                if t['Key'] in only_tags and t['Value'] != extant_tags.get(t['Key'], ""):
+                    copy_tags.append(t)
+            self.retry(
+                client.add_tags_to_resource, ResourceName=arn, Tags=copy_tags)
 
 # added unmark
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
@@ -540,6 +603,7 @@ class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('elasticache:RemoveTagsFromResource',)
 
     def process_resource_set(self, snapshots, tag_keys):
         client = local_session(

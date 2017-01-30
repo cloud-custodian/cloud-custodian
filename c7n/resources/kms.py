@@ -36,15 +36,13 @@ class KeyBase(object):
 @resources.register('kms')
 class KeyAlias(KeyBase, QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'kms'
         type = 'key-alias'
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
         dimension = None
-
-    resource_type = Meta
 
     def augment(self, resources):
         return [r for r in resources if 'TargetKeyId' in r]
@@ -53,15 +51,13 @@ class KeyAlias(KeyBase, QueryResourceManager):
 @resources.register('kms-key')
 class Key(KeyBase, QueryResourceManager):
 
-    class Meta(object):
+    class resource_type(object):
         service = 'kms'
         type = "key"
         enum_spec = ('list_keys', 'Keys', None)
         name = "KeyId"
         id = "KeyArn"
         dimension = None
-
-    resource_type = Meta
 
 
 @Key.filter_registry.register('key-rotation-status')
@@ -82,6 +78,7 @@ class KeyRotationStatus(ValueFilter):
     """
 
     schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
+    permissions = ('kms:GetKeyRotationStatus',)
 
     def process(self, resources, event=None):
 
@@ -115,6 +112,7 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
+    permissions = ('kms:GetKeyPolicy',)
 
     def process(self, resources, event=None):
         def _augment(r):
@@ -154,6 +152,7 @@ class GrantCount(Filter):
 
     schema = type_schema(
         'grant-count', min={'type': 'integer', 'minimum': 0})
+    permissions = ('kms:ListGrants',)
 
     def process(self, keys, event=None):
         with self.executor_factory(max_workers=3) as w:
@@ -181,6 +180,7 @@ class GrantCount(Filter):
 class ResourceKmsKeyAlias(ValueFilter):
 
     schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    permissions = KeyAlias.get_permissions()
 
     def get_matching_aliases(self, resources, event=None):
 
