@@ -172,7 +172,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     permissions = AMI.get_permissions()
 
     def validate(self):
-        if self.data.get('skip-ami-snapshots', not True or False):
+        if not isinstance(self.data.get('value', True), bool):
             raise FilterValidationError(
                 "invalid config: expected boolean value")
         return self

@@ -189,7 +189,7 @@ class FSOutput(LogOutput):
                     os.remove(fp)
 
     def use_s3(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
 
 class DirectoryOutput(FSOutput):

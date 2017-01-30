@@ -117,12 +117,15 @@ def validate(options):
         sys.exit(1)
 
 
-@policy_command
-def access(options, policies):
-    permissions = set()
-    for p in policies:
-        permissions.update(p.get_permissions())
-    pprint.pprint(sorted(list(permissions)))
+# This subcommand is disabled in cli.py.
+# Commmeting it out for coverage purposes.
+#
+#@policy_command
+#def access(options, policies):
+#    permissions = set()
+#    for p in policies:
+#        permissions.update(p.get_permissions())
+#    pprint.pprint(sorted(list(permissions)))
 
 
 @policy_command

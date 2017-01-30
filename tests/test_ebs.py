@@ -16,10 +16,11 @@ import logging
 from botocore.exceptions import ClientError
 
 from common import BaseTest
+from c7n.filters import FilterValidationError
 from c7n.resources.ebs import (
     CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot, Delete)
 from c7n.executor import MainThreadExecutor
-
+from nose.tools import raises
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -73,6 +74,21 @@ class SnapshotCopyTest(BaseTest):
                           'c7n:CopiedSnapshot']]}])['Tags']
         tags = {t['Key']: t['Value'] for t in tags}
         self.assertEqual(tags['ASV'], 'RoadKill')
+        
+    @raises(FilterValidationError)
+    def test_snapshot_copy_error(self):
+        # Missing 'target-key'
+        self.load_policy({
+            'name': 'snap-copy',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'tag:ASV': 'RoadKill'}],
+            'actions': [
+                {'type': 'copy',
+                 'target_region': 'us-east-1'}
+            ]
+        }, session_factory=None, validate=False)
+        self.fail("Validation error should have been thrown")
 
 
 class SnapshotAmiSnapshotTest(BaseTest):
@@ -103,6 +119,18 @@ class SnapshotAmiSnapshotTest(BaseTest):
             }, session_factory=factory)
         resources = policy.run()
         self.assertEqual(len(resources), 2)
+
+    @raises(FilterValidationError)
+    def test_snapshot_ami_error(self):
+        # skip-ami-snapshots must be a boolean
+        self.load_policy({
+            'name': 'ami-snap-filter',
+            'resource': 'ebs-snapshot',
+            'filters': [
+                {'type': 'skip-ami-snapshots',
+                 'value': None}],
+        }, session_factory=None, validate=False)
+        self.fail("Validation error should have been thrown")
 
 
 class SnapshotTrimTest(BaseTest):
@@ -216,6 +244,21 @@ class EncryptExtantVolumesTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['Encrypted'], False)
+
+    @raises(ValueError)
+    def test_encrypt_volumes_error(self):
+        # Missing 'key'
+        self.load_policy({
+            'name': 'ebs-remediate-attached',
+            'resource': 'ebs',
+            'filters': [
+                {'Encrypted': False},
+                {'VolumeId': 'vol-fdd1f844'}],
+            'actions': [
+                {'type': 'encrypt-instance-volumes',
+                 'delay': 0.1}]
+        }, session_factory=None, validate=False)
+        self.fail("Validation error should have been thrown")
 
 
 class TestKmsAlias(BaseTest):

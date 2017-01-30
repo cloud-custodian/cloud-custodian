@@ -278,14 +278,17 @@ def process_resource(type_name, resource_type, resource_defs):
         elif filter_name == 'event':
             r['filters'][filter_name] = {
                 '$ref': '#/definitions/filters/event'}
-        elif filter_name == 'or':
-            r['filters'][filter_name] = {
-                'type': 'array',
-                'items': {'anyOf': nested_filter_refs}}
-        elif filter_name == 'and':
-            r['filters'][filter_name] = {
-                'type': 'array',
-                'items': {'anyOf': nested_filter_refs}}
+        # Commenting out what appears to be dead code.  These two conditions
+        # will always match the first if statement above.  With Kapil's
+        # blessing we I will remove these lines.
+        #elif filter_name == 'or':
+        #    r['filters'][filter_name] = {
+        #        'type': 'array',
+        #        'items': {'anyOf': nested_filter_refs}}
+        #elif filter_name == 'and':
+        #    r['filters'][filter_name] = {
+        #        'type': 'array',
+        #        'items': {'anyOf': nested_filter_refs}}
         else:
             r['filters'][filter_name] = f.schema
         filter_refs.append(
@@ -362,10 +365,4 @@ def summary(vocabulary):
 
 def json_dump(resource=None):
     load_resources()
-    try:
-        print(json.dumps(generate(resource), indent=2))
-    except:
-        import traceback, pdb, sys
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
-
+    print(json.dumps(generate(resource), indent=2))
