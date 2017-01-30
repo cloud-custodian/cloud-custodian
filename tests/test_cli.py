@@ -114,6 +114,12 @@ class VersionTest(CliTest):
         output = self.get_output(['custodian', 'version'])
         self.assertEqual(output.strip(), version.version)
 
+    def test_debug_version(self):
+        output = self.get_output(['custodian', 'version', '--debug'])
+        # Among other things, this should print sys.path
+        self.assertIn(version.version, output)
+        self.assertIn(sys.path[0], output)
+
 
 class ValidateTest(CliTest):
 

@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
 import argparse
 import importlib
 import logging
+import os
 import pdb
 import sys
 import traceback
@@ -195,6 +197,9 @@ def setup_parser():
     version.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose Logging")
+    version.add_argument(
+        "--debug", action="store_true",
+        help="Print info for bug reports")
 
     validate_desc = (
         "Validate config files against the custodian jsonschema")
@@ -243,7 +248,27 @@ def setup_parser():
 
 def cmd_version(options):
     from c7n.version import version
-    print(version)
+
+    if not options.debug:
+        print(version)
+        return
+
+    indent = 13
+    import pprint
+    pp = pprint.PrettyPrinter(indent=indent)
+
+    print("\nPlease copy/paste the following info along with any bug reports:\n")
+    print("Custodian:  ", version)
+    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
+    print("Python:     ", pyversion)
+    # os.uname is only available on recent versions of Unix
+    try:
+        print("Platform:   ", os.uname())
+    except:  # pragma: no cover
+        print("Platform:  ", sys.platform)
+    print("Using venv: ", hasattr(sys, 'real_prefix'))
+    print("PYTHONPATH: ")
+    pp.pprint(sys.path)
 
 
 def main():
