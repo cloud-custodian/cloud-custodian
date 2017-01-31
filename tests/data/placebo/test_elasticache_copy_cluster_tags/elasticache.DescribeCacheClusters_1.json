@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CacheClusters": [
+            {
+                "Engine": "redis", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "SnapshotRetentionLimit": 0, 
+                "CacheClusterId": "test-tags", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "SnapshotWindow": "11:00-12:00", 
+                "CacheClusterCreateTime": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 23, 
+                    "microsecond": 3000, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 10
+                }, 
+                "AutoMinorVersionUpgrade": true, 
+                "CacheClusterStatus": "available", 
+                "PreferredAvailabilityZone": "us-west-2a", 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-4ad9862d"
+                    }, 
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-bf8ab6d8"
+                    }, 
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-4d18ad2b"
+                    }, 
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-58f2cf3f"
+                    }
+                ], 
+                "CacheSubnetGroupName": "test-subnet", 
+                "EngineVersion": "3.2.4", 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "mon:09:00-mon:10:00", 
+                "CacheNodeType": "cache.r3.large"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bd2dc27e-cd4c-11e6-92de-714cb0653961", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bd2dc27e-cd4c-11e6-92de-714cb0653961", 
+                "date": "Wed, 28 Dec 2016 22:26:55 GMT", 
+                "content-length": "2156", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

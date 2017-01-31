@@ -1,0 +1,81 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "044d598e-db85-11e6-bcee-b782993fedd5",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "044d598e-db85-11e6-bcee-b782993fedd5",
+                "vary": "Accept-Encoding",
+                "content-length": "2193",
+                "content-type": "text/xml",
+                "date": "Mon, 16 Jan 2017 00:45:03 GMT"
+            }
+        },
+        "Snapshots": [
+            {
+                "MasterUsername": "test123",
+                "OwnerAccount": "111111",
+                "CurrentBackupRateInMegaBytesPerSecond": 6.25,
+                "ActualIncrementalBackupSizeInMegaBytes": 4.0,
+                "NumberOfNodes": 1,
+                "Status": "available",
+                "VpcId": "vpc-45678",
+                "ClusterVersion": "1.0",
+                "Tags": [
+                    {
+                        "Value": "T11",
+                        "Key": "T1"
+                    },
+                    {
+                        "Value": "T22",
+                        "Key": "T2"
+                    },
+                    {
+                        "Value": "T33",
+                        "Key": "T3"
+                    }
+                ],
+                "EstimatedSecondsToCompletion": 0,
+                "EnhancedVpcRouting": false,
+                "TotalBackupSizeInMegaBytes": 12.0,
+                "DBName": "test",
+                "BackupProgressInMegaBytes": 4.0,
+                "ClusterCreateTime": {
+                    "hour": 0,
+                    "__class__": "datetime",
+                    "month": 1,
+                    "second": 47,
+                    "microsecond": 233000,
+                    "year": 2017,
+                    "day": 16,
+                    "minute": 3
+                },
+                "RestorableNodeTypes": [
+                    "dc1.large"
+                ],
+                "EncryptedWithHSM": false,
+                "ClusterIdentifier": "test-cluster",
+                "SnapshotCreateTime": {
+                    "hour": 0,
+                    "__class__": "datetime",
+                    "month": 1,
+                    "second": 9,
+                    "microsecond": 300000,
+                    "year": 2017,
+                    "day": 16,
+                    "minute": 37
+                },
+                "AvailabilityZone": "us-east-1d",
+                "NodeType": "dc1.large",
+                "Encrypted": true,
+                "ElapsedTimeInSeconds": 0,
+                "KmsKeyId": "arn:aws:kms:us-east-1:111111:key/K1", 
+                "SnapshotType": "manual",
+                "Port": 5439,
+                "SnapshotIdentifier": "backup-2017-01-15"
+            }
+        ]
+    }
+}
