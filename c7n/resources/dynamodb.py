@@ -15,6 +15,8 @@ import functools
 import itertools
 
 from botocore.exceptions import ClientError
+from c7n.actions import (
+    ActionRegistry, BaseAction)
 from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -23,6 +25,7 @@ from c7n.actions import BaseAction
 from c7n.utils import (
     local_session, get_account_id,get_retry, 
     chunks, snapshot_identifier, type_schema)
+from c7n.tags import TagDelayedAction, RemoveTag
 
 from concurrent.futures import as_completed
 
@@ -92,6 +95,69 @@ class StatusFilter(object):
         return result
 
 
+@Table.action_registry.register('mark-for-op')
+class TagDelayedAction(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: dynamo-mark-tag-compliance
+                resource: dynamodb-table
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Cluster does not have valid OwnerName tag: {op}@{action_date}"
+                    op: delete
+                    days: 7
+    """
+    permission = ('dynamodb:TagResource',)
+    batch_size = 1
+
+    def process_resource_set(self, tables, tags):
+        client = local_session(self.manager.session_factory).client(
+            'dynamodb')
+        for t in tables:
+            arn = t['TableArn']
+            client.tag_resource(ResourceArn=arn, Tags=tags)    
+
+
+@Table.action_registry.register('remove-tag')
+class UntagTable(RemoveTag):
+    """Action to remove tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: dynamodb-remove-tag
+                resource: dynamodb-table
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('dynamodb:UntagResource',)
+
+    def process_resource_set(self, tables, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('dynamodb')
+        for t in tables:
+            arn = t['TableArn']
+            client.untag_resource(
+                ResourceArn=arn, TagKeys=tag_keys)
+            
+            
 @Table.action_registry.register('delete')
 class DeleteTable(BaseAction, StatusFilter):
     """Action to delete dynamodb tables
