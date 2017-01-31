@@ -68,7 +68,6 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         arn = resources[0]['TableArn']
-        print arn
         tags = client.list_tags_of_resource(ResourceArn=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['Tags']}
         self.assertTrue('test_key' in tag_map)
