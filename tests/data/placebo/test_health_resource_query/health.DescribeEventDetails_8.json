@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "failedSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ac73a535-e801-11e6-9814-6fbf17e72875", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ac73a535-e801-11e6-9814-6fbf17e72875", 
+                "date": "Tue, 31 Jan 2017 22:07:36 GMT", 
+                "content-length": "784", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "successfulSet": [
+            {
+                "event": {
+                    "lastUpdatedTime": {
+                        "hour": 17, 
+                        "__class__": "datetime", 
+                        "month": 11, 
+                        "second": 34, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 21, 
+                        "minute": 9
+                    }, 
+                    "service": "EC2", 
+                    "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE", 
+                    "startTime": {
+                        "hour": 16, 
+                        "__class__": "datetime", 
+                        "month": 11, 
+                        "second": 2, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 21, 
+                        "minute": 45
+                    }, 
+                    "eventTypeCategory": "issue", 
+                    "endTime": {
+                        "hour": 17, 
+                        "__class__": "datetime", 
+                        "month": 11, 
+                        "second": 34, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 21, 
+                        "minute": 9
+                    }, 
+                    "region": "us-west-2", 
+                    "arn": "arn:aws:health:us-west-2::event/AWS_EC2_OPERATIONAL_ISSUE_1479766173", 
+                    "statusCode": "closed"
+                }, 
+                "eventDescription": {
+                    "latestDescription": "[RESOLVED] Increased Launch Error Rates\n2016-11-21T21:45:02Z We are investigating increased error rates for new instance launches in the US-WEST-2 Region.\n2016-11-21T22:09:34Z Between 1:16 PM and 2:04 PM PST we experienced increased error rates for some APIs and new instance launches in the US-WEST-2 Region. The issue has been resolved and the service is operating normally.\n"
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "entities": [
+            {
+                "entityValue": "UNKNOWN", 
+                "eventArn": "arn:aws:health:us-west-2::event/AWS_EC2_OPERATIONAL_ISSUE_1479766173", 
+                "lastUpdatedTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 9
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ac5e9693-e801-11e6-9814-6fbf17e72875", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ac5e9693-e801-11e6-9814-6fbf17e72875", 
+                "date": "Tue, 31 Jan 2017 22:07:36 GMT", 
+                "content-length": "180", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

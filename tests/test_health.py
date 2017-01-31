@@ -32,4 +32,7 @@ class HealthResource(BaseTest):
             'resource': 'health-events',
             'query': [{'services': 'EC2'}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 5)
+        self.assertEqual(len(resources), 8)
+        self.assertTrue('eventDescription' in resources[0])
+        self.assertTrue('latestDescription' in resources[0]['eventDescription'])
+        self.assertEqual(len(resources[0]['affectedEntities']), 1)

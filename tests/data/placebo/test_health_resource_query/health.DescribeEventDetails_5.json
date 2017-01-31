@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "failedSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ab90bf2f-e801-11e6-9814-6fbf17e72875", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ab90bf2f-e801-11e6-9814-6fbf17e72875", 
+                "date": "Tue, 31 Jan 2017 22:07:35 GMT", 
+                "content-length": "1400", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "successfulSet": [
+            {
+                "event": {
+                    "lastUpdatedTime": {
+                        "hour": 22, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 13, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 14, 
+                        "minute": 17
+                    }, 
+                    "service": "EC2", 
+                    "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE", 
+                    "startTime": {
+                        "hour": 20, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 8, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 14, 
+                        "minute": 50
+                    }, 
+                    "eventTypeCategory": "issue", 
+                    "endTime": {
+                        "hour": 22, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 13, 
+                        "microsecond": 0, 
+                        "year": 2016, 
+                        "day": 14, 
+                        "minute": 17
+                    }, 
+                    "region": "eu-west-1", 
+                    "arn": "arn:aws:health:eu-west-1::event/AWS_EC2_OPERATIONAL_ISSUE_1481766608", 
+                    "statusCode": "closed"
+                }, 
+                "eventDescription": {
+                    "latestDescription": "[RESOLVED] DNS Resolution Issues\n2016-12-15T01:50Z \r\n\r\nWe are investigating DNS resolution issues from some instances in the EU-WEST-1 Region.\n2016-12-15T02:29Z We have identified the root cause of the DNS resolution issues in the EU-WEST-1 Region and continue working towards resolution.\n2016-12-15T03:00Z We continue working through DNS resolution issues in the EU-WEST-1 Region. DNS resolution for public endpoints from the Internet are operating normally.\n2016-12-15T03:07Z We continue working through DNS resolution issues which is now affecting a single Availability Zone in the EU-WEST-1 Region. DNS resolution for public endpoints from the Internet continue operating normally. \n2016-12-15T03:17:13Z Between 5:14 PM and 7:09 PM PST we experienced elevated DNS resolution issues for some instances in the EU-WEST-1 Region. DNS resolution for public endpoints from the Internet was not impacted during this time. The issue has been resolved and the service is operating normally.\n"
+                }
+            }
+        ]
+    }
+}
