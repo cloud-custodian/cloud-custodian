@@ -8,7 +8,7 @@ response to infrastructure and application behavior. A number of
 different Amazon services can be used as event sources.
 
 CloudWatch Events
-##################
+#################
 
 CloudWatch Events (CWE) is a general event bus for AWS infrastructure. Currently,
 it covers several major sources of information: CloudTrail API calls
@@ -24,7 +24,7 @@ compliance - this means the non-compliant resources never
 became available.
 
 Cloud Custodian Integration
-###########################
+===========================
 
 Custodian provides for policy level execution against any CWE event
 stream. Each Custodian policy can be deployed as an independent Lambda
@@ -39,7 +39,7 @@ policy filters, and apply the policy actions to matching resources.
 :ref:`Mu<mu>` is the letter after Lambda, Lambda is a keyword in python.
 
 Configuration
-#############
+=============
 
 Examples
 
@@ -111,12 +111,15 @@ Examples
          type: periodic
          schedule: "rate(1 day)"
 
-AWS Config Rule Support
-#######################
+Config Rules
+############
 
-Cloud Custodian is the easiest way to write and provision `custom AWS Config
-rules
-<http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config_develop-rules.html>`_.
+`AWS Config rules
+<http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config_develop-rules.html>`_
+allow you to invoke logic in response to configuration changes in your AWS
+environment, and Cloud Custodian is the easiest way to write and provision
+Config rules.
+
 In this section we'll look at how we would deploy the :ref:`quickstart
 <quickstart>` example using Config. Before you proceed, make sure you've
 removed the ``Custodian`` tag from any EC2 instance left over from the
