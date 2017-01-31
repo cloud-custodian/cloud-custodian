@@ -23,10 +23,10 @@ from c7n.query import QueryResourceManager
 from c7n.manager import resources
 
 from c7n import utils
-from c7n.utils import type_schema
+from c7n.utils import type_schema, local_session
 
-filters = FilterRegistry('health.actions')
-actions = ActionRegistry('health.filters')
+filters = FilterRegistry('health.filters')
+actions = ActionRegistry('health.actions')
 
 
 @resources.register('health-events')
@@ -78,6 +78,19 @@ class HealthEvents(QueryResourceManager):
             query['filter'] = q
         return super(HealthEvents, self).resources(query=query)
 
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('health')
+        for r in resources:
+            affectedEntities = client.describe_affected_entities(
+                filter={'eventArns':[r['arn']]})['entities']
+            del affectedEntities[0]['eventArn']
+            if affectedEntities[0].get('awsAccountId'):
+                del affectedEntities[0]['awsAccountId']
+            r['affectedEntities'] = affectedEntities
+            r['eventDescription'] = client.describe_event_details(
+                eventArns=[r['arn']])['successfulSet'][0]['eventDescription']
+
+        return resources
 
 HEALTH_VALID_FILTERS = {
     'availability-zone': str,
