@@ -114,6 +114,12 @@ class VersionTest(CliTest):
         output = self.get_output(['custodian', 'version'])
         self.assertEqual(output.strip(), version.version)
 
+    def test_debug_version(self):
+        output = self.get_output(['custodian', 'version', '--debug'])
+        # Among other things, this should print sys.path
+        self.assertIn(version.version, output)
+        self.assertIn(sys.path[0], output)
+
 
 class ValidateTest(CliTest):
 
@@ -348,6 +354,29 @@ class LogsTest(CliTest):
         )
 
 
+class TabCompletionTest(CliTest):
+    """ Tests for argcomplete tab completion. """
+
+    def test_schema_completer(self):
+        self.assertIn('rds', cli.schema_completer('rd'))
+        self.assertIn('s3.', cli.schema_completer('s3'))
+        self.assertListEqual([], cli.schema_completer('invalidResource.'))
+        self.assertIn('rds.actions', cli.schema_completer('rds.'))
+        self.assertIn('s3.filters.', cli.schema_completer('s3.filters'))
+        self.assertIn('s3.filters.event', cli.schema_completer('s3.filters.eve'))
+        self.assertListEqual([], cli.schema_completer('rds.actions.foo.bar'))
+
+    def test_schema_completer_wrapper(self):
+        class MockArgs(object):
+            summary = False
+
+        args = MockArgs()
+        self.assertIn('rds', cli._schema_tab_completer('rd', args))
+        
+        args.summary = True
+        self.assertListEqual([], cli._schema_tab_completer('rd', args))
+
+        
 class RunTest(CliTest):
     
     def test_ec2(self):

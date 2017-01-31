@@ -51,6 +51,14 @@ class S3OutputTest(unittest.TestCase):
 
         return output
 
+    def test_s3_output(self):
+        output = self.get_s3_output()
+        self.assertEquals(output.use_s3(), True)
+
+        # Make sure __repr__ is defined
+        name = str(output)
+        self.assertIn('bucket:cloud-custodian', name)
+
     def test_join_leave_log(self):
         output = self.get_s3_output()
         output.join_log()

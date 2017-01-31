@@ -34,6 +34,31 @@ class TestEMR(BaseTest):
         resources = mgr.get_resources(["j-1EJMJNTXC63JW"])
         self.assertEqual(resources[0]['Id'], "j-1EJMJNTXC63JW")
 
+    def test_consolidate_query_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_emr_query_ids')
+
+        ctx = Bag(
+            session_factory=session_factory,
+            log_dir='',
+            options=Config.empty())
+
+        query = {
+            'query': [
+                {'tag:foo': 'val1'},
+                {'tag:foo': 'val2'},
+                {'tag:bar': 'val3'}
+            ]
+        }
+        mgr = emr.EMRCluster(ctx, query)
+        self.assertEqual(
+            mgr.consolidate_query_filter(),
+            [
+                {'Values': ['val1', 'val2'], 'Name': 'tag:foo'},
+                {'Values': ['val3'], 'Name': 'tag:bar'}
+            ]
+        )
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 
@@ -90,6 +115,16 @@ class TestEMRQueryFilter(unittest.TestCase):
             ValueError,
             QueryFilter.parse,
             [{'foo': 'bar'}])
+
+        self.assertRaises(
+            ValueError,
+            QueryFilter.parse,
+            [{'too': 'many', 'keys': 'error'}])
+
+        self.assertRaises(
+            ValueError,
+            QueryFilter.parse,
+            ['Not a dictionary'])
 
 
 class TestTerminate(BaseTest):

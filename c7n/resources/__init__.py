@@ -46,6 +46,7 @@ def load_resources():
     import c7n.resources.emr
     import c7n.resources.gamelift
     import c7n.resources.glacier
+    import c7n.resources.health
     import c7n.resources.hsm
     import c7n.resources.iam
     import c7n.resources.kinesis

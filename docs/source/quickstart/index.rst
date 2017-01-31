@@ -9,6 +9,7 @@ See also the readme in the GitHub repository.
 * :ref:`write-policy`
 * :ref:`explore-cc`
 * :ref:`monitor-cc`
+* :ref:`tab-completion`
 
 .. _install-cc:
 
@@ -187,3 +188,31 @@ And you can output logs and resource records to S3::
 
 For details, see :ref:`usage`.
 
+.. _tab-completion:
+
+Tab Completion
+--------------
+
+To enable command-line tab completion for `custodian` on bash do the following one-time steps:
+
+Run:
+
+.. code-block:: bash
+
+    activate-global-python-argcomplete
+
+Now launch a new shell (or refresh your bash environment by sourcing the appropriate
+file).
+
+Troubleshooting
++++++++++++++++
+
+If you get an error about "complete -D" not being supported, you need to update bash.
+See the "Base Version Compatability" note `in the argcomplete docs
+<https://argcomplete.readthedocs.io/en/latest/#global-completion>`_:
+
+If you have other errors, or for tcsh support, see `the argcomplete docs
+<https://argcomplete.readthedocs.io/en/latest/#activating-global-completion>`_.
+
+If you are invoking `custodian` via the `python` executable tab completion will not work.
+You must invoke `custodian` directly.

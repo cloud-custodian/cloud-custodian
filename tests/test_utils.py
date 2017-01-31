@@ -236,6 +236,7 @@ class UtilTest(unittest.TestCase):
             schema = {
                 'additionalProperties': False,
                 'properties': {
+                    'type': 'foo',
                     'default': {'type': 'object'},
                     'key': {'type': 'string'},
                     'op': {'enum': ['regex',
@@ -246,8 +247,20 @@ class UtilTest(unittest.TestCase):
                                         {'type': 'string'},
                                         {'type': 'boolean'},
                                         {'type': 'number'}]},
-                }
+                },
+                'required': ['key'],
             }
 
         ret = utils.reformat_schema(FakeResource)
-        self.assertEqual(ret, FakeResource.schema['properties'])
+        self.assertIsInstance(ret, dict)
+
+        # Test error conditions
+        # Instead of testing for specific keywords, just make sure that strings
+        # are returned instead of a dictionary.
+        FakeResource.schema = {}
+        ret = utils.reformat_schema(FakeResource)
+        self.assertIsInstance(ret, str)
+
+        delattr(FakeResource, 'schema')
+        ret = utils.reformat_schema(FakeResource)
+        self.assertIsInstance(ret, str)

@@ -28,13 +28,13 @@ import ipaddress
 # where we don't require yaml
 try:
     import yaml
-except ImportError:
+except ImportError:  # pragma: no cover
     yaml = None
 else:
     try:
         from yaml import CSafeLoader
         SafeLoader = CSafeLoader
-    except ImportError:
+    except ImportError:  # pragma: no cover
         try:
             from yaml import SafeLoader
         except ImportError:
