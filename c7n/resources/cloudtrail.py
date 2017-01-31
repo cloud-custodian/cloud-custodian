@@ -74,6 +74,21 @@ policy_json_tmpl = u'''{{
 
 @actions.register('enable')
 class EnableTrail(BaseAction):
+    """Enables logging on the trail(s) named in the policy
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: trail-test
+            description: Ensure CloudTrail logging is enabled
+            resource: cloudtrail
+            actions:
+              - type: enable
+                trails:
+                - mytrail
+    """
 
     schema = type_schema(
         'enable',
