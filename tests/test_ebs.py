@@ -276,7 +276,7 @@ class PiopsMetricsFilterTest(BaseTest):
                 'value': 50,
                 'statistics': 'Maximum',
                 'days': 1,
-                'percent_attr': 'Iops'}]
+                'percent-attr': 'Iops'}]
             }, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources),1)
