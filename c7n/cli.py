@@ -27,6 +27,11 @@ import traceback
 from datetime import datetime
 from dateutil.parser import parse as date_parse
 
+try:
+    from setproctitle import setproctitle
+except ImportError:
+    setproctitle = lambda t: None
+
 from c7n.commands import schema_completer
 
 DEFAULT_REGION = 'us-east-1'
@@ -217,6 +222,7 @@ def setup_parser():
         "--debug", action="store_true",
         help="Print info for bug reports")
 
+
     validate_desc = (
         "Validate config files against the custodian jsonschema")
     validate = subs.add_parser(
@@ -286,7 +292,6 @@ def cmd_version(options):
     print("PYTHONPATH: ")
     pp.pprint(sys.path)
 
-
 def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
@@ -305,6 +310,12 @@ def main():
             command = getattr(
                 importlib.import_module(command.rsplit('.', 1)[0]),
                 command.rsplit('.', 1)[-1])
+
+        # Set the process name to something cleaner
+        process_name = [os.path.basename(sys.argv[0])]
+        process_name.extend(sys.argv[1:])
+        setproctitle(' '.join(process_name))
+
         command(options)
     except Exception:
         if not options.debug:
