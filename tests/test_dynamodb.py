@@ -103,7 +103,7 @@ class DynamodbTest(BaseTest):
                 {'TableName': 'rolltop'}],
             'actions': [
                 {'type': 'remove-tag',
-                 'tags': 'test_key'}]},
+                 'tags': ['test_key']}]},
             session_factory=session_factory)
         resources = p.run()
         arn = resources[0]['TableArn']
