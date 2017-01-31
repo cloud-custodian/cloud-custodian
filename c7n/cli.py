@@ -310,7 +310,12 @@ def main():
             command = getattr(
                 importlib.import_module(command.rsplit('.', 1)[0]),
                 command.rsplit('.', 1)[-1])
-        setproctitle(' '.join([sys.argv[0], options.subparser]))
+
+        # Set the process name to something cleaner
+        process_name = [os.path.basename(sys.argv[0])]
+        process_name.extend(sys.argv[1:])
+        setproctitle(' '.join(process_name))
+
         command(options)
     except Exception:
         if not options.debug:
