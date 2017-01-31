@@ -36,6 +36,7 @@ class EMRCluster(QueryResourceManager):
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
+        date = "Status.Timeline.CreationDateTime"
         filter_name = None
 
     action_registry = actions

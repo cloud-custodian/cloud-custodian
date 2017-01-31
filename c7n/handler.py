@@ -73,6 +73,7 @@ def dispatch_event(event, context):
         log.info("Processing event\n %s", format_event(event))
 
     policies = load(Config.empty(), 'config.json', format='json')
-    for p in policies:
-        p.push(event, context)
+    if policies:
+        for p in policies:
+            p.push(event, context)
     return True

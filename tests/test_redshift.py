@@ -171,16 +171,37 @@ class TestRedshift(BaseTest):
 
     def test_redshift_snapshot(self):
         factory = self.replay_flight_data('test_redshift_snapshot')
+        client = factory().client('redshift')
+        cluster_tags = []
         p = self.load_policy({
             'name': 'redshift-snapshot',
             'resource': 'redshift',
             'filters': [
-                {'ClusterIdentifier': 'aaa'}],
+                {'type': 'value',
+                 'key': 'ClusterIdentifier',
+                 'value': 'test-cluster',
+                 'op': 'eq'}],
             'actions': [
                 {'type': 'snapshot'}]},
             session_factory=factory)
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        cluster = client.describe_clusters(
+            ClusterIdentifier=resources[0]['ClusterIdentifier'])
+        id_cluster = cluster.get('Clusters')[0].get('ClusterIdentifier')
+        snapshot = client.describe_cluster_snapshots(
+            SnapshotIdentifier='backup-test-cluster-2017-01-12')
+        get_snapshots = snapshot.get('Snapshots')
+        id_snapshot = get_snapshots[0].get('ClusterIdentifier')
+        tag_snapshot = get_snapshots[0].get('Tags')
+        self.assertEqual(id_cluster, id_snapshot)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['ClusterIdentifier'])
+        cluster_tags_array = client.describe_tags(ResourceName=arn)['TaggedResources']
+        for cluster_tag_elem in cluster_tags_array:
+            cluster_tags.append(cluster_tag_elem['Tag'])
+        self.assertEqual(cluster_tags, tag_snapshot)
 
     def test_redshift_vpc_routing(self):
         factory = self.replay_flight_data('test_redshift_vpc_routing')

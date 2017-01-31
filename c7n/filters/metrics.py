@@ -62,7 +62,7 @@ class MetricsFilter(Filter):
         op={'type': 'string', 'enum': OPERATORS.keys()},
         value={'type': 'number'},
         period={'type': 'number'},
-        percent_of_attr={'type': 'string'},
+        percent-attr={'type': 'string'},
         required=('value', 'name'))
 
     permissions = ("cloudwatch:GetMetricStatistics",)
@@ -165,11 +165,11 @@ class MetricsFilter(Filter):
                     Dimensions=dimensions)['Datapoints']
             if len(collected_metrics[key]) == 0:
                 continue
-            if self.data.get('percent_of_attr'):
-                percent = (collected_metrics[key][0][self.statistics] / 
-                    r[self.data.get('percent_of_attr')]) * 100
+            if self.data.get('percent-attr'):
+                percent = (collected_metrics[key][0][self.statistics] /
+                    r[self.data.get('percent-attr')]) * 100
                 if self.op(percent, self.value):
-                    matched.append(r)                                
-            if self.op(collected_metrics[key][0][self.statistics], self.value) and not self.data.get('percent_of_attr'):
+                    matched.append(r)
+            if self.op(collected_metrics[key][0][self.statistics], self.value) and not self.data.get('percent-attr'):
                 matched.append(r)
         return matched
