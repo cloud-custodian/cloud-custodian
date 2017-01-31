@@ -52,18 +52,18 @@ class MetricsFilter(Filter):
 
     schema = type_schema(
         'metrics',
-        namespace={'type': 'string'},
-        name={'type': 'string'},
-        dimensions={'type': 'array', 'items': {'type': 'string'}},
+        **{'namespace': {'type': 'string'},
+        'name': {'type': 'string'},
+        'dimensions': {'type': 'array', 'items': {'type': 'string'}},
         # Type choices
-        statistics={'type': 'string', 'enum': [
+        'statistics': {'type': 'string', 'enum': [
             'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
-        days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()},
-        value={'type': 'number'},
-        period={'type': 'number'},
-        percent-attr={'type': 'string'},
-        required=('value', 'name'))
+        'days': {'type': 'number'},
+        'op': {'type': 'string', 'enum': OPERATORS.keys()},
+        'value':{'type': 'number'},
+        'period': {'type': 'number'},
+        'percent-attr': {'type': 'string'},
+        'required': ('value', 'name')})
 
     permissions = ("cloudwatch:GetMetricStatistics",)
 
