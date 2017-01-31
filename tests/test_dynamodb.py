@@ -28,7 +28,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TableName'], 'rolltop')
         self.assertEqual(resources[0]['TableStatus'], 'ACTIVE')
-
+ 
     def test_invoke_action(self):
         session_factory = self.replay_flight_data(
             'test_dynamodb_invoke_action')
@@ -42,7 +42,7 @@ class DynamodbTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
+ 
     def test_delete_tables(self):
         session_factory = self.replay_flight_data('test_dynamodb_delete_table')
         self.patch(DeleteTable, 'executor_factory', MainThreadExecutor)
@@ -55,3 +55,20 @@ class DynamodbTest(BaseTest):
                 'type': 'delete'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(resources[0]['TableName'], 'c7n.DynamoDB.01')
+        
+    def test_tag_filter(self):
+        session_factory = self.replay_flight_data('test_dynamodb_tag_filter')
+        client = session_factory().client('dynamodb')
+        p = self.load_policy({
+            'name': 'dynamodb-tag-filters',
+            'resource': 'dynamodb-table',
+            'filters': [{
+                'tag:test_key': 'test_value'}]}, 
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['TableArn']
+        print arn
+        tags = client.list_tags_of_resource(ResourceArn=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['Tags']}
+        self.assertTrue('test_key' in tag_map)

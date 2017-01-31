@@ -21,8 +21,8 @@ from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.utils import (
-    local_session, get_account_id, generate_arn,
-    get_retry, chunks, snapshot_identifier, type_schema)
+    local_session, get_account_id,get_retry, 
+    chunks, snapshot_identifier, type_schema)
 
 from concurrent.futures import as_completed
 
@@ -43,14 +43,14 @@ class Table(QueryResourceManager):
         dimension = 'TableName'
 
     filter_registry = filters
-    _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('dynamodb:ListTagsOfResource')
     
     def augment(self, tables):
+        resources = super(Table, self).augment(tables)
         return filter(None, _dynamodb_table_tags(
             self.get_model(),
-            super(Table, self).augment(tables), 
+            resources, 
             self.session_factory, 
             self.executor_factory,
             self.retry))
@@ -74,7 +74,7 @@ def _dynamodb_table_tags(
         table['Tags'] = tag_list or []
         return table
     
-    with executor_factory(max_workers=1) as w:
+    with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, tables))
     
     
