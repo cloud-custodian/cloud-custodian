@@ -249,8 +249,6 @@ def generate_arn(
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
         arn = arn + '%s%s%s' % (resource_type, separator, resource)
-    elif service == 'dynamodb':
-        arn = arn + '%s%s%s' % ('table', '/', resource)
     else:
         arn = arn + resource
     return arn
