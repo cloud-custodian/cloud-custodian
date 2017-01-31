@@ -51,7 +51,7 @@ class HealthEvents(QueryResourceManager):
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [{'eventStatusCodes': 'open'}]))
+            self.data.get('query', [{'eventStatusCodes': ['open','upcoming']},{'eventTypeCategories': 'scheduledChange'}]))
 
     permissions = ('health:DescribeEvents',)
 
@@ -81,7 +81,7 @@ class HealthEvents(QueryResourceManager):
 
 HEALTH_VALID_FILTERS = {
     'availability-zone': str,
-    'eventTypeCategory': {'issue', 'accountNotification', 'scheduledChange'},
+    'eventTypeCategories': {'issue', 'accountNotification', 'scheduledChange'},
     'regions': str,
     'services': str,
     'eventStatusCodes': {'open', 'closed', 'upcoming'},
