@@ -81,14 +81,16 @@ class HealthEvents(QueryResourceManager):
     def augment(self, resources):
         client = local_session(self.session_factory).client('health')
         for r in resources:
-            affectedEntities = client.describe_affected_entities(
-                filter={'eventArns':[r['arn']]})['entities']
-            del affectedEntities[0]['eventArn']
-            if affectedEntities[0].get('awsAccountId'):
-                del affectedEntities[0]['awsAccountId']
-            r['affectedEntities'] = affectedEntities
             r['eventDescription'] = client.describe_event_details(
                 eventArns=[r['arn']])['successfulSet'][0]['eventDescription']
+            if r['eventTypeCategory'].encode('utf8') != 'accountNotification':
+                print r['eventTypeCategory']
+                affectedEntities = client.describe_affected_entities(
+                    filter={'eventArns':[r['arn']]})['entities']
+                del affectedEntities[0]['eventArn']
+                if affectedEntities[0].get('awsAccountId'):
+                    del affectedEntities[0]['awsAccountId']
+                r['affectedEntities'] = affectedEntities
 
         return resources
 
