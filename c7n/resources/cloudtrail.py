@@ -90,6 +90,13 @@ class EnableTrail(BaseAction):
                 - mytrail
     """
 
+    permissions = (
+        'cloudtrail:CreateTrail',
+        'cloudtrail:GetTrailStatus',
+        'cloudtrail:StartLogging',
+        's3:CreateBucket',
+        's3:PutBucketPolicy',
+    )
     schema = type_schema(
         'enable',
         trails={'type': 'array', 'items': {'type': 'string'}},
