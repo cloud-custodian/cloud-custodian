@@ -5,11 +5,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ac3bf361-e801-11e6-9814-6fbf17e72875", 
+            "RequestId": "87b25b11-e8bb-11e6-a27b-f12a808f398f", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "ac3bf361-e801-11e6-9814-6fbf17e72875", 
-                "date": "Tue, 31 Jan 2017 22:07:36 GMT", 
-                "content-length": "630", 
+                "x-amzn-requestid": "87b25b11-e8bb-11e6-a27b-f12a808f398f", 
+                "date": "Wed, 01 Feb 2017 20:18:01 GMT", 
+                "content-length": "719", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
@@ -17,44 +17,44 @@
             {
                 "event": {
                     "lastUpdatedTime": {
-                        "hour": 6, 
+                        "hour": 9, 
                         "__class__": "datetime", 
                         "month": 12, 
-                        "second": 42, 
+                        "second": 8, 
                         "microsecond": 0, 
                         "year": 2016, 
                         "day": 6, 
-                        "minute": 52
+                        "minute": 6
                     }, 
-                    "service": "EC2", 
-                    "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE", 
+                    "service": "IAM", 
+                    "eventTypeCode": "AWS_IAM_OPERATIONAL_ISSUE", 
                     "startTime": {
-                        "hour": 6, 
+                        "hour": 9, 
                         "__class__": "datetime", 
                         "month": 12, 
-                        "second": 41, 
+                        "second": 6, 
                         "microsecond": 0, 
                         "year": 2016, 
                         "day": 6, 
-                        "minute": 52
+                        "minute": 6
                     }, 
                     "eventTypeCategory": "issue", 
                     "endTime": {
-                        "hour": 6, 
+                        "hour": 9, 
                         "__class__": "datetime", 
                         "month": 12, 
-                        "second": 0, 
+                        "second": 6, 
                         "microsecond": 0, 
                         "year": 2016, 
                         "day": 6, 
-                        "minute": 53
+                        "minute": 6
                     }, 
                     "region": "us-east-1", 
-                    "arn": "arn:aws:health:us-east-1::event/AWS_EC2_OPERATIONAL_ISSUE_1481025161", 
+                    "arn": "arn:aws:health:us-east-1::event/AWS_IAM_OPERATIONAL_ISSUE_1481033166", 
                     "statusCode": "closed"
                 }, 
                 "eventDescription": {
-                    "latestDescription": "[RESOLVED] Increased API Error Rates\n2016-12-06T11:52:42Z Between 03:01 AM and 03:32 AM PST we experienced increased API error rates in the US-EAST-1 Region. The issue has been resolved and the service is operating normally.\n"
+                    "latestDescription": "[RESOLVED] Delays for User and Policy Updates\n2016-12-06T14:06:08Z Between 4:25 AM to 5:25 AM PST we experienced increased propagation delays in delivering changes made to IAM. Previously created credentials were not impacted during this period. The issue has been resolved and the service is operating normally.\n"
                 }
             }
         ]

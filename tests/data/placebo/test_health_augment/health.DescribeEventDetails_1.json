@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "failedSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8751c477-e8bb-11e6-a27b-f12a808f398f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8751c477-e8bb-11e6-a27b-f12a808f398f", 
+                "date": "Wed, 01 Feb 2017 20:18:00 GMT", 
+                "content-length": "1135", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "successfulSet": [
+            {
+                "event": {
+                    "lastUpdatedTime": {
+                        "hour": 20, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 16, 
+                        "microsecond": 919000, 
+                        "year": 2017, 
+                        "day": 31, 
+                        "minute": 40
+                    }, 
+                    "service": "BILLING", 
+                    "eventTypeCode": "AWS_BILLING_NOTIFICATION", 
+                    "startTime": {
+                        "hour": 20, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 31, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 31, 
+                        "minute": 36
+                    }, 
+                    "eventTypeCategory": "accountNotification", 
+                    "region": "global", 
+                    "arn": "arn:aws:health:global::event/event-1485912991457", 
+                    "statusCode": "open"
+                }, 
+                "eventDescription": {
+                    "latestDescription": "During a recent review of Amazon RDS billing, we found that some usage for Amazon RDS resources were not being correctly metered. Specifically, customers with DB instances in the US East (Ohio), EU (London) and Canada (Central) regions were not being billed for data transfer in and out of Amazon RDS instances.\n\nThis issue will be resolved for the February billing period and you may see it reflected on the bill you receive in March. Your account will not be billed for any charges from previous billing periods. You can view data transfer prices for each region published on the Amazon RDS web site at https://aws.amazon.com/rds/pricing/.\n\nShould you have any questions or concerns, you can contact the AWS Support Team at http://aws.amazon.com/support."
+                }
+            }
+        ]
+    }
+}
