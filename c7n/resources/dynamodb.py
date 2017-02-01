@@ -25,11 +25,12 @@ from c7n.actions import BaseAction
 from c7n.utils import (
     local_session, get_account_id,get_retry, 
     chunks, snapshot_identifier, type_schema)
-from c7n.tags import TagDelayedAction, RemoveTag
+from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter
 
 from concurrent.futures import as_completed
 
 filters = FilterRegistry('dynamodb-table.filters')
+filters.register('marked-for-op', TagActionFilter)
 
 @resources.register('dynamodb-table')
 class Table(QueryResourceManager):
@@ -156,8 +157,8 @@ class UntagTable(RemoveTag):
             arn = t['TableArn']
             client.untag_resource(
                 ResourceArn=arn, TagKeys=tag_keys)
-            
-            
+
+
 @Table.action_registry.register('delete')
 class DeleteTable(BaseAction, StatusFilter):
     """Action to delete dynamodb tables
