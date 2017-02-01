@@ -1,4 +1,4 @@
-argcomplete==1.7.0
+argcomplete>=1.8.2
 boto3>=1.4.0
 botocore>=1.4.34
 ipaddress>=1.0.16

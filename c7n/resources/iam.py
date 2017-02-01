@@ -83,11 +83,23 @@ class Policy(QueryResourceManager):
         type = 'policy'
         enum_spec = ('list_policies', 'Policies', None)
         id = 'PolicyId'
-        filter_name = None
         name = 'PolicyName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Policy"
+
+    arn_path_prefix = "aws:policy/"
+
+    def get_resources(self, resource_ids):
+        client = local_session(self.session_factory).client('iam')
+        results = []
+        try:
+            for r in resource_ids:
+                results.append(client.get_policy(PolicyArn=r)['Policy'])
+        except Exception as e:
+            self.log.warning("unable to resolve ids %s, err: %s",
+                             resource_ids, e)
+        return results
 
 
 @resources.register('iam-profile')
