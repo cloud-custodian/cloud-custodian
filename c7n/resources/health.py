@@ -51,7 +51,7 @@ class HealthEvents(QueryResourceManager):
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [{'eventStatusCodes': 'open'},{'eventTypeCategories': 'scheduledChange'}]))
+            self.data.get('query', [{'eventStatusCodes': 'open'},{'eventTypeCategories': ['issue', 'accountNotification']}]))
 
     permissions = ('health:DescribeEvents',)
 
@@ -84,7 +84,6 @@ class HealthEvents(QueryResourceManager):
             r['eventDescription'] = client.describe_event_details(
                 eventArns=[r['arn']])['successfulSet'][0]['eventDescription']
             if r['eventTypeCategory'].encode('utf8') != 'accountNotification':
-                print r['eventTypeCategory']
                 affectedEntities = client.describe_affected_entities(
                     filter={'eventArns':[r['arn']]})['entities']
                 del affectedEntities[0]['eventArn']
