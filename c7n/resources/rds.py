@@ -58,6 +58,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
     FilterValidationError)
 
+from c7n.filters.health import healthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -296,6 +297,13 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, dbs, event=None):
         return self.get_matching_aliases(dbs)
+
+
+@filters.register('health-events')
+class RdsHealthEventFilter(healthEventFilter):
+
+    def get_resource_map(self, resources):
+        return {r['DBInstanceIdentifier']: r for r in resources}
 
 
 @actions.register('mark-for-op')
