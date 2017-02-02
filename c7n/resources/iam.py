@@ -459,7 +459,8 @@ class UserCredentialReport(Filter):
             {'type': 'array'},
             {'type': 'string'},
             {'type': 'boolean'},
-            {'type': 'number'}]},
+            {'type': 'number'},
+            {'type': 'null'}]},
         op={'enum': OPERATORS.keys()},
         report_generate={
             'title': 'Generate a report if none is present.',

@@ -11,7 +11,9 @@ develop:
 
 coverage:
 	rm -Rf .coverage
+
 	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --processes=-1 --cover-inclusive tests
+
 
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer tests
@@ -22,7 +24,7 @@ test:
 	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 nosetests  --processes=-1 tests
 
 ftests:
-	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
+	AWS_DEFAULT_REGION=us-east-1 nosetests -s -v ftests
 
 depcache:
 	mkdir -p deps
