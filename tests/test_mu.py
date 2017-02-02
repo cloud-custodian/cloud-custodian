@@ -21,10 +21,11 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda,
-    CloudWatchLogSubscription, RUNTIME)
+    CloudWatchLogSubscription, SimpleNotificationServiceSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from common import BaseTest, Config, event_data
+from data import helloworld
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -92,6 +93,47 @@ class PolicyLambdaProvision(BaseTest):
         # try and update
         #params['sns_topic'] = "arn:123"
         #manager.publish(func)
+
+    def test_sns_subscriber(self):
+        self.patch(SimpleNotificationServiceSubscription, 'iam_delay', 0.01)
+        session_factory = self.record_flight_data('test_sns_subscriber')
+        session = session_factory()
+        client = session.client('sns')
+
+        # create an sns topic
+        tname = "custodian-test-sns-sub"
+        topic_arn = client.create_topic(Name=tname)['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
+
+        # provision a lambda via mu
+        params = dict(
+            session_factory=session_factory,
+            name='c7n-hello-world',
+            role=self.role,
+            topic_arn=topic_arn)
+
+        func = helloworld.get_function(**params)
+        manager = LambdaManager(session_factory)
+        manager.publish(func)
+        self.addCleanup(manager.remove, func)
+
+        # now publish to the topic and look for lambda log output
+        client.publish(TopicArn=topic_arn, Message='Greetings, program!')
+        time.sleep(15)
+        logs = session.client('logs')
+        log_group_name = '/aws/lambda/c7n-hello-world'
+        response = logs.describe_log_streams(
+            logGroupName=log_group_name,
+            orderBy='LastEventTime',
+            descending=True,
+            limit=1)
+        stream_info = response['logStreams'][0]
+        response = logs.get_log_events(
+            logGroupName=log_group_name,
+            logStreamName=stream_info['logStreamName'])
+        messages = [e['message'] for e in response['events']]
+        self.addCleanup(logs.delete_log_group, logGroupName=log_group_name)
+        self.assertIn('Greetings, program!\n', messages)
 
     def test_cwe_update_config_and_code(self):
         # Originally this was testing the no update case.. but
