@@ -120,6 +120,7 @@ class PolicyPermissions(BaseTest):
                     missing.append("%s.filters.%s" % (
                         k, n))
 
+                # in memory filters
                 if n in ('event', 'value', 'tag-count',
                          'marked-for-op', 'offhour', 'onhour', 'age',
                          'state-age', 'egress', 'ingress',
