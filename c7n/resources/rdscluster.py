@@ -74,8 +74,6 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        from c7n.resources.rds import RDSSubnetGroup
-        import pdb; pdb.set_trace()
         self.groups = {
             r['DBSubnetGroupName']: r for r in
             self.manager.get_resource_manager('rds-subnet-group').resources()}
