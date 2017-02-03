@@ -44,10 +44,32 @@ class BaseTest(PillTest):
         # Clear out thread local session cache
         CONN_CACHE.session = None
 
+    def write_policy_file(self, policy, format='yaml'):
+        """ Write a policy file to disk in the specified format.
+
+        Input a dictionary and a format. Valid formats are `yaml` and `json`
+        Returns the file path.
+        """
+        suffix = "." + format
+        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        if format == 'json':
+            json.dump(policy, file)
+        else:
+            file.write(yaml.dump(policy, Dumper=yaml.SafeDumper))
+
+        file.flush()
+        self.addCleanup(file.close)
+        return file.name
+
+    def get_temp_dir(self):
+        """ Return a temporary directory that will get cleaned up. """
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir)
+        return temp_dir
+
     def get_context(self, config=None, session_factory=None, policy=None):
         if config is None:
-            self.context_output_dir = tempfile.mkdtemp()
-            self.addCleanup(shutil.rmtree, self.context_output_dir)
+            self.context_output_dir = self.get_temp_dir()
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
             session_factory,
@@ -65,8 +87,7 @@ class BaseTest(PillTest):
 
         config = config or {}
         if not output_dir:
-            temp_dir = tempfile.mkdtemp()
-            self.addCleanup(shutil.rmtree, temp_dir)
+            temp_dir = self.get_temp_dir()
             config['output_dir'] = temp_dir
         if cache:
             config['cache'] = os.path.join(temp_dir, 'c7n.cache')
@@ -75,15 +96,12 @@ class BaseTest(PillTest):
         return policy.Policy(data, conf, session_factory)
 
     def load_policy_set(self, data, config=None):
-        t = tempfile.NamedTemporaryFile()
-        t.write(yaml.dump(data, Dumper=yaml.SafeDumper))
-        t.flush()
-        self.addCleanup(t.close)
+        filename = self.write_policy_file(data)
         if config:
             e = Config.empty(**config)
         else:
             e = Config.empty()
-        return policy.load(e, t.name)
+        return policy.load(e, filename)
 
     def patch(self, obj, attr, new):
         old = getattr(obj, attr, None)

@@ -102,12 +102,8 @@ class LaunchConfigFilterBase(object):
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
-        config_manager = LaunchConfig(self.manager.ctx, {})
-        if len(asgs) < 20:
-            configs = config_manager.get_resources(
-                [asg['LaunchConfigurationName'] for asg in asgs])
-        else:
-            configs = config_manager.resources()
+        configs = self.manager.get_resource_manager(
+            'launch-config').resources()
         self.configs = {
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
@@ -1375,10 +1371,12 @@ class UnusedLaunchConfig(Filter):
     """
 
     schema = type_schema('unused')
-    permissions = ASG.get_permissions()
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
 
     def process(self, configs, event=None):
-        asgs = ASG(self.manager.ctx, {}).resources()
+        asgs = self.manager.get_resource_manager('asg').resources()
         self.used = set([
             a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
             for a in asgs])
