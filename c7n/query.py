@@ -244,11 +244,11 @@ class QueryResourceManager(ResourceManager):
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
-        self.source = self.get_source()
+        self.source = sources.get(self.source_type)(self)
 
-    def get_source(self):
-        source_class = sources.get(self.data.get('source', 'describe'))
-        return source_class(self)
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe')
 
     @classmethod
     def get_model(cls):

@@ -94,8 +94,7 @@ def _filter_ami_snapshots(self, snapshots):
         return snapshots
     #try using cache first to get a listing of all AMI snapshots and compares resources to the list
     #This will populate the cache.
-    ami_manager = AMI(self.manager.ctx, {})
-    amis = ami_manager.resources()
+    amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
         for dev in i.get('BlockDeviceMappings'):
