@@ -61,6 +61,9 @@ class ResourceManager(object):
         """Retrieve a set of resources by id."""
         return []
 
+    def resources(self):
+        raise NotImplementedError("")
+
     def get_resource_manager(self, resource_type, data=None):
         klass = resources.get(resource_type)
         if klass is None:

@@ -1375,7 +1375,9 @@ class UnusedLaunchConfig(Filter):
     """
 
     schema = type_schema('unused')
-    permissions = ASG.get_permissions()
+
+    def get_permissions(self):
+        return ASG(self.manager.ctx, {}).get_permissions()
 
     def process(self, configs, event=None):
         asgs = ASG(self.manager.ctx, {}).resources()

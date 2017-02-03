@@ -91,7 +91,6 @@ class PolicyPermissions(BaseTest):
         missing = []
         cfg = Config.empty()
         for k, v in manager.resources.items():
-            self.assertTrue(v.get_permissions())
 
             p = Bag({'name': 'permcheck', 'resource': k})
             ctx = self.get_context(config=cfg, policy=p)

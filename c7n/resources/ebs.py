@@ -169,7 +169,9 @@ class SnapshotSkipAmiSnapshots(Filter):
     """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
-    permissions = AMI.get_permissions()
+
+    def get_permissions(self):
+        return AMI(self.manager.ctx, {}).get_permissions()
 
     def validate(self):
         if not isinstance(self.data.get('value', True), bool):

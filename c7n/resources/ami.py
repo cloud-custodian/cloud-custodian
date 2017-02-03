@@ -167,7 +167,7 @@ class ImageUnusedFilter(Filter):
 
     def get_permissions(self):
         return list(itertools.chain([
-            m.get_permissions() for m in (ASG, LaunchConfig)]))
+            m(self.manager.ctx, {}).get_permissions() for m in (ASG, LaunchConfig)]))
 
     def _pull_asg_images(self):
         asg_manager = ASG(self.manager.ctx, {})
