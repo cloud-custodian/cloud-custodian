@@ -41,22 +41,27 @@ def policy_command(f):
     @wraps(f)
     def _load_policies(options):
         load_resources()
-        collection = policy_load(options, options.config)
+        policies = policy_load(options, options.config)
         
-        if collection is None:
+        if policies is None:
             eprint('Error: empty policy file.  Nothing to do.')
             sys.exit(1)
 
-        policies = collection.filter(options.policy_filter)
-        
-        if options.policy_filter and len(policies) == 0 and len(collection) > 0:
-            eprint("Warning: no policies matched the filter ({})".format(options.policy_filter))
-            eprint("  Policies:")
-            for policy in collection.policies():
-                eprint("    - ", policy.name)
+        if len(policies) == 0:
+            eprint("Warning: no policies matched the filters provided.")
+            
+            eprint("\nFilters:")
+            if options.policy_filter:
+                eprint("    Policy name filter (-p):", options.policy_filter)
+            if options.resource_type:
+                eprint("    Resource type filter (-t):", options.resource_type)
+
+            eprint("\nAvailable policies:")
+            for policy in policies.unfiltered_policies:
+                eprint("    - {} ({})".format(policy.name, policy.resource_type))
             eprint()
 
-        return f(options, policies)
+        return f(options, policies.policies)
 
     return _load_policies
 

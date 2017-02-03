@@ -430,6 +430,21 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_config_source(self):
+        factory = self.replay_flight_data(
+            'test_security_group_config_source')
+        p = self.load_policy({
+            'name': 'sg-test',
+            'source': 'config',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'default-vpc'},
+                {'GroupName': 'default'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
+
     def test_only_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
