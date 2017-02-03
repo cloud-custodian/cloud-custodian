@@ -51,7 +51,6 @@ from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 
-from c7n import executor
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
