@@ -198,8 +198,8 @@ def bucket_client(session, b, kms=False):
 
 
 def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
-    client = local_session(session_factory).client('s3')
     for bucket in buckets:
+        client = bucket_client(local_session(session_factory), bucket)
         # all the tag marshalling back and forth is a bit gross :-(
         new_tags = {t['Key']: t['Value'] for t in add_tags}
         for t in bucket.get('Tags', ()):
@@ -463,7 +463,7 @@ class RemovePolicyStatement(BucketActionBase):
         if not found:
             return
 
-        s3 = local_session(self.manager.session_factory).client('s3')
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         if not statements:
             s3.delete_bucket_policy(Bucket=bucket['Name'])
         else:
@@ -501,8 +501,10 @@ class ToggleVersioning(BucketActionBase):
     # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-        client = local_session(self.manager.session_factory).client('s3')
+
         for r in resources:
+            client = bucket_client(
+                local_session(self.manager.session_factory), r)
             if 'Versioning' not in r or not r['Versioning']:
                 r['Versioning'] = {'Status': 'Suspended'}
             if enabled and (
@@ -550,8 +552,9 @@ class ToggleLogging(BucketActionBase):
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-        client = local_session(self.manager.session_factory).client('s3')
+
         for r in resources:
+            client = bucket_client(local_session(self.manager.session_factory), r)
             target_prefix = self.data.get('target_prefix', r['Name'])
             if 'TargetBucket' in r['Logging']:
                 r['Logging'] = {'Status': 'Enabled'}
@@ -1483,7 +1486,8 @@ class DeleteBucket(ScanBucket):
         Disable versioning on the bucket, so deletes don't
         generate fresh deletion markers.
         """
-        client = local_session(self.manager.session_factory).client('s3')
+        client = bucket_client(
+            local_session(self.manager.session_factory), b)
 
         # Stop replication so we can suspend versioning
         if b.get('Replication') is not None:
