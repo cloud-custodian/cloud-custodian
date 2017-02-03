@@ -69,38 +69,54 @@ class PolicyCollection(object):
         self.data = data
         self.options = options
 
-    def policies(self, filters=None, resource_type=None):
-        # self.options is the CLI options specified in cli.setup_parser()
-        policies = []
+        # We store all the policies passed in so we can refilter later
+        self._all_policies = []
         for p in self.data.get('policies', []):
-            policy = Policy(p, self.options, session_factory=self.test_session_factory())
-            if 'resource_type' in self.options and self.options.resource_type:
-                if policy.resource_type == self.options.resource_type:
-                    policies.append(policy)
-            else:
-                policies.append(policy)
+            self._all_policies.append(
+                Policy(p, options, session_factory=self.test_session_factory()))
+        
+        # Do an initial filtering
+        self.policies = []
+        resource_type = getattr(self.options, 'resource_type', None)
+        policy_name = getattr(self.options, 'policy_filter', None)
+        self.policies = self.filter(policy_name, resource_type)
 
-        if not filters:
-            return policies
+    @property
+    def unfiltered_policies(self):
+        return self._all_policies
 
-        return [p for p in policies if fnmatch.fnmatch(p.name, filters)]
+    def filter(self, policy_name=None, resource_type=None):
+        policies = []
+        for policy in self.unfiltered_policies:
+            if resource_type:
+                if policy.resource_type != resource_type:
+                    continue
 
-    filter = policies
+            if policy_name:
+                if not fnmatch.fnmatch(policy.name, policy_name):
+                    continue
 
+            policies.append(policy)
+
+        return policies
+    
     def __iter__(self):
-        return iter(self.policies())
+        return iter(self.policies)
 
     def __contains__(self, policy_name):
-        return policy_name in [p['name'] for p in self.data['policies']]
+        for p in self.policies:
+            if p.name == policy_name:
+                return True
+        return False
 
     def __len__(self):
-        return len(self.data.get('policies', []))
+        return len(self.policies)
 
     @property
     def resource_types(self):
         """resource types used by the collection."""
         rtypes = set()
-        for p in self:
+        for p in self.policies:
             rtypes.add(p.resource_type)
         return rtypes
 
