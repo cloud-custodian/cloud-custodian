@@ -155,6 +155,7 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
+                'source': {'enum': ['describe', 'config']},
                 'actions': {
                     'type': 'array',
                 },
