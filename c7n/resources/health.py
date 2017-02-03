@@ -83,7 +83,7 @@ class HealthEvents(QueryResourceManager):
         for r in resources:
             r['eventDescription'] = client.describe_event_details(
                 eventArns=[r['arn']])['successfulSet'][0]['eventDescription']
-            if r['eventTypeCategory'].encode('utf8') != 'accountNotification':
+            if r['eventTypeCategory'] != u'accountNotification':
                 affectedEntities = client.describe_affected_entities(
                     filter={'eventArns':[r['arn']]})['entities']
                 del affectedEntities[0]['eventArn']
