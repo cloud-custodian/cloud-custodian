@@ -3,8 +3,15 @@
     "data": {
         "Datapoints": [], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5ba5ce3b-1c21-11e6-b335-1756c1d94404"
+            "RequestId": "842fb38f-eace-11e6-86a6-e9acf07e07fe", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "842fb38f-eace-11e6-86a6-e9acf07e07fe", 
+                "date": "Sat, 04 Feb 2017 11:38:58 GMT", 
+                "content-length": "332", 
+                "content-type": "text/xml"
+            }
         }, 
         "Label": "Durations"
     }

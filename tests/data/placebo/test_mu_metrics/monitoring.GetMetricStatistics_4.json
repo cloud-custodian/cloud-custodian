@@ -3,8 +3,15 @@
     "data": {
         "Datapoints": [], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5c14bc32-1c21-11e6-8dcf-13e692d0eb26"
+            "RequestId": "84481dcb-eace-11e6-9a11-4be3639810eb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "84481dcb-eace-11e6-9a11-4be3639810eb", 
+                "date": "Sat, 04 Feb 2017 11:38:57 GMT", 
+                "content-length": "332", 
+                "content-type": "text/xml"
+            }
         }, 
         "Label": "Throttles"
     }

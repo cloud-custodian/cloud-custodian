@@ -3,16 +3,24 @@
     "data": {
         "subscriptionFilters": [
             {
-                "filterName": "c7n-log-sub", 
-                "destinationArn": "arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub", 
-                "creationTime": 1465469364827, 
                 "filterPattern": "Traceback", 
-                "logGroupName": "custodian-test-log-sub"
+                "filterName": "c7n-log-sub", 
+                "creationTime": 1486208335725, 
+                "logGroupName": "custodian-test-log-sub", 
+                "destinationArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-log-sub", 
+                "distribution": "ByLogStream"
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d4dfb58f-2e2f-11e6-930f-2717ec2d6f28"
+            "RequestId": "82bdad14-eace-11e6-9b9e-adc80b5213ef", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "82bdad14-eace-11e6-9b9e-adc80b5213ef", 
+                "date": "Sat, 04 Feb 2017 11:38:55 GMT", 
+                "content-length": "258", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }
     }
 }

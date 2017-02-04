@@ -1,13 +1,14 @@
 {
     "status_code": 201, 
     "data": {
-        "Statement": "{\"Condition\":{\"StringEquals\":{\"AWS:SourceAccount\":\"619193117841\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-west-2:619193117841:function:custodian-sg-modified\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"config.amazonaws.com\"},\"Sid\":\"custodian-sg-modified\"}", 
+        "Statement": "{\"Sid\":\"custodian-sg-modified\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:custodian-sg-modified\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"config.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceAccount\":\"644160558196\"}}}", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "9e0cac05-5d56-11e6-b767-41e6cbef0b2e", 
+            "RequestId": "64f291f4-eace-11e6-83a5-27f3e54eba42", 
             "HTTPHeaders": {
-                "date": "Mon, 08 Aug 2016 10:55:27 GMT", 
-                "x-amzn-requestid": "9e0cac05-5d56-11e6-b767-41e6cbef0b2e", 
+                "date": "Sat, 04 Feb 2017 11:38:05 GMT", 
+                "x-amzn-requestid": "64f291f4-eace-11e6-83a5-27f3e54eba42", 
                 "content-length": "324", 
                 "content-type": "application/json", 
                 "connection": "keep-alive"

@@ -1,10 +1,18 @@
 {
     "status_code": 201, 
     "data": {
-        "Statement": "{\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:logs:us-east-1:619193117841:log-group:custodian-test-log-sub:*\"}},\"Action\":[\"lambda:InvokeFunction\"],\"Resource\":\"arn:aws:lambda:us-east-1:619193117841:function:c7n-log-sub\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-east-1.amazonaws.com\"},\"Sid\":\"ustodian-test-log-sub\"}", 
+        "Statement": "{\"Sid\":\"ustodian-test-log-sub\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-log-sub\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-west-2.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:logs:us-west-2:644160558196:log-group:custodian-test-log-sub:*\"}}}", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "d499f9d7-2e2f-11e6-8611-a99b5bab2c0c"
+            "RequestId": "8259e2a4-eace-11e6-adc0-934346153e5e", 
+            "HTTPHeaders": {
+                "date": "Sat, 04 Feb 2017 11:38:54 GMT", 
+                "x-amzn-requestid": "8259e2a4-eace-11e6-adc0-934346153e5e", 
+                "content-length": "371", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
         }
     }
 }

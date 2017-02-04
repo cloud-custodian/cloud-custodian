@@ -3,8 +3,15 @@
     "data": {
         "Datapoints": [], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5b4e5f24-1c21-11e6-8dcf-13e692d0eb26"
+            "RequestId": "841aa553-eace-11e6-b2a0-67fd9f614aa8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "841aa553-eace-11e6-b2a0-67fd9f614aa8", 
+                "date": "Sat, 04 Feb 2017 11:38:57 GMT", 
+                "content-length": "334", 
+                "content-type": "text/xml"
+            }
         }, 
         "Label": "Invocations"
     }
