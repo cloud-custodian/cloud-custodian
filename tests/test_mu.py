@@ -29,7 +29,7 @@ from common import BaseTest, Config, event_data
 
 class PolicyLambdaProvision(BaseTest):
 
-    role = "arn:aws:iam::619193117841:role/lambda_basic_execution"
+    role = "arn:aws:iam::644160558196:role/custodian-mu"
 
     def assert_items(self, result, expected):
         for k, v in expected.items():
@@ -227,18 +227,18 @@ class PolicyLambdaProvision(BaseTest):
         self.assert_items(
             result,
             {'Description': 'cloud-custodian lambda policy',
-             'FunctionName': 'c7n-ec2-encrypted-vol',
-             'Handler': 'c7n_policy.run',
+             'FunctionName': 'custodian-ec2-encrypted-vol',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-ec2-encrypted-vol")
+        result = events.list_rules(NamePrefix="custodian-ec2-encrypted-vol")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "c7n-ec2-encrypted-vol"})
+             "Name": "custodian-ec2-encrypted-vol"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
@@ -262,18 +262,18 @@ class PolicyLambdaProvision(BaseTest):
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'c7n-asg-spin-detector',
-             'Handler': 'c7n_policy.run',
+            {'FunctionName': 'custodian-asg-spin-detector',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-asg-spin-detector")
+        result = events.list_rules(NamePrefix="custodian-asg-spin-detector")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "c7n-asg-spin-detector"})
+             "Name": "custodian-asg-spin-detector"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
@@ -298,20 +298,20 @@ class PolicyLambdaProvision(BaseTest):
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'c7n-periodic-ec2-checker',
-             'Handler': 'c7n_policy.run',
+            {'FunctionName': 'custodian-periodic-ec2-checker',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
              'Runtime': RUNTIME,
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-periodic-ec2-checker")
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
         self.assert_items(
             result['Rules'][0],
             {
                 "State": "ENABLED",
                 "ScheduleExpression": "rate(1 day)",
-                "Name": "c7n-periodic-ec2-checker"})
+                "Name": "custodian-periodic-ec2-checker"})
         mgr.remove(pl)
 
 
