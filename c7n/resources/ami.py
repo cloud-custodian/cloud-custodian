@@ -21,7 +21,6 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-from c7n.resources.ec2 import EC2
 from c7n.resources.asg import ASG, LaunchConfig
 
 
@@ -167,20 +166,19 @@ class ImageUnusedFilter(Filter):
 
     def get_permissions(self):
         return list(itertools.chain([
-            m.get_permissions() for m in (ASG, LaunchConfig)]))
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ec2')]))
 
     def _pull_asg_images(self):
-        asg_manager = ASG(self.manager.ctx, {})
-        asgs = asg_manager.resources()
+        asgs = self.manager.get_resource_manager('asg').resources()
         lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
-
-        lcfg_mgr = LaunchConfig(self.manager.ctx, {})
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
         return set([
             lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
             if lcfg['LaunchConfigurationName'] in lcfgs])
 
     def _pull_ec2_images(self):
-        ec2_manager = EC2(self.manager.ctx, {})
+        ec2_manager = self.manager.get_resource_manager('ec2')
         return set([i['ImageId'] for i in ec2_manager.resources()])
 
     def process(self, resources, event=None):

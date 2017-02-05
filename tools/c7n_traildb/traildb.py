@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 from cStringIO import StringIO
 from dateutil.parser import parse
@@ -26,6 +27,8 @@ import time
 import sqlite3
 
 import boto3
+
+from botocore.client import Config
 
 
 log = logging.getLogger('c7n_traildb')
@@ -53,7 +56,7 @@ def chunks(iterable, size=50):
 
 def process_trail_set(
         object_set, map_records, reduce_results=None, trail_bucket=None):
-    s3 = boto3.Session().client('s3')
+    s3 = boto3.Session().client('s3', config=Config(signature_version='s3v4'))
     previous = None
     for o in object_set:
         body = s3.get_object(Key=o['Key'], Bucket=trail_bucket)['Body']
@@ -164,7 +167,7 @@ def process_records(records,
             r['eventSource'],
             r.get('userAgent', ''),
             r.get('requestID', ''),
-            r['sourceIPAddress'],
+            r.get('sourceIPAddress', ''),
             uid,
 # TODO make this optional, for now omit for size
 #            json.dumps(r['requestParameters']),
@@ -190,7 +193,9 @@ def process_bucket(
         output=None, uid_filter=None, event_filter=None,
         service_filter=None, not_service_filter=None, data_dir=None):
 
-    s3 = boto3.Session().client('s3')
+    s3 = boto3.Session().client(
+        's3', config=Config(signature_version='s3v4'))
+
     paginator = s3.get_paginator('list_objects')
     # PyPy has some memory leaks.... :-(
     pool = Pool(maxtasksperchild=10)
@@ -245,7 +250,8 @@ def process_bucket(
         log.info(
             "Processed paged time:%0.2f size:%s count:%s" % (
                 t-l, object_size, object_count))
-        log.info('Last Page Key: %s', objects[-1]['Key'])
+        if objects:
+            log.info('Last Page Key: %s', objects[-1]['Key'])
 
 
 def get_bucket_path(options):

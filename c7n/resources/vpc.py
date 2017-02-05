@@ -308,8 +308,7 @@ class SGUsage(Filter):
         # Note assuming we also have launch config garbage collection
         # enabled.
         sg_ids = set()
-        from c7n.resources.asg import LaunchConfig
-        for cfg in LaunchConfig(self.manager.ctx, {}).resources():
+        for cfg in self.manager.get_resource_manager('launch-config').resources():
             for g in cfg['SecurityGroups']:
                 sg_ids.add(g)
             for g in cfg['ClassicLinkVPCSecurityGroups']:
@@ -318,8 +317,7 @@ class SGUsage(Filter):
 
     def get_lambda_sgs(self):
         sg_ids = set()
-        from c7n.resources.awslambda import AWSLambda
-        for func in AWSLambda(self.manager.ctx, {}).resources():
+        for func in self.manager.get_resource_manager('lambda').resources():
             if 'VpcConfig' not in func:
                 continue
             for g in func['VpcConfig']['SecurityGroupIds']:
@@ -328,14 +326,14 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        for nic in NetworkInterface(self.manager.ctx, {}).resources():
+        for nic in self.manager.get_resource_manager('eni').resources():
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
         return sg_ids
 
     def get_sg_refs(self):
         sg_ids = set()
-        for sg in SecurityGroup(self.manager.ctx, {}).resources():
+        for sg in self.manager.get_resource_manager('security-group').resources():
             for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
                 for p in sg.get(perm_type, []):
                     for g in p.get('UserIdGroupPairs', ()):

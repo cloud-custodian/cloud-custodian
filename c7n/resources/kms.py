@@ -180,7 +180,9 @@ class GrantCount(Filter):
 class ResourceKmsKeyAlias(ValueFilter):
 
     schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
-    permissions = KeyAlias.get_permissions()
+
+    def get_permissions(self):
+        return KeyAlias(self.manager.ctx, {}).get_permissions()
 
     def get_matching_aliases(self, resources, event=None):
 

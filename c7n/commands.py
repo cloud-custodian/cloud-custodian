@@ -62,7 +62,7 @@ def policy_command(f):
             _print_no_policies_warning(options, all_policies)
             sys.exit(1)
 
-        return f(options, policies)
+        return f(options, policies.policies)
 
     return _load_policies
 
