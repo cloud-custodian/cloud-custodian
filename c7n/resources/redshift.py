@@ -110,7 +110,7 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = ""
 
     def get_permissions(self):
-        return RedshiftSubnetGroup.get_permissions()
+        return RedshiftSubnetGroup(self.manager.ctx, {}).get_permissions()
 
     def get_related_ids(self, resources):
         group_ids = set()

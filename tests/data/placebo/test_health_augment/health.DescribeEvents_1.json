@@ -1,0 +1,84 @@
+{
+    "status_code": 200, 
+    "data": {
+        "events": [
+            {
+                "lastUpdatedTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 16, 
+                    "microsecond": 919000, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 40
+                }, 
+                "service": "BILLING", 
+                "eventTypeCode": "AWS_BILLING_NOTIFICATION", 
+                "startTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 36
+                }, 
+                "eventTypeCategory": "accountNotification", 
+                "region": "global", 
+                "arn": "arn:aws:health:global::event/event-1485912991457", 
+                "statusCode": "open"
+            }, 
+            {
+                "lastUpdatedTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 6
+                }, 
+                "service": "IAM", 
+                "eventTypeCode": "AWS_IAM_OPERATIONAL_ISSUE", 
+                "startTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 6
+                }, 
+                "eventTypeCategory": "issue", 
+                "endTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 6
+                }, 
+                "region": "us-east-1", 
+                "arn": "arn:aws:health:us-east-1::event/AWS_IAM_OPERATIONAL_ISSUE_1481033166", 
+                "statusCode": "closed"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "86e399d8-e8bb-11e6-8682-2f9c956fd1ad", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "86e399d8-e8bb-11e6-8682-2f9c956fd1ad", 
+                "date": "Wed, 01 Feb 2017 20:17:59 GMT", 
+                "content-length": "601", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

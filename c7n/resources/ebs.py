@@ -94,8 +94,7 @@ def _filter_ami_snapshots(self, snapshots):
         return snapshots
     #try using cache first to get a listing of all AMI snapshots and compares resources to the list
     #This will populate the cache.
-    ami_manager = AMI(self.manager.ctx, {})
-    amis = ami_manager.resources()
+    amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
         for dev in i.get('BlockDeviceMappings'):
@@ -169,7 +168,9 @@ class SnapshotSkipAmiSnapshots(Filter):
     """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
-    permissions = AMI.get_permissions()
+
+    def get_permissions(self):
+        return AMI(self.manager.ctx, {}).get_permissions()
 
     def validate(self):
         if not isinstance(self.data.get('value', True), bool):
@@ -216,7 +217,7 @@ class SnapshotDelete(BaseAction):
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
                  post, pre-post)
 
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
