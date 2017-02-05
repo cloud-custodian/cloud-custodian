@@ -55,7 +55,7 @@ from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps, get_account_id)
@@ -70,9 +70,8 @@ actions.register('auto-tag-user', AutoTagUser)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
-
 @resources.register('s3')
-class S3(QueryResourceManager):
+class S3(query.QueryResourceManager):
 
     class resource_type(object):
         service = 's3'
@@ -92,6 +91,12 @@ class S3(QueryResourceManager):
         super(S3, self).__init__(ctx, data)
         self.log_dir = ctx.log_dir
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeS3(self)
+        elif source_type == 'config':
+            return ConfigS3(self)
+
     @classmethod
     def get_permissions(cls):
         perms = ["s3:ListAllMyBuckets"]
@@ -107,6 +112,103 @@ class S3(QueryResourceManager):
             results = filter(None, results)
             return results
 
+
+class DescribeS3(query.DescribeSource):
+
+    def augment(self, buckets):
+        with self.manager.executor_factory(
+                max_workers=min((10, len(buckets)))) as w:
+            results = w.map(
+                assemble_bucket,
+                zip(itertools.repeat(self.manager.session_factory), buckets))
+            results = filter(None, results)
+            return results
+
+
+class ConfigS3(query.ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigS3, self).load_resource(item)
+        cfg = item['supplementaryConfig']
+
+        # location requires pulling from awsRegion
+        # logging requires remapping
+        # acl requires remap grantset -> grants, double encoded and lost info
+        for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
+            if cfg[k] == null_value:
+                continue
+            method = getattr(self, "handle_%s" % k, None)
+            method(resource, json.loads(cfg[k]))
+
+    PERMISSION_MAP = {
+        'FullControl': 'FULL_CONTROL',
+        'Write': 'WRITE',
+        'WriteAcp': 'WRITE_ACP',
+        'Read': 'READ',
+        'ReadAcp': 'READ_ACP'}
+
+    def handle_AccessControlList(self, resource, item):
+        # double serialized in config for some reason
+        item = json.loads(item)
+        resource['Acl']['Owner'] = {'ID': item['owner']['id']}
+        if item['owner']['displayName']:
+            resource['Acl']['Owner'] = item['owner']['displayName']
+        for g in item['grantList']:
+            rg = {'Permission': '', 'ID': ''}
+
+    # SKIP / till in custodian
+
+    def handle_AccelerateConfiguration(self, resource, item):
+        pass
+
+    def handle_BucketLoggingConfiguration(self, resource, item):
+        resource['Logging'] = {
+            'TargetBucket': item['destinationBucketName'],
+            'TargetPrefix': item['logFilePrefix']}
+
+    # VERIFY
+    def handle_BucketNotificationConfiguration(self, resource, item):
+        return resource['Notification'] = item['configurations']
+
+    def handle_BucketPolicy(self, resource, item):
+        resource['Policy'] = item['policyText']
+
+    def handle_BucketTaggingConfiguration(self, resource, item):
+        resource['Tags'] = [
+            {"Key": k, "Value": v} for k, v in item['tagSets'][0]['tags'].items()]
+
+    # VERIFY
+    def handle_BucketVersioningConfiguration(self, resource, item):
+        assert item['status'] in ('Enabled', 'Suspended')
+        assert item['isMfaDeletedEnabled'] in ('Enabled', 'Disabled')
+        resource['Versioning'] = {
+            'Status': item['status'],
+            'MFADelete': item['isMfaDeletedEnabled']}
+
+
+"""
+>>> pprint.pprint(xx)
+{u'Grants': [{u'Grantee': {u'ID': 'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
+                           u'Type': 'CanonicalUser'},
+              u'Permission': 'FULL_CONTROL'}],
+ u'Owner': {u'ID': 'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}}
+>>> pprint.pprint(json.loads(json.loads(item['supplementaryConfiguration']['AccessControlList'])))
+{u'grantList': [{u'grantee': {u'displayName': None,
+                              u'id': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'},
+                 u'permission': u'FullControl'}],
+ u'grantSet': None,
+ u'isRequesterCharged': False,
+ u'owner': {u'displayName': None,
+            u'id': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}}
+"""
+
+S3_CONFIG_SUPPLEMENT_NULL_MAP = {
+    'BucketLogging': u'{"destinationBucketName":null,"logFilePrefix":null}',
+    'BucketPolicy': u'{"policyText":null}',
+    'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}'
+    'BucketAccelerateConfiguration': u'{"status":null}',
+    'BucketNotificationConfiguration: u'{"configurations":{}},
+    )
 
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),

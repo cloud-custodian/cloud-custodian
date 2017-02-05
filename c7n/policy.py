@@ -436,6 +436,8 @@ class ConfigRuleMode(LambdaMode):
         if evaluation is None:
             resources = super(ConfigRuleMode, self).run(event, lambda_context)
             match = self.policy.data['mode'].get('match-compliant', False)
+            self.policy.log.info(
+                "found resources:%d match-compliant:%s", len(resources or ()), match)
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',
