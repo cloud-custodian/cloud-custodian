@@ -217,7 +217,7 @@ class SnapshotDelete(BaseAction):
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
                  post, pre-post)
 
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
