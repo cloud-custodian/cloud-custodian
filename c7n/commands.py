@@ -41,29 +41,48 @@ def policy_command(f):
     @wraps(f)
     def _load_policies(options):
         load_resources()
-        policies = policy_load(options, options.config)
-        
-        if policies is None:
-            eprint('Error: empty policy file.  Nothing to do.')
-            sys.exit(1)
+
+        policies = []
+        all_policies = []
+        for file in options.configs:
+            try:
+                collection = policy_load(options, file)
+            except ValueError:
+                eprint('Error: policy file does not exist ({})'.format(file))
+                continue
+
+            if collection is None:
+                log.info('Loaded file {}. Contained no policies.'.format(file))
+            else:
+                log.info('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
+                policies.extend(collection.policies)
+                all_policies.extend(collection.unfiltered_policies)
 
         if len(policies) == 0:
-            eprint("Warning: no policies matched the filters provided.")
-            
-            eprint("\nFilters:")
-            if options.policy_filter:
-                eprint("    Policy name filter (-p):", options.policy_filter)
-            if options.resource_type:
-                eprint("    Resource type filter (-t):", options.resource_type)
+            _print_no_policies_warning(options, all_policies)
+            sys.exit(1)
 
-            eprint("\nAvailable policies:")
-            for policy in policies.unfiltered_policies:
-                eprint("    - {} ({})".format(policy.name, policy.resource_type))
-            eprint()
-
-        return f(options, policies.policies)
+        return f(options, policies)
 
     return _load_policies
+
+
+def _print_no_policies_warning(options, policies):
+    if options.policy_filter or options.resource_type:
+        eprint("Warning: no policies matched the filters provided.")
+
+        eprint("\nFilters:")
+        if options.policy_filter:
+            eprint("    Policy name filter (-p):", options.policy_filter)
+        if options.resource_type:
+            eprint("    Resource type filter (-t):", options.resource_type)
+
+        eprint("\nAvailable policies:")
+        for policy in policies:
+            eprint("    - {} ({})".format(policy.name, policy.resource_type))
+        eprint()
+    else:
+        eprint('Error: empty policy file(s).  Nothing to do.')
 
 
 def validate(options):
@@ -369,6 +388,30 @@ def metrics_cmd(options, policies):
         log.info('Getting %s metrics', p)
         data[p.name] = p.get_metrics(start, end, options.period)
     print(dumps(data, indent=2))
+
+
+def version_cmd(options):
+    from c7n.version import version
+
+    if not options.debug:
+        print(version)
+        return
+
+    indent = 13
+    pp = pprint.PrettyPrinter(indent=indent)
+
+    print("\nPlease copy/paste the following info along with any bug reports:\n")
+    print("Custodian:  ", version)
+    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
+    print("Python:     ", pyversion)
+    # os.uname is only available on recent versions of Unix
+    try:
+        print("Platform:   ", os.uname())
+    except:  # pragma: no cover
+        print("Platform:  ", sys.platform)
+    print("Using venv: ", hasattr(sys, 'real_prefix'))
+    print("PYTHONPATH: ")
+    pp.pprint(sys.path)
 
 
 def eprint(*args, **kwargs):

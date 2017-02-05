@@ -57,9 +57,11 @@ def _default_options(p, blacklist=""):
                           help="Role to assume")
 
     config = p.add_argument_group(
-        "config", "Policy config file and policy selector")
-    config.add_argument("-c", "--config", required=True,
-                        help="Policy Configuration File")
+        "config", "Policy config file(s) and policy selectors")
+    # -c is deprecated.  Supported for legacy reasons
+    config.add_argument("-c", "--config", help=argparse.SUPPRESS)
+    config.add_argument("configs", nargs='*',
+                          help="Policy configuration file(s)")
     config.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
@@ -214,7 +216,7 @@ def setup_parser():
 
     version = subs.add_parser(
         'version', help="Display installed version of custodian")
-    version.set_defaults(command=cmd_version)
+    version.set_defaults(command='c7n.commands.version_cmd')
     version.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose Logging")
@@ -224,13 +226,12 @@ def setup_parser():
 
 
     validate_desc = (
-        "Validate config files against the custodian jsonschema")
+        "Validate config files against the json schema")
     validate = subs.add_parser(
         'validate', description=validate_desc, help=validate_desc)
     validate.set_defaults(command="c7n.commands.validate")
     validate.add_argument(
-        "-c", "--config",
-        help="Policy Configuration File (old; use configs instead)")
+        "-c", "--config", help = argparse.SUPPRESS)
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
@@ -268,30 +269,6 @@ def setup_parser():
     return parser
 
 
-def cmd_version(options):
-    from c7n.version import version
-
-    if not options.debug:
-        print(version)
-        return
-
-    indent = 13
-    import pprint
-    pp = pprint.PrettyPrinter(indent=indent)
-
-    print("\nPlease copy/paste the following info along with any bug reports:\n")
-    print("Custodian:  ", version)
-    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
-    print("Python:     ", pyversion)
-    # os.uname is only available on recent versions of Unix
-    try:
-        print("Platform:   ", os.uname())
-    except:  # pragma: no cover
-        print("Platform:  ", sys.platform)
-    print("Using venv: ", hasattr(sys, 'real_prefix'))
-    print("PYTHONPATH: ")
-    pp.pprint(sys.path)
-
 def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
@@ -303,6 +280,10 @@ def main():
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.ERROR)
+
+    # Support the deprecated -c option
+    if getattr(options, 'config', None) is not None:
+        options.configs.append(options.config)
 
     try:
         command = options.command
