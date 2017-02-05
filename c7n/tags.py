@@ -256,7 +256,7 @@ class Tag(Action):
     """Tag an ec2 resource.
     """
 
-    batch_size = 150
+    batch_size = 25
     concurrency = 2
 
     schema = utils.type_schema(
