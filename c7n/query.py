@@ -195,8 +195,11 @@ class ConfigSource(object):
         return results
 
     def load_resource(self, item):
-        resource = camelResource(json.loads(item['configuration']))
-        return resource
+        if isinstance(item['configuration'], (basestring,)):
+            item_config = json.loads(item['configuration'])
+        else:
+            item_config = item['configuration']
+        return camelResource(item_config)
 
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
@@ -244,14 +247,14 @@ class QueryResourceManager(ResourceManager):
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
-        self.source = self.get_source()
+        self.source = self.get_source(self.source_type)
 
     @property
     def source_type(self):
         return self.data.get('source', 'describe')
 
-    def get_source(self):
-        return sources.get(self.source_type)(self)        
+    def get_source(self, source_type):
+        return sources.get(source_type)(self)        
     
     @classmethod
     def get_model(cls):

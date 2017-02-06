@@ -70,6 +70,7 @@ actions.register('auto-tag-user', AutoTagUser)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
+
 @resources.register('s3')
 class S3(query.QueryResourceManager):
 
@@ -96,6 +97,8 @@ class S3(query.QueryResourceManager):
             return DescribeS3(self)
         elif source_type == 'config':
             return ConfigS3(self)
+        else:
+            return super(S3, self).get_source(source_type)
 
     @classmethod
     def get_permissions(cls):
@@ -129,16 +132,20 @@ class ConfigS3(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigS3, self).load_resource(item)
-        cfg = item['supplementaryConfig']
+        cfg = item['supplementaryConfiguration']
 
-        # location requires pulling from awsRegion
-        # logging requires remapping
-        # acl requires remap grantset -> grants, double encoded and lost info
+        if item['awsRegion'] != 'us-east-1': # aka standard
+            resource['Location'] = {'LocationConstraint': item['awsRegion']}
+
+        # owner is under acl per describe
+        resource.pop('Owner', None)
+
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
             if cfg[k] == null_value:
                 continue
             method = getattr(self, "handle_%s" % k, None)
             method(resource, json.loads(cfg[k]))
+        return resource
 
     PERMISSION_MAP = {
         'FullControl': 'FULL_CONTROL',
@@ -147,43 +154,53 @@ class ConfigS3(query.ConfigSource):
         'Read': 'READ',
         'ReadAcp': 'READ_ACP'}
 
-    def handle_AccessControlList(self, resource, item):
+    def handle_AccessControlList(self, resource, item_value):
         # double serialized in config for some reason
-        item = json.loads(item)
-        resource['Acl']['Owner'] = {'ID': item['owner']['id']}
-        if item['owner']['displayName']:
-            resource['Acl']['Owner'] = item['owner']['displayName']
-        for g in item['grantList']:
-            rg = {'Permission': '', 'ID': ''}
+        item_value = json.loads(item_value)
+        resource['Acl'] = {}
+        resource['Acl']['Owner'] = {'ID': item_value['owner']['id']}
+        if item_value['owner']['displayName']:
+            resource['Acl']['Owner']['DisplayName'] = item_value[
+                'owner']['displayName']
+        resource['Acl']['Grants'] = grants = []
+        for g in item_value['grantList']:
+            rg = {'ID': g['grantee']['id']}
+            if not g['grantee'].get('type'):
+                rg['Type'] = 'CanonicalUser'
+            else:
+                # value mapping..
+                rg['Type'] = g['grantee']['type']
+            if g['grantee']['displayName']:
+                rg['DisplayName'] = g['displayName']
+            grants.append({
+                'Permission': self.PERMISSION_MAP[g['permission']],
+                'Grantee': rg,
+                })
 
-    # SKIP / till in custodian
-
-    def handle_AccelerateConfiguration(self, resource, item):
+    def handle_AccelerateConfiguration(self, resource, item_value):
         pass
 
-    def handle_BucketLoggingConfiguration(self, resource, item):
-        resource['Logging'] = {
-            'TargetBucket': item['destinationBucketName'],
-            'TargetPrefix': item['logFilePrefix']}
+    def handle_BucketLoggingConfiguration(self, resource, item_value):
+        resource[u'Logging'] = {
+            'TargetBucket': item_value['destinationBucketName'],
+            'TargetPrefix': item_value['logFilePrefix']}
 
-    # VERIFY
-    def handle_BucketNotificationConfiguration(self, resource, item):
-        return resource['Notification'] = item['configurations']
+    def handle_BucketNotificationConfiguration(self, resource, item_value):
+        resource['Notification'] = item_value['configurations']
 
-    def handle_BucketPolicy(self, resource, item):
-        resource['Policy'] = item['policyText']
+    def handle_BucketPolicy(self, resource, item_value):
+        resource['Policy'] = item_value['policyText']
 
-    def handle_BucketTaggingConfiguration(self, resource, item):
+    def handle_BucketTaggingConfiguration(self, resource, item_value):
         resource['Tags'] = [
-            {"Key": k, "Value": v} for k, v in item['tagSets'][0]['tags'].items()]
+            {"Key": k, "Value": v} for k, v in item_value['tagSets'][0]['tags'].items()]
 
-    # VERIFY
-    def handle_BucketVersioningConfiguration(self, resource, item):
-        assert item['status'] in ('Enabled', 'Suspended')
-        assert item['isMfaDeletedEnabled'] in ('Enabled', 'Disabled')
+    def handle_BucketVersioningConfiguration(self, resource, item_value):
+        assert item_value['status'] in ('Enabled', 'Suspended')
+        assert item_value['isMfaDeletedEnabled'] in ('Enabled', 'Disabled')
         resource['Versioning'] = {
-            'Status': item['status'],
-            'MFADelete': item['isMfaDeletedEnabled']}
+            'Status': item_value['status'],
+            'MFADelete': item_value['isMfaDeletedEnabled']}
 
 
 """
@@ -203,12 +220,14 @@ class ConfigS3(query.ConfigSource):
 """
 
 S3_CONFIG_SUPPLEMENT_NULL_MAP = {
-    'BucketLogging': u'{"destinationBucketName":null,"logFilePrefix":null}',
+    'BucketLoggingConfiguration': u'{"destinationBucketName":null,"logFilePrefix":null}',
     'BucketPolicy': u'{"policyText":null}',
-    'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}'
+    'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}',
+    'AccessControlList': None,
     'BucketAccelerateConfiguration': u'{"status":null}',
-    'BucketNotificationConfiguration: u'{"configurations":{}},
-    )
+    'BucketTaggingConfiguration': u'',
+    'BucketNotificationConfiguration': u'{"configurations":{}}',
+    }
 
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),

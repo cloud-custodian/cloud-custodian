@@ -54,7 +54,7 @@ def load(options, path, format='yaml', validate=True):
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
@@ -65,6 +65,9 @@ def load(options, path, format='yaml', validate=True):
 
 class PolicyCollection(object):
 
+    # cli/collection tests patch this
+    session_factory = None
+
     def __init__(self, data, options):
         self.data = data
         self.options = options
@@ -73,8 +76,8 @@ class PolicyCollection(object):
         self._all_policies = []
         for p in self.data.get('policies', []):
             self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
-        
+                Policy(p, options, session_factory=self.session_factory))
+
         # Do an initial filtering
         self.policies = []
         resource_type = getattr(self.options, 'resource_type', None)
@@ -99,7 +102,7 @@ class PolicyCollection(object):
             policies.append(policy)
 
         return policies
-    
+
     def __iter__(self):
         return iter(self.policies)
 
@@ -119,10 +122,6 @@ class PolicyCollection(object):
         for p in self.policies:
             rtypes.add(p.resource_type)
         return rtypes
-
-    def test_session_factory(self):
-        """ For testing: patched by tests to use a custom session_factory """
-        return None
 
 
 class PolicyExecutionMode(object):
@@ -417,8 +416,8 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
 
     def resolve_resources(self, event):
-        return [utils.camelResource(
-            self.cfg_event['configurationItem']['configuration'])]
+        source = self.policy.resource_manager.get_source('config')
+        return [source.load_resource(self.cfg_event['configurationItem'])]
 
     def run(self, event, lambda_context):
         self.cfg_event = json.loads(event['invokingEvent'])
