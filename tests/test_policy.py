@@ -211,7 +211,7 @@ class TestPolicy(BaseTest):
 
     def test_file_not_found(self):
         self.assertRaises(
-            ValueError, policy.load, Config.empty(), "/asdf12")
+            IOError, policy.load, Config.empty(), "/asdf12")
 
     def test_lambda_policy_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
