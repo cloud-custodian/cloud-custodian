@@ -96,7 +96,7 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_sns_subscriber(self):
         self.patch(SNSSubscription, 'iam_delay', 0.01)
-        session_factory = self.record_flight_data('test_sns_subscriber')
+        session_factory = self.replay_flight_data('test_sns_subscriber')
         session = session_factory()
         client = session.client('sns')
 
@@ -119,7 +119,7 @@ class PolicyLambdaProvision(BaseTest):
 
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
-        time.sleep(15)
+        #time.sleep(15) -- turn this back on when recording flight data
         log_events = manager.logs(func, '1970-1-1', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
