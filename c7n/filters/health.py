@@ -44,7 +44,9 @@ class healthEventFilter(Filter):
                     eventDetail = client.describe_event_details(eventArns=[arn]
                         )
                     resource_map[entity]['HealthEvent'] = {
+                    'entityValue':entity,
                     'startTime':eventDetail['successfulSet'][0]['event']['startTime'],
+                    'eventTypeCode':eventDetail['successfulSet'][0]['event']['eventTypeCode'],
                     'eventDescription':eventDetail['successfulSet'][0]['eventDescription']['latestDescription']}
                     results.append(resource_map[entity])
         return results
