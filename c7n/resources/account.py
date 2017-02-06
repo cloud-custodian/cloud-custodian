@@ -294,6 +294,43 @@ class AccountPasswordPolicy(ValueFilter):
         return []
 
 
+@filters.register('optimizer-ec2-usage')
+class LowUsageEC2(Filter):
+    schema = type_schema(
+        'optimizer-ec2-usage',
+        threshold={'type': 'number'},
+        refresh_period={'type': 'integer'}
+    )
+
+    check_id = 'Qch7DwouX1'
+    check_limit = (
+        'Region/AZ', 'Instance ID', 'Instance Name', 'Instance Type',
+        'Estimated Monthly Savings', 'Day 1', 'Day 2', 'Day 3', 'Day 4',
+        'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10', 'Day 11',
+        'Day 12', 'Day 13', 'Day 14', '14-Day Average CPU Utilization',
+        '14-Day Average Network I/O', 'Number of Days Low Utilization')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('support')
+        checks = client.describe_trusted_advisor_check_result(
+            checkId=self.check_id, language='en')['result']
+
+        resources[0]['CostOptimization.LowUsageEC2'] = checks
+        delta = timedelta(self.data.get('refresh_period', 1))
+        check_date = parse_date(checks['timestamp'])
+        if datetime.now(tz=tzutc()) - delta > check_date:
+            client.refresh_trusted_advisor_check(checkId=self.check_id)
+        threshold = self.data.get('threshold')
+        values = []
+        for resource in checks['flaggedResources']:
+            if threshold is None and resource['status'] == 'ok':
+                continue
+            limit = dict(zip(self.check_limit, resource['metadata']))
+            values.append(limit)
+        resources[0]['CostOptimization.EC2Usage.Low'] = values
+        return resources
+
+
 @filters.register('service-limit')
 class ServiceLimit(Filter):
     """Check if account's service limits are past a given threshold.
