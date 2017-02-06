@@ -991,7 +991,7 @@ class CloudWatchLogSubscription(object):
                     raise
 
 
-class SimpleNotificationServiceSubscription(object):
+class SNSSubscription(object):
     """ Subscribe a lambda to one or more SNS topics.
     """
 

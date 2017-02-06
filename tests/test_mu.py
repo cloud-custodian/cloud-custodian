@@ -21,7 +21,7 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda,
-    CloudWatchLogSubscription, SimpleNotificationServiceSubscription, RUNTIME)
+    CloudWatchLogSubscription, SNSSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from common import BaseTest, Config, event_data
@@ -95,7 +95,7 @@ class PolicyLambdaProvision(BaseTest):
         #manager.publish(func)
 
     def test_sns_subscriber(self):
-        self.patch(SimpleNotificationServiceSubscription, 'iam_delay', 0.01)
+        self.patch(SNSSubscription, 'iam_delay', 0.01)
         session_factory = self.record_flight_data('test_sns_subscriber')
         session = session_factory()
         client = session.client('sns')
@@ -109,7 +109,7 @@ class PolicyLambdaProvision(BaseTest):
         params = dict(
             session_factory=session_factory,
             name='c7n-hello-world',
-            role=self.role,
+            role='arn:aws:iam::644160558196:role/custodian-mu',
             topic_arn=topic_arn)
 
         func = helloworld.get_function(**params)

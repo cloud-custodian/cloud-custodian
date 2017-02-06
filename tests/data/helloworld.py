@@ -22,8 +22,7 @@ def main(event, context):
 
 def get_function(session_factory, name, role, topic_arn):
     import os
-    from c7n.mu import (LambdaFunction, PythonPackageArchive,
-        SimpleNotificationServiceSubscription)
+    from c7n.mu import (LambdaFunction, PythonPackageArchive, SNSSubscription)
 
     config = dict(
         name=name,
@@ -33,8 +32,7 @@ def get_function(session_factory, name, role, topic_arn):
         timeout=15,
         role=role,
         description='Hello World',
-        events=[SimpleNotificationServiceSubscription(
-            session_factory, [topic_arn])])
+        events=[SNSSubscription(session_factory, [topic_arn])])
 
     archive = PythonPackageArchive(
         # Directory to lambda file
