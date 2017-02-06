@@ -512,7 +512,8 @@ class Policy(object):
             session_factory = SessionFactory(
                 options.region,
                 options.profile,
-                options.assume_role)
+                options.assume_role,
+                options.external_id)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.get_resource_manager()
