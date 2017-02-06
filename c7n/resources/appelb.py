@@ -76,8 +76,10 @@ class DescribeAppElb(DescribeSource):
 
     def augment(self, albs):
         _describe_appelb_tags(
-            albs, self.session_factory,
-            self.executor_factory, self.retry)
+            albs,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry)
 
         return albs
 

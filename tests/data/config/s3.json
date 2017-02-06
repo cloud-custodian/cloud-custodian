@@ -1,0 +1,34 @@
+{
+"configurationItemCaptureTime": "2017-02-04T06:10:33.880000-05:00", 
+"resourceCreationTime": "2017-02-04T06:06:27-05:00", 
+"availabilityZone": "Regional", 
+"awsRegion": "us-east-2", 
+"tags": {
+"Planet": "Earth", 
+"Verbose": "Game"
+}, 
+"resourceType": "AWS::S3::Bucket", 
+"resourceId": "config-rule-sanity", 
+"configurationStateId": "1486206633880", 
+"relatedEvents": [
+"4072c3c4-2f18-4ae0-9a3f-e7890c97b7ca"
+], 
+"relationships": [], 
+"arn": "arn:aws:s3:::config-rule-sanity", 
+"version": "1.2", 
+"configurationItemMD5Hash": "f93d1163843d62e07567e3287dba8e29", 
+"supplementaryConfiguration": {
+"BucketAccelerateConfiguration": "{\"status\":null}", 
+"BucketTaggingConfiguration": "{\"tagSets\":[{\"tags\":{\"Verbose\":\"Game\",\"Planet\":\"Earth\"}}]}", 
+"AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\",\\\"displayName\\\":null},\\\"permission\\\":\\\"FullControl\\\"}],\\\"owner\\\":{\\\"displayName\\\":null,\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\"},\\\"isRequesterCharged\\\":false}\"", 
+"BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}", 
+"BucketPolicy": "{\"policyText\":null}", 
+"BucketNotificationConfiguration": "{\"configurations\":{}}", 
+"BucketVersioningConfiguration": "{\"status\":\"Off\",\"isMfaDeleteEnabled\":null}", 
+"IsRequesterPaysEnabled": "false"
+}, 
+"resourceName": "config-rule-sanity", 
+"configuration": "{\"name\":\"config-rule-sanity\",\"owner\":{\"displayName\":\"mandeep.bal\",\"id\":\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\"},\"creationDate\":\"2017-02-04T11:06:27.000Z\"}", 
+"configurationItemStatus": "ResourceDiscovered", 
+"accountId": "644160558196"
+}
