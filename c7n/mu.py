@@ -1050,25 +1050,21 @@ class SNSSubscription(object):
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
 
-            next_token = ''
-            while 1:
-                response = self.client.list_subscriptions_by_topic(
-                    TopicArn=topic_arn,
-                    NextToken=next_token)  # has to be str (not None)
-                for subscription in response['Subscriptions']:
+            paginator = self.client.get_paginator('list_subscriptions_by_topic')
+            for page in paginator.paginate(TopicArn=topic_arn):
+                for subscription in page['Subscriptions']:
                     if subscription['Endpoint'] != func.arn:
                         continue
                     try:
                         response = self.client.unsubscribe(
                             SubscriptionArn=subscription['SubscriptionArn'])
-                        log.debug("Unsubscribed %s from %s" % (func.name, topic_name))
+                        log.debug("Unsubscribed %s from %s" %
+                            (func.name, topic_name))
                     except ClientError as e:
                         code = e.response['Error']['Code']
                         if code != 'ResourceNotFoundException':
                             raise
-                next_token = response.get('NextToken', '')
-                if not next_token:
-                    break  # in lieu of do/while
+                    break
 
 
 class ConfigRule(object):
