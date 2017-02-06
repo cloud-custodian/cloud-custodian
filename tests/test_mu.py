@@ -110,7 +110,7 @@ class PolicyLambdaProvision(BaseTest):
             session_factory=session_factory,
             name='c7n-hello-world',
             role='arn:aws:iam::644160558196:role/custodian-mu',
-            topic_arn=topic_arn)
+            events=[SNSSubscription(session_factory, [topic_arn])])
 
         func = helloworld.get_function(**params)
         manager = LambdaManager(session_factory)
@@ -120,20 +120,15 @@ class PolicyLambdaProvision(BaseTest):
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
         time.sleep(15)
-        logs = session.client('logs')
-        log_group_name = '/aws/lambda/c7n-hello-world'
-        response = logs.describe_log_streams(
-            logGroupName=log_group_name,
-            orderBy='LastEventTime',
-            descending=True,
-            limit=1)
-        stream_info = response['logStreams'][0]
-        response = logs.get_log_events(
-            logGroupName=log_group_name,
-            logStreamName=stream_info['logStreamName'])
-        messages = [e['message'] for e in response['events']]
-        self.addCleanup(logs.delete_log_group, logGroupName=log_group_name)
-        self.assertIn('Greetings, program!\n', messages)
+        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        messages = [e['message'] for e in log_events
+                    if e['message'].startswith('{"Records')]
+        self.addCleanup(
+            session.client('logs').delete_log_group,
+            logGroupName='/aws/lambda/c7n-hello-world')
+        self.assertEqual(
+            json.loads(messages[0])['Records'][0]['Sns']['Message'],
+            'Greetings, program!')
 
     def test_cwe_update_config_and_code(self):
         # Originally this was testing the no update case.. but

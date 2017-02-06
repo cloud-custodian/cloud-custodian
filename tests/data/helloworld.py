@@ -13,16 +13,17 @@
 # limitations under the License.
 """Hello world Lambda function for mu testing.
 """
+import json
+import sys
 
 
 def main(event, context):
-    for rec in event['Records']:
-        print(rec['Sns']['Message'])
+    json.dump(event, sys.stdout)
 
 
-def get_function(session_factory, name, role, topic_arn):
+def get_function(session_factory, name, role, events):
     import os
-    from c7n.mu import (LambdaFunction, PythonPackageArchive, SNSSubscription)
+    from c7n.mu import (LambdaFunction, PythonPackageArchive)
 
     config = dict(
         name=name,
@@ -32,7 +33,7 @@ def get_function(session_factory, name, role, topic_arn):
         timeout=15,
         role=role,
         description='Hello World',
-        events=[SNSSubscription(session_factory, [topic_arn])])
+        events=events)
 
     archive = PythonPackageArchive(
         # Directory to lambda file
