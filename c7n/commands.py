@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import print_function
 
+from collections import Counter
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
@@ -44,15 +45,16 @@ def policy_command(f):
 
         policies = []
         all_policies = []
+        errors = 0
         for file in options.configs:
             try:
                 collection = policy_load(options, file)
             except IOError:
                 eprint('Error: policy file does not exist ({})'.format(file))
-                sys.exit(1)
+                errors += 1
             except ValueError as e:
                 eprint('Error: problem loading policy file ({})'.format(e.message))
-                sys.exit(1)
+                errors += 1
 
             if collection is None:
                 log.info('Loaded file {}. Contained no policies.'.format(file))
@@ -61,9 +63,20 @@ def policy_command(f):
                 policies.extend(collection.policies)
                 all_policies.extend(collection.unfiltered_policies)
 
+        if errors > 0:
+            eprint('Found {} errors.  Exiting.'.format(errors))
+            sys.exit(1)
+
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
             sys.exit(1)
+
+        # Do not allow multiple policies with the same name, even across files
+        counts = Counter([p.name for p in policies])
+        for policy, count in counts.iteritems():
+            if count > 1:
+                eprint("Error: duplicate policy name '{}'".format(policy))
+                sys.exit(1)
 
         return f(options, policies)
 

@@ -524,3 +524,18 @@ class MiscTest(CliTest):
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file, nonexistent],
             1)
+
+    def test_duplicate_policy(self):
+        policy = {
+            'policies':
+            [{
+                'name': 'metrics-test',
+                'resource': 'ec2',
+                'query': [{"instance-state-name": "running"}],
+            }]
+        }
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file(policy)
+        self.run_and_expect_failure(
+            ['custodian', 'run', '-s', temp_dir, yaml_file, yaml_file],
+            1)
