@@ -47,9 +47,12 @@ def policy_command(f):
         for file in options.configs:
             try:
                 collection = policy_load(options, file)
-            except ValueError:
+            except IOError:
                 eprint('Error: policy file does not exist ({})'.format(file))
-                continue
+                sys.exit(1)
+            except ValueError as e:
+                eprint('Error: problem loading policy file ({})'.format(e.message))
+                sys.exit(1)
 
             if collection is None:
                 log.info('Loaded file {}. Contained no policies.'.format(file))
@@ -62,7 +65,7 @@ def policy_command(f):
             _print_no_policies_warning(options, all_policies)
             sys.exit(1)
 
-        return f(options, policies.policies)
+        return f(options, policies)
 
     return _load_policies
 
@@ -87,9 +90,6 @@ def _print_no_policies_warning(options, policies):
 
 def validate(options):
     load_resources()
-    if options.config is not None:
-        # support the old -c option
-        options.configs.append(options.config)
     if len(options.configs) < 1:
         # no configs to test
         # We don't have the parser object, so fake ArgumentParser.error
@@ -136,7 +136,7 @@ def validate(options):
 
         log.error("Configuration invalid: {}".format(config_file))
         for e in errors:
-            log.error(" %s" % e)
+            log.error("%s" % e)
     if errors:
         sys.exit(1)
 
@@ -171,10 +171,6 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
-    if len(policies) == 0:
-        eprint("Error: No policy supplied")
-        sys.exit(1)
-
     if len(policies) > 1:
         eprint("Error: Report subcommand can only operate on one policy")
         sys.exit(1)
@@ -196,10 +192,6 @@ def report(options, policies):
 
 @policy_command
 def logs(options, policies):
-    if len(policies) == 0:
-        eprint("Error: No policy supplied")
-        sys.exit(1)
-
     if len(policies) > 1:
         eprint("Error: Log subcommand can only operate on one policy")
         sys.exit(1)
