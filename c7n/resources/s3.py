@@ -203,30 +203,15 @@ class ConfigS3(query.ConfigSource):
             'MFADelete': item_value['isMfaDeletedEnabled']}
 
 
-"""
->>> pprint.pprint(xx)
-{u'Grants': [{u'Grantee': {u'ID': 'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
-                           u'Type': 'CanonicalUser'},
-              u'Permission': 'FULL_CONTROL'}],
- u'Owner': {u'ID': 'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}}
->>> pprint.pprint(json.loads(json.loads(item['supplementaryConfiguration']['AccessControlList'])))
-{u'grantList': [{u'grantee': {u'displayName': None,
-                              u'id': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'},
-                 u'permission': u'FullControl'}],
- u'grantSet': None,
- u'isRequesterCharged': False,
- u'owner': {u'displayName': None,
-            u'id': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}}
-"""
-
 S3_CONFIG_SUPPLEMENT_NULL_MAP = {
     'BucketLoggingConfiguration': u'{"destinationBucketName":null,"logFilePrefix":null}',
     'BucketPolicy': u'{"policyText":null}',
     'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}',
-    'AccessControlList': None,
     'BucketAccelerateConfiguration': u'{"status":null}',
-    'BucketTaggingConfiguration': u'',
     'BucketNotificationConfiguration': u'{"configurations":{}}',
+    # Always load
+    'AccessControlList': None,
+    'BucketTaggingConfiguration': u'',
     }
 
 S3_AUGMENT_TABLE = (
