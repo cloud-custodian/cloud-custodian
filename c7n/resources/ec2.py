@@ -820,7 +820,7 @@ class Snapshot(BaseAction):
 
     def process(self, resources):
         for resource in resources:
-            with self.executor_factory(max_workers=3) as w:
+            with self.executor_factory(max_workers=2) as w:
                 futures = []
                 futures.append(w.submit(self.process_volume_set, resource))
                 for f in as_completed(futures):

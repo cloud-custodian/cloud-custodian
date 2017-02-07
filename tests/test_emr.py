@@ -59,6 +59,62 @@ class TestEMR(BaseTest):
             ]
         )
 
+    def test_get_emr_tags(self):
+        session_factory = self.replay_flight_data(
+            'test_get_emr_tags')
+
+        policy = self.load_policy({
+            'name': 'test-get-emr-tags',
+            'resource': 'emr',
+            'filters': [{
+                "tag:first_tag": 'first'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        cluster = session_factory().client(
+            'emr').describe_cluster(ClusterId='j-1U3KBYP5TY79M')
+        cluster_tags = cluster['Cluster']['Tags']
+        tags = {t['Key']: t['Value'] for t in cluster_tags}
+        self.assertEqual(tags['first_tag'], 'first')
+
+    def test_emr_mark(self):
+        session_factory = self.replay_flight_data(
+            'test_emr_mark')
+        p = self.load_policy({
+            'name': 'emr-mark',
+            'resource': 'emr',
+            'filters': [
+                {"tag:first_tag": 'first'}],
+            'actions': [
+                {'type': 'mark-for-op', 'days': 4,
+                'op': 'terminate', 'tag': 'test_tag'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        new_tags = resources[0]['Tags']
+        self.assertEqual(len(resources), 1)
+        tag_map = {t['Key']: t['Value'] for t in new_tags}
+        self.assertTrue('test_tag' in tag_map)
+
+    def test_emr_unmark(self):
+        session_factory = self.replay_flight_data(
+            'test_emr_unmark')
+        p = self.load_policy({
+            'name': 'emr-unmark',
+            'resource': 'emr',
+            'filters': [
+                {"tag:first_tag": 'first'}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'tags': ['test_tag']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        old_tags = resources[0]['Tags']
+        self.assertEqual(len(resources), 1)
+        self.assertFalse('test_tag' in old_tags)
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 
