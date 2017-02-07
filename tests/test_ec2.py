@@ -74,7 +74,7 @@ class TestMetricFilter(BaseTest):
 
 class TestHealthEventsFilter(BaseTest):
     def test_ec2_health_events_filter(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_health_events_filter')
         policy = self.load_policy({
             'name': 'ec2-health-events-filter',
