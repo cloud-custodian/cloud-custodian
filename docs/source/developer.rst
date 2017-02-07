@@ -38,6 +38,12 @@ Then build the software:
 
    $ make develop
 
+Once that completes, make sure you load the virtualenv into your current shell:
+
+.. code-block:: bash
+
+   $ source bin/activate
+
 You should have the ``custodian`` command available now:
 
 .. code-block:: bash

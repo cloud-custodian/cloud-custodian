@@ -1,0 +1,108 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Cluster": {
+            "Status": {
+                "Timeline": {
+                    "EndDateTime": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 51, 
+                        "microsecond": 940000, 
+                        "year": 2017, 
+                        "day": 30, 
+                        "minute": 33
+                    }, 
+                    "CreationDateTime": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 40, 
+                        "microsecond": 847000, 
+                        "year": 2017, 
+                        "day": 30, 
+                        "minute": 31
+                    }
+                }, 
+                "State": "TERMINATED_WITH_ERRORS", 
+                "StateChangeReason": {
+                    "Message": "Failed to provision ec2 instances because 'The requested instance profile EMR_AutoScaling_DefaultRole is invalid'", 
+                    "Code": "VALIDATION_ERROR"
+                }
+            }, 
+            "Ec2InstanceAttributes": {
+                "Ec2SubnetId": "subnet-b242f6d6", 
+                "EmrManagedSlaveSecurityGroup": "sg-4fcf4037", 
+                "IamInstanceProfile": "EMR_AutoScaling_DefaultRole", 
+                "Ec2AvailabilityZone": "us-west-2b", 
+                "EmrManagedMasterSecurityGroup": "sg-4ecf4036"
+            }, 
+            "Name": "test-cluster-tags", 
+            "ServiceRole": "EMR_DefaultRole", 
+            "Tags": [
+                {
+                    "Value": "second", 
+                    "Key": "second_tag"
+                },
+                {
+                    "Value": "Cluster will be terminated",
+                    "Key": "test_tag"
+                },
+                {
+                    "Value": "first", 
+                    "Key": "first_tag"
+                }
+            ], 
+            "TerminationProtected": false, 
+            "ReleaseLabel": "emr-5.3.0", 
+            "NormalizedInstanceHours": 0, 
+            "Applications": [
+                {
+                    "Version": "3.7.2", 
+                    "Name": "Ganglia"
+                }, 
+                {
+                    "Version": "2.7.3", 
+                    "Name": "Hadoop"
+                }, 
+                {
+                    "Version": "2.1.1", 
+                    "Name": "Hive"
+                }, 
+                {
+                    "Version": "3.11.0", 
+                    "Name": "Hue"
+                }, 
+                {
+                    "Version": "0.12.2", 
+                    "Name": "Mahout"
+                }, 
+                {
+                    "Version": "0.16.0", 
+                    "Name": "Pig"
+                }, 
+                {
+                    "Version": "0.8.4", 
+                    "Name": "Tez"
+                }
+            ], 
+            "ScaleDownBehavior": "TERMINATE_AT_INSTANCE_HOUR", 
+            "VisibleToAllUsers": true, 
+            "AutoTerminate": false, 
+            "Id": "j-1U3KBYP5TY79M", 
+            "Configurations": []
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a03e27e2-e71b-11e6-97ad-97a107507ebe", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a03e27e2-e71b-11e6-97ad-97a107507ebe", 
+                "date": "Mon, 30 Jan 2017 18:40:51 GMT", 
+                "content-length": "1292", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
