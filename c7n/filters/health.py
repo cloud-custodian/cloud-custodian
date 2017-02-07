@@ -15,6 +15,7 @@
 from c7n.utils import local_session, type_schema
 from .core import Filter
 
+
 class healthEventFilter(Filter):
     """Check if there are health events related to the resources"""
 
@@ -30,24 +31,29 @@ class healthEventFilter(Filter):
             client = local_session(
                 self.manager.session_factory).client('health')
             resource_map = self.get_resource_map(resources)
-            statusCodes = self.data.get('eventStatusCodes',['open','upcoming'])
+            statusCodes = self.data.get(
+                'eventStatusCodes', ['open', 'upcoming'])
             eventArns = []
             paginator = client.get_paginator('describe_events')
             for p in paginator.paginate(filter={
-                'eventTypeCodes': self.data.get('eventTypeCodes'),
-                'eventStatusCodes': statusCodes}):
+                    'eventTypeCodes': self.data.get('eventTypeCodes'),
+                    'eventStatusCodes': statusCodes}):
                 eventArns.extend([e['arn'] for e in p['events']])
             for arn in eventArns:
                 entity = client.describe_affected_entities(filter={
-                    'eventArns':[arn]})['entities'][0]['entityValue']
+                    'eventArns': [arn]})['entities'][0]['entityValue']
                 if entity in resource_map:
-                    eventDetail = client.describe_event_details(eventArns=[arn]
-                        )
+                    eventDetail = client.describe_event_details(
+                        eventArns=[arn])
                     resource_map[entity]['HealthEvent'] = {
-                    'entityValue':entity,
-                    'startTime':eventDetail['successfulSet'][0]['event']['startTime'],
-                    'eventTypeCode':eventDetail['successfulSet'][0]['event']['eventTypeCode'],
-                    'eventDescription':eventDetail['successfulSet'][0]['eventDescription']['latestDescription']}
+                        'entityValue': entity,
+                        'startTime': eventDetail['successfulSet'][0]
+                                        ['event']['startTime'],
+                        'eventTypeCode': eventDetail['successfulSet'][0]
+                                        ['event']['eventTypeCode'],
+                        'eventDescription': eventDetail['successfulSet'][0]
+                                        ['eventDescription']
+                                        ['latestDescription']}
                     results.append(resource_map[entity])
         return results
 
