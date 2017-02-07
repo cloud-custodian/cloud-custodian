@@ -24,6 +24,8 @@ class healthEventFilter(Filter):
             required=['eventTypeCodes'],
             eventTypeCodes={'type': 'array', 'items': {'type': 'string'}},
             eventStatusCodes={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',
+        'health:DescribeEventDetails')
 
     def process(self, resources, event=None):
         results = []
