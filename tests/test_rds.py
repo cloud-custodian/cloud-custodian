@@ -752,7 +752,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
 class TestHealthEventsFilter(BaseTest):
     def test_rds_health_events_filter(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_rds_health_events_filter')
         policy = self.load_policy({
             'name': 'rds-health-events-filter',
