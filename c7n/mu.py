@@ -991,6 +991,86 @@ class CloudWatchLogSubscription(object):
                     raise
 
 
+class SNSSubscription(object):
+    """ Subscribe a lambda to one or more SNS topics.
+    """
+
+    iam_delay = 1.5
+
+    def __init__(self, session_factory, topic_arns):
+        self.topic_arns = topic_arns
+        self.session_factory = session_factory
+        self.session = session_factory()
+        self.client = self.session.client('sns')
+
+    @staticmethod
+    def _parse_arn(arn):
+        parts = arn.split(':')
+        region, topic_name = parts[3], parts[5]
+        statement_id = 'sns-topic-' + topic_name
+        return region, topic_name, statement_id
+
+    def add(self, func):
+        lambda_client = self.session.client('lambda')
+        for arn in self.topic_arns:
+            region, topic_name, statement_id = self._parse_arn(arn)
+
+            log.info("Subscribing %s to %s" % (func.name, topic_name))
+
+            # Add permission to lambda for sns invocation.
+            try:
+                lambda_client.add_permission(
+                    FunctionName=func.name,
+                    StatementId='sns-topic-' + topic_name,
+                    SourceArn=arn,
+                    Action='lambda:InvokeFunction',
+                    Principal='sns.amazonaws.com')
+                log.debug("Added permission for sns to invoke lambda")
+                # iam eventual consistency and propagation
+                time.sleep(self.iam_delay)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ResourceConflictException':
+                    raise
+
+            # Subscribe the lambda to the topic.
+            topic = self.session.resource('sns').Topic(arn)
+            topic.subscribe(Protocol='lambda', Endpoint=func.arn) # idempotent
+
+    def remove(self, func):
+        lambda_client = self.session.client('lambda')
+        for topic_arn in self.topic_arns:
+            region, topic_name, statement_id = self._parse_arn(topic_arn)
+
+            try:
+                response = lambda_client.remove_permission(
+                    FunctionName=func.name,
+                    StatementId=statement_id)
+                log.debug("Removed lambda permission result: %s" % response)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                    raise
+
+            paginator = self.client.get_paginator('list_subscriptions_by_topic')
+            class Done(Exception): pass
+            try:
+                for page in paginator.paginate(TopicArn=topic_arn):
+                    for subscription in page['Subscriptions']:
+                        if subscription['Endpoint'] != func.arn:
+                            continue
+                        try:
+                            response = self.client.unsubscribe(
+                                SubscriptionArn=subscription['SubscriptionArn'])
+                            log.debug("Unsubscribed %s from %s" %
+                                (func.name, topic_name))
+                        except ClientError as e:
+                            code = e.response['Error']['Code']
+                            if code != 'ResourceNotFoundException':
+                                raise
+                        raise Done  # break out of both for loops
+            except Done:
+                pass
+
+
 class ConfigRule(object):
     """Use a lambda as a custom config rule.
 
