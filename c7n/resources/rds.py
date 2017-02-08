@@ -75,6 +75,7 @@ actions = ActionRegistry('rds.actions')
 
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
+filters.register('health-events', healthEventFilter)
 actions.register('auto-tag-user', AutoTagUser)
 
 
@@ -297,13 +298,6 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, dbs, event=None):
         return self.get_matching_aliases(dbs)
-
-
-@filters.register('health-events')
-class RdsHealthEventFilter(healthEventFilter):
-
-    def get_resource_map(self, resources):
-        return {r['DBInstanceIdentifier']: r for r in resources}
 
 
 @actions.register('mark-for-op')

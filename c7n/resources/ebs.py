@@ -33,7 +33,7 @@ log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
-
+filters.register('health-events', healthEventFilter)
 
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
@@ -411,11 +411,6 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
 
-@filters.register('health-events')
-class EbsHealthEventFilter(healthEventFilter):
-
-    def get_resource_map(self, resources):
-        return {r['VolumeId']: r for r in resources}
 
 @filters.register('fault-tolerant')
 class FaultTolerantSnapshots(Filter):

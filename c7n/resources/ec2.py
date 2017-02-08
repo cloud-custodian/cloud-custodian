@@ -41,6 +41,7 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 actions.register('auto-tag-user', AutoTagUser)
+filters.register('health-events', healthEventFilter)
 
 
 @resources.register('ec2')
@@ -154,11 +155,6 @@ class EC2(QueryResourceManager):
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
 
-@filters.register('health-events')
-class Ec2HealthEventFilter(healthEventFilter):
-
-    def get_resource_map(self, resources):
-        return {r['InstanceId']: r for r in resources}
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
