@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9e349c2d-ee49-11e6-99c5-7d1266a7e3e6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9e349c2d-ee49-11e6-99c5-7d1266a7e3e6", 
+                "date": "Wed, 08 Feb 2017 21:57:42 GMT", 
+                "content-length": "1399", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MetricAlarms": [
+            {
+                "EvaluationPeriods": 3, 
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-99", 
+                "StateUpdatedTimestamp": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 42, 
+                    "microsecond": 829000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 57
+                }, 
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 42, 
+                    "microsecond": 829000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 57
+                }, 
+                "ComparisonOperator": "GreaterThanThreshold", 
+                "AlarmActions": [], 
+                "Namespace": "AWS/EC2", 
+                "Period": 300, 
+                "StateValue": "INSUFFICIENT_DATA", 
+                "Threshold": 1.0, 
+                "AlarmName": "c7n-test-alarm-delete-99", 
+                "Dimensions": [
+                    {
+                        "Name": "InstanceId", 
+                        "Value": "i-0953b366052acef5c"
+                    }
+                ], 
+                "Statistic": "Average", 
+                "StateReason": "Unchecked: Initial alarm creation", 
+                "InsufficientDataActions": [], 
+                "OKActions": [], 
+                "ActionsEnabled": true, 
+                "MetricName": "CPUUtilization"
+            }
+        ]
+    }
+}
