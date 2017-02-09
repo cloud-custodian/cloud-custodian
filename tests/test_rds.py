@@ -758,8 +758,7 @@ class TestHealthEventsFilter(BaseTest):
             'name': 'rds-health-events-filter',
             'resource': 'rds',
             'filters': [
-                {'type': 'health-events',
-                 'eventTypeCodes': ['AWS_RDS_MAINTENANCE_SCHEDULED']}
+                {'type': 'health-events'}
             ]},
             session_factory=session_factory)
         resources = policy.run()

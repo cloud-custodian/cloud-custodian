@@ -74,15 +74,13 @@ class TestMetricFilter(BaseTest):
 
 class TestHealthEventsFilter(BaseTest):
     def test_ec2_health_events_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.record_flight_data(
             'test_ec2_health_events_filter')
         policy = self.load_policy({
             'name': 'ec2-health-events-filter',
             'resource': 'ec2',
             'filters': [
-                {'type': 'health-events',
-                 'eventTypeCodes': 
-                    ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED']}
+                {'type': 'health-events'}
             ]},
             session_factory=session_factory)
         resources = policy.run()

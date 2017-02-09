@@ -1,7 +1,7 @@
 {
     "status_code": 200, 
     "data": {
-        "Marker": "AB1WgFwJSXt1BquftE6PJTUkCiraAMKOf+uYG+nuo4Zl9EJboxWJcVBvhznS+KF+LJf4dLnY5SKlv5wc6FMgH+6/", 
+        "Marker": "AC9wWvZCEx2orBOYgnRJoN/qgJ4Jx/WifPIKBzIhFUZdI1wgJG++hRqMaHU5qk5AYGi2FFVtcViwQwtGT2FEJyiC", 
         "IsTruncated": true, 
         "Roles": [
             {
@@ -25,10 +25,10 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "e15d912c-ed54-11e6-973f-c33f14bf6468", 
+            "RequestId": "8e2b676f-ef06-11e6-a3b2-c76164585397", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "e15d912c-ed54-11e6-973f-c33f14bf6468", 
-                "date": "Tue, 07 Feb 2017 16:45:48 GMT", 
+                "x-amzn-requestid": "8e2b676f-ef06-11e6-a3b2-c76164585397", 
+                "date": "Thu, 09 Feb 2017 20:30:10 GMT", 
                 "content-length": "961", 
                 "content-type": "text/xml"
             }
