@@ -20,7 +20,6 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
     ANNOTATION_KEY, FilterValidationError, OPERATORS)
-from c7n.filters.health import healthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -33,7 +32,6 @@ log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
-filters.register('health-events', healthEventFilter)
 
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
