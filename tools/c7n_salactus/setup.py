@@ -16,7 +16,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_salactus",
-    version='0.1',
+    version='0.1.1',
     description="Cloud Custodian - Salactus S3",
     classifiers=[
       "Topic :: System :: Systems Administration",
@@ -28,6 +28,6 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-salactus = c7n_salactus.cli:cli']},
-    install_requires=["c7n", "click"],
+    install_requires=["c7n", "click", "rq", "redis"],
 )
 

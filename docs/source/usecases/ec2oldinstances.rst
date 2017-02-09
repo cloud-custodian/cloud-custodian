@@ -7,9 +7,8 @@ EC2 - Old Instance Report
      resource: ec2
      comment: |
        Report running instances older than 60 days
-     query:
-       - instance-state-name: running
      filters:
+       - "State.Name": running
        - type: instance-age
          days: 60
 

@@ -233,7 +233,7 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
 
 @cli.command()
 def queues():
-    """Reeport on progress by queues."""
+    """Report on progress by queues."""
     conn = worker.connection
     failure_q = None
 

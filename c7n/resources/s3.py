@@ -251,20 +251,64 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
         """add in elb access by default
 
         ELB Accounts by region http://goo.gl/a8MXxd
+
+        Redshift Accounts by region https://goo.gl/MKWPTT
+
+        Cloudtrail Accounts by region https://goo.gl/kWQk9D
         """
         accounts = super(S3CrossAccountFilter, self).get_accounts()
         return accounts.union(
-            ['127311923021',  # us-east-1
-             '797873946194',  # us-west-2
-             '027434742980',  # us-west-1
-             '156460612806',  # eu-west-1
-             '054676820928',  # eu-central-1
-             '114774131450',  # ap-southeast-1
-             '582318560864',  # ap-northeast-1
-             '783225319266',  # ap-southeast-2
-             '600734575887',  # ap-northeast-2
-             '507241528517',  # sa-east-1
-             '048591011584',  # gov-cloud-1
+            [
+                # ELB accounts
+                '127311923021',  # us-east-1
+                '033677994240',  # us-east-2
+                '797873946194',  # us-west-2
+                '027434742980',  # us-west-1
+                '985666609251',  # ca-central-1
+                '156460612806',  # eu-west-1
+                '054676820928',  # eu-central-1
+                '652711504416',  # eu-west-2
+                '582318560864',  # ap-northeast-1
+                '600734575887',  # ap-northeast-2
+                '114774131450',  # ap-southeast-1
+                '783225319266',  # ap-southeast-2
+                '718504428378',  # ap-south-1
+                '507241528517',  # sa-east-1
+                '048591011584',  # us-gov-west-1 or gov-cloud-1
+                '638102146993',  # cn-north-1
+
+                # Redshift accounts
+                '368064434614',  # us-east-1
+                '790247189693',  # us-east-2
+                '703715109447',  # us-east-1
+                '473191095985',  # us-west-2
+                '408097707231',  # ap-south-1
+                '713597048934',  # ap-northeast-2
+                '960118270566',  # ap-southeast-1
+                '485979073181',  # ap-southeast-2
+                '615915377779',  # ap-northeast-1
+                '764870610256',  # ca-central-1
+                '434091160558',  # eu-central-1
+                '246478207311',  # eu-west-1
+                '885798887673',  # eu-west-2
+                '392442076723',  # sa-east-1
+
+                # Cloudtrail accounts (psa. folks should be using
+                # cloudtrail service in bucket policies)
+                '086441151436',  # us-east-1
+                '475085895292',  # us-west-2
+                '388731089494',  # us-west-1
+                '113285607260',  # us-west-2
+                '819402241893',  # ca-central-1
+                '977081816279',  # ap-south-1
+                '492519147666',  # ap-northeast-2
+                '903692715234',  # ap-southeast-1
+                '284668455005',  # ap-southeast-2
+                '216624486486',  # ap-northeast-1
+                '035351147821',  # eu-central-1
+                '859597730677',  # eu-west-1
+                '282025262664',  # eu-west-2
+                '814480443879',  # sa-east-1
              ])
 
 
