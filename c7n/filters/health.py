@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import itertools
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, chunks, type_schema
 from .core import Filter
 
 
@@ -22,11 +22,10 @@ class healthEventFilter(Filter):
 
     schema = type_schema(
             'health-events',
-            entityValues={'type': 'array', 'items': {'type': 'string'}},
             eventTypeCodes={'type': 'array', 'items': {'type': 'string'}},
             eventStatusCodes={'type': 'array', 'items': {'type': 'string'}})
     permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',
-        'health:DescribeEventDetails')
+                   'health:DescribeEventDetails')
 
     def process(self, resources, event=None):
         results = []
@@ -34,30 +33,28 @@ class healthEventFilter(Filter):
             return results
         client = local_session(self.manager.session_factory).client('health')
         m = self.manager.get_model()
-        resource_map = {r[m.id]: r for r in resources}
-        paginator = client.get_paginator('describe_events')
         statusCodes = self.data.get('eventStatusCodes', ['open', 'upcoming'])
         f = {'services': [m.service.upper()], 'eventStatusCodes': statusCodes}
-        if self.data.get('entityValues'):
-            f['entityValues'] = self.data.get('entityValues')
         if self.data.get('eventTypeCodes'):
             f['eventTypeCodes'] = self.data.get('eventTypeCodes')
-        events = list(itertools.chain(
-            *[p['events']for p in paginator.paginate(filter=f)]))
-        eventArns = list(itertools.chain(e['arn'] for e in events))
-        for arn in eventArns:
-            entity = client.describe_affected_entities(filter={
-                'eventArns': [arn]})['entities'][0]['entityValue']
-            if entity not in resource_map:
-                continue
-            eventDetail = client.describe_event_details(eventArns=[arn])
-            resource_map[entity]['HealthEvent'] = {
-                'entityValue': entity,
-                'startTime': eventDetail['successfulSet'][0]
-                                ['event']['startTime'],
-                'eventTypeCode': eventDetail['successfulSet'][0]
-                                ['event']['eventTypeCode'],
-                'eventDescription': eventDetail['successfulSet'][0]
-                                ['eventDescription']['latestDescription']}
-            results.append(resource_map[entity])
+        resource_map = {r[m.id]: r for r in resources}
+        for resource_set in chunks(resource_map.keys(), 100):
+            f['entityValues'] = resource_set
+            events = client.describe_events(filter=f)['events']
+            for event in events:
+                arn = event['arn']
+                entity = client.describe_affected_entities(filter={
+                    'eventArns': [arn]})['entities'][0]['entityValue']
+                if entity not in resource_map:
+                    continue
+                eventDetail = client.describe_event_details(eventArns=[arn])
+                resource_map[entity].setdefault('HealthEvent', []).append(
+                    {'entityValue': entity,
+                     'startTime': eventDetail['successfulSet'][0]
+                                    ['event']['startTime'],
+                     'eventTypeCode': eventDetail['successfulSet'][0]
+                                    ['event']['eventTypeCode'],
+                     'eventDescription': eventDetail['successfulSet'][0]
+                                    ['eventDescription']['latestDescription']})
+                results.append(resource_map[entity])
         return results
