@@ -21,10 +21,11 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda,
-    CloudWatchLogSubscription, RUNTIME)
+    CloudWatchLogSubscription, SNSSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from common import BaseTest, Config, event_data
+from data import helloworld
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -92,6 +93,42 @@ class PolicyLambdaProvision(BaseTest):
         # try and update
         #params['sns_topic'] = "arn:123"
         #manager.publish(func)
+
+    def test_sns_subscriber(self):
+        self.patch(SNSSubscription, 'iam_delay', 0.01)
+        session_factory = self.replay_flight_data('test_sns_subscriber')
+        session = session_factory()
+        client = session.client('sns')
+
+        # create an sns topic
+        tname = "custodian-test-sns-sub"
+        topic_arn = client.create_topic(Name=tname)['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
+
+        # provision a lambda via mu
+        params = dict(
+            session_factory=session_factory,
+            name='c7n-hello-world',
+            role='arn:aws:iam::644160558196:role/custodian-mu',
+            events=[SNSSubscription(session_factory, [topic_arn])])
+
+        func = helloworld.get_function(**params)
+        manager = LambdaManager(session_factory)
+        manager.publish(func)
+        self.addCleanup(manager.remove, func)
+
+        # now publish to the topic and look for lambda log output
+        client.publish(TopicArn=topic_arn, Message='Greetings, program!')
+        #time.sleep(15) -- turn this back on when recording flight data
+        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        messages = [e['message'] for e in log_events
+                    if e['message'].startswith('{"Records')]
+        self.addCleanup(
+            session.client('logs').delete_log_group,
+            logGroupName='/aws/lambda/c7n-hello-world')
+        self.assertEqual(
+            json.loads(messages[0])['Records'][0]['Sns']['Message'],
+            'Greetings, program!')
 
     def test_cwe_update_config_and_code(self):
         # Originally this was testing the no update case.. but

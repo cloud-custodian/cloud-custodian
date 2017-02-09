@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c2fa63a1-ec5a-11e6-8255-e7e7955d808e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c2fa63a1-ec5a-11e6-8255-e7e7955d808e", 
+                "date": "Mon, 06 Feb 2017 10:55:23 GMT", 
+                "content-length": "2218", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "nextForwardToken": "f/33147348406099034576805600702842058803646248213897347075", 
+        "events": [
+            {
+                "ingestionTime": 1486378523439, 
+                "timestamp": 1486378508371, 
+                "message": "START RequestId: b93aa9e2-ec5a-11e6-a382-5756603a5159 Version: $LATEST\n"
+            }, 
+            {
+                "ingestionTime": 1486378523439, 
+                "timestamp": 1486378508372, 
+                "message": "END RequestId: b93aa9e2-ec5a-11e6-a382-5756603a5159\n"
+            }, 
+            {
+                "ingestionTime": 1486378523439, 
+                "timestamp": 1486378508372, 
+                "message": "REPORT RequestId: b93aa9e2-ec5a-11e6-a382-5756603a5159\tDuration: 0.50 ms\tBilled Duration: 100 ms \tMemory Size: 512 MB\tMax Memory Used: 15 MB\t\n"
+            }, 
+            {
+                "ingestionTime": 1486378523439, 
+                "timestamp": 1486378509373, 
+                "message": "{\"Records\": [{\"EventVersion\": \"1.0\", \"EventSubscriptionArn\": \"arn:aws:sns:us-west-2:644160558196:custodian-test-sns-sub:009d60f5-9817-41d0-9ce4-5fe5e8fd4663\", \"EventSource\": \"aws:sns\", \"Sns\": {\"SignatureVersion\": \"1\", \"Timestamp\": \"2017-02-06T10:55:08.002Z\", \"Signature\": \"QqHs3HEG8/cZgN/h5nkL0ivjzuNNpg6bphx9A0FbO3zGLKQBJER9G4lwk4e5EgxPEcsf8qbVeVp2zF55sX3Flbu2vjnpg1BSVDJr3dthA/KKu7bFRMosZ8LT6DTBX8qqUhcjz0Cm0xUuaHUua1NjLmr5WGoPFWO/Pp5K2/Xt3pWvlR4/xZXj0fywfSV/2MCWRUU6cGIS7veX/Kg23iEXcxAUxXURDGRoz5ztpBbe+sQQnPJ1f/h/Mrkwsbqu4S/QlIhfJbdPKzr8BI0VuHv0NaK7FO/aiPLfz+n4vJdNpYlCCvXF6pZRCZs/S0GzuLSVrtp0K5K6a8W4Vj6na9nUZQ==\", \"SigningCertUrl\": \"https://sns.us-west-2.amazonaws.com/SimpleNotificationService-b95095beb82e8f6a046b3aafc7f4149a.pem\", \"MessageId\": \"226bbbc7-ed68-5804-b1e5-ead5b524d715\", \"Message\": \"Greetings, program!\", \"MessageAttributes\": {}, \"Type\": \"Notification\", \"UnsubscribeUrl\": \"https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:644160558196:custodian-test-sns-sub:009d60f5-9817-41d0-9ce4-5fe5e8fd4663\", \"TopicArn\": \"arn:aws:sns:us-west-2:644160558196:custodian-test-sns-sub\", \"Subject\": null}}]}"
+            }
+        ], 
+        "nextBackwardToken": "b/33147348383753687887877916315023269094452589984904970240"
+    }
+}

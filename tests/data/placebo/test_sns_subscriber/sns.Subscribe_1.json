@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bcb99a70-58e9-5966-8dad-cb6200a213ad", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bcb99a70-58e9-5966-8dad-cb6200a213ad", 
+                "date": "Mon, 06 Feb 2017 10:55:07 GMT", 
+                "content-length": "372", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "SubscriptionArn": "arn:aws:sns:us-west-2:644160558196:custodian-test-sns-sub:009d60f5-9817-41d0-9ce4-5fe5e8fd4663"
+    }
+}
