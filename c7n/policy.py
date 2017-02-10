@@ -40,8 +40,9 @@ from c7n.resources import load_resources
 
 
 def load(options, path, format='yaml', validate=True):
+    # should we do os.path.expanduser here?
     if not os.path.exists(path):
-        raise ValueError("Invalid path for config %r" % path)
+        raise IOError("Invalid path for config %r" % path)
 
     load_resources()
     with open(path) as fh:
