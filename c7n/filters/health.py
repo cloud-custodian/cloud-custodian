@@ -50,7 +50,7 @@ class HealthEventFilter(Filter):
             f['eventTypeCodes'] = self.data.get('types')
 
         resource_map = {r[m.id]: r for r in resources}
-        results = []
+        found = set()
         seen = set()
 
         for resource_set in chunks(resource_map.keys(), 100):
@@ -65,7 +65,7 @@ class HealthEventFilter(Filter):
                     event_map[d['event']['arn']]['Description'] = d[
                         'eventDescription']['latestDescription']
                 entities = client.describe_affected_entities(
-                    filter={'eventArns': event_map.keys()})
+                    filter={'eventArns': event_map.keys()})['entities']
 
                 for e in entities:
                     rid = e['entityValue']
@@ -73,5 +73,6 @@ class HealthEventFilter(Filter):
                         continue
                     resource_map[rid].setdefault(
                         'c7n:HealthEvent', []).append(event_map[e['eventArn']])
+                    found.add(rid)
                 seen.update(event_map.keys())
-        return results
+        return [resource_map[rid] for rid in found]
