@@ -758,7 +758,7 @@ class TestHealthEventsFilter(BaseTest):
             'name': 'rds-health-events-filter',
             'resource': 'rds',
             'filters': [
-                {'type': 'health-events'}
+                {'type': 'health-event'}
             ]},
             session_factory=session_factory)
         resources = policy.run()

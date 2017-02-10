@@ -80,7 +80,7 @@ class TestHealthEventsFilter(BaseTest):
             'name': 'ec2-health-events-filter',
             'resource': 'ec2',
             'filters': [
-                {'type': 'health-events'}
+                {'type': 'health-event'}
             ]},
             session_factory=session_factory)
         resources = policy.run()
