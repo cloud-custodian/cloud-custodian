@@ -28,7 +28,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TableName'], 'rolltop')
         self.assertEqual(resources[0]['TableStatus'], 'ACTIVE')
-
+ 
     def test_invoke_action(self):
         session_factory = self.replay_flight_data(
             'test_dynamodb_invoke_action')
@@ -42,7 +42,7 @@ class DynamodbTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
+ 
     def test_delete_tables(self):
         session_factory = self.replay_flight_data('test_dynamodb_delete_table')
         self.patch(DeleteTable, 'executor_factory', MainThreadExecutor)
@@ -55,3 +55,58 @@ class DynamodbTest(BaseTest):
                 'type': 'delete'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(resources[0]['TableName'], 'c7n.DynamoDB.01')
+        
+    def test_tag_filter(self):
+        session_factory = self.replay_flight_data('test_dynamodb_tag_filter')
+        client = session_factory().client('dynamodb')
+        p = self.load_policy({
+            'name': 'dynamodb-tag-filters',
+            'resource': 'dynamodb-table',
+            'filters': [{
+                'tag:test_key': 'test_value'}]}, 
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['TableArn']
+        tags = client.list_tags_of_resource(ResourceArn=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['Tags']}
+        self.assertTrue('test_key' in tag_map)
+        
+    def test_dynamodb_mark(self):
+        session_factory = self.replay_flight_data(
+            'test_dynamodb_mark')
+        client = session_factory().client('dynamodb')
+        p = self.load_policy({
+            'name': 'dynamodb-mark',
+            'resource': 'dynamodb-table',
+            'filters': [
+                {'TableName': 'rolltop'}],
+            'actions': [
+                {'type': 'mark-for-op', 'days': 4,
+                'op': 'delete', 'tag': 'test_tag'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        arn = resources[0]['TableArn']
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_of_resource(ResourceArn=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['Tags']}
+        self.assertTrue('test_key' in tag_map)
+
+    def test_dynamodb_unmark(self):
+        session_factory = self.replay_flight_data(
+            'test_dynamodb_unmark')
+        client = session_factory().client('dynamodb')
+        p = self.load_policy({
+            'name': 'dynamodb-unmark',
+            'resource': 'dynamodb-table',
+            'filters': [
+                {'TableName': 'rolltop'}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'tags': ['test_key']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        arn = resources[0]['TableArn']
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_of_resource(ResourceArn=arn)
+        self.assertFalse('test_key' in tags)            

@@ -12,6 +12,75 @@ via SES. Custodian lambda and instance policies can send to it. SQS queues
 should be cross-account enabled for sending between accounts.
 
 
+## Tutorial
+
+Our goal in starting out with the Custodian mailer is to install the mailer,
+and run a policy that triggers an email to your inbox.
+
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop.
+1. In your text editor, create a `mailer.yml` file to hold your mailer config.
+1. In the AWS console, create a new standard SQS queue (quick create is fine).
+   Copy the queue URL to `queue_url` in `mailer.yml`.
+1. In AWS, locate or create a role that has read access to the queue. Grab the
+   role ARN and set it as `role` in `mailer.yml`.
+1. Make sure your email address is verified in SES, and set it as
+   `from_address` in `mailer.yml`.
+
+Your `mailer.yml` should now look something like this:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+from_address: you@example.com
+```
+
+(Also set `region` if you are in a region other than `us-east-1`.)
+
+Now let's make a Custodian policy to populate your mailer queue. Create a
+`test-policy.yml` file with this content:
+
+```yaml
+policies:
+  - name: c7n-mailer-test
+    resource: sqs
+    filters:
+     - "tag:MailerTest": absent
+    actions:
+      - type: notify
+        template: default
+        subject: testing the c7n mailer
+        to:
+          - you@example.com
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+Now run:
+
+```
+c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+```
+
+You should see output similar to the following:
+
+```
+(env) $ c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+DEBUG:custodian.lambda:Created custodian lambda archive size: 3.01mb
+2017-01-12 07:55:16,227: custodian.policy:INFO Running policy c7n-mailer-test resource: sqs region:default c7n:0.8.22.0
+2017-01-12 07:55:16,229: custodian.policy:INFO policy: c7n-mailer-test resource:sqs has count:1 time:0.00
+2017-01-12 07:55:18,017: custodian.actions:INFO sent message:dead-beef policy:c7n-mailer-test template:default count:1
+2017-01-12 07:55:18,017: custodian.policy:INFO policy: c7n-mailer-test action: notify resources: 1 execution_time: 1.79
+(env) $
+```
+
+Check the AWS console for a new Lambda named `cloud-custodian-mailer`. The
+mailer runs every five minutes, so wait a bit and then look for an email in
+your inbox. If it doesn't appear, look in the lambda's logs for debugging
+information. If it does, congratulations! You are off and running with the
+Custodian mailer.
+
+
 ## Usage & Configuration
 
 Once [installed](#developer-install-os-x-el-capitan) you should have a
@@ -27,13 +96,13 @@ c7n-mailer: error: argument -c/--config is required
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
 [Mu](http://www.capitalone.io/cloud-custodian/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
-schema](./c7n_mailer/cli.py#L11-L28) to which the file must conform, here is
+schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 [an example config](./example.yml), and here is a description of the options:
 
 | Required? | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
 | &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
-|           | `from_address`       | string           | default from address                |
+| &#x2705;  | `from_address`       | string           | default from address                |
 |           | `contact_tags`       | array of strings | tags that we should look at for address information |
 
 
@@ -56,8 +125,8 @@ schema](./c7n_mailer/cli.py#L11-L28) to which the file must conform, here is
 |           | `cache`              | string           | memcached for caching ldap lookups  |
 |           | `cross_accounts`     | object           | account to assume back into for sending to SNS topics |
 |           | `ldap_bind_dn`       | string           | ldap server for resolving users     |
-| &#x2705;  | `ldap_bind_user`     | string           | ldap server for resolving users     |
-| &#x2705;  | `ldap_bind_password` | string           | ldap server for resolving users     |
+|           | `ldap_bind_user`     | string           | ldap server for resolving users     |
+|           | `ldap_bind_password` | string           | ldap server for resolving users     |
 |           | `ldap_uri`           | string           | ldap server for resolving users     |
 
 

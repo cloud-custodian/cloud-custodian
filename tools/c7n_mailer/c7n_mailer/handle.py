@@ -35,7 +35,7 @@ def bootstrap():
     os.environ['PYTHONPATH'] = "%s:%s" % (task_dir, os.environ.get('PYTHONPATH', ''))
     with open(os.path.join(task_dir, 'config.json')) as fh:
         config = json.load(fh)
-    if 'ldap_bind_password' in config:
+    if config['ldap_bind_password']:
         kms = session.client('kms')
         config['ldap_bind_password'] = kms.decrypt(
             CiphertextBlob=base64.b64decode(config['ldap_bind_password']))[

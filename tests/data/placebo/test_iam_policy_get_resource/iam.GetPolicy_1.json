@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": {
+            "PolicyName": "AWSHealthFullAccess", 
+            "Description": "Allows full access to the AWS Health Apis and Notifications and the Personal Health Dashboard", 
+            "CreateDate": {
+                "hour": 12, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 31, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 6, 
+                "minute": 30
+            }, 
+            "AttachmentCount": 1, 
+            "IsAttachable": true, 
+            "PolicyId": "ANPAI3CUMPCPEUPCSXC4Y", 
+            "DefaultVersionId": "v1", 
+            "Path": "/", 
+            "Arn": "arn:aws:iam::aws:policy/AWSHealthFullAccess", 
+            "UpdateDate": {
+                "hour": 12, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 31, 
+                "microsecond": 0, 
+                "year": 2016, 
+                "day": 6, 
+                "minute": 30
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "14a8da87-e865-11e6-a572-dddd468753c8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "14a8da87-e865-11e6-a572-dddd468753c8", 
+                "date": "Wed, 01 Feb 2017 09:59:10 GMT", 
+                "content-length": "808", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
