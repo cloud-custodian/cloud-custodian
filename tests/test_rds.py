@@ -749,3 +749,17 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 2)
         self.assertEqual(len(clean_resources), 4)
 
+
+class TestHealthEventsFilter(BaseTest):
+    def test_rds_health_events_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_health_events_filter')
+        policy = self.load_policy({
+            'name': 'rds-health-events-filter',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'health-event'}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)

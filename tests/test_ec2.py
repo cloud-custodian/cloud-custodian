@@ -72,6 +72,21 @@ class TestMetricFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestHealthEventsFilter(BaseTest):
+    def test_ec2_health_events_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_health_events_filter')
+        policy = self.load_policy({
+            'name': 'ec2-health-events-filter',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'health-event'}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+
 class TestTagTrim(BaseTest):
 
     def test_ec2_tag_trim(self):
