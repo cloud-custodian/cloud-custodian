@@ -58,7 +58,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
     FilterValidationError)
 
-from c7n.filters.health import healthEventFilter
+from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -75,7 +75,7 @@ actions = ActionRegistry('rds.actions')
 
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
-filters.register('health-events', healthEventFilter)
+filters.register('health-event', HealthEventFilter)
 actions.register('auto-tag-user', AutoTagUser)
 
 

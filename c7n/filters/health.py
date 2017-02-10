@@ -12,49 +12,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
 from c7n.utils import local_session, chunks, type_schema
 from .core import Filter
 
 
-class healthEventFilter(Filter):
-    """Check if there are health events related to the resources"""
+class HealthEventFilter(Filter):
+    """Check if there are health events related to the resources
+
+
+
+    Health events are stored as annotation on a resource.
+    """
 
     schema = type_schema(
-            'health-events',
-            eventTypeCodes={'type': 'array', 'items': {'type': 'string'}},
-            eventStatusCodes={'type': 'array', 'items': {'type': 'string'}})
+        'health-event',
+        types={'type': 'array', 'items': {'type': 'string'}},
+        statuses={'type': 'array', 'items': {
+            'type': 'string',
+            'enum': ['open', '']
+        }})
+
     permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',
                    'health:DescribeEventDetails')
 
     def process(self, resources, event=None):
-        results = []
-        if len(resources) == 0:
-            return results
+        if not resources:
+            return resources
+
         client = local_session(self.manager.session_factory).client('health')
         m = self.manager.get_model()
-        statusCodes = self.data.get('eventStatusCodes', ['open', 'upcoming'])
-        f = {'services': [m.service.upper()], 'eventStatusCodes': statusCodes}
+
+        f = {'services': [m.service.upper()],
+             'eventStatusCodes': self.data.get(
+                 'statuses', ['open', 'upcoming'])}
+
         if self.data.get('eventTypeCodes'):
-            f['eventTypeCodes'] = self.data.get('eventTypeCodes')
+            f['eventTypeCodes'] = self.data.get('types')
+
         resource_map = {r[m.id]: r for r in resources}
+        results = []
+        seen = set()
+
         for resource_set in chunks(resource_map.keys(), 100):
             f['entityValues'] = resource_set
             events = client.describe_events(filter=f)['events']
-            for event in events:
-                arn = event['arn']
-                entity = client.describe_affected_entities(filter={
-                    'eventArns': [arn]})['entities'][0]['entityValue']
-                if entity not in resource_map:
-                    continue
-                eventDetail = client.describe_event_details(eventArns=[arn])
-                resource_map[entity].setdefault('HealthEvent', []).append(
-                    {'entityValue': entity,
-                     'startTime': eventDetail['successfulSet'][0]
-                                    ['event']['startTime'],
-                     'eventTypeCode': eventDetail['successfulSet'][0]
-                                    ['event']['eventTypeCode'],
-                     'eventDescription': eventDetail['successfulSet'][0]
-                                    ['eventDescription']['latestDescription']})
-                results.append(resource_map[entity])
+            events = [e for e in events if e['arn'] not in seen]
+
+            for event_set in chunks(events, 10):
+                event_map = {e['arn']: e for e in event_set}
+                for d in client.describe_event_details(
+                        eventArns=event_map.keys()).get('successfulSet', ()):
+                    event_map[d['event']['arn']]['Description'] = d[
+                        'eventDescription']['latestDescription']
+                entities = client.describe_affected_entities(
+                    filter={'eventArns': event_map.keys()})
+
+                for e in entities:
+                    rid = e['entityValue']
+                    if rid not in resource_map:
+                        continue
+                    resource_map[rid].setdefault(
+                        'c7n:HealthEvent', []).append(event_map[e['eventArn']])
+                seen.update(event_map.keys())
         return results
