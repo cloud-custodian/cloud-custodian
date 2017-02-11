@@ -57,9 +57,9 @@ def policy_command(f):
                 errors += 1
 
             if collection is None:
-                log.info('Loaded file {}. Contained no policies.'.format(file))
+                log.debug('Loaded file {}. Contained no policies.'.format(file))
             else:
-                log.info('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
+                log.debug('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
                 policies.extend(collection.policies)
                 all_policies.extend(collection.unfiltered_policies)
 

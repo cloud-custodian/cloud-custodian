@@ -36,6 +36,8 @@ from c7n.commands import schema_completer
 
 DEFAULT_REGION = 'us-east-1'
 
+log = logging.getLogger('custodian.cli')
+
 
 def _default_options(p, blacklist=""):
     """ Add basic options ot the subparser.
@@ -92,6 +94,24 @@ def _default_options(p, blacklist=""):
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
+
+
+def _default_region(options):
+    marker = object()
+    value = getattr(options, 'region', marker)
+    if value is marker:
+        return
+
+    if value is not None:
+        return
+
+    profile = getattr(options, 'profile', None)
+    try:
+        import boto3
+        options.region = boto3.Session(profile_name=profile).region_name
+        log.debug("using default region:%s from boto" % options.region)
+    except:
+        return
 
 
 def _report_options(p):
@@ -224,14 +244,13 @@ def setup_parser():
         "--debug", action="store_true",
         help="Print info for bug reports")
 
-
     validate_desc = (
         "Validate config files against the json schema")
     validate = subs.add_parser(
         'validate', description=validate_desc, help=validate_desc)
     validate.set_defaults(command="c7n.commands.validate")
     validate.add_argument(
-        "-c", "--config", help = argparse.SUPPRESS)
+        "-c", "--config", help=argparse.SUPPRESS)
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
@@ -284,6 +303,8 @@ def main():
     # Support the deprecated -c option
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
+
+    _default_region(options)
 
     try:
         command = options.command
