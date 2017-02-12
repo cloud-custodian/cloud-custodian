@@ -382,6 +382,8 @@ class RenameTag(Action):
 
     permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
+    tag_count_max = 50
+
     def delete_tag(self, client, ids, key, value):
         client.delete_tags(
             Resources=ids,
@@ -406,20 +408,20 @@ class RenameTag(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            new_key, tag_value)
+        # We have a preference to creating the new tag when possible first
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) < self.tag_count_max]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
         self.delete_tag(
             c, [r[self.id_key] for r in resource_set], old_key, tag_value)
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) > 49],
-            new_key, tag_value)
+        # For resources with 50 tags, we need to delete first and then create.
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) > self.tag_count_max - 1]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
     def create_set(self, instances):
         old_key = self.data.get('old_key', None)
