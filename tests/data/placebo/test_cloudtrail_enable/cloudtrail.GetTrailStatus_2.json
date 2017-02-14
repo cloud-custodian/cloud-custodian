@@ -4,50 +4,40 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "248b0e03-e7f7-11e6-9ee0-2d7a83d99566", 
+            "RequestId": "74a1b766-ed84-11e6-b9d9-b595a348f3d8", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "248b0e03-e7f7-11e6-9ee0-2d7a83d99566", 
-                "date": "Tue, 31 Jan 2017 20:52:13 GMT", 
-                "content-length": "397", 
+                "x-amzn-requestid": "74a1b766-ed84-11e6-b9d9-b595a348f3d8", 
+                "date": "Tue, 07 Feb 2017 22:26:22 GMT", 
+                "content-length": "319", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
+        "LatestDeliveryAttemptTime": "", 
         "LatestNotificationAttemptSucceeded": "", 
-        "LatestDeliveryAttemptTime": "2017-01-31T20:48:53Z", 
-        "LatestDeliveryTime": {
-            "hour": 15, 
-            "__class__": "datetime", 
-            "month": 1, 
-            "second": 53, 
-            "microsecond": 246000, 
-            "year": 2017, 
-            "day": 31, 
-            "minute": 48
-        }, 
-        "LatestDeliveryAttemptSucceeded": "2017-01-31T20:48:53Z", 
+        "LatestDeliveryAttemptSucceeded": "", 
         "IsLogging": true, 
-        "TimeLoggingStarted": "2017-01-31T20:52:13Z", 
+        "TimeLoggingStarted": "2017-02-07T22:26:22Z", 
         "StartLoggingTime": {
-            "hour": 15, 
+            "hour": 17, 
             "__class__": "datetime", 
-            "month": 1, 
-            "second": 13, 
-            "microsecond": 362000, 
+            "month": 2, 
+            "second": 22, 
+            "microsecond": 24000, 
             "year": 2017, 
-            "day": 31, 
-            "minute": 52
+            "day": 7, 
+            "minute": 26
         }, 
         "StopLoggingTime": {
-            "hour": 15, 
+            "hour": 17, 
             "__class__": "datetime", 
-            "month": 1, 
-            "second": 44, 
-            "microsecond": 103000, 
+            "month": 2, 
+            "second": 49, 
+            "microsecond": 585000, 
             "year": 2017, 
-            "day": 31, 
-            "minute": 51
+            "day": 7, 
+            "minute": 25
         }, 
         "LatestNotificationAttemptTime": "", 
-        "TimeLoggingStopped": "2017-01-31T20:51:44Z"
+        "TimeLoggingStopped": "2017-02-07T22:25:49Z"
     }
 }

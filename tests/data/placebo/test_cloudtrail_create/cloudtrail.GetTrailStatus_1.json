@@ -4,29 +4,19 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9f62ebcc-e7f6-11e6-8bdd-a522d59a4202", 
+            "RequestId": "98512e41-ed81-11e6-9205-e16fedb50da3", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "9f62ebcc-e7f6-11e6-8bdd-a522d59a4202", 
-                "date": "Tue, 31 Jan 2017 20:48:30 GMT", 
-                "content-length": "264", 
+                "x-amzn-requestid": "98512e41-ed81-11e6-9205-e16fedb50da3", 
+                "date": "Tue, 07 Feb 2017 22:05:53 GMT", 
+                "content-length": "209", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
         "LatestDeliveryAttemptTime": "", 
         "LatestNotificationAttemptSucceeded": "", 
         "LatestDeliveryAttemptSucceeded": "", 
-        "IsLogging": true, 
-        "TimeLoggingStarted": "2017-01-31T20:48:29Z", 
-        "StartLoggingTime": {
-            "hour": 15, 
-            "__class__": "datetime", 
-            "month": 1, 
-            "second": 29, 
-            "microsecond": 931000, 
-            "year": 2017, 
-            "day": 31, 
-            "minute": 48
-        }, 
+        "IsLogging": false, 
+        "TimeLoggingStarted": "", 
         "LatestNotificationAttemptTime": "", 
         "TimeLoggingStopped": ""
     }
