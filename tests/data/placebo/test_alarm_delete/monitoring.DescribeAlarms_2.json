@@ -1,14 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "NextToken": "c7n-test-alarm-delete-99", 
+        "NextToken": "c7n-test-alarm-delete-98", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9e13a6f5-ee49-11e6-ab09-1f8371da8486", 
+            "RequestId": "7fd4bfe1-f2cf-11e6-98d0-c7b55e7614d9", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "9e13a6f5-ee49-11e6-ab09-1f8371da8486", 
-                "date": "Wed, 08 Feb 2017 21:57:43 GMT", 
+                "x-amzn-requestid": "7fd4bfe1-f2cf-11e6-98d0-c7b55e7614d9", 
+                "date": "Tue, 14 Feb 2017 16:06:09 GMT", 
                 "content-length": "55098", 
                 "content-type": "text/xml"
             }
@@ -16,26 +16,69 @@
         "MetricAlarms": [
             {
                 "EvaluationPeriods": 3, 
-                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-53", 
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-52", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 431000, 
+                    "second": 43, 
+                    "microsecond": 584000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 431000, 
+                    "second": 43, 
+                    "microsecond": 584000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
+                }, 
+                "ComparisonOperator": "GreaterThanThreshold", 
+                "AlarmActions": [], 
+                "Namespace": "AWS/EC2", 
+                "Period": 300, 
+                "StateValue": "INSUFFICIENT_DATA", 
+                "Threshold": 1.0, 
+                "AlarmName": "c7n-test-alarm-delete-52", 
+                "Dimensions": [
+                    {
+                        "Name": "InstanceId", 
+                        "Value": "i-0953b366052acef5c"
+                    }
+                ], 
+                "Statistic": "Average", 
+                "StateReason": "Unchecked: Initial alarm creation", 
+                "InsufficientDataActions": [], 
+                "OKActions": [], 
+                "ActionsEnabled": true, 
+                "MetricName": "CPUUtilization"
+            }, 
+            {
+                "EvaluationPeriods": 3, 
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-53", 
+                "StateUpdatedTimestamp": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 43, 
+                    "microsecond": 674000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 4
+                }, 
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 43, 
+                    "microsecond": 674000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -61,24 +104,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-54", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 538000, 
+                    "second": 43, 
+                    "microsecond": 821000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 538000, 
+                    "second": 43, 
+                    "microsecond": 821000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -104,24 +147,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-55", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 664000, 
+                    "second": 43, 
+                    "microsecond": 914000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 664000, 
+                    "second": 43, 
+                    "microsecond": 914000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -147,24 +190,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-56", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 781000, 
+                    "second": 44, 
+                    "microsecond": 8000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 781000, 
+                    "second": 44, 
+                    "microsecond": 8000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -190,24 +233,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-57", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 868000, 
+                    "second": 44, 
+                    "microsecond": 95000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 26, 
-                    "microsecond": 868000, 
+                    "second": 44, 
+                    "microsecond": 95000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -233,24 +276,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-58", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 311000, 
+                    "second": 44, 
+                    "microsecond": 205000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 311000, 
+                    "second": 44, 
+                    "microsecond": 205000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -276,24 +319,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-59", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 423000, 
+                    "second": 44, 
+                    "microsecond": 347000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 423000, 
+                    "second": 44, 
+                    "microsecond": 347000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -319,24 +362,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-6", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 78000, 
+                    "second": 27, 
+                    "microsecond": 554000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 78000, 
+                    "second": 27, 
+                    "microsecond": 554000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -362,24 +405,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-60", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 571000, 
+                    "second": 44, 
+                    "microsecond": 458000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 571000, 
+                    "second": 44, 
+                    "microsecond": 458000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -405,24 +448,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-61", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 667000, 
+                    "second": 44, 
+                    "microsecond": 558000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 667000, 
+                    "second": 44, 
+                    "microsecond": 558000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -448,24 +491,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-62", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 746000, 
+                    "second": 44, 
+                    "microsecond": 653000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 746000, 
+                    "second": 44, 
+                    "microsecond": 653000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -491,24 +534,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-63", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 834000, 
+                    "second": 44, 
+                    "microsecond": 775000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 834000, 
+                    "second": 44, 
+                    "microsecond": 775000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -534,24 +577,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-64", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 955000, 
+                    "second": 44, 
+                    "microsecond": 865000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 31, 
-                    "microsecond": 955000, 
+                    "second": 44, 
+                    "microsecond": 865000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -577,24 +620,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-65", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 92000, 
+                    "second": 46, 
+                    "microsecond": 442000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 92000, 
+                    "second": 46, 
+                    "microsecond": 442000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -620,24 +663,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-66", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 257000, 
+                    "second": 47, 
+                    "microsecond": 296000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 257000, 
+                    "second": 47, 
+                    "microsecond": 296000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -663,24 +706,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-67", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 334000, 
+                    "second": 47, 
+                    "microsecond": 380000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 334000, 
+                    "second": 47, 
+                    "microsecond": 380000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -706,24 +749,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-68", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 418000, 
+                    "second": 47, 
+                    "microsecond": 508000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 418000, 
+                    "second": 47, 
+                    "microsecond": 508000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -749,24 +792,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-69", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 533000, 
+                    "second": 47, 
+                    "microsecond": 614000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 533000, 
+                    "second": 47, 
+                    "microsecond": 614000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -792,24 +835,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-7", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 176000, 
+                    "second": 27, 
+                    "microsecond": 693000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 176000, 
+                    "second": 27, 
+                    "microsecond": 693000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -835,24 +878,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-70", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 621000, 
+                    "second": 47, 
+                    "microsecond": 714000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 621000, 
+                    "second": 47, 
+                    "microsecond": 714000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -878,24 +921,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-71", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 724000, 
+                    "second": 47, 
+                    "microsecond": 886000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 724000, 
+                    "second": 47, 
+                    "microsecond": 886000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -921,24 +964,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-72", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 818000, 
+                    "second": 47, 
+                    "microsecond": 969000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 818000, 
+                    "second": 47, 
+                    "microsecond": 969000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -964,24 +1007,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-73", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 895000, 
+                    "second": 48, 
+                    "microsecond": 59000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 32, 
-                    "microsecond": 895000, 
+                    "second": 48, 
+                    "microsecond": 59000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1007,24 +1050,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-74", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 70000, 
+                    "second": 48, 
+                    "microsecond": 153000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 70000, 
+                    "second": 48, 
+                    "microsecond": 153000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1050,24 +1093,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-75", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 156000, 
+                    "second": 48, 
+                    "microsecond": 244000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 156000, 
+                    "second": 48, 
+                    "microsecond": 244000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1093,24 +1136,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-76", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 246000, 
+                    "second": 48, 
+                    "microsecond": 366000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 246000, 
+                    "second": 48, 
+                    "microsecond": 366000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1136,24 +1179,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-77", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 334000, 
+                    "second": 51, 
+                    "microsecond": 826000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 334000, 
+                    "second": 51, 
+                    "microsecond": 826000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1179,24 +1222,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-78", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 428000, 
+                    "second": 51, 
+                    "microsecond": 936000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 428000, 
+                    "second": 51, 
+                    "microsecond": 936000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1222,24 +1265,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-79", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 548000, 
+                    "second": 52, 
+                    "microsecond": 20000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 548000, 
+                    "second": 52, 
+                    "microsecond": 20000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1265,24 +1308,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-8", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 269000, 
+                    "second": 27, 
+                    "microsecond": 829000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 269000, 
+                    "second": 27, 
+                    "microsecond": 829000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1308,24 +1351,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-80", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 628000, 
+                    "second": 52, 
+                    "microsecond": 136000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 628000, 
+                    "second": 52, 
+                    "microsecond": 136000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1351,24 +1394,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-81", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 731000, 
+                    "second": 52, 
+                    "microsecond": 249000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 731000, 
+                    "second": 52, 
+                    "microsecond": 249000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1394,24 +1437,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-82", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 856000, 
+                    "second": 52, 
+                    "microsecond": 327000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 856000, 
+                    "second": 52, 
+                    "microsecond": 327000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1437,24 +1480,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-83", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 940000, 
+                    "second": 52, 
+                    "microsecond": 418000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 38, 
-                    "microsecond": 940000, 
+                    "second": 52, 
+                    "microsecond": 418000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1480,24 +1523,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-84", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 38000, 
+                    "second": 52, 
+                    "microsecond": 516000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 38000, 
+                    "second": 52, 
+                    "microsecond": 516000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1523,24 +1566,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-85", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 145000, 
+                    "second": 52, 
+                    "microsecond": 616000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 145000, 
+                    "second": 52, 
+                    "microsecond": 616000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1566,24 +1609,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-86", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 239000, 
+                    "second": 52, 
+                    "microsecond": 704000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 239000, 
+                    "second": 52, 
+                    "microsecond": 704000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1609,24 +1652,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-87", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 356000, 
+                    "second": 52, 
+                    "microsecond": 799000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 356000, 
+                    "second": 52, 
+                    "microsecond": 799000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1652,24 +1695,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-88", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 462000, 
+                    "second": 52, 
+                    "microsecond": 931000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 462000, 
+                    "second": 52, 
+                    "microsecond": 931000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1695,24 +1738,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-89", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 540000, 
+                    "second": 55, 
+                    "microsecond": 236000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 540000, 
+                    "second": 55, 
+                    "microsecond": 236000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1738,24 +1781,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-9", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 364000, 
+                    "second": 27, 
+                    "microsecond": 894000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 13, 
-                    "microsecond": 364000, 
+                    "second": 27, 
+                    "microsecond": 894000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1781,24 +1824,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-90", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 625000, 
+                    "second": 55, 
+                    "microsecond": 343000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 625000, 
+                    "second": 55, 
+                    "microsecond": 343000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1824,24 +1867,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-91", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 720000, 
+                    "second": 55, 
+                    "microsecond": 441000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 720000, 
+                    "second": 55, 
+                    "microsecond": 441000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1867,24 +1910,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-92", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 830000, 
+                    "second": 55, 
+                    "microsecond": 557000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 830000, 
+                    "second": 55, 
+                    "microsecond": 557000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1910,24 +1953,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-93", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 926000, 
+                    "second": 55, 
+                    "microsecond": 633000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 39, 
-                    "microsecond": 926000, 
+                    "second": 55, 
+                    "microsecond": 633000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1953,24 +1996,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-94", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 20000, 
+                    "second": 55, 
+                    "microsecond": 784000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 20000, 
+                    "second": 55, 
+                    "microsecond": 784000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -1996,24 +2039,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-95", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 112000, 
+                    "second": 55, 
+                    "microsecond": 874000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 112000, 
+                    "second": 55, 
+                    "microsecond": 874000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -2039,24 +2082,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-96", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 235000, 
+                    "second": 55, 
+                    "microsecond": 993000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 40, 
-                    "microsecond": 235000, 
+                    "second": 55, 
+                    "microsecond": 993000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -2082,24 +2125,24 @@
                 "EvaluationPeriods": 3, 
                 "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-97", 
                 "StateUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 42, 
-                    "microsecond": 379000, 
+                    "second": 56, 
+                    "microsecond": 96000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 42, 
-                    "microsecond": 379000, 
+                    "second": 56, 
+                    "microsecond": 96000, 
                     "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
+                    "day": 14, 
+                    "minute": 4
                 }, 
                 "ComparisonOperator": "GreaterThanThreshold", 
                 "AlarmActions": [], 
@@ -2108,49 +2151,6 @@
                 "StateValue": "INSUFFICIENT_DATA", 
                 "Threshold": 1.0, 
                 "AlarmName": "c7n-test-alarm-delete-97", 
-                "Dimensions": [
-                    {
-                        "Name": "InstanceId", 
-                        "Value": "i-0953b366052acef5c"
-                    }
-                ], 
-                "Statistic": "Average", 
-                "StateReason": "Unchecked: Initial alarm creation", 
-                "InsufficientDataActions": [], 
-                "OKActions": [], 
-                "ActionsEnabled": true, 
-                "MetricName": "CPUUtilization"
-            }, 
-            {
-                "EvaluationPeriods": 3, 
-                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete-98", 
-                "StateUpdatedTimestamp": {
-                    "hour": 21, 
-                    "__class__": "datetime", 
-                    "month": 2, 
-                    "second": 42, 
-                    "microsecond": 465000, 
-                    "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
-                }, 
-                "AlarmConfigurationUpdatedTimestamp": {
-                    "hour": 21, 
-                    "__class__": "datetime", 
-                    "month": 2, 
-                    "second": 42, 
-                    "microsecond": 465000, 
-                    "year": 2017, 
-                    "day": 8, 
-                    "minute": 57
-                }, 
-                "ComparisonOperator": "GreaterThanThreshold", 
-                "AlarmActions": [], 
-                "Namespace": "AWS/EC2", 
-                "Period": 300, 
-                "StateValue": "INSUFFICIENT_DATA", 
-                "Threshold": 1.0, 
-                "AlarmName": "c7n-test-alarm-delete-98", 
                 "Dimensions": [
                     {
                         "Name": "InstanceId", 

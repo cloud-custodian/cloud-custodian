@@ -21,6 +21,7 @@ import logging
 import operator
 import re
 
+import pytz
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
@@ -349,6 +350,11 @@ class ValueFilter(Filter):
                     value = parse(value)
                 except (AttributeError, TypeError):
                     value = 0
+
+            # Work around placebo issues with tz
+            if isinstance(value, datetime) and not value.tzinfo:
+                value = pytz.utc.localize(value)
+
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.

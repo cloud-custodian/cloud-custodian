@@ -19,7 +19,7 @@ from c7n.filters import Filter
 from c7n.filters import OPERATORS
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, chunks
 
 
 @resources.register('alarm')
@@ -37,33 +37,6 @@ class Alarm(QueryResourceManager):
         dimension = None
 
 
-@Alarm.filter_registry.register('age')
-class AlarmAge(AgeFilter):
-    """CloudWatch Alarm Age Filter
-
-    Filters a CloudWatch Alarm based on the age of the last alarm state
-    change (in days)
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: unchanged-alarm-month-old
-                resource: ebs-snapshot
-                filters:
-                  - type: age
-                    days: 30
-                    op: ge
-    """
-
-    schema = type_schema(
-        'age',
-        days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
-    date_attribute = 'StateUpdatedTimestamp'
-
-
 @Alarm.action_registry.register('delete')
 class AlarmDelete(BaseAction):
     """
@@ -76,8 +49,10 @@ class AlarmDelete(BaseAction):
               - name: cloudwatch-delete-stale-alarms
                 resource: alarm
                 filters:
-                  - type: age
-                    days: 30
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
                     op: ge
                   - StateValue: INSUFFICIENT_DATA
                 actions:
@@ -89,17 +64,9 @@ class AlarmDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('cloudwatch')
-        alarms = []
 
-        for i, r in enumerate(resources, start=1):
-            alarms.append(r['AlarmName'])
-            if not i % 100:
-                # Delete alarms every 100 per the API max
-                client.delete_alarms(AlarmNames=alarms)
-                alarms = []
-
-        # Delete any alarms that weren't in a batch of 100
-        client.delete_alarms(AlarmNames=alarms)
+        for resource_set in chunks(resources, size=100):
+            client.delete_alarms(AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
 @resources.register('event-rule')

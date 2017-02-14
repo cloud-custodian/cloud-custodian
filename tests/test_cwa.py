@@ -21,21 +21,6 @@ class AlarmTest(BaseTest):
         alarm = 'c7n-test-alarm-delete'
         factory = self.replay_flight_data('test_alarm_delete')
         client = factory().client('cloudwatch')
-        for i in range(101):
-            client.put_metric_alarm(
-                AlarmName='{}-{}'.format(alarm, i),
-                MetricName='CPUUtilization',
-                Namespace='AWS/EC2',
-                Dimensions=[
-                    {'Name': 'InstanceId',
-                     'Value': 'i-0953b366052acef5c'},
-                ],
-                Statistic='Average',
-                Period=300,
-                EvaluationPeriods=3,
-                Threshold=1.0,
-                ComparisonOperator='GreaterThanThreshold',
-            )
 
         p = self.load_policy(
             {'name': 'delete-alarm',
@@ -45,7 +30,8 @@ class AlarmTest(BaseTest):
                  'key': 'AlarmName',
                  'value': alarm + '-*',
                  'op': 'glob'}],
-             'actions': ['delete']},
+             'actions': ['delete']
+             },
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 101)
@@ -53,28 +39,20 @@ class AlarmTest(BaseTest):
             client.describe_alarms(
                 AlarmNames=[alarm])['MetricAlarms'], [])
 
-    def test_alarm_age_filter(self):
+    def test_alarm_age(self):
         alarm = 'c7n-test-alarm-age-filter'
         factory = self.replay_flight_data('test_alarm_age_filter')
         client = factory().client('cloudwatch')
-        client.put_metric_alarm(
-            AlarmName=alarm,
-            MetricName='CPUUtilization',
-            Namespace='AWS/EC2',
-            Dimensions=[
-                {'Name': 'InstanceId',
-                 'Value': 'i-0953b366052acef5c'},
-            ],
-            Statistic='Average',
-            Period=300,
-            EvaluationPeriods=3,
-            Threshold=1.0,
-            ComparisonOperator='GreaterThanThreshold',
-        )
         p = self.load_policy({
             'name': 'alarm-age-filter',
             'resource': 'alarm',
-            'filters': [{'type': 'age', 'days': 1}]},
+            'filters': [{
+                'type': 'value',
+                'value_type': 'age',
+                'key': 'StateUpdatedTimestamp',
+                'value': 1,
+                'op': 'ge',
+            }]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
