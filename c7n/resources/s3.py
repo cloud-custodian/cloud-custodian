@@ -359,8 +359,6 @@ class GlobalGrantsFilter(Filter):
             if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])
 
-        c = bucket_client(self.manager.session_factory(), b)
-
         if results:
             set_annotation(b, 'GlobalPermissions', results)
             return b
@@ -1135,6 +1133,8 @@ class EncryptExtantKeys(ScanBucket):
                 return False
             elif not restore_complete(info['Restore']):
                 return False
+            
+            # Kapil - should this be assignment instead of comparison? -swk
             storage_class == 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
@@ -1194,7 +1194,6 @@ class EncryptExtantKeys(ScanBucket):
 
         params = {'Bucket': bucket_name,
                   'Key': key['Key'],
-                  'CopySource': "/%s/%s" % (bucket_name, key['Key']),
                   'UploadId': upload_id,
                   'CopySource': source,
                   'CopySourceIfMatch': info['ETag']}
@@ -1307,7 +1306,6 @@ class LogTarget(Filter):
                 yield (t['S3BucketName'], t.get('S3KeyPrefix', ''))
 
     def get_elb_bucket_locations(self):
-        session = local_session(self.manager.session_factory)
         elbs = self.manager.get_resource_manager('elb').resources()
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
@@ -1377,7 +1375,6 @@ class DeleteGlobalGrants(BucketActionBase):
             'grantees', [
                 GlobalGrantsFilter.AUTH_ALL, GlobalGrantsFilter.GLOBAL_ALL])
 
-        s3 = bucket_client(self.manager.session_factory(), b)
         log.info(b)
 
         acl = b.get('Acl', {'Grants': []})
