@@ -656,6 +656,64 @@ class Snapshot(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
 
 
+@actions.register('resize')
+class ResizeInstance(BaseAction):
+    """Change the allocated storage of an rds instance.
+
+    :example:
+
+       This will find databases using over 85% of their allocated
+       storage, and resize them to have an additional 30% storage
+       the resize here is async during the next maintenance.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: 30
+
+
+       This will find databases using under 20% of their allocated
+       storage, and resize them to be 30% smaller, the resize here
+       is configured to be immediate.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: -30
+                    immediate: true
+    """
+    schema = type_schema(
+        'resize',
+        percent={'type': 'number'},
+        immediate={'type': 'boolean'})
+
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, resources):
+        for r in resources:
+            pass
+
+
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots
