@@ -89,6 +89,7 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
+        self.register('count', CountFilter)
 
     def parse(self, data, manager):
         results = []
@@ -216,8 +217,8 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap']},
+                'age', 'integer', 'expiration', 'normalize',
+                'size', 'cidr', 'cidr_size', 'swap']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -439,3 +440,19 @@ class EventFilter(ValueFilter):
             return resources
         return []
 
+
+class CountFilter(ValueFilter):
+
+    schema = type_schema(
+        'count',
+        value={'type': 'number'},
+        op={'enum': OPERATORS.keys()})
+
+    def validate(self):
+        return self
+
+    def process(self, resources, event=None):
+        op = OPERATORS[self.data.get('op')]
+        if op(len(resources), self.data.get('value')):
+            return resources
+        return []
