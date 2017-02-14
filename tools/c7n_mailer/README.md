@@ -24,7 +24,10 @@ and run a policy that triggers an email to your inbox.
 1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 1. Make sure your email address is verified in SES, and set it as
-   `from_address` in `mailer.yml`.
+   `from_address` in `mailer.yml`. By default SES is in sandbox mode where
+   you must verify every individual receipient of emails. If need be, make
+   an AWS support ticket to be taken out of SES sandbox mode.
+   AWS SES Docs: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html
 
 Your `mailer.yml` should now look something like this:
 

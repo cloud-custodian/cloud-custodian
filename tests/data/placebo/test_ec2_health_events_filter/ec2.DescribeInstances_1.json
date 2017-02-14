@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9102e013-d8c9-419a-85f5-bda018423301", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 09 Feb 2017 21:29:31 GMT"
+            }
+        }
+    }
+}

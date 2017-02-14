@@ -33,7 +33,6 @@ log = logging.getLogger('custodian.ebs')
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
 
-
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
