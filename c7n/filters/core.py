@@ -217,8 +217,8 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize',
-                'size', 'cidr', 'cidr_size', 'swap']},
+                'age', 'integer', 'expiration', 'normalize', 'size',
+                'cidr', 'cidr_size', 'swap']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
