@@ -1511,6 +1511,8 @@ class DeleteBucket(ScanBucket):
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
 
+    permissions = ('s3:*',)
+
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
