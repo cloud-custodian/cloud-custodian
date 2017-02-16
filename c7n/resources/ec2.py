@@ -197,7 +197,13 @@ class StateTransitionAge(AgeFilter):
         v = i.get('StateTransitionReason')
         if not v:
             return None
-        return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
+        dates = self.RE_PARSE_AGE.findall(v)
+        if dates:
+            try:
+                return parse(dates[0][1:-1])
+            except ValueError:
+                self.log.warning('Failed to parse date in EC2 StateTransitionAge ({})'.format(v))
+        return None
 
 
 class StateTransitionFilter(object):
