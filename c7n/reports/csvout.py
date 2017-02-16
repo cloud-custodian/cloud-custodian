@@ -103,7 +103,7 @@ def _get_values(record, field_list, tag_map):
             if value is None:
                 value = ''
             else:
-                value = ', '.join(value)
+                value = ', '.join([str(v) for v in value])
         elif field.startswith(count_prefix):
             count_field = field.replace(count_prefix, '', 1)
             value = jmespath.search(count_field, record)
