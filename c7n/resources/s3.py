@@ -1133,9 +1133,8 @@ class EncryptExtantKeys(ScanBucket):
                 return False
             elif not restore_complete(info['Restore']):
                 return False
-            
-            # Kapil - should this be assignment instead of comparison? -swk
-            storage_class == 'STANDARD'
+
+            storage_class = 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
         key_id = self.data.get('key-id')
