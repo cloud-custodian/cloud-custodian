@@ -266,6 +266,8 @@ class AttachedVolume(ValueFilter):
                         continue
                     volume_ids.append(bd['Ebs']['VolumeId'])
             for v in manager.get_resources(volume_ids):
+                if not v['Attachments']:
+                    continue
                 volume_map.setdefault(
                     v['Attachments'][0]['InstanceId'], []).append(v)
         return volume_map
