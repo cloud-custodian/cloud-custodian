@@ -89,7 +89,6 @@ class FilterRegistry(PluginRegistry):
         self.register('or', Or)
         self.register('and', And)
         self.register('event', EventFilter)
-        self.register('count', CountFilter)
 
     def parse(self, data, manager):
         results = []
@@ -218,7 +217,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap']},
+                'cidr', 'cidr_size', 'swap', 'count']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -230,9 +229,41 @@ class ValueFilter(Filter):
 
     annotate = True
 
+    def _validate_count(self):
+        """ Specific validation for `count` type
+        
+        The `count` works a little differently because it operates on the
+        entire set of resources.  It:
+          - does not require `key`
+          - `value` must be a number
+          - supports a subset of the OPERATORS list
+        """
+        for field in ('op', 'value'):
+            if field not in self.data:
+                raise FilterValidationError(
+                    "Missing '%s' in value filter %s" % (field, self.data))
+
+        if not (isinstance(self.data['value'], int) or
+                isinstance(self.data['value'], list)):
+            raise FilterValidationError(
+                "`value` must be an integer in count filter %s" % self.data)
+
+        # I don't see how to support regex for this?
+        if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
+            raise FilterValidationError(
+                "Invalid operator in value filter %s" % self.data)
+
+        return self
+
     def validate(self):
         if len(self.data) == 1:
             return self
+        
+        # `count` requires a slightly different schema than the rest of the
+        # value filters because it operates on the full resource list
+        if self.data.get('value_type') == 'count':
+            return self._validate_count()
+        
         if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
@@ -253,10 +284,23 @@ class ValueFilter(Filter):
         return self
 
     def __call__(self, i):
+        if self.data.get('value_type') == 'count':
+            return self.process(i)
+
         matched = self.match(i)
         if matched and self.annotate:
             set_annotation(i, ANNOTATION_KEY, self.k)
         return matched
+
+    def process(self, resources, event=None):
+        # For the count filter we operate on the full set of resources.
+        if self.data.get('value_type') == 'count':
+            op = OPERATORS[self.data.get('op')]
+            if op(len(resources), self.data.get('value')):
+                return resources
+            return []
+
+        return super(ValueFilter, self).process(resources, event)
 
     def get_resource_value(self, k, i):
         if k.startswith('tag:'):
@@ -437,22 +481,5 @@ class EventFilter(ValueFilter):
         if event is None:
             return resources
         if self(event):
-            return resources
-        return []
-
-
-class CountFilter(ValueFilter):
-
-    schema = type_schema(
-        'count',
-        value={'type': 'number'},
-        op={'enum': OPERATORS.keys()})
-
-    def validate(self):
-        return self
-
-    def process(self, resources, event=None):
-        op = OPERATORS[self.data.get('op')]
-        if op(len(resources), self.data.get('value')):
             return resources
         return []

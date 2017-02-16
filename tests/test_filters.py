@@ -290,6 +290,24 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
 
+    def test_count_filter(self):
+        fdata = {
+            'type': 'value',
+            'value_type': 'count',
+            'op': 'lt',
+            'value': 2
+        }
+        self.assertFilter(fdata, instance(file='ec2-instances.json'), [])
+
+        f = filters.factory({
+            'type': 'value',
+            'value_type': 'count',
+            'op': 'eq',
+            'value': 2
+        })
+        i = instance(file='ec2-instances.json')
+        self.assertEqual(i, f(i))
+
 
 class TestInstanceAge(BaseFilterTest):
 
