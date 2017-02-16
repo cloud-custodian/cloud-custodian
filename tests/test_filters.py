@@ -308,6 +308,36 @@ class TestValueTypes(BaseFilterTest):
         i = instance(file='ec2-instances.json')
         self.assertEqual(i, f(i))
 
+    def test_count_filter_validation(self):
+        # Bad `op`
+        f = {
+            'type': 'value',
+            'value_type': 'count',
+            'op': 'regex',
+            'value': 'foo',
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
+        # Bad `value`
+        f = {
+            'type': 'value',
+            'value_type': 'count',
+            'op': 'eq',
+            'value': 'foo',
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
+        # Missing `op`
+        f = {
+            'type': 'value',
+            'value_type': 'count',
+            'value': 1,
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
 
 class TestInstanceAge(BaseFilterTest):
 
