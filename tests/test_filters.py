@@ -314,7 +314,7 @@ class TestValueTypes(BaseFilterTest):
             'type': 'value',
             'value_type': 'count',
             'op': 'regex',
-            'value': 'foo',
+            'value': 1,
         }
         self.assertRaises(
             base_filters.FilterValidationError, filters.factory, f, {})
