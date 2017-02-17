@@ -905,6 +905,7 @@ class ScanBucket(BucketActionBase):
                 futures[w.submit(helper, b)] = b
             for f in as_completed(futures):
                 if f.exception():
+                    b = futures[f]
                     self.log.error(
                         "Error on bucket:%s region:%s policy:%s error: %s",
                         b['Name'], b.get('Location', 'unknown'),
