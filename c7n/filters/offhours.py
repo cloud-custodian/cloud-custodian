@@ -186,7 +186,17 @@ class Time(Filter):
         'ct': 'America/Chicago',
         'mt': 'America/Denver',
         'gmt': 'Europe/London',
-        'gt': 'Europe/London'}
+        'gt': 'Europe/London',
+        'bst': 'Europe/London',
+        'ist': 'Europe/Dublin',
+        'cet': 'Europe/Berlin',
+        'it': 'Asia/Kolkata', # Technically IST (Indian Standard Time), but that's the same as Ireland
+        'jst': 'Asia/Tokyo',
+        'kst': 'Asia/Seoul',
+        'sgt': 'Asia/Singapore',
+        'aet': 'Australia/Sydney',
+        'brt': 'America/Sao_Paulo'
+        }
 
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
