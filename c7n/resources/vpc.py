@@ -14,6 +14,7 @@
 
 import json
 import itertools
+import operator
 import zlib
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
@@ -42,6 +43,94 @@ class Vpc(QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.filter_registry.register('flow-logs')
+class FlowLogFilter(Filter):
+    """Are flow logs enabled on the resource.
+
+    ie to find all vpcs with flows logs disabled we can do this
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: flow-logs-enabled
+                resource: vpc
+                filters:
+                  - flow-logs
+
+    or to find all vpcs with flow logs but that don't match a
+    particular configuration.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: flow-mis-configured
+                resource: vpc
+                filters:
+                  - type: flow-logs
+                    enabled: true
+                    op: not-equal
+                    # equality operator applies to following keys
+                    traffic-type: all
+                    status: success
+                    log-group: vpc-logs
+
+    """
+
+    schema = type_schema(
+        'flow-logs',
+        **{'enabled': {'type': 'boolean', 'default': False},
+           'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
+           'status': {'enum': ['success', 'failed']},
+           'traffic-type': {'enum': ['accept', 'reject', 'all']},
+           'log-group': {'type': 'string'}})
+
+    permissions = ('ec2:DescribeFlowLogs',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        # TODO given subnet/nic level logs, we should paginate, but we'll
+        # need to add/update botocore pagination support.
+        logs = client.describe_flow_logs().get('FlowLogs', ())
+
+        m = self.manager.get_model()
+        resource_map = {}
+
+        for fl in logs:
+            resource_map.setdefault(fl['ResourceId'], []).append(fl)
+
+        enabled = self.data.get('enabled', False)
+        log_group = self.data.get('log-group')
+        traffic_type = self.data.get('traffic-type')
+        status = self.data.get('status')
+        op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
+
+        results = []
+        for r in resources:
+            if r[m.id] not in resource_map:
+                if enabled:
+                    continue
+                results.append(r)
+                continue
+            flogs = resource_map[r[m.id]]
+            r['c7n:flow-logs'] = flogs
+            for fl in flogs:
+                if status and not op(fl['Status'], status.upper()):
+                    continue
+                if traffic_type and not op(fl['TrafficType'], traffic_type.upper()):
+                    continue
+                if log_group and not op(fl['LogGroupName'], log_group):
+                    continue
+                results.append(r)
+                break
+
+        return results
+
+
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
 
@@ -57,6 +146,7 @@ class Subnet(QueryResourceManager):
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
+Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
@@ -831,6 +921,8 @@ class NetworkInterface(QueryResourceManager):
         date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+
+NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
 
 
 @NetworkInterface.filter_registry.register('subnet')
