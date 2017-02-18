@@ -13,6 +13,7 @@
 # limitations under the License.
 import functools
 import json
+import os
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
@@ -200,6 +201,55 @@ class BucketDelete(BaseTest):
                 {'Name': bname}],
             'actions': [{'type': 'delete', 'remove-contents': True}]
         }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertFalse(bname in buckets)
+
+    def test_delete_bucket_with_failure(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3.DeleteBucket, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_delete_bucket_with_failure')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-perm-denied'
+        client.create_bucket(Bucket=bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        # This bucket policy prevents viewing contents
+        policy = {
+            "Version": "2012-10-17",
+            "Id": "Policy1487359365244",
+            "Statement": [{
+                "Sid": "Stmt1487359361981",
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:DeleteBucket",
+                "Resource":"arn:aws:s3:::{}".format(bname)
+            }]
+        }
+        client.put_bucket_policy(Bucket=bname, Policy=json.dumps(policy))
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'delete', 'remove-contents': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        # Make sure file got written
+        denied_file = os.path.join(p.resource_manager.log_dir, 'denied.json')
+        self.assertIn(bname, open(denied_file).read())
+        
+        #
+        # Now delete it for real
+        #
+        client.delete_bucket_policy(Bucket=bname)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
