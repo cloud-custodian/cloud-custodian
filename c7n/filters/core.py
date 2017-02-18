@@ -217,7 +217,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'count']},
+                'cidr', 'cidr_size', 'swap', 'resource_count']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -229,11 +229,11 @@ class ValueFilter(Filter):
 
     annotate = True
 
-    def _validate_count(self):
-        """ Specific validation for `count` type
+    def _validate_resource_count(self):
+        """ Specific validation for `resource_count` type
         
-        The `count` works a little differently because it operates on the
-        entire set of resources.  It:
+        The `resource_count` type works a little differently because it operates
+        on the entire set of resources.  It:
           - does not require `key`
           - `value` must be a number
           - supports a subset of the OPERATORS list
@@ -246,7 +246,7 @@ class ValueFilter(Filter):
         if not (isinstance(self.data['value'], int) or
                 isinstance(self.data['value'], list)):
             raise FilterValidationError(
-                "`value` must be an integer in count filter %s" % self.data)
+                "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
         if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
@@ -259,10 +259,10 @@ class ValueFilter(Filter):
         if len(self.data) == 1:
             return self
         
-        # `count` requires a slightly different schema than the rest of the
-        # value filters because it operates on the full resource list
-        if self.data.get('value_type') == 'count':
-            return self._validate_count()
+        # `resource_count` requires a slightly different schema than the rest of
+        # the value filters because it operates on the full resource list
+        if self.data.get('value_type') == 'resource_count':
+            return self._validate_resource_count()
         
         if 'key' not in self.data:
             raise FilterValidationError(
@@ -284,7 +284,7 @@ class ValueFilter(Filter):
         return self
 
     def __call__(self, i):
-        if self.data.get('value_type') == 'count':
+        if self.data.get('value_type') == 'resource_count':
             return self.process(i)
 
         matched = self.match(i)
@@ -293,8 +293,8 @@ class ValueFilter(Filter):
         return matched
 
     def process(self, resources, event=None):
-        # For the count filter we operate on the full set of resources.
-        if self.data.get('value_type') == 'count':
+        # For the resource_count filter we operate on the full set of resources.
+        if self.data.get('value_type') == 'resource_count':
             op = OPERATORS[self.data.get('op')]
             if op(len(resources), self.data.get('value')):
                 return resources

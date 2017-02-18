@@ -290,10 +290,10 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
 
-    def test_count_filter(self):
+    def test_resource_count_filter(self):
         fdata = {
             'type': 'value',
-            'value_type': 'count',
+            'value_type': 'resource_count',
             'op': 'lt',
             'value': 2
         }
@@ -301,18 +301,18 @@ class TestValueTypes(BaseFilterTest):
 
         f = filters.factory({
             'type': 'value',
-            'value_type': 'count',
+            'value_type': 'resource_count',
             'op': 'eq',
             'value': 2
         })
         i = instance(file='ec2-instances.json')
         self.assertEqual(i, f(i))
 
-    def test_count_filter_validation(self):
+    def test_resource_count_filter_validation(self):
         # Bad `op`
         f = {
             'type': 'value',
-            'value_type': 'count',
+            'value_type': 'resource_count',
             'op': 'regex',
             'value': 1,
         }
@@ -322,7 +322,7 @@ class TestValueTypes(BaseFilterTest):
         # Bad `value`
         f = {
             'type': 'value',
-            'value_type': 'count',
+            'value_type': 'resource_count',
             'op': 'eq',
             'value': 'foo',
         }
@@ -332,7 +332,7 @@ class TestValueTypes(BaseFilterTest):
         # Missing `op`
         f = {
             'type': 'value',
-            'value_type': 'count',
+            'value_type': 'resource_count',
             'value': 1,
         }
         self.assertRaises(
