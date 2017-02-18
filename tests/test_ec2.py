@@ -251,10 +251,11 @@ class TestStateTransitionAgeFilter(BaseTest):
         self.assertIsNone(instance.get_resource_date({}))
 
         # Bad date format
-        self.assertIsNone(
-            instance.get_resource_date({
-                'StateTransitionReason': "User initiated (201-02-06 17:77:00 GMT)"
-        }))
+        self.assertRaises(
+            ValueError,
+            instance.get_resource_date,
+            {'StateTransitionReason': "User initiated (201-02-06 17:77:00 GMT)"}
+        )
         
         # Won't match regex
         self.assertIsNone(
