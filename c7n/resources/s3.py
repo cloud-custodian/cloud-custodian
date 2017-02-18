@@ -359,8 +359,6 @@ class GlobalGrantsFilter(Filter):
             if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])
 
-        c = bucket_client(self.manager.session_factory(), b)
-
         if results:
             set_annotation(b, 'GlobalPermissions', results)
             return b
@@ -872,7 +870,7 @@ class ScanBucket(BucketActionBase):
 
     def __init__(self, data, manager=None):
         super(ScanBucket, self).__init__(data, manager)
-        self.denied_buckets = []
+        self.denied_buckets = set()
 
     def get_bucket_style(self, b):
         return (
@@ -895,30 +893,37 @@ class ScanBucket(BucketActionBase):
         return keys
 
     def process(self, buckets):
+        results = self._process_with_futures(self.process_bucket, buckets)
+        self.write_denied_buckets_file()
+        return results
+
+    def _process_with_futures(self, helper, buckets, max_workers=3):
         results = []
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers) as w:
             futures = {}
             for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
+                futures[w.submit(helper, b)] = b
             for f in as_completed(futures):
                 if f.exception():
+                    b = futures[f]
                     self.log.error(
                         "Error on bucket:%s region:%s policy:%s error: %s",
                         b['Name'], b.get('Location', 'unknown'),
                         self.manager.data.get('name'), f.exception())
-                    self.denied_buckets.append(b['Name'])
+                    self.denied_buckets.add(b['Name'])
                     continue
                 result = f.result()
                 if result:
                     results.append(result)
+        return results
 
+    def write_denied_buckets_file(self):
         if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
-                json.dump(self.denied_buckets, fh, indent=2)
-            self.denied_buckets = []
-        return results
+                json.dump(list(self.denied_buckets), fh, indent=2)
+            self.denied_buckets = set()
 
     def process_bucket(self, b):
         log.info(
@@ -946,7 +951,7 @@ class ScanBucket(BucketActionBase):
                     if e.response['Error']['Code'] == 'AccessDenied':
                         log.warning(
                             "Access Denied Bucket:%s while scanning" % b['Name'])
-                        self.denied_buckets.append(b['Name'])
+                        self.denied_buckets.add(b['Name'])
                         return
                     log.exception(
                         "Error processing bucket:%s paginator:%s" % (
@@ -1129,7 +1134,8 @@ class EncryptExtantKeys(ScanBucket):
                 return False
             elif not restore_complete(info['Restore']):
                 return False
-            storage_class == 'STANDARD'
+
+            storage_class = 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
         key_id = self.data.get('key-id')
@@ -1188,7 +1194,6 @@ class EncryptExtantKeys(ScanBucket):
 
         params = {'Bucket': bucket_name,
                   'Key': key['Key'],
-                  'CopySource': "/%s/%s" % (bucket_name, key['Key']),
                   'UploadId': upload_id,
                   'CopySource': source,
                   'CopySourceIfMatch': info['ETag']}
@@ -1301,7 +1306,6 @@ class LogTarget(Filter):
                 yield (t['S3BucketName'], t.get('S3KeyPrefix', ''))
 
     def get_elb_bucket_locations(self):
-        session = local_session(self.manager.session_factory)
         elbs = self.manager.get_resource_manager('elb').resources()
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
@@ -1371,7 +1375,6 @@ class DeleteGlobalGrants(BucketActionBase):
             'grantees', [
                 GlobalGrantsFilter.AUTH_ALL, GlobalGrantsFilter.GLOBAL_ALL])
 
-        s3 = bucket_client(self.manager.session_factory(), b)
         log.info(b)
 
         acl = b.get('Acl', {'Grants': []})
@@ -1509,6 +1512,8 @@ class DeleteBucket(ScanBucket):
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
 
+    permissions = ('s3:*',)
+
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
@@ -1559,12 +1564,12 @@ class DeleteBucket(ScanBucket):
         # might be worth sanity checking all our permissions
         # on the bucket up front before disabling versioning/replication.
         if self.data.get('remove-contents', True):
-            with self.executor_factory(max_workers=3) as w:
-                list(w.map(self.process_delete_enablement, buckets))
+            self._process_with_futures(self.process_delete_enablement, buckets)
             self.empty_buckets(buckets)
-        with self.executor_factory(max_workers=3) as w:
-            results = w.map(self.delete_bucket, buckets)
-            return filter(None, list(results))
+
+        results = self._process_with_futures(self.delete_bucket, buckets)
+        self.write_denied_buckets_file()
+        return results
 
     def delete_bucket(self, b):
         s3 = bucket_client(self.manager.session_factory(), b)
