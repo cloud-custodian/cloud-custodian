@@ -163,12 +163,14 @@ class IamRoleUsage(Filter):
         results = []
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
-            svcs = client.list_services(cluster=cluster)['serviceArns']
-            for svc in client.describe_services(
-                    cluster=cluster, services=svcs)['services']:
-                if 'roleArn' not in svc:
-                    continue
-                results.append(svc['roleArn'])
+            services = client.list_services(
+                    cluster=cluster['clusterName'])['serviceArns']
+            if services:
+                for service in client.describe_services(
+                        cluster=cluster['clusterName'],
+                        services=services)['services']:
+                    if 'roleArn' in service:
+                        results.append(service['roleArn'])
         return results
 
     def scan_asg_roles(self):
@@ -219,7 +221,7 @@ class UnusedIamRole(IamRoleUsage):
         roles = self.service_role_usage()
         results = []
         for r in resources:
-            if r['Arn'] not in roles or r['RoleName'] not in roles:
+            if r['Arn'] not in roles and r['RoleName'] not in roles:
                 results.append(r)
         self.log.info("%d of %d iam roles not currently used.",
                       len(results), len(resources))
