@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "8QGW/+n5Oc1LqcerWMR5k1fRqwI8ORP4YsJTNKfdyPG6e/k3yi5W4c7ztqM0cnPf7XzNj6JOKjw=", 
-            "RequestId": "D8ADCFB844F25E15", 
+            "HostId": "n3niQbn4pC/huvQZAaB2jTjq51e7ubun33HK3xCz7zgBY7iRrieY8a9EJR2t5CMlx3gjxZlDiUo=", 
+            "RequestId": "ECFFB6CF86FB38C9", 
             "HTTPHeaders": {
                 "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "8QGW/+n5Oc1LqcerWMR5k1fRqwI8ORP4YsJTNKfdyPG6e/k3yi5W4c7ztqM0cnPf7XzNj6JOKjw=", 
+                "x-amz-id-2": "n3niQbn4pC/huvQZAaB2jTjq51e7ubun33HK3xCz7zgBY7iRrieY8a9EJR2t5CMlx3gjxZlDiUo=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "D8ADCFB844F25E15", 
-                "date": "Tue, 20 Dec 2016 23:33:05 GMT", 
+                "x-amz-request-id": "ECFFB6CF86FB38C9", 
+                "date": "Sun, 19 Feb 2017 02:16:42 GMT", 
                 "content-type": "application/xml"
             }
         }, 
@@ -25,16 +25,16 @@
         "Contents": [
             {
                 "LastModified": {
-                    "hour": 23, 
+                    "hour": 2, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 5, 
+                    "month": 2, 
+                    "second": 41, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 20, 
-                    "minute": 33
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 16
                 }, 
-                "ETag": "\"a464522089f63853f27b5b6d46248918\"", 
+                "ETag": "\"f6e8913e4ce55825bc15b01e47cd05b0\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/10", 
                 "Owner": {
@@ -45,16 +45,16 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 23, 
+                    "hour": 2, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 5, 
+                    "month": 2, 
+                    "second": 41, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 20, 
-                    "minute": 33
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 16
                 }, 
-                "ETag": "\"38c441aabafaeddbf47b5437569d8f90\"", 
+                "ETag": "\"b06678ecd25f4473d81498a2c2362ae9\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "AWSLogs/2015/10/11", 
                 "Owner": {
@@ -65,16 +65,16 @@
             }, 
             {
                 "LastModified": {
-                    "hour": 23, 
+                    "hour": 2, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 5, 
+                    "month": 2, 
+                    "second": 42, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 20, 
-                    "minute": 33
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 16
                 }, 
-                "ETag": "\"f65a0781ff29281512e824e929681dd6\"", 
+                "ETag": "\"91719c54f9eeb80f3a3984170f89f220\"", 
                 "StorageClass": "STANDARD", 
                 "Key": "home.txt", 
                 "Owner": {

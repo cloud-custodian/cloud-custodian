@@ -3,30 +3,30 @@
     "data": {
         "CopyObjectResult": {
             "LastModified": {
-                "hour": 23, 
+                "hour": 2, 
                 "__class__": "datetime", 
-                "month": 12, 
-                "second": 5, 
+                "month": 2, 
+                "second": 41, 
                 "microsecond": 0, 
-                "year": 2016, 
-                "day": 20, 
-                "minute": 33
+                "year": 2017, 
+                "day": 19, 
+                "minute": 16
             }, 
-            "ETag": "\"a464522089f63853f27b5b6d46248918\""
+            "ETag": "\"f6e8913e4ce55825bc15b01e47cd05b0\""
         }, 
-        "SSEKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/662c9918-50cb-4644-bf82-e34fd4ae710c", 
+        "SSEKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/845ab6f1-744c-4edc-b702-efae6836818a", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "G3iBaexe9AmoHQvv2gtri3CYjcGj94ySoBco0gusLjNj8sL4nLd/EhuKFNC86sXRvfSYQ8XrFTw=", 
-            "RequestId": "C614A7775362E86F", 
+            "HostId": "an7FDQiEnPOSBcoRTWNyXaQly+Q6y7uRAGXkY7I3ah/B3XO4kKJfkByBkvqjWJaCCk89kXg4uEM=", 
+            "RequestId": "D2F4BA97C7C2A415", 
             "HTTPHeaders": {
                 "content-length": "234", 
-                "x-amz-id-2": "G3iBaexe9AmoHQvv2gtri3CYjcGj94ySoBco0gusLjNj8sL4nLd/EhuKFNC86sXRvfSYQ8XrFTw=", 
+                "x-amz-id-2": "an7FDQiEnPOSBcoRTWNyXaQly+Q6y7uRAGXkY7I3ah/B3XO4kKJfkByBkvqjWJaCCk89kXg4uEM=", 
                 "server": "AmazonS3", 
-                "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:644160558196:key/662c9918-50cb-4644-bf82-e34fd4ae710c", 
-                "x-amz-request-id": "C614A7775362E86F", 
-                "date": "Tue, 20 Dec 2016 23:33:05 GMT", 
+                "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:644160558196:key/845ab6f1-744c-4edc-b702-efae6836818a", 
+                "x-amz-request-id": "D2F4BA97C7C2A415", 
+                "date": "Sun, 19 Feb 2017 02:16:41 GMT", 
                 "x-amz-server-side-encryption": "aws:kms", 
                 "content-type": "application/xml"
             }
