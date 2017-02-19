@@ -58,7 +58,7 @@ Now, run Custodian:
 
 .. code-block:: bash
 
-    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. --config=custodian.yml
+    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. custodian.yml
 
 If successful, you should see output similar to the following on the command line::
 
@@ -98,14 +98,14 @@ validate it separately:
 
 .. code-block:: bash
 
-  $ custodian validate -c custodian.yml
+  $ custodian validate custodian.yml
 
 You can also check which resources are identified by the policy, without
 running any actions on the resources:
 
 .. code-block:: bash
 
-  $ custodian run --dryrun -c custodian.yml -s .
+  $ custodian run --dryrun -s . custodian.yml
 
 
 .. _explore-cc:
@@ -176,15 +176,15 @@ Additional commands let you monitor your services in detail.
 
 You can generate metrics by specifying the boolean metrics flag::
 
-  $ custodian run -c <policyfile>.yml -s <output_directory> --metrics
+  $ custodian run -s <output_directory> --metrics <policyfile>.yml
 
 You can also upload Cloud Custodian logs to CloudWatch logs::
 
-  $ custodian run -c <policyfile>.yml --log-group=/cloud-custodian/<dev-account>/<region>
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> <policyfile>.yml
 
 And you can output logs and resource records to S3::
 
-  $ custodian run -c <policyfile>.yml -s s3://<my-bucket><my-prefix>
+  $ custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
 
 For details, see :ref:`usage`.
 

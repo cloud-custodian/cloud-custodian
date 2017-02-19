@@ -34,6 +34,13 @@ ASG_POLICY = Policy(
     },
     Config.empty(),
 )
+ELB_POLICY = Policy(
+    {
+        'name': 'report-test-elb',
+        'resource': 'elb',
+    },
+    Config.empty(),
+)
 
 
 class TestEC2Report(unittest.TestCase):
@@ -93,6 +100,26 @@ class TestASGReport(unittest.TestCase):
 
     def test_csv(self):
         formatter = Formatter(ASG_POLICY.resource_manager)
+        tests = [
+            (['full'], ['full']),
+            (['minimal'], ['minimal']),
+            (['full', 'minimal'], ['full', 'minimal']),
+            (['full', 'duplicate', 'minimal'], ['full', 'minimal'])]
+        for rec_ids, row_ids in tests:
+            recs = map(lambda x: self.records[x], rec_ids)
+            rows = map(lambda x: self.rows[x], row_ids)
+            self.assertEqual(formatter.to_csv(recs), rows)
+
+
+class TestELBReport(unittest.TestCase):
+    def setUp(self):
+        data = load_data('report.json')
+        self.records = data['elb']['records']
+        self.headers = data['elb']['headers']
+        self.rows = data['elb']['rows']
+
+    def test_csv(self):
+        formatter = Formatter(ELB_POLICY.resource_manager)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
