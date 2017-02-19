@@ -24,7 +24,7 @@ from c7n.resources.s3 import EncryptExtantKeys
 from c7n.utils import get_retry
 
 s3 = config = None
-retry = get_retry(['404', '503'])
+retry = get_retry(['404', '503'], max_attempts=4, min_delay=2)
 
 
 def init():
@@ -73,7 +73,7 @@ def get_function(session_factory, role, buckets=None, account_id=None):
         name='c7n-s3-encrypt',
         handler='s3crypt.process_key_event',
         memory_size=256,
-        timeout=15,
+        timeout=30,
         role=role,
         runtime="python2.7",
         description='Custodian S3 Key Encrypt')
