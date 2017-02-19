@@ -14,12 +14,10 @@
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter
 from c7n.filters import Filter
-from c7n.filters import OPERATORS
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import type_schema, local_session, chunks
+from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
 @resources.register('alarm')
@@ -36,10 +34,12 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
 
+    retry = staticmethod(get_retry(('Throttled',)))
+
 
 @Alarm.action_registry.register('delete')
 class AlarmDelete(BaseAction):
-    """
+    """Delete a cloudwatch alarm.
 
     :example:
 
@@ -63,10 +63,13 @@ class AlarmDelete(BaseAction):
     permissions = ('cloudwatch:DeleteAlarms',)
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client('cloudwatch')
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
 
         for resource_set in chunks(resources, size=100):
-            client.delete_alarms(AlarmNames=[r['AlarmName'] for r in resource_set])
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
 @resources.register('event-rule')
