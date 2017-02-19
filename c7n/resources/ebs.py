@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections import Counter
 import logging
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -32,6 +34,7 @@ log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
+
 
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
@@ -868,3 +871,162 @@ class Delete(BaseAction):
             if e.response['Error']['Code'] == "InvalidVolume.NotFound":
                 return
             raise
+
+
+@filters.register('modifyable')
+class ModifyableVolume(Filter):
+    """Check if an ebs volume is modifyable online.
+
+    Considerations - https://goo.gl/CBhfqV
+
+    Consideration Summary
+      - only current instance types are supported (one exception m3.medium)
+        Current Generation Instances (2017-2) https://goo.gl/iuNjPZ
+
+      - older magnetic volume types are not supported
+      - shrinking volumes is not supported
+      - must wait at least 6hrs between modifications to the same volume.
+      - volumes must have been attached after nov 1st, 2016.
+
+    See `custodian schema ebs.actions.modify` for examples.
+    """
+
+    schema = type_schema('modifyable')
+
+    older_generation = set((
+        'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge',
+        'c1.medium', 'c1.xlarge', 'cc2.8xlarge',
+        'm2.xlarge', 'm2.2xlarge', 'm2.4xlarge', 'cr1.8xlarge',
+        'hi1.4xlarge', 'hs1.8xlarge', 'cg1.4xlarge', 't1.micro',
+        # two legs good, not all current gen work either.
+        'm3.large', 'm3.xlarge', 'm3.2xlarge'
+    ))
+
+    permissions = ("ec2:DescribeInstances",)
+
+    def process(self, resources, event=None):
+        results = []
+        filtered = []
+        attached = []
+        stats = Counter()
+        marker_date = parse_date('2016-11-01T00:00:00+00:00')
+
+        for r in resources:
+            # unsupported type
+            if r['VolumeType'] == 'standard':
+                stats['vol-type'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            # unattached are easy
+            if not r.get('Attachments'):
+                results.append(r)
+                continue
+
+            # check for attachment date older then supported date
+            if r['Attachments'][0]['AttachTime'] < marker_date:
+                stats['attach-time'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            attached.append(r)
+
+        # attached instance type check
+        ec2 = self.manager.get_resource_manager('ec2')
+
+        instance_map = {}
+        for v in attached:
+            instance_map.setdefault(
+                v['Attachments'][0]['InstanceId'], []).append(v)
+
+        instances = ec2.get_resources(instance_map.keys())
+        for i in instances:
+            if i['InstanceType'] in self.older_generation:
+                stats['instance-type'] += 1
+                filtered.extend(instance_map.pop(i['InstanceId']))
+            else:
+                results.extend(instance_map.pop(i['InstanceId']))
+
+        self.log.debug(
+            "filtered %d volumes due to %s",
+            len(filtered), stats.items())
+
+        return results
+
+
+@actions.register('modify')
+class ModifyVolume(BaseAction):
+    """Modify an ebs volume online.
+
+    **Note this action requires use of modifyable filter**
+
+    Intro Blog & Use Cases - https://goo.gl/E3u4Ue
+    Docs - https://goo.gl/DJM4T0
+    Considerations - https://goo.gl/CBhfqV
+
+    :example:
+
+      Find under utilized provisioned iops volumes older than a week
+      and change their type.
+
+        .. code-block: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+               - type: value
+                 key: CreateDate
+                 value_type: age
+                 value: 7
+                 op: greater-than
+               - VolumeType: io1
+               - type: metrics
+                 name: VolumeConsumedReadWriteOps
+                 statistics: Maximum
+                 value: 100
+                 op: less-than
+                 days: 7
+               - modifyable
+              actions:
+               - type: modify
+                 volume-type: gp1
+
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+           'size-percent': {'type': 'number'},
+           'iops-percent': {'type': 'number'}})
+
+    # assumptions as its the closest i can find.
+    permissions = ("ec2:ModifyVolumeAttribute",)
+
+    def validate(self):
+        if 'modifyable' not in self.manager.data.get('filters', ()):
+            raise FilterValidationError(
+                "modify action requires modifyable filter in policy")
+
+        return self
+
+    def process(self, resources):
+        for resource_set in chunks(resources, 50):
+            self.process_resource_set(resource_set)
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('ec2')
+        vtype = self.data.get('volume-type')
+        psize = self.data.get('size-percent')
+        piops = self.data.get('iops-percent')
+
+        for r in resource_set:
+            params = {'VolumeId': r['VolumeId']}
+            if piops and ('io1' in (vtype, r['VolumeType'])):
+                # default here if we're changing to io1
+                params['Iops'] = int(r['Iops'] + r.get('Iops', 10) * piops/100.0)
+            if psize:
+                params['Size'] = int(r['Size'] + r['Size'] * psize/100.0)
+            if vtype:
+                params['VolumeType'] = vtype
+            self.manager.retry(client.modify_volume, **params)
