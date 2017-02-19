@@ -394,6 +394,7 @@ class ValueFilter(Filter):
                     value = parse(value)
                 except (AttributeError, TypeError):
                     value = 0
+
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
