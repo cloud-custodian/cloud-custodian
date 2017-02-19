@@ -14,10 +14,12 @@
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
+from c7n.filters import AgeFilter
 from c7n.filters import Filter
+from c7n.filters import OPERATORS
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, chunks
 
 
 @resources.register('alarm')
@@ -33,6 +35,38 @@ class Alarm(QueryResourceManager):
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
+
+
+@Alarm.action_registry.register('delete')
+class AlarmDelete(BaseAction):
+    """
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-alarms
+                resource: alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            client.delete_alarms(AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
 @resources.register('event-rule')
