@@ -1064,10 +1064,13 @@ class EncryptExtantKeys(ScanBucket):
         return perms
 
     def process(self, buckets):
+        self.kms_id = self.data.get('key-id')
+
         t = time.time()
         results = super(EncryptExtantKeys, self).process(buckets)
         run_time = time.time() - t
         remediated_count = object_count = 0
+
         for r in results:
             object_count += r['Count']
             remediated_count += r['Remediated']
@@ -1114,7 +1117,10 @@ class EncryptExtantKeys(ScanBucket):
             info = s3.head_object(Bucket=bucket_name, Key=k)
 
         if 'ServerSideEncryption' in info:
-            return False
+            if self.kms_id and info.get('SSEKMSKeyId', '') == self.kms_id:
+                return False
+            else:
+                return False
 
         if self.data.get('report-only'):
             return k
@@ -1147,7 +1153,7 @@ class EncryptExtantKeys(ScanBucket):
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
 
-        if key_id and crypto_method is 'aws:kms':
+        if key_id and crypto_method == 'aws:kms':
             params['SSEKMSKeyId'] = key_id
 
         if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
