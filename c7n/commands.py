@@ -69,6 +69,8 @@ def policy_command(f):
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
+            if len(all_policies) == 0:
+                return
             sys.exit(1)
 
         # Do not allow multiple policies with the same name, even across files
@@ -98,7 +100,7 @@ def _print_no_policies_warning(options, policies):
             eprint("    - {} ({})".format(policy.name, policy.resource_type))
         eprint()
     else:
-        eprint('Error: empty policy file(s).  Nothing to do.')
+        eprint('Empty policy file(s).  Nothing to do.')
 
 
 def validate(options):

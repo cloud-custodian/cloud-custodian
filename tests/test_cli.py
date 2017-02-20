@@ -235,9 +235,9 @@ class ReportTest(CliTest):
         temp_dir = self.get_temp_dir()
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
-        self.run_and_expect_failure(
+        self.run_and_expect_success(
             ['custodian', 'report', '-s', temp_dir, yaml_file],
-            1)
+        )
 
         # more than 1 policy
         policies = {
@@ -293,9 +293,9 @@ class LogsTest(CliTest):
         # Test 1 - empty file
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
-        self.run_and_expect_failure(
+        self.run_and_expect_success(
             ['custodian', 'logs', '-s', temp_dir, yaml_file],
-            1)
+        )
 
         # Test 2 - more than one policy
         policies = {
@@ -510,12 +510,12 @@ class MetricsTest(CliTest):
 
 class MiscTest(CliTest):
     
-    def test_empty_policy_file_error(self):
+    def test_empty_policy_file(self):
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
-        self.run_and_expect_failure(
+        self.run_and_expect_success(
             ['custodian', 'run', '-s', temp_dir, yaml_file],
-            1)
+        0)
 
     def test_nonexistent_policy_file(self):
         temp_dir = self.get_temp_dir()
