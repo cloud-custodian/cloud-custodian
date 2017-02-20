@@ -48,18 +48,16 @@ Lambdas can receive CWE over CloudTrail API calls with a 1-15m delay.
 .. code-block:: yaml
 
    policies:
-     - name: ec2-tag-compliance
+     - name: ec2-tag-running
        resource: ec2
        mode:
          type: cloudtrail
          events:
           - RunInstances
-       filters:
-         - or:
-           - tag:required1: absent
-           - tag:required2: absent
        actions:
-         - stop
+         - type: mark
+           tag: foo
+           msg: bar
 
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
