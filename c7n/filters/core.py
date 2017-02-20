@@ -211,12 +211,27 @@ class Not(Filter):
         self.filters = registry.parse(self.data.values()[0], manager)
         self.manager = manager
 
-    def process(self, resources, events=None):
+    def process(self, resources, event=None):
+        if self.manager:
+            return self.process_set(resources, event)
+        return super(Not, self).process(resources, event)
+
+    def __call__(self, r):
+        """Fallback for older unit tests that don't utilize a query manager"""
+
+        # There is an implicit 'and' for self.filters
+        # ~(A ^ B ^ ... ^ Z) = ~A v ~B v ... v ~Z
+        for f in self.filters:
+            if not f(r):
+                return True
+        return False
+
+    def process_set(self, resources, event=None):
         resource_type = self.manager.get_model()
         resource_map = {r[resource_type.id]: r for r in resources}
 
         for f in self.filters:
-            resources = f.process(resources, events)
+            resources = f.process(resources, event)
 
         before = set(resource_map.keys())
         after = set([r[resource_type.id] for r in resources])
