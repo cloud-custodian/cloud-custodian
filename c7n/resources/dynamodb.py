@@ -11,26 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import functools
-import itertools
-
 from botocore.exceptions import ClientError
-from c7n.actions import (
-    ActionRegistry, BaseAction)
-from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
+from concurrent.futures import as_completed
+
+from c7n.actions import BaseAction
+from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema
-from c7n.actions import BaseAction
-from c7n.utils import (
-    local_session, get_account_id,get_retry, 
-    chunks, snapshot_identifier, type_schema)
+from c7n.utils import chunks, local_session, type_schema, get_retry
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter
 
-from concurrent.futures import as_completed
 
 filters = FilterRegistry('dynamodb-table.filters')
 filters.register('marked-for-op', TagActionFilter)
+
 
 @resources.register('dynamodb-table')
 class Table(QueryResourceManager):
@@ -57,11 +51,12 @@ class Table(QueryResourceManager):
             resources, 
             self.session_factory, 
             self.executor_factory,
-            self.retry))
+            self.retry,
+            self.log))
 
 
 def _dynamodb_table_tags(
-        model, tables, session_factory, executor_factory, retry):
+        model, tables, session_factory, executor_factory, retry, log):
     """ Augment DynamoDB tables with their respective tags
     """
 

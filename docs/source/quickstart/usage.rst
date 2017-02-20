@@ -31,7 +31,7 @@ Additionally some filters and actions may generate their own metrics.
 In order to enable metrics output, the boolean metrics
 flag needs to be specified when running Cloud Custodian::
 
-  $ custodian run -c <policyfile>.yml -s <output_directory> --metrics
+  $ custodian run -s <output_directory> --metrics <policyfile>.yml
 
 
 CloudWatch Logs
@@ -43,7 +43,7 @@ separate stream.
 
 Usage example::
 
-  $ custodian run -c <policyfile>.yml --log-group=/cloud-custodian/<dev-account>/<region>
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> <policyfile>.yml
 
 
 If enabled, it is recommended to set a log subscription on the group to
@@ -61,7 +61,7 @@ with its log files for archival purposes.
 
 The S3 bucket and prefix can be specified via parameters::
 
-  $ custodian run -c <policyfile>.yml --output-dir s3://<my-bucket>/<my-prefix>
+  $ custodian run --output-dir s3://<my-bucket>/<my-prefix> <policyfile>.yml
 
 Reports
 -------

@@ -21,6 +21,13 @@ setup(
     entry_points={
         'console_scripts': [
             'custodian = c7n.cli:main']},
-    install_requires=["boto3", "dashtable", "pyyaml", "jsonschema", "ipaddress", "argcomplete"],
+    install_requires=[
+        "boto3>=1.4.4",
+        "dashtable",
+        "pyyaml",
+        "jsonschema",
+        "ipaddress",
+        "argcomplete",
+    ],
 )
 
