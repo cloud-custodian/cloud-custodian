@@ -36,7 +36,7 @@ class SchemaTest(BaseTest):
     def test_schema_plugin_name_mismatch(self):
         for k, v in resources.items():
             for fname, f in v.filter_registry.items():
-                if fname in ('or', 'and'):
+                if fname in ('or', 'and', 'not'):
                     continue
                 self.assertIn(
                     fname, f.schema['properties']['type']['enum'])

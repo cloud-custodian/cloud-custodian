@@ -226,7 +226,7 @@ class Not(Filter):
                 return True
         return False
 
-    def process_set(self, resources, event=None):
+    def process_set(self, resources, event):
         resource_type = self.manager.get_model()
         resource_map = {r[resource_type.id]: r for r in resources}
 
