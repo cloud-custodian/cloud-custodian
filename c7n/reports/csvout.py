@@ -44,6 +44,7 @@ from concurrent.futures import as_completed
 
 from cStringIO import StringIO
 import csv
+from dashtable import data2md
 from datetime import datetime
 import gzip
 import json
@@ -79,10 +80,16 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
     log.debug("Found %d records", len(records))
+    
     rows = formatter.to_csv(records)
-    writer = csv.writer(output_fh, formatter.headers())
-    writer.writerow(formatter.headers())
-    writer.writerows(rows)
+    if options.ascii:
+        table = [formatter.headers()]
+        table.extend(rows)
+        print(data2md(table))
+    else:
+        writer = csv.writer(output_fh, formatter.headers())
+        writer.writerow(formatter.headers())
+        writer.writerows(rows)
 
     if raw_output_fh is not None:
         dumps(records, raw_output_fh, indent=2)

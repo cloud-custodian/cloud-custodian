@@ -131,6 +131,9 @@ def _report_options(p):
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
+    p.add_argument(
+        '--ascii', action="store_true",
+        help="Use ASCII output instead of CSV.")
 
     # We don't include `region` because the report command ignores it
     p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
