@@ -52,9 +52,11 @@ def policy_command(f):
             except IOError:
                 eprint('Error: policy file does not exist ({})'.format(file))
                 errors += 1
+                continue
             except ValueError as e:
                 eprint('Error: problem loading policy file ({})'.format(e.message))
                 errors += 1
+                continue
 
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(file))
