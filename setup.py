@@ -23,11 +23,11 @@ setup(
             'custodian = c7n.cli:main']},
     install_requires=[
         "boto3>=1.4.4",
-        "dashtable",
         "pyyaml",
         "jsonschema",
         "ipaddress",
         "argcomplete",
+        "tabulate",
     ],
 )
 

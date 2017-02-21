@@ -44,13 +44,13 @@ from concurrent.futures import as_completed
 
 from cStringIO import StringIO
 import csv
-from dashtable import data2md
 from datetime import datetime
 import gzip
 import json
 import jmespath
 import logging
 import os
+from tabulate import tabulate
 
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
@@ -83,9 +83,7 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
     
     rows = formatter.to_csv(records)
     if options.ascii:
-        table = [formatter.headers()]
-        table.extend(rows)
-        print(data2md(table))
+        print(tabulate(rows, headers=formatter.headers()))
     else:
         writer = csv.writer(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
