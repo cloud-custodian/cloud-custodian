@@ -146,7 +146,7 @@ Now deploy the policy:
 
 .. code-block:: bash
 
-    custodian run -c custodian.yml -s .
+    custodian run -s . custodian.yml
 
 That should give you log output like this::
 
