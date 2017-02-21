@@ -223,9 +223,9 @@ class ReportTest(CliTest):
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 
-        # ASCII test
+        # ASCII formatted test
         output = self.get_output(
-            ['custodian', 'report', '--ascii', '-s', self.output_dir, yaml_file])
+            ['custodian', 'report', '--format', 'grid', '-s', self.output_dir, yaml_file])
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 

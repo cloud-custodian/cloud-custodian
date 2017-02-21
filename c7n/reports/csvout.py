@@ -82,12 +82,13 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
     log.debug("Found %d records", len(records))
     
     rows = formatter.to_csv(records)
-    if options.ascii:
-        print(tabulate(rows, headers=formatter.headers()))
-    else:
+    if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
+    else:
+        # We special case CSV, and for other formats we pass to tabulate
+        print(tabulate(rows, formatter.headers(), tablefmt=options.format))
 
     if raw_output_fh is not None:
         dumps(records, raw_output_fh, indent=2)
