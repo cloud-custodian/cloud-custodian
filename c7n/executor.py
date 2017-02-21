@@ -40,10 +40,17 @@ def executor(name, **kw):
 
 
 class MainThreadExecutor(object):
+    """ For running tests.
+
+    async == True  -> catch exceptions and store them in the future.
+    async == False -> let exceptions bubble up.
+    """
+    
     # For Dev/Unit Testing with concurrent.futures
-    def __init__(self, *args, **kw):
+    def __init__(self, async=True, *args, **kw):
         self.args = args
         self.kw = kw
+        self.async = async
 
     def map(self, func, iterable):
         for args in iterable:
@@ -53,7 +60,9 @@ class MainThreadExecutor(object):
         try:
             return MainThreadFuture(func(*args, **kw))
         except Exception as e:
-            return MainThreadFuture(None, exception=e)
+            if self.async:
+                return MainThreadFuture(None, exception=e)
+            raise e
 
     def __enter__(self):
         return self
