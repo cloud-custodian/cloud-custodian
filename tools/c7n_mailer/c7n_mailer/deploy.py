@@ -34,7 +34,7 @@ def dispatch(event, context):
 
 def get_archive(config):
 
-    required = ['ldap3', 'pyasn1', 'jinja2', 'markupsafe']
+    required = ['ldap3', 'pyasn1', 'jinja2', 'markupsafe','yaml']
     remove = ['_yaml.so', 'c7n.egg-link']
 
     def lib_filter(root, dirs, files):

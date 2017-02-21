@@ -817,19 +817,19 @@ class S3Test(BaseTest):
         self.addCleanup(destroyBucket, client, bname)
         generateBucketContents(session.resource('s3'), bname)
 
+        key_id = '845ab6f1-744c-4edc-b702-efae6836818a'
         p = self.load_policy({
             'name': 'encrypt-keys',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [{'type': 'encrypt-keys',
                          'crypto': 'aws:kms',
-                         'key-id': '662c9918-50cb-4644-bf82-e34fd4ae710c'}]},
+                         'key-id': key_id}]},
             session_factory=session_factory)
         p.run()
-
-        self.assertTrue(
-            'SSEKMSKeyId' in client.head_object(
-                Bucket=bname, Key='home.txt'))
+        result = client.head_object(Bucket=bname, Key='home.txt')
+        self.assertTrue('SSEKMSKeyId' in result)
+        self.assertTrue(key_id in result['SSEKMSKeyId'])
 
     def test_global_grants_filter_option(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
