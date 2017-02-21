@@ -26,6 +26,7 @@ import jinja2
 from address import get_user
 from record import resource_tag, resource_owner, resource_format, format_struct
 
+import yaml
 
 log = logging.getLogger('custodian.mail')
 
@@ -49,6 +50,7 @@ class Processor(object):
         self.cache = cache
         self.env = jinja2.Environment(
             trim_blocks=True, autoescape=False)
+        self.env.filters['yaml_safe'] = yaml.safe_dump
 
         self.env.globals['format_resource'] = resource_format
         self.env.globals['format_struct'] = format_struct
