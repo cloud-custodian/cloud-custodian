@@ -43,7 +43,7 @@ policy filters, and apply the policy actions to matching resources.
 CloudTrail API Calls
 ++++++++++++++++++++
 
-Lambdas can receive CWE over CloudTrail API calls with a 1-15m delay.
+Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
 
 .. code-block:: yaml
 
@@ -127,7 +127,8 @@ Config Rules
 <http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config_develop-rules.html>`_
 allow you to invoke logic in response to configuration changes in your AWS
 environment, and Cloud Custodian is the easiest way to write and provision
-Config rules.
+Config rules. Delay here is typically 1-15m (though the SLA on tag-only changes
+is a bit higher).
 
 In this section we'll look at how we would deploy the :ref:`quickstart
 <quickstart>` example using Config. Before you proceed, make sure you've
