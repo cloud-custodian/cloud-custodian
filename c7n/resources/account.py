@@ -68,7 +68,7 @@ class Account(ResourceManager):
 class AccountCredentialReport(CredentialReport):
 
     def process(self, resources, event=None):
-
+        super(AccountCredentialReport, self).process(resources, event)
         report = self.get_credential_report()
         if report is None:
             return []
