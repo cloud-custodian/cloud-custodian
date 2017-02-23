@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import ActionRegistry
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
@@ -292,6 +294,46 @@ class AccountPasswordPolicy(ValueFilter):
         if self.match(resources[0]['c7n:password_policy']):
             return resources
         return []
+
+@filters.register('has-password-policy')
+class HasAccountPasswordPolicy(Filter):
+  """
+    Filter accounts to those those where it has a password policy set up (or, inversely, not set up).
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: no-password-policy
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: has-password-policy
+                    value: false
+  """
+
+  schema = type_schema('has-password-policy', value={'type': 'boolean'})
+  permissions = ('iam:GetAccountPasswordPolicy',)
+
+  def process(self, resources, event=None):
+    results = []
+    expected = self.data.get('value', True)
+    for r in resources:
+      if not 'c7n:has_password_policy' in r:
+        client = local_session(self.manager.session_factory).client('iam')
+        try:
+          policy = client.get_account_password_policy().get('PasswordPolicy', {})
+          r['c7n:has_password_policy'] = True
+        except ClientError as e:
+          if e.response['Error']['Code'] == 'NoSuchEntity':
+            r['c7n:has_password_policy'] = False
+          else:
+            raise
+
+      if r['c7n:has_password_policy'] == expected:
+        results.append(r)
+    return results
 
 
 @filters.register('service-limit')
