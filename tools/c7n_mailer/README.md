@@ -131,7 +131,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_user`     | string           | ldap server for resolving users     |
 |           | `ldap_bind_password` | string           | ldap server for resolving users     |
 |           | `ldap_uri`           | string           | ldap server for resolving users     |
-
+|           | `ses_region`         | string           | AWS region that handles SES API calls |
 
 #### SDK Config
 
