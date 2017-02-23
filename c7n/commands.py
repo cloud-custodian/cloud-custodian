@@ -52,9 +52,11 @@ def policy_command(f):
             except IOError:
                 eprint('Error: policy file does not exist ({})'.format(file))
                 errors += 1
+                continue
             except ValueError as e:
                 eprint('Error: problem loading policy file ({})'.format(e.message))
                 errors += 1
+                continue
 
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(file))
@@ -69,7 +71,11 @@ def policy_command(f):
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
-            sys.exit(1)
+            # If we filtered out all the policies we want to exit with a
+            # non-zero status. But if the policy file is empty then continue
+            # on to the specific command to determine the exit status.
+            if len(all_policies) > 0:
+                sys.exit(1)
 
         # Do not allow multiple policies with the same name, even across files
         counts = Counter([p.name for p in policies])
@@ -98,16 +104,15 @@ def _print_no_policies_warning(options, policies):
             eprint("    - {} ({})".format(policy.name, policy.resource_type))
         eprint()
     else:
-        eprint('Error: empty policy file(s).  Nothing to do.')
+        eprint('Empty policy file(s).  Nothing to do.')
 
 
 def validate(options):
     load_resources()
     if len(options.configs) < 1:
-        # no configs to test
-        # We don't have the parser object, so fake ArgumentParser.error
         eprint('Error: no config files specified')
         sys.exit(1)
+
     used_policy_names = set()
     schm = schema.generate()
     errors = []
@@ -184,8 +189,8 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
-    if len(policies) > 1:
-        eprint("Error: Report subcommand can only operate on one policy")
+    if len(policies) != 1:
+        eprint("Error: Report subcommand requires exactly one policy")
         sys.exit(1)
     
     policy = policies.pop()
@@ -205,8 +210,8 @@ def report(options, policies):
 
 @policy_command
 def logs(options, policies):
-    if len(policies) > 1:
-        eprint("Error: Log subcommand can only operate on one policy")
+    if len(policies) != 1:
+        eprint("Error: Log subcommand requires exactly one policy")
         sys.exit(1)
 
     policy = policies.pop()
