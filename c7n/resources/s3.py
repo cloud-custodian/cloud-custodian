@@ -1586,10 +1586,6 @@ class DeleteBucket(ScanBucket):
                 self.log.error(
                     "Error while deleting bucket %s, bucket not empty" % (
                         b['Name']))
-            elif e.response['Error']['Code'] == 'AccessDenied':
-                self.log.error(
-                    "Error while deleting bucket %s, access denied" % (
-                        b['Name']))
             else:
                 raise e
 

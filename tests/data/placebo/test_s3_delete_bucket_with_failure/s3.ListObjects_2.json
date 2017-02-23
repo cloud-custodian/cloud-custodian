@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-perm-denied", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "CzLDEoc9noKeuprt7U0hfrT4Odw/mxx7+Co8C9JzpcNoL9pcXslRIp04aIoxeQE/N834UwnKD2w=", 
+            "RequestId": "E09BADA7215E17DC", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "CzLDEoc9noKeuprt7U0hfrT4Odw/mxx7+Co8C9JzpcNoL9pcXslRIp04aIoxeQE/N834UwnKD2w=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E09BADA7215E17DC", 
+                "date": "Sat, 18 Feb 2017 05:03:39 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}
