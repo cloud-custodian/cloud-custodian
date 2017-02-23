@@ -510,12 +510,13 @@ class MetricsTest(CliTest):
 
 class MiscTest(CliTest):
     
-    def test_empty_policy_file_error(self):
+    def test_empty_policy_file(self):
+        # Doesn't do anything, but should exit 0
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
-        self.run_and_expect_failure(
+        self.run_and_expect_success(
             ['custodian', 'run', '-s', temp_dir, yaml_file],
-            1)
+        0)
 
     def test_nonexistent_policy_file(self):
         temp_dir = self.get_temp_dir()
