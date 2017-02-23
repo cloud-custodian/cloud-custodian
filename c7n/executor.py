@@ -46,11 +46,12 @@ class MainThreadExecutor(object):
     async == False -> let exceptions bubble up.
     """
     
+    async = True
+
     # For Dev/Unit Testing with concurrent.futures
-    def __init__(self, async=True, *args, **kw):
+    def __init__(self, *args, **kw):
         self.args = args
         self.kw = kw
-        self.async = async
 
     def map(self, func, iterable):
         for args in iterable:
@@ -62,7 +63,7 @@ class MainThreadExecutor(object):
         except Exception as e:
             if self.async:
                 return MainThreadFuture(None, exception=e)
-            raise e
+            raise
 
     def __enter__(self):
         return self
