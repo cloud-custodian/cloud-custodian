@@ -88,6 +88,7 @@ class FilterRegistry(PluginRegistry):
         self.register('value', ValueFilter)
         self.register('or', Or)
         self.register('and', And)
+        self.register('not', Not)
         self.register('event', EventFilter)
 
     def parse(self, data, manager):
@@ -109,6 +110,8 @@ class FilterRegistry(PluginRegistry):
                 return Or(data, self, manager)
             elif data.keys()[0] == 'and':
                 return And(data, self, manager)
+            elif data.keys()[0] == 'not':
+                return Not(data, self, manager)
             return ValueFilter(data, manager).validate()
         if isinstance(data, basestring):
             filter_type = data
@@ -199,6 +202,42 @@ class And(Filter):
             resources = f.process(resources, events)
         return resources
 
+
+class Not(Filter):
+    
+    def __init__(self, data, registry, manager):
+        super(Not, self).__init__(data)
+        self.registry = registry
+        self.filters = registry.parse(self.data.values()[0], manager)
+        self.manager = manager
+
+    def process(self, resources, event=None):
+        if self.manager:
+            return self.process_set(resources, event)
+        return super(Not, self).process(resources, event)
+
+    def __call__(self, r):
+        """Fallback for older unit tests that don't utilize a query manager"""
+
+        # There is an implicit 'and' for self.filters
+        # ~(A ^ B ^ ... ^ Z) = ~A v ~B v ... v ~Z
+        for f in self.filters:
+            if not f(r):
+                return True
+        return False
+
+    def process_set(self, resources, event):
+        resource_type = self.manager.get_model()
+        resource_map = {r[resource_type.id]: r for r in resources}
+
+        for f in self.filters:
+            resources = f.process(resources, event)
+
+        before = set(resource_map.keys())
+        after = set([r[resource_type.id] for r in resources])
+        results = before - after
+        return [resource_map[r_id] for r_id in results]
+        
 
 class ValueFilter(Filter):
     """Generic value filter using jmespath
