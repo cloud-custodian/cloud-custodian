@@ -269,7 +269,7 @@ def process_resource(type_name, resource_type, resource_defs):
         else:
             filters_seen.add(f)
 
-        if filter_name in ('or', 'and'):
+        if filter_name in ('or', 'and', 'not'):
             continue
         elif filter_name == 'value':
             r['filters'][filter_name] = {
@@ -279,17 +279,6 @@ def process_resource(type_name, resource_type, resource_defs):
         elif filter_name == 'event':
             r['filters'][filter_name] = {
                 '$ref': '#/definitions/filters/event'}
-        # Commenting out what appears to be dead code.  These two conditions
-        # will always match the first if statement above.  With Kapil's
-        # blessing we I will remove these lines.
-        #elif filter_name == 'or':
-        #    r['filters'][filter_name] = {
-        #        'type': 'array',
-        #        'items': {'anyOf': nested_filter_refs}}
-        #elif filter_name == 'and':
-        #    r['filters'][filter_name] = {
-        #        'type': 'array',
-        #        'items': {'anyOf': nested_filter_refs}}
         else:
             r['filters'][filter_name] = f.schema
         filter_refs.append(

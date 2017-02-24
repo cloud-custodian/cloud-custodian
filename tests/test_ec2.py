@@ -830,3 +830,41 @@ class TestModifySecurityGroupAction(BaseTest):
         self.assertEqual(len(
             second_resources[0]['NetworkInterfaces'][0]['Groups']), 2)
 
+
+class TestFilter(BaseTest):
+    
+    def test_not_filter(self):
+        # This test is to get coverage for the `not` filter's process_set method
+        session_factory = self.replay_flight_data(
+            'test_ec2_not_filter')
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [
+                    {'InstanceId': 'i-036ee05e8c2ca83b3'}
+                ]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [{
+                    'or': [
+                        {'InstanceId': 'i-036ee05e8c2ca83b3'},
+                        {'InstanceId': 'i-03d8207d8285cbf53'}
+                    ]
+                }]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
