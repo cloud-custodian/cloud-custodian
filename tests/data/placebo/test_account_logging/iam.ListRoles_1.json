@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "ABodXw7JGrq1IIiuM3KHS2tcgx4050YWa7qPihuJqFtAaDkpQ+vjH1EUdiKhukxtyEpP1kcp19Q88yrL/GjsRXPL", 
+        "IsTruncated": true, 
+        "Roles": [
+            {
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22quicksight.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "RoleId": "AROAJ7VIQKM2MU4RUFTLO", 
+                "CreateDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 42
+                }, 
+                "RoleName": "aws-quicksight-service-role-v0", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::644160558196:role/service-role/aws-quicksight-service-role-v0"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ccf645e8-bbc2-11e6-b03e-911baa2f243e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ccf645e8-bbc2-11e6-b03e-911baa2f243e", 
+                "date": "Tue, 06 Dec 2016 14:46:41 GMT", 
+                "content-length": "1004", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "8052080e-bbd0-11e6-bf9f-1fb63d564a69", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8052080e-bbd0-11e6-bf9f-1fb63d564a69", 
+                "date": "Tue, 06 Dec 2016 16:24:45 GMT", 
+                "content-length": "97", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Unknown trail: invalid for the user: 644160558196", 
+            "Code": "TrailNotFoundException"
+        }
+    }
+}

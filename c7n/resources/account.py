@@ -14,15 +14,21 @@
 """AWS Account as a custodian resource.
 """
 
+from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, get_account_id, type_schema
+from c7n.utils import (
+    local_session,
+    get_account_id,
+    type_schema,
+    get_retry,
+)
 
 
 filters = FilterRegistry('aws.account.actions')
@@ -395,3 +401,161 @@ class ServiceLimit(Filter):
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
         return []
+
+
+@actions.register('record-start')
+class RecordStart(BaseAction):
+    """Enables recording for AWS Config
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: config-start-recording
+            resource: account
+            actions:
+              - record-start
+    """
+
+    def process(self, accounts):
+        client = local_session(
+            self.manager.session_factory).client('config')
+        recorders = client.describe_configuration_recorders()[
+            'ConfigurationRecorders']
+        retry = get_retry(
+            ('RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5,
+        )
+        for acc in accounts:
+            acc_id = acc['account_id']
+            for rec in recorders:
+                if acc_id not in rec['roleARN']:
+                    continue
+                retry(
+                    client.start_configuration_recorder,
+                    ConfigurationRecorderName=rec['name'],
+                )
+
+
+@actions.register('record-stop')
+class RecordStop(BaseAction):
+    """Disables recording for AWS Config
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: config-stop-recording
+            resource: account
+            actions:
+              - record-stop
+    """
+
+    def process(self, accounts):
+        client = local_session(
+            self.manager.session_factory).client('config')
+        recorders = client.describe_configuration_recorders()[
+            'ConfigurationRecorders']
+        retry = get_retry(
+            ('RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5,
+        )
+        for acc in accounts:
+            acc_id = acc['account_id']
+            for rec in recorders:
+                if acc_id not in rec['roleARN']:
+                    continue
+                retry(
+                    client.stop_configuration_recorder,
+                    ConfigurationRecorderName=rec['name'],
+                )
+
+
+@actions.register('logging-start')
+class LoggingStart(BaseAction):
+    """Enables CloudTrail logging for listed trail(s)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: config-start-logging
+            resource: account
+            actions:
+              - type: logging-start
+                trails:
+                  - trail-one
+                  - trail-two
+    """
+
+    schema = type_schema(
+        'logging-start',
+        trails={'type': 'array', 'items': {'type': 'string'}},
+        required=('trails',),
+    )
+
+    def process(self, accounts):
+        trails = self.data.get('trails')
+        client = local_session(
+            self.manager.session_factory).client('cloudtrail')
+        retry = get_retry(
+            ('RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5,
+        )
+        for trail in trails:
+            try:
+                retry(client.start_logging, Name=trail)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'TrailNotFoundException':
+                    self.log.exception(
+                        "Error while starting logging: %s",
+                        e.response['Error']['Message'],
+                    )
+                raise
+
+
+@actions.register('logging-stop')
+class LoggingStop(BaseAction):
+    """Disables CloudTrail logging for listed trail(s)
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: config-stop-logging
+            resource: account
+            actions:
+              - type: logging-stop
+                trails:
+                  - trail-one
+                  - trail-two
+    """
+
+    schema = type_schema(
+        'logging-stop',
+        trails={'type': 'array', 'items': {'type': 'string'}},
+        required=('trails',),
+    )
+
+    def process(self, accounts):
+        trails = self.data.get('trails')
+        client = local_session(
+            self.manager.session_factory).client('cloudtrail')
+        retry = get_retry(
+            ('RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            max_attempts=5,
+        )
+        for trail in trails:
+            try:
+                retry(client.stop_logging, Name=trail)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'TrailNotFoundException':
+                    self.log.exception(
+                        "Error while stoping logging: %s",
+                        e.response['Error']['Message'],
+                    )
+                raise
