@@ -1055,6 +1055,12 @@ class NetworkAcl(QueryResourceManager):
         id_prefix = "acl-"
 
 
+@NetworkAcl.filter_registry.register('subnet')
+class AclSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Associations[].SubnetId"
+
+
 @resources.register('network-addr')
 class Address(QueryResourceManager):
 
