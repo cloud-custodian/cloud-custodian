@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UploadIdMarker": "", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "XxGx7F93WdEznAWj1GHAnG6ySASqHXDTVkNsjsn2K4ryWbEJMHScBUeI7nZ8gvhXWmvYErrN4IQ=", 
+            "RequestId": "59F0B4314A718EBB", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "XxGx7F93WdEznAWj1GHAnG6ySASqHXDTVkNsjsn2K4ryWbEJMHScBUeI7nZ8gvhXWmvYErrN4IQ=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "59F0B4314A718EBB", 
+                "date": "Sat, 18 Feb 2017 05:03:33 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "NextKeyMarker": "", 
+        "Bucket": "custodian-perm-denied", 
+        "NextUploadIdMarker": "", 
+        "KeyMarker": "", 
+        "MaxUploads": 1000, 
+        "IsTruncated": false
+    }
+}

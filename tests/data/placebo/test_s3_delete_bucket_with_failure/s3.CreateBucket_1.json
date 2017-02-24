@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-perm-denied", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Mpf+5OmD2gTjcAYau38FEDQDKjV6PnWO1sm10nI+PQDeEN5MFuO7ZMHjhWFHURmmyajIU2njb1o=", 
+            "RequestId": "A46F6C0391D98BF4", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "Mpf+5OmD2gTjcAYau38FEDQDKjV6PnWO1sm10nI+PQDeEN5MFuO7ZMHjhWFHURmmyajIU2njb1o=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "A46F6C0391D98BF4", 
+                "location": "/custodian-perm-denied", 
+                "date": "Sat, 18 Feb 2017 05:03:25 GMT"
+            }
+        }
+    }
+}

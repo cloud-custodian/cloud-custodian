@@ -40,6 +40,14 @@ def executor(name, **kw):
 
 
 class MainThreadExecutor(object):
+    """ For running tests.
+
+    async == True  -> catch exceptions and store them in the future.
+    async == False -> let exceptions bubble up.
+    """
+    
+    async = True
+
     # For Dev/Unit Testing with concurrent.futures
     def __init__(self, *args, **kw):
         self.args = args
@@ -50,7 +58,12 @@ class MainThreadExecutor(object):
             yield func(args)
 
     def submit(self, func, *args, **kw):
-        return MainThreadFuture(func(*args, **kw))
+        try:
+            return MainThreadFuture(func(*args, **kw))
+        except Exception as e:
+            if self.async:
+                return MainThreadFuture(None, exception=e)
+            raise
 
     def __enter__(self):
         return self
@@ -62,8 +75,9 @@ class MainThreadExecutor(object):
 class MainThreadFuture(object):
     # For Dev/Unit Testing with concurrent.futures
 
-    def __init__(self, value):
+    def __init__(self, value, exception=None):
         self.value = value
+        self._exception = exception
         # Sigh concurrent.futures pokes at privates
         self._state = 'FINISHED'
         self._waiters = []
@@ -76,12 +90,14 @@ class MainThreadFuture(object):
         return False
 
     def exception(self):
-        return None
+        return self._exception
 
     def done(self):
         return True
 
     def result(self, timeout=None):
+        if self._exception:
+            raise self._exception
         return self.value
 
     def add_done_callback(self, fn):
