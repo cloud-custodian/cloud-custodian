@@ -31,6 +31,7 @@ import platform
 import tempfile
 import zipfile
 
+import ipaddress
 from boto3.s3.transfer import S3Transfer, TransferConfig
 from botocore.exceptions import ClientError
 
@@ -117,29 +118,16 @@ class PythonPackageArchive(object):
                     self.add_file(f_path, dest_path)
 
         # Library Source
-        venv_lib_paths = (
-            os.path.join(
-                self.virtualenv_dir,
-                'lib', RUNTIME, 'site-packages',
-            ),
-            os.path.join(
-                self.virtualenv_dir,
-                'lib64', RUNTIME, 'site-packages',
-            ),
-        )
-
-        for venv_lib_path in venv_lib_paths:
-            if not os.path.exists(venv_lib_path):
-                continue
-            for root, dirs, files in os.walk(venv_lib_path):
-                if self.lib_filter:
-                    dirs, files = self.lib_filter(root, dirs, files)
-                arc_prefix = os.path.relpath(root, venv_lib_path)
-                files = self.filter_files(files)
-                for f in files:
-                    f_path = os.path.join(root, f)
-                    dest_path = os.path.join(arc_prefix, f)
-                    self.add_file(f_path, dest_path)
+        venv_lib_path = os.path.dirname(ipaddress.__file__)
+        for root, dirs, files in os.walk(venv_lib_path):
+            if self.lib_filter:
+                dirs, files = self.lib_filter(root, dirs, files)
+            arc_prefix = os.path.relpath(root, venv_lib_path)
+            files = self.filter_files(files)
+            for f in files:
+                f_path = os.path.join(root, f)
+                dest_path = os.path.join(arc_prefix, f)
+                self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)
