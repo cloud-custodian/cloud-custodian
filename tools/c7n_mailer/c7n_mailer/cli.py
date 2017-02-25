@@ -32,6 +32,7 @@ CONFIG_SCHEMA = {
         'ldap_bind_user': {'type': 'string'},
         'ldap_bind_password': {'type': 'string'},
         'cross_accounts': {'type': 'object'},
+        'ses_region': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
