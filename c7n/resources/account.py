@@ -87,6 +87,7 @@ class CloudTrailEnabled(Filter):
         'check-cloudtrail',
         **{'multi-region': {'type': 'boolean'},
            'global-events': {'type': 'boolean'},
+           'current-region': {'type': 'boolean'},
            'running': {'type': 'boolean'},
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
@@ -96,12 +97,16 @@ class CloudTrailEnabled(Filter):
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
 
     def process(self, resources, event=None):
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
+        session = local_session(self.manager.session_factory)
+        client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
+        if self.data.get('current-region'):
+            current_region = session.region_name
+            trails  = [t for t in trails if t.get('HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
+            print(trails, current_region)
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
         if self.data.get('kms-key'):
