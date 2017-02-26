@@ -264,7 +264,10 @@ class IAMSummary(ValueFilter):
 
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
-    """Check an account's password policy
+    """Check an account's password policy.
+
+    Note that on top of the default password policy fields, we also add an extra key, PasswordPolicyConfigured
+    which will be set to true or false to signify if the given account has attempted to set a policy at all.
 
     :example:
 
@@ -287,53 +290,22 @@ class AccountPasswordPolicy(ValueFilter):
     permissions = ('iam:GetAccountPasswordPolicy',)
 
     def process(self, resources, event=None):
-        if not resources[0].get('c7n:password_policy'):
-            client = local_session(self.manager.session_factory).client('iam')
-            policy = client.get_account_password_policy().get('PasswordPolicy', {})
-            resources[0]['c7n:password_policy'] = policy
-        if self.match(resources[0]['c7n:password_policy']):
-            return resources
-        return []
-
-@filters.register('has-password-policy')
-class HasAccountPasswordPolicy(Filter):
-  """
-    Filter accounts to those those where it has a password policy set up (or, inversely, not set up).
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: no-password-policy
-                resource: account
-                region: us-east-1
-                filters:
-                  - type: has-password-policy
-                    value: false
-  """
-
-  schema = type_schema('has-password-policy', value={'type': 'boolean'})
-  permissions = ('iam:GetAccountPasswordPolicy',)
-
-  def process(self, resources, event=None):
-    results = []
-    expected = self.data.get('value', True)
-    for r in resources:
-      if not 'c7n:has_password_policy' in r:
-        client = local_session(self.manager.session_factory).client('iam')
-        try:
-          policy = client.get_account_password_policy().get('PasswordPolicy', {})
-          r['c7n:has_password_policy'] = True
-        except ClientError as e:
-          if e.response['Error']['Code'] == 'NoSuchEntity':
-            r['c7n:has_password_policy'] = False
-          else:
-            raise
-
-      if r['c7n:has_password_policy'] == expected:
-        results.append(r)
-    return results
+      account = resources[0]
+      if not account.get('c7n:password_policy'):
+          client = local_session(self.manager.session_factory).client('iam')
+          policy = {}
+          try:
+              policy = client.get_account_password_policy().get('PasswordPolicy', {})
+              policy['PasswordPolicyConfigured'] = True
+          except ClientError as e:
+              if e.response['Error']['Code'] == 'NoSuchEntity':
+                  policy['PasswordPolicyConfigured'] = False
+              else:
+                raise
+          account['c7n:password_policy'] = policy
+      if self.match(account['c7n:password_policy']):
+          return resources
+      return []
 
 
 @filters.register('service-limit')

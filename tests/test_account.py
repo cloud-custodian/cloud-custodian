@@ -165,7 +165,7 @@ class AccountTests(BaseTest):
             'name': 'missing-password-policy',
             'resource': 'account',
             'filters': [{
-                'type': 'has-password-policy', 'value': False}]},
+                'type': 'password-policy', 'key': 'PasswordPolicyConfigured', 'value': False}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
