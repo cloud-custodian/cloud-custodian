@@ -112,7 +112,7 @@ class PolicyPermissions(BaseTest):
                         k, n))
 
             for n, f in v.filter_registry.items():
-                if n in ('and', 'or'):
+                if n in ('and', 'or', 'not'):
                     continue
                 p['filters'] = [n]
                 perms = f({}, mgr).get_permissions()
