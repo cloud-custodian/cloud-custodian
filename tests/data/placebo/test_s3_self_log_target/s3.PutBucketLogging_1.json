@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Kgia3I0kK0UacB3S7+MjZhUwUvbBOFyx5ydCgC//v69TlYdqYP7GFgqus1x4P6+2xJa9cRSRKPQ=", 
+            "RequestId": "D3F8F89F69E1A49F", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Kgia3I0kK0UacB3S7+MjZhUwUvbBOFyx5ydCgC//v69TlYdqYP7GFgqus1x4P6+2xJa9cRSRKPQ=", 
+                "date": "Mon, 27 Feb 2017 17:33:31 GMT", 
+                "content-length": "0", 
+                "x-amz-request-id": "D3F8F89F69E1A49F", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

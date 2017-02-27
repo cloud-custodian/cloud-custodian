@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 23, 
+                    "minute": 54
+                }, 
+                "Name": "config-bucket-619193117841"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 4, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 25, 
+                    "minute": 22
+                }, 
+                "Name": "custodian-deploy"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 33
+                }, 
+                "Name": "custodian-log-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2013, 
+                    "day": 21, 
+                    "minute": 12
+                }, 
+                "Name": "hazmat-audit-logs"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Mkx6hIcJ/LKplsWgDnRpsB5HbZgbACrF4i9dCcxyZndKRTzJMdgQJeNgDjzPRtv/5CEmmg5z3cg=", 
+            "RequestId": "3F96082702D42E3A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Mkx6hIcJ/LKplsWgDnRpsB5HbZgbACrF4i9dCcxyZndKRTzJMdgQJeNgDjzPRtv/5CEmmg5z3cg=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3F96082702D42E3A", 
+                "date": "Mon, 27 Feb 2017 17:33:32 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
