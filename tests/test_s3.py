@@ -389,12 +389,6 @@ class S3Test(BaseTest):
                 'LoggingEnabled': {
                     'TargetBucket': bname,
                     'TargetPrefix': 's3-logs/'}})
-        client.put_bucket_logging(
-            Bucket=bname,
-            BucketLoggingStatus={
-                'LoggingEnabled': {
-                    'TargetBucket': bname,
-                    'TargetPrefix': 's3-logs/'}})
         p = self.load_policy({
             'name': 's3-log-targets',
             'resource': 's3',

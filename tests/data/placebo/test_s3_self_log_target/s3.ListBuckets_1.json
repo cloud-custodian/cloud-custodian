@@ -11,65 +11,26 @@
                     "hour": 17, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 54, 
-                    "microsecond": 0, 
-                    "year": 2015, 
-                    "day": 23, 
-                    "minute": 54
-                }, 
-                "Name": "config-bucket-619193117841"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 1, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 4, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 25, 
-                    "minute": 22
-                }, 
-                "Name": "custodian-deploy"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 2, 
-                    "second": 32, 
+                    "second": 51, 
                     "microsecond": 0, 
                     "year": 2017, 
                     "day": 27, 
-                    "minute": 33
+                    "minute": 34
                 }, 
                 "Name": "custodian-log-test"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 3, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 51, 
-                    "microsecond": 0, 
-                    "year": 2013, 
-                    "day": 21, 
-                    "minute": 12
-                }, 
-                "Name": "hazmat-audit-logs"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "Mkx6hIcJ/LKplsWgDnRpsB5HbZgbACrF4i9dCcxyZndKRTzJMdgQJeNgDjzPRtv/5CEmmg5z3cg=", 
-            "RequestId": "3F96082702D42E3A", 
+            "HostId": "0wHtB9lpDFSSdxUix1YugwYgEay+LagjqvHCJdqO7Fwu9ibOoPgIhwqJodYVwolgx1zpJdgMM7o=", 
+            "RequestId": "276933F0EC3BB988", 
             "HTTPHeaders": {
-                "x-amz-id-2": "Mkx6hIcJ/LKplsWgDnRpsB5HbZgbACrF4i9dCcxyZndKRTzJMdgQJeNgDjzPRtv/5CEmmg5z3cg=", 
+                "x-amz-id-2": "0wHtB9lpDFSSdxUix1YugwYgEay+LagjqvHCJdqO7Fwu9ibOoPgIhwqJodYVwolgx1zpJdgMM7o=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "3F96082702D42E3A", 
-                "date": "Mon, 27 Feb 2017 17:33:32 GMT", 
+                "x-amz-request-id": "276933F0EC3BB988", 
+                "date": "Mon, 27 Feb 2017 17:34:52 GMT", 
                 "content-type": "application/xml"
             }
         }
