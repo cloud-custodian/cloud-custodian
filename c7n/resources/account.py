@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import ActionRegistry
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
@@ -262,7 +264,10 @@ class IAMSummary(ValueFilter):
 
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
-    """Check an account's password policy
+    """Check an account's password policy.
+
+    Note that on top of the default password policy fields, we also add an extra key, PasswordPolicyConfigured
+    which will be set to true or false to signify if the given account has attempted to set a policy at all.
 
     :example:
 
@@ -285,13 +290,22 @@ class AccountPasswordPolicy(ValueFilter):
     permissions = ('iam:GetAccountPasswordPolicy',)
 
     def process(self, resources, event=None):
-        if not resources[0].get('c7n:password_policy'):
-            client = local_session(self.manager.session_factory).client('iam')
-            policy = client.get_account_password_policy().get('PasswordPolicy', {})
-            resources[0]['c7n:password_policy'] = policy
-        if self.match(resources[0]['c7n:password_policy']):
-            return resources
-        return []
+      account = resources[0]
+      if not account.get('c7n:password_policy'):
+          client = local_session(self.manager.session_factory).client('iam')
+          policy = {}
+          try:
+              policy = client.get_account_password_policy().get('PasswordPolicy', {})
+              policy['PasswordPolicyConfigured'] = True
+          except ClientError as e:
+              if e.response['Error']['Code'] == 'NoSuchEntity':
+                  policy['PasswordPolicyConfigured'] = False
+              else:
+                raise
+          account['c7n:password_policy'] = policy
+      if self.match(account['c7n:password_policy']):
+          return resources
+      return []
 
 
 @filters.register('service-limit')
