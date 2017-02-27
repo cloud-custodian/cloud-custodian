@@ -44,7 +44,7 @@ class Processor(object):
 
     def __init__(self, config, session, cache):
         self.config = config
-        self.ses = session.client('ses')
+        self.ses = session.client('ses', region_name=config.get('ses_region'))
         self.sts = session.client('sts')
         self.sns_cache = {}
         self.cache = cache

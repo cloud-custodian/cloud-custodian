@@ -66,6 +66,46 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class NetworkAclTest(BaseTest):
+
+    def test_s3_cidr_network_acl_present(self):
+        factory = self.replay_flight_data('test_network_acl_s3_present')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        p = self.load_policy({
+            'name': 'nacl-check',
+            'resource': 'network-acl',
+            'filters': [
+                {'VpcId': vpc_id},
+                {'type': 's3-cidr', 'present': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_s3_cidr_network_acl_not_present(self):
+        factory = self.replay_flight_data(
+            'test_network_acl_s3_missing')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        acls = client.describe_network_acls(
+            Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}])['NetworkAcls']
+
+        client.delete_network_acl_entry(
+            NetworkAclId=acls[0]['NetworkAclId'],
+            RuleNumber=acls[0]['Entries'][0]['RuleNumber'],
+            Egress=True)
+
+        p = self.load_policy({
+            'name': 'nacl-check',
+            'resource': 'network-acl',
+            'filters': [
+                {'VpcId': vpc_id}, 's3-cidr']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class NetworkInterfaceTest(BaseTest):
 
