@@ -18,7 +18,13 @@ Install Cloud Custodian
 
 To install Cloud Custodian, just run::
 
-  $ pip install c7n
+  $ virtualenv --python=python2 custodian
+  $ source custodian/bin/activate
+  (custodian) $ pip install c7n
+
+(Note that Custodian's `Lambda features <../policy/lambda.html>`_ currently `do
+not work <https://github.com/capitalone/cloud-custodian/issues/193>`_ outside
+of a virtualenv.)
 
 
 .. _write-policy:

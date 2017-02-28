@@ -87,7 +87,9 @@ class ValuesFrom(object):
         'properties': {
             'url': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt']},
-            'expr': {'type': 'string'}
+            'expr': {'oneOf': [
+                {'type': 'integer'},
+                {'type': 'string'}]}
         }
     }
 
