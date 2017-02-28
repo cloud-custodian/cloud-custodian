@@ -286,7 +286,10 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         for bd in cfg['BlockDeviceMappings']:
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
-            if bd['Ebs']['SnapshotId'] not in self.snapshots:
+            snapshot_id = bd['Ebs']['SnapshotId']
+            if hasattr(snapshot_id, 'strip'):
+                snapshot_id = snapshot_id.strip()
+            if snapshot_id not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
 
