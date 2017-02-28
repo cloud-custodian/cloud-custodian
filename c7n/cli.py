@@ -132,7 +132,7 @@ def _report_options(p):
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
-        '--format', default='csv',
+        '--format', default='csv', choices=['csv', 'grid', 'simple'],
         help="Format to output data in (default: %(default)s). "\
             "Options include simple, grid, rst")
 
