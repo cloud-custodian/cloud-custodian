@@ -31,7 +31,6 @@ import platform
 import tempfile
 import zipfile
 
-import ipaddress
 from boto3.s3.transfer import S3Transfer, TransferConfig
 from botocore.exceptions import ClientError
 
@@ -61,17 +60,14 @@ class PythonPackageArchive(object):
     See http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python
     """
 
-    def __init__(self, src_path, virtualenv_dir=None, skip=None,
-                 lib_filter=None, src_filter=None):
+    def __init__(self, src_path, skip=None, lib_paths=None, lib_filter=None,
+                 src_filter=None):
 
         self.src_path = src_path
-        if virtualenv_dir is None:
-            virtualenv_dir = os.path.abspath(
-                os.path.join(os.path.dirname(sys.executable), '..'))
-        self.virtualenv_dir = virtualenv_dir
         self._temp_archive_file = None
         self._zip_file = None
         self._closed = False
+        self.lib_paths = lib_paths or []
         self.lib_filter = lib_filter
         self.src_filter = src_filter
         self.skip = skip
@@ -118,16 +114,18 @@ class PythonPackageArchive(object):
                     self.add_file(f_path, dest_path)
 
         # Library Source
-        venv_lib_path = os.path.dirname(ipaddress.__file__)
-        for root, dirs, files in os.walk(venv_lib_path):
-            if self.lib_filter:
-                dirs, files = self.lib_filter(root, dirs, files)
-            arc_prefix = os.path.relpath(root, venv_lib_path)
-            files = self.filter_files(files)
-            for f in files:
-                f_path = os.path.join(root, f)
-                dest_path = os.path.join(arc_prefix, f)
-                self.add_file(f_path, dest_path)
+        for lib_path in self.lib_paths:
+            if not os.path.exists(lib_path):
+                continue
+            for root, dirs, files in os.walk(lib_path):
+                if self.lib_filter:
+                    dirs, files = self.lib_filter(root, dirs, files)
+                arc_prefix = os.path.relpath(root, lib_path)
+                files = self.filter_files(files)
+                for f in files:
+                    f_path = os.path.join(root, f)
+                    dest_path = os.path.join(arc_prefix, f)
+                    self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest):
         info = zipfile.ZipInfo(dest)
@@ -185,6 +183,15 @@ def custodian_archive(skip=None):
     required = ["pkg_resources", "ipaddress.py"]
     host_platform = platform.uname()[0]
 
+    # We need to locate the Lambda's dependencies, but the location where
+    # dependencies will have been installed varies widely across systems,
+    # and is somewhat complicated to solve generically. As an 80% hack,
+    # let's install a known third-party dependency of custodian, and assume
+    # that it's in the place where the rest of the needed dependencies will
+    # be as well.
+    import ipaddress
+    lib_path = os.path.dirname(ipaddress.__file__)
+
     def lib_filter(root, dirs, files):
         for f in list(files):
             # Don't bother with shared libs across platforms
@@ -198,9 +205,8 @@ def custodian_archive(skip=None):
 
     return PythonPackageArchive(
         os.path.dirname(inspect.getabsfile(c7n)),
-        os.path.abspath(os.path.join(
-            os.path.dirname(sys.executable), '..')),
         skip=skip,
+        lib_paths=[lib_path],
         lib_filter=lib_filter)
 
 

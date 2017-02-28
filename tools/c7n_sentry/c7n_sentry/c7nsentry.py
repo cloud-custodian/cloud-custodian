@@ -342,11 +342,7 @@ def get_function(session_factory, name, handler, role,
             CloudWatchLogSubscription(
                 session_factory, log_groups, pattern)])
 
-    archive = PythonPackageArchive(
-        os.path.dirname(__file__),
-        skip='*.pyc',
-        lib_filter=lambda x, y, z: ([], []))
-
+    archive = PythonPackageArchive(os.path.dirname(__file__), skip='*.pyc')
     archive.create()
     archive.add_contents(
         'config.json', json.dumps({
