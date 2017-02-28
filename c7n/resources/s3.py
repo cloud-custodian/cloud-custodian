@@ -359,8 +359,6 @@ class GlobalGrantsFilter(Filter):
             if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])
 
-        c = bucket_client(self.manager.session_factory(), b)
-
         if results:
             set_annotation(b, 'GlobalPermissions', results)
             return b
@@ -872,7 +870,7 @@ class ScanBucket(BucketActionBase):
 
     def __init__(self, data, manager=None):
         super(ScanBucket, self).__init__(data, manager)
-        self.denied_buckets = []
+        self.denied_buckets = set()
 
     def get_bucket_style(self, b):
         return (
@@ -895,30 +893,37 @@ class ScanBucket(BucketActionBase):
         return keys
 
     def process(self, buckets):
+        results = self._process_with_futures(self.process_bucket, buckets)
+        self.write_denied_buckets_file()
+        return results
+
+    def _process_with_futures(self, helper, buckets, max_workers=3):
         results = []
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers) as w:
             futures = {}
             for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
+                futures[w.submit(helper, b)] = b
             for f in as_completed(futures):
                 if f.exception():
+                    b = futures[f]
                     self.log.error(
                         "Error on bucket:%s region:%s policy:%s error: %s",
                         b['Name'], b.get('Location', 'unknown'),
                         self.manager.data.get('name'), f.exception())
-                    self.denied_buckets.append(b['Name'])
+                    self.denied_buckets.add(b['Name'])
                     continue
                 result = f.result()
                 if result:
                     results.append(result)
+        return results
 
+    def write_denied_buckets_file(self):
         if self.denied_buckets and self.manager.log_dir:
             with open(
                     os.path.join(
                         self.manager.log_dir, 'denied.json'), 'w') as fh:
-                json.dump(self.denied_buckets, fh, indent=2)
-            self.denied_buckets = []
-        return results
+                json.dump(list(self.denied_buckets), fh, indent=2)
+            self.denied_buckets = set()
 
     def process_bucket(self, b):
         log.info(
@@ -946,7 +951,7 @@ class ScanBucket(BucketActionBase):
                     if e.response['Error']['Code'] == 'AccessDenied':
                         log.warning(
                             "Access Denied Bucket:%s while scanning" % b['Name'])
-                        self.denied_buckets.append(b['Name'])
+                        self.denied_buckets.add(b['Name'])
                         return
                     log.exception(
                         "Error processing bucket:%s paginator:%s" % (
@@ -1059,10 +1064,13 @@ class EncryptExtantKeys(ScanBucket):
         return perms
 
     def process(self, buckets):
+        self.kms_id = self.data.get('key-id')
+
         t = time.time()
         results = super(EncryptExtantKeys, self).process(buckets)
         run_time = time.time() - t
         remediated_count = object_count = 0
+
         for r in results:
             object_count += r['Count']
             remediated_count += r['Remediated']
@@ -1109,7 +1117,10 @@ class EncryptExtantKeys(ScanBucket):
             info = s3.head_object(Bucket=bucket_name, Key=k)
 
         if 'ServerSideEncryption' in info:
-            return False
+            if self.kms_id and info.get('SSEKMSKeyId', '') == self.kms_id:
+                return False
+            else:
+                return False
 
         if self.data.get('report-only'):
             return k
@@ -1129,7 +1140,8 @@ class EncryptExtantKeys(ScanBucket):
                 return False
             elif not restore_complete(info['Restore']):
                 return False
-            storage_class == 'STANDARD'
+
+            storage_class = 'STANDARD'
 
         crypto_method = self.data.get('crypto', 'AES256')
         key_id = self.data.get('key-id')
@@ -1141,7 +1153,7 @@ class EncryptExtantKeys(ScanBucket):
                   'StorageClass': storage_class,
                   'ServerSideEncryption': crypto_method}
 
-        if key_id and crypto_method is 'aws:kms':
+        if key_id and crypto_method == 'aws:kms':
             params['SSEKMSKeyId'] = key_id
 
         if info['ContentLength'] > MAX_COPY_SIZE and self.data.get(
@@ -1188,7 +1200,6 @@ class EncryptExtantKeys(ScanBucket):
 
         params = {'Bucket': bucket_name,
                   'Key': key['Key'],
-                  'CopySource': "/%s/%s" % (bucket_name, key['Key']),
                   'UploadId': upload_id,
                   'CopySource': source,
                   'CopySourceIfMatch': info['ETag']}
@@ -1251,7 +1262,12 @@ class LogTarget(Filter):
                   - type: is-log-target
     """
 
-    schema = type_schema('is-log-target', value={'type': 'boolean'})
+    schema = type_schema(
+        'is-log-target',
+        services={'type': 'array', 'items': {'enum': [
+            's3', 'elb', 'cloudtrail']}},
+        self={'type': 'boolean'},
+        value={'type': 'boolean'})
 
     def get_permissions(self):
         perms = self.manager.get_resource_manager('elb').get_permissions()
@@ -1261,19 +1277,26 @@ class LogTarget(Filter):
     def process(self, buckets, event=None):
         log_buckets = set()
         count = 0
-        for bucket, _ in self.get_elb_bucket_locations():
-            log_buckets.add(bucket)
-            count += 1
-        self.log.debug("Found %d elb log targets" % count)
 
-        count = 0
-        for bucket, _ in self.get_s3_bucket_locations(buckets):
-            count += 1
-            log_buckets.add(bucket)
-        self.log.debug('Found %d s3 log targets' % count)
+        services = self.data.get('services', ['elb', 's3', 'cloudtrail'])
+        self_log = self.data.get('self', False)
 
-        for bucket, _ in self.get_cloud_trail_locations(buckets):
-            log_buckets.add(bucket)
+        if 'elb' in services and not self_log:
+            for bucket, _ in self.get_elb_bucket_locations():
+                log_buckets.add(bucket)
+                count += 1
+            self.log.debug("Found %d elb log targets" % count)
+
+        if 's3' in services:
+            count = 0
+            for bucket, _ in self.get_s3_bucket_locations(buckets, self_log):
+                count += 1
+                log_buckets.add(bucket)
+            self.log.debug('Found %d s3 log targets' % count)
+
+        if 'cloudtrail' in services and not self_log:
+            for bucket, _ in self.get_cloud_trail_locations(buckets):
+                log_buckets.add(bucket)
 
         self.log.info("Found %d log targets for %d buckets" % (
             len(log_buckets), len(buckets)))
@@ -1283,13 +1306,16 @@ class LogTarget(Filter):
             return [b for b in buckets if b['Name'] not in log_buckets]
 
     @staticmethod
-    def get_s3_bucket_locations(buckets):
+    def get_s3_bucket_locations(buckets, self_log=False):
         """return (bucket_name, prefix) for all s3 logging targets"""
         for b in buckets:
             if b['Logging']:
+                if self_log:
+                    if b['Name'] != b['Logging']['TargetBucket']:
+                        continue
                 yield (b['Logging']['TargetBucket'],
                        b['Logging']['TargetPrefix'])
-            if b['Name'].startswith('cf-templates-'):
+            if not self_log and b['Name'].startswith('cf-templates-'):
                 yield (b['Name'], '')
 
     def get_cloud_trail_locations(self, buckets):
@@ -1301,7 +1327,6 @@ class LogTarget(Filter):
                 yield (t['S3BucketName'], t.get('S3KeyPrefix', ''))
 
     def get_elb_bucket_locations(self):
-        session = local_session(self.manager.session_factory)
         elbs = self.manager.get_resource_manager('elb').resources()
         get_elb_attrs = functools.partial(
             _query_elb_attrs, self.manager.session_factory)
@@ -1371,7 +1396,6 @@ class DeleteGlobalGrants(BucketActionBase):
             'grantees', [
                 GlobalGrantsFilter.AUTH_ALL, GlobalGrantsFilter.GLOBAL_ALL])
 
-        s3 = bucket_client(self.manager.session_factory(), b)
         log.info(b)
 
         acl = b.get('Acl', {'Grants': []})
@@ -1509,6 +1533,8 @@ class DeleteBucket(ScanBucket):
 
     schema = type_schema('delete', **{'remove-contents': {'type': 'boolean'}})
 
+    permissions = ('s3:*',)
+
     bucket_ops = {
         'standard': {
             'iterator': 'list_objects',
@@ -1559,12 +1585,12 @@ class DeleteBucket(ScanBucket):
         # might be worth sanity checking all our permissions
         # on the bucket up front before disabling versioning/replication.
         if self.data.get('remove-contents', True):
-            with self.executor_factory(max_workers=3) as w:
-                list(w.map(self.process_delete_enablement, buckets))
+            self._process_with_futures(self.process_delete_enablement, buckets)
             self.empty_buckets(buckets)
-        with self.executor_factory(max_workers=3) as w:
-            results = w.map(self.delete_bucket, buckets)
-            return filter(None, list(results))
+
+        results = self._process_with_futures(self.delete_bucket, buckets)
+        self.write_denied_buckets_file()
+        return results
 
     def delete_bucket(self, b):
         s3 = bucket_client(self.manager.session_factory(), b)
@@ -1574,10 +1600,6 @@ class DeleteBucket(ScanBucket):
             if e.response['Error']['Code'] == 'BucketNotEmpty':
                 self.log.error(
                     "Error while deleting bucket %s, bucket not empty" % (
-                        b['Name']))
-            elif e.response['Error']['Code'] == 'AccessDenied':
-                self.log.error(
-                    "Error while deleting bucket %s, access denied" % (
                         b['Name']))
             else:
                 raise e

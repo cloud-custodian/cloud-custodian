@@ -13,6 +13,7 @@
 # limitations under the License.
 import functools
 import json
+import os
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
@@ -205,6 +206,55 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    def test_delete_bucket_with_failure(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3.DeleteBucket, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_delete_bucket_with_failure')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-perm-denied'
+        client.create_bucket(Bucket=bname)
+        generateBucketContents(session.resource('s3'), bname)
+
+        # This bucket policy prevents viewing contents
+        policy = {
+            "Version": "2012-10-17",
+            "Id": "Policy1487359365244",
+            "Statement": [{
+                "Sid": "Stmt1487359361981",
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:DeleteBucket",
+                "Resource":"arn:aws:s3:::{}".format(bname)
+            }]
+        }
+        client.put_bucket_policy(Bucket=bname, Policy=json.dumps(policy))
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'delete', 'remove-contents': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        # Make sure file got written
+        denied_file = os.path.join(p.resource_manager.log_dir, 'denied.json')
+        self.assertIn(bname, open(denied_file).read())
+        
+        #
+        # Now delete it for real
+        #
+        client.delete_bucket_policy(Bucket=bname)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertFalse(bname in buckets)
+
 
 class BucketTag(BaseTest):
 
@@ -305,6 +355,52 @@ class S3Test(BaseTest):
         self.assertEqual(post_info['Metadata'], {'planet': 'earth'})
         # etags on multipart do not reflect md5 :-(
         self.assertTrue(info['ContentLength'], post_info['ContentLength'])
+
+    def test_self_log(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')])
+        session_factory = self.replay_flight_data('test_s3_self_log_target')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-log-test'
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "k_vertigo",
+                    "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'WRITE'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'READ_ACP'},
+                    ]})
+        client.put_bucket_logging(
+            Bucket=bname,
+            BucketLoggingStatus={
+                'LoggingEnabled': {
+                    'TargetBucket': bname,
+                    'TargetPrefix': 's3-logs/'}})
+        p = self.load_policy({
+            'name': 's3-log-targets',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'is-log-target', 'self': True}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        names = [b['Name'] for b in resources]
+        self.assertEqual(names[0], bname)
+        self.assertEqual(len(names), 1)
 
     def test_log_target(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
@@ -817,19 +913,19 @@ class S3Test(BaseTest):
         self.addCleanup(destroyBucket, client, bname)
         generateBucketContents(session.resource('s3'), bname)
 
+        key_id = '845ab6f1-744c-4edc-b702-efae6836818a'
         p = self.load_policy({
             'name': 'encrypt-keys',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [{'type': 'encrypt-keys',
                          'crypto': 'aws:kms',
-                         'key-id': '662c9918-50cb-4644-bf82-e34fd4ae710c'}]},
+                         'key-id': key_id}]},
             session_factory=session_factory)
         p.run()
-
-        self.assertTrue(
-            'SSEKMSKeyId' in client.head_object(
-                Bucket=bname, Key='home.txt'))
+        result = client.head_object(Bucket=bname, Key='home.txt')
+        self.assertTrue('SSEKMSKeyId' in result)
+        self.assertTrue(key_id in result['SSEKMSKeyId'])
 
     def test_global_grants_filter_option(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)

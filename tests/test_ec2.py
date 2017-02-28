@@ -13,6 +13,8 @@
 # limitations under the License.
 import unittest
 
+from datetime import datetime
+from dateutil import tz
 from jsonschema.exceptions import ValidationError
 
 from c7n.filters import FilterValidationError
@@ -241,6 +243,33 @@ class TestStateTransitionAgeFilter(BaseTest):
         #compare stateTransition reason to expected
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['StateTransitionReason'], 'User initiated (2015-11-25 10:11:55 GMT)')
+        
+    def test_date_parsing(self):
+        instance = ec2.StateTransitionAge(None)
+        
+        # Missing key
+        self.assertIsNone(instance.get_resource_date({}))
+
+        # Bad date format
+        self.assertRaises(
+            ValueError,
+            instance.get_resource_date,
+            {'StateTransitionReason': "User initiated (201-02-06 17:77:00 GMT)"}
+        )
+        
+        # Won't match regex
+        self.assertIsNone(
+            instance.get_resource_date({
+                'StateTransitionReason': "Server.InternalError"
+        }))
+
+        # Test for success
+        self.assertEqual(
+            instance.get_resource_date({
+                'StateTransitionReason': "User initiated (2017-02-06 17:57:00 GMT)"
+            }),
+            datetime(2017, 2, 6, 17, 57, tzinfo=tz.tzutc())
+        )
 
 
 class TestImageAgeFilter(BaseTest):
@@ -801,3 +830,41 @@ class TestModifySecurityGroupAction(BaseTest):
         self.assertEqual(len(
             second_resources[0]['NetworkInterfaces'][0]['Groups']), 2)
 
+
+class TestFilter(BaseTest):
+    
+    def test_not_filter(self):
+        # This test is to get coverage for the `not` filter's process_set method
+        session_factory = self.replay_flight_data(
+            'test_ec2_not_filter')
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [
+                    {'InstanceId': 'i-036ee05e8c2ca83b3'}
+                ]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [{
+                    'or': [
+                        {'InstanceId': 'i-036ee05e8c2ca83b3'},
+                        {'InstanceId': 'i-03d8207d8285cbf53'}
+                    ]
+                }]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)

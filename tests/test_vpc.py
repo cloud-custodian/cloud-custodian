@@ -11,9 +11,100 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from common import BaseTest
 from c7n.filters import FilterValidationError
-from nose.tools import raises
+
+
+class VpcTest(BaseTest):
+
+    def test_flow_logs(self):
+        factory = self.replay_flight_data(
+            'test_vpc_flow_logs')
+
+        session = factory()
+        ec2 = session.client('ec2')
+        logs = session.client('logs')
+
+        vpc_id = ec2.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(ec2.delete_vpc, VpcId=vpc_id)
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'vpc',
+            'filters': [
+                {'VpcId': vpc_id},
+                'flow-logs']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id)
+
+        log_group = 'vpc-logs'
+        logs.create_log_group(logGroupName=log_group)
+        self.addCleanup(logs.delete_log_group, logGroupName=log_group)
+
+        ec2.create_flow_logs(
+            ResourceIds=[vpc_id],
+            ResourceType='VPC',
+            TrafficType='ALL',
+            LogGroupName=log_group,
+            DeliverLogsPermissionArn='arn:aws:iam::644160558196:role/flowlogsRole')
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'vpc',
+            'filters': [
+                {'VpcId': vpc_id},
+                {'type': 'flow-logs',
+                 'enabled': True,
+                 'traffic-type': 'all',
+                 'log-group': log_group}]
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class NetworkAclTest(BaseTest):
+
+    def test_s3_cidr_network_acl_present(self):
+        factory = self.replay_flight_data('test_network_acl_s3_present')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        p = self.load_policy({
+            'name': 'nacl-check',
+            'resource': 'network-acl',
+            'filters': [
+                {'VpcId': vpc_id},
+                {'type': 's3-cidr', 'present': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_s3_cidr_network_acl_not_present(self):
+        factory = self.replay_flight_data(
+            'test_network_acl_s3_missing')
+        client = factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        acls = client.describe_network_acls(
+            Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}])['NetworkAcls']
+
+        client.delete_network_acl_entry(
+            NetworkAclId=acls[0]['NetworkAclId'],
+            RuleNumber=acls[0]['Entries'][0]['RuleNumber'],
+            Egress=True)
+
+        p = self.load_policy({
+            'name': 'nacl-check',
+            'resource': 'network-acl',
+            'filters': [
+                {'VpcId': vpc_id}, 's3-cidr']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class NetworkInterfaceTest(BaseTest):
@@ -684,15 +775,15 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
 
-    @raises(FilterValidationError)
     def test_egress_validation_error(self):
-        self.load_policy({
-            'name': 'sg-find2',
-            'resource': 'security-group',
-            'filters': [
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'sg-find2',
+             'resource': 'security-group',
+             'filters': [
                 {'type': 'egress',
                  'InvalidKey': True},
-                {'GroupName': 'sg2'}]
-            }, session_factory=None)
-        self.fail("Validation error should have been thrown")
+                {'GroupName': 'sg2'}]})
+
 

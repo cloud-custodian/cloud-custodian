@@ -159,4 +159,15 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_missing_password_policy(self):
+        session_factory = self.replay_flight_data('test_account_missing_password_policy')
+        p = self.load_policy({
+            'name': 'missing-password-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'password-policy', 'key': 'PasswordPolicyConfigured', 'value': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 

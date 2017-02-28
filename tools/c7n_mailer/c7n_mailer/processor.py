@@ -26,6 +26,7 @@ import jinja2
 from address import get_user
 from record import resource_tag, resource_owner, resource_format, format_struct
 
+import yaml
 
 log = logging.getLogger('custodian.mail')
 
@@ -43,12 +44,13 @@ class Processor(object):
 
     def __init__(self, config, session, cache):
         self.config = config
-        self.ses = session.client('ses')
+        self.ses = session.client('ses', region_name=config.get('ses_region'))
         self.sts = session.client('sts')
         self.sns_cache = {}
         self.cache = cache
         self.env = jinja2.Environment(
             trim_blocks=True, autoescape=False)
+        self.env.filters['yaml_safe'] = yaml.safe_dump
 
         self.env.globals['format_resource'] = resource_format
         self.env.globals['format_struct'] = format_struct

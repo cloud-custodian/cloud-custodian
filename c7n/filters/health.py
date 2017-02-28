@@ -29,7 +29,7 @@ class HealthEventFilter(Filter):
         types={'type': 'array', 'items': {'type': 'string'}},
         statuses={'type': 'array', 'items': {
             'type': 'string',
-            'enum': ['open', '']
+            'enum': ['open', 'upcoming']
         }})
 
     permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',

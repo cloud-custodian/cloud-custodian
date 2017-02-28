@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoggingEnabled": {
+            "TargetPrefix": "s3-logs/", 
+            "TargetBucket": "custodian-log-test"
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "2FTyb/06Lzx3rwTid/AwsCixVtORinx9Vf6pBSXie213Rs3UrSqitAofxxvprLqqlsbWd5l5R8k=", 
+            "RequestId": "3AE0ED881EEE1544", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "2FTyb/06Lzx3rwTid/AwsCixVtORinx9Vf6pBSXie213Rs3UrSqitAofxxvprLqqlsbWd5l5R8k=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3AE0ED881EEE1544", 
+                "date": "Mon, 27 Feb 2017 17:34:53 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
