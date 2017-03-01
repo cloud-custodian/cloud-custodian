@@ -1262,7 +1262,12 @@ class LogTarget(Filter):
                   - type: is-log-target
     """
 
-    schema = type_schema('is-log-target', value={'type': 'boolean'})
+    schema = type_schema(
+        'is-log-target',
+        services={'type': 'array', 'items': {'enum': [
+            's3', 'elb', 'cloudtrail']}},
+        self={'type': 'boolean'},
+        value={'type': 'boolean'})
 
     def get_permissions(self):
         perms = self.manager.get_resource_manager('elb').get_permissions()
@@ -1272,19 +1277,26 @@ class LogTarget(Filter):
     def process(self, buckets, event=None):
         log_buckets = set()
         count = 0
-        for bucket, _ in self.get_elb_bucket_locations():
-            log_buckets.add(bucket)
-            count += 1
-        self.log.debug("Found %d elb log targets" % count)
 
-        count = 0
-        for bucket, _ in self.get_s3_bucket_locations(buckets):
-            count += 1
-            log_buckets.add(bucket)
-        self.log.debug('Found %d s3 log targets' % count)
+        services = self.data.get('services', ['elb', 's3', 'cloudtrail'])
+        self_log = self.data.get('self', False)
 
-        for bucket, _ in self.get_cloud_trail_locations(buckets):
-            log_buckets.add(bucket)
+        if 'elb' in services and not self_log:
+            for bucket, _ in self.get_elb_bucket_locations():
+                log_buckets.add(bucket)
+                count += 1
+            self.log.debug("Found %d elb log targets" % count)
+
+        if 's3' in services:
+            count = 0
+            for bucket, _ in self.get_s3_bucket_locations(buckets, self_log):
+                count += 1
+                log_buckets.add(bucket)
+            self.log.debug('Found %d s3 log targets' % count)
+
+        if 'cloudtrail' in services and not self_log:
+            for bucket, _ in self.get_cloud_trail_locations(buckets):
+                log_buckets.add(bucket)
 
         self.log.info("Found %d log targets for %d buckets" % (
             len(log_buckets), len(buckets)))
@@ -1294,13 +1306,16 @@ class LogTarget(Filter):
             return [b for b in buckets if b['Name'] not in log_buckets]
 
     @staticmethod
-    def get_s3_bucket_locations(buckets):
+    def get_s3_bucket_locations(buckets, self_log=False):
         """return (bucket_name, prefix) for all s3 logging targets"""
         for b in buckets:
             if b['Logging']:
+                if self_log:
+                    if b['Name'] != b['Logging']['TargetBucket']:
+                        continue
                 yield (b['Logging']['TargetBucket'],
                        b['Logging']['TargetPrefix'])
-            if b['Name'].startswith('cf-templates-'):
+            if not self_log and b['Name'].startswith('cf-templates-'):
                 yield (b['Name'], '')
 
     def get_cloud_trail_locations(self, buckets):

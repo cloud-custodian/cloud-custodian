@@ -391,8 +391,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
 #    IAM Users    #
 ###################
 
-@User.filter_registry.register('credential')
-class UserCredentialReport(Filter):
+class CredentialReport(Filter):
     """Use IAM Credential report to filter users.
 
     The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
@@ -553,16 +552,7 @@ class UserCredentialReport(Filter):
         if '.' in self.data['key']:
             self.matcher_config = dict(self.data)
             self.matcher_config['key'] = self.data['key'].split('.', 1)[1]
-        report = self.get_credential_report()
-        if report is None:
-            return []
-        results = []
-        for r in resources:
-            info = report.get(r['UserName'])
-            if self.match(info):
-                r['c7n:credential-report'] = info
-                results.append(r)
-        return results
+        return []
 
     def match(self, info):
         if info is None:
@@ -579,6 +569,22 @@ class UserCredentialReport(Filter):
         for v in info.get(prefix, ()):
             if vf.match(v):
                 return True
+
+@User.filter_registry.register('credential')
+class UserCredentialReport(CredentialReport):
+
+    def process(self, resources, event=None):
+        super(UserCredentialReport, self).process(resources, event)
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        for r in resources:
+            info = report.get(r['UserName'])
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
 
 
 @User.filter_registry.register('policy')

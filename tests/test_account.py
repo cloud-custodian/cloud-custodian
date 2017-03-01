@@ -13,6 +13,10 @@
 # limitations under the License.
 from common import BaseTest
 
+import datetime
+from dateutil import parser
+from test_offhours import mock_datetime_now
+
 
 class AccountTests(BaseTest):
 
@@ -127,6 +131,22 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_credential_report(self):
+        session_factory = self.replay_flight_data('test_account_credential_report')
+        p = self.load_policy({
+            'name': 'credential-details',
+            'resource': 'account',
+            'filters': [
+                {'type': 'credential',
+                 'key': 'mfa_active',
+                 'value': True}
+            ]}, session_factory=session_factory)
+        with mock_datetime_now(
+                parser.parse('2017-02-23T00:40:00+00:00'), datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
     def test_service_limit(self):
         session_factory = self.replay_flight_data('test_account_service_limit')
         p = self.load_policy({
@@ -194,5 +214,16 @@ class AccountTests(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_missing_password_policy(self):
+        session_factory = self.replay_flight_data('test_account_missing_password_policy')
+        p = self.load_policy({
+            'name': 'missing-password-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'password-policy', 'key': 'PasswordPolicyConfigured', 'value': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
