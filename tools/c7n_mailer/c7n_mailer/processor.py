@@ -104,12 +104,13 @@ class Processor(object):
     def send_resource_owner_messages(self, data):
         owners = {}
         for r in data['resources']:
-            owner = self.find_resource_owner(r)
-            if owner is None:
+            contact_tags = self.find_resource_owners(r)
+            if not contact_tags:
                 log.info("No resource owner found for %s" % (
                     resource_format(r, data['policy']['resource'])))
                 continue
-            owners.setdefault(owner, []).append(r)
+            for contact_tag in contact_tags:
+                owners.setdefault(contact_tag, []).append(r)
 
         # Address resolution can take some time, try to do it upfront
         t = time.time()
@@ -122,13 +123,15 @@ class Processor(object):
         for o, resources in owners.items():
             self.send_resource_set_message([owner_addrs[o]], data, resources)
 
-    def find_resource_owner(self, resource):
+    def find_resource_owners(self, resource):
         if 'Tags' not in resource:
-            return
+            return []
         tags = {t['Key']: t['Value'] for t in resource['Tags']}
+        owners = []
         for t in self.OwnerTags:
             if t in tags:
-                return tags[t]
+                owners.append(tags[t])
+        return owners
 
     def send_resource_set_message(self, targets, data, resources):
         for t in targets:
