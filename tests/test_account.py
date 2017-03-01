@@ -58,6 +58,42 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_cloudtrail_current_region_global(self):
+        session_factory = self.replay_flight_data('test_account_trail')
+        p = self.load_policy({
+            'name': 'trail-global',
+            'resource': 'account',
+            'filters': [
+                {'type': 'check-cloudtrail',
+                 'current-region': True,
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_current_region_specific_same(self):
+        session_factory = self.replay_flight_data('test_account_trail_same_region')
+        p = self.load_policy({
+            'name': 'trail-same-region',
+            'resource': 'account',
+            'filters': [
+                {'type': 'check-cloudtrail',
+                 'current-region': True,
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_current_region_specific_same(self):
+        session_factory = self.replay_flight_data('test_account_trail_different_region')
+        p = self.load_policy({
+            'name': 'trail-different-region',
+            'resource': 'account',
+            'filters': [
+                {'type': 'check-cloudtrail',
+                 'current-region': True,
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_cloudtrail_notifies(self):
         session_factory = self.replay_flight_data('test_account_trail')
         p = self.load_policy({
