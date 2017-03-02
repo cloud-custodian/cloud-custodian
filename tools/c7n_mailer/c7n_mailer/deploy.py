@@ -51,7 +51,11 @@ def get_archive(config):
                     dirs.remove(n)
         return dirs, files
 
-    archive = PythonPackageArchive(os.path.dirname(__file__), skip='*.pyc')
+    archive = PythonPackageArchive(
+        os.path.dirname(__file__),
+        skip='*.pyc',
+        lib_filter=lib_filter)
+
     archive.create()
 
     template_dir = os.path.abspath(
