@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime, timedelta
+import imp
 import json
 import logging
+import os
+import py_compile
+import shutil
+import sys
+import tempfile
 import time
 import unittest
-import StringIO
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaManager, PolicyLambda,
+    custodian_archive, LambdaManager, PolicyLambda, PythonPackageArchive,
     CloudWatchLogSubscription, SNSSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
@@ -354,37 +359,127 @@ class PolicyLambdaProvision(BaseTest):
 
 class PythonArchiveTest(unittest.TestCase):
 
-    def test_archive_bytes(self):
-        self.archive = custodian_archive()
-        self.archive.create()
-        self.addCleanup(self.archive.remove)
-        self.archive.close()
-        io = StringIO.StringIO(self.archive.get_bytes())
-        reader = zipfile.ZipFile(io, mode='r')
-        fileset = [n.filename for n in reader.filelist]
-        self.assertTrue('c7n/__init__.py' in fileset)
+    def make_archive(self, *a, **kw):
+        archive = self.make_open_archive(*a, **kw)
+        archive.close()
+        return archive
 
-    def test_archive_skip(self):
-        self.archive = custodian_archive("*.pyc")
-        self.archive.create()
-        self.addCleanup(self.archive.remove)
-        self.archive.close()
-        with open(self.archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            fileset = [n.filename for n in reader.filelist]
-            for i in ['c7n/__init__.pyc',
-                      'c7n/resources/s3.pyc',
-                      'boto3/__init__.py']:
-                self.assertFalse(i in fileset)
+    def make_open_archive(self, *a, **kw):
+        archive = PythonPackageArchive(*a, **kw)
+        self.addCleanup(archive.remove)
+        return archive
 
-    def test_archive_permissions(self):
-        # files should all be readable
-        self.archive = custodian_archive("*.pyc")
-        self.archive.create()
-        self.addCleanup(self.archive.remove)
-        self.archive.close()
+    def get_filenames(self, *a, **kw):
+        return self.make_archive(*a, **kw).get_filenames()
+
+
+    def test_handles_stdlib_modules(self):
+        filenames = self.get_filenames('webbrowser')
+        self.assertTrue('webbrowser.py' in filenames)
+
+    def test_handles_third_party_modules(self):
+        filenames = self.get_filenames('ipaddress')
+        self.assertTrue('ipaddress.py' in filenames)
+
+    def test_handles_packages(self):
+        filenames = self.get_filenames('c7n')
+        self.assertTrue('c7n/__init__.py' in filenames)
+        self.assertTrue('c7n/resources/s3.py' in filenames)
+        self.assertTrue('c7n/ufuncs/s3crypt.py' in filenames)
+
+    def test_excludes_non_py_files(self):
+        filenames = self.get_filenames('ctypes')
+        self.assertTrue('ctypes/__init__.py' in filenames)
+        self.assertTrue('ctypes/macholib/__init__.py' in filenames)
+        self.assertTrue('README.ctypes' not in filenames)
+
+    def test_files_are_all_readable(self):
+        archive = self.make_archive('c7n')
         readable = 0444 << 16L
-        with open(self.archive.path) as fh:
+        with open(archive.path) as fh:
             reader = zipfile.ZipFile(fh, mode='r')
             for i in reader.infolist():
                 self.assertGreaterEqual(i.external_attr, readable)
+
+    def test_cant_get_bytes_when_open(self):
+        archive = self.make_open_archive()
+        self.assertRaises(AssertionError, archive.get_bytes)
+
+    def test_cant_add_files_when_closed(self):
+        archive = self.make_archive()
+        self.assertRaises(AssertionError, archive.add_file, __file__)
+
+    def test_cant_add_contents_when_closed(self):
+        archive = self.make_archive()
+        self.assertRaises(AssertionError, archive.add_contents, 'foo', 'bar')
+
+    def test_can_add_additional_files_while_open(self):
+        archive = self.make_open_archive()
+        archive.add_file(__file__)
+        archive.close()
+        filenames = archive.get_filenames()
+        self.assertTrue('test_mu.py' in filenames)
+
+    def test_can_set_path_when_adding_files(self):
+        archive = self.make_open_archive()
+        archive.add_file(__file__, 'cheese/is/yummy.txt')
+        archive.close()
+        filenames = archive.get_filenames()
+        self.assertTrue('test_mu.py' not in filenames)
+        self.assertTrue('cheese/is/yummy.txt' in filenames)
+
+    def test_can_add_a_file_with_contents_from_a_string(self):
+        archive = self.make_open_archive()
+        archive.add_contents('cheese.txt', 'So yummy!')
+        archive.close()
+        self.assertTrue('cheese.txt' in archive.get_filenames())
+        with archive.get_reader() as reader:
+            self.assertEqual('So yummy!', reader.read('cheese.txt'))
+
+    def test_custodian_archive_creates_a_custodian_archive(self):
+        archive = custodian_archive()
+        self.addCleanup(archive.remove)
+        archive.close()
+        filenames = archive.get_filenames()
+        self.assertTrue('c7n/__init__.py' in filenames)
+        self.assertTrue('pkg_resources/__init__.py' in filenames)
+        self.assertTrue('ipaddress.py' in filenames)
+
+
+    def test_we_only_accept_py_modules_not_pyc(self):
+        bench = tempfile.mkdtemp()
+        sys.path.insert(0, bench)
+
+        def py_with_pyc(name):
+            path = os.path.join(bench, name)
+            open(path, 'w+').write('42')
+            py_compile.compile(path)
+            return path
+
+        try:
+            # Create a module with both *.py and *.pyc.
+            py_with_pyc('foo.py')
+
+            # Create another with a *.pyc but no *.py behind it.
+            os.unlink(py_with_pyc('bar.py'))
+
+            # Now: *.py takes precedence over *.pyc, and while *.pyc is
+            # importable, we refuse it.
+            get = lambda name: os.path.basename(imp.find_module(name)[1])
+            self.assertTrue(get('foo'), 'foo.py')
+            self.assertTrue(get('bar'), 'bar.pyc')
+            with self.assertRaises(ValueError) as raised:
+                PythonPackageArchive('bar')
+            msg = raised.exception.args[0]
+            self.assertTrue(msg.startswith('We need a *.py source file instead'))
+            self.assertTrue(msg.endswith('bar.pyc'))
+
+            # We readily ignore a *.pyc if a *.py exists.
+            archive = PythonPackageArchive('foo')
+            archive.close()
+            self.assertEqual(archive.get_filenames(), ['foo.py'])
+            with archive.get_reader() as reader:
+                self.assertEqual('42', reader.read('foo.py'))
+        finally:
+            sys.path.remove(bench)
+            shutil.rmtree(bench)

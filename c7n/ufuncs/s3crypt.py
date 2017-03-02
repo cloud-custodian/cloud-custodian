@@ -84,7 +84,6 @@ def get_function(session_factory, role, buckets=None, account_id=None):
             for b in buckets]
 
     archive = custodian_archive()
-    archive.create()
 
     src = __file__
     if src.endswith('.pyc'):
