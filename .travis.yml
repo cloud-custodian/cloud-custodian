@@ -11,6 +11,6 @@ install:
   - pip install pytest pytest-xdist pytest-cov
   - pip install coveralls
   - python setup.py develop
-script: make sphinx && py.test -s -v -n auto --cov=c7n tests
+script: make sphinx && py.test -s -v -n auto --cov=c7n tests tools/c7n_*
 after_success:
   coveralls
