@@ -11,18 +11,18 @@ develop:
 
 coverage:
 	rm -Rf .coverage
-	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --processes=-1 --cover-inclusive tests
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true py.test -s -v --cov=c7n --cov-report html:html -n auto tests
 
 ttest:
-	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer tests
+	AWS_DEFAULT_REGION=us-east-1 py.test -s --durations=100 tests
 lint:
 	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
-	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 nosetests  --processes=-1 tests
+	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 py.test -n auto tests
 
 ftests:
-	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
+	AWS_DEFAULT_REGION=us-east-1 ./bin/py.test -s -v -m functional tests
 
 depcache:
 	mkdir -p deps

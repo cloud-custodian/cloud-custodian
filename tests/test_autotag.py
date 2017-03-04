@@ -13,7 +13,7 @@
 # limitations under the License.
 from c7n.utils import query_instances
 from common import BaseTest, event_data
-from nose.tools import raises
+from pytest import raises
 
 
 class AutoTagCreator(BaseTest):
@@ -97,18 +97,17 @@ class AutoTagCreator(BaseTest):
         tags = {t['Key']: t['Value'] for t in instances[0]['Tags']}
         self.assertEqual(tags['Owner'], 'Bob')
 
-    @raises(ValueError)
     def test_error_auto_tag_bad_mode(self):
         # mode type is not cloudtrail
-        policy = self.load_policy({
-            'name': 'auto-tag-error',
-            'resource': 'ec2',
-            'mode': {
-                'type': 'not-cloudtrail',
-                'events': ['RunInstances']},
-            'actions': [
-                {'type': 'auto-tag-user',
-                 'update': True,
-                 'tag': 'Owner'}]
-        }, session_factory=None, validate=False)
-        self.fail('Should have raised ValueError')
+        with raises(ValueError):
+            self.load_policy({
+                'name': 'auto-tag-error',
+                'resource': 'ec2',
+                'mode': {
+                    'type': 'not-cloudtrail',
+                    'events': ['RunInstances']},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'update': True,
+                     'tag': 'Owner'}]
+            }, session_factory=None, validate=False)

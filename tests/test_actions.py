@@ -14,15 +14,14 @@
 from botocore.exceptions import ClientError
 from c7n.actions import Action, ActionRegistry
 from common import BaseTest
-from nose.tools import raises
+from pytest import raises
 
 
 class ActionTest(BaseTest):
 
-    @raises(NotImplementedError)
     def test_process_unimplemented(self):
-        action = Action().process(None)
-        self.fail('Should have raised NotImplementedError')
+        with raises(NotImplementedError):
+            Action().process(None)
 
     def test_run_api(self):
         resp = {
@@ -40,7 +39,6 @@ class ActionTest(BaseTest):
         # sure that the ClientError gets caught and not re-raised
         Action()._run_api(func)
 
-    @raises(ClientError)
     def test_run_api_error(self):
         resp = {
             'Error': {
@@ -49,18 +47,16 @@ class ActionTest(BaseTest):
             }
         }
         func = lambda: (_ for _ in ()).throw(ClientError(resp, 'test2'))
-        Action()._run_api(func)
-        self.fail('Should have raised ClientError')
+        with raises(ClientError):
+            Action()._run_api(func)
 
 
 class ActionRegistryTest(BaseTest):
-    
-    @raises(ValueError)
-    def test_error_bad_action_type(self):
-        ActionRegistry('test.actions').factory({}, None)
-        self.fail('Should have raised ValueError')
 
-    @raises(ValueError)
+    def test_error_bad_action_type(self):
+        with raises(ValueError):
+            ActionRegistry('test.actions').factory({}, None)
+
     def test_error_unregistered_action_type(self):
-        ActionRegistry('test.actions').factory('foo', None)
-        self.fail('Should have raised ValueError')
+        with raises(ValueError):
+            ActionRegistry('test.actions').factory('foo', None)
