@@ -23,10 +23,8 @@ class DataPipeline(QueryResourceManager):
     class resource_type(object):
         service = 'datapipeline'
         type = 'dataPipeline'
-        id = name = 'Cheese'
-        date = 'CreatedTime'
+        id = 'id'
+        name = 'name'
+        date = None
         dimension = 'name'
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
-        default_report_fields = (
-            'name',
-        )
