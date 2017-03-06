@@ -13,7 +13,6 @@
 # limitations under the License.
 from c7n.utils import query_instances
 from common import BaseTest, event_data
-from pytest import raises
 
 
 class AutoTagCreator(BaseTest):
@@ -99,8 +98,8 @@ class AutoTagCreator(BaseTest):
 
     def test_error_auto_tag_bad_mode(self):
         # mode type is not cloudtrail
-        with raises(ValueError):
-            self.load_policy({
+        self.assertRaises(ValueError,
+            self.load_policy, {
                 'name': 'auto-tag-error',
                 'resource': 'ec2',
                 'mode': {

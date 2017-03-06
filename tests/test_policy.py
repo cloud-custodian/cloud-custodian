@@ -19,7 +19,6 @@ import tempfile
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from pytest import raises
 
 from common import BaseTest, Config, Bag
 
@@ -366,12 +365,12 @@ class TestPolicy(BaseTest):
 class PolicyExecutionModeTest(BaseTest):
 
     def test_run_unimplemented(self):
-        with raises(NotImplementedError):
-            policy.PolicyExecutionMode({}).run()
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).run)
 
     def test_get_logs_unimplemented(self):
-        with raises(NotImplementedError):
-            policy.PolicyExecutionMode({}).get_logs(1, 2)
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).get_logs, 1, 2)
 
 
 class PullModeTest(BaseTest):

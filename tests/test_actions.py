@@ -14,14 +14,12 @@
 from botocore.exceptions import ClientError
 from c7n.actions import Action, ActionRegistry
 from common import BaseTest
-from pytest import raises
 
 
 class ActionTest(BaseTest):
 
     def test_process_unimplemented(self):
-        with raises(NotImplementedError):
-            Action().process(None)
+        self.assertRaises(NotImplementedError, Action().process, None)
 
     def test_run_api(self):
         resp = {
@@ -47,16 +45,13 @@ class ActionTest(BaseTest):
             }
         }
         func = lambda: (_ for _ in ()).throw(ClientError(resp, 'test2'))
-        with raises(ClientError):
-            Action()._run_api(func)
+        self.assertRaises(ClientError, Action()._run_api, func)
 
 
 class ActionRegistryTest(BaseTest):
 
     def test_error_bad_action_type(self):
-        with raises(ValueError):
-            ActionRegistry('test.actions').factory({}, None)
+        self.assertRaises(ValueError, ActionRegistry('test.actions').factory, {}, None)
 
     def test_error_unregistered_action_type(self):
-        with raises(ValueError):
-            ActionRegistry('test.actions').factory('foo', None)
+        self.assertRaises(ValueError, ActionRegistry('test.actions').factory, 'foo', None)
