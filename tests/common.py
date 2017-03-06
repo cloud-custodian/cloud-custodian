@@ -225,3 +225,10 @@ class Client(object):
         self.filters = filters
         return [Reservation(
             {'instances': [i for i in self.instances]})]
+
+
+try:
+    import pytest
+    functional = pytest.mark.functional
+except ImportError:
+    functional = lambda func: func  # noop

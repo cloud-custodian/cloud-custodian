@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from common import BaseTest
+from common import BaseTest, functional
 from c7n.filters import FilterValidationError
 
 
 class VpcTest(BaseTest):
 
+    @functional
     def test_flow_logs(self):
         factory = self.replay_flight_data(
             'test_vpc_flow_logs')
@@ -68,6 +69,7 @@ class VpcTest(BaseTest):
 
 class NetworkAclTest(BaseTest):
 
+    @functional
     def test_s3_cidr_network_acl_present(self):
         factory = self.replay_flight_data('test_network_acl_s3_present')
         client = factory().client('ec2')
@@ -83,6 +85,7 @@ class NetworkAclTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
     def test_s3_cidr_network_acl_not_present(self):
         factory = self.replay_flight_data(
             'test_network_acl_s3_missing')
@@ -109,6 +112,7 @@ class NetworkAclTest(BaseTest):
 
 class NetworkInterfaceTest(BaseTest):
 
+    @functional
     def test_interface_subnet(self):
         factory = self.replay_flight_data(
             'test_network_interface_filter')
@@ -167,6 +171,7 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
+    @functional
     def test_id_selector(self):
         p = self.load_policy({
             'name': 'sg',
@@ -176,6 +181,7 @@ class SecurityGroupTest(BaseTest):
                 ['vpc-asdf', 'i-asdf3e', 'sg-1235a', 'sg-4671']),
             ['sg-1235a', 'sg-4671'])
 
+    @functional
     def test_stale(self):
         # setup a multi vpc security group reference, break the ref
         # and look for stale
@@ -231,6 +237,7 @@ class SecurityGroupTest(BaseTest):
                    u'VpcId': vpc2_id,
                    u'VpcPeeringConnectionId': peer_id}]}])
 
+    @functional
     def test_used(self):
         factory = self.replay_flight_data(
             'test_security_group_used')
@@ -245,6 +252,7 @@ class SecurityGroupTest(BaseTest):
             set(['sg-f9cc4d9f', 'sg-13de8f75', 'sg-ce548cb7']),
             set([r['GroupId'] for r in resources]))
 
+    @functional
     def test_unused(self):
         factory = self.replay_flight_data(
             'test_security_group_unused')
@@ -256,6 +264,7 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
     def test_only_ports(self):
         factory = self.replay_flight_data(
             'test_security_group_only_ports')
@@ -299,6 +308,7 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 62000,
               u'UserIdGroupPairs': []}])
 
+    @functional
     def test_self_reference(self):
         factory = self.replay_flight_data(
             'test_security_group_self_reference')
@@ -394,6 +404,7 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @functional
     def test_security_group_delete(self):
         factory = self.replay_flight_data(
             'test_security_group_delete')
@@ -430,6 +441,7 @@ class SecurityGroupTest(BaseTest):
         else:
             self.fail("group not deleted")
 
+    @functional
     def test_port_within_range(self):
         factory = self.replay_flight_data(
             'test_security_group_port_in_range')
@@ -469,6 +481,7 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 62000,
               u'UserIdGroupPairs': []}])
 
+    @functional
     def test_ingress_remove(self):
         factory = self.replay_flight_data(
             'test_security_group_ingress_filter')
@@ -521,6 +534,7 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
     def test_config_source(self):
         factory = self.replay_flight_data(
             'test_security_group_config_source')
@@ -536,6 +550,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
 
+    @functional
     def test_only_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -563,6 +578,7 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    @functional
     def test_multi_attribute_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -592,6 +608,7 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    @functional
     def test_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -619,6 +636,7 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    @functional
     def test_permission_expansion(self):
         factory = self.replay_flight_data('test_security_group_perm_expand')
         client = factory().client('ec2')
@@ -688,6 +706,7 @@ class SecurityGroupTest(BaseTest):
               u'IpRanges': [{u'CidrIp': u'10.42.1.0/24'}],
               u'ToPort': 443}])
 
+    @functional
     def test_cidr_ingress(self):
         factory = self.replay_flight_data('test_security_group_cidr_ingress')
         client = factory().client('ec2')
@@ -724,6 +743,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(
             len(resources[0].get('MatchedIpPermissions', [])), 1)
 
+    @functional
     def test_cidr_size_egress(self):
         factory = self.replay_flight_data('test_security_group_cidr_size')
         client = factory().client('ec2')
@@ -775,6 +795,7 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
 
+    @functional
     def test_egress_validation_error(self):
         self.assertRaises(
             FilterValidationError,
