@@ -147,11 +147,13 @@ def process_records(records,
         if not_service_filter and r['eventSource'] == not_service_filter:
             continue
 
-        utype = r['userIdentity']['type']
+        utype = r['userIdentity'].get('type', None)
         if utype == 'Root':
             uid = 'root'
         elif utype == 'SAMLUser':
             uid = r['userIdentity']['userName']
+        elif utype is None and r['userIdentity']['invokedBy'] == 'AWS Internal':
+            uid = r['userIdentity']['invokedBy']
         else:
             uid = r['userIdentity'].get('arn', '')
 
