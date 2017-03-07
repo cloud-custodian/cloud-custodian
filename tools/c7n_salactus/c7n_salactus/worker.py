@@ -90,7 +90,7 @@ connection = redis.Redis(host=REDIS_HOST)
 # seeing some odd net slowness all around.
 s3config = Config(read_timeout=420, connect_timeout=90)
 keyconfig = {
-    'report-only': os.environ.get('SALACTUS_ENCRYPT') and False or True,
+    'report-only': not os.environ.get('SALACTUS_ENCRYPT') and True or False,
     'glacier': False,
     'large': True,
     'key-id': os.environ.get('SALACTUS_KEYID'),
