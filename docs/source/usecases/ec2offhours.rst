@@ -6,25 +6,27 @@ EC2 - Offhours Support
 .. code-block:: yaml
 
    policies:
-     - name: offhour-stop-19
+     - name: offhour_stop_19
        resource: ec2
        comments: |
          Daily stoppage at 7pm
        filters:
          - type: offhour
            tag: c7n_downtime
-           hour: 22
+           offhour: 22
+           default_tz: est
        actions:
          - stop
    
-     - name: onhour-start-10
+     - name: onhour_start_10
        resource: ec2
        comments: |
          Daily start at 10am
        filters:
          - type: onhour
            tag: c7n_downtime
-           hour: 10
+           onhour: 10
+           default_tz: est
        actions:
          - start
          
