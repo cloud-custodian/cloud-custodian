@@ -19,7 +19,6 @@ import tempfile
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from nose.tools import raises
 
 from common import BaseTest, Config, Bag
 
@@ -153,7 +152,7 @@ class TestPolicy(BaseTest):
             }]
         }
         self.assertRaises(Exception, self.load_policy_set, invalid_policies)
-        
+
 
     def test_policy_validation(self):
         policy = self.load_policy({
@@ -191,14 +190,14 @@ class TestPolicy(BaseTest):
 
         self.assertIn('s3-remediate', collection)
         self.assertNotIn('s3-argle-bargle', collection)
-        
+
         # Make sure __iter__ works
         for p in collection:
             self.assertTrue(p.name is not None)
 
         self.assertEqual(collection.resource_types, set(('s3', 'ec2')))
         self.assertTrue('s3-remediate' in collection)
-        
+
         self.assertEqual(
             [p.name for p in collection.filter('s3*')],
             ['s3-remediate', 's3-global-grants'])
@@ -365,15 +364,13 @@ class TestPolicy(BaseTest):
 
 class PolicyExecutionModeTest(BaseTest):
 
-    @raises(NotImplementedError)
     def test_run_unimplemented(self):
-        action = policy.PolicyExecutionMode({}).run()
-        self.fail('Should have raised NotImplementedError')
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).run)
 
-    @raises(NotImplementedError)
     def test_get_logs_unimplemented(self):
-        action = policy.PolicyExecutionMode({}).get_logs(1, 2)
-        self.fail('Should have raised NotImplementedError')
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).get_logs, 1, 2)
 
 
 class PullModeTest(BaseTest):
