@@ -26,6 +26,8 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, get_account_id, type_schema
 
+from c7n.resources.iam import CredentialReport
+
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
@@ -64,12 +66,31 @@ class Account(ResourceManager):
     def get_resources(self, resource_ids):
         return [get_account(self.session_factory)]
 
+@filters.register('credential')
+class AccountCredentialReport(CredentialReport):
+
+    def process(self, resources, event=None):
+        super(AccountCredentialReport, self).process(resources, event)
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        info = report.get('<root_account>')
+        for r in resources:
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
+
 
 @filters.register('check-cloudtrail')
 class CloudTrailEnabled(Filter):
     """Verify cloud trail enabled for this account per specifications.
 
     Returns an annotated account resource if trail is not enabled.
+
+    Of particular note, the current-region option will evaluate whether cloudtrail is available
+    in the current region, either as a multi region trail or as a trail with it as the home region.
 
     :example:
 
@@ -89,6 +110,7 @@ class CloudTrailEnabled(Filter):
         'check-cloudtrail',
         **{'multi-region': {'type': 'boolean'},
            'global-events': {'type': 'boolean'},
+           'current-region': {'type': 'boolean'},
            'running': {'type': 'boolean'},
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
@@ -98,12 +120,15 @@ class CloudTrailEnabled(Filter):
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
 
     def process(self, resources, event=None):
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
+        session = local_session(self.manager.session_factory)
+        client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
+        if self.data.get('current-region'):
+            current_region = session.region_name
+            trails  = [t for t in trails if t.get('HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
         if self.data.get('kms-key'):
