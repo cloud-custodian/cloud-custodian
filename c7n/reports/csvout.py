@@ -50,6 +50,7 @@ import json
 import jmespath
 import logging
 import os
+from tabulate import tabulate
 
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
@@ -79,10 +80,15 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
     log.debug("Found %d records", len(records))
+    
     rows = formatter.to_csv(records)
-    writer = csv.writer(output_fh, formatter.headers())
-    writer.writerow(formatter.headers())
-    writer.writerows(rows)
+    if options.format == 'csv':
+        writer = csv.writer(output_fh, formatter.headers())
+        writer.writerow(formatter.headers())
+        writer.writerows(rows)
+    else:
+        # We special case CSV, and for other formats we pass to tabulate
+        print(tabulate(rows, formatter.headers(), tablefmt=options.format))
 
     if raw_output_fh is not None:
         dumps(records, raw_output_fh, indent=2)
