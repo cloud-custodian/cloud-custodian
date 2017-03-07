@@ -1053,6 +1053,10 @@ class EncryptExtantKeys(ScanBucket):
         ('Total Keys', {'Scope': 'Account'}),
         ('Unencrypted', {'Scope': 'Account'})]
 
+    def __init__(self, data, manager=None):
+        super(EncryptExtantKeys, self).__init__(data, manager)
+        self.kms_id = self.data.get('key-id')
+
     def get_permissions(self):
         perms = ("s3:GetObject", "s3:GetObjectVersion")
         if self.data.get('report-only'):
@@ -1064,7 +1068,6 @@ class EncryptExtantKeys(ScanBucket):
         return perms
 
     def process(self, buckets):
-        self.kms_id = self.data.get('key-id')
 
         t = time.time()
         results = super(EncryptExtantKeys, self).process(buckets)
