@@ -478,7 +478,7 @@ def detect_partition_strategy(account_info, bucket, delimiters=('/', '-'), prefi
         process_bucket_iterator, [account_info, bucket], prefixes)
 
 
-@job('bucket-partition', timeout=3600*4, connection=connection)
+@job('bucket-partition', timeout=3600*12, connection=connection)
 def process_bucket_partitions(
         account_info, bucket, prefix_set=('',), partition='/',
         strategy=None, limit=4):
@@ -595,7 +595,7 @@ def process_bucket_iterator(account_info, bucket,
                 invoke(process_keyset, account_info, bucket, page)
 
 
-@job('bucket-keyset-scan', timeout=3600*8, connection=connection)
+@job('bucket-keyset-scan', timeout=3600*12, connection=connection)
 def process_keyset(account_info, bucket, key_set):
     session = get_session(account_info)
     s3 = session.client('s3', region_name=bucket['region'], config=s3config)
