@@ -448,18 +448,6 @@ class MissingPolicyStatementFilter(Filter):
         return True
 
 
-@filters.register('static-website-hosting')
-class StaticWebsiteHosting(Filter):
-    """Finds if bucket is hosting a static website."""
-
-    schema = type_schema('static-website-hosting')
-
-    permissions = ('s3:*',)
-
-    def process(self, buckets, event=None):
-        return [b for b in buckets if b['Website']]
-
-
 @actions.register('no-op')
 class NoOp(BucketActionBase):
 
