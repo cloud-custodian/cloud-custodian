@@ -1071,7 +1071,7 @@ class S3Test(BaseTest):
         p = self.load_policy({
             'name': 's3-website-hosting',
             'resource': 's3',
-            'filters': ['static-website-hosting']},
+            'filters': ['Website: not-null']},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -1081,7 +1081,7 @@ class S3Test(BaseTest):
         p = self.load_policy({
             'name': 's3-website-hosting',
             'resource': 's3',
-            'filters': ['static-website-hosting'],
+            'filters': ['Website: not-null'],
             'actions': ['remove-website-hosting']},
             session_factory=session_factory)
         resources = p.run()

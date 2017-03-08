@@ -1380,12 +1380,12 @@ def _query_elb_attrs(session_factory, elb_set):
 
 
 @actions.register('remove-website-hosting')
-class AOLRemoveWebsiteHosting(BucketActionBase):
+class RemoveWebsiteHosting(BucketActionBase):
     """Action that removes website hosting configuration."""
 
     schema = type_schema('remove-website-hosting')
 
-    permissions = ('s3:*',)
+    permissions = ('s3:DeleteBucketWebsite',)
 
     def process(self, buckets):
         session = local_session(self.manager.session_factory)
