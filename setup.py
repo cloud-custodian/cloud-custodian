@@ -27,6 +27,7 @@ setup(
         "jsonschema",
         "ipaddress",
         "argcomplete",
+        "tabulate",
     ],
 )
 
