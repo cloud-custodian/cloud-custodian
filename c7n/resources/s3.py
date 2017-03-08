@@ -448,6 +448,18 @@ class MissingPolicyStatementFilter(Filter):
         return True
 
 
+@filters.register('static-website-hosting')
+class StaticWebsiteHosting(Filter):
+    """Finds if bucket is hosting a static website."""
+
+    schema = type_schema('static-website-hosting')
+
+    permissions = ('s3:*',)
+
+    def process(self, buckets, event=None):
+        return [b for b in buckets if b['Website']]
+
+
 @actions.register('no-op')
 class NoOp(BucketActionBase):
 
@@ -1362,6 +1374,21 @@ def _query_elb_attrs(session_factory, elb_set):
                 "Could not retrieve load balancer %s: %s" % (
                     e['LoadBalancerName'], err))
     return log_targets
+
+
+@actions.register('remove-website-hosting')
+class AOLRemoveWebsiteHosting(BucketActionBase):
+    """Action that removes website hosting configuration."""
+
+    schema = type_schema('remove-website-hosting')
+
+    permissions = ('s3:*',)
+
+    def process(self, buckets):
+        session = local_session(self.manager.session_factory)
+        for bucket in buckets:
+            client = bucket_client(session, bucket)
+            client.delete_bucket_website(Bucket=bucket['Name'])
 
 
 @actions.register('delete-global-grants')
