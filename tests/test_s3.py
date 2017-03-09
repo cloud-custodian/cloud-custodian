@@ -1067,6 +1067,17 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-static-website-test'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_website(
+          Bucket=bname,
+          WebsiteConfiguration={
+            'ErrorDocument': {
+                'Key': 'error.html'
+            },
+            'IndexDocument': {
+                'Suffix': 'index.html'
+            }
+          })
         self.addCleanup(client.delete_bucket, Bucket=bname)
         p = self.load_policy({
             'name': 's3-website-hosting',
