@@ -430,7 +430,8 @@ class ValueFilter(Filter):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
                 try:
-                    value = parse(value)
+                    value = parse(value, default=datetime.now(tz=tzutc()))
+
                 except (AttributeError, TypeError):
                     value = 0
 
@@ -458,7 +459,7 @@ class ValueFilter(Filter):
                 sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)
 
             if not isinstance(value, datetime):
-                value = parse(value)
+                value = parse(value, default=datetime.now(tz=tzutc()))
 
             return sentinel, value
         return sentinel, value
