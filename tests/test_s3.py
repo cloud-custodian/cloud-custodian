@@ -245,7 +245,7 @@ class BucketDelete(BaseTest):
         # Make sure file got written
         denied_file = os.path.join(p.resource_manager.log_dir, 'denied.json')
         self.assertIn(bname, open(denied_file).read())
-        
+
         #
         # Now delete it for real
         #
@@ -517,6 +517,57 @@ class S3Test(BaseTest):
                 {'Name': bname},
                 {'type': 'missing-policy-statement',
                  'statement_ids': ['RequireEncryptedPutObject']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_missing_lifecycle_rule(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingLifecycleRuleFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_lifecycle',  'Lifecycle', None, 'Lifecycle'),
+        ])
+        session_factory = self.replay_flight_data('test_s3_missing_lifecycle')
+        bname = "custodian-test"
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        client.put_bucket_lifecycle(
+            Bucket=bname,
+            LifecycleConfiguration={'Rules': [
+             {
+                'Expiration': {
+                    'Date': '2017-03-01',
+                    'Days': 123,
+                    'ExpiredObjectDeleteMarker': True
+                },
+                'ID': 'string',
+                'Prefix': 'string',
+                'Status': 'Enabled',
+                'Transition': {
+                    'Date': '2017-03-01',
+                    'Days': 123,
+                    'StorageClass': 'GLACIER'
+                },
+                'NoncurrentVersionTransition': {
+                    'NoncurrentDays': 123,
+                    'StorageClass': 'GLACIER'
+                },
+                'NoncurrentVersionExpiration': {
+                    'NoncurrentDays': 123
+                }
+             }]})
+
+        p = self.load_policy({
+            'name': 'Lifecycle-rule',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'missing-lifecycle-rule',
+                 'rule_names': ['AbortIncompleteMultipartUpload']}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

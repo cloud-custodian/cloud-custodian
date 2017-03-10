@@ -1,0 +1,24 @@
+{"status_code": 200,
+"data":{
+	"Rules": [{
+		"Status": "Enabled",
+		"Transition": {
+			"Days": 30,
+			"StorageClass": "STANDARD_IA"
+		},
+		"Prefix": "",
+		"Expiration": {
+			"Days": 365
+		},
+		"AbortIncompleteMultipartUpload":
+			{"DaysAfterInitiation": 7}, "ID": "multipart"
+			}],
+	"ResponseMetadata": {
+		"HTTPStatusCode": 200,
+		"RetryAttempts": 0,
+		"HostId": "xmbUyKiHYMIF76VH7f5Si10KAf5X/8zgAtbQ+5nK8XOxAE/eyO3k38YYcBQ2D9cTpHTVfJHhUsc=",
+		"RequestId": "3BB7A475B50DD0A3"
+
+	}
+}
+}
