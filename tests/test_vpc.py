@@ -171,7 +171,6 @@ class NetworkInterfaceTest(BaseTest):
 
 class SecurityGroupTest(BaseTest):
 
-    @functional
     def test_id_selector(self):
         p = self.load_policy({
             'name': 'sg',
@@ -237,7 +236,6 @@ class SecurityGroupTest(BaseTest):
                    u'VpcId': vpc2_id,
                    u'VpcPeeringConnectionId': peer_id}]}])
 
-    @functional
     def test_used(self):
         factory = self.replay_flight_data(
             'test_security_group_used')
@@ -252,7 +250,6 @@ class SecurityGroupTest(BaseTest):
             set(['sg-f9cc4d9f', 'sg-13de8f75', 'sg-ce548cb7']),
             set([r['GroupId'] for r in resources]))
 
-    @functional
     def test_unused(self):
         factory = self.replay_flight_data(
             'test_security_group_unused')
@@ -534,7 +531,6 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @functional
     def test_config_source(self):
         factory = self.replay_flight_data(
             'test_security_group_config_source')
@@ -550,7 +546,6 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
 
-    @functional
     def test_only_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -578,7 +573,6 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
-    @functional
     def test_multi_attribute_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -608,7 +602,6 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
-    @functional
     def test_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -636,7 +629,6 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
-    @functional
     def test_permission_expansion(self):
         factory = self.replay_flight_data('test_security_group_perm_expand')
         client = factory().client('ec2')
@@ -795,7 +787,6 @@ class SecurityGroupTest(BaseTest):
               u'ToPort': 443,
               u'UserIdGroupPairs': []}])
 
-    @functional
     def test_egress_validation_error(self):
         self.assertRaises(
             FilterValidationError,
@@ -806,5 +797,3 @@ class SecurityGroupTest(BaseTest):
                 {'type': 'egress',
                  'InvalidKey': True},
                 {'GroupName': 'sg2'}]})
-
-
