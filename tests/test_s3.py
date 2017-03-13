@@ -1059,3 +1059,41 @@ class S3Test(BaseTest):
         tags = client.get_bucket_tagging(Bucket=bname)
         tag_map = {t['Key']: t['Value'] for t in tags.get('TagSet', {})}
         self.assertTrue('maid_status' not in tag_map)
+
+    def test_hosts_website(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_website', 'Website', None, None)])
+        session_factory = self.replay_flight_data('test_s3_hosts_website')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-static-website-test'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_website(
+          Bucket=bname,
+          WebsiteConfiguration={
+            'ErrorDocument': {
+                'Key': 'error.html'
+            },
+            'IndexDocument': {
+                'Suffix': 'index.html'
+            }
+          })
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+        p = self.load_policy({
+            'name': 's3-website-hosting',
+            'resource': 's3',
+            'filters': [{'Website': 'not-null'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        names = [b['Name'] for b in resources]
+        self.assertTrue(bname in names)
+
+        p = self.load_policy({
+            'name': 's3-website-hosting',
+            'resource': 's3',
+            'filters': [{'Website': 'not-null'}],
+            'actions': ['remove-website-hosting']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

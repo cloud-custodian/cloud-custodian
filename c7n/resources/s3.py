@@ -1367,6 +1367,21 @@ def _query_elb_attrs(session_factory, elb_set):
     return log_targets
 
 
+@actions.register('remove-website-hosting')
+class RemoveWebsiteHosting(BucketActionBase):
+    """Action that removes website hosting configuration."""
+
+    schema = type_schema('remove-website-hosting')
+
+    permissions = ('s3:DeleteBucketWebsite',)
+
+    def process(self, buckets):
+        session = local_session(self.manager.session_factory)
+        for bucket in buckets:
+            client = bucket_client(session, bucket)
+            client.delete_bucket_website(Bucket=bucket['Name'])
+
+
 @actions.register('delete-global-grants')
 class DeleteGlobalGrants(BucketActionBase):
     """Deletes global grants associated to a S3 bucket
