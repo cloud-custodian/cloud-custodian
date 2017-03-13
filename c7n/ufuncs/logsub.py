@@ -112,7 +112,7 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
                 session_factory, log_groups, pattern)])
 
     archive = PythonPackageArchive()
-    archive.add_file(__file__)
+    archive.add_py_file(__file__)
     archive.add_contents(
         'config.json', json.dumps({
             'topic': sns_topic,

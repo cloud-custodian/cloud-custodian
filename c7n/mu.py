@@ -115,6 +115,22 @@ class PythonPackageArchive(object):
             contents = fp.read()
             self.add_contents(info, contents)
 
+    def add_py_file(self, src, dest=None):
+        """This is a special case of :py:meth:`add_file` that helps for adding
+        a ``py`` when a ``pyc`` may be present as well. So for example, if
+        ``__file__`` is ``foo.pyc`` and you do:
+
+        .. code-block:: python
+
+          archive.add_py_file(__file__)
+
+        then this method will add ``foo.py`` instead if it exists, and raise
+        ``IOError`` if it doesn't.
+
+        """
+        src = src[:-1] if src.endswith('.pyc') else src
+        self.add_file(src, dest)
+
     def add_contents(self, dest, contents):
         """Add file contents to the archive under ``dest``.
         """

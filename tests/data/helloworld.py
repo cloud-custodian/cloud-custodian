@@ -35,7 +35,7 @@ def get_function(session_factory, name, role, events):
         events=events)
 
     archive = PythonPackageArchive()
-    archive.add_file(__file__)
+    archive.add_py_file(__file__)
     archive.close()
 
     return LambdaFunction(config, archive)

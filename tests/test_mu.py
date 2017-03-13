@@ -446,40 +446,69 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('ipaddress.py' in filenames)
 
 
-    def test_we_only_accept_py_modules_not_pyc(self):
-        bench = tempfile.mkdtemp()
-        sys.path.insert(0, bench)
+class PycCase(unittest.TestCase):
 
-        def py_with_pyc(name):
-            path = os.path.join(bench, name)
-            open(path, 'w+').write('42')
-            py_compile.compile(path)
-            return path
+    def setUp(self):
+        self.bench = tempfile.mkdtemp()
+        sys.path.insert(0, self.bench)
 
-        try:
-            # Create a module with both *.py and *.pyc.
-            py_with_pyc('foo.py')
+    def tearDown(self):
+        sys.path.remove(self.bench)
+        shutil.rmtree(self.bench)
 
-            # Create another with a *.pyc but no *.py behind it.
-            os.unlink(py_with_pyc('bar.py'))
+    def py_with_pyc(self, name):
+        path = os.path.join(self.bench, name)
+        open(path, 'w+').write('42')
+        py_compile.compile(path)
+        return path
 
-            # Now: *.py takes precedence over *.pyc, and while *.pyc is
-            # importable, we refuse it.
-            get = lambda name: os.path.basename(imp.find_module(name)[1])
-            self.assertTrue(get('foo'), 'foo.py')
-            self.assertTrue(get('bar'), 'bar.pyc')
-            with self.assertRaises(ValueError) as raised:
-                PythonPackageArchive('bar')
-            msg = raised.exception.args[0]
-            self.assertTrue(msg.startswith('We need a *.py source file instead'))
-            self.assertTrue(msg.endswith('bar.pyc'))
 
-            # We readily ignore a *.pyc if a *.py exists.
-            archive = PythonPackageArchive('foo')
-            archive.close()
-            self.assertEqual(archive.get_filenames(), ['foo.py'])
-            with archive.get_reader() as reader:
-                self.assertEqual('42', reader.read('foo.py'))
-        finally:
-            sys.path.remove(bench)
-            shutil.rmtree(bench)
+class Constructor(PycCase):
+
+    def test_class_constructor_only_accepts_py_modules_not_pyc(self):
+
+        # Create a module with both *.py and *.pyc.
+        self.py_with_pyc('foo.py')
+
+        # Create another with a *.pyc but no *.py behind it.
+        os.unlink(self.py_with_pyc('bar.py'))
+
+        # Now: *.py takes precedence over *.pyc, and while *.pyc is
+        # importable, we refuse it.
+        get = lambda name: os.path.basename(imp.find_module(name)[1])
+        self.assertTrue(get('foo'), 'foo.py')
+        self.assertTrue(get('bar'), 'bar.pyc')
+        with self.assertRaises(ValueError) as raised:
+            PythonPackageArchive('bar')
+        msg = raised.exception.args[0]
+        self.assertTrue(msg.startswith('We need a *.py source file instead'))
+        self.assertTrue(msg.endswith('bar.pyc'))
+
+        # We readily ignore a *.pyc if a *.py exists.
+        archive = PythonPackageArchive('foo')
+        archive.close()
+        self.assertEqual(archive.get_filenames(), ['foo.py'])
+        with archive.get_reader() as reader:
+            self.assertEqual('42', reader.read('foo.py'))
+
+
+class AddPyFile(PycCase):
+
+    def test_can_add_py_file(self):
+        archive = PythonPackageArchive()
+        archive.add_py_file(self.py_with_pyc('foo.py'))
+        archive.close()
+        self.assertEqual(archive.get_filenames(), ['foo.py'])
+
+    def test_reverts_to_py_if_available(self):
+        archive = PythonPackageArchive()
+        py = self.py_with_pyc('foo.py')
+        archive.add_py_file(py+'c')
+        archive.close()
+        self.assertEqual(archive.get_filenames(), ['foo.py'])
+
+    def test_fails_if_py_not_available(self):
+        archive = PythonPackageArchive()
+        py = self.py_with_pyc('foo.py')
+        os.unlink(py)
+        self.assertRaises(IOError, archive.add_py_file, py+'c')
