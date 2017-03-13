@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "1K86DP6MB03RQURBT2423496GNVV4KQNSO5AEMVJF66Q9ASUAAJG"
+        },
+        "TableNames": [
+            "rolltop"
+        ]
+    }
+}
