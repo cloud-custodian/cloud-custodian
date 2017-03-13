@@ -42,6 +42,10 @@ class DataPipelineTest(BaseTest):
                     {"key": "parent", "refValue": "Default"},
                     {"key": "schedule", "refValue": "Schedule"}]}
                   ])
+        client.add_tags(
+            pipelineId=pipe_id,
+            tags=[{'key': 'foo', 'value': 'bar'}]
+        )
         client.activate_pipeline(pipelineId=pipe_id)
         self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
 
@@ -56,3 +60,4 @@ class DataPipelineTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'PipelinesFTW')
+        self.assertEqual(resources[0]['tags'], [{'key': 'foo', 'value': 'bar'}])
