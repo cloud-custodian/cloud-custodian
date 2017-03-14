@@ -27,7 +27,7 @@ from c7n.filters.revisions import Diff
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import (
-    local_session, type_schema, get_retry, camelResource, parse_cidr)
+    chunks, local_session, type_schema, get_retry, camelResource, parse_cidr)
 
 
 @resources.register('vpc')
@@ -372,10 +372,11 @@ class SGUsage(Filter):
         # Check that groups are not referenced across accounts
         client = local_session(self.manager.session_factory).client('ec2')
         peered_ids = set()
-        for sg_ref in client.describe_security_group_references(
-                GroupId=[r['GroupId'] for r in resources]
-        )['SecurityGroupReferenceSet']:
-            peered_ids.add(sg_ref['GroupId'])
+        for resource_set in chunks(resources, 200):
+            for sg_ref in client.describe_security_group_references(
+                    GroupId=[r['GroupId'] for r in resource_set]
+            )['SecurityGroupReferenceSet']:
+                peered_ids.add(sg_ref['GroupId'])
         self.log.debug(
             "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
