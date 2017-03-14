@@ -131,6 +131,10 @@ def _report_options(p):
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
+    p.add_argument(
+        '--format', default='csv', choices=['csv', 'grid', 'simple'],
+        help="Format to output data in (default: %(default)s). "\
+            "Options include simple, grid, rst")
 
     # We don't include `region` because the report command ignores it
     p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
@@ -216,7 +220,9 @@ def setup_parser():
     # later on when doing post-parsing validation.
     subs = parser.add_subparsers(dest='subparser')
 
-    report_desc = "CSV report of resources that a policy matched/ran on"
+    report_desc = ("Report of resources that a policy matched/ran on. "
+                   "The default output format is csv, but other formats "
+                   "are available.")
     report = subs.add_parser(
         "report", description=report_desc, help=report_desc)
     report.set_defaults(command="c7n.commands.report")

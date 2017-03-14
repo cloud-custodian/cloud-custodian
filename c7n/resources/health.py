@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -37,7 +38,6 @@ class HealthEvents(QueryResourceManager):
         'health:DescribeEvents',
         'health:DescribeEventDetails',
         'health:DescribeAffectedEntities')
-
 
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
@@ -80,12 +80,13 @@ class HealthEvents(QueryResourceManager):
 
             event_arns = [r['arn'] for r in resource_set
                           if r['eventTypeCategory'] != 'accountNotification']
-            
+
             if not event_arns:
                 continue
-            
-            entities = client.describe_affected_entities(
-                filter={'eventArns': event_arns})['entities']
+            paginator = client.get_paginator('describe_affected_entities')
+            entities = list(itertools.chain(
+                *[p['entities']for p in paginator.paginate(
+                    filter={'eventArns': event_arns})]))
 
             for e in entities:
                 event_map[e.pop('eventArn')].setdefault(
@@ -100,7 +101,7 @@ HEALTH_VALID_FILTERS = {
     'regions': str,
     'services': str,
     'eventStatusCodes': {'open', 'closed', 'upcoming'},
-    'types': str
+    'eventTypeCodes': str
 }
 
 

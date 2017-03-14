@@ -21,9 +21,6 @@ lint:
 test:
 	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 nosetests  --processes=-1 tests
 
-ftests:
-	AWS_DEFAULT_REGION=us-east-1 ./bin/nosetests -s -v ftests
-
 depcache:
 	mkdir -p deps
 	python -m virtualenv --python python2.7 dep-download
