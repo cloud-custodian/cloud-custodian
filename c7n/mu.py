@@ -73,7 +73,24 @@ class PythonPackageArchive(object):
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
         self._closed = False
+        self.add_modules(*modules)
 
+    @property
+    def path(self):
+        return self._temp_archive_file.name
+
+    @property
+    def size(self):
+        if not self._closed:
+            raise ValueError("Archive not closed, size not accurate")
+        return os.stat(self._temp_archive_file.name).st_size
+
+    def add_modules(self, *modules):
+        """Add the named Python modules to the archive. For consistency's sake
+        we only add ``*.py`` files, not ``*.pyc``. We also don't add other
+        files, including compiled modules. You'll have to add such files
+        manually using :py:meth:`add_file`.
+        """
         for module in modules:
             path = imp.find_module(module)[1]
             if os.path.isfile(path):
@@ -89,16 +106,6 @@ class PythonPackageArchive(object):
                         f_path = os.path.join(root, f)
                         dest_path = os.path.join(arc_prefix, f)
                         self.add_file(f_path, dest_path)
-
-    @property
-    def path(self):
-        return self._temp_archive_file.name
-
-    @property
-    def size(self):
-        if not self._closed:
-            raise ValueError("Archive not closed, size not accurate")
-        return os.stat(self._temp_archive_file.name).st_size
 
     def add_file(self, src, dest=None):
         """Add the file at ``src`` to the archive.
