@@ -79,7 +79,7 @@ class PythonPackageArchive(object):
             if os.path.isfile(path):
                 if not path.endswith('.py'):
                     raise ValueError('We need a *.py source file instead of ' + path)
-                self._zip_file.write(path, os.path.basename(path))
+                self.add_file(path)
             elif os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     arc_prefix = os.path.relpath(root, os.path.dirname(path))
@@ -110,10 +110,9 @@ class PythonPackageArchive(object):
 
         """
         dest = dest or os.path.basename(src)
-        info = zipfile.ZipInfo(dest)
         with open(src, 'rb') as fp:
             contents = fp.read()
-            self.add_contents(info, contents)
+        self.add_contents(dest, contents)
 
     def add_py_file(self, src, dest=None):
         """This is a special case of :py:meth:`add_file` that helps for adding
@@ -133,13 +132,16 @@ class PythonPackageArchive(object):
 
     def add_contents(self, dest, contents):
         """Add file contents to the archive under ``dest``.
+
+        If ``dest`` is a path, it will be added compressed and world-readable
+        (user-writeable). You may also pass a :py:class:`~zipfile.ZipInfo` for
+        custom behavior.
+
         """
-        if not isinstance(dest, zipfile.ZipInfo):
-            dest = zinfo(dest)
-        # see zinfo function for some caveats
         assert not self._closed, "Archive closed"
-        dest.external_attr = 0444 << 16L
-        self._zip_file.writestr(dest, contents)
+        if not isinstance(dest, zipfile.ZipInfo):
+            info = zinfo(dest)  # see for some caveats
+        self._zip_file.writestr(info, contents)
 
     def close(self):
         """Close the zip file.
@@ -600,7 +602,7 @@ def zinfo(fname):
     ie. It respects file perm attributes from the zip including
     those that prevent lambda from working. Namely lambda
     extracts code as one user, and executes code as a different
-    user without permissions for the executing user to read
+    user. Without permissions for the executing user to read
     the file the lambda function is broken.
 
     Python's default zipfile.writestr does a 0600 perm which
@@ -608,7 +610,8 @@ def zinfo(fname):
     """
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
-    info.compress_type = zipfile.ZIP_DEFLATED
+    # http://unix.stackexchange.com/questions/14705/
+    info.external_attr = 0o644 << 16L
     return info
 
 
