@@ -98,7 +98,7 @@ class DynamodbTest(BaseTest):
         p = self.load_policy({
                 'name': 'dynamodb-tag-table',
                 'resource': 'dynamodb-table',
-                'filter': [{'TableName': 'rolltop'}],
+                'filters': [{'TableName': 'rolltop'}],
                 'actions': [{
                     'type': 'tag',
                     'tags': {'new_tag_key': 'new_tag_value'}
