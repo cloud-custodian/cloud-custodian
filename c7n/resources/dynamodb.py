@@ -122,6 +122,7 @@ class TagDelayedAction(TagDelayedAction):
             arn = t['TableArn']
             client.tag_resource(ResourceArn=arn, Tags=tags)
 
+
 @Table.action_registry.register('tag')
 class TagTable(Tag):
     """Action to create tag(s) on a resource
@@ -142,13 +143,14 @@ class TagTable(Tag):
     """
 
     permissions = ('dynamodb:TagResource',)
-    batch_size  = 1
+    batch_size = 1
 
     def process_resource_set(self, tables, tags):
         client = local_session(self.manager.session_factory).client('dynamodb')
         for t in tables:
             arn = t['TableArn']
             client.tag_resource(ResourceArn=arn, Tags=tags)
+
 
 @Table.action_registry.register('remove-tag')
 class UntagTable(RemoveTag):

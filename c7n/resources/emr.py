@@ -134,6 +134,7 @@ class TagDelayedAction(TagDelayedAction):
         for r in resources:
             client.add_tags(ResourceId=r['Id'], Tags=tags)
 
+
 @actions.register('tag')
 class TagTable(Tag):
     """Action to create tag(s) on a resource
@@ -154,12 +155,13 @@ class TagTable(Tag):
     """
 
     permissions = ('elasticmapreduce:AddTags',)
-    batch_size  = 1
+    batch_size = 1
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
             client.add_tags(ResourceId=r['Id'], Tags=tags)
+
 
 @actions.register('remove-tag')
 class UntagTable(RemoveTag):
