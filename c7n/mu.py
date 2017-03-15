@@ -147,8 +147,8 @@ class PythonPackageArchive(object):
         """
         assert not self._closed, "Archive closed"
         if not isinstance(dest, zipfile.ZipInfo):
-            info = zinfo(dest)  # see for some caveats
-        self._zip_file.writestr(info, contents)
+            dest = zinfo(dest)  # see for some caveats
+        self._zip_file.writestr(dest, contents)
 
     def close(self):
         """Close the zip file.
@@ -181,6 +181,7 @@ class PythonPackageArchive(object):
 
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
+        assert self._closed, "Archive not closed"
         io = StringIO.StringIO(self.get_bytes())
         return zipfile.ZipFile(io, mode='r')
 

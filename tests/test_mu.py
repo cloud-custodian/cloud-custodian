@@ -393,14 +393,6 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('ctypes/macholib/__init__.py' in filenames)
         self.assertTrue('README.ctypes' not in filenames)
 
-    def test_files_are_all_readable(self):
-        archive = self.make_archive('c7n')
-        readable = 0444 << 16L
-        with open(archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            for i in reader.infolist():
-                self.assertGreaterEqual(i.external_attr, readable)
-
     def test_cant_get_bytes_when_open(self):
         archive = self.make_open_archive()
         self.assertRaises(AssertionError, archive.get_bytes)
@@ -444,6 +436,39 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
         self.assertTrue('ipaddress.py' in filenames)
+
+
+    def make_file(self):
+        bench = tempfile.mkdtemp()
+        path = os.path.join(bench, 'foo.txt')
+        open(path, 'w+').write('Foo.')
+        self.addCleanup(lambda: shutil.rmtree(bench))
+        return path
+
+    def check_readable(self, archive):
+        readable = 0o444 << 16L
+        with open(archive.path) as fh:
+            reader = zipfile.ZipFile(fh, mode='r')
+            for i in reader.infolist():
+                self.assertGreaterEqual(i.external_attr, readable)
+
+    def test_files_are_all_readable(self):
+        self.check_readable(self.make_archive('c7n'))
+
+    def test_even_unreadable_files_become_readable(self):
+        path = self.make_file()
+        os.chmod(path, 0o600)
+        archive = self.make_open_archive()
+        archive.add_file(path)
+        archive.close()
+        self.check_readable(archive)
+
+    def test_unless_you_make_your_own_zipinfo(self):
+        info = zipfile.ZipInfo(self.make_file())
+        archive = self.make_open_archive()
+        archive.add_contents(info, 'foo.txt')
+        archive.close()
+        self.assertRaises(AssertionError, self.check_readable, archive)
 
 
 class PycCase(unittest.TestCase):
