@@ -90,6 +90,14 @@ class EMRCluster(QueryResourceManager):
             else:
                 names.add(query_filter['Name'])
                 result.append(query_filter)
+        if 'ClusterStates' not in names:
+            # include default query
+            result.append(
+                {
+                    'Name': 'ClusterStates',
+                    'Values': ['waiting', 'running', 'bootstrapping'],
+                }
+            )
         return result
 
     def augment(self, resources):

@@ -55,7 +55,34 @@ class TestEMR(BaseTest):
             mgr.consolidate_query_filter(),
             [
                 {'Values': ['val1', 'val2'], 'Name': 'tag:foo'},
-                {'Values': ['val3'], 'Name': 'tag:bar'}
+                {'Values': ['val3'], 'Name': 'tag:bar'},
+                # default query
+                {
+                    'Values': ['waiting', 'running', 'bootstrapping'],
+                    'Name': 'ClusterStates',
+                },
+            ]
+        )
+
+        query = {
+            'query': [
+                {'tag:foo': 'val1'},
+                {'tag:foo': 'val2'},
+                {'tag:bar': 'val3'},
+                {'ClusterStates': 'terminated'},
+            ]
+        }
+        mgr = emr.EMRCluster(ctx, query)
+        self.assertEqual(
+            mgr.consolidate_query_filter(),
+            [
+                {'Values': ['val1', 'val2'], 'Name': 'tag:foo'},
+                {'Values': ['val3'], 'Name': 'tag:bar'},
+                # verify default is overridden
+                {
+                    'Values': ['terminated'],
+                    'Name': 'ClusterStates',
+                },
             ]
         )
 
