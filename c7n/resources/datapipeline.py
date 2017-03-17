@@ -35,13 +35,13 @@ class DataPipeline(QueryResourceManager):
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
 
     def augment(self, resources):
-        filter(None, _datapipeline_tags(
+        filter(None, _datapipeline_info(
             resources, self.session_factory, self.executor_factory,
             self.retry))
         return resources
 
 
-def _datapipeline_tags(pipes, session_factory, executor_factory, retry):
+def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
     def process_tags(pipe_set):
         client = local_session(session_factory).client('datapipeline')
@@ -64,7 +64,13 @@ def _datapipeline_tags(pipes, session_factory, executor_factory, retry):
                     break
                 continue
         for pipe_desc in results['pipelineDescriptionList']:
-            pipe_map[pipe_desc['pipelineId']]['tags'] = pipe_desc['tags']
+            pipe = pipe_map[pipe_desc['pipelineId']]
+            pipe['tags'] = pipe_desc['tags']
+            for field in pipe_desc['fields']:
+                key = field['key']
+                if not key.startswith('@'):
+                    continue
+                pipe[key[1:]] = field['stringValue']
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, chunks(pipes, 20)))
