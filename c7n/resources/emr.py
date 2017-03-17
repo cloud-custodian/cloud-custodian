@@ -95,7 +95,7 @@ class EMRCluster(QueryResourceManager):
             result.append(
                 {
                     'Name': 'ClusterStates',
-                    'Values': ['waiting', 'running', 'bootstrapping'],
+                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
                 }
             )
         return result
@@ -210,17 +210,7 @@ class Terminate(BaseAction):
 
 
 # Valid EMR Query Filters
-EMR_VALID_FILTERS = {
-    'CreatedAfter': datetime,
-    'CreatedBefore': datetime,
-    'ClusterStates': (
-        'terminated',
-        'bootstrapping',
-        'running',
-        'waiting',
-        'terminating',
-        'terminated',
-        'terminated_with_errors')}
+EMR_VALID_FILTERS = set(('CreatedAfter', 'CreatedBefore', 'ClusterStates'))
 
 
 class QueryFilter(object):

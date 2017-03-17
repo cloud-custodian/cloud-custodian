@@ -58,7 +58,7 @@ class TestEMR(BaseTest):
                 {'Values': ['val3'], 'Name': 'tag:bar'},
                 # default query
                 {
-                    'Values': ['waiting', 'running', 'bootstrapping'],
+                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
                     'Name': 'ClusterStates',
                 },
             ]
