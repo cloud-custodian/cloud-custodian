@@ -8,8 +8,8 @@ python:
   - "2.7"
 install:
   - pip install -r requirements-dev.txt
-  - pip install pytest pytest-xdist pytest-cov
-  - pip install coveralls
+  - pip install --upgrade pytest pytest-xdist pytest-cov
+  - pip install --upgrade coveralls
   - python setup.py develop
 script: make sphinx && py.test -s -v -n auto --cov=c7n tests tools/c7n_*
 after_success:

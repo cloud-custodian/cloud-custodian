@@ -84,13 +84,8 @@ def get_function(session_factory, role, buckets=None, account_id=None):
             for b in buckets]
 
     archive = custodian_archive()
-    archive.create()
 
-    src = __file__
-    if src.endswith('.pyc'):
-        src = src[:-1]
-
-    archive.add_file(src, 's3crypt.py')
+    archive.add_py_file(__file__)
     archive.add_contents('config.json', json.dumps({}))
     archive.close()
     return LambdaFunction(config, archive)

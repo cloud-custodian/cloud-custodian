@@ -19,15 +19,14 @@ docs/lambda.rst
 
 import abc
 import base64
-import inspect
-import fnmatch
+import imp
 import hashlib
 import json
 import logging
 import os
+import StringIO
 import sys
 import time
-import platform
 import tempfile
 import zipfile
 
@@ -35,8 +34,6 @@ from boto3.s3.transfer import S3Transfer, TransferConfig
 from botocore.exceptions import ClientError
 
 from concurrent.futures import ThreadPoolExecutor
-
-import c7n
 
 # Static event mapping to help simplify cwe rules creation
 from c7n.cwe import CloudWatchEvents
@@ -52,28 +49,31 @@ RUNTIME = 'python{}.{}'.format(
 
 
 class PythonPackageArchive(object):
-    """Creates a zip file for python lambda functions
+    """Creates a zip file for python lambda functions.
 
-    Packages up a virtualenv and a source package directory per lambda's
-    directory structure.
+    :param tuple modules: the Python modules to add to the archive
 
-    See http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python
+    Amazon doesn't give us straightforward docs here, only `an example
+    <http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python>`_,
+    from which we can infer that they simply unzip the file into a directory on
+    ``sys.path``. So what we do is locate all of the ``modules`` specified, and
+    add all of the ``.py`` files we find for these modules to a zip file.
+
+    In addition to the modules specified during instantiation, you can add
+    arbitrary additional files to the archive using :py:func:`add_file` and
+    :py:func:`add_contents`. For example, since we only add ``*.py`` files for
+    you, you'll need to manually add files for any compiled extension modules
+    that your Lambda requires.
+
     """
 
-    def __init__(self, src_path, virtualenv_dir=None, skip=None,
-                 lib_filter=None, src_filter=None):
-
-        self.src_path = src_path
-        if virtualenv_dir is None:
-            virtualenv_dir = os.path.abspath(
-                os.path.join(os.path.dirname(sys.executable), '..'))
-        self.virtualenv_dir = virtualenv_dir
-        self._temp_archive_file = None
-        self._zip_file = None
+    def __init__(self, *modules):
+        self._temp_archive_file = tempfile.NamedTemporaryFile()
+        self._zip_file = zipfile.ZipFile(
+            self._temp_archive_file, mode='w',
+            compression=zipfile.ZIP_DEFLATED)
         self._closed = False
-        self.lib_filter = lib_filter
-        self.src_filter = src_filter
-        self.skip = skip
+        self.add_modules(*modules)
 
     @property
     def path(self):
@@ -85,78 +85,76 @@ class PythonPackageArchive(object):
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
 
-    def filter_files(self, files):
-        if not self.skip:
-            return files
-        skip_files = set(fnmatch.filter(files, self.skip))
-        return [f for f in files if f not in skip_files]
+    def add_modules(self, *modules):
+        """Add the named Python modules to the archive. For consistency's sake
+        we only add ``*.py`` files, not ``*.pyc``. We also don't add other
+        files, including compiled modules. You'll have to add such files
+        manually using :py:meth:`add_file`.
+        """
+        for module in modules:
+            path = imp.find_module(module)[1]
+            if os.path.isfile(path):
+                if not path.endswith('.py'):
+                    raise ValueError('We need a *.py source file instead of ' + path)
+                self.add_file(path)
+            elif os.path.isdir(path):
+                for root, dirs, files in os.walk(path):
+                    arc_prefix = os.path.relpath(root, os.path.dirname(path))
+                    for f in files:
+                        if not f.endswith('.py'):
+                            continue
+                        f_path = os.path.join(root, f)
+                        dest_path = os.path.join(arc_prefix, f)
+                        self.add_file(f_path, dest_path)
 
-    def create(self):
-        assert not self._temp_archive_file, "Archive already created"
-        self._temp_archive_file = tempfile.NamedTemporaryFile()
-        self._zip_file = zipfile.ZipFile(
-            self._temp_archive_file, mode='w',
-            compression=zipfile.ZIP_DEFLATED)
+    def add_file(self, src, dest=None):
+        """Add the file at ``src`` to the archive.
 
-        prefix = os.path.dirname(self.src_path)
-        if os.path.isfile(self.src_path):
-            # Module Source
-            self._zip_file.write(
-                os.path.join(self.src_path), os.path.basename(self.src_path))
-        elif os.path.isdir(self.src_path):
-            # Package Source
-            for root, dirs, files in os.walk(self.src_path):
-                arc_prefix = os.path.relpath(
-                    root, os.path.dirname(self.src_path))
-                if self.src_filter:
-                    self.src_filter(root, dirs, files)
-                files = self.filter_files(files)
-                for f in files:
-                    f_path = os.path.join(root, f)
-                    dest_path = os.path.join(arc_prefix, f)
-                    self.add_file(f_path, dest_path)
+        If ``dest`` is ``None`` then it is added under just the original
+        filename. So ``add_file('foo/bar.txt')`` ends up at ``bar.txt`` in the
+        archive, while ``add_file('bar.txt', 'foo/bar.txt')`` ends up at
+        ``foo/bar.txt``.
 
-        # Library Source
-        venv_lib_paths = (
-            os.path.join(
-                self.virtualenv_dir,
-                'lib', RUNTIME, 'site-packages',
-            ),
-            os.path.join(
-                self.virtualenv_dir,
-                'lib64', RUNTIME, 'site-packages',
-            ),
-        )
-
-        for venv_lib_path in venv_lib_paths:
-            if not os.path.exists(venv_lib_path):
-                continue
-            for root, dirs, files in os.walk(venv_lib_path):
-                if self.lib_filter:
-                    dirs, files = self.lib_filter(root, dirs, files)
-                arc_prefix = os.path.relpath(root, venv_lib_path)
-                files = self.filter_files(files)
-                for f in files:
-                    f_path = os.path.join(root, f)
-                    dest_path = os.path.join(arc_prefix, f)
-                    self.add_file(f_path, dest_path)
-
-    def add_file(self, src, dest):
-        info = zipfile.ZipInfo(dest)
+        """
+        dest = dest or os.path.basename(src)
         with open(src, 'rb') as fp:
             contents = fp.read()
-            self.add_contents(info, contents)
+        self.add_contents(dest, contents)
+
+    def add_py_file(self, src, dest=None):
+        """This is a special case of :py:meth:`add_file` that helps for adding
+        a ``py`` when a ``pyc`` may be present as well. So for example, if
+        ``__file__`` is ``foo.pyc`` and you do:
+
+        .. code-block:: python
+
+          archive.add_py_file(__file__)
+
+        then this method will add ``foo.py`` instead if it exists, and raise
+        ``IOError`` if it doesn't.
+
+        """
+        src = src[:-1] if src.endswith('.pyc') else src
+        self.add_file(src, dest)
 
     def add_contents(self, dest, contents):
-        if not isinstance(dest, zipfile.ZipInfo):
-            dest = zinfo(dest)
-        # see zinfo function for some caveats
+        """Add file contents to the archive under ``dest``.
+
+        If ``dest`` is a path, it will be added compressed and world-readable
+        (user-writeable). You may also pass a :py:class:`~zipfile.ZipInfo` for
+        custom behavior.
+
+        """
         assert not self._closed, "Archive closed"
-        dest.external_attr = 0444 << 16L
+        if not isinstance(dest, zipfile.ZipInfo):
+            dest = zinfo(dest)  # see for some caveats
         self._zip_file.writestr(dest, contents)
 
     def close(self):
-        # Note underlying tempfile is removed when archive is garbage collected
+        """Close the zip file.
+
+        Note underlying tempfile is removed when archive is garbage collected.
+        """
         self._closed = True
         self._zip_file.close()
         log.debug(
@@ -166,20 +164,30 @@ class PythonPackageArchive(object):
         return self
 
     def remove(self):
-        # dispose of the temp file for garbage collection
+        """Dispose of the temp file for garbage collection."""
         if self._temp_archive_file:
             self._temp_archive_file = None
 
     def get_checksum(self):
-        """Return the b64 encoded sha256 checksum."""
+        """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
         with open(self._temp_archive_file.name) as fh:
             return base64.b64encode(checksum(fh, hashlib.sha256()))
 
     def get_bytes(self):
-        # return the entire zip file as byte string.
+        """Return the entire zip file as a byte string. """
         assert self._closed, "Archive not closed"
         return open(self._temp_archive_file.name, 'rb').read()
+
+    def get_reader(self):
+        """Return a read-only :py:class:`~zipfile.ZipFile`."""
+        assert self._closed, "Archive not closed"
+        io = StringIO.StringIO(self.get_bytes())
+        return zipfile.ZipFile(io, mode='r')
+
+    def get_filenames(self):
+        """Return a list of filenames in the archive."""
+        return [n.filename for n in self.get_reader().filelist]
 
 
 def checksum(fh, hasher, blocksize=65536):
@@ -190,30 +198,9 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def custodian_archive(skip=None):
+def custodian_archive():
     """Create a lambda code archive for running custodian."""
-
-    # Some aggressive shrinking
-    required = ["pkg_resources", "ipaddress.py"]
-    host_platform = platform.uname()[0]
-
-    def lib_filter(root, dirs, files):
-        for f in list(files):
-            # Don't bother with shared libs across platforms
-            if f.endswith('.so') and host_platform != 'Linux':
-                files.remove(f)
-        if os.path.basename(root) == 'site-packages':
-            for n in tuple(dirs):
-                if n not in required:
-                    dirs.remove(n)
-        return dirs, files
-
-    return PythonPackageArchive(
-        os.path.dirname(inspect.getabsfile(c7n)),
-        os.path.abspath(os.path.join(
-            os.path.dirname(sys.executable), '..')),
-        skip=skip,
-        lib_filter=lib_filter)
+    return PythonPackageArchive('c7n', 'pkg_resources', 'ipaddress')
 
 
 class LambdaManager(object):
@@ -569,7 +556,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     def __init__(self, policy):
         self.policy = policy
-        self.archive = custodian_archive('*pyc')
+        self.archive = custodian_archive()
 
     @property
     def name(self):
@@ -608,7 +595,6 @@ class PolicyLambda(AbstractLambdaFunction):
         return events
 
     def get_archive(self):
-        self.archive.create()
         self.archive.add_contents(
             'config.json', json.dumps(
                 {'policies': [self.policy.data]}, indent=2))
@@ -624,7 +610,7 @@ def zinfo(fname):
     ie. It respects file perm attributes from the zip including
     those that prevent lambda from working. Namely lambda
     extracts code as one user, and executes code as a different
-    user without permissions for the executing user to read
+    user. Without permissions for the executing user to read
     the file the lambda function is broken.
 
     Python's default zipfile.writestr does a 0600 perm which
@@ -632,7 +618,8 @@ def zinfo(fname):
     """
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
-    info.compress_type = zipfile.ZIP_DEFLATED
+    # http://unix.stackexchange.com/questions/14705/
+    info.external_attr = 0o644 << 16L
     return info
 
 

@@ -33,30 +33,9 @@ def dispatch(event, context):
 
 
 def get_archive(config):
-
-    required = ['ldap3', 'pyasn1', 'jinja2', 'markupsafe','yaml', 'memcached']
-    remove = ['_yaml.so', 'c7n.egg-link']
-
-    def lib_filter(root, dirs, files):
-        for f in tuple(files):
-            if f.endswith('.pyo'):
-                files.remove(f)
-        for r in remove:
-            if r in files:
-                files.remove(r)
-
-        if os.path.basename(root) == 'site-packages':
-            for n in tuple(dirs):
-                if n not in required:
-                    dirs.remove(n)
-        return dirs, files
-
     archive = PythonPackageArchive(
-        os.path.dirname(__file__),
-        skip='*.pyc',
-        lib_filter=lib_filter)
-
-    archive.create()
+        'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'yaml',
+        'memcache')
 
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'msg-templates'))
