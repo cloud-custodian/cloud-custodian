@@ -1,7 +1,7 @@
 .. _developer:
 
-Developer Install and Testing
-=============================
+Developer Guide
+===============
 
 Requirements
 ------------
@@ -50,8 +50,11 @@ You should have the ``custodian`` command available now:
 
    $ custodian -h
 
+Testing
+-------
+
 Running tests
--------------
+~~~~~~~~~~~~~
 
 Unit tests can be run with:
 
@@ -72,3 +75,9 @@ Coverage reports can be generated and viewed with the following:
 
    # on gnomeish linux
    $ gnome-open coverage/index.html
+
+Decorating tests
+~~~~~~~~~~~~~~~~
+
+The ``functional`` decorator marks tests that don't require any pre-existing
+AWS context, and can therefore be run cleanly against live AWS.
