@@ -19,7 +19,7 @@ from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema, get_retry
-from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter
+from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -43,13 +43,13 @@ class Table(QueryResourceManager):
     filter_registry = filters
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('dynamodb:ListTagsOfResource')
-    
+
     def augment(self, tables):
         resources = super(Table, self).augment(tables)
         return filter(None, _dynamodb_table_tags(
             self.get_model(),
-            resources, 
-            self.session_factory, 
+            resources,
+            self.session_factory,
             self.executor_factory,
             self.retry,
             self.log))
@@ -72,11 +72,11 @@ def _dynamodb_table_tags(
             return None
         table['Tags'] = tag_list or []
         return table
-    
+
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, tables))
-    
-    
+
+
 class StatusFilter(object):
     """Filter tables by status"""
 
@@ -120,7 +120,36 @@ class TagDelayedAction(TagDelayedAction):
             'dynamodb')
         for t in tables:
             arn = t['TableArn']
-            client.tag_resource(ResourceArn=arn, Tags=tags)    
+            client.tag_resource(ResourceArn=arn, Tags=tags)
+
+
+@Table.action_registry.register('tag')
+class TagTable(Tag):
+    """Action to create tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: dynamodb-tag-table
+                resource: dynamodb-table
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('dynamodb:TagResource',)
+    batch_size = 1
+
+    def process_resource_set(self, tables, tags):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for t in tables:
+            arn = t['TableArn']
+            client.tag_resource(ResourceArn=arn, Tags=tags)
 
 
 @Table.action_registry.register('remove-tag')

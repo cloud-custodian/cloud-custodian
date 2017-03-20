@@ -22,7 +22,7 @@ from c7n.query import QueryResourceManager
 from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
-    TagDelayedAction, RemoveTag, TagActionFilter)
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
 filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
@@ -139,6 +139,34 @@ class TagDelayedAction(TagDelayedAction):
     def process_resource_set(self, resources, tags):
         client = local_session(
             self.manager.session_factory).client('emr')
+        for r in resources:
+            client.add_tags(ResourceId=r['Id'], Tags=tags)
+
+
+@actions.register('tag')
+class TagTable(Tag):
+    """Action to create tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-tag-table
+                resource: emr
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('elasticmapreduce:AddTags',)
+    batch_size = 1
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
             client.add_tags(ResourceId=r['Id'], Tags=tags)
 

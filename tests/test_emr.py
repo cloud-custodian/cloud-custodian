@@ -125,6 +125,28 @@ class TestEMR(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in new_tags}
         self.assertTrue('test_tag' in tag_map)
 
+    def test_emr_tag(self):
+        session_factory = self.replay_flight_data('test_emr_tag')
+        p = self.load_policy({
+                'name': 'emr-tag-table',
+                'resource': 'emr',
+                'filters': [{'tag:first_tag': 'first'}],
+                'actions': [{
+                    'type': 'tag',
+                    'tags': {'new_tag_key': 'new_tag_value'}
+                }]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        new_tags = resources[0]['Tags']
+        tag_map = {t['Key']: t['Value'] for t in new_tags}
+        self.assertEqual({
+                'first_tag': 'first',
+                'second_tag': 'second',
+                'new_tag_key': 'new_tag_value'
+            },
+            tag_map)
+
     def test_emr_unmark(self):
         session_factory = self.replay_flight_data(
             'test_emr_unmark')
