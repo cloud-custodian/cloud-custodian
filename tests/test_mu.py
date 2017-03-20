@@ -16,6 +16,7 @@ import imp
 import json
 import logging
 import os
+import platform
 import py_compile
 import shutil
 import sys
@@ -483,7 +484,8 @@ class PycCase(unittest.TestCase):
 
     def py_with_pyc(self, name):
         path = os.path.join(self.bench, name)
-        open(path, 'w+').write('42')
+        with open(path, 'w+') as fp:
+            fp.write('42')
         py_compile.compile(path)
         return path
 
@@ -498,16 +500,23 @@ class Constructor(PycCase):
         # Create another with a *.pyc but no *.py behind it.
         os.unlink(self.py_with_pyc('bar.py'))
 
-        # Now: *.py takes precedence over *.pyc, and while *.pyc is
-        # importable, we refuse it.
+        # Now: *.py takes precedence over *.pyc ...
         get = lambda name: os.path.basename(imp.find_module(name)[1])
         self.assertTrue(get('foo'), 'foo.py')
-        self.assertTrue(get('bar'), 'bar.pyc')
-        with self.assertRaises(ValueError) as raised:
-            PythonPackageArchive('bar')
-        msg = raised.exception.args[0]
-        self.assertTrue(msg.startswith('We need a *.py source file instead'))
-        self.assertTrue(msg.endswith('bar.pyc'))
+        try:
+            # ... and while *.pyc is importable ...
+            self.assertTrue(get('bar'), 'bar.pyc')
+        except ImportError:
+            # (except on PyPy)
+            # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
+            self.assertEqual(platform.python_implementation(), 'PyPy')
+        else:
+            # ... we refuse it.
+            with self.assertRaises(ValueError) as raised:
+                PythonPackageArchive('bar')
+            msg = raised.exception.args[0]
+            self.assertTrue(msg.startswith('We need a *.py source file instead'))
+            self.assertTrue(msg.endswith('bar.pyc'))
 
         # We readily ignore a *.pyc if a *.py exists.
         archive = PythonPackageArchive('foo')
