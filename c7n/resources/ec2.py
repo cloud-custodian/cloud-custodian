@@ -487,7 +487,9 @@ class InstanceAgeFilter(AgeFilter):
     schema = type_schema(
         'instance-age',
         op={'type': 'string', 'enum': OPERATORS.keys()},
-        days={'type': 'number'})
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
