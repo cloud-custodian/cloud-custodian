@@ -87,7 +87,7 @@ class FlowLogFilter(Filter):
         'flow-logs',
         **{'enabled': {'type': 'boolean', 'default': False},
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
-           'status': {'enum': ['success', 'failed']},
+           'status': {'enum': ['active']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -113,16 +113,20 @@ class FlowLogFilter(Filter):
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
 
         results = []
+        # looping over vpc resources
         for r in resources:
             if r[m.id] not in resource_map:
+                # we didn't find a flow log for this vpc
                 if enabled:
+                    # vpc flow logs not enabled so exclude this vpc from results
                     continue
                 results.append(r)
                 continue
             flogs = resource_map[r[m.id]]
             r['c7n:flow-logs'] = flogs
             for fl in flogs:
-                if status and not op(fl['Status'], status.upper()):
+                # effective AND relation between multiple specified criteria
+                if status and not op(fl['FlowLogStatus'], status.upper()):
                     continue
                 if traffic_type and not op(fl['TrafficType'], traffic_type.upper()):
                     continue
