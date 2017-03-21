@@ -59,6 +59,7 @@ class VpcTest(BaseTest):
                 {'VpcId': vpc_id},
                 {'type': 'flow-logs',
                  'enabled': True,
+                 'status': 'active',
                  'traffic-type': 'all',
                  'log-group': log_group}]
         }, session_factory=factory)
@@ -66,6 +67,43 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
+    def test_flow_logs_misconfiguration(self):
+        """Validate that each VPC has at least one valid configuration
+
+        In terms of filters, we then want to flag VPCs for which every
+        flow log configuration has at least one invalid value
+
+        Here - return 2 vpcs, the first of which has three flow logs which each have different misconfigurations
+        The second has one correctly configured flow log, and one where all config is bad
+
+        Only the first should be returned by the filter"""
+
+        factory = self.replay_flight_data(
+            'test_vpc_flow_logs_misconfigured')
+
+
+        vpc_id1 = 'vpc-4a9ff72e'
+        vpc_id2 = 'vpc-d0e386b7'
+        traffic_type = 'ALL'
+        log_group = '/aws/lambda/myIOTFunction'
+        status = 'ACTIVE'
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'vpc',
+            'filters': [
+                {'type': 'flow-logs',
+                 'enabled': True,
+                 'op': 'equal',
+                 'set-op': 'not-in',
+                 'status': status,
+                 'traffic-type': traffic_type,
+                 'log-group': log_group}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
 class NetworkAclTest(BaseTest):
 

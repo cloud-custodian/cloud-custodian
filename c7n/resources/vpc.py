@@ -75,7 +75,8 @@ class FlowLogFilter(Filter):
                 filters:
                   - type: flow-logs
                     enabled: true
-                    op: not-equal
+                    set-op: not-in
+                    op: equal
                     # equality operator applies to following keys
                     traffic-type: all
                     status: success
@@ -87,6 +88,7 @@ class FlowLogFilter(Filter):
         'flow-logs',
         **{'enabled': {'type': 'boolean', 'default': False},
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
+           'set-op': {'enum': ['in', 'not-in', 'all'], 'default': 'in'},
            'status': {'enum': ['active']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
@@ -111,10 +113,12 @@ class FlowLogFilter(Filter):
         traffic_type = self.data.get('traffic-type')
         status = self.data.get('status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
+        set_op = self.data.get('set-op', 'in')
 
         results = []
         # looping over vpc resources
         for r in resources:
+
             if r[m.id] not in resource_map:
                 # we didn't find a flow log for this vpc
                 if enabled:
@@ -124,16 +128,26 @@ class FlowLogFilter(Filter):
                 continue
             flogs = resource_map[r[m.id]]
             r['c7n:flow-logs'] = flogs
+
+            fl_matches = []
             for fl in flogs:
-                # effective AND relation between multiple specified criteria
-                if status and not op(fl['FlowLogStatus'], status.upper()):
-                    continue
-                if traffic_type and not op(fl['TrafficType'], traffic_type.upper()):
-                    continue
-                if log_group and not op(fl['LogGroupName'], log_group):
-                    continue
-                results.append(r)
-                break
+                status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                traffic_type_match = (traffic_type is None) or op(fl['TrafficType'], traffic_type.upper())
+                log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
+
+                # combine all conditions to check if flow log matches the spec
+                fl_match = status_match and traffic_type_match and log_group_match
+                fl_matches.append(fl_match)
+
+            if set_op == 'in':
+                if any(fl_matches):
+                    results.append(r)
+            elif set_op == 'not-in':
+                if not any(fl_matches):
+                    results.append(r)
+            elif set_op == 'all':
+                if all(fl_matches):
+                    results.append(r)
 
         return results
 
