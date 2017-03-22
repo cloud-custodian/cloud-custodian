@@ -85,7 +85,7 @@ class VpcTest(BaseTest):
 
         vpc_id1 = 'vpc-4a9ff72e'
         vpc_id2 = 'vpc-d0e386b7'
-        traffic_type = 'ALL'
+        traffic_type = 'all'
         log_group = '/aws/lambda/myIOTFunction'
         status = 'active'
 
