@@ -87,7 +87,7 @@ class VpcTest(BaseTest):
         vpc_id2 = 'vpc-d0e386b7'
         traffic_type = 'ALL'
         log_group = '/aws/lambda/myIOTFunction'
-        status = 'ACTIVE'
+        status = 'active'
 
         p = self.load_policy({
             'name': 'net-find',
