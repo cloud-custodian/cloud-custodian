@@ -33,6 +33,7 @@ scalar operators:
     - ``not-in`` or ``ni``
     - ``or`` or ``Or``
     - ``and`` or ``And``
+    - ``not``
 - Special operators:
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case
@@ -73,7 +74,7 @@ JMESPath Filter
   - ``normalize`` - convert the value to lowercase
   - ``resource_count`` - compare against the number of matched resources
   - ``size`` - the length of an element
-  - ``swap`` - swap the sentinel and the value
+  - ``swap`` - swap the value and the evaluated key
 
   Examples:
 
