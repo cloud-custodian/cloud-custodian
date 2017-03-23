@@ -16,21 +16,26 @@ mixing and combining those with a boolean conditional operators that
 are nest-able. Comparison between values is configurable supporting
 scalar operators:
 
-- ``absent``
-- ``not-null``
-- ``equal`` or ``eq``
-- ``not-equal`` or ``ne``
-- ``greater-than`` or ``gt``
-- ``gte`` or ``ge``
-- ``less-than`` or ``lt``
-- ``lte`` or ``le``
-- collection operators against user supplied lists:
+- Comparison operators:
+    - ``equal`` or ``eq``
+    - ``not-equal`` or ``ne``
+    - ``greater-than`` or ``gt``
+    - ``gte`` or ``ge``
+    - ``less-than`` or ``lt``
+    - ``lte`` or ``le``
+- Other operators
+    - ``absent``
+    - ``present``
+    - ``not-null``
+    - ``empty``
+- Collection operators against user supplied lists:
     - ``in``
     - ``not-in`` or ``ni``
     - ``or`` or ``Or``
     - ``and`` or ``And``
-- `glob` - Provides Glob matching support
-- `regex` - Provides Regex matching support but ignores case
+- Special operators:
+    - ``glob`` - Provides Glob matching support
+    - ``regex`` - Provides Regex matching support but ignores case
 
 `AgeFilter`
   Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
