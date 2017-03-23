@@ -47,6 +47,7 @@ import itertools
 import logging
 import operator
 import re
+from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
@@ -710,8 +711,16 @@ class ResizeInstance(BaseAction):
     permissions = ('rds:ModifyDBInstance',)
 
     def process(self, resources):
+        c = local_session(self.manager.session_factory).client('rds')
         for r in resources:
-            pass
+            old_val = D(r['AllocatedStorage'])
+            _100 = D(100)
+            new_val = ((_100 + D(self.data['percent'])) / _100) * old_val
+            rounded = int(new_val.quantize(D('0'), ROUND_HALF_UP))
+            c.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                AllocatedStorage=rounded,
+                ApplyImmediately=True)
 
 
 @actions.register('retention')

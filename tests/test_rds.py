@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 import time
+import uuid
 
 from common import BaseTest
 
@@ -795,3 +796,59 @@ class TestHealthEventsFilter(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 0)
+
+
+class Resize(BaseTest):
+
+    class NeverShowedUp(Exception): pass
+
+    def create_instance(self, rds, gb=5, sleep=0):
+        dbid = 'test-' + str(uuid.uuid4())
+        rds.create_db_instance(
+            Engine='mariadb',
+            DBInstanceIdentifier=dbid,
+            DBInstanceClass='db.r3.large',
+            MasterUsername='eric',
+            MasterUserPassword='cheese42',
+            AllocatedStorage=gb,
+            BackupRetentionPeriod=0)  # disable automatic backups
+        def delete():
+            rds.delete_db_instance(
+                DBInstanceIdentifier=dbid,
+                SkipFinalSnapshot=True)
+        self.addCleanup(delete)
+        self.wait_until(rds, dbid, 'available', sleep=sleep)
+        return dbid
+
+    def wait_until(self, rds, dbid, status, timeout=1800, sleep=0):
+        end_time = time.time() + timeout
+        while time.time() < end_time:
+            response = rds.describe_db_instances(DBInstanceIdentifier=dbid)
+            dbs = response['DBInstances']
+            if not dbs and status is None:
+                return
+            elif dbs[0]['DBInstanceStatus'] == status:
+                return dbs[0]
+            time.sleep(sleep)
+        raise self.NeverShowedUp()
+
+
+    def test_can_resize_up(self):
+        session_factory = self.replay_flight_data('test_rds_resize_up')
+        session = session_factory(region='us-west-2')
+        rds = session.client('rds')
+        dbid = self.create_instance(rds)
+
+        policy = self.load_policy({
+            'name': 'rds-resize-up',
+            'resource': 'rds',
+            'filters': [{'type': 'value',
+                'key': 'DBInstanceIdentifier', 'value': dbid}],
+            'actions': [{'type': 'resize', 'percent': 10}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+        policy.run()
+        self.wait_until(rds, dbid, 'modifying')
+
+        db = self.wait_until(rds, dbid, 'available')
+        self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
