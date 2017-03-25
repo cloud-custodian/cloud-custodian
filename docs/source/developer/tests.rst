@@ -1,57 +1,7 @@
-.. _developer:
+.. _developer-tests:
 
-Developer Guide
-===============
-
-Requirements
-------------
-
-The Custodian requires Python 2.7, and a make/C toolchain.
-
-On Linux
-~~~~~~~~
-
-.. code-block:: bash
-
-   sudo apt-get install python python-dev python-pip python-virtualenv
-
-On Mac
-~~~~~~
-
-.. code-block:: bash
-
-   brew install python
-
-Installing
-----------
-
-First, clone the repository:
-
-.. code-block:: bash
-
-   $ git clone https://github.com/capitalone/cloud-custodian.git
-   $ cd cloud-custodian
-
-Then build the software:
-
-.. code-block:: bash
-
-   $ make develop
-
-Once that completes, make sure you load the virtualenv into your current shell:
-
-.. code-block:: bash
-
-   $ source bin/activate
-
-You should have the ``custodian`` command available now:
-
-.. code-block:: bash
-
-   $ custodian -h
-
-Testing
--------
+Testing for Developers
+======================
 
 Running tests
 ~~~~~~~~~~~~~
@@ -119,13 +69,14 @@ example:
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-Now run this test via nosetest.  This may take a little while as the test is
-contacting AWS.  All responses are stored in the placebo dir, and can be viewed
-when the test is finished:
+Now run this test.  This may take a little while as the test is contacting AWS.
+All responses are stored in the placebo dir, and can be viewed when the test is
+finished.  It is not necessary to inspect these files, but they can be helpful
+if the test is not behaving how you expect.
 
   .. code-block:: shell
 
-    $ ls -1 tests/data/placebo/test_example/
+    $ ls tests/data/placebo/test_example/
     ec2.DescribeInstances_1.json
     ec2.DescribeTags_1.json
 
