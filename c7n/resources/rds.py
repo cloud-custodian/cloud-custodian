@@ -369,7 +369,7 @@ class AutoPatch(BaseAction):
 
         params = {'AutoMinorVersionUpgrade': self.data.get('minor', True)}
         if self.data.get('window'):
-            params['PreferredMaintenanceWindow'] = self.data['minor']
+            params['PreferredMaintenanceWindow'] = self.data['window']
 
         for db in dbs:
             client.modify_db_instance(

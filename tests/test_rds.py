@@ -36,6 +36,38 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_autopatch_with_window(self):
+        window = 'mon:23:00-tue:01:00'
+
+        session_factory = self.replay_flight_data('test_rds_auto_patch_with_window')
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [{
+                'AutoMinorVersionUpgrade': False,
+                }],
+            'actions': [{
+                    'type': 'auto-patch',
+                    'minor': True,
+                    'window': window,
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [{
+                'DBInstanceIdentifier': resources[0]['DBInstanceIdentifier'],
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['PreferredMaintenanceWindow'], window)
+
     def test_rds_tags(self):
         session_factory = self.replay_flight_data('test_rds_tags')
         p = self.load_policy({
