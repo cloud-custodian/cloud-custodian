@@ -28,6 +28,21 @@ class ElasticFileSystem(QueryResourceManager):
         date = 'CreationTime'
         dimension = None
 
+    def augment(self, filesystems):
+        # inject tags into the metadata for each filesystem
+        client = local_session(self.session_factory).client('efs')
+        retry = get_retry(
+            ('RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+            5,
+        )
+        for fs in filesystems:
+            fs_id = fs.get('FileSystemId')
+            if not fs_id:
+                continue
+            resp = retry(client.describe_tags, FileSystemId=fs_id)
+            fs[u'Tags'] = resp.get('Tags', [])
+        return filesystems
+
 
 @ElasticFileSystem.action_registry.register('delete')
 class Delete(Action):
