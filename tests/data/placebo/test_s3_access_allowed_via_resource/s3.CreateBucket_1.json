@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/test-bucket-for-access-filter", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "9tLp7oxdOwQjICoWzfwELbmRz0ZUmyLWxyrjXW2qI3Y37jgVGQUaGfhnlqPxsDhflq/+YFT9HsQ=", 
+            "RequestId": "35E199AF33A24DC2", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "9tLp7oxdOwQjICoWzfwELbmRz0ZUmyLWxyrjXW2qI3Y37jgVGQUaGfhnlqPxsDhflq/+YFT9HsQ=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "35E199AF33A24DC2", 
+                "location": "/test-bucket-for-access-filter", 
+                "date": "Sat, 06 May 2017 09:37:07 GMT"
+            }
+        }
+    }
+}

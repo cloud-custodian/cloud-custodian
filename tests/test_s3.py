@@ -22,6 +22,7 @@ import time  # NOQA needed for some recordings
 
 from unittest import TestCase
 
+import boto3
 from botocore.exceptions import ClientError
 
 from c7n.executor import MainThreadExecutor
@@ -188,6 +189,107 @@ class BucketInventory(BaseTest):
         self.assertFalse(
             client.list_bucket_inventory_configurations(
                 Bucket=bname).get('InventoryConfigurationList'))
+
+
+class AccessFilter(BaseTest):
+
+    username = 'test-user-for-access-filter'
+    user_arn = 'arn:aws:iam::114002464496:user/' + username
+
+    @classmethod
+    def setUpClass(cls):
+        if not cls.recording:
+            return
+        cls._bare_iam = boto3.Session().client('iam')
+        response = cls._bare_iam.create_user(UserName=cls.username)
+        assert cls.user_arn == response['User']['Arn']
+
+    @classmethod
+    def tearDownClass(cls):
+        if not cls.recording:
+            return
+        cls._bare_iam.delete_user(UserName=cls.username)
+
+
+    def check(self, flight, result_from_iam, result_from_resource):
+        bname = 'test-bucket-for-access-filter'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
+        session_factory = self.get_session_factory(flight)
+        session = session_factory()
+
+        # create a bucket
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        # create a user with certain bucket perms
+        iam = session.client('iam')
+        bucket_arn = "arn:aws:s3:::%s/*" % bname
+        if result_from_iam is not None:
+            effect = 'Allow' if result_from_iam else 'Deny'
+            iam.put_user_policy(
+                UserName=self.username,
+                PolicyName='test-policy',
+                PolicyDocument='''{"Version": "2012-10-17", "Statement":[{
+                    "Effect": "%s",
+                    "Resource": "%s",
+                    "Action": ["s3:*"]}]}
+                ''' % (effect, bucket_arn))
+        if result_from_resource is not None:
+            if self.recording:
+                time.sleep(10)  # Dodge 'Invalid principal in policy'
+            effect = 'Allow' if result_from_resource else 'Deny'
+            client.put_bucket_policy(
+                Bucket=bname,
+                Policy='''{"Version": "2012-10-17", "Statement":[{
+                    "Principal": {"AWS": "%s"},
+                    "Effect": "%s",
+                    "Resource": "%s",
+                    "Action": ["s3:*"]}]}
+                ''' % (self.user_arn, effect, bucket_arn))
+
+        def cleanup():
+            if result_from_iam is not None:
+                iam.delete_user_policy(
+                    UserName=self.username, PolicyName='test-policy')
+                if self.recording:
+                    # Dodge an error trying to delete the user in tearDownClass
+                    time.sleep(3)
+        self.addCleanup(cleanup)
+
+        # filter resources - is ours there?
+        allowed = result_from_iam or result_from_resource
+        p = self.load_policy({
+            'name': 's3-perms',
+            'resource': 's3',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Name',
+                 'value': bname},
+                {'type': 'access',
+                 'policy_source': self.user_arn,
+                 'value': 'allowed' if allowed else 'denied'}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        return bname in [b['Name'] for b in resources]
+
+    def test_access_allowed_via_iam(self):
+        self.assertTrue(self.check('test_s3_access_allowed_via_iam',
+            result_from_iam=True,
+            result_from_resource=None))
+
+    def test_access_denied_via_iam(self):
+        self.assertFalse(self.check('test_s3_access_denied_via_iam',
+            result_from_iam=False,
+            result_from_resource=None))
+
+    def test_access_allowed_via_resource(self):
+        self.assertTrue(self.check('test_s3_access_allowed_via_resource',
+            result_from_iam=None,
+            result_from_resource=True))
 
 
 class BucketDelete(BaseTest):

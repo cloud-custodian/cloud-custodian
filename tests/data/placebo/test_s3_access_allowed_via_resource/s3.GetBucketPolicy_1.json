@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::114002464496:user/test-user-for-access-filter\"},\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::test-bucket-for-access-filter/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "9MmlSSKyUExMZejhQpHpWeM+rAnLLZCtwYi6wI51pOncn3JQCvNXOmQSZXFRDHIGdMOVN2pLsdQ=", 
+            "RequestId": "461ACB121D73A959", 
+            "HTTPHeaders": {
+                "content-length": "212", 
+                "x-amz-id-2": "9MmlSSKyUExMZejhQpHpWeM+rAnLLZCtwYi6wI51pOncn3JQCvNXOmQSZXFRDHIGdMOVN2pLsdQ=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "461ACB121D73A959", 
+                "date": "Sat, 06 May 2017 09:37:21 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
