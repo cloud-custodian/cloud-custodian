@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TaggedResources": [
+            {
+                "ResourceType": "cluster", 
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:cluster:test", 
+                "Tag": {
+                    "Value": "v1", 
+                    "Key": "c1"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b38930a-14e5-11e7-abe8-f373102209eb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b38930a-14e5-11e7-abe8-f373102209eb", 
+                "date": "Thu, 30 Mar 2017 01:08:16 GMT", 
+                "content-length": "563", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

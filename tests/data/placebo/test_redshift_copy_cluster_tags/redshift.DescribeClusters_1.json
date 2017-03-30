@@ -1,0 +1,82 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "PubliclyAccessible": false, 
+                "MasterUsername": "testing", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-0b3d3377"
+                    }
+                ], 
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCKzoApz3XvDhQPch2GF1fLZwTSU96Y4/ZBaWLF1uezqVKr0xuPAiui1QE7uDip7SFjQtb2JWiwreUJwtSLcJ0VIRxvu5j0Y8YjAxo0fdPqDfO5TdZQHxF69zyADLK6BDUCfoOTVFSClCMA0Xj56EWFwvsckXy7zYSvOJcAxr90Q7Qa3BPECgCpfj6Gw1t27bDhrm/G9vpyAprTdJuyEk/kxRKS/gOBh9pyTSec3+zQRedM530Hi+Ob4sE+ZXyFytJTvD1176apNtn1crt7G6e6YFeSBha0mxB6X80EGJoxY8ScOA0a0bGdQZ+eUWrdYRbI6S4gfa0n/3y+kVTt/uP1 Amazon-Redshift\n", 
+                "NumberOfNodes": 1, 
+                "PendingModifiedValues": {}, 
+                "VpcId": "vpc-d2d616b5", 
+                "ClusterVersion": "1.0", 
+                "Tags": [
+                    {
+                        "Value": "v1", 
+                        "Key": "c1"
+                    }
+                ], 
+                "AutomatedSnapshotRetentionPeriod": 1, 
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "default.redshift-1.0", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "DBName": "testdb", 
+                "PreferredMaintenanceWindow": "fri:04:30-fri:05:00", 
+                "Endpoint": {
+                    "Port": 5439, 
+                    "Address": "test.clalcef7utom.us-east-1.redshift.amazonaws.com"
+                }, 
+                "IamRoles": [], 
+                "AllowVersionUpgrade": true, 
+                "ClusterCreateTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 11, 
+                    "microsecond": 233000, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 26
+                }, 
+                "ClusterSubnetGroupName": "default", 
+                "EnhancedVpcRouting": false, 
+                "ClusterSecurityGroups": [], 
+                "ClusterIdentifier": "test", 
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED", 
+                        "PrivateIPAddress": "172.31.18.91", 
+                        "PublicIPAddress": "34.203.151.67"
+                    }
+                ], 
+                "AvailabilityZone": "us-east-1b", 
+                "NodeType": "dc1.large", 
+                "Encrypted": true, 
+                "ClusterRevisionNumber": "1232", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/e39ed135-2a46-4d5e-8c05-41b8d900d0c7", 
+                "ClusterStatus": "available"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5be5c305-14e5-11e7-abe8-f373102209eb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5be5c305-14e5-11e7-abe8-f373102209eb", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2939", 
+                "content-type": "text/xml", 
+                "date": "Thu, 30 Mar 2017 01:08:18 GMT"
+            }
+        }
+    }
+}
