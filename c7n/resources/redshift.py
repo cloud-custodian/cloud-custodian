@@ -647,7 +647,7 @@ class CopyClusterTags(BaseAction):
                     ValueList = t['Value']
                     copy_tags.append({'Key': KeyList,'Value': ValueList})
 
-                client.create_tags(ResourceName=arn,Tags=tagged_resources)
+                client.create_tags(ResourceName=arn,Tags=copy_tags)
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):
