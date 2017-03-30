@@ -36,10 +36,10 @@ Writing Placebo Tests
 ~~~~~~~~~~~~~~~~~~~~~
 
 The `Placebo <http://placebo.readthedocs.io/en/latest/>`_ library is used to
-simulate AWS responses so that tests can run locally, and in a fraction of the
-time it would take to interact with live AWS services.
+record and replay AWS responses so that tests can run locally, and in a fraction
+of the time it would take to interact with live AWS services.
 
-In order to write a placebo test two helper functions are provided:
+In order to write a placebo test two helper methods are provided:
 
   - `record_flight_data` - use this when creating the test
   - `replay_flight_data` - use this when the test is completed
