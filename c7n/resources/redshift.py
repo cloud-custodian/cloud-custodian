@@ -600,7 +600,6 @@ class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 ClusterIdentifier=c['ClusterIdentifier'],
                 VpcSecurityGroupIds=groups[idx])
 
-
 @RedshiftSnapshot.action_registry.register('copy-cluster-tags')
 class CopyClusterTags(BaseAction):
 
@@ -649,7 +648,6 @@ class CopyClusterTags(BaseAction):
                     copy_tags.append({'Key': KeyList,'Value': ValueList})
 
                 client.create_tags(ResourceName=arn,Tags=tagged_resources)
-
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):

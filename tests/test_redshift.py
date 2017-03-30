@@ -203,7 +203,6 @@ class TestRedshift(BaseTest):
             cluster_tags.append(cluster_tag_elem['Tag'])
         self.assertEqual(cluster_tags, tag_snapshot)
 
-
     def test_redshift_snapshot_copy_cluster_tags(self):
         session_factory = self.replay_flight_data(
             'test_redshift_copy_cluster_tags')
@@ -230,7 +229,6 @@ class TestRedshift(BaseTest):
         results = session_factory().client('redshift').describe_tags(ResourceName=arn)['TaggedResources']
         tags2 = {t1['Tag']['Key']: t1['Tag']['Value'] for t1 in results}
         self.assertEqual(tags1,tags2)
-
 
     def test_redshift_vpc_routing(self):
         factory = self.replay_flight_data('test_redshift_vpc_routing')
