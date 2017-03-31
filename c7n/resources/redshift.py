@@ -601,6 +601,57 @@ class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 VpcSecurityGroupIds=groups[idx])
 
 
+
+@RedshiftSnapshot.action_registry.register('copy-cluster-tags')
+class CopyClusterTags(BaseAction):
+
+    """
+    Copy specific tags from cluster to Snapshot
+    :example:
+
+        .. code-block: yaml
+
+            - name: redshiftsnapshot-copytags
+              resource: redshift-snapshot
+              actions:
+                - type: copy-cluster-tags
+                  tags:
+                    - required-tag
+                    - required-tag1
+    """
+
+    schema = type_schema(
+        'copy-cluster-tags',
+        tags={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+        required = ('tags',))
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('redshift').get_permissions()
+        perms.append('redshift:CreateTags',)
+        return perms
+
+    def process(self, snapshots):
+        log.info("Modifying %d redshift snapshots", len(snapshots))
+        client = local_session(self.manager.session_factory).client('redshift')
+        clusters = {
+            cluster['ClusterIdentifier']: cluster for cluster in
+            self.manager.get_resource_manager('redshift').resources()}
+
+        for s in snapshots:
+            if s['ClusterIdentifier'] in clusters:
+                arn = self.manager.generate_arn(
+                    s['ClusterIdentifier'] + '/' + s['SnapshotIdentifier'])
+                tagged_resources = clusters[s['ClusterIdentifier']]['Tags']
+                copy_tags = []
+
+                for t in tagged_resources:
+                    KeyList = t['Key']
+                    ValueList = t['Value']
+                    copy_tags.append({'Key': KeyList,'Value': ValueList})
+
+                client.create_tags(ResourceName=arn,Tags=copy_tags)
+
+
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):
     """Filters redshift snapshots based on age (in days)
