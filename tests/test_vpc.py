@@ -68,13 +68,38 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @functional
+    def test_flow_logs_absent(self):
+        """Test that ONLY vpcs with no flow logs are retained
+
+        'vpc-4a9ff72e' - has no flow logs
+        'vpc-d0e386b7' - has flow logs
+        """
+        factory = self.replay_flight_data(
+            'test_vpc_flow_logs_absent')
+
+        vpc_id1 = 'vpc-4a9ff72e'
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'vpc',
+            'filters': [
+                {'VpcId': vpc_id1},
+                'flow-logs']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
+
+    @functional
     def test_flow_logs_misconfiguration(self):
         """Validate that each VPC has at least one valid configuration
 
         In terms of filters, we then want to flag VPCs for which every
         flow log configuration has at least one invalid value
 
-        Here - return 2 vpcs, the first of which has three flow logs which each have different misconfigurations
+        Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
+        The first has three flow logs which each have different misconfigured properties
         The second has one correctly configured flow log, and one where all config is bad
 
         Only the first should be returned by the filter"""
@@ -82,9 +107,8 @@ class VpcTest(BaseTest):
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_misconfigured')
 
-
         vpc_id1 = 'vpc-4a9ff72e'
-        vpc_id2 = 'vpc-d0e386b7'
+
         traffic_type = 'all'
         log_group = '/aws/lambda/myIOTFunction'
         status = 'active'
@@ -93,13 +117,17 @@ class VpcTest(BaseTest):
             'name': 'net-find',
             'resource': 'vpc',
             'filters': [
-                {'type': 'flow-logs',
-                 'enabled': True,
-                 'op': 'equal',
-                 'set-op': 'not-in',
-                 'status': status,
-                 'traffic-type': traffic_type,
-                 'log-group': log_group}]},
+                {'not': [{
+                        'type': 'flow-logs',
+                        'enabled': True,
+                        'op': 'equal',
+                        'set-op': 'or',
+                        'status': status,
+                        'traffic-type': traffic_type,
+                        'log-group': log_group
+                    }]
+                }
+            ]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
