@@ -21,7 +21,7 @@ from dateutil.tz import tzutc
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, get_account_id, type_schema
@@ -434,3 +434,59 @@ class ServiceLimit(Filter):
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
         return []
+
+
+
+@actions.register('request-limit-increase')
+class RequestLimitIncrease(BaseAction):
+    """ File support ticket to raise limit
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: account-service-limits
+            resource: account
+            filters:
+             - type: service-limit
+               services:
+                 - EBS
+               threshold: 60.5
+             actions:
+               - type: request-limit-increase
+                 notify: [email, email2]
+                 percent-increase: 50
+                 template: foo | sane default
+    """
+
+    schema = type_schema(
+        'request-limit-increase',
+        **{'notify': {'type': 'array'},
+           'percent-increase': {'type': 'number'},
+           'template': {'type': 'string'}})
+
+    default_template = 'Please raise the limit of {id} by {percent}%'
+    
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('account')
+        
+        for resource in resources:
+            resource_id = resource.get('VolumeId'),
+
+            subject = 'Raise the limit of {}'.format(resource_id)
+
+            body = self.data.get('template', default_template)
+            body = body.format(**{
+                    'id': resource_id,
+                    'percent': self.data.get('percent-increase')
+                    })
+
+            client.create_case(
+                subject=subject,
+                communicationBody=body,
+                serviceCode='amazon-elastic-block-store',
+                categoryCode='general-guidance',
+                severityCode='low',
+                ccEmailAddresses=self.data.get('notify', []))
