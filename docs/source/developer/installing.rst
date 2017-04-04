@@ -1,7 +1,7 @@
-.. _developer:
+.. _developer-installing:
 
-Developer Guide
-===============
+Installing for Developers
+=========================
 
 Requirements
 ------------
@@ -49,35 +49,3 @@ You should have the ``custodian`` command available now:
 .. code-block:: bash
 
    $ custodian -h
-
-Testing
--------
-
-Running tests
-~~~~~~~~~~~~~
-
-Unit tests can be run with:
-
-.. code-block:: bash
-
-   $ make test
-
-Coverage reports can be generated and viewed with the following:
-
-.. code-block:: bash
-
-   $ make coverage
-
-   # Open the reports in a browser
-
-   # on osx
-   $ open coverage/index.html
-
-   # on gnomeish linux
-   $ gnome-open coverage/index.html
-
-Decorating tests
-~~~~~~~~~~~~~~~~
-
-The ``functional`` decorator marks tests that don't require any pre-existing
-AWS context, and can therefore be run cleanly against live AWS.
