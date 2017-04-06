@@ -13,6 +13,16 @@
                         "VpcSecurityGroupId": "sg-f9cc4d9f"
                     }
                 ], 
+                "InstanceCreateTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 22, 
+                    "microsecond": 158000, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 55
+                }, 
                 "CopyTagsToSnapshot": false, 
                 "OptionGroupMemberships": [
                     {
@@ -20,9 +30,7 @@
                         "OptionGroupName": "default:mariadb-10-0"
                     }
                 ], 
-                "PendingModifiedValues": {
-                    "MasterUserPassword": "****"
-                }, 
+                "PendingModifiedValues": {}, 
                 "Engine": "mariadb", 
                 "MultiAZ": false, 
                 "DBSecurityGroups": [], 
@@ -33,7 +41,7 @@
                     }
                 ], 
                 "AutoMinorVersionUpgrade": true, 
-                "PreferredBackupWindow": "06:40-07:10", 
+                "PreferredBackupWindow": "08:46-09:16", 
                 "DBSubnetGroup": {
                     "Subnets": [
                         {
@@ -64,33 +72,38 @@
                     "SubnetGroupStatus": "Complete"
                 }, 
                 "ReadReplicaDBInstanceIdentifiers": [], 
-                "AllocatedStorage": 5, 
-                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-6fa4a30f-a024-471c-b0ac-e981182b3465", 
+                "AllocatedStorage": 6, 
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-a1b954d2-a8a0-402a-bab0-5366736becc8", 
                 "BackupRetentionPeriod": 0, 
-                "PreferredMaintenanceWindow": "sat:07:51-sat:08:21", 
-                "DBInstanceStatus": "creating", 
+                "PreferredMaintenanceWindow": "fri:11:50-fri:12:20", 
+                "Endpoint": {
+                    "HostedZoneId": "Z1PVIF0B656C1W", 
+                    "Port": 3306, 
+                    "Address": "test-a1b954d2-a8a0-402a-bab0-5366736becc8.cnhganveedh2.us-west-2.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
                 "EngineVersion": "10.0.24", 
                 "AvailabilityZone": "us-west-2a", 
                 "DomainMemberships": [], 
                 "StorageType": "standard", 
-                "DbiResourceId": "db-UIK6I6AVSXM34HGLSXPKNOTC7Q", 
+                "DbiResourceId": "db-3UGCXHIQNQIG3WMEINSETOPCUM", 
                 "CACertificateIdentifier": "rds-ca-2015", 
                 "StorageEncrypted": false, 
                 "DBInstanceClass": "db.r3.large", 
                 "DbInstancePort": 0, 
-                "DBInstanceIdentifier": "test-6fa4a30f-a024-471c-b0ac-e981182b3465"
+                "DBInstanceIdentifier": "test-a1b954d2-a8a0-402a-bab0-5366736becc8"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "43d8627c-1136-11e7-b03a-097d47b1b9f0", 
+            "RequestId": "504f7528-1aca-11e7-abec-ffcbc05ecea9", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "43d8627c-1136-11e7-b03a-097d47b1b9f0", 
+                "x-amzn-requestid": "504f7528-1aca-11e7-abec-ffcbc05ecea9", 
                 "vary": "Accept-Encoding", 
-                "content-length": "3902", 
+                "content-length": "4193", 
                 "content-type": "text/xml", 
-                "date": "Sat, 25 Mar 2017 08:37:21 GMT"
+                "date": "Thu, 06 Apr 2017 13:09:48 GMT"
             }
         }
     }
