@@ -457,36 +457,45 @@ class RequestLimitIncrease(BaseAction):
                - type: request-limit-increase
                  notify: [email, email2]
                  percent-increase: 50
-                 template: foo | sane default
+                 message: "Raise {service} by {percent}%"
     """
 
     schema = type_schema(
         'request-limit-increase',
         **{'notify': {'type': 'array'},
            'percent-increase': {'type': 'number'},
-           'template': {'type': 'string'}})
+           'message': {'type': 'string'},
+           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
+           })
 
-    default_template = 'Please raise the limit of {id} by {percent}%'
-    
+    default_template = 'Please raise the account limit of {service} by {percent}%'
+    default_severity = 'normal'
+
+    service_code_mapping = {
+        'ebs': 'amazon-elastic-block-store',
+        # TODO - look up other codes
+    }
+
     def process(self, resources):
         session = local_session(self.manager.session_factory)
-        client = session.client('account')
+        client = session.client('support')
         
         for resource in resources:
-            resource_id = resource.get('VolumeId'),
+            service = 'ebs'
+            service_code = self.service_code_mapping.get(service)
 
-            subject = 'Raise the limit of {}'.format(resource_id)
+            subject = 'Raise the account limit of {}'.format(service)
 
-            body = self.data.get('template', default_template)
+            body = self.data.get('message', self.default_template)
             body = body.format(**{
-                    'id': resource_id,
+                    'service': service,
                     'percent': self.data.get('percent-increase')
                     })
 
             client.create_case(
                 subject=subject,
                 communicationBody=body,
-                serviceCode='amazon-elastic-block-store',
+                serviceCode=service_code,
                 categoryCode='general-guidance',
-                severityCode='low',
+                severityCode=self.data.get('severity', self.default_severity),
                 ccEmailAddresses=self.data.get('notify', []))
