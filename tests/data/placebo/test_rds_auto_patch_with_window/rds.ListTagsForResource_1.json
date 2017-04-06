@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e9eb750e-122d-11e7-a538-a3fbf178d03e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e9eb750e-122d-11e7-a538-a3fbf178d03e", 
+                "date": "Sun, 26 Mar 2017 14:10:06 GMT", 
+                "content-length": "394", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "other", 
+                "Key": "workload-type"
+            }
+        ]
+    }
+}

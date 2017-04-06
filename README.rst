@@ -135,14 +135,14 @@ First a policy file needs to be created in YAML format, as an example::
 Given that, you can run cloud-custodian with::
 
   # Validate the configuration (note this happens by default on run)
-  $ custodian validate -c policy.yml
+  $ custodian validate policy.yml
 
   # Dryrun on the policies (no actions executed) to see what resources
   # match each policy.
-  $ custodian run --dryrun -c policy.yml -s out
+  $ custodian run --dryrun -s out policy.yml
 
   # Run the policy
-  $ custodian run -c policy.yml -s out
+  $ custodian run -s out policy.yml
 
 
 Custodian supports a few other useful subcommands and options, including

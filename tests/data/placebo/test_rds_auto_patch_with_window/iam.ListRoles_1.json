@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "AC0erkd3DaFqORhUZsLr3zwDKSyS7FoD161v4GAHB1e7NQGngAoN6BHtxkBpCRjN/tM7U4m8+90Pt92t1WWaofI1f72yZMFM7EvBtDLv02WBbQ==", 
+        "IsTruncated": true, 
+        "Roles": [
+            {
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22apigateway.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "RoleId": "AROAJ3IYRN5TVLQIYC5NU", 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 9
+                }, 
+                "RoleName": "ApiGwLogger", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:role/ApiGwLogger"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e9c72498-122d-11e7-b4b2-712691fb77d1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e9c72498-122d-11e7-b4b2-712691fb77d1", 
+                "date": "Sun, 26 Mar 2017 14:10:05 GMT", 
+                "content-length": "985", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
