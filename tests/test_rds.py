@@ -15,6 +15,7 @@ import logging
 import time
 import uuid
 
+import boto3
 from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
@@ -802,7 +803,7 @@ class Resize(BaseTest):
 
     class NeverShowedUp(Exception): pass
 
-    def create_instance(self, rds, gb=5, sleep=0):
+    def create_instance(self, rds, gb=5):
         dbid = 'test-' + str(uuid.uuid4())
         rds.create_db_instance(
             Engine='mariadb',
@@ -817,10 +818,9 @@ class Resize(BaseTest):
                 DBInstanceIdentifier=dbid,
                 SkipFinalSnapshot=True)
         self.addCleanup(delete)
-        self.wait_until(rds, dbid, 'available', sleep=sleep)
         return dbid
 
-    def wait_until(self, rds, dbid, status, timeout=1800, sleep=0):
+    def wait_until(self, rds, dbid, status, timeout=1800, sleep=30):
         end_time = time.time() + timeout
         while time.time() < end_time:
             response = rds.describe_db_instances(DBInstanceIdentifier=dbid)
@@ -837,7 +837,11 @@ class Resize(BaseTest):
         session_factory = self.replay_flight_data('test_rds_resize_up')
         session = session_factory(region='us-west-2')
         rds = session.client('rds')
+        #waiting_client = boto3.Session(
+        #    region_name=session.region_name).client('rds')
+
         dbid = self.create_instance(rds)
+        #self.wait_until(waiting_client, dbid, 'available')
 
         policy = self.load_policy({
             'name': 'rds-resize-up',
@@ -848,7 +852,9 @@ class Resize(BaseTest):
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         policy.run()
-        self.wait_until(rds, dbid, 'modifying')
+        #self.wait_until(waiting_client, dbid, 'modifying')
 
-        db = self.wait_until(rds, dbid, 'available')
+        #self.wait_until(waiting_client, dbid, 'available')
+        db = rds.describe_db_instances(
+            DBInstanceIdentifier=dbid)['DBInstances'][0]
         self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
