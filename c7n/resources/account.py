@@ -464,34 +464,47 @@ class RequestLimitIncrease(BaseAction):
         'request-limit-increase',
         **{'notify': {'type': 'array'},
            'percent-increase': {'type': 'number'},
+           'subject': {'type': 'string'},
            'message': {'type': 'string'},
-           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
+           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']},
+           'required': ['percent-increase'],
            })
 
+    default_subject = 'Raise the account limit of {service}'
     default_template = 'Please raise the account limit of {service} by {percent}%'
     default_severity = 'normal'
 
     service_code_mapping = {
-        'ebs': 'amazon-elastic-block-store',
-        # TODO - look up other codes
+        'AutoScaling': 'auto-scaling',
+        'CloudFormation': 'elastic-load-balancing',  # Is this the correct service name?
+        'EBS': 'amazon-elastic-block-store',
+        'EC2': 'amazon-elastic-compute-cloud-linux',
+        'RDS': 'amazon-relational-database-service-aurora',
+        'VPC': 'amazon-virtual-private-cloud',
     }
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('support')
-        
-        for resource in resources:
-            service = 'ebs'
+
+        services_done = set()
+        for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
+            service = resource['service']
+            if service in services_done:
+                continue
+
+            services_done.add(service)
             service_code = self.service_code_mapping.get(service)
 
-            subject = 'Raise the account limit of {}'.format(service)
+            subject = self.data.get('subject', self.default_subject)
+            subject.format(service=service)
 
             body = self.data.get('message', self.default_template)
             body = body.format(**{
                     'service': service,
                     'percent': self.data.get('percent-increase')
                     })
-
+            
             client.create_case(
                 subject=subject,
                 communicationBody=body,
