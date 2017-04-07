@@ -235,7 +235,7 @@ class AccountTests(BaseTest):
             'resource': 'account',
             'filters': [{
                 'type': 'service-limit',
-                'services': 'EBS',
+                'services': ['EBS'],
                 'threshold': 0.01,
             }],
             'actions': [{
