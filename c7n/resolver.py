@@ -124,8 +124,11 @@ class ValuesFrom(object):
             data = csv.reader(StringIO(contents))
             if 'expr' in self.data and isinstance(self.data['expr'], int):
                 return [d[self.data['expr']] for d in data]
+            # TODO - how do we handle duplicate headers?
+            # TODO - do we care about order?  Can use an ordereddict
+            data_dict = {x[0]: x[1:] for x in zip(*data)}
             if 'expr' in self.data:
-                return jmespath.search(self.data['expr'], list(data))
-            return list(data)
+                return jmespath.search(self.data['expr'], data_dict)
+            return data_dict
         elif format == 'txt':
             return [s.strip() for s in StringIO(contents).readlines()]
