@@ -32,7 +32,7 @@
                 }
             ], 
             "AutoMinorVersionUpgrade": true, 
-            "PreferredBackupWindow": "08:46-09:16", 
+            "PreferredBackupWindow": "12:38-13:08", 
             "DBSubnetGroup": {
                 "Subnets": [
                     {
@@ -64,30 +64,30 @@
             }, 
             "ReadReplicaDBInstanceIdentifiers": [], 
             "AllocatedStorage": 5, 
-            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-a1b954d2-a8a0-402a-bab0-5366736becc8", 
+            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-210b289e-68f7-4cf6-9fcf-0f5cbf4f6613", 
             "BackupRetentionPeriod": 0, 
-            "PreferredMaintenanceWindow": "fri:11:50-fri:12:20", 
+            "PreferredMaintenanceWindow": "mon:09:59-mon:10:29", 
             "DBInstanceStatus": "creating", 
             "EngineVersion": "10.0.24", 
             "DomainMemberships": [], 
             "StorageType": "standard", 
-            "DbiResourceId": "db-3UGCXHIQNQIG3WMEINSETOPCUM", 
+            "DbiResourceId": "db-EGKLC6ENGIJCLELY5NIBFXGJVM", 
             "CACertificateIdentifier": "rds-ca-2015", 
             "StorageEncrypted": false, 
             "DBInstanceClass": "db.r3.large", 
             "DbInstancePort": 0, 
-            "DBInstanceIdentifier": "test-a1b954d2-a8a0-402a-bab0-5366736becc8"
+            "DBInstanceIdentifier": "test-210b289e-68f7-4cf6-9fcf-0f5cbf4f6613"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c74a2aca-1ac7-11e7-a349-272c8e9469c8", 
+            "RequestId": "6b51699e-1b84-11e7-860d-f35247878979", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c74a2aca-1ac7-11e7-a349-272c8e9469c8", 
+                "x-amzn-requestid": "6b51699e-1b84-11e7-860d-f35247878979", 
                 "vary": "Accept-Encoding", 
                 "content-length": "3710", 
                 "content-type": "text/xml", 
-                "date": "Thu, 06 Apr 2017 12:51:42 GMT"
+                "date": "Fri, 07 Apr 2017 11:22:03 GMT"
             }
         }
     }
