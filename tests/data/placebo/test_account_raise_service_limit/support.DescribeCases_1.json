@@ -1,0 +1,97 @@
+{
+    "status_code": 200, 
+    "data": {
+        "cases": [
+            {
+                "status": "opened", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Hello Mandeep,\n\nIt seems the chat was disconnected earlier today. I reviewed you case and informed your TAM. We apologize for the delay, but they will contact you as soon as possible. \n\nThank you for your understanding.\n\nBest regards,\n\nRocket D.\nAmazon Web Services\nWe value your feedback. Please rate my response using the link below.\n===================================================\n\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                            "timeCreated": "2016-10-17T22:17:55.000Z", 
+                            "submittedBy": "Amazon Web Services"
+                        }, 
+                        {
+                            "body": "07:15:59 PM Rocket D: Hello, my name is Rocket D.  I'm here to help you today.\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                            "timeCreated": "2016-10-17T19:15:41.000Z", 
+                            "submittedBy": "Mandeep.Bal@capitalone.com"
+                        }, 
+                        {
+                            "body": "Hi Noah,\n\nWe're still waiting for Peter to reach out to us. \n\nThanks,\nMandeep\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                            "timeCreated": "2016-10-17T19:15:38.000Z", 
+                            "submittedBy": "mandeep (IAM) <mandeep.bal@capitalone.com>"
+                        }, 
+                        {
+                            "body": "\nHello,\n\nWe haven't heard back from you regarding this case. At this time, we're marking this case as Resolved. However, if you're still experiencing issues, we want to hear from you! Please re-open this case for continued support:\n\nhttps://console.aws.amazon.com/support/home?#/case/?caseId=1900382061&displayId=1900382061&language=en\n\nPlease let us know if we resolved your issue: \n(If you will connect by federation, log in before following the link.)\n\nIf yes, click here:\nhttps://aws-portal.amazon.com/gp/aws/html-forms-controller/contactus/AWS-PS-HMD-Survey?mailref=yes&case=1900382061\nIf no, click here:\nhttps://aws-portal.amazon.com/gp/aws/html-forms-controller/contactus/AWS-PS-HMD-Survey?mailref=no&case=1900382061\n\nBest regards,\n\nAmazon Web Services\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                            "timeCreated": "2016-10-15T15:22:47.000Z", 
+                            "submittedBy": "Amazon Web Services"
+                        }, 
+                        {
+                            "body": "\nHello,\n\nWe haven't heard back from you regarding case 1900382061 for a while. For continued support regarding the same issue, you can contact us any time using the following URL:\nhttps://console.aws.amazon.com/support/home?#/case/?caseId=1900382061&displayId=1900382061&language=en\n\nPlease note that no action is required on your part if you wish this case to be resolved. However, if you want to close this case yourself, you could do so via the Support Center. If we haven't heard back from you within the next 48 hours we will mark the case as Resolved, although you can re-open the case any time using the link above.\n\nBest Regards,\n\nAmazon Web Services\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                            "timeCreated": "2016-10-13T14:23:34.000Z", 
+                            "submittedBy": "Amazon Web Services"
+                        }
+                    ], 
+                    "nextToken": "AwIUvBR8xgc/AqRzxBmKr8Fgw6brUB5rmhox1JUANqnwfQiBpsXYTnoSSgMJKRoerGE64UZV0iA="
+                }, 
+                "ccEmailAddresses": [], 
+                "timeCreated": "2016-10-06T19:09:30.000Z", 
+                "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
+                "severityCode": "low", 
+                "language": "en", 
+                "categoryCode": "apis", 
+                "serviceCode": "aws-identity-and-access-management", 
+                "submittedBy": "Mandeep.Bal@capitalone.com", 
+                "displayId": "1900382061", 
+                "subject": "CLA SDK"
+            }, 
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the account limit of EBS by 50%\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-17fea6f5a010739a", 
+                            "timeCreated": "2017-04-07T02:42:01.000Z", 
+                            "submittedBy": "scot@sixfeetup.com (IAM) <mandeep.bal@capitalone.com>"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-04-07T02:42:01.000Z", 
+                "caseId": "case-644160558196-muen-2017-17fea6f5a010739a", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-elastic-block-store", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "2145600921", 
+                "subject": "Programmatic test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c7e9864b-1b3b-11e7-9d84-4784ca73fa30", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c7e9864b-1b3b-11e7-9d84-4784ca73fa30", 
+                "date": "Fri, 07 Apr 2017 02:42:03 GMT", 
+                "content-length": "4082", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

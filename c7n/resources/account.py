@@ -499,7 +499,7 @@ class RequestLimitIncrease(BaseAction):
             service_code = self.service_code_mapping.get(service)
 
             subject = self.data.get('subject', self.default_subject)
-            subject.format(service=service)
+            subject = subject.format(service=service)
 
             body = self.data.get('message', self.default_template)
             body = body.format(**{
