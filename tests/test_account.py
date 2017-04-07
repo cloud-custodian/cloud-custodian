@@ -229,7 +229,7 @@ class AccountTests(BaseTest):
     def test_raise_service_limit(self):
         magic_string = 'Programmatic test'
 
-        session_factory = self.record_flight_data('test_account_raise_service_limit')
+        session_factory = self.replay_flight_data('test_account_raise_service_limit')
         p = self.load_policy({
             'name': 'raise-service-limit-policy',
             'resource': 'account',
