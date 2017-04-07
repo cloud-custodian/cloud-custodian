@@ -14,6 +14,7 @@
 import logging
 import time
 import uuid
+from collections import OrderedDict
 
 import boto3
 from common import BaseTest
@@ -801,8 +802,6 @@ class TestHealthEventsFilter(BaseTest):
 
 class Resize(BaseTest):
 
-    class NeverShowedUp(Exception): pass
-
     def get_waiting_client(sef, session_factory, session, name):
         if session_factory.__name__ == '<lambda>':
             # We are replaying flight data.
@@ -811,19 +810,24 @@ class Resize(BaseTest):
             # We are recording flight data.
             return boto3.Session(region_name=session.region_name).client(name)
 
-    def wait_until(self, client, dbid, status, timeout=1800, sleep=30):
+    def install_modifying_waiter(self, client):
+        # Not provided by boto otb.
+        client._get_waiter_config()  # primes cache if needed
+        waiters = client._cache['waiter_config']['waiters']
+        if 'DBInstanceModifying' not in waiters:
+            pattern = waiters['DBInstanceAvailable']
+            acceptors = [OrderedDict(eg) for eg in pattern['acceptors']]
+            acceptors[0]['expected'] = 'modifying'
+            waiter = OrderedDict(pattern)
+            waiter['acceptors'] = acceptors
+            waiters['DBInstanceModifying'] = waiter
+
+    def wait_until(self, client, dbid, status):
         if client is None:
             return  # We're in replay mode. Don't bother waiting.
-        end_time = time.time() + timeout
-        while time.time() < end_time:
-            response = client.describe_db_instances(DBInstanceIdentifier=dbid)
-            dbs = response['DBInstances']
-            if not dbs and status is None:
-                return
-            elif dbs[0]['DBInstanceStatus'] == status:
-                return dbs[0]
-            time.sleep(sleep)
-        raise self.NeverShowedUp()
+        self.install_modifying_waiter(client)
+        waiter = client.get_waiter('db_instance_'+status)
+        waiter.wait(Filters=[{'Name': 'db-instance-id', 'Value': dbid}])
 
     def create_instance(self, client, gb=5):
         dbid = 'test-' + str(uuid.uuid4())
