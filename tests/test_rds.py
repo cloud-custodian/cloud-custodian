@@ -803,27 +803,20 @@ class Resize(BaseTest):
 
     class NeverShowedUp(Exception): pass
 
-    def create_instance(self, rds, gb=5):
-        dbid = 'test-' + str(uuid.uuid4())
-        rds.create_db_instance(
-            Engine='mariadb',
-            DBInstanceIdentifier=dbid,
-            DBInstanceClass='db.r3.large',
-            MasterUsername='eric',
-            MasterUserPassword='cheese42',
-            AllocatedStorage=gb,
-            BackupRetentionPeriod=0)  # disable automatic backups
-        def delete():
-            rds.delete_db_instance(
-                DBInstanceIdentifier=dbid,
-                SkipFinalSnapshot=True)
-        self.addCleanup(delete)
-        return dbid
+    def get_waiting_client(sef, session_factory, session, name):
+        if session_factory.__name__ == '<lambda>':
+            # We are replaying flight data.
+            return None
+        else:
+            # We are recording flight data.
+            return boto3.Session(region_name=session.region_name).client(name)
 
-    def wait_until(self, rds, dbid, status, timeout=1800, sleep=30):
+    def wait_until(self, client, dbid, status, timeout=1800, sleep=30):
+        if client is None:
+            return  # We're in replay mode. Don't bother waiting.
         end_time = time.time() + timeout
         while time.time() < end_time:
-            response = rds.describe_db_instances(DBInstanceIdentifier=dbid)
+            response = client.describe_db_instances(DBInstanceIdentifier=dbid)
             dbs = response['DBInstances']
             if not dbs and status is None:
                 return
@@ -832,16 +825,32 @@ class Resize(BaseTest):
             time.sleep(sleep)
         raise self.NeverShowedUp()
 
+    def create_instance(self, client, gb=5):
+        dbid = 'test-' + str(uuid.uuid4())
+        client.create_db_instance(
+            Engine='mariadb',
+            DBInstanceIdentifier=dbid,
+            DBInstanceClass='db.r3.large',
+            MasterUsername='eric',
+            MasterUserPassword='cheese42',
+            AllocatedStorage=gb,
+            BackupRetentionPeriod=0)  # disable automatic backups
+        def delete():
+            client.delete_db_instance(
+                DBInstanceIdentifier=dbid,
+                SkipFinalSnapshot=True)
+        self.addCleanup(delete)
+        return dbid
+
 
     def test_can_resize_up(self):
         session_factory = self.replay_flight_data('test_rds_resize_up')
         session = session_factory(region='us-west-2')
-        rds = session.client('rds')
-        #waiting_client = boto3.Session(
-        #    region_name=session.region_name).client('rds')
+        client = session.client('rds')
+        waiting_client = self.get_waiting_client(session_factory, session, 'rds')
 
-        dbid = self.create_instance(rds)
-        #self.wait_until(waiting_client, dbid, 'available')
+        dbid = self.create_instance(client)
+        self.wait_until(waiting_client, dbid, 'available')
 
         policy = self.load_policy({
             'name': 'rds-resize-up',
@@ -852,9 +861,9 @@ class Resize(BaseTest):
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         policy.run()
-        #self.wait_until(waiting_client, dbid, 'modifying')
+        self.wait_until(waiting_client, dbid, 'modifying')
 
-        #self.wait_until(waiting_client, dbid, 'available')
-        db = rds.describe_db_instances(
+        self.wait_until(waiting_client, dbid, 'available')
+        db = client.describe_db_instances(
             DBInstanceIdentifier=dbid)['DBInstances'][0]
         self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
