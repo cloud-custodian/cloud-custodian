@@ -66,6 +66,7 @@ Now, run Custodian:
 
     AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. custodian.yml
 
+Note: If you already have AWS credentials configured for AWS CLI or SDK access, then you may omit providing them on the command line. 
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2

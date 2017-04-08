@@ -13,7 +13,7 @@ EC2 - Offhours Support
        filters:
          - type: offhour
            tag: c7n_downtime
-           offhour: 22
+           offhour: 19
            default_tz: est
        actions:
          - stop

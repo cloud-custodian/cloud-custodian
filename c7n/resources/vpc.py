@@ -73,13 +73,15 @@ class FlowLogFilter(Filter):
               - name: flow-mis-configured
                 resource: vpc
                 filters:
-                  - type: flow-logs
-                    enabled: true
-                    op: not-equal
-                    # equality operator applies to following keys
-                    traffic-type: all
-                    status: success
-                    log-group: vpc-logs
+                  - not:
+                    - type: flow-logs
+                      enabled: true
+                      set-op: or
+                      op: equal
+                      # equality operator applies to following keys
+                      traffic-type: all
+                      status: success
+                      log-group: vpc-logs
 
     """
 
@@ -87,7 +89,8 @@ class FlowLogFilter(Filter):
         'flow-logs',
         **{'enabled': {'type': 'boolean', 'default': False},
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
-           'status': {'enum': ['success', 'failed']},
+           'set-op': {'enum': ['or', 'and'], 'default': 'or'},
+           'status': {'enum': ['active']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -111,25 +114,40 @@ class FlowLogFilter(Filter):
         traffic_type = self.data.get('traffic-type')
         status = self.data.get('status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
+        set_op = self.data.get('set-op', 'or')
 
         results = []
+        # looping over vpc resources
         for r in resources:
+
             if r[m.id] not in resource_map:
+                # we didn't find a flow log for this vpc
                 if enabled:
+                    # vpc flow logs not enabled so exclude this vpc from results
                     continue
                 results.append(r)
                 continue
             flogs = resource_map[r[m.id]]
             r['c7n:flow-logs'] = flogs
-            for fl in flogs:
-                if status and not op(fl['Status'], status.upper()):
-                    continue
-                if traffic_type and not op(fl['TrafficType'], traffic_type.upper()):
-                    continue
-                if log_group and not op(fl['LogGroupName'], log_group):
-                    continue
-                results.append(r)
-                break
+
+            # config comparisons are pointless if we only want vpcs with no flow logs
+            if enabled:
+                fl_matches = []
+                for fl in flogs:
+                    status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                    traffic_type_match = (traffic_type is None) or op(fl['TrafficType'], traffic_type.upper())
+                    log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
+
+                    # combine all conditions to check if flow log matches the spec
+                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_matches.append(fl_match)
+
+                if set_op == 'or':
+                    if any(fl_matches):
+                        results.append(r)
+                elif set_op == 'and':
+                    if all(fl_matches):
+                        results.append(r)
 
         return results
 
