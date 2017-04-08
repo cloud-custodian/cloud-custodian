@@ -827,7 +827,7 @@ class Resize(BaseTest):
             return  # We're in replay mode. Don't bother waiting.
         self.install_modifying_waiter(client)
         waiter = client.get_waiter('db_instance_'+status)
-        waiter.wait(Filters=[{'Name': 'db-instance-id', 'Value': dbid}])
+        waiter.wait(Filters=[{'Name': 'db-instance-id', 'Values': [dbid]}])
 
     def create_instance(self, client, gb=5):
         dbid = 'test-' + str(uuid.uuid4())
