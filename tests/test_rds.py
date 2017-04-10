@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import logging
+import os
 import time
 import uuid
 from collections import OrderedDict
@@ -802,13 +804,20 @@ class TestHealthEventsFilter(BaseTest):
 
 class Resize(BaseTest):
 
-    def get_waiting_client(sef, session_factory, session, name):
-        if session_factory.__name__ == '<lambda>':
-            # We are replaying flight data.
+    def get_waiting_client(self, session_factory, session, name):
+        if session_factory.__name__ == '<lambda>':  # replaying
             return None
-        else:
-            # We are recording flight data.
+        else:                                       # recording
             return boto3.Session(region_name=session.region_name).client(name)
+
+    def get_dbid(self, recording, flight_data):
+        if recording:
+            return 'test-' + str(uuid.uuid4())
+        else:
+            pill_path = os.path.join(os.path.dirname(__file__), 'data',
+                'placebo', flight_data, 'rds.CreateDBInstance_1.json')
+            pill = json.load(open(pill_path))
+            return pill['data']['DBInstance']['DBInstanceIdentifier']
 
     def install_modifying_waiter(self, client):
         # Not provided by boto otb.
@@ -829,8 +838,7 @@ class Resize(BaseTest):
         waiter = client.get_waiter('db_instance_'+status)
         waiter.wait(Filters=[{'Name': 'db-instance-id', 'Values': [dbid]}])
 
-    def create_instance(self, client, gb=5):
-        dbid = 'test-' + str(uuid.uuid4())
+    def create_instance(self, client, dbid, gb=5):
         client.create_db_instance(
             Engine='mariadb',
             DBInstanceIdentifier=dbid,
@@ -848,12 +856,14 @@ class Resize(BaseTest):
 
 
     def test_can_resize_up(self):
-        session_factory = self.replay_flight_data('test_rds_resize_up')
+        flight_data = 'test_rds_resize_up'
+        session_factory = self.replay_flight_data(flight_data)
         session = session_factory(region='us-west-2')
         client = session.client('rds')
         waiting_client = self.get_waiting_client(session_factory, session, 'rds')
+        dbid = self.get_dbid(bool(waiting_client), flight_data)
 
-        dbid = self.create_instance(client)
+        self.create_instance(client, dbid)
         self.wait_until(waiting_client, dbid, 'available')
 
         policy = self.load_policy({
