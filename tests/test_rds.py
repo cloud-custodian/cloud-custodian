@@ -855,8 +855,8 @@ class Resize(BaseTest):
         return dbid
 
 
-    def test_can_resize_up(self):
-        flight_data = 'test_rds_resize_up'
+    def test_can_resize_up_immediately(self):
+        flight_data = 'test_rds_resize_up_immediately'
         session_factory = self.replay_flight_data(flight_data)
         session = session_factory(region='us-west-2')
         client = session.client('rds')
@@ -871,7 +871,7 @@ class Resize(BaseTest):
             'resource': 'rds',
             'filters': [{'type': 'value',
                 'key': 'DBInstanceIdentifier', 'value': dbid}],
-            'actions': [{'type': 'resize', 'percent': 10}]},
+            'actions': [{'type': 'resize', 'percent': 10, 'immediate': True}]},
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         policy.run()

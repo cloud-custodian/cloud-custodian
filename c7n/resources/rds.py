@@ -720,7 +720,7 @@ class ResizeInstance(BaseAction):
             c.modify_db_instance(
                 DBInstanceIdentifier=r['DBInstanceIdentifier'],
                 AllocatedStorage=rounded,
-                ApplyImmediately=True)
+                ApplyImmediately=self.data.get('immediate', False))
 
 
 @actions.register('retention')
