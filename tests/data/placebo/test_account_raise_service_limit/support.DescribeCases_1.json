@@ -7,7 +7,7 @@
                 "recentCommunications": {
                     "communications": [
                         {
-                            "body": "Hello Mandeep,\n\nIt seems the chat was disconnected earlier today. I reviewed you case and informed your TAM. We apologize for the delay, but they will contact you as soon as possible. \n\nThank you for your understanding.\n\nBest regards,\n\nRocket D.\nAmazon Web Services\nWe value your feedback. Please rate my response using the link below.\n===================================================\n\n\n", 
+                            "body": "Hello Foo,\n\nIt seems the chat was disconnected earlier today. I reviewed you case and informed your TAM. We apologize for the delay, but they will contact you as soon as possible. \n\nThank you for your understanding.\n\nBest regards,\n\nRocket D.\nAmazon Web Services\nWe value your feedback. Please rate my response using the link below.\n===================================================\n\n\n", 
                             "attachmentSet": [], 
                             "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
                             "timeCreated": "2016-10-17T22:17:55.000Z", 
@@ -18,14 +18,14 @@
                             "attachmentSet": [], 
                             "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
                             "timeCreated": "2016-10-17T19:15:41.000Z", 
-                            "submittedBy": "Mandeep.Bal@capitalone.com"
+                            "submittedBy": "Foo@example.com"
                         }, 
                         {
-                            "body": "Hi Noah,\n\nWe're still waiting for Peter to reach out to us. \n\nThanks,\nMandeep\n\n", 
+                            "body": "Hi Noah,\n\nWe're still waiting for Peter to reach out to us. \n\nThanks,\nFoo\n\n", 
                             "attachmentSet": [], 
                             "caseId": "case-644160558196-muen-2016-510796ab37c7ff37", 
                             "timeCreated": "2016-10-17T19:15:38.000Z", 
-                            "submittedBy": "mandeep (IAM) <mandeep.bal@capitalone.com>"
+                            "submittedBy": "foo (IAM) <foo.bal@example.com>"
                         }, 
                         {
                             "body": "\nHello,\n\nWe haven't heard back from you regarding this case. At this time, we're marking this case as Resolved. However, if you're still experiencing issues, we want to hear from you! Please re-open this case for continued support:\n\nhttps://console.aws.amazon.com/support/home?#/case/?caseId=1900382061&displayId=1900382061&language=en\n\nPlease let us know if we resolved your issue: \n(If you will connect by federation, log in before following the link.)\n\nIf yes, click here:\nhttps://aws-portal.amazon.com/gp/aws/html-forms-controller/contactus/AWS-PS-HMD-Survey?mailref=yes&case=1900382061\nIf no, click here:\nhttps://aws-portal.amazon.com/gp/aws/html-forms-controller/contactus/AWS-PS-HMD-Survey?mailref=no&case=1900382061\n\nBest regards,\n\nAmazon Web Services\n\n", 
@@ -51,7 +51,7 @@
                 "language": "en", 
                 "categoryCode": "apis", 
                 "serviceCode": "aws-identity-and-access-management", 
-                "submittedBy": "Mandeep.Bal@capitalone.com", 
+                "submittedBy": "Foo.Bal@example.com", 
                 "displayId": "1900382061", 
                 "subject": "CLA SDK"
             }, 
@@ -62,34 +62,35 @@
                         {
                             "body": "Please raise the account limit of EBS by 50%\n\n", 
                             "attachmentSet": [], 
-                            "caseId": "case-644160558196-muen-2017-17fea6f5a010739a", 
-                            "timeCreated": "2017-04-07T02:42:01.000Z", 
-                            "submittedBy": "scot@sixfeetup.com (IAM) <mandeep.bal@capitalone.com>"
+                            "caseId": "case-644160558196-muen-2017-dde2738abdf823fa", 
+                            "timeCreated": "2017-04-12T03:32:19.000Z", 
+                            "submittedBy": "scot@sixfeetup.com (IAM) <foo.bal@example.com>"
                         }
                     ]
                 }, 
                 "ccEmailAddresses": [
-                    "kapil.thangavelu@capitalone.com"
+                    "bar@example.com"
                 ], 
-                "timeCreated": "2017-04-07T02:42:01.000Z", 
-                "caseId": "case-644160558196-muen-2017-17fea6f5a010739a", 
+                "timeCreated": "2017-04-12T03:32:19.000Z", 
+                "caseId": "case-644160558196-muen-2017-dde2738abdf823fa", 
                 "severityCode": "normal", 
                 "language": "en", 
                 "categoryCode": "general-guidance", 
                 "serviceCode": "amazon-elastic-block-store", 
-                "submittedBy": "mandeep.bal@capitalone.com", 
-                "displayId": "2145600921", 
+                "submittedBy": "foo.bal@example.com", 
+                "displayId": "2152226481", 
                 "subject": "Programmatic test"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c7e9864b-1b3b-11e7-9d84-4784ca73fa30", 
+            "RequestId": "a30da11e-1f30-11e7-85c6-374a0a7a6cf4", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c7e9864b-1b3b-11e7-9d84-4784ca73fa30", 
-                "date": "Fri, 07 Apr 2017 02:42:03 GMT", 
+                "x-amzn-requestid": "a30da11e-1f30-11e7-85c6-374a0a7a6cf4", 
+                "date": "Wed, 12 Apr 2017 03:32:21 GMT", 
                 "content-length": "4082", 
+                "x-amzn-actiontrace": "amzn1.tr.a30da16a-1f30-11e7-a365-0aa352e30000.0..Ongdn1", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
