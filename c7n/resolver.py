@@ -74,6 +74,11 @@ class ValuesFrom(object):
          format: json
          expr: Region."us-east-1"[].ImageId
 
+      value_from:
+         url: s3://bucket/abc/foo.csv
+         csv2dict: true
+         expr: key[1]
+
        # inferred from extension
        format: [json, csv, txt]
     """
@@ -87,6 +92,7 @@ class ValuesFrom(object):
         'properties': {
             'url': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt']},
+            'csv2dict': {'type': 'boolean'},
             'expr': {'oneOf': [
                 {'type': 'integer'},
                 {'type': 'string'}]}
@@ -124,11 +130,12 @@ class ValuesFrom(object):
             data = csv.reader(StringIO(contents))
             if 'expr' in self.data and isinstance(self.data['expr'], int):
                 return [d[self.data['expr']] for d in data]
-            # TODO - how do we handle duplicate headers?
-            # TODO - do we care about order?  Can use an ordereddict
-            data_dict = {x[0]: x[1:] for x in zip(*data)}
+            if self.data.get('csv2dict'):
+                data = {x[0]: list(x[1:]) for x in zip(*data)}
+            else:
+                data = list(data)
             if 'expr' in self.data:
-                return jmespath.search(self.data['expr'], data_dict)
-            return data_dict
+                return jmespath.search(self.data['expr'], data)
+            return data
         elif format == 'txt':
             return [s.strip() for s in StringIO(contents).readlines()]
