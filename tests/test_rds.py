@@ -916,7 +916,7 @@ class Resize(BaseTest):
 
     def test_can_resize_up_asynchronously(self):
         flight_data = 'test_rds_resize_up_asynchronously'
-        session_factory = self.record_flight_data(flight_data)
+        session_factory = self.replay_flight_data(flight_data)
         session = session_factory(region='us-west-2')
         client = session.client('rds')
         waiting_client = self.get_waiting_client(session_factory, session, 'rds')
