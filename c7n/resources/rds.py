@@ -47,6 +47,7 @@ import itertools
 import logging
 import operator
 import re
+from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
@@ -654,6 +655,72 @@ class Snapshot(BaseAction):
                 'Backup',
                 resource['DBInstanceIdentifier']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
+
+
+@actions.register('resize')
+class ResizeInstance(BaseAction):
+    """Change the allocated storage of an rds instance.
+
+    :example:
+
+       This will find databases using over 85% of their allocated
+       storage, and resize them to have an additional 30% storage
+       the resize here is async during the next maintenance.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: 30
+
+
+       This will find databases using under 20% of their allocated
+       storage, and resize them to be 30% smaller, the resize here
+       is configured to be immediate.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: -30
+                    immediate: true
+    """
+    schema = type_schema(
+        'resize',
+        percent={'type': 'number'},
+        immediate={'type': 'boolean'})
+
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, resources):
+        c = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            old_val = D(r['AllocatedStorage'])
+            _100 = D(100)
+            new_val = ((_100 + D(self.data['percent'])) / _100) * old_val
+            rounded = int(new_val.quantize(D('0'), ROUND_HALF_UP))
+            c.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                AllocatedStorage=rounded,
+                ApplyImmediately=self.data.get('immediate', False))
 
 
 @actions.register('retention')
