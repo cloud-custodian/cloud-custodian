@@ -32,7 +32,7 @@
                 }
             ], 
             "AutoMinorVersionUpgrade": true, 
-            "PreferredBackupWindow": "07:35-08:05", 
+            "PreferredBackupWindow": "12:41-13:11", 
             "DBSubnetGroup": {
                 "Subnets": [
                     {
@@ -64,30 +64,30 @@
             }, 
             "ReadReplicaDBInstanceIdentifiers": [], 
             "AllocatedStorage": 5, 
-            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-0da9a27d-ec4f-46e2-ba1e-7ce2c4bf951a", 
+            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f", 
             "BackupRetentionPeriod": 0, 
-            "PreferredMaintenanceWindow": "mon:12:56-mon:13:26", 
+            "PreferredMaintenanceWindow": "wed:09:24-wed:09:54", 
             "DBInstanceStatus": "creating", 
             "EngineVersion": "10.0.24", 
             "DomainMemberships": [], 
-            "StorageType": "standard", 
-            "DbiResourceId": "db-JUMKVRGICGPA4ZZWFI5MQJOO5Q", 
+            "StorageType": "gp2", 
+            "DbiResourceId": "db-LM6AURZI53JHTTNKNL5GLMKCNM", 
             "CACertificateIdentifier": "rds-ca-2015", 
             "StorageEncrypted": false, 
             "DBInstanceClass": "db.r3.large", 
             "DbInstancePort": 0, 
-            "DBInstanceIdentifier": "test-0da9a27d-ec4f-46e2-ba1e-7ce2c4bf951a"
+            "DBInstanceIdentifier": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "8446ba4c-1c48-11e7-b17f-c37fb956d8af", 
+            "RequestId": "543705a4-203f-11e7-823b-2f98338c9e98", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "8446ba4c-1c48-11e7-b17f-c37fb956d8af", 
+                "x-amzn-requestid": "543705a4-203f-11e7-823b-2f98338c9e98", 
                 "vary": "Accept-Encoding", 
-                "content-length": "3710", 
+                "content-length": "3705", 
                 "content-type": "text/xml", 
-                "date": "Sat, 08 Apr 2017 10:45:45 GMT"
+                "date": "Thu, 13 Apr 2017 11:50:05 GMT"
             }
         }
     }
