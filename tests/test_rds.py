@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
 import json
 import logging
 import os
+import re
 import time
 import uuid
 from collections import OrderedDict
@@ -819,22 +821,41 @@ class Resize(BaseTest):
             pill = json.load(open(pill_path))
             return pill['data']['DBInstance']['DBInstanceIdentifier']
 
-    def install_modifying_waiter(self, client):
+    def install_modification_pending_waiter(self, waiters):
+        if 'DBInstanceModificationPending' in waiters:
+            return
+        pattern = waiters['DBInstanceAvailable']
+        acceptors = [OrderedDict(eg) for eg in pattern['acceptors'][1:]]
+        acceptors.insert(0, OrderedDict(
+            expected=True,
+            matcher='path',
+            state='success',
+            argument='!!length(DBInstances[].PendingModifiedValues)'))
+        waiter = OrderedDict(pattern)
+        waiter['acceptors'] = acceptors
+        waiters['DBInstanceModificationPending'] = waiter
+
+    def install_modifying_waiter(self, waiters):
+        if 'DBInstanceModifying' in waiters:
+            return
+        pattern = waiters['DBInstanceAvailable']
+        acceptors = [OrderedDict(eg) for eg in pattern['acceptors']]
+        acceptors[0]['expected'] = 'modifying'
+        waiter = OrderedDict(pattern)
+        waiter['acceptors'] = acceptors
+        waiters['DBInstanceModifying'] = waiter
+
+    def install_waiters(self, client):
         # Not provided by boto otb.
         client._get_waiter_config()  # primes cache if needed
         waiters = client._cache['waiter_config']['waiters']
-        if 'DBInstanceModifying' not in waiters:
-            pattern = waiters['DBInstanceAvailable']
-            acceptors = [OrderedDict(eg) for eg in pattern['acceptors']]
-            acceptors[0]['expected'] = 'modifying'
-            waiter = OrderedDict(pattern)
-            waiter['acceptors'] = acceptors
-            waiters['DBInstanceModifying'] = waiter
+        self.install_modification_pending_waiter(waiters)
+        self.install_modifying_waiter(waiters)
 
     def wait_until(self, client, dbid, status):
         if client is None:
             return  # We're in replay mode. Don't bother waiting.
-        self.install_modifying_waiter(client)
+        self.install_waiters(client)
         waiter = client.get_waiter('db_instance_'+status)
         waiter.wait(Filters=[{'Name': 'db-instance-id', 'Values': [dbid]}])
 
@@ -845,6 +866,7 @@ class Resize(BaseTest):
             DBInstanceClass='db.r3.large',
             MasterUsername='eric',
             MasterUserPassword='cheese42',
+            StorageType='gp2',
             AllocatedStorage=gb,
             BackupRetentionPeriod=0)  # disable automatic backups
         def delete():
@@ -853,6 +875,16 @@ class Resize(BaseTest):
                 SkipFinalSnapshot=True)
         self.addCleanup(delete)
         return dbid
+
+    @staticmethod
+    def get_window_now():
+        start = datetime.datetime.utcnow()
+        end = start + datetime.timedelta(seconds=60*60)  # hour long
+        fmt = '%a:%H:%M'
+        return '{}-{}'.format(start.strftime(fmt), end.strftime(fmt))
+
+    def test_can_get_a_window_now(self):
+        assert re.match(r'[A-Za-z]{3}:\d\d:\d\d', self.get_window_now())
 
 
     def test_can_resize_up_immediately(self):
@@ -875,6 +907,38 @@ class Resize(BaseTest):
             config={'region': 'us-west-2'},
             session_factory=session_factory)
         policy.run()
+        self.wait_until(waiting_client, dbid, 'modifying')
+
+        self.wait_until(waiting_client, dbid, 'available')
+        db = client.describe_db_instances(
+            DBInstanceIdentifier=dbid)['DBInstances'][0]
+        self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
+
+    def test_can_resize_up_asynchronously(self):
+        flight_data = 'test_rds_resize_up_asynchronously'
+        session_factory = self.record_flight_data(flight_data)
+        session = session_factory(region='us-west-2')
+        client = session.client('rds')
+        waiting_client = self.get_waiting_client(session_factory, session, 'rds')
+        dbid = self.get_dbid(bool(waiting_client), flight_data)
+
+        self.create_instance(client, dbid)
+        self.wait_until(waiting_client, dbid, 'available')
+
+        policy = self.load_policy({
+            'name': 'rds-resize-up',
+            'resource': 'rds',
+            'filters': [{'type': 'value',
+                'key': 'DBInstanceIdentifier', 'value': dbid}],
+            'actions': [{'type': 'resize', 'percent': 10}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+        policy.run()
+        self.wait_until(waiting_client, dbid, 'modification_pending')
+
+        client.modify_db_instance(
+            DBInstanceIdentifier=dbid,
+            PreferredMaintenanceWindow=self.get_window_now())
         self.wait_until(waiting_client, dbid, 'modifying')
 
         self.wait_until(waiting_client, dbid, 'available')
