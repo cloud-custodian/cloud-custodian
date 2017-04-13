@@ -887,61 +887,51 @@ class Resize(BaseTest):
         assert re.match(r'[A-Za-z]{3}:\d\d:\d\d', self.get_window_now())
 
 
-    def test_can_resize_up_immediately(self):
-        flight_data = 'test_rds_resize_up_immediately'
+    def start(self, flight_data):
         session_factory = self.replay_flight_data(flight_data)
         session = session_factory(region='us-west-2')
         client = session.client('rds')
         waiting_client = self.get_waiting_client(session_factory, session, 'rds')
         dbid = self.get_dbid(bool(waiting_client), flight_data)
-
         self.create_instance(client, dbid)
-        self.wait_until(waiting_client, dbid, 'available')
 
-        policy = self.load_policy({
-            'name': 'rds-resize-up',
-            'resource': 'rds',
-            'filters': [{'type': 'value',
-                'key': 'DBInstanceIdentifier', 'value': dbid}],
-            'actions': [{'type': 'resize', 'percent': 10, 'immediate': True}]},
-            config={'region': 'us-west-2'},
-            session_factory=session_factory)
-        policy.run()
-        self.wait_until(waiting_client, dbid, 'modifying')
+        wait_until = lambda state: self.wait_until(waiting_client, dbid, state)
+        wait_until('available')
 
-        self.wait_until(waiting_client, dbid, 'available')
-        db = client.describe_db_instances(
+        describe = lambda: client.describe_db_instances(
             DBInstanceIdentifier=dbid)['DBInstances'][0]
-        self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
+
+        def resize(**kw):
+            action = {'type': 'resize', 'percent': 10}
+            action.update(kw)
+            policy = self.load_policy({
+                'name': 'rds-resize-up',
+                'resource': 'rds',
+                'filters': [{'type': 'value',
+                    'key': 'DBInstanceIdentifier', 'value': dbid}],
+                'actions': [action]},
+                config={'region': 'us-west-2'},
+                session_factory=session_factory)
+            policy.run()
+
+        return client, dbid, resize, wait_until, describe
 
     def test_can_resize_up_asynchronously(self):
-        flight_data = 'test_rds_resize_up_asynchronously'
-        session_factory = self.replay_flight_data(flight_data)
-        session = session_factory(region='us-west-2')
-        client = session.client('rds')
-        waiting_client = self.get_waiting_client(session_factory, session, 'rds')
-        dbid = self.get_dbid(bool(waiting_client), flight_data)
-
-        self.create_instance(client, dbid)
-        self.wait_until(waiting_client, dbid, 'available')
-
-        policy = self.load_policy({
-            'name': 'rds-resize-up',
-            'resource': 'rds',
-            'filters': [{'type': 'value',
-                'key': 'DBInstanceIdentifier', 'value': dbid}],
-            'actions': [{'type': 'resize', 'percent': 10}]},
-            config={'region': 'us-west-2'},
-            session_factory=session_factory)
-        policy.run()
-        self.wait_until(waiting_client, dbid, 'modification_pending')
-
+        flight = 'test_rds_resize_up_asynchronously'
+        client, dbid, resize, wait_until, describe = self.start(flight)
+        resize()
+        wait_until('modification_pending')
         client.modify_db_instance(
             DBInstanceIdentifier=dbid,
             PreferredMaintenanceWindow=self.get_window_now())
-        self.wait_until(waiting_client, dbid, 'modifying')
+        wait_until('modifying')
+        wait_until('available')
+        self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
 
-        self.wait_until(waiting_client, dbid, 'available')
-        db = client.describe_db_instances(
-            DBInstanceIdentifier=dbid)['DBInstances'][0]
-        self.assertEqual(db['AllocatedStorage'], 6)  # nearest gigabyte
+    def test_can_resize_up_immediately(self):
+        flight = 'test_rds_resize_up_immediately'
+        _, _, resize, wait_until, describe  = self.start(flight)
+        resize(immediate=True)
+        wait_until('modifying')
+        wait_until('available')
+        self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
