@@ -63,17 +63,13 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        p = self.load_policy({
-            'name': 'rds-tags',
-            'resource': 'rds',
-            'filters': [{
-                'DBInstanceIdentifier': resources[0]['DBInstanceIdentifier'],
-                }],
-            },
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['PreferredMaintenanceWindow'], window)
+        rds = session_factory().client('rds')
+        details = rds.describe_db_instances(
+            DBInstanceIdentifier=resources[0]['DBInstanceIdentifier'])
+        details = details['DBInstances'][0]
+
+        self.assertTrue(details['AutoMinorVersionUpgrade'])
+        self.assertEqual(details['PreferredMaintenanceWindow'], window)
 
     def test_rds_tags(self):
         session_factory = self.replay_flight_data('test_rds_tags')
