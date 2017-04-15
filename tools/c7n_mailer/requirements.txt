@@ -15,3 +15,4 @@ ldap3>=2.1.1
 PyYAML>=3.11
 six==1.10.0
 python-memcached==1.58
+pytz>=2017.2
