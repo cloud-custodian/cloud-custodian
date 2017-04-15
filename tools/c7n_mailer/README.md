@@ -235,6 +235,12 @@ The following extra global functions are available:
 | `resource_owner(resource)` | retrieve the contact field value for a resource from tags, if not found returns `Unknown` |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
 
+The following extra jinja filters are available:
+
+| filter | behavior |
+|:----------|:-----------|
+| `{{ utc_string|date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z') }}` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+
 
 ## Developer Install (OS X El Capitan)
 

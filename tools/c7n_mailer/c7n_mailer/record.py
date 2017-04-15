@@ -13,6 +13,12 @@
 # limitations under the License.
 import json
 from cStringIO import StringIO
+from dateutil import parser
+from dateutil.tz import gettz
+
+
+def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
+    return parser.parse(utc_str).astimezone(gettz(tz_str)).strftime(format)
 
 
 def format_struct(evt):
