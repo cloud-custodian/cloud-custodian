@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('acm-certificate')
 class Certificate(QueryResourceManager):
-
     class resource_type(object):
         service = 'acm'
         enum_spec = ('list_certificates', 'CertificateSummaryList', None)
@@ -26,7 +25,6 @@ class Certificate(QueryResourceManager):
         name = 'DomainName'
         date = 'CreatedAt'
         dimension = None
-        detail_spec = (
-            "describe_certificate", "CertificateArn",
-            'CertificateArn', 'Certificate')
+        detail_spec = ("describe_certificate", "CertificateArn",
+                       'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"

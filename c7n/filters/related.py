@@ -31,20 +31,18 @@ class RelatedResourceFilter(ValueFilter):
     def validate(self):
         name = self.__class__.__name__
         if self.RelatedIdsExpression is None:
-            raise ValueError(
-                "%s Filter requires resource expression" % name)
-        #if self.AnnotationKey is None:
+            raise ValueError("%s Filter requires resource expression" % name)
+        # if self.AnnotationKey is None:
         #    raise ValueError(
         #        "%s Filter requires annotation key" % name)
 
         if self.RelatedResource is None:
-            raise ValueError(
-                "%s Filter requires resource manager spec" % name)
+            raise ValueError("%s Filter requires resource manager spec" % name)
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
-        return set(jmespath.search(
-            "[].%s" % self.RelatedIdsExpression, resources))
+        return set(
+            jmespath.search("[].%s" % self.RelatedIdsExpression, resources))
 
     def get_related(self, resources):
         resource_manager = self.get_resource_manager()
@@ -54,8 +52,7 @@ class RelatedResourceFilter(ValueFilter):
             related = resource_manager.get_resources(list(related_ids))
         else:
             related = resource_manager.resources()
-        return {r[model.id]: r for r in related
-                if r[model.id] in related_ids}
+        return {r[model.id]: r for r in related if r[model.id] in related_ids}
 
     def get_resource_manager(self):
         mod_path, class_name = self.RelatedResource.rsplit('.', 1)
@@ -76,10 +73,8 @@ class RelatedResourceFilter(ValueFilter):
             if robj is None:
                 self.log.warning(
                     "Resource %s:%s references non existant %s: %s",
-                    model.type,
-                    resource[model.id],
-                    self.RelatedResource.rsplit('.', 1)[-1],
-                    rid)
+                    model.type, resource[model.id],
+                    self.RelatedResource.rsplit('.', 1)[-1], rid)
                 continue
             if self.match(robj):
                 found.append(rid)

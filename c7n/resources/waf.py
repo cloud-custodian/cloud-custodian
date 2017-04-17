@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('waf')
 class WAF(QueryResourceManager):
-
     class resource_type(object):
         service = "waf"
         enum_spec = ("list_web_acls", "WebACLs", None)
@@ -30,7 +29,6 @@ class WAF(QueryResourceManager):
 
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):
-
     class resource_type(object):
         service = "waf-regional"
         enum_spec = ("list_web_acls", "WebACLs", None)
@@ -38,4 +36,3 @@ class RegionalWAF(QueryResourceManager):
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
-

@@ -34,17 +34,17 @@ class HealthEvents(QueryResourceManager):
         dimension = None
         date = 'startTime'
 
-    permissions = (
-        'health:DescribeEvents',
-        'health:DescribeEventDetails',
-        'health:DescribeAffectedEntities')
+    permissions = ('health:DescribeEvents', 'health:DescribeEventDetails',
+                   'health:DescribeAffectedEntities')
 
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [
-                {'eventStatusCodes': 'open'},
-                {'eventTypeCategories': ['issue', 'accountNotification']}]))
+            self.data.get('query', [{
+                'eventStatusCodes': 'open'
+            }, {
+                'eventTypeCategories': ['issue', 'accountNotification']
+            }]))
 
     def resource_query(self):
         qf = {}
@@ -75,18 +75,23 @@ class HealthEvents(QueryResourceManager):
             event_details = client.describe_event_details(
                 eventArns=event_map.keys())['successfulSet']
             for d in event_details:
-                event_map[d['event']['arn']][
-                    'Description'] = d['eventDescription']['latestDescription']
+                event_map[d['event']['arn']]['Description'] = d[
+                    'eventDescription']['latestDescription']
 
-            event_arns = [r['arn'] for r in resource_set
-                          if r['eventTypeCategory'] != 'accountNotification']
+            event_arns = [
+                r['arn'] for r in resource_set
+                if r['eventTypeCategory'] != 'accountNotification'
+            ]
 
             if not event_arns:
                 continue
             paginator = client.get_paginator('describe_affected_entities')
-            entities = list(itertools.chain(
-                *[p['entities']for p in paginator.paginate(
-                    filter={'eventArns': event_arns})]))
+            entities = list(
+                itertools.chain(
+                    *
+                    [p['entities']
+                     for p in paginator.paginate(
+                         filter={'eventArns': event_arns})]))
 
             for e in entities:
                 event_map[e.pop('eventArn')].setdefault(
@@ -106,7 +111,6 @@ HEALTH_VALID_FILTERS = {
 
 
 class QueryFilter(object):
-
     @classmethod
     def parse(cls, data):
         results = []
@@ -124,14 +128,13 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(self.data.keys()) == 1:
-            raise ValueError(
-                "Health Query Filter Invalid %s" % self.data)
+            raise ValueError("Health Query Filter Invalid %s" % self.data)
         self.key = self.data.keys()[0]
         self.value = self.data.values()[0]
 
         if self.key not in HEALTH_VALID_FILTERS:
-            raise ValueError(
-                "Health Query Filter invalid filter name %s" % (self.data))
+            raise ValueError("Health Query Filter invalid filter name %s" %
+                             (self.data))
 
         if self.value is None:
             raise ValueError(

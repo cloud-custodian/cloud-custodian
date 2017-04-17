@@ -43,8 +43,10 @@ def process_key_event(event, context):
     processor = EncryptExtantKeys(config)
     for record in event.get('Records', []):
         bucket = record['s3']['bucket']['name']
-        key = {'Key': record['s3']['object']['key'],
-               'Size': record['s3']['object']['size']}
+        key = {
+            'Key': record['s3']['object']['key'],
+            'Size': record['s3']['object']['size']
+        }
         version = record['s3']['object'].get('versionId')
         try:
             if version is not None:
@@ -57,8 +59,8 @@ def process_key_event(event, context):
                 result = retry(processor.process_key, s3, key, bucket)
         except ClientError as e:
             # Ensure we know which key caused an issue
-            print("error %s:%s code:%s" % (
-                bucket, key['Key'], e.response['Error']))
+            print("error %s:%s code:%s" % (bucket, key['Key'],
+                                           e.response['Error']))
             raise
         if not result:
             return
@@ -66,8 +68,7 @@ def process_key_event(event, context):
 
 
 def get_function(session_factory, role, buckets=None, account_id=None):
-    from c7n.mu import (
-        LambdaFunction, custodian_archive, BucketNotification)
+    from c7n.mu import (LambdaFunction, custodian_archive, BucketNotification)
 
     config = dict(
         name='c7n-s3-encrypt',
@@ -80,8 +81,10 @@ def get_function(session_factory, role, buckets=None, account_id=None):
 
     if buckets:
         config['events'] = [
-            BucketNotification({'account_s3': account_id}, session_factory, b)
-            for b in buckets]
+            BucketNotification({
+                'account_s3': account_id
+            }, session_factory, b) for b in buckets
+        ]
 
     archive = custodian_archive()
 

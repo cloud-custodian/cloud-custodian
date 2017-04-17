@@ -30,7 +30,10 @@ from dateutil.parser import parse as date_parse
 try:
     from setproctitle import setproctitle
 except ImportError:
-    setproctitle = lambda t: None
+
+    def setproctitle(t):
+        return None
+
 
 from c7n.commands import schema_completer
 
@@ -50,47 +53,65 @@ def _default_options(p, blacklist=""):
 
     if 'region' not in blacklist:
         provider.add_argument(
-            "-r", "--region", default=None,
+            "-r",
+            "--region",
+            default=None,
             help="AWS Region to target (Default: %(default)s)")
     provider.add_argument(
-        "--profile",
-        help="AWS Account Config File Profile to utilize")
-    provider.add_argument("--assume", default=None, dest="assume_role",
-                          help="Role to assume")
+        "--profile", help="AWS Account Config File Profile to utilize")
+    provider.add_argument(
+        "--assume", default=None, dest="assume_role", help="Role to assume")
 
-    config = p.add_argument_group(
-        "config", "Policy config file(s) and policy selectors")
+    config = p.add_argument_group("config",
+                                  "Policy config file(s) and policy selectors")
     # -c is deprecated.  Supported for legacy reasons
     config.add_argument("-c", "--config", help=argparse.SUPPRESS)
-    config.add_argument("configs", nargs='*',
-                          help="Policy configuration file(s)")
-    config.add_argument("-p", "--policies", default=None, dest='policy_filter',
-                        help="Only use named/matched policies")
-    config.add_argument("-t", "--resource", default=None, dest='resource_type',
-                        help="Only use policies with the given resource type")
+    config.add_argument(
+        "configs", nargs='*', help="Policy configuration file(s)")
+    config.add_argument(
+        "-p",
+        "--policies",
+        default=None,
+        dest='policy_filter',
+        help="Only use named/matched policies")
+    config.add_argument(
+        "-t",
+        "--resource",
+        default=None,
+        dest='resource_type',
+        help="Only use policies with the given resource type")
 
-    p.add_argument("-v", "--verbose", action="store_true",
-                   help="Verbose logging")
-    p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
-                   action="store_true")
+    p.add_argument(
+        "-v", "--verbose", action="store_true", help="Verbose logging")
+    p.add_argument(
+        "--debug", default=False, help=argparse.SUPPRESS, action="store_true")
 
     if 'log-group' not in blacklist:
         p.add_argument(
-            "-l", "--log-group", default=None,
+            "-l",
+            "--log-group",
+            default=None,
             help="Cloudwatch Log Group to send policy logs")
     else:
         p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 
     if 'output-dir' not in blacklist:
-        p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For policy output")
+        p.add_argument(
+            "-s",
+            "--output-dir",
+            required=True,
+            help="Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
-            "-f", "--cache", default="~/.cache/cloud-custodian.cache",
+            "-f",
+            "--cache",
+            default="~/.cache/cloud-custodian.cache",
             help="Cache file (default %(default)s)")
         p.add_argument(
-            "--cache-period", default=15, type=int,
+            "--cache-period",
+            default=15,
+            type=int,
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
@@ -110,7 +131,7 @@ def _default_region(options):
         import boto3
         options.region = boto3.Session(profile_name=profile).region_name
         log.debug("using default region:%s from boto" % options.region)
-    except:
+    except BaseException:
         return
 
 
@@ -118,23 +139,32 @@ def _report_options(p):
     """ Add options specific to the report subcommand. """
     _default_options(p, blacklist=['region', 'cache', 'log-group'])
     p.add_argument(
-        '--days', type=float, default=1,
+        '--days',
+        type=float,
+        default=1,
         help="Number of days of history to consider")
     p.add_argument(
-        '--raw', type=argparse.FileType('wb'),
+        '--raw',
+        type=argparse.FileType('wb'),
         help="Store raw json of collected records to given file path")
     p.add_argument(
-        '--field', action='append', default=[], type=_key_val_pair,
+        '--field',
+        action='append',
+        default=[],
+        type=_key_val_pair,
         metavar='HEADER=FIELD',
-        help='Repeatable. JMESPath of field to include in the output OR '\
-            'for a tag use prefix `tag:`')
+        help='Repeatable. JMESPath of field to include in the output OR '
+        'for a tag use prefix `tag:`')
     p.add_argument(
-        '--no-default-fields', action="store_true",
+        '--no-default-fields',
+        action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
-        '--format', default='csv', choices=['csv', 'grid', 'simple'],
-        help="Format to output data in (default: %(default)s). "\
-            "Options include simple, grid, rst")
+        '--format',
+        default='csv',
+        choices=['csv', 'grid', 'simple'],
+        help="Format to output data in (default: %(default)s). "
+        "Options include simple, grid, rst")
 
     # We don't include `region` because the report command ignores it
     p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
@@ -145,14 +175,16 @@ def _metrics_options(p):
     _default_options(p, blacklist=['log-group', 'output-dir', 'cache'])
 
     p.add_argument(
-        '--start', type=date_parse,
+        '--start',
+        type=date_parse,
         help='Start date (requires --end, overrides --days)')
+    p.add_argument('--end', type=date_parse, help='End date')
     p.add_argument(
-        '--end', type=date_parse, help='End date')
-    p.add_argument(
-        '--days', type=int, default=14,
+        '--days',
+        type=int,
+        default=14,
         help='Number of days of history to consider (default: %(default)i)')
-    p.add_argument('--period', type=int, default=60*24*24)
+    p.add_argument('--period', type=int, default=60 * 24 * 24)
 
 
 def _logs_options(p):
@@ -163,13 +195,11 @@ def _logs_options(p):
     p.add_argument(
         '--start',
         default='the beginning',  # invalid, will result in 0
-        help='Start date and/or time',
-    )
+        help='Start date and/or time', )
     p.add_argument(
         '--end',
         default=datetime.now().strftime('%c'),
-        help='End date and/or time',
-    )
+        help='End date and/or time', )
 
 
 def _schema_tab_completer(prefix, parsed_args, **kwargs):
@@ -187,18 +217,20 @@ def _schema_options(p):
         'resource', metavar='selector', nargs='?',
         default=None).completer = _schema_tab_completer
     p.add_argument(
-        '--summary', action="store_true",
+        '--summary',
+        action="store_true",
         help="Summarize counts of available resources, actions and filters")
     p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
     p.add_argument(
-        '-v', '--verbose', action="store_true",
-        help="Verbose logging")
+        '-v', '--verbose', action="store_true", help="Verbose logging")
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
 
 def _dryrun_option(p):
     p.add_argument(
-        "-d", "--dryrun", action="store_true",
+        "-d",
+        "--dryrun",
+        action="store_true",
         help="Don't execute actions but filter resources")
 
 
@@ -229,8 +261,7 @@ def setup_parser():
     _report_options(report)
 
     logs_desc = "Get policy execution logs from s3 or cloud watch logs"
-    logs = subs.add_parser(
-        'logs', help=logs_desc, description=logs_desc)
+    logs = subs.add_parser('logs', help=logs_desc, description=logs_desc)
     logs.set_defaults(command="c7n.commands.logs")
     _logs_options(logs)
 
@@ -244,41 +275,39 @@ def setup_parser():
         'version', help="Display installed version of custodian")
     version.set_defaults(command='c7n.commands.version_cmd')
     version.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Verbose Logging")
+        "-v", "--verbose", action="store_true", help="Verbose Logging")
     version.add_argument(
-        "--debug", action="store_true",
-        help="Print info for bug reports")
+        "--debug", action="store_true", help="Print info for bug reports")
 
-    validate_desc = (
-        "Validate config files against the json schema")
+    validate_desc = ("Validate config files against the json schema")
     validate = subs.add_parser(
         'validate', description=validate_desc, help=validate_desc)
     validate.set_defaults(command="c7n.commands.validate")
+    validate.add_argument("-c", "--config", help=argparse.SUPPRESS)
     validate.add_argument(
-        "-c", "--config", help=argparse.SUPPRESS)
-    validate.add_argument("configs", nargs='*',
-                          help="Policy Configuration File(s)")
-    validate.add_argument("-v", "--verbose", action="store_true",
-                          help="Verbose Logging")
+        "configs", nargs='*', help="Policy Configuration File(s)")
+    validate.add_argument(
+        "-v", "--verbose", action="store_true", help="Verbose Logging")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
-    schema_desc = ("Browse the available vocabularies (resources, filters, and "
-                   "actions) for policy construction. The selector "
-                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
-                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
+    schema_desc = (
+        "Browse the available vocabularies (resources, filters, and "
+        "actions) for policy construction. The selector "
+        "is specified with RESOURCE[.CATEGORY[.ITEM]] "
+        "examples: s3, ebs.actions, or ec2.filters.instance-age")
     schema = subs.add_parser(
-        'schema', description=schema_desc,
+        'schema',
+        description=schema_desc,
         help="Interactive cli docs for policy authors")
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    #access_desc = ("Show permissions needed to execute the policies")
-    #access = subs.add_parser(
+    # access_desc = ("Show permissions needed to execute the policies")
+    # access = subs.add_parser(
     #    'access', description=access_desc, help=access_desc)
-    #access.set_defaults(command='c7n.commands.access')
-    #_default_options(access)
-    #access.add_argument(
+    # access.set_defaults(command='c7n.commands.access')
+    # _default_options(access)
+    # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
     run_desc = ("Execute the policies in a config file")
@@ -287,8 +316,10 @@ def setup_parser():
     _default_options(run)
     _dryrun_option(run)
     run.add_argument(
-        "-m", "--metrics-enabled",
-        default=False, action="store_true",
+        "-m",
+        "--metrics-enabled",
+        default=False,
+        action="store_true",
         help="Emit metrics to CloudWatch Metrics")
 
     return parser
@@ -301,8 +332,7 @@ def main():
 
     level = options.verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
-        level=level,
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+        level=level, format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.ERROR)
 
@@ -330,4 +360,3 @@ def main():
             raise
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
-

@@ -30,7 +30,6 @@ from c7n.utils import local_session, type_schema, chunks
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'group'
@@ -46,7 +45,6 @@ class Group(QueryResourceManager):
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'role'
@@ -62,7 +60,6 @@ class Role(QueryResourceManager):
 
 @resources.register('iam-user')
 class User(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'user'
@@ -77,7 +74,6 @@ class User(QueryResourceManager):
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'policy'
@@ -97,14 +93,13 @@ class Policy(QueryResourceManager):
             for r in resource_ids:
                 results.append(client.get_policy(PolicyArn=r)['Policy'])
         except Exception as e:
-            self.log.warning("unable to resolve ids %s, err: %s",
-                             resource_ids, e)
+            self.log.warning("unable to resolve ids %s, err: %s", resource_ids,
+                             e)
         return results
 
 
 @resources.register('iam-profile')
 class InstanceProfile(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'instance-profile'
@@ -118,13 +113,11 @@ class InstanceProfile(QueryResourceManager):
 
 @resources.register('iam-certificate')
 class ServerCertificate(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'server-certificate'
         enum_spec = ('list_server_certificates',
-                     'ServerCertificateMetadataList',
-                     None)
+                     'ServerCertificateMetadataList', None)
         id = 'ServerCertificateId'
         filter_name = None
         name = 'ServerCertificateName'
@@ -133,11 +126,12 @@ class ServerCertificate(QueryResourceManager):
 
 
 class IamRoleUsage(Filter):
-
     def get_permissions(self):
-        perms = list(itertools.chain([
-            self.manager.get_resource_manager(m).get_permissions()
-            for m in ['lambda', 'launch-config', 'ec2']]))
+        perms = list(
+            itertools.chain([
+                self.manager.get_resource_manager(m).get_permissions()
+                for m in ['lambda', 'launch-config', 'ec2']
+            ]))
         perms.extend(['ecs:DescribeClusters', 'ecs:DescribeServices'])
         return perms
 
@@ -164,7 +158,7 @@ class IamRoleUsage(Filter):
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
             services = client.list_services(
-                    cluster=cluster['clusterName'])['serviceArns']
+                cluster=cluster['clusterName'])['serviceArns']
             if services:
                 for service in client.describe_services(
                         cluster=cluster['clusterName'],
@@ -175,8 +169,10 @@ class IamRoleUsage(Filter):
 
     def scan_asg_roles(self):
         manager = self.manager.get_resource_manager('launch-config')
-        return [r['IamInstanceProfile'] for r in manager.resources()
-                if 'IamInstanceProfile' in r]
+        return [
+            r['IamInstanceProfile'] for r in manager.resources()
+            if 'IamInstanceProfile' in r
+        ]
 
     def scan_ec2_roles(self):
         manager = self.manager.get_resource_manager('ec2')
@@ -207,8 +203,8 @@ class UsedIamRole(IamRoleUsage):
         for r in resources:
             if r['Arn'] in roles or r['RoleName'] in roles:
                 results.append(r)
-        self.log.info(
-            "%d of %d iam roles currently used.", len(results), len(resources))
+        self.log.info("%d of %d iam roles currently used.",
+                      len(results), len(resources))
         return results
 
 
@@ -238,11 +234,12 @@ class IamRoleInlinePolicy(Filter):
     """
 
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
-    permissions = ('iam:ListRolePolicies',)
+    permissions = ('iam:ListRolePolicies', )
 
     def _inline_policies(self, client, resource):
-        return len(client.list_role_policies(
-            RoleName=resource['RoleName'])['PolicyNames'])
+        return len(
+            client.list_role_policies(RoleName=resource['RoleName'])[
+                'PolicyNames'])
 
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
@@ -260,7 +257,7 @@ class IamRoleInlinePolicy(Filter):
 class UsedIamPolicies(Filter):
 
     schema = type_schema('used')
-    permissions = ('iam:ListPolicies',)
+    permissions = ('iam:ListPolicies', )
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] > 0]
@@ -270,7 +267,7 @@ class UsedIamPolicies(Filter):
 class UnusedIamPolicies(Filter):
 
     schema = type_schema('unused')
-    permissions = ('iam:ListPolicies',)
+    permissions = ('iam:ListPolicies', )
 
     def process(self, resources, event=None):
         return [r for r in resources if r['AttachmentCount'] == 0]
@@ -322,30 +319,27 @@ class AllowAllIamPolicies(Filter):
 
     def has_allow_all_policy(self, client, resource):
         statements = client.get_policy_version(
-            PolicyArn=resource['Arn'],
-            VersionId=resource['DefaultVersionId']
-        )['PolicyVersion']['Document']['Statement']
+            PolicyArn=resource['Arn'], VersionId=resource['DefaultVersionId'])[
+                'PolicyVersion']['Document']['Statement']
         if isinstance(statements, dict):
             statements = [statements]
 
         for s in statements:
-            if ('Condition' not in s and
-                    'Action' in s and
+            if ('Condition' not in s and 'Action' in s and
                     isinstance(s['Action'], basestring) and
                     s['Action'] == "*" and
                     isinstance(s['Resource'], basestring) and
-                    s['Resource'] == "*" and
-                    s['Effect'] == "Allow"):
+                    s['Resource'] == "*" and s['Effect'] == "Allow"):
                 return True
         return False
 
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         results = [r for r in resources if self.has_allow_all_policy(c, r)]
-        self.log.info(
-            "%d of %d iam policies have allow all.",
-            len(results), len(resources))
+        self.log.info("%d of %d iam policies have allow all.",
+                      len(results), len(resources))
         return results
+
 
 ###############################
 #    IAM Instance Profiles    #
@@ -363,9 +357,8 @@ class UsedInstanceProfiles(IamRoleUsage):
         for r in resources:
             if r['Arn'] in profiles or r['InstanceProfileName'] in profiles:
                 results.append(r)
-        self.log.info(
-            "%d of %d instance profiles currently in use." % (
-                len(results), len(resources)))
+        self.log.info("%d of %d instance profiles currently in use." %
+                      (len(results), len(resources)))
         return results
 
 
@@ -379,17 +372,17 @@ class UnusedInstanceProfiles(IamRoleUsage):
         profiles = self.instance_profile_usage()
         for r in resources:
             if (r['Arn'] not in profiles or
-                        r['InstanceProfileName'] not in profiles):
+                    r['InstanceProfileName'] not in profiles):
                 results.append(r)
-        self.log.info(
-            "%d of %d instance profiles currently not in use." % (
-                len(results), len(resources)))
+        self.log.info("%d of %d instance profiles currently not in use." %
+                      (len(results), len(resources)))
         return results
 
 
 ###################
 #    IAM Users    #
 ###################
+
 
 class CredentialReport(Filter):
     """Use IAM Credential report to filter users.
@@ -432,57 +425,68 @@ class CredentialReport(Filter):
     """
     schema = type_schema(
         'credential',
-        value_type={'type': 'string', 'enum': [
-            'age', 'expiration', 'size', 'regex']},
-
-        key={'type': 'string',
-             'title': 'report key to search',
-             'enum': [
-                 'user',
-                 'arn',
-                 'user_creation_time',
-                 'password_enabled',
-                 'password_last_used',
-                 'password_last_changed',
-                 'password_next_rotation',
-                 'mfa_active',
-                 'access_keys',
-                 'access_keys.active',
-                 'access_keys.last_used_date',
-                 'access_keys.last_used_region',
-                 'access_keys.last_used_service',
-                 'access_keys.last_rotated',
-                 'certs',
-                 'certs.active',
-                 'certs.last_rotated',
-                 ]},
-        value={'oneOf': [
-            {'type': 'array'},
-            {'type': 'string'},
-            {'type': 'boolean'},
-            {'type': 'number'}]},
+        value_type={
+            'type': 'string',
+            'enum': ['age', 'expiration', 'size', 'regex']
+        },
+        key={
+            'type':
+            'string',
+            'title':
+            'report key to search',
+            'enum': [
+                'user',
+                'arn',
+                'user_creation_time',
+                'password_enabled',
+                'password_last_used',
+                'password_last_changed',
+                'password_next_rotation',
+                'mfa_active',
+                'access_keys',
+                'access_keys.active',
+                'access_keys.last_used_date',
+                'access_keys.last_used_region',
+                'access_keys.last_used_service',
+                'access_keys.last_rotated',
+                'certs',
+                'certs.active',
+                'certs.last_rotated',
+            ]
+        },
+        value={
+            'oneOf': [{
+                'type': 'array'
+            }, {
+                'type': 'string'
+            }, {
+                'type': 'boolean'
+            }, {
+                'type': 'number'
+            }]
+        },
         op={'enum': OPERATORS.keys()},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,
-            'type': 'boolean'},
+            'type': 'boolean'
+        },
         report_delay={
             'title': 'Number of seconds to wait for report generation.',
             'default': 10,
-            'type': 'number'},
+            'type': 'number'
+        },
         report_max_age={
             'title': 'Number of seconds to consider a report valid.',
             'default': 60 * 60 * 24,
-            'type': 'number'})
+            'type': 'number'
+        })
 
-    list_sub_objects = (
-        ('access_key_1_', 'access_keys'),
-        ('access_key_2_', 'access_keys'),
-        ('cert_1_', 'certs'),
-        ('cert_2_', 'certs'))
+    list_sub_objects = (('access_key_1_', 'access_keys'), ('access_key_2_',
+                                                           'access_keys'),
+                        ('cert_1_', 'certs'), ('cert_2_', 'certs'))
 
-    permissions = ('iam:GenerateCredentialReport',
-                   'iam:GetCredentialReport')
+    permissions = ('iam:GenerateCredentialReport', 'iam:GetCredentialReport')
 
     def get_value_or_schema_default(self, k):
         if k in self.data:
@@ -518,8 +522,8 @@ class CredentialReport(Filter):
                 info[k] = True
         # Object conversion
         for p, t in cls.list_sub_objects:
-            obj = dict([(k[len(p):], info.pop(k))
-                        for k in keys if k.startswith(p)])
+            obj = dict([(k[len(p):], info.pop(k)) for k in keys
+                        if k.startswith(p)])
             if obj.get('active', False):
                 info.setdefault(t, []).append(obj)
         return info
@@ -534,8 +538,7 @@ class CredentialReport(Filter):
             report = None
         if report:
             threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
-                seconds=self.get_value_or_schema_default(
-                    'report_max_age'))
+                seconds=self.get_value_or_schema_default('report_max_age'))
             if not report['GeneratedTime'].tzinfo:
                 threshold = threshold.replace(tzinfo=None)
             if report['GeneratedTime'] < threshold:
@@ -570,9 +573,9 @@ class CredentialReport(Filter):
             if vf.match(v):
                 return True
 
+
 @User.filter_registry.register('credential')
 class UserCredentialReport(CredentialReport):
-
     def process(self, resources, event=None):
         super(UserCredentialReport, self).process(resources, event)
         report = self.get_credential_report()
@@ -605,7 +608,7 @@ class UserPolicy(ValueFilter):
     """
 
     schema = type_schema('policy', rinherit=ValueFilter.schema)
-    permissions = ('iam:ListAttachedUserPolicies',)
+    permissions = ('iam:ListAttachedUserPolicies', )
 
     def user_policies(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
@@ -621,8 +624,7 @@ class UserPolicy(ValueFilter):
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            self.log.debug(
-                "Querying %d users policies" % len(resources))
+            self.log.debug("Querying %d users policies" % len(resources))
             list(w.map(self.user_policies, user_set))
 
         matched = []
@@ -652,7 +654,7 @@ class UserAccessKey(ValueFilter):
     """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
-    permissions = ('iam:ListAccessKeys',)
+    permissions = ('iam:ListAccessKeys', )
 
     def user_keys(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
@@ -663,8 +665,7 @@ class UserAccessKey(ValueFilter):
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            self.log.debug(
-                "Querying %d users' api keys" % len(resources))
+            self.log.debug("Querying %d users' api keys" % len(resources))
             list(w.map(self.user_keys, user_set))
 
         matched = []
@@ -680,22 +681,20 @@ class UserAccessKey(ValueFilter):
 class UserMfaDevice(ValueFilter):
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
-    permissions = ('iam:ListMfaDevices',)
+    permissions = ('iam:ListMfaDevices', )
 
     def __init__(self, *args, **kw):
         super(UserMfaDevice, self).__init__(*args, **kw)
         self.data['key'] = 'MFADevices'
 
     def process(self, resources, event=None):
-
         def _user_mfa_devices(resource):
             client = local_session(self.manager.session_factory).client('iam')
             resource['MFADevices'] = client.list_mfa_devices(
                 UserName=resource['UserName'])['MFADevices']
 
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'MFADevices' not in r]
+            query_resources = [r for r in resources if 'MFADevices' not in r]
             self.log.debug(
                 "Querying %d users' mfa devices" % len(query_resources))
             list(w.map(_user_mfa_devices, query_resources))
@@ -741,8 +740,7 @@ class UserRemoveAccessKey(BaseAction):
                         Status='Inactive')
                 else:
                     client.delete_access_key(
-                        UserName=r['UserName'],
-                        AccessKeyId=k['AccessKeyId'])
+                        UserName=r['UserName'], AccessKeyId=k['AccessKeyId'])
 
 
 #################
@@ -759,7 +757,7 @@ class IamGroupUsers(Filter):
         False: Filter all IAM groups without any users assigned to it
     """
     schema = type_schema('has-users', value={'type': 'boolean'})
-    permissions = ('iam:GetGroup',)
+    permissions = ('iam:GetGroup', )
 
     def _user_count(self, client, resource):
         return len(client.get_group(GroupName=resource['GroupName'])['Users'])
@@ -781,11 +779,12 @@ class IamGroupInlinePolicy(Filter):
         False: Filter all groups that do not have an inline-policy attached
     """
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
-    permissions = ('iam:ListGroupPolicies',)
+    permissions = ('iam:ListGroupPolicies', )
 
     def _inline_policies(self, client, resource):
-        return len(client.list_group_policies(
-            GroupName=resource['GroupName'])['PolicyNames'])
+        return len(
+            client.list_group_policies(GroupName=resource['GroupName'])[
+                'PolicyNames'])
 
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')

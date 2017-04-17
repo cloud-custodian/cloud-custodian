@@ -20,14 +20,13 @@ from c7n.utils import get_retry
 @resources.register('codecommit')
 class CodeRepository(QueryResourceManager):
 
-    retry = staticmethod(get_retry(('Throttling',)))
+    retry = staticmethod(get_retry(('Throttling', )))
 
     class resource_type(object):
         service = 'codecommit'
         enum_spec = ('list_repositories', 'repositories', None)
-        batch_detail_spec = (
-            'batch_get_repositories', 'repositoryNames', 'repositoryName',
-            'repositories')
+        batch_detail_spec = ('batch_get_repositories', 'repositoryNames',
+                             'repositoryName', 'repositories')
         id = 'repositoryId'
         name = 'repositoryName'
         date = 'creationDate'
@@ -36,12 +35,10 @@ class CodeRepository(QueryResourceManager):
 
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
-
     class resource_type(object):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
-        batch_detail_spec = (
-            'batch_get_projects', 'names', None, 'projects')
+        batch_detail_spec = ('batch_get_projects', 'names', None, 'projects')
         name = id = 'project'
         date = 'created'
         dimension = None
@@ -50,7 +47,7 @@ class CodeBuildProject(QueryResourceManager):
 @resources.register('codepipeline')
 class CodeDeployPipeline(QueryResourceManager):
 
-    retry = staticmethod(get_retry(('Throttling',)))
+    retry = staticmethod(get_retry(('Throttling', )))
 
     class resource_type(object):
         service = 'codepipeline'
@@ -59,6 +56,3 @@ class CodeDeployPipeline(QueryResourceManager):
         dimension = filter_name = None
         name = id = 'name'
         date = 'created'
-
-
-

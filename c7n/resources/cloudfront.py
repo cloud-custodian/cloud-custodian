@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('distribution')
 class Distribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         enum_spec = ('list_distributions', 'DistributionList.Items', None)
@@ -30,12 +29,10 @@ class Distribution(QueryResourceManager):
 
 @resources.register('streaming-distribution')
 class StreamingDistribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         enum_spec = ('list_streaming_distributions',
-                     'StreamingDistributionList.Items',
-                     None)
+                     'StreamingDistributionList.Items', None)
         id = 'Id'
         name = 'DomainName'
         date = 'LastModifiedTime'
@@ -62,7 +59,10 @@ class DistributionMetrics(MetricsFilter):
     """
 
     def get_dimensions(self, resource):
-        return [{'Name': self.model.dimension,
-                 'Value': resource[self.model.id]},
-                {'Name': 'Region', 'Value': 'Global'}]
-
+        return [{
+            'Name': self.model.dimension,
+            'Value': resource[self.model.id]
+        }, {
+            'Name': 'Region',
+            'Value': 'Global'
+        }]

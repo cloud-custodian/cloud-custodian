@@ -45,7 +45,10 @@ class CrossAccountAccessFilter(Filter):
     schema = type_schema(
         'cross-account',
         whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+        whitelist={'type': 'array',
+                   'items': {
+                       'type': 'string'
+                   }})
 
     policy_attribute = 'Policy'
 
@@ -117,11 +120,10 @@ def check_cross_account(policy_text, allowed_accounts):
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         # At this point principal is required?
-        p = (
-            isinstance(s['Principal'], basestring) and s['Principal']
-            or s['Principal']['AWS'])
+        p = (isinstance(s['Principal'], basestring) and s['Principal'] or
+             s['Principal']['AWS'])
 
-        p = isinstance(p, basestring) and (p,) or p
+        p = isinstance(p, basestring) and (p, ) or p
         for pid in p:
             if pid == '*':
                 principal_ok = False
@@ -155,21 +157,21 @@ def check_cross_account(policy_text, allowed_accounts):
                 if so in allowed_accounts:
                     principal_ok = True
 
-        ## BEGIN S3 WhiteList
-        ## Note these are transient white lists for s3
-        ## we need to refactor this to verify ip against a
-        ## cidr white list, and verify vpce/vpc against the
-        ## accounts.
+        # BEGIN S3 WhiteList
+        # Note these are transient white lists for s3
+        # we need to refactor this to verify ip against a
+        # cidr white list, and verify vpce/vpc against the
+        # accounts.
 
-            # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition']['StringEquals'].keys()[0] in (
-                    "aws:sourceVpce", "aws:sourceVpce"):
+        # For now allow vpce/vpc conditions as sufficient on s3
+            if s['Condition']['StringEquals'].keys()[0] in ("aws:sourceVpce",
+                                                            "aws:sourceVpce"):
                 principal_ok = True
 
         if 'StringLike' in s['Condition']:
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition'][
-                    'StringLike'].keys()[0].lower() == "aws:sourcevpce":
+            if s['Condition']['StringLike'].keys()[
+                    0].lower() == "aws:sourcevpce":
                 principal_ok = True
 
         if 'ForAnyValue:StringLike' in s['Condition']:
@@ -180,7 +182,7 @@ def check_cross_account(policy_text, allowed_accounts):
         if 'IpAddress' in s['Condition']:
             principal_ok = True
 
-        ## END S3 WhiteList
+        # END S3 WhiteList
 
         if 'ArnEquals' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
@@ -195,7 +197,7 @@ def check_cross_account(policy_text, allowed_accounts):
             if v is None:
                 violations.append(s)
             else:
-                v = isinstance(v, basestring) and (v,) or v
+                v = isinstance(v, basestring) and (v, ) or v
                 for arn in v:
                     aid = _account(arn)
                     if aid not in allowed_accounts:
@@ -206,7 +208,7 @@ def check_cross_account(policy_text, allowed_accounts):
                 v = s['Condition']['ArnLike'].get(k)
                 if v:
                     break
-            v = isinstance(v, basestring) and (v,) or v
+            v = isinstance(v, basestring) and (v, ) or v
             principal_ok = True
             for arn in v:
                 aid = _account(arn)

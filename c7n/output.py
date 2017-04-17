@@ -40,7 +40,7 @@ class MetricsOutput(object):
     """Send metrics data to cloudwatch
     """
 
-    permissions = ("cloudWatch:PutMetricData",)
+    permissions = ("cloudWatch:PutMetricData", )
 
     @staticmethod
     def select(metrics_enabled):
@@ -63,10 +63,15 @@ class MetricsOutput(object):
             "MetricName": key,
             "Timestamp": datetime.datetime.now(),
             "Value": value,
-            "Unit": unit}
-        d["Dimensions"] = [
-            {"Name": "Policy", "Value": self.ctx.policy.name},
-            {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
+            "Unit": unit
+        }
+        d["Dimensions"] = [{
+            "Name": "Policy",
+            "Value": self.ctx.policy.name
+        }, {
+            "Name": "ResType",
+            "Value": self.ctx.policy.resource_type
+        }]
         for k, v in dimensions.items():
             d['Dimensions'].append({"Name": k, "Value": v})
 
@@ -150,14 +155,12 @@ class CloudWatchLogOutput(LogOutput):
                 assume=False))
 
     def __repr__(self):
-        return "<%s to group:%s stream:%s>" % (
-            self.__class__.__name__,
-            self.ctx.options.log_group,
-            self.ctx.policy.name)
+        return "<%s to group:%s stream:%s>" % (self.__class__.__name__,
+                                               self.ctx.options.log_group,
+                                               self.ctx.policy.name)
 
 
 class FSOutput(LogOutput):
-
     @staticmethod
     def select(path):
         if path.startswith('s3://'):
@@ -220,7 +223,7 @@ class S3Output(FSOutput):
 
     """
 
-    permissions = ('S3:PutObject',)
+    permissions = ('S3:PutObject', )
 
     def __init__(self, ctx):
         super(S3Output, self).__init__(ctx)
@@ -231,10 +234,10 @@ class S3Output(FSOutput):
         self.transfer = None
 
     def __repr__(self):
-        return "<%s to bucket:%s prefix:%s>" % (
-            self.__class__.__name__,
-            self.bucket,
-            "%s/%s" % (self.key_prefix, self.date_path))
+        return "<%s to bucket:%s prefix:%s>" % (self.__class__.__name__,
+                                                self.bucket,
+                                                "%s/%s" % (self.key_prefix,
+                                                           self.date_path))
 
     @staticmethod
     def join(*parts):
@@ -255,20 +258,17 @@ class S3Output(FSOutput):
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
-                key = "%s/%s%s" % (
-                    self.key_prefix,
-                    self.date_path,
-                    "%s/%s" % (
-                        root[len(self.root_dir):], f))
+                key = "%s/%s%s" % (self.key_prefix, self.date_path,
+                                   "%s/%s" % (root[len(self.root_dir):], f))
                 key = key.strip('/')
                 self.transfer.upload_file(
-                    os.path.join(root, f), self.bucket, key,
-                    extra_args={
-                        'ServerSideEncryption': 'AES256'})
+                    os.path.join(root, f),
+                    self.bucket,
+                    key,
+                    extra_args={'ServerSideEncryption': 'AES256'})
 
     def use_s3(self):
         return True
 
 
 s3_join = S3Output.join
-

@@ -18,12 +18,11 @@ from c7n.query import QueryResourceManager
 
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
         #
-        #detail_spec = (
+        # detail_spec = (
         #    'get_event_selectors', 'TrailName', 'TrailArn', None)
         filter_name = 'trailNameList'
         filter_type = 'list'

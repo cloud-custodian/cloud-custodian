@@ -19,13 +19,12 @@ from c7n.utils import local_session, type_schema
 
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
-
     class resource_type(object):
         service = 'kinesis'
         type = 'stream'
         enum_spec = ('list_streams', 'StreamNames', None)
-        detail_spec = (
-            'describe_stream', 'StreamName', None, 'StreamDescription')
+        detail_spec = ('describe_stream', 'StreamName', None,
+                       'StreamDescription')
         name = id = 'StreamName'
         filter_name = None
         filter_type = None
@@ -37,32 +36,30 @@ class KinesisStream(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ("kinesis:DeleteStream",)
+    permissions = ("kinesis:DeleteStream", )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
-        not_active = [r['StreamName'] for r in resources
-                      if r['StreamStatus'] != 'ACTIVE']
+        not_active = [
+            r['StreamName'] for r in resources if r['StreamStatus'] != 'ACTIVE'
+        ]
         self.log.warning(
-            "The following streams cannot be deleted (wrong state): %s" % (
-                ", ".join(not_active)))
+            "The following streams cannot be deleted (wrong state): %s" %
+            (", ".join(not_active)))
         for r in resources:
             if not r['StreamStatus'] == 'ACTIVE':
                 continue
-            client.delete_stream(
-                StreamName=r['StreamName'])
+            client.delete_stream(StreamName=r['StreamName'])
 
 
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
-
     class resource_type(object):
         service = 'firehose'
         type = 'deliverystream'
         enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', None)
-        detail_spec = (
-            'describe_delivery_stream', 'DeliveryStreamName', None,
-            'DeliveryStreamDescription')
+        detail_spec = ('describe_delivery_stream', 'DeliveryStreamName', None,
+                       'DeliveryStreamDescription')
         name = id = 'DeliveryStreamName'
         filter_name = None
         filter_type = None
@@ -74,16 +71,18 @@ class DeliveryStream(QueryResourceManager):
 class FirehoseDelete(Action):
 
     schema = type_schema('delete')
-    permissions = ("firehose:DeleteDeliveryStream",)
+    permissions = ("firehose:DeleteDeliveryStream", )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('firehose')
-        creating = [r['DeliveryStreamName'] for r in resources
-                    if r['DeliveryStreamStatus'] == 'CREATING']
+        creating = [
+            r['DeliveryStreamName'] for r in resources
+            if r['DeliveryStreamStatus'] == 'CREATING'
+        ]
         if creating:
             self.log.warning(
-                "These delivery streams can't be deleted (wrong state): %s" % (
-                    ", ".join(creating)))
+                "These delivery streams can't be deleted (wrong state): %s" %
+                (", ".join(creating)))
         for r in resources:
             if not r['DeliveryStreamStatus'] == 'ACTIVE':
                 continue
@@ -93,7 +92,6 @@ class FirehoseDelete(Action):
 
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
-
     class resource_type(object):
         service = "kinesisanalytics"
         enum_spec = ('list_applications', 'ApplicationSummaries', None)
@@ -110,7 +108,7 @@ class AnalyticsApp(QueryResourceManager):
 class AppDelete(Action):
 
     schema = type_schema('delete')
-    permissions = ("kinesisanalytics:DeleteApplication",)
+    permissions = ("kinesisanalytics:DeleteApplication", )
 
     def process(self, resources):
         client = local_session(

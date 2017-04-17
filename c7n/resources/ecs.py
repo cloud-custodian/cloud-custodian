@@ -18,7 +18,6 @@ from c7n.manager import resources
 
 @resources.register('ecs')
 class ECSCluster(QueryResourceManager):
-
     class resource_type(object):
         service = 'ecs'
         enum_spec = ('describe_clusters', 'clusters', None)

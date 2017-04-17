@@ -21,7 +21,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('sqs')
 class SQS(QueryResourceManager):
-
     class resource_type(object):
         service = 'sqs'
         type = 'queue'
@@ -34,11 +33,8 @@ class SQS(QueryResourceManager):
         date = 'CreatedTimestamp'
         dimension = 'QueueName'
 
-        default_report_fields = (
-            'QueueArn',
-            'CreatedTimestamp',
-            'ApproximateNumberOfMessages',
-        )
+        default_report_fields = ('QueueArn', 'CreatedTimestamp',
+                                 'ApproximateNumberOfMessages', )
 
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
@@ -46,13 +42,11 @@ class SQS(QueryResourceManager):
         return perms
 
     def augment(self, resources):
-
         def _augment(r):
             client = local_session(self.session_factory).client('sqs')
             try:
                 queue = client.get_queue_attributes(
-                    QueueUrl=r,
-                    AttributeNames=['All'])['Attributes']
+                    QueueUrl=r, AttributeNames=['All'])['Attributes']
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDenied':
                     self.log.warning("Denied access to sqs %s" % r)
@@ -69,4 +63,4 @@ class SQS(QueryResourceManager):
 
 @SQS.filter_registry.register('cross-account')
 class SQSCrossAccount(CrossAccountAccessFilter):
-    permissions = ('sqs:GetQueueAttributes',)
+    permissions = ('sqs:GetQueueAttributes', )

@@ -23,7 +23,6 @@ from c7n.utils import get_retry
 
 
 class SessionFactory(object):
-
     def __init__(self, region, profile=None, assume_role=None):
         self.region = region
         self.profile = profile
@@ -32,9 +31,8 @@ class SessionFactory(object):
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
-            session = assumed_session(
-                self.assume_role, "CloudCustodian", session,
-                region or self.region)
+            session = assumed_session(self.assume_role, "CloudCustodian",
+                                      session, region or self.region)
         else:
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
@@ -62,7 +60,7 @@ def assumed_session(role_arn, session_name, session=None, region=None):
     if session is None:
         session = Session()
 
-    retry = get_retry(('Throttling',))
+    retry = get_retry(('Throttling', ))
 
     def refresh():
         credentials = retry(
@@ -77,9 +75,7 @@ def assumed_session(role_arn, session_name, session=None, region=None):
             expiry_time=credentials['Expiration'].isoformat())
 
     session_credentials = RefreshableCredentials.create_from_metadata(
-        metadata=refresh(),
-        refresh_using=refresh,
-        method='sts-assume-role')
+        metadata=refresh(), refresh_using=refresh, method='sts-assume-role')
 
     # so dirty.. it hurts, no clean way to set this outside of the
     # internals poke. There's some work upstream on making this nicer

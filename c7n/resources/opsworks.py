@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('opswork-stack')
 class OpsworkStack(QueryResourceManager):
-
     class resource_type(object):
         service = 'opsworks'
         enum_spec = ('describe_stacks', 'Stacks', None)
@@ -32,7 +31,6 @@ class OpsworkStack(QueryResourceManager):
 
 @resources.register('opswork-cm')
 class OpsworksCM(QueryResourceManager):
-
     class resource_type(object):
         service = "opsworkscm"
         enum_spec = ('describe_servers', 'Servers', None)

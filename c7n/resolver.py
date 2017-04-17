@@ -22,7 +22,6 @@ import jmespath
 
 
 class URIResolver(object):
-
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
         self.cache = cache
@@ -42,9 +41,7 @@ class URIResolver(object):
     def get_s3_uri(self, uri):
         parsed = urlparse.urlparse(uri)
         client = self.session_factory().client('s3')
-        params = dict(
-            Bucket=parsed.netloc,
-            Key=parsed.path[1:])
+        params = dict(Bucket=parsed.netloc, Key=parsed.path[1:])
         if parsed.query:
             params.update(dict(urlparse.parse_qsl(parsed.query)))
         result = client.get_object(**params)
@@ -85,11 +82,19 @@ class ValuesFrom(object):
         'additionalProperties': 'False',
         'required': ['url'],
         'properties': {
-            'url': {'type': 'string'},
-            'format': {'enum': ['csv', 'json', 'txt']},
-            'expr': {'oneOf': [
-                {'type': 'integer'},
-                {'type': 'string'}]}
+            'url': {
+                'type': 'string'
+            },
+            'format': {
+                'enum': ['csv', 'json', 'txt']
+            },
+            'expr': {
+                'oneOf': [{
+                    'type': 'integer'
+                }, {
+                    'type': 'string'
+                }]
+            }
         }
     }
 
@@ -107,9 +112,8 @@ class ValuesFrom(object):
             format = format[1:]
 
         if format not in self.supported_formats:
-            raise ValueError(
-                "Unsupported format %s for url %s",
-                format, self.data['url'])
+            raise ValueError("Unsupported format %s for url %s", format,
+                             self.data['url'])
         contents = self.resolver.resolve(self.data['url'])
         return contents, format
 

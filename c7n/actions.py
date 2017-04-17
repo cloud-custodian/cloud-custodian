@@ -27,7 +27,6 @@ from c7n.version import version as VERSION
 
 
 class ActionRegistry(PluginRegistry):
-
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
@@ -43,17 +42,15 @@ class ActionRegistry(PluginRegistry):
         if isinstance(data, dict):
             action_type = data.get('type')
             if action_type is None:
-                raise ValueError(
-                    "Invalid action type found in %s" % (data))
+                raise ValueError("Invalid action type found in %s" % (data))
         else:
             action_type = data
             data = {}
 
         action_class = self.get(action_type)
         if action_class is None:
-            raise ValueError(
-                "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+            raise ValueError("Invalid action type %s, valid actions %s" %
+                             (action_type, self.keys()))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
@@ -91,13 +88,12 @@ class Action(object):
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
-        except ClientError, e:
-            if (e.response['Error']['Code'] == 'DryRunOperation'
-                    and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
-                    and 'would have succeeded' in e.message):
-                return self.log.info(
-                    "Dry run operation %s succeeded" % (
-                        self.__class__.__name__.lower()))
+        except ClientError as e:
+            if (e.response['Error']['Code'] == 'DryRunOperation' and
+                    e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
+                    'would have succeeded' in e.message):
+                return self.log.info("Dry run operation %s succeeded" %
+                                     (self.__class__.__name__.lower()))
             raise
 
 
@@ -121,30 +117,62 @@ class ModifyVpcSecurityGroupsAction(Action):
         isolation-group: sg-xyz
     """
     schema = {
-        'type': 'object',
-        'additionalProperties': False,
+        'type':
+        'object',
+        'additionalProperties':
+        False,
         'properties': {
-            'type': {'enum': ['modify-security-groups']},
-            'add': {'oneOf': [
-                {'type': 'string', 'pattern': '^sg-*'},
-                {'type': 'array', 'items': {
-                    'pattern': '^sg-*',
-                    'type': 'string'}}]},
-            'remove': {'oneOf': [
-                {'type': 'array', 'items': {
-                    'type': 'string', 'pattern': '^sg-*'}},
-                {'enum': [
-                    'matched', 'all',
-                    {'type': 'string', 'pattern': '^sg-*'}]}]},
-            'isolation-group': {'oneOf': [
-                {'type': 'string', 'pattern': '^sg-*'},
-                {'type': 'array', 'items': {
-                    'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
-        }
+            'type': {
+                'enum': ['modify-security-groups']
+            },
+            'add': {
+                'oneOf': [{
+                    'type': 'string',
+                    'pattern': '^sg-*'
+                }, {
+                    'type': 'array',
+                    'items': {
+                        'pattern': '^sg-*',
+                        'type': 'string'
+                    }
+                }]
+            },
+            'remove': {
+                'oneOf': [{
+                    'type': 'array',
+                    'items': {
+                        'type': 'string',
+                        'pattern': '^sg-*'
+                    }
+                }, {
+                    'enum':
+                    ['matched', 'all', {
+                        'type': 'string',
+                        'pattern': '^sg-*'
+                    }]
+                }]
+            },
+            'isolation-group': {
+                'oneOf': [{
+                    'type': 'string',
+                    'pattern': '^sg-*'
+                }, {
+                    'type': 'array',
+                    'items': {
+                        'type': 'string',
+                        'pattern': '^sg-*'
+                    }
+                }]
+            }
+        },
+        'oneOf': [{
+            'required': ['isolation-group', 'remove']
+        }, {
+            'required': ['add', 'remove']
+        }, {
+            'required': ['add']
+        }]
+    }
 
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
@@ -194,7 +222,8 @@ class ModifyVpcSecurityGroupsAction(Action):
                 else:
                     rgroups = [g for g in r['SecurityGroups']]
             elif r.get('VpcSecurityGroups'):
-                if metadata_key and isinstance(r['VpcSecurityGroups'][0], dict):
+                if metadata_key and isinstance(r['VpcSecurityGroups'][0],
+                                               dict):
                     rgroups = [g[metadata_key] for g in r['VpcSecurityGroups']]
                 else:
                     rgroups = [g for g in r['VpcSecurityGroups']]
@@ -272,14 +301,14 @@ class LambdaInvoke(EventAction):
         async={'type': 'boolean'},
         qualifier={'type': 'string'},
         batch_size={'type': 'integer'},
-        required=('function',))
+        required=('function', ))
 
     def get_permissions(self):
         if self.data.get('async', True):
-            return ('lambda:InvokeAsync',)
-        return ('lambda:Invoke',)
+            return ('lambda:InvokeAsync', )
+        return ('lambda:Invoke', )
 
-    permissions = ('lambda:InvokeFunction',)
+    permissions = ('lambda:InvokeFunction', )
 
     def process(self, resources, event=None):
         client = utils.local_session(
@@ -296,10 +325,12 @@ class LambdaInvoke(EventAction):
             'version': VERSION,
             'event': event,
             'action': self.data,
-            'policy': self.manager.data}
+            'policy': self.manager.data
+        }
 
         results = []
-        for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
+        for resource_set in utils.chunks(resources,
+                                         self.data.get('batch_size', 250)):
             payload['resources'] = resource_set
             params['Payload'] = utils.dumps(payload)
             result = client.invoke(**params)
@@ -345,26 +376,57 @@ class Notify(EventAction):
         'type': 'object',
         'required': ['type', 'transport', 'to'],
         'properties': {
-            'type': {'enum': ['notify']},
-            'to': {'type': 'array', 'items': {'type': 'string'}},
-            'cc': {'type': 'array', 'items': {'type': 'string'}},
-            'cc_manager': {'type': 'boolean'},
-            'from': {'type': 'string'},
-            'subject': {'type': 'string'},
-            'template': {'type': 'string'},
+            'type': {
+                'enum': ['notify']
+            },
+            'to': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            },
+            'cc': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            },
+            'cc_manager': {
+                'type': 'boolean'
+            },
+            'from': {
+                'type': 'string'
+            },
+            'subject': {
+                'type': 'string'
+            },
+            'template': {
+                'type': 'string'
+            },
             'transport': {
-                'oneOf': [
-                    {'type': 'object',
-                     'required': ['type', 'queue'],
-                     'properties': {
-                         'queue': {'type': 'string'},
-                         'type': {'enum': ['sqs']}}},
-                    {'type': 'object',
-                     'required': ['type', 'topic'],
-                     'properties': {
-                         'topic': {'type': 'string'},
-                         'type': {'enum': ['sns']},
-                         }}]
+                'oneOf': [{
+                    'type': 'object',
+                    'required': ['type', 'queue'],
+                    'properties': {
+                        'queue': {
+                            'type': 'string'
+                        },
+                        'type': {
+                            'enum': ['sqs']
+                        }
+                    }
+                }, {
+                    'type': 'object',
+                    'required': ['type', 'topic'],
+                    'properties': {
+                        'topic': {
+                            'type': 'string'
+                        },
+                        'type': {
+                            'enum': ['sns']
+                        },
+                    }
+                }]
             }
         }
     }
@@ -373,9 +435,9 @@ class Notify(EventAction):
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
-            return ('sns:Publish',)
+            return ('sns:Publish', )
         if self.data.get('transport', {'type': 'sqs'}).get('type') == 'sqs':
-            return ('sqs:SendMessage',)
+            return ('sqs:SendMessage', )
         return ()
 
     def process(self, resources, event=None):
@@ -383,16 +445,18 @@ class Notify(EventAction):
             'iam').list_account_aliases().get('AccountAliases', ())
         account_name = aliases and aliases[0] or ''
         for batch in utils.chunks(resources, self.batch_size):
-            message = {'resources': batch,
-                       'event': event,
-                       'account': account_name,
-                       'action': self.data,
-                       'region': self.manager.config.region,
-                       'policy': self.manager.data}
+            message = {
+                'resources': batch,
+                'event': event,
+                'account': account_name,
+                'action': self.data,
+                'region': self.manager.config.region,
+                'policy': self.manager.data
+            }
             receipt = self.send_data_message(message)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
+            self.log.info("sent message:%s policy:%s template:%s count:%s" %
+                          (receipt, self.manager.data['name'],
+                           self.data.get('template', 'default'), len(batch)))
 
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
@@ -406,8 +470,7 @@ class Notify(EventAction):
         client = self.manager.session_factory(region=region).client('sns')
         client.publish(
             TopicArn=topic,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
-            )
+            Message=base64.b64encode(zlib.compress(utils.dumps(message))))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -417,8 +480,8 @@ class Notify(EventAction):
             'mtype': {
                 'DataType': 'String',
                 'StringValue': self.C7N_DATA_MESSAGE,
-                },
-            }
+            },
+        }
         result = client.send_message(
             QueueUrl=queue,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
@@ -458,22 +521,25 @@ class AutoTagUser(EventAction):
     schema = utils.type_schema(
         'auto-tag-user',
         required=['tag'],
-        **{'user-type': {
-            'type': 'array',
-            'items': {'type': 'string',
-                      'enum': [
-                          'IAMUser',
-                          'AssumedRole',
-                          'FederatedUser'
-                      ]}},
-           'update': {'type': 'boolean'},
-           'tag': {'type': 'string'},
-           }
-    )
+        **{
+            'user-type': {
+                'type': 'array',
+                'items': {
+                    'type': 'string',
+                    'enum': ['IAMUser', 'AssumedRole', 'FederatedUser']
+                }
+            },
+            'update': {
+                'type': 'boolean'
+            },
+            'tag': {
+                'type': 'string'
+            },
+        })
 
     def get_permissions(self):
-        return self.manager.action_registry.get(
-            'tag')({}, self.manager).get_permissions()
+        return self.manager.action_registry.get('tag')(
+            {}, self.manager).get_permissions()
 
     def validate(self):
         if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
@@ -518,7 +584,8 @@ class AutoTagUser(EventAction):
             untagged = resources
 
         tag_action = self.manager.action_registry.get('tag')
-        tag_action(
-            {'key': self.data['tag'], 'value': user},
-            self.manager).process(untagged)
+        tag_action({
+            'key': self.data['tag'],
+            'value': user
+        }, self.manager).process(untagged)
         return untagged

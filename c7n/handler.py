@@ -25,7 +25,6 @@ import uuid
 from c7n.policy import load
 from c7n.utils import format_event
 
-
 logging.root.setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
@@ -33,7 +32,6 @@ log = logging.getLogger('custodian.lambda')
 
 # TODO move me / we should load config options directly from policy config
 class Config(dict):
-
     def __getattr__(self, k):
         try:
             return self[k]
@@ -44,17 +42,25 @@ class Config(dict):
     def empty(cls, **kw):
         d = {}
         d.update({
-            'region': os.environ.get('AWS_DEFAULT_REGION'),
-            'cache': '',
-            'profile': None,
-            'assume_role': None,
-            'log_group': None,
-            'metrics_enabled': True,
-            'output_dir': os.environ.get(
-                'C7N_OUTPUT_DIR',
-                '/tmp/' + str(uuid.uuid4())),
-            'cache_period': 0,
-            'dryrun': False})
+            'region':
+            os.environ.get('AWS_DEFAULT_REGION'),
+            'cache':
+            '',
+            'profile':
+            None,
+            'assume_role':
+            None,
+            'log_group':
+            None,
+            'metrics_enabled':
+            True,
+            'output_dir':
+            os.environ.get('C7N_OUTPUT_DIR', '/tmp/' + str(uuid.uuid4())),
+            'cache_period':
+            0,
+            'dryrun':
+            False
+        })
         d.update(kw)
         if not os.path.exists(d['output_dir']):
             os.mkdir(d['output_dir'])

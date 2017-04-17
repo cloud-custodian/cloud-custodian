@@ -33,7 +33,6 @@ from c7n.manager import ResourceManager
 
 
 class ResourceQuery(object):
-
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
@@ -48,8 +47,7 @@ class ResourceQuery(object):
     def filter(self, resource_type, **params):
         """Query a set of resources."""
         m = self.resolve(resource_type)
-        client = local_session(self.session_factory).client(
-            m.service)
+        client = local_session(self.session_factory).client(m.service)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
@@ -93,7 +91,6 @@ class ResourceQuery(object):
 
 
 class QueryMeta(type):
-
     def __new__(cls, name, parents, attrs):
         if 'filter_registry' not in attrs:
             attrs['filter_registry'] = FilterRegistry(
@@ -110,12 +107,13 @@ class QueryMeta(type):
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
                 # Generic ec2 retry
-                attrs['retry'] = staticmethod(get_retry((
-                    'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
+                attrs['retry'] = staticmethod(
+                    get_retry(('RequestLimitExceeded',
+                               'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
-                    register_tags(
-                        attrs['filter_registry'], attrs['action_registry'])
+                    register_tags(attrs['filter_registry'],
+                                  attrs['action_registry'])
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
@@ -127,14 +125,12 @@ sources = PluginRegistry('sources')
 
 
 class Source(object):
-
     def __init__(self, manager):
         self.manager = manager
 
 
 @sources.register('describe')
 class DescribeSource(Source):
-
     def __init__(self, manager):
         self.manager = manager
         self.query = ResourceQuery(self.manager.session_factory)
@@ -144,8 +140,8 @@ class DescribeSource(Source):
 
     def resources(self, query):
         if self.manager.retry:
-            resources = self.manager.retry(
-                self.query.filter, self.manager.resource_type, **query)
+            resources = self.manager.retry(self.query.filter,
+                                           self.manager.resource_type, **query)
         else:
             resources = self.query.filter(self.manager.resource_type, **query)
         return resources
@@ -167,21 +163,21 @@ class DescribeSource(Source):
             _augment = _batch_augment
         else:
             return resources
-        _augment = functools.partial(
-            _augment, self.manager, model, detail_spec)
+        _augment = functools.partial(_augment, self.manager, model,
+                                     detail_spec)
         with self.manager.executor_factory(
                 max_workers=self.manager.max_workers) as w:
-            results = list(w.map(
-                _augment, chunks(resources, self.manager.chunk_size)))
+            results = list(
+                w.map(_augment, chunks(resources, self.manager.chunk_size)))
             return list(itertools.chain(*results))
 
 
 @sources.register('config')
 class ConfigSource(Source):
-
     def get_permissions(self):
-        return ["config:GetResourceConfigHistory",
-                "config:ListDiscoveredResources"]
+        return [
+            "config:GetResourceConfigHistory", "config:ListDiscoveredResources"
+        ]
 
     def get_resources(self, ids, cache=True):
         client = local_session(self.manager.session_factory).client('config')
@@ -192,9 +188,7 @@ class ConfigSource(Source):
                 camelResource(
                     json.loads(
                         client.get_resource_config_history(
-                            resourceId=i,
-                            resourceType=m.config_type,
-                            limit=1)[
+                            resourceId=i, resourceType=m.config_type, limit=1)[
                                 'configurationItems'][0]['configuration'])))
         return results
 
@@ -206,12 +200,12 @@ class ConfigSource(Source):
         results = []
         with self.manager.executor_factory(max_workers=5) as w:
             resource_ids = [
-                r['resourceId'] for r in
-                pages.build_full_result()['resourceIdentifiers']]
-            self.manager.log.debug(
-                "querying %d %s resources",
-                len(resource_ids),
-                self.manager.__class__.__name__.lower())
+                r['resourceId']
+                for r in pages.build_full_result()['resourceIdentifiers']
+            ]
+            self.manager.log.debug("querying %d %s resources",
+                                   len(resource_ids),
+                                   self.manager.__class__.__name__.lower())
 
             for resource_set in chunks(resource_ids, 50):
                 futures = []
@@ -219,8 +213,8 @@ class ConfigSource(Source):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception creating snapshot set \n %s" % (
-                                f.exception()))
+                            "Exception creating snapshot set \n %s" %
+                            (f.exception()))
                     results.extend(f.result())
         return results
 
@@ -269,18 +263,19 @@ class QueryResourceManager(ResourceManager):
         return perms
 
     def resources(self, query=None):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': query}
+        key = {
+            'region': self.config.region,
+            'resource': str(self.__class__.__name__),
+            'q': query
+        }
 
         if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
-                self.log.debug("Using cached %s: %d" % (
-                   "%s.%s" % (
-                        self.__class__.__module__,
-                        self.__class__.__name__),
-                    len(resources)))
+                self.log.debug("Using cached %s: %d" %
+                               ("%s.%s" % (self.__class__.__module__,
+                                           self.__class__.__name__),
+                                len(resources)))
                 return self.filter_resources(resources)
 
         if query is None:
@@ -291,9 +286,11 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def get_resources(self, ids, cache=True):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': None}
+        key = {
+            'region': self.config.region,
+            'resource': str(self.__class__.__name__),
+            'q': None
+        }
         if cache and self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
@@ -322,7 +319,7 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     client = local_session(manager.session_factory).client(model.service)
     op = getattr(client, detail_op)
     if manager.retry:
-        args = (op,)
+        args = (op, )
         op = manager.retry
     else:
         args = ()
@@ -336,7 +333,7 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
     client = local_session(manager.session_factory).client(model.service)
     op = getattr(client, detail_op)
     if manager.retry:
-        args = (op,)
+        args = (op, )
         op = manager.retry
     else:
         args = ()
@@ -355,4 +352,3 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
             r.update(response)
         results.append(r)
     return results
-

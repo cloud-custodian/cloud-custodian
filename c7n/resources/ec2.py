@@ -20,12 +20,10 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 
-from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
-)
-from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
-)
+from c7n.actions import (ActionRegistry, BaseAction, AutoTagUser,
+                         ModifyVpcSecurityGroupsAction)
+from c7n.filters import (FilterRegistry, AgeFilter, ValueFilter, Filter,
+                         OPERATORS, DefaultVpcBase)
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
@@ -36,7 +34,6 @@ from c7n.query import QueryResourceManager
 from c7n import utils
 from c7n.utils import type_schema
 
-
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
@@ -46,7 +43,6 @@ filters.register('health-event', HealthEventFilter)
 
 @resources.register('ec2')
 class EC2(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'instance'
@@ -61,21 +57,15 @@ class EC2(QueryResourceManager):
         config_type = "AWS::EC2::Instance"
         shape = "Instance"
 
-        default_report_fields = (
-            'CustodianDate',
-            'InstanceId',
-            'tag:Name',
-            'InstanceType',
-            'LaunchTime',
-            'VpcId',
-            'PrivateIpAddress',
-        )
+        default_report_fields = ('CustodianDate', 'InstanceId', 'tag:Name',
+                                 'InstanceType', 'LaunchTime', 'VpcId',
+                                 'PrivateIpAddress', )
 
     filter_registry = filters
     action_registry = actions
 
     # if we have to do a fallback scenario where tags don't come in describe
-    permissions = ('ec2:DescribeTags',)
+    permissions = ('ec2:DescribeTags', )
 
     def __init__(self, ctx, data):
         super(EC2, self).__init__(ctx, data)
@@ -142,8 +132,10 @@ class EC2(QueryResourceManager):
         client = utils.local_session(self.session_factory).client('ec2')
         tag_set = self.retry(
             client.describe_tags,
-            Filters=[{'Name': 'resource-type',
-                      'Values': ['instance']}])['Tags']
+            Filters=[{
+                'Name': 'resource-type',
+                'Values': ['instance']
+            }])['Tags']
         resource_tags = {}
         for t in tag_set:
             t.pop('ResourceType')
@@ -190,7 +182,8 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string',
+            'enum': OPERATORS.keys()},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
@@ -217,10 +210,9 @@ class StateTransitionFilter(object):
     def filter_instance_state(self, instances, states=None):
         states = states or self.valid_origin_states
         orig_length = len(instances)
-        results = [i for i in instances
-                   if i['State']['Name'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
+        results = [i for i in instances if i['State']['Name'] in states]
+        self.log.info("%s %d of %d instances" % (self.__class__.__name__,
+                                                 len(results), orig_length))
         return results
 
 
@@ -244,9 +236,19 @@ class AttachedVolume(ValueFilter):
     """
 
     schema = type_schema(
-        'ebs', rinherit=ValueFilter.schema,
-        **{'operator': {'enum': ['and', 'or']},
-           'skip-devices': {'type': 'array', 'items': {'type': 'string'}}})
+        'ebs',
+        rinherit=ValueFilter.schema,
+        **{
+            'operator': {
+                'enum': ['and', 'or']
+            },
+            'skip-devices': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            }
+        })
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ebs').get_permissions()
@@ -254,8 +256,7 @@ class AttachedVolume(ValueFilter):
     def process(self, resources, event=None):
         self.volume_map = self.get_volume_mapping(resources)
         self.skip = self.data.get('skip-devices', [])
-        self.operator = self.data.get(
-            'operator', 'or') == 'or' and any or all
+        self.operator = self.data.get('operator', 'or') == 'or' and any or all
         return filter(self, resources)
 
     def get_volume_mapping(self, resources):
@@ -271,8 +272,8 @@ class AttachedVolume(ValueFilter):
             for v in manager.get_resources(volume_ids):
                 if not v['Attachments']:
                     continue
-                volume_map.setdefault(
-                    v['Attachments'][0]['InstanceId'], []).append(v)
+                volume_map.setdefault(v['Attachments'][0]['InstanceId'],
+                                      []).append(v)
         return volume_map
 
     def __call__(self, i):
@@ -288,10 +289,11 @@ class AttachedVolume(ValueFilter):
 
 
 class InstanceImageBase(object):
-
     def get_image_mapping(self, resources):
-        return {i['ImageId']: i for i in
-                self.manager.get_resource_manager('ami').resources()}
+        return {
+            i['ImageId']: i
+            for i in self.manager.get_resource_manager('ami').resources()
+        }
 
 
 @filters.register('image-age')
@@ -317,7 +319,8 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string',
+            'enum': OPERATORS.keys()},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -350,9 +353,8 @@ class InstanceImage(ValueFilter, InstanceImageBase):
     def __call__(self, i):
         image = self.image_map.get(i['ImageId'])
         if not image:
-            self.log.warning(
-                "Could not locate image for instance:%s ami:%s" % (
-                    i['InstanceId'], i["ImageId"]))
+            self.log.warning("Could not locate image for instance:%s ami:%s" %
+                             (i['InstanceId'], i["ImageId"]))
             # Match instead on empty skeleton?
             return False
         return self.match(image)
@@ -381,11 +383,11 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
               - stop
     """
 
-    valid_origin_states = ('running',)
+    valid_origin_states = ('running', )
 
     def process(self, resources, event=None):
-        return super(InstanceOffHour, self).process(
-            self.filter_instance_state(resources))
+        return super(InstanceOffHour,
+                     self).process(self.filter_instance_state(resources))
 
 
 @filters.register('onhour')
@@ -411,11 +413,11 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
               - start
     """
 
-    valid_origin_states = ('stopped',)
+    valid_origin_states = ('stopped', )
 
     def process(self, resources, event=None):
-        return super(InstanceOnHour, self).process(
-            self.filter_instance_state(resources))
+        return super(InstanceOnHour,
+                     self).process(self.filter_instance_state(resources))
 
 
 @filters.register('ephemeral')
@@ -460,7 +462,8 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string',
+            'enum': OPERATORS.keys()},
         days={'type': 'number'})
 
 
@@ -486,7 +489,8 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string',
+            'enum': OPERATORS.keys()},
         days={'type': 'number'},
         hours={'type': 'number'},
         minutes={'type': 'number'})
@@ -497,7 +501,8 @@ class InstanceAgeFilter(AgeFilter):
         found = False
         ebs_vols = [
             block['Ebs'] for block in i['BlockDeviceMappings']
-            if 'Ebs' in block]
+            if 'Ebs' in block
+        ]
         if not ebs_vols:
             # Fall back to using age attribute (ephemeral instances)
             return super(InstanceAgeFilter, self).get_resource_date(i)
@@ -536,9 +541,9 @@ class Start(BaseAction, StateTransitionFilter):
     http://docs.aws.amazon.com/cli/latest/reference/ec2/start-instances.html
     """
 
-    valid_origin_states = ('stopped',)
+    valid_origin_states = ('stopped', )
     schema = type_schema('start')
-    permissions = ('ec2:StartInstances',)
+    permissions = ('ec2:StartInstances', )
     batch_size = 10
 
     def _filter_ec2_with_volumes(self, instances):
@@ -554,8 +559,8 @@ class Start(BaseAction, StateTransitionFilter):
             self.manager.session_factory).client('ec2')
 
         # Play nice around aws having insufficient capacity...
-        for itype, t_instances in utils.group_by(
-                instances, 'InstanceType').items():
+        for itype, t_instances in utils.group_by(instances,
+                                                 'InstanceType').items():
             for izone, z_instances in utils.group_by(
                     t_instances, 'AvailabilityZone').items():
                 for batch in utils.chunks(z_instances, self.batch_size):
@@ -563,20 +568,19 @@ class Start(BaseAction, StateTransitionFilter):
 
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
-        retry = utils.get_retry((
-            'InsufficientInstanceCapacity',
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(
+            ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+             'Client.RequestLimitExceeded'),
             max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
+                self.log.exception(("Could not start instances:%d type:%s"
+                                    " zone:%s instances:%s error:%s"),
+                                   len(instances), itype, izone,
+                                   ", ".join(instance_ids), e)
                 return
             self.log.exception("Error while starting instances error %s", e)
             raise
@@ -598,11 +602,17 @@ class Resize(BaseAction, StateTransitionFilter):
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
     """
 
-    schema = type_schema(
-        'resize',
-        **{'restart': {'type': 'boolean'},
-           'type-map': {'type': 'object'},
-           'default': {'type': 'string'}})
+    schema = type_schema('resize', **{
+        'restart': {
+            'type': 'boolean'
+        },
+        'type-map': {
+            'type': 'object'
+        },
+        'default': {
+            'type': 'string'
+        }
+    })
 
     valid_origin_states = ('running', 'stopped')
 
@@ -613,14 +623,15 @@ class Resize(BaseAction, StateTransitionFilter):
         return perms
 
     def process(self, resources):
-        stopped_instances = self.filter_instance_state(
-            resources, ('stopped',))
-        running_instances = self.filter_instance_state(
-            resources, ('running',))
+        stopped_instances = self.filter_instance_state(resources,
+                                                       ('stopped', ))
+        running_instances = self.filter_instance_state(resources,
+                                                       ('running', ))
 
         if self.data.get('restart') and running_instances:
-            Stop({'terminate-ephemeral': False},
-                 self.manager).process(running_instances)
+            Stop({
+                'terminate-ephemeral': False
+            }, self.manager).process(running_instances)
             client = utils.local_session(
                 self.manager.session_factory).client('ec2')
             waiter = client.get_waiter('instance_stopped')
@@ -631,8 +642,8 @@ class Resize(BaseAction, StateTransitionFilter):
                 self.log.exception(
                     "Exception stopping instances for resize:\n %s" % e)
 
-        for instance_set in utils.chunks(itertools.chain(
-                stopped_instances, running_instances), 20):
+        for instance_set in utils.chunks(
+                itertools.chain(stopped_instances, running_instances), 20):
             self.process_resource_set(instance_set)
 
         if self.data.get('restart') and running_instances:
@@ -648,8 +659,8 @@ class Resize(BaseAction, StateTransitionFilter):
             self.manager.session_factory).client('ec2')
 
         for i in instance_set:
-            self.log.debug(
-                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
+            self.log.debug("resizing %s %s" % (i['InstanceId'],
+                                               i['InstanceType']))
             new_type = type_map.get(i['InstanceType'], default_type)
             if new_type == i['InstanceType']:
                 continue
@@ -659,8 +670,8 @@ class Resize(BaseAction, StateTransitionFilter):
                     InstanceType={'Value': new_type})
             except ClientError as e:
                 self.log.exception(
-                    "Exception resizing instance:%s new:%s old:%s \n %s" % (
-                        i['InstanceId'], new_type, i['InstanceType'], e))
+                    "Exception resizing instance:%s new:%s old:%s \n %s" %
+                    (i['InstanceId'], new_type, i['InstanceType'], e))
 
 
 @actions.register('stop')
@@ -679,15 +690,17 @@ class Stop(BaseAction, StateTransitionFilter):
             actions:
               - stop
     """
-    valid_origin_states = ('running',)
+    valid_origin_states = ('running', )
 
-    schema =  type_schema(
-        'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
+    schema = type_schema('stop',
+                         **{'terminate-ephemeral': {
+                             'type': 'boolean'
+                         }})
 
     def get_permissions(self):
-        perms = ('ec2:StopInstances',)
+        perms = ('ec2:StopInstances', )
         if self.data.get('terminate-ephemeral', False):
-            perms += ('ec2:TerminateInstances',)
+            perms += ('ec2:TerminateInstances', )
         return perms
 
     def split_on_storage(self, instances):
@@ -709,13 +722,11 @@ class Stop(BaseAction, StateTransitionFilter):
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
-            self._run_instances_op(
-                client.terminate_instances,
-                [i['InstanceId'] for i in ephemeral])
+            self._run_instances_op(client.terminate_instances,
+                                   [i['InstanceId'] for i in ephemeral])
         if persistent:
-            self._run_instances_op(
-                client.stop_instances,
-                [i['InstanceId'] for i in persistent])
+            self._run_instances_op(client.stop_instances,
+                                   [i['InstanceId'] for i in persistent])
         return instances
 
     def _run_instances_op(self, op, instance_ids):
@@ -725,7 +736,7 @@ class Stop(BaseAction, StateTransitionFilter):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     msg = e.response['Error']['Message']
-                    e_instance_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_instance_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     instance_ids.remove(e_instance_id)
                     if not instance_ids:
                         return
@@ -762,9 +773,9 @@ class Terminate(BaseAction, StateTransitionFilter):
     schema = type_schema('terminate', force={'type': 'boolean'})
 
     def get_permissions(self):
-        permissions = ("ec2:TerminateInstances",)
+        permissions = ("ec2:TerminateInstances", )
         if self.data.get('force'):
-            permissions += ('ec2:ModifyInstanceAttribute',)
+            permissions += ('ec2:ModifyInstanceAttribute', )
         return permissions
 
     def process(self, instances):
@@ -783,7 +794,6 @@ class Terminate(BaseAction, StateTransitionFilter):
                 InstanceIds=[i['InstanceId'] for i in instances])
 
     def disable_deletion_protection(self, instances):
-
         @utils.worker
         def process_instance(i):
             client = utils.local_session(
@@ -822,10 +832,15 @@ class Snapshot(BaseAction):
                 - Name
     """
 
-    schema = type_schema(
-        'snapshot',
-        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
-    permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
+    schema = type_schema('snapshot', **{
+        'copy-tags': {
+            'type': 'array',
+            'items': {
+                'type': 'string'
+            }
+        }
+    })
+    permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags', )
 
     def process(self, resources):
         for resource in resources:
@@ -835,8 +850,8 @@ class Snapshot(BaseAction):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception creating snapshot set \n %s" % (
-                                f.exception()))
+                            "Exception creating snapshot set \n %s" %
+                            (f.exception()))
 
     @utils.worker
     def process_volume_set(self, resource):
@@ -845,9 +860,8 @@ class Snapshot(BaseAction):
             if 'Ebs' not in block_device:
                 continue
             volume_id = block_device['Ebs']['VolumeId']
-            description = "Automated,Backup,%s,%s" % (
-                resource['InstanceId'],
-                volume_id)
+            description = "Automated,Backup,%s,%s" % (resource['InstanceId'],
+                                                      volume_id)
             try:
                 response = c.create_snapshot(
                     DryRun=self.manager.config.dryrun,
@@ -855,19 +869,25 @@ class Snapshot(BaseAction):
                     Description=description)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
-                    self.log.warning(
-                        "action:%s volume:%s is incorrect state" % (
-                            self.__class__.__name__.lower(),
-                            volume_id))
+                    self.log.warning("action:%s volume:%s is incorrect state" %
+                                     (self.__class__.__name__.lower(),
+                                      volume_id))
                     continue
                 raise
 
-            tags = [
-                {'Key': 'Name', 'Value': volume_id},
-                {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
-                {'Key': 'custodian_snapshot', 'Value': ''}
-            ]
+            tags = [{
+                'Key': 'Name',
+                'Value': volume_id
+            }, {
+                'Key': 'InstanceId',
+                'Value': resource['InstanceId']
+            }, {
+                'Key': 'DeviceName',
+                'Value': block_device['DeviceName']
+            }, {
+                'Key': 'custodian_snapshot',
+                'Value': ''
+            }]
 
             copy_keys = self.data.get('copy-tags', [])
             copy_tags = []
@@ -877,17 +897,14 @@ class Snapshot(BaseAction):
                         copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 40:
-                self.log.warning(
-                    "action:%s volume:%s too many tags to copy" % (
-                        self.__class__.__name__.lower(),
-                        volume_id))
+                self.log.warning("action:%s volume:%s too many tags to copy" %
+                                 (self.__class__.__name__.lower(), volume_id))
                 copy_tags = []
 
             tags.extend(copy_tags)
             c.create_tags(
                 DryRun=self.manager.config.dryrun,
-                Resources=[
-                    response['SnapshotId']],
+                Resources=[response['SnapshotId']],
                 Tags=tags)
 
 
@@ -895,7 +912,7 @@ class Snapshot(BaseAction):
 class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
-    permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+    permissions = ("ec2:ModifyNetworkInterfaceAttribute", )
 
     def process(self, instances):
         if not len(instances):
@@ -916,43 +933,46 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
         for idx, i in enumerate(interfaces):
             client.modify_network_interface_attribute(
-                NetworkInterfaceId=i['NetworkInterfaceId'],
-                Groups=groups[idx])
+                NetworkInterfaceId=i['NetworkInterfaceId'], Groups=groups[idx])
 
 
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {
     'architecture': ('i386', 'x86_64'),
-    'availability-zone': str,
-    'iam-instance-profile.arn': str,
-    'image-id': str,
-    'instance-id': str,
-    'instance-lifecycle': ('spot',),
-    'instance-state-name': (
-        'pending',
-        'terminated',
-        'running',
-        'shutting-down',
-        'stopping',
-        'stopped'),
-    'instance.group-id': str,
-    'instance.group-name': str,
-    'tag-key': str,
-    'tag-value': str,
-    'tag:': str,
-    'vpc-id': str}
+    'availability-zone':
+    str,
+    'iam-instance-profile.arn':
+    str,
+    'image-id':
+    str,
+    'instance-id':
+    str,
+    'instance-lifecycle': ('spot', ),
+    'instance-state-name': ('pending', 'terminated', 'running',
+                            'shutting-down', 'stopping', 'stopped'),
+    'instance.group-id':
+    str,
+    'instance.group-name':
+    str,
+    'tag-key':
+    str,
+    'tag-value':
+    str,
+    'tag:':
+    str,
+    'vpc-id':
+    str
+}
 
 
 class QueryFilter(object):
-
     @classmethod
     def parse(cls, data):
         results = []
         for d in data:
             if not isinstance(d, dict):
-                raise ValueError(
-                    "EC2 Query Filter Invalid structure %s" % d)
+                raise ValueError("EC2 Query Filter Invalid structure %s" % d)
             results.append(cls(d).validate())
         return results
 
@@ -963,21 +983,19 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(self.data.keys()) == 1:
-            raise ValueError(
-                "EC2 Query Filter Invalid %s" % self.data)
+            raise ValueError("EC2 Query Filter Invalid %s" % self.data)
         self.key = self.data.keys()[0]
         self.value = self.data.values()[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
-                "EC2 Query Filter invalid filter name %s" % (self.data))
+            raise ValueError("EC2 Query Filter invalid filter name %s" %
+                             (self.data))
 
         if self.value is None:
-            raise ValueError(
-                "EC2 Query Filters must have a value, use tag-key"
-                " w/ tag name as value for tag present checks"
-                " %s" % self.data)
+            raise ValueError("EC2 Query Filters must have a value, use tag-key"
+                             " w/ tag name as value for tag present checks"
+                             " %s" % self.data)
         return self
 
     def query(self):

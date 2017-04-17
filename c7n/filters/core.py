@@ -32,7 +32,8 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr
 
 
-class FilterValidationError(Exception): pass
+class FilterValidationError(Exception):
+    pass
 
 
 # Matching filters annotate their key onto objects
@@ -78,11 +79,11 @@ OPERATORS = {
     'regex': regex_match,
     'in': operator_in,
     'ni': operator_ni,
-    'not-in': operator_ni}
+    'not-in': operator_ni
+}
 
 
 class FilterRegistry(PluginRegistry):
-
     def __init__(self, *args, **kw):
         super(FilterRegistry, self).__init__(*args, **kw)
         self.register('value', ValueFilter)
@@ -119,20 +120,19 @@ class FilterRegistry(PluginRegistry):
         else:
             filter_type = data.get('type')
         if not filter_type:
-            raise FilterValidationError(
-                "%s Invalid Filter %s" % (
-                    self.plugin_type, data))
+            raise FilterValidationError("%s Invalid Filter %s" %
+                                        (self.plugin_type, data))
         filter_class = self.get(filter_type)
         if filter_class is not None:
             return filter_class(data, manager).validate()
         else:
-            raise FilterValidationError(
-                "%s Invalid filter type %s" % (
-                    self.plugin_type, data))
+            raise FilterValidationError("%s Invalid filter type %s" %
+                                        (self.plugin_type, data))
 
 
 # Really should be an abstract base class (abc) or
 # zope.interface
+
 
 class Filter(object):
 
@@ -161,7 +161,6 @@ class Filter(object):
 
 
 class Or(Filter):
-
     def __init__(self, data, registry, manager):
         super(Or, self).__init__(data)
         self.registry = registry
@@ -185,13 +184,12 @@ class Or(Filter):
         resource_map = {r[resource_type.id]: r for r in resources}
         results = set()
         for f in self.filters:
-            results = results.union([
-                r[resource_type.id] for r in f.process(resources, event)])
+            results = results.union(
+                [r[resource_type.id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
 class And(Filter):
-
     def __init__(self, data, registry, manager):
         super(And, self).__init__(data)
         self.registry = registry
@@ -204,7 +202,6 @@ class And(Filter):
 
 
 class Not(Filter):
-    
     def __init__(self, data, registry, manager):
         super(Not, self).__init__(data)
         self.registry = registry
@@ -237,7 +234,7 @@ class Not(Filter):
         after = set([r[resource_type.id] for r in resources])
         results = before - after
         return [resource_map[r_id] for r_id in results]
-        
+
 
 class ValueFilter(Filter):
     """Generic value filter using jmespath
@@ -252,25 +249,44 @@ class ValueFilter(Filter):
         'required': ['type'],
         'properties': {
             # Doesn't mix well as enum with inherits that extend
-            'type': {'enum': ['value']},
-            'key': {'type': 'string'},
-            'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count']},
-            'default': {'type': 'object'},
+            'type': {
+                'enum': ['value']
+            },
+            'key': {
+                'type': 'string'
+            },
+            'value_type': {
+                'enum': [
+                    'age', 'integer', 'expiration', 'normalize', 'size',
+                    'cidr', 'cidr_size', 'swap', 'resource_count'
+                ]
+            },
+            'default': {
+                'type': 'object'
+            },
             'value_from': ValuesFrom.schema,
-            'value': {'oneOf': [
-                {'type': 'array'},
-                {'type': 'string'},
-                {'type': 'boolean'},
-                {'type': 'number'}]},
-            'op': {'enum': OPERATORS.keys()}}}
+            'value': {
+                'oneOf': [{
+                    'type': 'array'
+                }, {
+                    'type': 'string'
+                }, {
+                    'type': 'boolean'
+                }, {
+                    'type': 'number'
+                }]
+            },
+            'op': {
+                'enum': OPERATORS.keys()
+            }
+        }
+    }
 
     annotate = True
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
-        
+
         The `resource_count` type works a little differently because it operates
         on the entire set of resources.  It:
           - does not require `key`
@@ -279,13 +295,14 @@ class ValueFilter(Filter):
         """
         for field in ('op', 'value'):
             if field not in self.data:
-                raise FilterValidationError(
-                    "Missing '%s' in value filter %s" % (field, self.data))
+                raise FilterValidationError("Missing '%s' in value filter %s" %
+                                            (field, self.data))
 
         if not (isinstance(self.data['value'], int) or
                 isinstance(self.data['value'], list)):
             raise FilterValidationError(
-                "`value` must be an integer in resource_count filter %s" % self.data)
+                "`value` must be an integer in resource_count filter %s" %
+                self.data)
 
         # I don't see how to support regex for this?
         if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
@@ -297,12 +314,12 @@ class ValueFilter(Filter):
     def validate(self):
         if len(self.data) == 1:
             return self
-        
+
         # `resource_count` requires a slightly different schema than the rest of
         # the value filters because it operates on the full resource list
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
-        
+
         if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
@@ -318,8 +335,8 @@ class ValueFilter(Filter):
                 try:
                     re.compile(self.data['value'])
                 except re.error as e:
-                    raise FilterValidationError(
-                        "Invalid regex: %s %s" % (e, self.data))
+                    raise FilterValidationError("Invalid regex: %s %s" %
+                                                (e, self.data))
         return self
 
     def __call__(self, i):
@@ -332,7 +349,8 @@ class ValueFilter(Filter):
         return matched
 
     def process(self, resources, event=None):
-        # For the resource_count filter we operate on the full set of resources.
+        # For the resource_count filter we operate on the full set of
+        # resources.
         if self.data.get('value_type') == 'resource_count':
             op = OPERATORS[self.data.get('op')]
             if op(len(resources), self.data.get('value')):
@@ -442,8 +460,8 @@ class ValueFilter(Filter):
         elif self.vtype == 'cidr':
             s = parse_cidr(sentinel)
             v = parse_cidr(value)
-            if (isinstance(s, ipaddress._BaseAddress)
-                    and isinstance(v, ipaddress._BaseNetwork)):
+            if (isinstance(s, ipaddress._BaseAddress) and
+                    isinstance(v, ipaddress._BaseNetwork)):
                 return v, s
             return s, v
         elif self.vtype == 'cidr_size':
@@ -505,7 +523,8 @@ class AgeFilter(Filter):
                 n = datetime.now(tz=tzutc())
             else:
                 n = datetime.now()
-            self.threshold_date = n - timedelta(days=days, hours=hours, minutes=minutes)
+            self.threshold_date = n - \
+                timedelta(days=days, hours=hours, minutes=minutes)
 
         return op(self.threshold_date, v)
 

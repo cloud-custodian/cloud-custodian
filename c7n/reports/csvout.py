@@ -58,7 +58,6 @@ from dateutil.parser import parse as date_parse
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session, dumps
 
-
 log = logging.getLogger('custodian.reports')
 
 
@@ -67,20 +66,16 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
     formatter = Formatter(
         policy.resource_manager,
         extra_fields=options.field,
-        no_default_fields=options.no_default_fields,
-    )
+        no_default_fields=options.no_default_fields, )
 
     if policy.ctx.output.use_s3():
-        records = record_set(
-            policy.session_factory,
-            policy.ctx.output.bucket,
-            policy.ctx.output.key_prefix,
-            start_date)
+        records = record_set(policy.session_factory, policy.ctx.output.bucket,
+                             policy.ctx.output.key_prefix, start_date)
     else:
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
     log.debug("Found %d records", len(records))
-    
+
     rows = formatter.to_csv(records)
     if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers())
@@ -128,9 +123,10 @@ def _get_values(record, field_list, tag_map):
 
 
 class Formatter(object):
-
-    def __init__(
-            self, resource_manager, extra_fields=(), no_default_fields=None):
+    def __init__(self,
+                 resource_manager,
+                 extra_fields=(),
+                 no_default_fields=None):
 
         self.resource_manager = resource_manager
         # Lookup default fields for resource type.
@@ -183,8 +179,7 @@ class Formatter(object):
         date_sort = ('CustodianDate' in records[0] and 'CustodianDate' or
                      self._date_field)
         if date_sort:
-            records.sort(
-                key=lambda r: r[date_sort], reverse=reverse)
+            records.sort(key=lambda r: r[date_sort], reverse=reverse)
 
         uniq = self.uniq_by_id(records)
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
@@ -198,8 +193,7 @@ def fs_record_set(output_path, policy_name):
     if not os.path.exists(record_path):
         return []
 
-    mdate = datetime.fromtimestamp(
-        os.stat(record_path).st_ctime)
+    mdate = datetime.fromtimestamp(os.stat(record_path).st_ctime)
 
     with open(record_path) as fh:
         records = json.load(fh)
@@ -219,29 +213,30 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     key_count = 0
 
     marker = key_prefix.strip("/") + "/" + start_date.strftime(
-         '%Y/%m/%d/00') + "/resources.json.gz"
+        '%Y/%m/%d/00') + "/resources.json.gz"
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        StartAfter=marker,
-    )
+        StartAfter=marker, )
 
     with ThreadPoolExecutor(max_workers=20) as w:
         for key_set in p:
             if 'Contents' not in key_set:
                 continue
-            keys = [k for k in key_set['Contents']
-                    if k['Key'].endswith('resources.json.gz')]
+            keys = [
+                k for k in key_set['Contents']
+                if k['Key'].endswith('resources.json.gz')
+            ]
             key_count += len(keys)
-            futures = map(lambda k: w.submit(
-                get_records, bucket, k, session_factory), keys)
+            futures = map(
+                lambda k: w.submit(get_records, bucket, k, session_factory),
+                keys)
 
             for f in as_completed(futures):
                 records.extend(f.result())
 
-    log.info("Fetched %d records across %d files" % (
-        len(records), key_count))
+    log.info("Fetched %d records across %d files" % (len(records), key_count))
     return records
 
 
@@ -259,8 +254,8 @@ def get_records(bucket, key, session_factory):
     blob = StringIO(result['Body'].read())
 
     records = json.load(gzip.GzipFile(fileobj=blob))
-    log.debug("bucket: %s key: %s records: %d",
-              bucket, key['Key'], len(records))
+    log.debug("bucket: %s key: %s records: %d", bucket, key['Key'],
+              len(records))
     for r in records:
         r['CustodianDate'] = custodian_date
     return records

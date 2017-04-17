@@ -159,14 +159,26 @@ class Time(Filter):
     schema = {
         'type': 'object',
         'properties': {
-            'tag': {'type': 'string'},
-            'default_tz': {'type': 'string'},
-            'weekends': {'type': 'boolean'},
-            'weekends-only': {'type': 'boolean'},
-            'opt-out': {'type': 'boolean'},
-            'debug': {'type': 'boolean'},
-            }
+            'tag': {
+                'type': 'string'
+            },
+            'default_tz': {
+                'type': 'string'
+            },
+            'weekends': {
+                'type': 'boolean'
+            },
+            'weekends-only': {
+                'type': 'boolean'
+            },
+            'opt-out': {
+                'type': 'boolean'
+            },
+            'debug': {
+                'type': 'boolean'
+            },
         }
+    }
 
     time_type = None
 
@@ -190,13 +202,15 @@ class Time(Filter):
         'bst': 'Europe/London',
         'ist': 'Europe/Dublin',
         'cet': 'Europe/Berlin',
-        'it': 'Asia/Kolkata', # Technically IST (Indian Standard Time), but that's the same as Ireland
+        # Technically IST (Indian Standard Time), but that's the same as
+        # Ireland
+        'it': 'Asia/Kolkata',
         'jst': 'Asia/Tokyo',
         'kst': 'Asia/Seoul',
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
         'brt': 'America/Sao_Paulo'
-        }
+    }
 
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
@@ -227,14 +241,13 @@ class Time(Filter):
         resources = super(Time, self).process(resources)
         if self.parse_errors and self.manager and self.manager.log_dir:
             self.log.warning("parse errors %d", len(self.parse_errors))
-            with open(join(
-                    self.manager.log_dir, 'parse_errors.json'), 'w') as fh:
+            with open(join(self.manager.log_dir, 'parse_errors.json'),
+                      'w') as fh:
                 dumps(self.parse_errors, fh=fh)
             self.parse_errors = []
         if self.opted_out and self.manager and self.manager.log_dir:
             self.log.debug("disabled count %d", len(self.opted_out))
-            with open(join(
-                    self.manager.log_dir, 'opted_out.json'), 'w') as fh:
+            with open(join(self.manager.log_dir, 'opted_out.json'), 'w') as fh:
                 dumps(self.opted_out, fh=fh)
             self.opted_out = []
         return resources
@@ -244,16 +257,15 @@ class Time(Filter):
         # Sigh delayed init, due to circle dep, process/init would be better
         # but unit testing is calling this direct.
         if self.id_key is None:
-            self.id_key = (
-                self.manager is None and 'InstanceId'
-                or self.manager.get_model().id)
+            self.id_key = (self.manager is None and 'InstanceId' or
+                           self.manager.get_model().id)
 
         # The resource tag is not present, if we're not running in an opt-out
         # mode, we're done.
         if value is False:
             if not self.opt_out:
                 return False
-            value = "" # take the defaults
+            value = ""  # take the defaults
 
         # Resource opt out, track and record
         if 'off' == value:
@@ -264,10 +276,9 @@ class Time(Filter):
 
         try:
             return self.process_resource_schedule(i, value)
-        except:
-            log.exception(
-                "%s failed to process resource:%s value:%s",
-                self.__class__.__name__, i[self.id_key], value)
+        except BaseException:
+            log.exception("%s failed to process resource:%s value:%s",
+                          self.__class__.__name__, i[self.id_key], value)
             return False
 
     def process_resource_schedule(self, i, value):
@@ -287,15 +298,14 @@ class Time(Filter):
             schedule = None
 
         if schedule is None:
-            log.warning(
-                "Invalid schedule on resource:%s value:%s", rid, value)
+            log.warning("Invalid schedule on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
 
         tz = self.get_tz(schedule['tz'])
         if not tz:
-            log.warning(
-                "Could not resolve tz on resource:%s value:%s", rid, value)
+            log.warning("Could not resolve tz on resource:%s value:%s", rid,
+                        value)
             self.parse_errors.append((rid, value))
             return False
 
@@ -339,16 +349,25 @@ class Time(Filter):
 class OffHour(Time):
 
     schema = type_schema(
-        'offhour', rinherit=Time.schema, required=['offhour', 'default_tz'],
-        offhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        'offhour',
+        rinherit=Time.schema,
+        required=['offhour', 'default_tz'],
+        offhour={'type': 'integer',
+                 'minimum': 0,
+                 'maximum': 24})
     time_type = "off"
 
     DEFAULT_HR = 19
 
     def get_default_schedule(self):
-        default = {'tz': self.default_tz, self.time_type: [
-            {'hour': self.data.get(
-                "%shour" % self.time_type, self.DEFAULT_HR)}]}
+        default = {
+            'tz':
+            self.default_tz,
+            self.time_type: [{
+                'hour':
+                self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
+            }]
+        }
         if self.weekends_only:
             default[self.time_type][0]['days'] = [4]
         elif self.weekends:
@@ -361,16 +380,25 @@ class OffHour(Time):
 class OnHour(Time):
 
     schema = type_schema(
-        'onhour', rinherit=Time.schema, required=['onhour', 'default_tz'],
-        onhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        'onhour',
+        rinherit=Time.schema,
+        required=['onhour', 'default_tz'],
+        onhour={'type': 'integer',
+                'minimum': 0,
+                'maximum': 24})
     time_type = "on"
 
     DEFAULT_HR = 7
 
     def get_default_schedule(self):
-        default = {'tz': self.default_tz, self.time_type: [
-            {'hour': self.data.get(
-                "%shour" % self.time_type, self.DEFAULT_HR)}]}
+        default = {
+            'tz':
+            self.default_tz,
+            self.time_type: [{
+                'hour':
+                self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
+            }]
+        }
         if self.weekends_only:
             # turn on monday
             default[self.time_type][0]['days'] = [0]
@@ -522,11 +550,12 @@ class ScheduleParser(object):
         # single day specified
         if days in self.DAY_MAP:
             return [self.DAY_MAP[days]]
-        day_range = [d for d in map(self.DAY_MAP.get, days.split('-'))
-                     if d is not None]
+        day_range = [
+            d for d in map(self.DAY_MAP.get, days.split('-')) if d is not None
+        ]
         if not len(day_range) == 2:
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1]+1)
+            return range(day_range[0], 7) + range(day_range[1] + 1)
         return range(min(day_range), max(day_range) + 1)

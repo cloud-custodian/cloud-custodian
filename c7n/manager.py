@@ -18,7 +18,6 @@ from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.utils import dumps
 
-
 resources = PluginRegistry('resources')
 
 
@@ -36,8 +35,8 @@ class ResourceManager(object):
         self.data = data
         self.log_dir = ctx.log_dir
         self._cache = cache.factory(self.ctx.options)
-        self.log = logging.getLogger('custodian.resources.%s' % (
-            self.__class__.__name__.lower()))
+        self.log = logging.getLogger('custodian.resources.%s' %
+                                     (self.__class__.__name__.lower()))
 
         if self.filter_registry:
             self.filters = self.filter_registry.parse(
@@ -77,18 +76,18 @@ class ResourceManager(object):
     def filter_resources(self, resources, event=None):
         original = len(resources)
         if event and event.get('debug', False):
-            self.log.info(
-                "Filtering resources with %s", self.filters)
+            self.log.info("Filtering resources with %s", self.filters)
         for f in self.filters:
             if not resources:
                 break
             rcount = len(resources)
             resources = f.process(resources, event)
             if event and event.get('debug', False):
-                self.log.debug(
-                    "applied filter %s %d->%d", f, rcount, len(resources))
-        self.log.debug("Filtered from %d to %d %s" % (
-            original, len(resources), self.__class__.__name__.lower()))
+                self.log.debug("applied filter %s %d->%d", f, rcount,
+                               len(resources))
+        self.log.debug("Filtered from %d to %d %s" %
+                       (original, len(resources),
+                        self.__class__.__name__.lower()))
         return resources
 
     def get_model(self):

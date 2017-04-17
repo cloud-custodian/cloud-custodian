@@ -32,8 +32,7 @@ from c7n.logs_support import (
     normalized_log_entries,
     log_entries_in_range,
     log_entries_from_s3,
-    log_entries_from_group,
-)
+    log_entries_from_group, )
 from c7n.version import version
 
 from c7n.resources import load_resources
@@ -55,17 +54,17 @@ def load(options, path, format='yaml', validate=True):
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
+            raise Exception("Failed to validate on policy %s \n %s" %
+                            (errors[1], errors[0]))
     return PolicyCollection(data, options)
 
 
 class PolicyCollection(object):
-
     def __init__(self, data, options):
         self.data = data
         self.options = options
@@ -74,8 +73,9 @@ class PolicyCollection(object):
         self._all_policies = []
         for p in self.data.get('policies', []):
             self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
-        
+                Policy(
+                    p, options, session_factory=self.test_session_factory()))
+
         # Do an initial filtering
         self.policies = []
         resource_type = getattr(self.options, 'resource_type', None)
@@ -100,7 +100,7 @@ class PolicyCollection(object):
             policies.append(policy)
 
         return policies
-    
+
     def __iter__(self):
         return iter(self.policies)
 
@@ -149,15 +149,16 @@ class PolicyExecutionMode(object):
         """Retrieve any associated metrics for the policy."""
         values = {}
         default_dimensions = {
-            'Policy': self.policy.name, 'ResType': self.policy.resource_type,
-            'Scope': 'Policy'}
+            'Policy': self.policy.name,
+            'ResType': self.policy.resource_type,
+            'Scope': 'Policy'
+        }
 
         metrics = list(self.POLICY_METRICS)
 
         # Support action, and filter custom metrics
-        for el in itertools.chain(
-                self.policy.resource_manager.actions,
-                self.policy.resource_manager.filters):
+        for el in itertools.chain(self.policy.resource_manager.actions,
+                                  self.policy.resource_manager.filters):
             if el.metrics:
                 metrics.extend(el.metrics)
 
@@ -173,9 +174,10 @@ class PolicyExecutionMode(object):
                 dimensions.update(m_dimensions)
             results = client.get_metric_statistics(
                 Namespace=DEFAULT_NAMESPACE,
-                Dimensions=[
-                    {'Name': k, 'Value': v} for k, v
-                    in dimensions.items()],
+                Dimensions=[{
+                    'Name': k,
+                    'Value': v
+                } for k, v in dimensions.items()],
                 Statistics=['Sum', 'Average'],
                 StartTime=start,
                 EndTime=end,
@@ -204,30 +206,29 @@ class PullMode(PolicyExecutionMode):
             self.policy.log.info(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region or 'default',
-                version)
+                self.policy.options.region or 'default', version)
 
             s = time.time()
             resources = self.policy.resource_manager.resources()
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s has count:%d time:%0.2f" % (
-                    self.policy.name,
-                    self.policy.resource_type,
-                    len(resources), rt))
+                "policy: %s resource:%s has count:%d time:%0.2f" %
+                (self.policy.name, self.policy.resource_type, len(resources),
+                 rt))
             self.policy.ctx.metrics.put_metric(
                 "ResourceCount", len(resources), "Count", Scope="Policy")
             self.policy.ctx.metrics.put_metric(
                 "ResourceTime", rt, "Seconds", Scope="Policy")
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
+            self.policy._write_file('resources.json',
+                                    utils.dumps(resources, indent=2))
 
             if not resources:
                 return []
             elif (self.policy.max_resources is not None and
                   len(resources) > self.policy.max_resources):
                 msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources), self.policy.max_resources)
+                    self.policy.name, len(resources),
+                    self.policy.max_resources)
                 self.policy.log.warning(msg)
                 raise RuntimeError(msg)
 
@@ -239,14 +240,13 @@ class PullMode(PolicyExecutionMode):
             for a in self.policy.resource_manager.actions:
                 s = time.time()
                 results = a.process(resources)
-                self.policy.log.info(
-                    "policy: %s action: %s"
-                    " resources: %d"
-                    " execution_time: %0.2f" % (
-                        self.policy.name, a.name,
-                        len(resources), time.time()-s))
-                self.policy._write_file(
-                    "action-%s" % a.name, utils.dumps(results))
+                self.policy.log.info("policy: %s action: %s"
+                                     " resources: %d"
+                                     " execution_time: %0.2f" %
+                                     (self.policy.name, a.name, len(resources),
+                                      time.time() - s))
+                self.policy._write_file("action-%s" % a.name,
+                                        utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
@@ -260,21 +260,18 @@ class PullMode(PolicyExecutionMode):
                 session,
                 self.policy.options.log_group,
                 start,
-                end,
-            )
+                end, )
         elif log_source.use_s3():
             raw_entries = log_entries_from_s3(
                 self.policy.session_factory,
                 log_source,
                 start,
-                end,
-            )
+                end, )
             # log files can be downloaded out of order, so sort on timestamp
             # log_gen isn't really a generator once we do this, but oh well
             log_gen = sorted(
                 normalized_log_entries(raw_entries),
-                key=lambda e: e.get('timestamp', 0),
-            )
+                key=lambda e: e.get('timestamp', 0), )
         else:
             log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
             with open(log_path) as log_fh:
@@ -283,22 +280,20 @@ class PullMode(PolicyExecutionMode):
         return log_entries_in_range(
             log_gen,
             start,
-            end,
-        )
+            end, )
 
 
 class LambdaMode(PolicyExecutionMode):
     """A policy that runs/executes in lambda."""
 
-    POLICY_METRICS = ('ResourceCount',)
+    POLICY_METRICS = ('ResourceCount', )
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
         manager = LambdaManager(self.policy.session_factory)
-        values = manager.metrics(
-            [PolicyLambda(self.policy)], start, end, period)[0]
-        values.update(
-            super(LambdaMode, self).get_metrics(start, end, period))
+        values = manager.metrics([PolicyLambda(self.policy)], start, end,
+                                 period)[0]
+        values.update(super(LambdaMode, self).get_metrics(start, end, period))
         return values
 
     def resolve_resources(self, event):
@@ -340,17 +335,20 @@ class LambdaMode(PolicyExecutionMode):
 
         if not resources:
             self.policy.log.info(
-                "policy: %s resources: %s no resources matched" % (
-                    self.policy.name, self.policy.resource_type))
+                "policy: %s resources: %s no resources matched" %
+                (self.policy.name, self.policy.resource_type))
             return
 
         self.policy.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            'ResourceCount',
+            len(resources),
+            'Count',
+            Scope="Policy",
             buffer=False)
 
         if 'debug' in event:
-            self.policy.log.info(
-                "Invoking actions %s", self.policy.resource_manager.actions)
+            self.policy.log.info("Invoking actions %s",
+                                 self.policy.resource_manager.actions)
         for action in self.policy.resource_manager.actions:
             self.policy.log.info(
                 "policy: %s invoking action: %s resources: %d",
@@ -366,8 +364,8 @@ class LambdaMode(PolicyExecutionMode):
         from c7n.mu import PolicyLambda, LambdaManager
 
         with self.policy.ctx:
-            self.policy.log.info(
-                "Provisioning policy lambda %s", self.policy.name)
+            self.policy.log.info("Provisioning policy lambda %s",
+                                 self.policy.name)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -376,7 +374,8 @@ class LambdaMode(PolicyExecutionMode):
                 manager = LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                PolicyLambda(self.policy), 'current',
+                PolicyLambda(self.policy),
+                'current',
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
@@ -385,8 +384,7 @@ class LambdaMode(PolicyExecutionMode):
         return log_entries_in_range(
             log_gen,
             start,
-            end,
-        )
+            end, )
 
 
 class PeriodicMode(LambdaMode, PullMode):
@@ -418,8 +416,10 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
 
     def resolve_resources(self, event):
-        return [utils.camelResource(
-            self.cfg_event['configurationItem']['configuration'])]
+        return [
+            utils.camelResource(
+                self.cfg_event['configurationItem']['configuration'])
+        ]
 
     def run(self, event, lambda_context):
         self.cfg_event = json.loads(event['invokingEvent'])
@@ -427,39 +427,49 @@ class ConfigRuleMode(LambdaMode):
         evaluation = None
         # TODO config resource type matches policy check
         if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
-                "ResourceDeleted",
-                "ResourceNotRecorded",
+                "ResourceDeleted", "ResourceNotRecorded",
                 "ResourceDeletedNotRecorded"):
             evaluation = {
                 'annotation': 'The rule does not apply.',
-                'compliance_type': 'NOT_APPLICABLE'}
+                'compliance_type': 'NOT_APPLICABLE'
+            }
 
         if evaluation is None:
             resources = super(ConfigRuleMode, self).run(event, lambda_context)
             match = self.policy.data['mode'].get('match-compliant', False)
             if (match and resources) or (not match and not resources):
                 evaluation = {
-                    'compliance_type': 'COMPLIANT',
-                    'annotation': 'The resource is compliant with policy:%s.' % (
-                        self.policy.name)}
+                    'compliance_type':
+                    'COMPLIANT',
+                    'annotation':
+                    'The resource is compliant with policy:%s.' %
+                    (self.policy.name)
+                }
             else:
                 evaluation = {
-                    'compliance_type': 'NON_COMPLIANT',
-                    'annotation': 'Resource is not compliant with policy:%s' % (
-                        self.policy.name)
+                    'compliance_type':
+                    'NON_COMPLIANT',
+                    'annotation':
+                    'Resource is not compliant with policy:%s' %
+                    (self.policy.name)
                 }
 
         client = utils.local_session(
             self.policy.session_factory).client('config')
         client.put_evaluations(
             Evaluations=[{
-                'ComplianceResourceType': cfg_item['resourceType'],
-                'ComplianceResourceId': cfg_item['resourceId'],
-                'ComplianceType': evaluation['compliance_type'],
-                'Annotation': evaluation['annotation'],
+                'ComplianceResourceType':
+                cfg_item['resourceType'],
+                'ComplianceResourceId':
+                cfg_item['resourceId'],
+                'ComplianceType':
+                evaluation['compliance_type'],
+                'Annotation':
+                evaluation['annotation'],
                 # TODO ? if not applicable use current timestamp
-                'OrderingTimestamp': cfg_item[
-                    'configurationItemCaptureTime']}],
+                'OrderingTimestamp':
+                cfg_item['configurationItemCaptureTime']
+            }],
             ResultToken=event.get('resultToken', 'No token found.'))
         return resources
 
@@ -472,7 +482,8 @@ class Policy(object):
         'cloudtrail': CloudTrailMode,
         'ec2-instance-state': EC2InstanceState,
         'asg-instance-state': ASGInstanceState,
-        'config-rule': ConfigRuleMode}
+        'config-rule': ConfigRuleMode
+    }
 
     log = logging.getLogger('custodian.policy')
 
@@ -481,17 +492,15 @@ class Policy(object):
         self.options = options
         assert "name" in self.data
         if session_factory is None:
-            session_factory = SessionFactory(
-                options.region,
-                options.profile,
-                options.assume_role)
+            session_factory = SessionFactory(options.region, options.profile,
+                                             options.assume_role)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.get_resource_manager()
 
     def __repr__(self):
-        return "<Policy resource: %s name: %s>" % (
-            self.resource_type, self.name)
+        return "<Policy resource: %s name: %s>" % (self.resource_type,
+                                                   self.name)
 
     @property
     def name(self):
@@ -582,6 +591,5 @@ class Policy(object):
         resource_type = self.data.get('resource')
         factory = resources.get(resource_type)
         if not factory:
-            raise ValueError(
-                "Invalid resource type: %s" % resource_type)
+            raise ValueError("Invalid resource type: %s" % resource_type)
         return factory(self.ctx, self.data)

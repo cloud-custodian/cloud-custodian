@@ -19,7 +19,6 @@ from c7n.utils import local_session, type_schema, get_retry
 
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
-
     class resource_type(object):
         service = 'efs'
         enum_spec = ('describe_file_systems', 'FileSystems', None)
@@ -34,14 +33,13 @@ class ElasticFileSystem(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ('efs:DescribeMountTargets',
-                   'efs:DeleteMountTargets',
+    permissions = ('efs:DescribeMountTargets', 'efs:DeleteMountTargets',
                    'efs:DeleteFileSystem')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
         self.unmount_filesystems(resources)
-        retry = get_retry(('FileSystemInUse',), 12)
+        retry = get_retry(('FileSystemInUse', ), 12)
         for r in resources:
             retry(client.delete_file_system, FileSystemId=r['FileSystemId'])
 

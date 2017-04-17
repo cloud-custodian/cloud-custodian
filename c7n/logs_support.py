@@ -29,7 +29,6 @@ from gzip import GzipFile
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session
 
-
 log = logging.getLogger('custodian.logs')
 
 
@@ -85,39 +84,39 @@ def log_entries_from_s3(session_factory, output, start, end):
     client = local_session(session_factory).client('s3')
     key_prefix = output.key_prefix.strip('/')
     local_tz = tz.tzlocal()
-    start = datetime.fromtimestamp(
-        _timestamp_from_string(start) / 1000
-    )
-    end = datetime.fromtimestamp(
-        _timestamp_from_string(end) / 1000
-    ).replace(tzinfo=local_tz)
+    start = datetime.fromtimestamp(_timestamp_from_string(start) / 1000)
+    end = datetime.fromtimestamp(_timestamp_from_string(end) / 1000).replace(
+        tzinfo=local_tz)
     records = []
     key_count = 0
     log_filename = 'custodian-run.log.gz'
     marker = '{}/{}/{}'.format(
         key_prefix,
         start.strftime('%Y/%m/%d/00'),
-        log_filename,
-    )
+        log_filename, )
     p = client.get_paginator('list_objects_v2').paginate(
         Bucket=output.bucket,
         Prefix=key_prefix + '/',
-        StartAfter=marker,
-    )
+        StartAfter=marker, )
     with ThreadPoolExecutor(max_workers=20) as w:
         for key_set in p:
             if 'Contents' not in key_set:
                 continue
-            log_keys = [k for k in key_set['Contents']
-                    if k['Key'].endswith(log_filename)]
+            log_keys = [
+                k for k in key_set['Contents']
+                if k['Key'].endswith(log_filename)
+            ]
             keys = [k for k in log_keys if k['LastModified'] < end]
             if len(log_keys) >= 1 and len(keys) == 0:
                 # there were logs, but we're now past the end date
                 break
             key_count += len(keys)
             futures = map(
-                lambda k:
-                    w.submit(get_records, output.bucket, k, session_factory),
+                lambda k: w.submit(
+                    get_records,
+                    output.bucket,
+                    k,
+                    session_factory),
                 keys,
             )
 
@@ -126,8 +125,7 @@ def log_entries_from_s3(session_factory, output, start, end):
 
     log.info('Fetched {} records across {} files'.format(
         len(records),
-        key_count,
-    ))
+        key_count, ))
     return records
 
 
@@ -137,8 +135,8 @@ def get_records(bucket, key, session_factory):
     blob = StringIO(result['Body'].read())
 
     records = GzipFile(fileobj=blob).readlines()
-    log.debug("bucket: %s key: %s records: %d",
-              bucket, key['Key'], len(records))
+    log.debug("bucket: %s key: %s records: %d", bucket, key['Key'],
+              len(records))
     return records
 
 
@@ -157,8 +155,7 @@ def log_entries_from_group(session, group_name, start, end):
             logGroupName=group_name,
             orderBy="LastEventTime",
             limit=3,
-            descending=True,
-        )
+            descending=True, )
     except ClientError as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
             return
@@ -170,7 +167,6 @@ def log_entries_from_group(session, group_name, start, end):
             logGroupName=group_name,
             logStreamName=s['logStreamName'],
             startTime=start,
-            endTime=end,
-        )
+            endTime=end, )
         for e in result['events']:
             yield e
