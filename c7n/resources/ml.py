@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('ml-model')
 class MLModel(QueryResourceManager):
-
     class resource_type(object):
         service = 'machinelearning'
         enum_spec = ('describe_ml_models', 'Results', None)
@@ -26,5 +25,5 @@ class MLModel(QueryResourceManager):
         name = 'Name'
         date = 'CreatedAt'
         # need to specify request-mode dimension as well
-        #dimension = 'MLModelId'
+        # dimension = 'MLModelId'
         dimension = None

@@ -33,12 +33,10 @@ from c7n.manager import resources
 from c7n.resources import load_resources
 from c7n import schema
 
-
 log = logging.getLogger('custodian.commands')
 
 
 def policy_command(f):
-
     @wraps(f)
     def _load_policies(options):
         load_resources()
@@ -54,14 +52,18 @@ def policy_command(f):
                 errors += 1
                 continue
             except ValueError as e:
-                eprint('Error: problem loading policy file ({})'.format(e.message))
+                eprint('Error: problem loading policy file ({})'.format(
+                    e.message))
                 errors += 1
                 continue
 
             if collection is None:
-                log.debug('Loaded file {}. Contained no policies.'.format(file))
+                log.debug(
+                    'Loaded file {}. Contained no policies.'.format(file))
             else:
-                log.debug('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
+                log.debug(
+                    'Loaded file {}. Contains {} policies (after filtering)'.
+                    format(file, len(collection)))
                 policies.extend(collection.policies)
                 all_policies.extend(collection.unfiltered_policies)
 
@@ -126,27 +128,27 @@ def validate(options):
         with open(config_file) as fh:
             if format in ('yml', 'yaml'):
                 data = yaml.safe_load(fh.read())
-            if format in ('json',):
+            if format in ('json', ):
                 data = json.load(fh)
 
         errors = schema.validate(data, schm)
         conf_policy_names = {p['name'] for p in data.get('policies', ())}
         dupes = conf_policy_names.intersection(used_policy_names)
         if len(dupes) >= 1:
-            errors.append(ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)
-                )
-            ))
+            errors.append(
+                ValueError(
+                    "Only one policy with a given name allowed, duplicates: %s"
+                    % (", ".join(dupes))))
         used_policy_names = used_policy_names.union(conf_policy_names)
         if not errors:
-            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            null_config = Bag(
+                dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
                 try:
                     Policy(p, null_config, Bag())
                 except Exception as e:
-                    msg = "Policy: %s is invalid: %s" % (
-                        p.get('name', 'unknown'), e)
+                    msg = "Policy: %s is invalid: %s" % (p.get(
+                        'name', 'unknown'), e)
                     errors.append(msg)
         if not errors:
             log.info("Configuration valid: {}".format(config_file))
@@ -162,8 +164,8 @@ def validate(options):
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.
 #
-#@policy_command
-#def access(options, policies):
+# @policy_command
+# def access(options, policies):
 #    permissions = set()
 #    for p in policies:
 #        permissions.update(p.get_permissions())
@@ -180,9 +182,8 @@ def run(options, policies):
             exit_code = 2
             if options.debug:
                 raise
-            log.exception(
-                "Error while executing policy %s, continuing" % (
-                    policy.name))
+            log.exception("Error while executing policy %s, continuing" %
+                          (policy.name))
     if exit_code != 0:
         sys.exit(exit_code)
 
@@ -192,7 +193,7 @@ def report(options, policies):
     if len(policies) != 1:
         eprint("Error: Report subcommand requires exactly one policy")
         sys.exit(1)
-    
+
     policy = policies.pop()
     odir = options.output_dir.rstrip(os.path.sep)
     if os.path.sep in odir and os.path.basename(odir) == policy.name:
@@ -204,8 +205,7 @@ def report(options, policies):
     delta = timedelta(days=options.days)
     begin_date = d - delta
     do_report(
-        policy, begin_date, options, sys.stdout,
-        raw_output_fh=options.raw)
+        policy, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
 
 @policy_command
@@ -217,10 +217,9 @@ def logs(options, policies):
     policy = policies.pop()
 
     for e in policy.get_logs(options.start, options.end):
-        print("%s: %s" % (
-            time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
-            e['message']))
+        print("%s: %s" % (time.strftime("%Y-%m-%d %H:%M:%S",
+                                        time.localtime(e['timestamp'] / 1000)),
+                          e['message']))
 
 
 def _schema_get_docstring(starting_class):
@@ -236,36 +235,40 @@ def _schema_get_docstring(starting_class):
 
 def schema_completer(prefix):
     """ For tab-completion via argcomplete, return completion options.
-    
+
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
     load_resources()
     components = prefix.split('.')
-    
+
     # Completions for resource
     if len(components) == 1:
         choices = [r for r in resources.keys() if r.startswith(prefix)]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     if components[0] not in resources.keys():
         return []
-    
+
     # Completions for category
     if len(components) == 2:
-        choices = ['{}.{}'.format(components[0], x)
-                   for x in ('actions', 'filters') if x.startswith(components[1])]
+        choices = [
+            '{}.{}'.format(components[0], x) for x in ('actions', 'filters')
+            if x.startswith(components[1])
+        ]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     # Completions for item
     elif len(components) == 3:
         resource_mapping = schema.resource_vocabulary()
-        return ['{}.{}.{}'.format(components[0], components[1], x) 
-                for x in resource_mapping[components[0]][components[1]]]
+        return [
+            '{}.{}.{}'.format(components[0], components[1], x)
+            for x in resource_mapping[components[0]][components[1]]
+        ]
 
     return []
 
@@ -298,7 +301,7 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(resources.keys()) }
+        resource_list = {'resources': sorted(resources.keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
 
@@ -314,7 +317,7 @@ def schema_cmd(options):
         sys.exit(1)
 
     if len(components) == 1:
-        del(resource_mapping[resource]['classes'])
+        del (resource_mapping[resource]['classes'])
         output = {resource: resource_mapping[resource]}
         print(yaml.safe_dump(output))
         return
@@ -331,8 +334,11 @@ def schema_cmd(options):
     if len(components) == 2:
         output = "No {} available for resource {}.".format(category, resource)
         if category in resource_mapping[resource]:
-            output = {resource: {
-                category: resource_mapping[resource][category]}}
+            output = {
+                resource: {
+                    category: resource_mapping[resource][category]
+                }
+            }
         print(yaml.safe_dump(output))
         return
 
@@ -342,7 +348,7 @@ def schema_cmd(options):
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
         eprint('Error: {} is not in the {} list for resource {}'.format(
-                item, category, resource))
+            item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
@@ -364,7 +370,9 @@ def schema_cmd(options):
             pp.pprint(cls.schema)
         else:
             # Shouldn't ever hit this, so exclude from cover
-            print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
+            print(
+                "No schema is available for this item.",
+                file=sys.sterr)  # pragma: no cover
         print('')
         return
 
@@ -410,14 +418,16 @@ def version_cmd(options):
     indent = 13
     pp = pprint.PrettyPrinter(indent=indent)
 
-    print("\nPlease copy/paste the following info along with any bug reports:\n")
+    print(
+        "\nPlease copy/paste the following info along with any bug reports:\n")
     print("Custodian:  ", version)
-    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
+    pyversion = sys.version.replace('\n',
+                                    '\n' + ' ' * indent)  # For readability
     print("Python:     ", pyversion)
     # os.uname is only available on recent versions of Unix
     try:
         print("Platform:   ", os.uname())
-    except:  # pragma: no cover
+    except BaseException:
         print("Platform:  ", sys.platform)
     print("Using venv: ", hasattr(sys, 'real_prefix'))
     print("PYTHONPATH: ")

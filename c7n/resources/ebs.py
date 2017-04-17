@@ -19,16 +19,16 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import (
-    CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, FilterValidationError, OPERATORS)
+from c7n.filters import (CrossAccountAccessFilter, Filter, FilterRegistry,
+                         AgeFilter, ValueFilter, ANNOTATION_KEY,
+                         FilterValidationError, OPERATORS)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
-from c7n.utils import (
-    local_session, set_annotation, chunks, type_schema, worker, camelResource)
+from c7n.utils import (local_session, set_annotation, chunks, type_schema,
+                       worker, camelResource)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
@@ -36,14 +36,13 @@ log = logging.getLogger('custodian.ebs')
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
 
+
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'snapshot'
-        enum_spec = (
-            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+        enum_spec = ('describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
         detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
@@ -52,14 +51,8 @@ class Snapshot(QueryResourceManager):
         date = 'StartTime'
         dimension = None
 
-        default_report_fields = (
-            'SnapshotId',
-            'VolumeId',
-            'tag:InstanceId',
-            'VolumeSize',
-            'StartTime',
-            'State',
-        )
+        default_report_fields = ('SnapshotId', 'VolumeId', 'tag:InstanceId',
+                                 'VolumeSize', 'StartTime', 'State', )
 
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
@@ -87,15 +80,16 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string',
+            'enum': OPERATORS.keys()})
     date_attribute = 'StartTime'
 
 
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
         return snapshots
-    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    #This will populate the cache.
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    # This will populate the cache.
     amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
@@ -112,7 +106,7 @@ def _filter_ami_snapshots(self, snapshots):
 @Snapshot.filter_registry.register('cross-account')
 class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
-    permissions = ('ec2:DescribeSnapshotAttribute',)
+    permissions = ('ec2:DescribeSnapshotAttribute', )
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
@@ -120,13 +114,13 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for resource_set in chunks(resources, 50):
-                futures.append(w.submit(
-                    self.process_resource_set, resource_set))
+                futures.append(
+                    w.submit(self.process_resource_set, resource_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Exception checking cross account access \n %s" % (
-                            f.exception()))
+                        "Exception checking cross account access \n %s" %
+                        (f.exception()))
                     continue
                 results.extend(f.result())
         return results
@@ -140,7 +134,9 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
                 SnapshotId=r['SnapshotId'],
                 Attribute='createVolumePermission')['CreateVolumePermissions']
             shared_accounts = {
-                g.get('Group') or g.get('UserId') for g in attrs}
+                g.get('Group') or g.get('UserId')
+                for g in attrs
+            }
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
                 r['c7n:CrossAccountViolations'] = list(delta_accounts)
@@ -204,20 +200,22 @@ class SnapshotDelete(BaseAction):
                   - delete
     """
 
-    schema = type_schema(
-        'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-    permissions = ('ec2.DeleteSnapshot',)
+    schema = type_schema('delete',
+                         **{'skip-ami-snapshots': {
+                             'type': 'boolean'
+                         }})
+    permissions = ('ec2.DeleteSnapshot', )
 
     def process(self, snapshots):
         self.image_snapshots = snaps = set()
-         # Be careful re image snapshots, we do this by default
+        # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         pre = len(snapshots)
         snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
         post = len(snapshots)
-        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
-                 post, pre-post)
+        log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots", post,
+                 pre - post)
 
         with self.executor_factory(max_workers=2) as w:
             futures = []
@@ -226,9 +224,8 @@ class SnapshotDelete(BaseAction):
                     w.submit(self.process_snapshot_set, snapshot_set))
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Exception deleting snapshot set \n %s" % (
-                            f.exception()))
+                    self.log.error("Exception deleting snapshot set \n %s" %
+                                   (f.exception()))
         return snapshots
 
     @worker
@@ -275,10 +272,9 @@ class CopySnapshot(BaseAction):
         'copy',
         target_region={'type': 'string'},
         target_key={'type': 'string'},
-        encrypted={'type': 'boolean'},
-    )
-    permissions = (
-        'ec2:CreateTags', 'ec2:CopySnapshot', 'ec2:DescribeSnapshots')
+        encrypted={'type': 'boolean'}, )
+    permissions = ('ec2:CreateTags', 'ec2:CopySnapshot',
+                   'ec2:DescribeSnapshots')
 
     def validate(self):
         if self.data.get('encrypted', True):
@@ -318,27 +314,24 @@ class CopySnapshot(BaseAction):
                     Description=r.get('Description', ''),
                     **params)['SnapshotId']
                 if r.get('Tags'):
-                    client.create_tags(
-                        Resources=[snapshot_id], Tags=r['Tags'])
+                    client.create_tags(Resources=[snapshot_id], Tags=r['Tags'])
                 r['c7n:CopiedSnapshot'] = snapshot_id
 
             if not cross_region or len(snapshot_set) < 5:
                 continue
 
             copy_ids = [r['c7n:CopiedSnapshot'] for r in snapshot_set]
-            self.log.debug(
-                "Waiting on cross-region snapshot copy %s", ",".join(copy_ids))
+            self.log.debug("Waiting on cross-region snapshot copy %s",
+                           ",".join(copy_ids))
             waiter = client.get_waiter('snapshot_completed')
             waiter.config.delay = 60
             waiter.config.max_attempts = 60
             waiter.wait(SnapshotIds=copy_ids)
-            self.log.debug(
-                "Cross region copy complete %s", ",".join(copy_ids))
+            self.log.debug("Cross region copy complete %s", ",".join(copy_ids))
 
 
 @resources.register('ebs')
 class EBS(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'volume'
@@ -350,13 +343,8 @@ class EBS(QueryResourceManager):
         dimension = 'VolumeId'
         metrics_namespace = 'AWS/EBS'
         config_type = "AWS::EC2::Volume"
-        default_report_fields = (
-            'VolumeId',
-            'Attachments[0].InstanceId',
-            'Size',
-            'VolumeType',
-            'KmsKeyId'
-        )
+        default_report_fields = ('VolumeId', 'Attachments[0].InstanceId',
+                                 'Size', 'VolumeType', 'KmsKeyId')
 
     filter_registry = filters
     action_registry = actions
@@ -385,8 +373,8 @@ class AttachedInstanceFilter(ValueFilter):
     def process(self, resources, event=None):
         original_count = len(resources)
         resources = [r for r in resources if r.get('Attachments')]
-        self.log.debug('Filtered from %d volumes to %d attached volumes' % (
-            original_count, len(resources)))
+        self.log.debug('Filtered from %d volumes to %d attached volumes' %
+                       (original_count, len(resources)))
         self.instance_map = self.get_instance_mapping(resources)
         return filter(self, resources)
 
@@ -399,16 +387,15 @@ class AttachedInstanceFilter(ValueFilter):
 
     def get_instance_mapping(self, resources):
         instance_ids = [r['Attachments'][0]['InstanceId'] for r in resources]
-        instances = self.manager.get_resource_manager(
-            'ec2').get_resources(instance_ids)
-        self.log.debug("Queried %d instances for %d volumes" % (
-            len(instances), len(resources)))
+        instances = self.manager.get_resource_manager('ec2').get_resources(
+            instance_ids)
+        self.log.debug("Queried %d instances for %d volumes" %
+                       (len(instances), len(resources)))
         return {i['InstanceId']: i for i in instances}
 
 
 @filters.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
-
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
 
@@ -454,17 +441,27 @@ class HealthFilter(HealthEventFilter):
 
     schema = type_schema(
         'health-event',
-        types={'type': 'array', 'items': {
-            'type': 'string',
-            'enum': ['AWS_EBS_DEGRADED_EBS_VOLUME_PERFORMANCE',
-                     'AWS_EBS_VOLUME_LOST']}},
-        statuses={'type': 'array', 'items': {
-            'type': 'string',
-            'enum': ['open', 'upcoming', 'closed']
-        }})
+        types={
+            'type': 'array',
+            'items': {
+                'type':
+                'string',
+                'enum': [
+                    'AWS_EBS_DEGRADED_EBS_VOLUME_PERFORMANCE',
+                    'AWS_EBS_VOLUME_LOST'
+                ]
+            }
+        },
+        statuses={
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'enum': ['open', 'upcoming', 'closed']
+            }
+        })
 
     permissions = HealthEventFilter.permissions + (
-        'config:GetResourceConfigHistory',)
+        'config:GetResourceConfigHistory', )
 
     def process(self, resources, event=None):
         if 'AWS_EBS_VOLUME_LOST' not in self.data['types']:
@@ -477,8 +474,9 @@ class HealthFilter(HealthEventFilter):
         resource_map = {}
 
         paginator = client.get_paginator('describe_events')
-        events = list(itertools.chain(
-            *[p['events']for p in paginator.paginate(filter=f)]))
+        events = list(
+            itertools.chain(
+                * [p['events'] for p in paginator.paginate(filter=f)]))
         entities = []
         self.process_event(events, entities)
 
@@ -487,15 +485,14 @@ class HealthFilter(HealthEventFilter):
             rid = e['entityValue']
             if not resource_map.get(rid):
                 resource_map[rid] = self.load_resource(rid)
-            resource_map[rid].setdefault(
-                'c7n:HealthEvent', []).append(event_map[e['eventArn']])
+            resource_map[rid].setdefault('c7n:HealthEvent',
+                                         []).append(event_map[e['eventArn']])
         return resource_map.values()
 
     def load_resource(self, rid):
         config = local_session(self.manager.session_factory).client('config')
         resources_histories = config.get_resource_config_history(
-            resourceType='AWS::EC2::Volume',
-            resourceId=rid,
+            resourceType='AWS::EC2::Volume', resourceId=rid,
             limit=2)['configurationItems']
         for r in resources_histories:
             if r['configurationItemStatus'] != u'ResourceDeleted':
@@ -535,7 +532,10 @@ class CopyInstanceTags(BaseAction):
 
     schema = type_schema(
         'copy-instance-tags',
-        tags={'type': 'array', 'items': {'type': 'string'}})
+        tags={'type': 'array',
+              'items': {
+                  'type': 'string'
+              }})
 
     def get_permissions(self):
         perms = self.manager.get_resource_manager('ec2').get_permissions()
@@ -547,30 +547,29 @@ class CopyInstanceTags(BaseAction):
         with self.executor_factory(max_workers=10) as w:
             futures = []
             for volume_set in chunks(reversed(volumes), size=100):
-                futures.append(
-                    w.submit(self.process_volume_set, volume_set))
+                futures.append(w.submit(self.process_volume_set, volume_set))
 
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Exception copying instance tags \n %s" % (
-                            f.exception()))
+                    self.log.error("Exception copying instance tags \n %s" %
+                                   (f.exception()))
 
     def process_volume_set(self, volume_set):
         instance_vol_map = {}
         for v in volume_set:
-            instance_vol_map.setdefault(
-                v['Attachments'][0]['InstanceId'], []).append(v)
+            instance_vol_map.setdefault(v['Attachments'][0]['InstanceId'],
+                                        []).append(v)
 
         instance_map = {
-            i['InstanceId']: i for i in
-            self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys())}
+            i['InstanceId']: i
+            for i in self.manager.get_resource_manager('ec2').get_resources(
+                instance_vol_map.keys())
+        }
 
         for i in instance_vol_map:
             try:
-                self.process_instance_volumes(
-                    instance_map[i], instance_vol_map[i])
+                self.process_instance_volumes(instance_map[i],
+                                              instance_vol_map[i])
             except Exception as e:
                 self.log.exception(
                     "Error copying instance tags to volumes \n %s" % e)
@@ -585,9 +584,9 @@ class CopyInstanceTags(BaseAction):
             # to delete extant ones inline, else trim-tags action.
             if len(copy_tags) > 40:
                 log.warning(
-                    "action:%s volume:%s instance:%s too many tags to copy" % (
-                        self.__class__.__name__.lower(),
-                        v['VolumeId'], instance['InstanceId']))
+                    "action:%s volume:%s instance:%s too many tags to copy" %
+                    (self.__class__.__name__.lower(), v['VolumeId'],
+                     instance['InstanceId']))
                 continue
             try:
                 self.manager.retry(
@@ -603,8 +602,8 @@ class CopyInstanceTags(BaseAction):
     def get_volume_tags(self, volume, instance, attachment):
         only_tags = self.data.get('tags', [])  # specify which tags to copy
         copy_tags = []
-        extant_tags = dict([
-            (t['Key'], t['Value']) for t in volume.get('Tags', [])])
+        extant_tags = dict([(t['Key'], t['Value'])
+                            for t in volume.get('Tags', [])])
 
         for t in instance.get('Tags', ()):
             if only_tags and not t['Key'] in only_tags:
@@ -620,11 +619,14 @@ class CopyInstanceTags(BaseAction):
            and extant_tags['LastAttachInstance'] == attachment['InstanceId']:
             return copy_tags
 
-        copy_tags.append(
-            {'Key': 'LastAttachTime',
-             'Value': attachment['AttachTime'].isoformat()})
-        copy_tags.append(
-            {'Key': 'LastAttachInstance', 'Value': attachment['InstanceId']})
+        copy_tags.append({
+            'Key': 'LastAttachTime',
+            'Value': attachment['AttachTime'].isoformat()
+        })
+        copy_tags.append({
+            'Key': 'LastAttachInstance',
+            'Value': attachment['InstanceId']
+        })
         return copy_tags
 
 
@@ -673,33 +675,27 @@ class EncryptInstanceVolumes(BaseAction):
         delay={'type': 'number'},
         verbose={'type': 'boolean'})
 
-    permissions = (
-        'ec2:CopySnapshot',
-        'ec2:CreateSnapshot',
-        'ec2:CreateVolume',
-        'ec2:DescribeInstances',
-        'ec2:DescribeSnapshots',
-        'ec2:DescribeVolumes',
-        'ec2:StopInstances',
-        'ec2:StartInstances')
+    permissions = ('ec2:CopySnapshot', 'ec2:CreateSnapshot',
+                   'ec2:CreateVolume', 'ec2:DescribeInstances',
+                   'ec2:DescribeSnapshots', 'ec2:DescribeVolumes',
+                   'ec2:StopInstances', 'ec2:StartInstances')
 
     def validate(self):
         key = self.data.get('key')
         if not key:
-            raise ValueError(
-                "action:encrypt-instance-volume "
-                "requires kms keyid/alias specified")
+            raise ValueError("action:encrypt-instance-volume "
+                             "requires kms keyid/alias specified")
         self.verbose = self.data.get('verbose', False)
         return self
 
     def process(self, volumes):
         original_count = len(volumes)
-        volumes = [v for v in volumes
-                   if not v['Encrypted'] or not v['Attachments']]
-        log.debug(
-            "EncryptVolumes filtered from %d to %d "
-            " unencrypted attached volumes" % (
-                original_count, len(volumes)))
+        volumes = [
+            v for v in volumes if not v['Encrypted'] or not v['Attachments']
+        ]
+        log.debug("EncryptVolumes filtered from %d to %d "
+                  " unencrypted attached volumes" % (original_count,
+                                                     len(volumes)))
 
         # Group volumes by instance id
         instance_vol_map = {}
@@ -709,23 +705,24 @@ class EncryptInstanceVolumes(BaseAction):
 
         # Query instances to find current instance state
         self.instance_map = {
-            i['InstanceId']: i for i in
-            self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys(), cache=False)}
+            i['InstanceId']: i
+            for i in self.manager.get_resource_manager('ec2').get_resources(
+                instance_vol_map.keys(), cache=False)
+        }
 
         with self.executor_factory(max_workers=10) as w:
             futures = {}
             for instance_id, vol_set in instance_vol_map.items():
-                futures[w.submit(
-                    self.process_volume, instance_id, vol_set)] = instance_id
+                futures[w.submit(self.process_volume, instance_id,
+                                 vol_set)] = instance_id
 
             for f in as_completed(futures):
                 if f.exception():
                     instance_id = futures[f]
                     log.error(
-                        "Exception processing instance:%s volset: %s \n %s" % (
-                            instance_id, instance_vol_map[instance_id],
-                            f.exception()))
+                        "Exception processing instance:%s volset: %s \n %s" %
+                        (instance_id, instance_vol_map[instance_id],
+                         f.exception()))
 
     def process_volume(self, instance_id, vol_set):
         """Encrypt attached unencrypted ebs volumes
@@ -756,7 +753,8 @@ class EncryptInstanceVolumes(BaseAction):
             # 5/8/2016 The detach isn't immediately consistent
             self.data.get('delay', 15)
             client.attach_volume(
-                InstanceId=instance_id, VolumeId=vol_id,
+                InstanceId=instance_id,
+                VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
 
         if instance_running:
@@ -775,7 +773,7 @@ class EncryptInstanceVolumes(BaseAction):
         if instance_state in ('shutting-down', 'terminated'):
             self.log.debug('Skipping terminating instance: %s' % instance_id)
             return
-        elif instance_state in ('running',):
+        elif instance_state in ('running', ):
             client.stop_instances(InstanceIds=[instance_id])
             self.wait_on_resource(client, instance_id=instance_id)
             return True
@@ -786,12 +784,14 @@ class EncryptInstanceVolumes(BaseAction):
         ec2 = local_session(self.manager.session_factory).client('ec2')
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
-            Description="maid transient snapshot for encryption",)
+            Description="maid transient snapshot for encryption", )
         transient_snapshots = [results['SnapshotId']]
         ec2.create_tags(
             Resources=[results['SnapshotId']],
-            Tags=[
-                {'Key': 'maid-crypto-remediation', 'Value': 'true'}])
+            Tags=[{
+                'Key': 'maid-crypto-remediation',
+                'Value': 'true'
+            }])
         self.wait_on_resource(ec2, snapshot_id=results['SnapshotId'])
 
         # Create encrypted snapshot from current
@@ -804,9 +804,10 @@ class EncryptInstanceVolumes(BaseAction):
         transient_snapshots.append(results['SnapshotId'])
         ec2.create_tags(
             Resources=[results['SnapshotId']],
-            Tags=[
-                {'Key': 'maid-crypto-remediation', 'Value': 'true'}
-            ])
+            Tags=[{
+                'Key': 'maid-crypto-remediation',
+                'Value': 'true'
+            }])
         self.wait_on_resource(ec2, snapshot_id=results['SnapshotId'])
 
         # Create encrypted volume, also tag so we can recover
@@ -818,11 +819,16 @@ class EncryptInstanceVolumes(BaseAction):
             Encrypted=True)
         ec2.create_tags(
             Resources=[results['VolumeId']],
-            Tags=[
-                {'Key': 'maid-crypt-remediation', 'Value': instance_id},
-                {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
-                {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+            Tags=[{
+                'Key': 'maid-crypt-remediation',
+                'Value': instance_id
+            }, {
+                'Key': 'maid-origin-volume',
+                'Value': v['VolumeId']
+            }, {
+                'Key': 'maid-instance-device',
+                'Value': v['Attachments'][0]['Device']
+            }])
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])
@@ -856,8 +862,11 @@ class EncryptInstanceVolumes(BaseAction):
             except Exception:
                 return self._wait_on_resource(*args, **kw)
 
-    def _wait_on_resource(
-            self, client, snapshot_id=None, volume_id=None, instance_id=None):
+    def _wait_on_resource(self,
+                          client,
+                          snapshot_id=None,
+                          volume_id=None,
+                          instance_id=None):
         # boto client waiters poll every 15 seconds up to a max 600s (5m)
         if snapshot_id:
             if self.verbose:
@@ -905,8 +914,8 @@ class Delete(BaseAction):
                   - delete
     """
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = (
-        'ec2:DetachVolume', 'ec2:DeleteVolume', 'ec2:DescribeVolumes')
+    permissions = ('ec2:DetachVolume', 'ec2:DeleteVolume',
+                   'ec2:DescribeVolumes')
 
     def process(self, volumes):
         with self.executor_factory(max_workers=3) as w:

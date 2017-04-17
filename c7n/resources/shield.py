@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('shield-protection')
 class ShieldProtection(QueryResourceManager):
-
     class resource_type(object):
         service = 'shield'
         enum_spec = ('list_projections', 'Protections', None)
@@ -29,7 +28,6 @@ class ShieldProtection(QueryResourceManager):
 
 @resources.register('shield-attack')
 class ShieldAttack(QueryResourceManager):
-
     class resource_type(object):
         service = 'shield'
         enum_spec = ('list_attacks', 'Attacks', None)

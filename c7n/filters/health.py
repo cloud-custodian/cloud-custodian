@@ -27,11 +27,17 @@ class HealthEventFilter(Filter):
 
     schema = type_schema(
         'health-event',
-        types={'type': 'array', 'items': {'type': 'string'}},
-        statuses={'type': 'array', 'items': {
-            'type': 'string',
-            'enum': ['open', 'upcoming', 'closed']
-        }})
+        types={'type': 'array',
+               'items': {
+                   'type': 'string'
+               }},
+        statuses={
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'enum': ['open', 'upcoming', 'closed']
+            }
+        })
 
     permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',
                    'health:DescribeEventDetails')
@@ -62,7 +68,7 @@ class HealthEventFilter(Filter):
                     'c7n:HealthEvent', []).append(event_map[e['eventArn']])
                 found.add(rid)
             seen.update(event_map.keys())
-        return [resource_map[rid] for rid in found]
+        return [resource_map[id] for id in found]
 
     def get_filter(self):
         m = self.manager
@@ -70,9 +76,10 @@ class HealthEventFilter(Filter):
             service = 'EBS'
         else:
             service = m.get_model().service.upper()
-        f = {'services': [service],
-             'eventStatusCodes': self.data.get(
-                 'statuses', ['open', 'upcoming'])}
+        f = {
+            'services': [service],
+            'eventStatusCodes': self.data.get('statuses', ['open', 'upcoming'])
+        }
         if self.data.get('types'):
             f['eventTypeCodes'] = self.data.get('types')
         return f
@@ -86,6 +93,10 @@ class HealthEventFilter(Filter):
                 event_map[d['event']['arn']]['Description'] = d[
                     'eventDescription']['latestDescription']
             paginator = client.get_paginator('describe_affected_entities')
-            entities.extend(list(itertools.chain(
-                            *[p['entities']for p in paginator.paginate(
-                                filter={'eventArns': event_map.keys()})])))
+            entities.extend(
+                list(
+                    itertools.chain(* [
+                        p['entities']
+                        for p in paginator.paginate(
+                            filter={'eventArns': event_map.keys()})
+                    ])))

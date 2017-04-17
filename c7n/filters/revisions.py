@@ -21,7 +21,6 @@ from dateutil.parser import parse as parse_date
 from c7n.filters import Filter, FilterValidationError
 from c7n.utils import local_session, type_schema
 
-
 ErrNotFound = "ResourceNotDiscoveredException"
 
 
@@ -43,7 +42,7 @@ class Diff(Filter):
         # For date selectors allow value specification
         selector_value={'type': 'string'})
 
-    permissions = ('config:GetResourceConfigHistory',)
+    permissions = ('config:GetResourceConfigHistory', )
 
     selector_value = mode = parser = resource_shape = None
 
@@ -55,8 +54,7 @@ class Diff(Filter):
             try:
                 parse_date(self.data['selector_value'])
             except ValueError:
-                raise FilterValidationError(
-                    "Invalid date for selector_value")
+                raise FilterValidationError("Invalid date for selector_value")
 
         elif 'selector' in self.data and self.data['selector'] == 'locked':
             idx = self.manager.data['filters'].index(self.data)
@@ -98,9 +96,9 @@ class Diff(Filter):
                 **params)['configurationItems']
         except ClientError as e:
             if e.response['Error']['Code'] != ErrNotFound:
-                self.log.debug(
-                    "config - resource %s:%s not found" % (
-                        self.model.config_type, resource[self.model.id]))
+                self.log.debug("config - resource %s:%s not found" %
+                               (self.model.config_type,
+                                resource[self.model.id]))
                 revisions = []
             raise
         return revisions
@@ -127,7 +125,8 @@ class Diff(Filter):
                 'date': rev['configurationItemCaptureTime'],
                 'version_id': rev['configurationStateId'],
                 'events': rev['relatedEvents'],
-                'resource': self.transform_revision(rev)}
+                'resource': self.transform_revision(rev)
+            }
 
     def transform_revision(self, revision):
         """make config revision look like describe output."""

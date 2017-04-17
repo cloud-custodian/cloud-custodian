@@ -21,7 +21,6 @@ from c7n.utils import local_session
 
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
-
     class Meta(object):
         service = 'glacier'
         enum_spec = ('list_vaults', 'VaultList', None)
@@ -51,7 +50,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
                       - permitted-account-01
                       - permitted-account-02
     """
-    permissions = ('glacier:GetVaultAccessPolicy',)
+    permissions = ('glacier:GetVaultAccessPolicy', )
 
     def process(self, resources, event=None):
         def _augment(r):
@@ -63,9 +62,8 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
                 return r
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied getting policy glacier:%s",
-                        r['FunctionName'])
+                    self.log.warning("Access denied getting policy glacier:%s",
+                                     r['FunctionName'])
 
         self.log.debug("fetching policy for %d glacier" % len(resources))
         with self.executor_factory(max_workers=3) as w:

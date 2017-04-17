@@ -66,7 +66,9 @@ class CloudWatchLogHandler(logging.Handler):
     batch_interval = 40
     batch_min_buffer = 10
 
-    def __init__(self, log_group=__name__, log_stream=None,
+    def __init__(self,
+                 log_group=__name__,
+                 log_stream=None,
                  session_factory=None):
         super(CloudWatchLogHandler, self).__init__()
         self.log_group = log_group
@@ -83,15 +85,14 @@ class CloudWatchLogHandler(logging.Handler):
         # cleanup atexit, custodian is a bit more explicitly scoping shutdown to
         # each policy, so use a sentinel value to avoid deadlocks.
         self.shutdown = False
-        retry = get_retry(('ThrottlingException',))
+        retry = get_retry(('ThrottlingException', ))
         try:
             client = self.session_factory().client('logs')
             logs = retry(
                 client.describe_log_groups,
                 logGroupNamePrefix=self.log_group)['logGroups']
             if not [l for l in logs if l['logGroupName'] == self.log_group]:
-                retry(client.create_log_group,
-                      logGroupName=self.log_group)
+                retry(client.create_log_group, logGroupName=self.log_group)
         except ClientError as e:
             if Error.code(e) != Error.ResourceExists:
                 raise
@@ -142,16 +143,17 @@ class CloudWatchLogHandler(logging.Handler):
 
     def format_message(self, msg):
         """format message."""
-        return {'timestamp': int(msg.created * 1000),
-                'message': self.format(msg),
-                'stream': self.log_stream or msg.name,
-                'group': self.log_group}
+        return {
+            'timestamp': int(msg.created * 1000),
+            'message': self.format(msg),
+            'stream': self.log_stream or msg.name,
+            'group': self.log_group
+        }
 
     def start_transports(self):
         """start thread transports."""
-        self.transport = Transport(
-            self.queue, self.batch_size, self.batch_interval,
-            self.session_factory)
+        self.transport = Transport(self.queue, self.batch_size,
+                                   self.batch_interval, self.session_factory)
         thread = threading.Thread(target=self.transport.loop)
         self.threads.append(thread)
         thread.daemon = True
@@ -165,7 +167,6 @@ class CloudWatchLogHandler(logging.Handler):
 
 
 class Transport(object):
-
     def __init__(self, queue, batch_size, batch_interval, session_factory):
         self.queue = queue
         self.batch_size = batch_size
@@ -197,7 +198,8 @@ class Transport(object):
                 return
             self.sequences[stream] = None
         params = dict(
-            logGroupName=group, logStreamName=stream,
+            logGroupName=group,
+            logStreamName=stream,
             logEvents=sorted(
                 messages, key=itemgetter('timestamp'), reverse=False))
         if self.sequences[stream]:
@@ -215,8 +217,7 @@ class Transport(object):
 
     def loop(self):
         def keyed(datum):
-            return "%s=%s" % (
-                datum.pop('group'), datum.pop('stream'))
+            return "%s=%s" % (datum.pop('group'), datum.pop('stream'))
 
         while True:
             try:

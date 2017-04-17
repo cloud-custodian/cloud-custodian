@@ -40,12 +40,10 @@ from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
-
 log = logging.getLogger('custodian.lambda')
 RUNTIME = 'python{}.{}'.format(
     sys.version_info.major,
-    sys.version_info.minor,
-)
+    sys.version_info.minor, )
 
 
 class PythonPackageArchive(object):
@@ -70,7 +68,8 @@ class PythonPackageArchive(object):
     def __init__(self, *modules):
         self._temp_archive_file = tempfile.NamedTemporaryFile()
         self._zip_file = zipfile.ZipFile(
-            self._temp_archive_file, mode='w',
+            self._temp_archive_file,
+            mode='w',
             compression=zipfile.ZIP_DEFLATED)
         self._closed = False
         self.add_modules(*modules)
@@ -95,7 +94,8 @@ class PythonPackageArchive(object):
             path = imp.find_module(module)[1]
             if os.path.isfile(path):
                 if not path.endswith('.py'):
-                    raise ValueError('We need a *.py source file instead of ' + path)
+                    raise ValueError('We need a *.py source file instead of ' +
+                                     path)
                 self.add_file(path)
             elif os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
@@ -157,10 +157,8 @@ class PythonPackageArchive(object):
         """
         self._closed = True
         self._zip_file.close()
-        log.debug(
-            "Created custodian lambda archive size: %0.2fmb",
-            (os.path.getsize(self._temp_archive_file.name) / (
-                1024.0 * 1024.0)))
+        log.debug("Created custodian lambda archive size: %0.2fmb", (
+            os.path.getsize(self._temp_archive_file.name) / (1024.0 * 1024.0)))
         return self
 
     def remove(self):
@@ -234,9 +232,8 @@ class LambdaManager(object):
 
         for e in func.get_events(self.session_factory):
             if e.add(func):
-                log.debug(
-                    "Added event source: %s to function: %s",
-                    e, func.alias)
+                log.debug("Added event source: %s to function: %s", e,
+                          func.alias)
         return result
 
     def remove(self, func, alias=None):
@@ -249,8 +246,7 @@ class LambdaManager(object):
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
                 raise
 
-    def metrics(self, funcs, start, end, period=5*60):
-
+    def metrics(self, funcs, start, end, period=5 * 60):
         def func_metrics(f):
             metrics = local_session(self.session_factory).client('cloudwatch')
             values = {}
@@ -258,10 +254,11 @@ class LambdaManager(object):
                 values[m] = metrics.get_metric_statistics(
                     Namespace="AWS/Lambda",
                     Dimensions=[{
-                        'Name': 'FunctionName',
-                        'Value': (
-                            isinstance(f, dict) and f['FunctionName']
-                            or f.name)}],
+                        'Name':
+                        'FunctionName',
+                        'Value': (isinstance(f, dict) and f['FunctionName'] or
+                                  f.name)
+                    }],
                     Statistics=["Sum"],
                     StartTime=start,
                     EndTime=end,
@@ -290,7 +287,9 @@ class LambdaManager(object):
         try:
             log_streams = logs.describe_log_streams(
                 logGroupName=group_name,
-                orderBy="LastEventTime", limit=3, descending=True)
+                orderBy="LastEventTime",
+                limit=3,
+                descending=True)
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
                 return
@@ -302,8 +301,7 @@ class LambdaManager(object):
                 logGroupName=group_name,
                 logStreamName=s['logStreamName'],
                 startTime=start,
-                endTime=end,
-            )
+                endTime=end, )
             for e in result['events']:
                 yield e
 
@@ -348,7 +346,8 @@ class LambdaManager(object):
                 result = self.client.update_function_configuration(**params)
                 changed = True
         else:
-            log.info('Publishing custodian policy lambda function %s', func.name)
+            log.info('Publishing custodian policy lambda function %s',
+                     func.name)
             params = func.get_config()
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
@@ -361,14 +360,12 @@ class LambdaManager(object):
         key = "%s/%s" % (key_prefix, func.name)
         transfer = S3Transfer(
             self.session_factory().client('s3'),
-            config=TransferConfig(
-                multipart_threshold=1024*1024*4))
+            config=TransferConfig(multipart_threshold=1024 * 1024 * 4))
         transfer.upload_file(
             archive.path,
             bucket=bucket,
             key=key,
-            extra_args={
-                'ServerSideEncryption': 'AES256'})
+            extra_args={'ServerSideEncryption': 'AES256'})
         return bucket, key
 
     def publish_alias(self, func_data, alias):
@@ -403,14 +400,13 @@ class LambdaManager(object):
         params = {'FunctionName': func_name}
         if qualifier:
             params['Qualifier'] = qualifier
-        return resource_exists(
-            self.client.get_function, **params)
+        return resource_exists(self.client.get_function, **params)
 
 
 def resource_exists(op, NotFound="ResourceNotFoundException", *args, **kw):
     try:
         return op(*args, **kw)
-    except ClientError, e:
+    except ClientError as e:
         if e.response['Error']['Code'] == NotFound:
             return False
         raise
@@ -474,22 +470,21 @@ class AbstractLambdaFunction:
             'Description': self.description,
             'Runtime': self.runtime,
             'Handler': self.handler,
-            'Timeout': self.timeout}
+            'Timeout': self.timeout
+        }
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
-                'SecurityGroupIds': self.security_groups}
+                'SecurityGroupIds': self.security_groups
+            }
         return conf
 
 
 class LambdaFunction(AbstractLambdaFunction):
-
     def __init__(self, func_data, archive):
         self.func_data = func_data
-        required = set((
-            'name', 'handler', 'memory_size',
-            'timeout', 'role', 'runtime',
-            'description'))
+        required = set(('name', 'handler', 'memory_size', 'timeout', 'role',
+                        'runtime', 'description'))
         missing = required.difference(func_data)
         if missing:
             raise ValueError("Missing required keys %s" % " ".join(missing))
@@ -564,8 +559,8 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def description(self):
-        return self.policy.data.get(
-            'description', 'cloud-custodian lambda policy')
+        return self.policy.data.get('description',
+                                    'cloud-custodian lambda policy')
 
     @property
     def role(self):
@@ -590,14 +585,17 @@ class PolicyLambda(AbstractLambdaFunction):
                 ConfigRule(self.policy.data['mode'], session_factory))
         else:
             events.append(
-                CloudWatchEventSource(
-                    self.policy.data['mode'], session_factory))
+                CloudWatchEventSource(self.policy.data['mode'],
+                                      session_factory))
         return events
 
     def get_archive(self):
-        self.archive.add_contents(
-            'config.json', json.dumps(
-                {'policies': [self.policy.data]}, indent=2))
+        self.archive.add_contents('config.json',
+                                  json.dumps(
+                                      {
+                                          'policies': [self.policy.data]
+                                      },
+                                      indent=2))
         self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
         self.archive.close()
         return self.archive
@@ -619,7 +617,7 @@ def zinfo(fname):
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
     # http://unix.stackexchange.com/questions/14705/
-    info.external_attr = 0o644 << 16L
+    info.external_attr = 0o644 << 16
     return info
 
 
@@ -657,7 +655,8 @@ class CloudWatchEventSource(object):
         'launch-success': 'EC2 Instance Launch Successful',
         'launch-failure': 'EC2 Instance Launch Unsuccessful',
         'terminate-success': 'EC2 Instance Terminate Successful',
-        'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
+        'terminate-failure': 'EC2 Instance Terminate Unsuccessful'
+    }
 
     def __init__(self, data, session_factory, prefix="custodian-"):
         self.session_factory = session_factory
@@ -708,7 +707,8 @@ class CloudWatchEventSource(object):
 
         payload['detail'] = {
             'eventSource': list(set(sources)),
-            'eventName': events}
+            'eventName': events
+        }
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
@@ -719,8 +719,7 @@ class CloudWatchEventSource(object):
 
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
-            payload['detail-type'] = [
-                "EC2 Instance State-change Notification"]
+            payload['detail-type'] = ["EC2 Instance State-change Notification"]
             # Technically could let empty be all events, but likely misconfig
             payload['detail'] = {"state": self.data.get('events', [])}
         elif event_type == "asg-instance-state":
@@ -787,11 +786,14 @@ class CloudWatchEventSource(object):
         if found:
             return
 
-        log.debug('Creating cwe rule target for %s on func:%s' % (
-            self, func_arn))
+        log.debug('Creating cwe rule target for %s on func:%s' % (self,
+                                                                  func_arn))
 
         result = self.client.put_targets(
-            Rule=func.name, Targets=[{"Id": func.name, "Arn": func_arn}])
+            Rule=func.name, Targets=[{
+                "Id": func.name,
+                "Arn": func_arn
+            }])
 
         return True
 
@@ -816,12 +818,10 @@ class CloudWatchEventSource(object):
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
                 self.client.remove_targets(
-                    Rule=func.name,
-                    Ids=[t['Id'] for t in targets])
+                    Rule=func.name, Ids=[t['Id'] for t in targets])
             except ClientError as e:
-                log.warning(
-                    "Could not remove targets for rule %s error: %s",
-                    func.name, e)
+                log.warning("Could not remove targets for rule %s error: %s",
+                            func.name, e)
             self.client.delete_rule(Name=func.name)
 
 
@@ -860,10 +860,10 @@ class BucketNotification(object):
         n_params = {
             'Id': func.name,
             'LambdaFunctionArn': func_arn,
-            'Events': self.data.get('events', ['s3:ObjectCreated:*'])}
+            'Events': self.data.get('events', ['s3:ObjectCreated:*'])
+        }
         if self.data.get('filters'):
-            n_params['Filters'] = {
-                'Key': {'FilterRules': self.filters}}
+            n_params['Filters'] = {'Key': {'FilterRules': self.filters}}
 
         if found:
             if self.delta(found, n_params):
@@ -889,7 +889,8 @@ class BucketNotification(object):
             if e.response['Error']['Code'] != 'ResourceConflictException':
                 raise
 
-        notifies.setdefault('LambdaFunctionConfigurations', []).append(n_params)
+        notifies.setdefault('LambdaFunctionConfigurations',
+                            []).append(n_params)
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'], NotificationConfiguration=notifies)
 
@@ -913,8 +914,7 @@ class BucketNotification(object):
 
         notifies['LambdaFunctionConfigurations'].remove(found)
         s3.put_bucket_notification_configuration(
-            Bucket=self.bucket['Name'],
-            NotificationConfiguration=notifies)
+            Bucket=self.bucket['Name'], NotificationConfiguration=notifies)
 
 
 class CloudWatchLogSubscription(object):
@@ -1021,7 +1021,7 @@ class SNSSubscription(object):
 
             # Subscribe the lambda to the topic.
             topic = self.session.resource('sns').Topic(arn)
-            topic.subscribe(Protocol='lambda', Endpoint=func.arn) # idempotent
+            topic.subscribe(Protocol='lambda', Endpoint=func.arn)  # idempotent
 
     def remove(self, func):
         lambda_client = self.session.client('lambda')
@@ -1030,15 +1030,18 @@ class SNSSubscription(object):
 
             try:
                 response = lambda_client.remove_permission(
-                    FunctionName=func.name,
-                    StatementId=statement_id)
+                    FunctionName=func.name, StatementId=statement_id)
                 log.debug("Removed lambda permission result: %s" % response)
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
 
-            paginator = self.client.get_paginator('list_subscriptions_by_topic')
-            class Done(Exception): pass
+            paginator = self.client.get_paginator(
+                'list_subscriptions_by_topic')
+
+            class Done(Exception):
+                pass
+
             try:
                 for page in paginator.paginate(TopicArn=topic_arn):
                     for subscription in page['Subscriptions']:
@@ -1046,9 +1049,10 @@ class SNSSubscription(object):
                             continue
                         try:
                             response = self.client.unsubscribe(
-                                SubscriptionArn=subscription['SubscriptionArn'])
-                            log.debug("Unsubscribed %s from %s" %
-                                (func.name, topic_name))
+                                SubscriptionArn=subscription[
+                                    'SubscriptionArn'])
+                            log.debug("Unsubscribed %s from %s" % (func.name,
+                                                                   topic_name))
                         except ClientError as e:
                             code = e.response['Error']['Code']
                             if code != 'ResourceNotFoundException':
@@ -1082,19 +1086,22 @@ class ConfigRule(object):
             ConfigRuleName=func.name,
             Description=func.description,
             Source={
-                'Owner': 'CUSTOM_LAMBDA',
-                'SourceIdentifier': func_arn,
+                'Owner':
+                'CUSTOM_LAMBDA',
+                'SourceIdentifier':
+                func_arn,
                 'SourceDetails': [{
-                    'EventSource': 'aws.config',
-                    'MessageType': 'ConfigurationItemChangeNotification'}]
-                }
-            )
+                    'EventSource':
+                    'aws.config',
+                    'MessageType':
+                    'ConfigurationItemChangeNotification'
+                }]
+            })
 
         if isinstance(func, PolicyLambda):
             manager = func.policy.get_resource_manager()
             config_type = manager.get_model().config_type
-            params['Scope'] = {
-                'ComplianceResourceTypes': [config_type]}
+            params['Scope'] = {'ComplianceResourceTypes': [config_type]}
         else:
             params['Scope']['ComplianceResourceTypes'] = self.data.get(
                 'resource-types', ())
@@ -1152,8 +1159,7 @@ class ConfigRule(object):
         if not rule:
             return
         try:
-            self.client.delete_config_rule(
-                ConfigRuleName=func.name)
+            self.client.delete_config_rule(ConfigRuleName=func.name)
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
                 raise

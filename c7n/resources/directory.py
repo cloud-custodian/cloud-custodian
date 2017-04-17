@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 
 
 @resources.register('directory')
 class Directory(QueryResourceManager):
-
     class resource_type(object):
         service = "ds"
         enum_spec = ("describe_directories", "DirectoryDescriptions", None)

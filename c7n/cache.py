@@ -36,7 +36,6 @@ def factory(config):
 
 
 class NullCache(object):
-
     def __init__(self, config):
         self.config = config
 
@@ -51,14 +50,11 @@ class NullCache(object):
 
 
 class FileCacheManager(object):
-
     def __init__(self, config):
         self.config = config
         self.cache_period = config.cache_period
         self.cache_path = os.path.abspath(
-            os.path.expanduser(
-                os.path.expandvars(
-                    config.cache)))
+            os.path.expanduser(os.path.expandvars(config.cache)))
         self.data = {}
 
     def get(self, key):
@@ -86,13 +82,13 @@ class FileCacheManager(object):
                 self.data[cPickle.dumps(key)] = data
                 cPickle.dump(self.data, fh, protocol=2)
         except Exception as e:
-            log.warning("Could not save cache %s err: %s" % (
-                self.cache_path, e))
+            log.warning("Could not save cache %s err: %s" % (self.cache_path,
+                                                             e))
             if not os.path.exists(self.cache_path):
                 directory = os.path.dirname(self.cache_path)
                 log.info('Generating Cache directory: %s.' % directory)
                 try:
                     os.makedirs(directory)
                 except Exception as e:
-                    log.warning("Could not create directory: %s err: %s" % (
-                        directory, e))
+                    log.warning("Could not create directory: %s err: %s" %
+                                (directory, e))

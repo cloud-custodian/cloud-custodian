@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('storage-gateway')
 class StorageGateway(QueryResourceManager):
-
     class resource_type(object):
         service = 'storagegateway'
         enum_spec = ('list_gateways', 'Gateways', None)

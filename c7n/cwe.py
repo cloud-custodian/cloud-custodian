@@ -30,43 +30,45 @@ class CloudWatchEvents(object):
         # jmespath expression
         'CreateAutoScalingGroup': {
             'ids': 'requestParameters.autoScalingGroupName',
-            'source': 'autoscaling.amazonaws.com'},
-
+            'source': 'autoscaling.amazonaws.com'
+        },
         'UpdateAutoScalingGroup': {
             'ids': 'requestParameters.autoScalingGroupName',
-            'source': 'autoscaling.amazonaws.com'},
-
+            'source': 'autoscaling.amazonaws.com'
+        },
         'CreateBucket': {
             'ids': 'requestParameters.bucketName',
-            'source': 's3.amazonaws.com'},
-
+            'source': 's3.amazonaws.com'
+        },
         'CreateCluster': {
             'ids': 'requestParameters.clusterIdentifier',
-            'source': 'redshift.amazonaws.com'},
-
+            'source': 'redshift.amazonaws.com'
+        },
         'CreateLoadBalancer': {
             'ids': 'requestParameters.loadBalancerName',
-            'source': 'elasticloadbalancing.amazonaws.com'},
-
+            'source': 'elasticloadbalancing.amazonaws.com'
+        },
         'CreateLoadBalancerPolicy': {
             'ids': 'requestParameters.loadBalancerName',
-            'source': 'elasticloadbalancing.amazonaws.com'},
-
+            'source': 'elasticloadbalancing.amazonaws.com'
+        },
         'CreateDBInstance': {
             'ids': 'requestParameters.dBInstanceIdentifier',
-            'source': 'rds.amazonaws.com'},
-
+            'source': 'rds.amazonaws.com'
+        },
         'CreateVolume': {
             'ids': 'responseElements.volumeId',
-            'source': 'ec2.amazonaws.com'},
-
+            'source': 'ec2.amazonaws.com'
+        },
         'SetLoadBalancerPoliciesOfListener': {
             'ids': 'requestParameters.loadBalancerName',
-            'source': 'elasticloadbalancing.amazonaws.com'},
-
+            'source': 'elasticloadbalancing.amazonaws.com'
+        },
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
-            'source': 'ec2.amazonaws.com'}}
+            'source': 'ec2.amazonaws.com'
+        }
+    }
 
     @classmethod
     def get(cls, event_name):
@@ -117,8 +119,7 @@ class CloudWatchEvents(object):
             id_query = e.get('ids')
             if not id_query:
                 raise ValueError("No id query configured")
-            resource_ids = jmespath.search(
-                id_query, event.get('detail', {}))
+            resource_ids = jmespath.search(id_query, event.get('detail', {}))
             if resource_ids:
                 break
         return resource_ids
@@ -129,7 +130,9 @@ class CloudWatchEvents(object):
         if mode_type == 'ec2-instance-state':
             resource_ids = [event.get('detail', {}).get('instance-id')]
         elif mode_type == 'asg-instance-state':
-            resource_ids = [event.get('detail', {}).get('AutoScalingGroupName')]
+            resource_ids = [
+                event.get('detail', {}).get('AutoScalingGroupName')
+            ]
         elif mode_type != 'cloudtrail':
             return None
         else:

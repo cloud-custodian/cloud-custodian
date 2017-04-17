@@ -22,14 +22,13 @@ from c7n.utils import local_session, chunks, type_schema
 
 @resources.register('simpledb')
 class SimpleDB(QueryResourceManager):
-
     class resource_type(object):
         service = "sdb"
         enum_spec = ("list_domains", "DomainNames", None)
         id = name = "DomainName"
         dimension = None
 
-    permissions = ('sdb:DomainMetadata',)
+    permissions = ('sdb:DomainMetadata', )
 
     def augment(self, resources):
         def _augment(resource_set):
@@ -43,15 +42,15 @@ class SimpleDB(QueryResourceManager):
             return results
 
         with self.executor_factory(max_workers=3) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))
+            return list(
+                itertools.chain(*w.map(_augment, chunks(resources, 20))))
 
 
 @SimpleDB.action_registry.register('delete')
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ('sdb:DeleteDomain',)
+    permissions = ('sdb:DeleteDomain', )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('sdb')

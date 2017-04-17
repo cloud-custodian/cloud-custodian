@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('directconnect')
 class DirectConnect(QueryResourceManager):
-
     class resource_type(object):
         service = 'directconnect'
         enum_spec = ('describe_connections', 'connections', None)
@@ -26,5 +25,3 @@ class DirectConnect(QueryResourceManager):
         name = 'connectionName'
         filter_name = 'connectionId'
         dimension = None
-
-

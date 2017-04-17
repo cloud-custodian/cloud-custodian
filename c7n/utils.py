@@ -40,12 +40,10 @@ else:
         except ImportError:
             SafeLoader = None
 
-
 from StringIO import StringIO
 
 
 class Bag(dict):
-
     def __getattr__(self, k):
         try:
             return self[k]
@@ -76,9 +74,12 @@ def format_event(evt):
     return io.getvalue()
 
 
-def type_schema(
-        type_name, inherits=None, rinherit=None,
-        aliases=None, required=None, **props):
+def type_schema(type_name,
+                inherits=None,
+                rinherit=None,
+                aliases=None,
+                required=None,
+                **props):
     """jsonschema generation helper
 
     params:
@@ -100,10 +101,7 @@ def type_schema(
         s = copy.deepcopy(rinherit)
         s['properties']['type'] = {'enum': type_names}
     else:
-        s = {
-            'type': 'object',
-            'properties': {
-                'type': {'enum': type_names}}}
+        s = {'type': 'object', 'properties': {'type': {'enum': type_names}}}
 
     # Ref based inheritance and additional properties don't mix well.
     # http://goo.gl/8UyRvQ
@@ -124,7 +122,6 @@ def type_schema(
 
 
 class DateTimeEncoder(json.JSONEncoder):
-
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
@@ -179,9 +176,12 @@ def query_instances(session, client=None, **query):
         client = session.client('ec2')
     p = client.get_paginator('describe_instances')
     results = p.paginate(**query)
-    return list(itertools.chain(
-        *[r["Instances"] for r in itertools.chain(
-            *[pp['Reservations'] for pp in results])]))
+    return list(
+        itertools.chain(* [
+            r["Instances"]
+            for r in itertools.chain(* [pp['Reservations'] for pp in results])
+        ]))
+
 
 CONN_CACHE = threading.local()
 
@@ -239,14 +239,19 @@ def parse_s3(s3_path):
     return s3_path, bucket, key_prefix
 
 
-def generate_arn(
-        service, resource, partition='aws',
-        region=None, account_id=None, resource_type=None, separator='/'):
+def generate_arn(service,
+                 resource,
+                 partition='aws',
+                 region=None,
+                 account_id=None,
+                 resource_type=None,
+                 separator='/'):
     """Generate an Amazon Resource Name.
     See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
     """
-    arn = 'arn:%s:%s:%s:%s:' % (
-        partition, service, region if region else '', account_id if account_id else '')
+    arn = 'arn:%s:%s:%s:%s:' % (partition, service, region
+                                if region else '', account_id
+                                if account_id else '')
     if resource_type:
         arn = arn + '%s%s%s' % (resource_type, separator, resource)
     else:
@@ -279,7 +284,7 @@ def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
     Returns a function for invoking aws client calls that
     retries on retryable error codes.
     """
-    max_delay = max(min_delay, 2) ** max_attempts
+    max_delay = max(min_delay, 2)**max_attempts
 
     def _retry(func, *args, **kw):
         for idx, delay in enumerate(
@@ -297,6 +302,7 @@ def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
                         "retrying %s on error:%s attempt:%d last delay:%0.2f",
                         func, e.response['Error']['Code'], idx, delay)
             time.sleep(delay)
+
     return _retry
 
 
@@ -345,14 +351,15 @@ def worker(f):
     full accounting of the error in the logs, in a format that our error
     collection (cwl subscription) can still pickup.
     """
+
     def _f(*args, **kw):
         try:
             return f(*args, **kw)
         except Exception as e:
-            worker_log.exception(
-                'Error invoking %s',
-                "%s.%s" % (f.__module__, f.__name__))
+            worker_log.exception('Error invoking %s', "%s.%s" % (f.__module__,
+                                                                 f.__name__))
             raise
+
     functools.update_wrapper(_f, f)
     return _f
 
@@ -364,11 +371,11 @@ def reformat_schema(model):
 
     if 'properties' not in model.schema:
         return "Schema in unexpected format."
-    
+
     ret = copy.deepcopy(model.schema['properties'])
-    
+
     if 'type' in ret:
-        del(ret['type'])
+        del (ret['type'])
 
     for key in model.schema.get('required', []):
         if key in ret:

@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 
 
 @resources.register('hostedzone')
 class HostedZone(QueryResourceManager):
-
     class resource_type(object):
         service = 'route53'
         type = 'hostedzone'
@@ -34,7 +32,6 @@ class HostedZone(QueryResourceManager):
 
 @resources.register('healthcheck')
 class HealthCheck(QueryResourceManager):
-
     class resource_type(object):
         service = 'route53'
         type = 'healthcheck'
@@ -47,7 +44,6 @@ class HealthCheck(QueryResourceManager):
 
 @resources.register('rrset')
 class ResourceRecordSet(QueryResourceManager):
-
     class resource_type(object):
         service = 'route53'
         type = 'rrset'
@@ -56,5 +52,3 @@ class ResourceRecordSet(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
-
-

@@ -21,14 +21,12 @@ from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema, get_retry
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 
-
 filters = FilterRegistry('dynamodb-table.filters')
 filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('dynamodb-table')
 class Table(QueryResourceManager):
-
     class resource_type(object):
         service = 'dynamodb'
         type = 'table'
@@ -41,22 +39,19 @@ class Table(QueryResourceManager):
         dimension = 'TableName'
 
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('Throttled', )))
     permissions = ('dynamodb:ListTagsOfResource')
 
     def augment(self, tables):
         resources = super(Table, self).augment(tables)
-        return filter(None, _dynamodb_table_tags(
-            self.get_model(),
-            resources,
-            self.session_factory,
-            self.executor_factory,
-            self.retry,
-            self.log))
+        return filter(None,
+                      _dynamodb_table_tags(
+                          self.get_model(), resources, self.session_factory,
+                          self.executor_factory, self.retry, self.log))
 
 
-def _dynamodb_table_tags(
-        model, tables, session_factory, executor_factory, retry, log):
+def _dynamodb_table_tags(model, tables, session_factory, executor_factory,
+                         retry, log):
     """ Augment DynamoDB tables with their respective tags
     """
 
@@ -65,8 +60,7 @@ def _dynamodb_table_tags(
         arn = table['TableArn']
         try:
             tag_list = retry(
-                client.list_tags_of_resource,
-                ResourceArn=arn)['Tags']
+                client.list_tags_of_resource, ResourceArn=arn)['Tags']
         except ClientError as e:
             log.warning("Exception getting DynamoDB tags  \n %s", e)
             return None
@@ -86,8 +80,8 @@ class StatusFilter(object):
         states = states or self.valid_states
         orig_count = len(tables)
         result = [t for t in tables if t['TableStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
+        self.log.info("%s %d of %d tables" % (self.__class__.__name__,
+                                              len(result), orig_count))
         return result
 
 
@@ -112,12 +106,11 @@ class TagDelayedAction(TagDelayedAction):
                     op: delete
                     days: 7
     """
-    permission = ('dynamodb:TagResource',)
+    permission = ('dynamodb:TagResource', )
     batch_size = 1
 
     def process_resource_set(self, tables, tags):
-        client = local_session(self.manager.session_factory).client(
-            'dynamodb')
+        client = local_session(self.manager.session_factory).client('dynamodb')
         for t in tables:
             arn = t['TableArn']
             client.tag_resource(ResourceArn=arn, Tags=tags)
@@ -142,7 +135,7 @@ class TagTable(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('dynamodb:TagResource',)
+    permissions = ('dynamodb:TagResource', )
     batch_size = 1
 
     def process_resource_set(self, tables, tags):
@@ -172,15 +165,13 @@ class UntagTable(RemoveTag):
 
     concurrency = 2
     batch_size = 5
-    permissions = ('dynamodb:UntagResource',)
+    permissions = ('dynamodb:UntagResource', )
 
     def process_resource_set(self, tables, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('dynamodb')
+        client = local_session(self.manager.session_factory).client('dynamodb')
         for t in tables:
             arn = t['TableArn']
-            client.untag_resource(
-                ResourceArn=arn, TagKeys=tag_keys)
+            client.untag_resource(ResourceArn=arn, TagKeys=tag_keys)
 
 
 @Table.action_registry.register('delete')
@@ -200,9 +191,9 @@ class DeleteTable(BaseAction, StatusFilter):
                   - delete
     """
 
-    valid_status = ('ACTIVE',)
+    valid_status = ('ACTIVE', )
     schema = type_schema('delete')
-    permissions = ("dynamodb:DeleteTable",)
+    permissions = ("dynamodb:DeleteTable", )
 
     def delete_table(self, table_set):
         client = local_session(self.manager.session_factory).client('dynamodb')
@@ -210,8 +201,7 @@ class DeleteTable(BaseAction, StatusFilter):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_table_state(resources, self.valid_status)
         if not len(resources):
             return
 
@@ -222,8 +212,8 @@ class DeleteTable(BaseAction, StatusFilter):
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception deleting dynamodb table set \n %s" % (
-                                f.exception()))
+                            "Exception deleting dynamodb table set \n %s" %
+                            (f.exception()))
 
 
 @resources.register('dynamodb-stream')
@@ -236,8 +226,8 @@ class Stream(QueryResourceManager):
         # Note max rate of 5 calls per second
         enum_spec = ('list_streams', 'Streams', None)
         # Note max rate of 10 calls per second.
-        detail_spec = (
-            "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
+        detail_spec = ("describe_stream", "StreamArn", "StreamArn",
+                       "StreamDescription")
         id = 'StreamArn'
 
         # TODO, we default to filtering by id, but the api takes table names, which

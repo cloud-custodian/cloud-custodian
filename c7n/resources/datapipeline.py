@@ -23,7 +23,7 @@ from c7n.utils import chunks, local_session, get_retry
 @resources.register('datapipeline')
 class DataPipeline(QueryResourceManager):
 
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('Throttled', )))
 
     class resource_type(object):
         service = 'datapipeline'
@@ -35,14 +35,13 @@ class DataPipeline(QueryResourceManager):
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
 
     def augment(self, resources):
-        filter(None, _datapipeline_info(
-            resources, self.session_factory, self.executor_factory,
-            self.retry))
+        filter(None,
+               _datapipeline_info(resources, self.session_factory,
+                                  self.executor_factory, self.retry))
         return resources
 
 
 def _datapipeline_info(pipes, session_factory, executor_factory, retry):
-
     def process_tags(pipe_set):
         client = local_session(session_factory).client('datapipeline')
         pipe_map = {pipe['id']: pipe for pipe in pipe_set}
@@ -50,8 +49,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
         while True:
             try:
                 results = retry(
-                    client.describe_pipelines,
-                    pipelineIds=pipe_map.keys())
+                    client.describe_pipelines, pipelineIds=pipe_map.keys())
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'PipelineNotFound':

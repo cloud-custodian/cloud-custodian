@@ -21,9 +21,16 @@ from .related import RelatedResourceFilter
 class SecurityGroupFilter(RelatedResourceFilter):
     """Filter a resource by its associated security groups."""
     schema = type_schema(
-        'security-group', rinherit=ValueFilter.schema,
-        **{'match-resource':{'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
+        'security-group',
+        rinherit=ValueFilter.schema,
+        **{
+            'match-resource': {
+                'type': 'boolean'
+            },
+            'operator': {
+                'enum': ['and', 'or']
+            }
+        })
 
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
     AnnotationKey = "matched-security-groups"
@@ -32,9 +39,16 @@ class SecurityGroupFilter(RelatedResourceFilter):
 class SubnetFilter(RelatedResourceFilter):
     """Filter a resource by its associated subnets."""
     schema = type_schema(
-        'subnet', rinherit=ValueFilter.schema,
-        **{'match-resource':{'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
+        'subnet',
+        rinherit=ValueFilter.schema,
+        **{
+            'match-resource': {
+                'type': 'boolean'
+            },
+            'operator': {
+                'enum': ['and', 'or']
+            }
+        })
 
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
@@ -44,15 +58,16 @@ class DefaultVpcBase(Filter):
     """Filter to resources in a default vpc."""
     vpcs = None
     default_vpc = None
-    permissions = ('ec2:DescribeVpcs',)
+    permissions = ('ec2:DescribeVpcs', )
 
     def match(self, vpc_id):
         if self.default_vpc is None:
             self.log.debug("querying default vpc %s" % vpc_id)
             client = local_session(self.manager.session_factory).client('ec2')
-            vpcs = [v['VpcId'] for v
-                    in client.describe_vpcs()['Vpcs']
-                    if v['IsDefault']]
+            vpcs = [
+                v['VpcId'] for v in client.describe_vpcs()['Vpcs']
+                if v['IsDefault']
+            ]
             if vpcs:
                 self.default_vpc = vpcs.pop()
         return vpc_id == self.default_vpc and True or False

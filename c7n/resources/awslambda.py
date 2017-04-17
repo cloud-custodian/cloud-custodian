@@ -24,7 +24,6 @@ from c7n.utils import local_session, type_schema
 
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
-
     class resource_type(object):
         service = 'lambda'
         type = 'function'
@@ -54,7 +53,7 @@ class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n.EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
-    permissions = ('lambda:GetPolicy',)
+    permissions = ('lambda:GetPolicy', )
 
     def process(self, resources, event=None):
         def _augment(r):
@@ -68,9 +67,8 @@ class LambdaEventSource(ValueFilter):
                 return r
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied getting policy lambda:%s",
-                        r['FunctionName'])
+                    self.log.warning("Access denied getting policy lambda:%s",
+                                     r['FunctionName'])
 
         self.log.debug("fetching policy for %d lambdas" % len(resources))
         self.data['key'] = self.annotation_key
@@ -117,10 +115,9 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
                       - 'IAM-Policy-Cross-Account-Access'
 
     """
-    permissions = ('lambda:GetPolicy',)
+    permissions = ('lambda:GetPolicy', )
 
     def process(self, resources, event=None):
-
         def _augment(r):
             client = local_session(
                 self.manager.session_factory).client('lambda')
@@ -130,9 +127,8 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
                 return r
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied getting policy lambda:%s",
-                        r['FunctionName'])
+                    self.log.warning("Access denied getting policy lambda:%s",
+                                     r['FunctionName'])
 
         self.log.debug("fetching policy for %d lambdas" % len(resources))
         with self.executor_factory(max_workers=3) as w:
@@ -159,7 +155,7 @@ class Delete(BaseAction):
                   - delete
     """
     schema = type_schema('delete')
-    permissions = ("lambda:DeleteFunction",)
+    permissions = ("lambda:DeleteFunction", )
 
     def process(self, functions):
         client = local_session(self.manager.session_factory).client('lambda')

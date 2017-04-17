@@ -22,10 +22,8 @@ log = logging.getLogger('custodian.kms')
 
 
 class KeyBase(object):
-
     def augment(self, resources):
-        client = local_session(
-            self.session_factory).client('kms')
+        client = local_session(self.session_factory).client('kms')
         for r in resources:
             key_id = r.get('AliasArn') or r.get('KeyArn')
             info = client.describe_key(KeyId=key_id)['KeyMetadata']
@@ -35,7 +33,6 @@ class KeyBase(object):
 
 @resources.register('kms')
 class KeyAlias(KeyBase, QueryResourceManager):
-
     class resource_type(object):
         service = 'kms'
         type = 'key-alias'
@@ -50,7 +47,6 @@ class KeyAlias(KeyBase, QueryResourceManager):
 
 @resources.register('kms-key')
 class Key(KeyBase, QueryResourceManager):
-
     class resource_type(object):
         service = 'kms'
         type = "key"
@@ -78,10 +74,9 @@ class KeyRotationStatus(ValueFilter):
     """
 
     schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
-    permissions = ('kms:GetKeyRotationStatus',)
+    permissions = ('kms:GetKeyRotationStatus', )
 
     def process(self, resources, event=None):
-
         def _key_rotation_status(resource):
             client = local_session(self.manager.session_factory).client('kms')
             resource['KeyRotationEnabled'] = client.get_key_rotation_status(
@@ -89,7 +84,8 @@ class KeyRotationStatus(ValueFilter):
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
-                r for r in resources if 'KeyRotationEnabled' not in r]
+                r for r in resources if 'KeyRotationEnabled' not in r
+            ]
             self.log.debug(
                 "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
@@ -112,12 +108,11 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
-    permissions = ('kms:GetKeyPolicy',)
+    permissions = ('kms:GetKeyPolicy', )
 
     def process(self, resources, event=None):
         def _augment(r):
-            client = local_session(
-                self.manager.session_factory).client('kms')
+            client = local_session(self.manager.session_factory).client('kms')
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
             r['Policy'] = client.get_key_policy(
@@ -150,9 +145,8 @@ class GrantCount(Filter):
                     min: 100
     """
 
-    schema = type_schema(
-        'grant-count', min={'type': 'integer', 'minimum': 0})
-    permissions = ('kms:ListGrants',)
+    schema = type_schema('grant-count', min={'type': 'integer', 'minimum': 0})
+    permissions = ('kms:ListGrants', )
 
     def process(self, keys, event=None):
         with self.executor_factory(max_workers=3) as w:
@@ -171,8 +165,7 @@ class GrantCount(Filter):
             return None
 
         self.manager.ctx.metrics.put_metric(
-            "ExtantGrants", grant_count, "Count",
-            Scope=key['AliasName'][6:])
+            "ExtantGrants", grant_count, "Count", Scope=key['AliasName'][6:])
 
         return key
 

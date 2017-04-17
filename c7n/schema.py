@@ -51,13 +51,16 @@ def validate(data, schema=None):
             if v > 1:
                 dupes.append(k)
         if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)))]
+            return [
+                ValueError(
+                    "Only one policy with a given name allowed, duplicates: %s"
+                    % (", ".join(dupes)))
+            ]
         return []
     try:
         resp = specific_error(errors[0])
-        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        name = isinstance(errors[0].instance, dict) and errors[0].instance.get(
+            'name', 'unknown') or 'unknown'
         return [resp, name]
     except Exception:
         logging.exception(
@@ -136,9 +139,9 @@ def generate(resource_types=()):
             'valuekv': {
                 'type': 'object',
                 'minProperties': 1,
-                'maxProperties': 1},
+                'maxProperties': 1
+            },
         },
-
         'policy': {
             'type': 'object',
             'required': ['name', 'resource'],
@@ -146,16 +149,38 @@ def generate(resource_types=()):
             'properties': {
                 'name': {
                     'type': 'string',
-                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
-                'region': {'type': 'string'},
-                'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer'},
-                'comment': {'type': 'string'},
-                'comments': {'type': 'string'},
-                'description': {'type': 'string'},
-                'tags': {'type': 'array', 'items': {'type': 'string'}},
-                'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config']},
+                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"
+                },
+                'region': {
+                    'type': 'string'
+                },
+                'resource': {
+                    'type': 'string'
+                },
+                'max-resources': {
+                    'type': 'integer'
+                },
+                'comment': {
+                    'type': 'string'
+                },
+                'comments': {
+                    'type': 'string'
+                },
+                'description': {
+                    'type': 'string'
+                },
+                'tags': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'string'
+                    }
+                },
+                'mode': {
+                    '$ref': '#/definitions/policy-mode'
+                },
+                'source': {
+                    'enum': ['describe', 'config']
+                },
                 'actions': {
                     'type': 'array',
                 },
@@ -170,10 +195,13 @@ def generate(resource_types=()):
                 # in json schema inheritance prevent us from doing this
                 # on a type specific basis http://goo.gl/8UyRvQ
                 'query': {
-                    'type': 'array', 'items': {
+                    'type': 'array',
+                    'items': {
                         'type': 'object',
                         'minProperties': 1,
-                        'maxProperties': 1}}
+                        'maxProperties': 1
+                    }
+                }
             },
         },
         'policy-mode': {
@@ -182,22 +210,32 @@ def generate(resource_types=()):
             'properties': {
                 'type': {
                     'enum': [
-                        'cloudtrail',
-                        'ec2-instance-state',
-                        'asg-instance-state',
-                        'config-rule',
-                        'periodic'
-                    ]},
-                'events': {'type': 'array', 'items': {
-                    'oneOf': [
-                        {'type': 'string'},
-                        {'type': 'object',
-                         'required': ['event', 'source', 'ids'],
-                         'properties': {
-                             'source': {'type': 'string'},
-                             'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}]
-                    }}
+                        'cloudtrail', 'ec2-instance-state',
+                        'asg-instance-state', 'config-rule', 'periodic'
+                    ]
+                },
+                'events': {
+                    'type': 'array',
+                    'items': {
+                        'oneOf': [{
+                            'type': 'string'
+                        }, {
+                            'type': 'object',
+                            'required': ['event', 'source', 'ids'],
+                            'properties': {
+                                'source': {
+                                    'type': 'string'
+                                },
+                                'ids': {
+                                    'type': 'string'
+                                },
+                                'event': {
+                                    'type': 'string'
+                                }
+                            }
+                        }]
+                    }
+                }
             },
         },
     }
@@ -217,13 +255,17 @@ def generate(resource_types=()):
         'required': ['policies'],
         'additionalProperties': False,
         'properties': {
-            'vars': {'type': 'object'},
+            'vars': {
+                'type': 'object'
+            },
             'policies': {
                 'type': 'array',
                 'additionalItems': False,
-                'items': {'anyOf': resource_refs}
+                'items': {
+                    'anyOf': resource_refs
                 }
             }
+        }
     }
 
     return schema
@@ -240,13 +282,13 @@ def process_resource(type_name, resource_type, resource_defs):
         else:
             seen_actions.add(a)
         r['actions'][action_name] = a.schema
-        action_refs.append(
-            {'$ref': '#/definitions/resources/%s/actions/%s' % (
-                type_name, action_name)})
+        action_refs.append({
+            '$ref':
+            '#/definitions/resources/%s/actions/%s' % (type_name, action_name)
+        })
 
     # one word action shortcuts
-    action_refs.append(
-        {'enum': resource_type.action_registry.keys()})
+    action_refs.append({'enum': resource_type.action_registry.keys()})
 
     nested_filter_refs = []
     filters_seen = set()
@@ -255,14 +297,14 @@ def process_resource(type_name, resource_type, resource_defs):
             continue
         else:
             filters_seen.add(v)
-        nested_filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, k)})
-    nested_filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
+        nested_filter_refs.append({
+            '$ref':
+            '#/definitions/resources/%s/filters/%s' % (type_name, k)
+        })
+    nested_filter_refs.append({'$ref': '#/definitions/filters/valuekv'})
 
     filter_refs = []
-    filters_seen = set() # for aliases
+    filters_seen = set()  # for aliases
     for filter_name, f in sorted(resource_type.filter_registry.items()):
         if f in filters_seen:
             continue
@@ -272,37 +314,46 @@ def process_resource(type_name, resource_type, resource_defs):
         if filter_name in ('or', 'and', 'not'):
             continue
         elif filter_name == 'value':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/value'}
-            r['filters']['valuekv'] = {
-                '$ref': '#/definitions/filters/valuekv'}
+            r['filters'][filter_name] = {'$ref': '#/definitions/filters/value'}
+            r['filters']['valuekv'] = {'$ref': '#/definitions/filters/valuekv'}
         elif filter_name == 'event':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/event'}
+            r['filters'][filter_name] = {'$ref': '#/definitions/filters/event'}
         else:
             r['filters'][filter_name] = f.schema
-        filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, filter_name)})
-    filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
+        filter_refs.append({
+            '$ref':
+            '#/definitions/resources/%s/filters/%s' % (type_name, filter_name)
+        })
+    filter_refs.append({'$ref': '#/definitions/filters/valuekv'})
 
     # one word filter shortcuts
-    filter_refs.append(
-        {'enum': resource_type.filter_registry.keys()})
+    filter_refs.append({'enum': resource_type.filter_registry.keys()})
 
     resource_policy = {
         'allOf': [
-            {'$ref': '#/definitions/policy'},
-            {'properties': {
-                'resource': {'enum': [type_name]},
-                'filters': {
-                    'type': 'array',
-                    'items': {'anyOf': filter_refs}},
-                'actions': {
-                    'type': 'array',
-                    'items': {'anyOf': action_refs}}}},
-            ]
+            {
+                '$ref': '#/definitions/policy'
+            },
+            {
+                'properties': {
+                    'resource': {
+                        'enum': [type_name]
+                    },
+                    'filters': {
+                        'type': 'array',
+                        'items': {
+                            'anyOf': filter_refs
+                        }
+                    },
+                    'actions': {
+                        'type': 'array',
+                        'items': {
+                            'anyOf': action_refs
+                        }
+                    }
+                }
+            },
+        ]
     }
 
     if type_name == 'ec2':

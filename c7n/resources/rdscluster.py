@@ -21,8 +21,7 @@ from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks)
+from c7n.utils import (type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -68,15 +67,18 @@ class SubnetFilter(net_filters.SubnetFilter):
     def get_related_ids(self, resources):
         group_ids = set()
         for r in resources:
-            group_ids.update(
-                [s['SubnetIdentifier'] for s in
-                 self.groups[r['DBSubnetGroup']]['Subnets']])
+            group_ids.update([
+                s['SubnetIdentifier']
+                for s in self.groups[r['DBSubnetGroup']]['Subnets']
+            ])
         return group_ids
 
     def process(self, resources, event=None):
         self.groups = {
-            r['DBSubnetGroupName']: r for r in
-            self.manager.get_resource_manager('rds-subnet-group').resources()}
+            r['DBSubnetGroupName']: r
+            for r in self.manager.get_resource_manager('rds-subnet-group')
+            .resources()
+        }
         return super(SubnetFilter, self).process(resources, event)
 
 
@@ -106,11 +108,16 @@ class Delete(BaseAction):
                     delete-instances: true
     """
 
-    schema = type_schema(
-        'delete', **{'skip-snapshot': {'type': 'boolean'},
-                     'delete-instances': {'type': 'boolean'}})
+    schema = type_schema('delete', **{
+        'skip-snapshot': {
+            'type': 'boolean'
+        },
+        'delete-instances': {
+            'type': 'boolean'
+        }
+    })
 
-    permissions = ('rds:DeleteDBCluster',)
+    permissions = ('rds:DeleteDBCluster', )
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
@@ -123,9 +130,8 @@ class Delete(BaseAction):
                     client.delete_db_instance(
                         DBInstanceIdentifier=instance['DBInstanceIdentifier'],
                         SkipFinalSnapshot=True)
-                    self.log.info(
-                        'Deleted RDS instance: %s',
-                        instance['DBInstanceIdentifier'])
+                    self.log.info('Deleted RDS instance: %s',
+                                  instance['DBInstanceIdentifier'])
 
             params = {'DBClusterIdentifier': cluster['DBClusterIdentifier']}
             if skip:
@@ -137,15 +143,13 @@ class Delete(BaseAction):
                 client.delete_db_cluster(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidDBClusterStateFault':
-                    self.log.info(
-                        'RDS cluster in invalid state: %s',
-                        cluster['DBClusterIdentifier'])
+                    self.log.info('RDS cluster in invalid state: %s',
+                                  cluster['DBClusterIdentifier'])
                     continue
                 raise
 
-            self.log.info(
-                'Deleted RDS cluster: %s',
-                cluster['DBClusterIdentifier'])
+            self.log.info('Deleted RDS cluster: %s',
+                          cluster['DBClusterIdentifier'])
 
 
 @actions.register('retention')
@@ -172,18 +176,15 @@ class RetentionWindow(BaseAction):
     date_attribute = "BackupRetentionPeriod"
     # Tag copy not yet available for Aurora:
     #   https://forums.aws.amazon.com/thread.jspa?threadID=225812
-    schema = type_schema(
-        'retention',
-        **{'days': {'type': 'number'}})
-    permissions = ('rds:ModifyDBCluster',)
+    schema = type_schema('retention', **{'days': {'type': 'number'}})
+    permissions = ('rds:ModifyDBCluster', )
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for cluster in clusters:
-                futures.append(w.submit(
-                    self.process_snapshot_retention,
-                    cluster))
+                futures.append(
+                    w.submit(self.process_snapshot_retention, cluster))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -195,9 +196,8 @@ class RetentionWindow(BaseAction):
         new_retention = self.data['days']
 
         if current_retention < new_retention:
-            self.set_retention_window(
-                cluster,
-                max(current_retention, new_retention))
+            self.set_retention_window(cluster,
+                                      max(current_retention, new_retention))
             return cluster
 
     def set_retention_window(self, cluster, retention):
@@ -225,15 +225,14 @@ class Snapshot(BaseAction):
     """
 
     schema = type_schema('snapshot')
-    permissions = ('rds:CreateDBClusterSnapshot',)
+    permissions = ('rds:CreateDBClusterSnapshot', )
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for cluster in clusters:
-                futures.append(w.submit(
-                    self.process_cluster_snapshot,
-                    cluster))
+                futures.append(
+                    w.submit(self.process_cluster_snapshot, cluster))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -245,8 +244,7 @@ class Snapshot(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
         c.create_db_cluster_snapshot(
             DBClusterSnapshotIdentifier=snapshot_identifier(
-                'Backup',
-                cluster['DBClusterIdentifier']),
+                'Backup', cluster['DBClusterIdentifier']),
             DBClusterIdentifier=cluster['DBClusterIdentifier'])
 
 
@@ -259,8 +257,8 @@ class RDSClusterSnapshot(QueryResourceManager):
 
         service = 'rds'
         type = 'rds-cluster-snapshot'
-        enum_spec = (
-            'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
+        enum_spec = ('describe_db_cluster_snapshots', 'DBClusterSnapshots',
+                     None)
         name = id = 'DBClusterSnapshotIdentifier'
         filter_name = None
         filter_type = None
@@ -289,8 +287,10 @@ class RDSSnapshotAge(AgeFilter):
     """
 
     schema = type_schema(
-        'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        'age',
+        days={'type': 'number'},
+        op={'type': 'string',
+            'enum': OPERATORS.keys()})
 
     date_attribute = 'SnapshotCreateTime'
 
@@ -318,7 +318,7 @@ class RDSClusterSnapshotDelete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('rds:DeleteDBClusterSnapshot',)
+    permissions = ('rds:DeleteDBClusterSnapshot', )
 
     def process(self, snapshots):
         log.info("Deleting %d RDS cluster snapshots", len(snapshots))
@@ -329,9 +329,8 @@ class RDSClusterSnapshotDelete(BaseAction):
                     w.submit(self.process_snapshot_set, snapshot_set))
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Exception deleting snapshot set \n %s",
-                        f.exception())
+                    self.log.error("Exception deleting snapshot set \n %s",
+                                   f.exception())
         return snapshots
 
     def process_snapshot_set(self, snapshots_set):

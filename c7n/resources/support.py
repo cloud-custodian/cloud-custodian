@@ -18,7 +18,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('support-case')
 class SupportCase(QueryResourceManager):
-
     class resource_type(object):
         service = 'support'
         enum_spec = ('describe_cases', 'q', None)

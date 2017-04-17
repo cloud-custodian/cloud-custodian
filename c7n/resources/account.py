@@ -28,7 +28,6 @@ from c7n.utils import local_session, get_account_id, type_schema
 
 from c7n.resources.iam import CredentialReport
 
-
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
 
@@ -36,11 +35,9 @@ actions = ActionRegistry('aws.account.filters')
 def get_account(session_factory):
     session = local_session(session_factory)
     client = session.client('iam')
-    aliases = client.list_account_aliases().get(
-        'AccountAliases', ('',))
+    aliases = client.list_account_aliases().get('AccountAliases', ('', ))
     name = aliases and aliases[0] or ""
-    return {'account_id': get_account_id(session),
-            'account_name': name}
+    return {'account_id': get_account_id(session), 'account_name': name}
 
 
 @resources.register('account')
@@ -55,7 +52,7 @@ class Account(ResourceManager):
 
     @classmethod
     def get_permissions(cls):
-        return ('iam:ListAccountAliases',)
+        return ('iam:ListAccountAliases', )
 
     def get_model(self):
         return self.resource_type
@@ -66,9 +63,9 @@ class Account(ResourceManager):
     def get_resources(self, resource_ids):
         return [get_account(self.session_factory)]
 
+
 @filters.register('credential')
 class AccountCredentialReport(CredentialReport):
-
     def process(self, resources, event=None):
         super(AccountCredentialReport, self).process(resources, event)
         report = self.get_credential_report()
@@ -106,16 +103,32 @@ class CloudTrailEnabled(Filter):
                     multi-region: true
                     running: true
     """
-    schema = type_schema(
-        'check-cloudtrail',
-        **{'multi-region': {'type': 'boolean'},
-           'global-events': {'type': 'boolean'},
-           'current-region': {'type': 'boolean'},
-           'running': {'type': 'boolean'},
-           'notifies': {'type': 'boolean'},
-           'file-digest': {'type': 'boolean'},
-           'kms': {'type': 'boolean'},
-           'kms-key': {'type': 'string'}})
+    schema = type_schema('check-cloudtrail', **{
+        'multi-region': {
+            'type': 'boolean'
+        },
+        'global-events': {
+            'type': 'boolean'
+        },
+        'current-region': {
+            'type': 'boolean'
+        },
+        'running': {
+            'type': 'boolean'
+        },
+        'notifies': {
+            'type': 'boolean'
+        },
+        'file-digest': {
+            'type': 'boolean'
+        },
+        'kms': {
+            'type': 'boolean'
+        },
+        'kms-key': {
+            'type': 'string'
+        }
+    })
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
 
@@ -128,15 +141,20 @@ class CloudTrailEnabled(Filter):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
             current_region = session.region_name
-            trails  = [t for t in trails if t.get('HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
+            trails = [
+                t for t in trails
+                if t.get('HomeRegion') == current_region or
+                t.get('IsMultiRegionTrail')
+            ]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
         if self.data.get('kms-key'):
-            trails = [t for t in trails
-                      if t.get('KmsKeyId', '') == self.data['kms-key']]
+            trails = [
+                t for t in trails
+                if t.get('KmsKeyId', '') == self.data['kms-key']
+            ]
         if self.data.get('file-digest'):
-            trails = [t for t in trails
-                      if t.get('LogFileValidationEnabled')]
+            trails = [t for t in trails if t.get('LogFileValidationEnabled')]
         if self.data.get('multi-region'):
             trails = [t for t in trails if t.get('IsMultiRegionTrail')]
         if self.data.get('notifies'):
@@ -174,21 +192,25 @@ class ConfigEnabled(Filter):
                     running: true
     """
 
-    schema = type_schema(
-        'check-config', **{
-            'all-resources': {'type': 'boolean'},
-            'running': {'type': 'boolean'},
-            'global-resources': {'type': 'boolean'}})
+    schema = type_schema('check-config', **{
+        'all-resources': {
+            'type': 'boolean'
+        },
+        'running': {
+            'type': 'boolean'
+        },
+        'global-resources': {
+            'type': 'boolean'
+        }
+    })
 
     permissions = ('config:DescribeDeliveryChannels',
                    'config:DescribeConfigurationRecorders',
                    'config:DescribeConfigurationRecorderStatus')
 
     def process(self, resources, event=None):
-        client = local_session(
-            self.manager.session_factory).client('config')
-        channels = client.describe_delivery_channels()[
-            'DeliveryChannels']
+        client = local_session(self.manager.session_factory).client('config')
+        channels = client.describe_delivery_channels()['DeliveryChannels']
         recorders = client.describe_configuration_recorders()[
             'ConfigurationRecorders']
         resources[0]['c7n:config_recorders'] = recorders
@@ -196,19 +218,24 @@ class ConfigEnabled(Filter):
         if self.data.get('global-resources'):
             recorders = [
                 r for r in recorders
-                if r['recordingGroup'].get('includeGlobalResourceTypes')]
+                if r['recordingGroup'].get('includeGlobalResourceTypes')
+            ]
         if self.data.get('all-resources'):
-            recorders = [r for r in recorders
-                         if r['recordingGroup'].get('allSupported')]
+            recorders = [
+                r for r in recorders if r['recordingGroup'].get('allSupported')
+            ]
         if self.data.get('running', True) and recorders:
-            status = {s['name']: s for
-                      s in client.describe_configuration_recorder_status(
-                      )['ConfigurationRecordersStatus']}
+            status = {
+                s['name']: s
+                for s in client.describe_configuration_recorder_status()[
+                    'ConfigurationRecordersStatus']
+            }
             resources[0]['c7n:config_status'] = status
-            recorders = [r for r in recorders
-                         if status[r['name']]['recording']
-                         and status[r['name']]['lastStatus'].lower() in (
-                             'pending', 'success')]
+            recorders = [
+                r for r in recorders
+                if status[r['name']]['recording'] and status[r['name']]
+                ['lastStatus'].lower() in ('pending', 'success')
+            ]
         if channels and recorders:
             return []
         return resources
@@ -274,14 +301,13 @@ class IAMSummary(ValueFilter):
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
 
-    permissions = ('iam:GetAccountSummary',)
+    permissions = ('iam:GetAccountSummary', )
 
     def process(self, resources, event=None):
         if not resources[0].get('c7n:iam_summary'):
-            client = local_session(
-                self.manager.session_factory).client('iam')
-            resources[0]['c7n:iam_summary'] = client.get_account_summary(
-                )['SummaryMap']
+            client = local_session(self.manager.session_factory).client('iam')
+            resources[0]['c7n:iam_summary'] = client.get_account_summary()[
+                'SummaryMap']
         if self.match(resources[0]['c7n:iam_summary']):
             return resources
         return []
@@ -312,25 +338,26 @@ class AccountPasswordPolicy(ValueFilter):
                     value: true
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
-    permissions = ('iam:GetAccountPasswordPolicy',)
+    permissions = ('iam:GetAccountPasswordPolicy', )
 
     def process(self, resources, event=None):
-      account = resources[0]
-      if not account.get('c7n:password_policy'):
-          client = local_session(self.manager.session_factory).client('iam')
-          policy = {}
-          try:
-              policy = client.get_account_password_policy().get('PasswordPolicy', {})
-              policy['PasswordPolicyConfigured'] = True
-          except ClientError as e:
-              if e.response['Error']['Code'] == 'NoSuchEntity':
-                  policy['PasswordPolicyConfigured'] = False
-              else:
-                raise
-          account['c7n:password_policy'] = policy
-      if self.match(account['c7n:password_policy']):
-          return resources
-      return []
+        account = resources[0]
+        if not account.get('c7n:password_policy'):
+            client = local_session(self.manager.session_factory).client('iam')
+            policy = {}
+            try:
+                policy = client.get_account_password_policy().get(
+                    'PasswordPolicy', {})
+                policy['PasswordPolicyConfigured'] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntity':
+                    policy['PasswordPolicyConfigured'] = False
+                else:
+                    raise
+            account['c7n:password_policy'] = policy
+        if self.match(account['c7n:password_policy']):
+            return resources
+        return []
 
 
 @filters.register('service-limit')
@@ -391,12 +418,21 @@ class ServiceLimit(Filter):
         'service-limit',
         threshold={'type': 'number'},
         refresh_period={'type': 'integer'},
-        limits={'type': 'array', 'items': {'type': 'string'}},
-        services={'type': 'array', 'items': {
-            'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
-                     'RDS', 'EBS', 'SES', 'IAM']}})
+        limits={'type': 'array',
+                'items': {
+                    'type': 'string'
+                }},
+        services={
+            'type': 'array',
+            'items': {
+                'enum': [
+                    'EC2', 'ELB', 'VPC', 'AutoScaling', 'RDS', 'EBS', 'SES',
+                    'IAM'
+                ]
+            }
+        })
 
-    permissions = ('support:DescribeTrustedAdvisorCheckResult',)
+    permissions = ('support:DescribeTrustedAdvisorCheckResult', )
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
 
@@ -425,8 +461,8 @@ class ServiceLimit(Filter):
             if limits and limit['check'] not in limits:
                 continue
             limit['status'] = resource['status']
-            limit['percentage'] = float(limit['extant'] or 0) / float(
-                limit['limit']) * 100
+            limit['percentage'] = float(limit['extant'] or
+                                        0) / float(limit['limit']) * 100
             if threshold and limit['percentage'] < threshold:
                 continue
             exceeded.append(limit)

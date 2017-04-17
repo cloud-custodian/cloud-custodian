@@ -20,19 +20,18 @@ import zlib
 import jmespath
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.filters import (
-    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+from c7n.filters import (DefaultVpcBase, Filter, FilterValidationError,
+                         ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.revisions import Diff
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, camelResource, parse_cidr)
+from c7n.utils import (chunks, local_session, type_schema, get_retry,
+                       camelResource, parse_cidr)
 
 
 @resources.register('vpc')
 class Vpc(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'vpc'
@@ -85,16 +84,31 @@ class FlowLogFilter(Filter):
 
     """
 
-    schema = type_schema(
-        'flow-logs',
-        **{'enabled': {'type': 'boolean', 'default': False},
-           'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
-           'set-op': {'enum': ['or', 'and'], 'default': 'or'},
-           'status': {'enum': ['active']},
-           'traffic-type': {'enum': ['accept', 'reject', 'all']},
-           'log-group': {'type': 'string'}})
+    schema = type_schema('flow-logs', **{
+        'enabled': {
+            'type': 'boolean',
+            'default': False
+        },
+        'op': {
+            'enum': ['equal', 'not-equal'],
+            'default': 'equal'
+        },
+        'set-op': {
+            'enum': ['or', 'and'],
+            'default': 'or'
+        },
+        'status': {
+            'enum': ['active']
+        },
+        'traffic-type': {
+            'enum': ['accept', 'reject', 'all']
+        },
+        'log-group': {
+            'type': 'string'
+        }
+    })
 
-    permissions = ('ec2:DescribeFlowLogs',)
+    permissions = ('ec2:DescribeFlowLogs', )
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -113,7 +127,8 @@ class FlowLogFilter(Filter):
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
         status = self.data.get('status')
-        op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
+        op = self.data.get('op',
+                           'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
 
         results = []
@@ -123,22 +138,28 @@ class FlowLogFilter(Filter):
             if r[m.id] not in resource_map:
                 # we didn't find a flow log for this vpc
                 if enabled:
-                    # vpc flow logs not enabled so exclude this vpc from results
+                    # vpc flow logs not enabled so exclude this vpc from
+                    # results
                     continue
                 results.append(r)
                 continue
             flogs = resource_map[r[m.id]]
             r['c7n:flow-logs'] = flogs
 
-            # config comparisons are pointless if we only want vpcs with no flow logs
+            # config comparisons are pointless if we only want vpcs with no
+            # flow logs
             if enabled:
                 fl_matches = []
                 for fl in flogs:
-                    status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
-                    traffic_type_match = (traffic_type is None) or op(fl['TrafficType'], traffic_type.upper())
-                    log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
+                    status_match = (status is None) or op(
+                        fl['FlowLogStatus'], status.upper())
+                    traffic_type_match = (traffic_type is None) or op(
+                        fl['TrafficType'], traffic_type.upper())
+                    log_group_match = (log_group is None) or op(
+                        fl['LogGroupName'], log_group)
 
-                    # combine all conditions to check if flow log matches the spec
+                    # combine all conditions to check if flow log matches the
+                    # spec
                     fl_match = status_match and traffic_type_match and log_group_match
                     fl_matches.append(fl_match)
 
@@ -154,7 +175,6 @@ class FlowLogFilter(Filter):
 
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'subnet'
@@ -167,11 +187,12 @@ class Subnet(QueryResourceManager):
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
+
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'security-group'
@@ -188,7 +209,6 @@ class SecurityGroup(QueryResourceManager):
 
 @SecurityGroup.filter_registry.register('diff')
 class SecurityGroupDiffFilter(Diff):
-
     def diff(self, source, target):
         differ = SecurityGroupDiff()
         return differ.diff(source, target)
@@ -204,8 +224,7 @@ class SecurityGroupDiffFilter(Diff):
                     p.pop('ToPort')
                 if 'Ipv6Ranges' not in p:
                     p[u'Ipv6Ranges'] = []
-                for attribute, element_key in (
-                        ('IpRanges', u'CidrIp'),):
+                for attribute, element_key in (('IpRanges', u'CidrIp'), ):
                     if attribute not in p:
                         continue
                     p[attribute] = [{element_key: v} for v in p[attribute]]
@@ -227,8 +246,8 @@ class SecurityGroupDiff(object):
         ingress_delta = self.get_rule_delta('IpPermissions', source, target)
         if ingress_delta:
             delta['ingress'] = ingress_delta
-        egress_delta = self.get_rule_delta(
-            'IpPermissionsEgress', source, target)
+        egress_delta = self.get_rule_delta('IpPermissionsEgress', source,
+                                           target)
         if egress_delta:
             delta['egress'] = egress_delta
         if delta:
@@ -245,42 +264,51 @@ class SecurityGroupDiff(object):
         for k in target_keys.intersection(source_keys):
             if source_tags[k] != target_tags[k]:
                 changed.add(k)
-        return {k: v for k, v in {
-            'added': {k: target_tags[k] for k in added},
-            'removed': {k: source_tags[k] for k in removed},
-            'updated': {k: target_tags[k] for k in changed}}.items() if v}
+        return {
+            k: v
+            for k, v in {
+                'added': {k: target_tags[k]
+                          for k in added},
+                'removed': {k: source_tags[k]
+                            for k in removed},
+                'updated': {k: target_tags[k]
+                            for k in changed}
+            }.items() if v
+        }
 
     def get_rule_delta(self, key, source, target):
         source_rules = {
-            self.compute_rule_hash(r): r for r in source.get(key, ())}
+            self.compute_rule_hash(r): r
+            for r in source.get(key, ())
+        }
         target_rules = {
-            self.compute_rule_hash(r): r for r in target.get(key, ())}
+            self.compute_rule_hash(r): r
+            for r in target.get(key, ())
+        }
         source_keys = set(source_rules.keys())
         target_keys = set(target_rules.keys())
         removed = source_keys.difference(target_keys)
         added = target_keys.difference(source_keys)
-        return {k: v for k, v in
-                {'removed': [source_rules[rid] for rid in sorted(removed)],
-                 'added': [target_rules[rid] for rid in sorted(added)]}.items() if v}
+        return {
+            k: v
+            for k, v in {
+                'removed': [source_rules[rid] for rid in sorted(removed)],
+                'added': [target_rules[rid] for rid in sorted(added)]
+            }.items() if v
+        }
 
-    RULE_ATTRS = (
-        ('PrefixListIds', 'PrefixListId'),
-        ('UserIdGroupPairs', 'GroupId'),
-        ('IpRanges', 'CidrIp'),
-        ('Ipv6Ranges', 'CidrIpv6')
-    )
+    RULE_ATTRS = (('PrefixListIds', 'PrefixListId'), ('UserIdGroupPairs',
+                                                      'GroupId'),
+                  ('IpRanges', 'CidrIp'), ('Ipv6Ranges', 'CidrIpv6'))
 
     def compute_rule_hash(self, rule):
-        buf = "%d-%d-%s-" % (
-            rule.get('FromPort', 0) or 0,
-            rule.get('ToPort', 0) or 0,
-            rule.get('IpProtocol', '-1') or '-1'
-            )
+        buf = "%d-%d-%s-" % (rule.get('FromPort', 0) or 0,
+                             rule.get('ToPort', 0) or 0,
+                             rule.get('IpProtocol', '-1') or '-1')
         for a, ke in self.RULE_ATTRS:
             if a not in rule:
                 continue
-            ev = [e[ke] for e in rule[a]]
-            ev.sort()
+            ev = sorted([e[ke] for e in rule[a]])
             for e in ev:
                 buf += "%s-" % e
         return abs(zlib.crc32(buf))
@@ -292,16 +320,16 @@ class SecurityGroupApplyPatch(BaseAction):
     """
     schema = type_schema('patch')
 
-    permissions = ('ec2:AuthorizeSecurityGroupIngress',
-                   'ec2:AuthorizeSecurityGroupEgress',
-                   'ec2:RevokeSecurityGroupIngress',
-                   'ec2:RevokeSecurityGroupEgress',
-                   'ec2:CreateTags',
-                   'ec2:DeleteTags')
+    permissions = (
+        'ec2:AuthorizeSecurityGroupIngress',
+        'ec2:AuthorizeSecurityGroupEgress', 'ec2:RevokeSecurityGroupIngress',
+        'ec2:RevokeSecurityGroupEgress', 'ec2:CreateTags', 'ec2:DeleteTags')
 
     def validate(self):
-        diff_filters = [n for n in self.manager.filters if isinstance(
-            n, SecurityGroupDiffFilter)]
+        diff_filters = [
+            n for n in self.manager.filters
+            if isinstance(n, SecurityGroupDiffFilter)
+        ]
         if not len(diff_filters):
             raise FilterValidationError(
                 "resource patching requires diff filter")
@@ -321,68 +349,74 @@ class SecurityGroupApplyPatch(BaseAction):
 class SecurityGroupPatch(object):
 
     RULE_TYPE_MAP = {
-        'egress': ('IpPermissionsEgress',
-                   'revoke_security_group_egress',
+        'egress': ('IpPermissionsEgress', 'revoke_security_group_egress',
                    'authorize_security_group_egress'),
-        'ingress': ('IpPermissions',
-                    'revoke_security_group_ingress',
-                    'authorize_security_group_ingress')}
+        'ingress': ('IpPermissions', 'revoke_security_group_ingress',
+                    'authorize_security_group_ingress')
+    }
 
-    retry = staticmethod(get_retry((
-        'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
+    retry = staticmethod(
+        get_retry(('RequestLimitExceeded', 'Client.RequestLimitExceeded')))
 
     def apply_delta(self, client, target, change_set):
         if 'tags' in change_set:
             self.process_tags(client, target, change_set['tags'])
         if 'ingress' in change_set:
-            self.process_rules(
-                client, 'ingress', target, change_set['ingress'])
+            self.process_rules(client, 'ingress', target,
+                               change_set['ingress'])
         if 'egress' in change_set:
-            self.process_rules(
-                client, 'egress', target, change_set['egress'])
+            self.process_rules(client, 'egress', target, change_set['egress'])
 
     def process_tags(self, client, group, tag_delta):
         if 'removed' in tag_delta:
-            self.retry(client.delete_tags,
-                       Resources=[group['GroupId']],
-                       Tags=[{'Key': k}
-                             for k in tag_delta['removed']])
+            self.retry(
+                client.delete_tags,
+                Resources=[group['GroupId']],
+                Tags=[{
+                    'Key': k
+                } for k in tag_delta['removed']])
         tags = []
         if 'added' in tag_delta:
-            tags.extend(
-                [{'Key': k, 'Value': v}
-                 for k, v in tag_delta['added'].items()])
+            tags.extend([{
+                'Key': k,
+                'Value': v
+            } for k, v in tag_delta['added'].items()])
         if 'updated' in tag_delta:
-            tags.extend(
-                [{'Key': k, 'Value': v}
-                 for k, v in tag_delta['updated'].items()])
+            tags.extend([{
+                'Key': k,
+                'Value': v
+            } for k, v in tag_delta['updated'].items()])
         if tags:
             self.retry(
                 client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
     def process_rules(self, client, rule_type, group, delta):
         key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
-        revoke, authorize = getattr(
-            client, revoke_op), getattr(client, auth_op)
+        revoke, authorize = getattr(client, revoke_op), getattr(
+            client, auth_op)
 
         # Process removes
         if 'removed' in delta:
-            self.retry(revoke, GroupId=group['GroupId'],
-                       IpPermissions=[r for r in delta['removed']])
+            self.retry(
+                revoke,
+                GroupId=group['GroupId'],
+                IpPermissions=[r for r in delta['removed']])
 
         # Process adds
         if 'added' in delta:
-            self.retry(authorize, GroupId=group['GroupId'],
-                       IpPermissions=[r for r in delta['added']])
+            self.retry(
+                authorize,
+                GroupId=group['GroupId'],
+                IpPermissions=[r for r in delta['added']])
 
 
 class SGUsage(Filter):
-
     def get_permissions(self):
-        return list(itertools.chain(
-            [self.manager.get_resource_manager(m).get_permissions()
-             for m in
-             ['lambda', 'eni', 'launch-config', 'security-group']]))
+        return list(
+            itertools.chain([
+                self.manager.get_resource_manager(m).get_permissions()
+                for m in ['lambda', 'eni', 'launch-config', 'security-group']
+            ]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -392,27 +426,24 @@ class SGUsage(Filter):
         peered_ids = set()
         for resource_set in chunks(resources, 200):
             for sg_ref in client.describe_security_group_references(
-                    GroupId=[r['GroupId'] for r in resource_set]
-            )['SecurityGroupReferenceSet']:
+                    GroupId=[r['GroupId'] for r in resource_set
+                             ])['SecurityGroupReferenceSet']:
                 peered_ids.add(sg_ref['GroupId'])
-        self.log.debug(
-            "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
+        self.log.debug("%d of %d groups w/ peered refs",
+                       len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
 
     def scan_groups(self):
         used = set()
         for kind, scanner in (
-                ("nics", self.get_eni_sgs),
-                ("sg-perm-refs", self.get_sg_refs),
-                ('lambdas', self.get_lambda_sgs),
-                ("launch-configs", self.get_launch_config_sgs),
-        ):
+            ("nics", self.get_eni_sgs), ("sg-perm-refs", self.get_sg_refs),
+            ('lambdas', self.get_lambda_sgs), ("launch-configs",
+                                               self.get_launch_config_sgs), ):
             sg_ids = scanner()
             new_refs = sg_ids.difference(used)
             used = used.union(sg_ids)
-            self.log.debug(
-                "%s using %d sgs, new refs %s total %s",
-                kind, len(sg_ids), len(new_refs), len(used))
+            self.log.debug("%s using %d sgs, new refs %s total %s", kind,
+                           len(sg_ids), len(new_refs), len(used))
 
         return used
 
@@ -420,7 +451,8 @@ class SGUsage(Filter):
         # Note assuming we also have launch config garbage collection
         # enabled.
         sg_ids = set()
-        for cfg in self.manager.get_resource_manager('launch-config').resources():
+        for cfg in self.manager.get_resource_manager(
+                'launch-config').resources():
             for g in cfg['SecurityGroups']:
                 sg_ids.add(g)
             for g in cfg['ClassicLinkVPCSecurityGroups']:
@@ -445,7 +477,8 @@ class SGUsage(Filter):
 
     def get_sg_refs(self):
         sg_ids = set()
-        for sg in self.manager.get_resource_manager('security-group').resources():
+        for sg in self.manager.get_resource_manager(
+                'security-group').resources():
             for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
                 for p in sg.get(perm_type, []):
                     for g in p.get('UserIdGroupPairs', ()):
@@ -481,9 +514,8 @@ class UnusedSecurityGroup(SGUsage):
     def process(self, resources, event=None):
         used = self.scan_groups()
         unused = [
-            r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            r for r in resources if r['GroupId'] not in used and 'VpcId' in r
+        ]
         return unused and self.filter_peered_refs(unused) or []
 
 
@@ -509,9 +541,8 @@ class UsedSecurityGroup(SGUsage):
     def process(self, resources, event=None):
         used = self.scan_groups()
         unused = [
-            r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            r for r in resources if r['GroupId'] not in used and 'VpcId' in r
+        ]
         unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
         return [r for r in resources if r['GroupId'] not in unused]
 
@@ -536,7 +567,7 @@ class Stale(Filter):
                   - stale
     """
     schema = type_schema('stale')
-    permissions = ('ec2:DescribeStaleSecurityGroups',)
+    permissions = ('ec2:DescribeStaleSecurityGroups', )
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -658,9 +689,8 @@ class SGPermission(Filter):
 
     """
 
-    perm_attrs = set((
-        'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-        'IpRanges', 'PrefixListIds'))
+    perm_attrs = set(('IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
+                      'IpRanges', 'PrefixListIds'))
     filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
 
@@ -722,8 +752,9 @@ class SGPermission(Filter):
     def process_self_reference(self, perm, sg_id):
         found = None
         if 'UserIdGroupPairs' in perm and 'SelfReference' in self.data:
-            self_reference = sg_id in [p['GroupId']
-                                       for p in perm['UserIdGroupPairs']]
+            self_reference = sg_id in [
+                p['GroupId'] for p in perm['UserIdGroupPairs']
+            ]
             found = self_reference & self.data['SelfReference']
         return found
 
@@ -737,9 +768,7 @@ class SGPermission(Filter):
         for p in permissions:
             np = dict(p)
             values = {}
-            for k in (u'IpRanges',
-                      u'Ipv6Ranges',
-                      u'PrefixListIds',
+            for k in (u'IpRanges', u'Ipv6Ranges', u'PrefixListIds',
                       u'UserIdGroupPairs'):
                 values[k] = np.pop(k, ())
                 np[k] = []
@@ -766,19 +795,19 @@ class SGPermission(Filter):
             if found is None or found:
                 port_found = self.process_ports(perm)
                 if port_found is not None:
-                    found = (
-                        found is not None and port_found & found or port_found)
+                    found = (found is not None and port_found & found or
+                             port_found)
             if found is None or found:
                 cidr_found = self.process_cidrs(perm)
                 if cidr_found is not None:
-                    found = (
-                        found is not None and cidr_found & found or cidr_found)
+                    found = (found is not None and cidr_found & found or
+                             cidr_found)
             if found is None or found:
                 self_reference_found = self.process_self_reference(perm, sg_id)
                 if self_reference_found is not None:
                     found = (
-                        found is not None and
-                        self_reference_found & found or self_reference_found)
+                        found is not None and self_reference_found & found or
+                        self_reference_found)
             if not found:
                 continue
             matched.append(perm)
@@ -807,13 +836,23 @@ class IPPermission(SGPermission):
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['ingress']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'SelfReference': {'type': 'boolean'}
+            'type': {
+                'enum': ['ingress']
             },
-        'required': ['type']}
+            'Ports': {
+                'type': 'array',
+                'items': {
+                    'type': 'integer'
+                }
+            },
+            'SelfReference': {
+                'type': 'boolean'
+            }
+        },
+        'required': ['type']
+    }
 
 
 @SecurityGroup.filter_registry.register('egress')
@@ -838,12 +877,17 @@ class IPPermissionEgress(SGPermission):
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['egress']},
-            'SelfReference': {'type': 'boolean'}
+            'type': {
+                'enum': ['egress']
             },
-        'required': ['type']}
+            'SelfReference': {
+                'type': 'boolean'
+            }
+        },
+        'required': ['type']
+    }
 
 
 @SecurityGroup.action_registry.register('delete')
@@ -867,7 +911,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('ec2:DeleteSecurityGroup',)
+    permissions = ('ec2:DeleteSecurityGroup', )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -898,8 +942,10 @@ class RemovePermissions(BaseAction):
     """
     schema = type_schema(
         'remove-permissions',
-        ingress={'type': 'string', 'enum': ['matched', 'all']},
-        egress={'type': 'string', 'enum': ['matched', 'all']})
+        ingress={'type': 'string',
+                 'enum': ['matched', 'all']},
+        egress={'type': 'string',
+                'enum': ['matched', 'all']})
 
     permissions = ('ec2:RevokeSecurityGroupIngress',
                    'ec2:RevokeSecurityGroupEgress')
@@ -931,7 +977,6 @@ class RemovePermissions(BaseAction):
 
 @resources.register('eni')
 class NetworkInterface(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'eni'
@@ -943,6 +988,7 @@ class NetworkInterface(QueryResourceManager):
         date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+
 
 NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
 
@@ -1018,21 +1064,19 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                     groups: matched
                     isolation-group: sg-01ab23c4
     """
-    permissions = ('ec2:ModifyNetworkInterfaceAttribute',)
+    permissions = ('ec2:ModifyNetworkInterfaceAttribute', )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        groups = super(
-            InterfaceModifyVpcSecurityGroups, self).get_groups(resources)
+        groups = super(InterfaceModifyVpcSecurityGroups,
+                       self).get_groups(resources)
         for idx, r in enumerate(resources):
             client.modify_network_interface_attribute(
-                NetworkInterfaceId=r['NetworkInterfaceId'],
-                Groups=groups[idx])
+                NetworkInterfaceId=r['NetworkInterfaceId'], Groups=groups[idx])
 
 
 @resources.register('route-table')
 class RouteTable(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'route-table'
@@ -1047,7 +1091,6 @@ class RouteTable(QueryResourceManager):
 
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'vpc-peering-connection'
@@ -1063,7 +1106,6 @@ class PeeringConnection(QueryResourceManager):
 
 @resources.register('network-acl')
 class NetworkAcl(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'network-acl'
@@ -1118,16 +1160,19 @@ class AclAwsS3Cidrs(Filter):
     # TODO allow for port specification as range
     schema = type_schema(
         's3-cidr',
-        egress={'type': 'boolean', 'default': True},
-        ingress={'type': 'boolean', 'default': True},
-        present={'type': 'boolean', 'default': False})
+        egress={'type': 'boolean',
+                'default': True},
+        ingress={'type': 'boolean',
+                 'default': True},
+        present={'type': 'boolean',
+                 'default': False})
 
-    permissions = ('ec2:DescribePrefixLists',)
+    permissions = ('ec2:DescribePrefixLists', )
 
     def process(self, resources, event=None):
         ec2 = local_session(self.manager.session_factory).client('ec2')
-        cidrs = jmespath.search(
-            "PrefixLists[].Cidrs[]", ec2.describe_prefix_lists())
+        cidrs = jmespath.search("PrefixLists[].Cidrs[]",
+                                ec2.describe_prefix_lists())
         cidrs = [parse_cidr(cidr) for cidr in cidrs]
         results = []
 
@@ -1156,7 +1201,6 @@ class AclAwsS3Cidrs(Filter):
 
 @resources.register('network-addr')
 class Address(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'network-addr'
@@ -1172,7 +1216,6 @@ class Address(QueryResourceManager):
 
 @resources.register('customer-gateway')
 class CustomerGateway(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'customer-gateway'
@@ -1189,7 +1232,6 @@ class CustomerGateway(QueryResourceManager):
 
 @resources.register('internet-gateway')
 class InternetGateway(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'internet-gateway'
@@ -1205,7 +1247,6 @@ class InternetGateway(QueryResourceManager):
 
 @resources.register('vpn-connection')
 class VPNConnection(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'vpc-connection'
@@ -1221,7 +1262,6 @@ class VPNConnection(QueryResourceManager):
 
 @resources.register('vpn-gateway')
 class VPNGateway(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'vpc-gateway'
@@ -1237,7 +1277,6 @@ class VPNGateway(QueryResourceManager):
 
 @resources.register('key-pair')
 class KeyPair(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'key-pair'
@@ -1248,4 +1287,3 @@ class KeyPair(QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
-

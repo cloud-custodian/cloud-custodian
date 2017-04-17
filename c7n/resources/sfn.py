@@ -27,8 +27,5 @@ class StepFunction(QueryResourceManager):
         name = 'name'
         date = 'creationDate'
         dimension = None
-        detail_spec = (
-            "describe_state_machine", "stateMachineArn",
-            'stateMachineArn', None)
-
-
+        detail_spec = ("describe_state_machine", "stateMachineArn",
+                       'stateMachineArn', None)

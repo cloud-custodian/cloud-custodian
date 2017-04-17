@@ -17,7 +17,6 @@ from c7n.query import QueryResourceManager
 
 @resources.register('rest-api')
 class RestAPI(QueryResourceManager):
-
     class resource_type(object):
         service = 'apigateway'
         type = 'restapis'

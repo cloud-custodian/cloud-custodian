@@ -20,7 +20,6 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-
 log = logging.getLogger('custodian.cfn')
 
 filters = FilterRegistry('cfn.filters')
@@ -29,7 +28,6 @@ actions = ActionRegistry('cfn.actions')
 
 @resources.register('cfn')
 class CloudFormation(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudformation'
         type = 'stack'
@@ -65,7 +63,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ("cloudformation:DeleteStack",)
+    permissions = ("cloudformation:DeleteStack", )
 
     def process(self, stacks):
         with self.executor_factory(max_workers=10) as w:
@@ -75,4 +73,3 @@ class Delete(BaseAction):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
         client.delete_stack(StackName=stack['StackName'])
-

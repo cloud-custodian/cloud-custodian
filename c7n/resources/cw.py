@@ -22,7 +22,6 @@ from c7n.utils import type_schema, local_session, chunks, get_retry
 
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudwatch'
         type = 'alarm'
@@ -34,7 +33,7 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
 
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('Throttled', )))
 
 
 @Alarm.action_registry.register('delete')
@@ -60,7 +59,7 @@ class AlarmDelete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('cloudwatch:DeleteAlarms',)
+    permissions = ('cloudwatch:DeleteAlarms', )
 
     def process(self, resources):
         client = local_session(
@@ -74,7 +73,6 @@ class AlarmDelete(BaseAction):
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
-
     class resource_type(object):
         service = 'events'
         type = 'event-rule'
@@ -88,7 +86,6 @@ class EventRule(QueryResourceManager):
 
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
-
     class resource_type(object):
         service = 'logs'
         type = 'log-group'
@@ -118,15 +115,14 @@ class Retention(BaseAction):
     """
 
     schema = type_schema('retention', days={'type': 'integer'})
-    permissions = ('logs:PutRetentionPolicy',)
+    permissions = ('logs:PutRetentionPolicy', )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         days = self.data['days']
         for r in resources:
             client.put_retention_policy(
-                logGroupName=r['logGroupName'],
-                retentionInDays=days)
+                logGroupName=r['logGroupName'], retentionInDays=days)
 
 
 @LogGroup.action_registry.register('delete')
@@ -148,7 +144,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('logs:DeleteLogGroup',)
+    permissions = ('logs:DeleteLogGroup', )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -172,9 +168,8 @@ class LastWriteDays(Filter):
                     days: 60
     """
 
-    schema = type_schema(
-        'last-write', days={'type': 'number'})
-    permissions = ('logs:DescribeLogStreams',)
+    schema = type_schema('last-write', days={'type': 'number'})
+    permissions = ('logs:DescribeLogStreams', )
 
     def process(self, resources, event=None):
         self.date_threshold = datetime.utcnow() - timedelta(
@@ -197,6 +192,6 @@ class LastWriteDays(Filter):
         else:
             last_timestamp = streams[0]['lastIngestionTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp/1000.0)
+        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write

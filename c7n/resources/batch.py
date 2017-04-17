@@ -18,26 +18,22 @@ from c7n.query import QueryResourceManager
 
 @resources.register('batch-compute')
 class ComputeEnvironment(QueryResourceManager):
-
     class resource_type(object):
         service = 'batch'
         filter_name = 'computeEnvironments'
         filter_type = 'list'
         dimension = None
         id = name = "computeEnvironmentName"
-        enum_spec = (
-            'describe_compute_environments', 'computeEnvironments', None)
+        enum_spec = ('describe_compute_environments', 'computeEnvironments',
+                     None)
 
 
 @resources.register('batch-definition')
 class JobDefinition(QueryResourceManager):
-
     class resource_type(object):
         service = 'batch'
         filter_name = 'jobDefinitions'
         filter_type = 'list'
         dimension = None
         id = name = "jobDefinitionName"
-        enum_spec = (
-            'describe_job_definitions', 'jobDefinitions', None)
-
+        enum_spec = ('describe_job_definitions', 'jobDefinitions', None)

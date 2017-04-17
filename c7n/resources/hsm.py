@@ -18,20 +18,17 @@ from c7n.query import QueryResourceManager
 
 @resources.register('hsm')
 class CloudHSM(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudhsm'
         enum_spec = ('list_hsms', 'HsmList', None)
         id = 'HsmArn'
         name = 'Name'
         date = dimension = None
-        detail_spec = (
-            "describe_hsm", "HsmArn", None, None)
+        detail_spec = ("describe_hsm", "HsmArn", None, None)
 
 
 @resources.register('hsm-hapg')
 class PartitionGroup(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudhsm'
         enum_spec = ('list_hapgs', 'HapgList', None)
@@ -44,7 +41,6 @@ class PartitionGroup(QueryResourceManager):
 
 @resources.register('hsm-client')
 class HSMClient(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudhsm'
         enum_spec = ('list_luna_clients', 'ClientList', None)

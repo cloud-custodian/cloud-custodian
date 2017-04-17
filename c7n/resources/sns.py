@@ -18,13 +18,12 @@ from c7n.query import QueryResourceManager
 
 @resources.register('sns')
 class SNS(QueryResourceManager):
-
     class resource_type(object):
         service = 'sns'
         type = 'topic'
         enum_spec = ('list_topics', 'Topics', None)
-        detail_spec = (
-            'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
+        detail_spec = ('get_topic_attributes', 'TopicArn', 'TopicArn',
+                       'Attributes')
         id = 'TopicArn'
         filter_name = None
         filter_type = None
@@ -32,15 +31,10 @@ class SNS(QueryResourceManager):
         date = None
         dimension = 'TopicName'
         default_report_fields = (
-            'TopicArn',
-            'DisplayName',
-            'SubscriptionsConfirmed',
-            'SubscriptionsPending',
-            'SubscriptionsDeleted'
-            )
+            'TopicArn', 'DisplayName', 'SubscriptionsConfirmed',
+            'SubscriptionsPending', 'SubscriptionsDeleted')
 
 
 @SNS.filter_registry.register('cross-account')
 class SNSCrossAccount(CrossAccountAccessFilter):
-    permissions = ('sns:GetTopicAttributes',)
-
+    permissions = ('sns:GetTopicAttributes', )

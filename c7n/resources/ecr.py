@@ -21,7 +21,6 @@ from c7n.utils import local_session
 
 @resources.register('ecr')
 class ECR(QueryResourceManager):
-
     class resource_type(object):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
@@ -47,17 +46,17 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
                       expr: "accounts.*.accountNumber"
                       url: *accounts_url
     """
-    permissions = ('ecr:GetRepositoryPolicy',)
+    permissions = ('ecr:GetRepositoryPolicy', )
 
     def process(self, resources, event=None):
-
         def _augment(r):
             client = local_session(self.manager.session_factory).client('ecr')
             try:
                 r['Policy'] = client.get_repository_policy(
                     repositoryName=r['repositoryName'])['policyText']
             except ClientError as e:
-                if e.response['Error']['Code'] == 'RepositoryPolicyNotFoundException':
+                if e.response['Error'][
+                        'Code'] == 'RepositoryPolicyNotFoundException':
                     return None
                 raise
             return r
@@ -66,4 +65,5 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
         with self.executor_factory(max_workers=3) as w:
             resources = filter(None, w.map(_augment, resources))
 
-        return super(ECRCrossAccountAccessFilter, self).process(resources, event)
+        return super(ECRCrossAccountAccessFilter, self).process(
+            resources, event)

@@ -19,7 +19,6 @@ from c7n.utils import local_session, type_schema
 
 @resources.register('cloudsearch')
 class CloudSearch(QueryResourceManager):
-
     class resource_type(object):
         service = "cloudsearch"
         enum_spec = ("describe_domains", "DomainStatusList", None)
@@ -31,7 +30,7 @@ class CloudSearch(QueryResourceManager):
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ('cloudsearch:DeleteDomain',)
+    permissions = ('cloudsearch:DeleteDomain', )
 
     def process(self, resources):
         client = local_session(

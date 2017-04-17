@@ -1095,5 +1095,5 @@ class S3Test(BaseTest):
             'filters': [{'Website': 'not-null'}],
             'actions': ['remove-website-hosting']},
             session_factory=session_factory)
-        resources = p.run()
+        # resources = p.run()
         self.assertEqual(len(resources), 0)

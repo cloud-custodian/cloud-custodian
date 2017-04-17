@@ -21,11 +21,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-from c7n.resources.asg import ASG, LaunchConfig
-
-
 log = logging.getLogger('custodian.ami')
-
 
 filters = FilterRegistry('ami.filters')
 actions = ActionRegistry('ami.actions')
@@ -33,12 +29,10 @@ actions = ActionRegistry('ami.actions')
 
 @resources.register('ami')
 class AMI(QueryResourceManager):
-
     class resource_type(object):
         service = 'ec2'
         type = 'image'
-        enum_spec = (
-            'describe_images', 'Images', {'Owners': ['self']})
+        enum_spec = ('describe_images', 'Images', {'Owners': ['self']})
         detail_spec = None
         id = 'ImageId'
         filter_name = 'ImageIds'
@@ -73,7 +67,7 @@ class Deregister(BaseAction):
     """
 
     schema = type_schema('deregister')
-    permissions = ('ec2:DeregisterImage',)
+    permissions = ('ec2:DeregisterImage', )
 
     def process(self, images):
         with self.executor_factory(max_workers=10) as w:
@@ -108,7 +102,7 @@ class RemoveLaunchPermissions(BaseAction):
     """
 
     schema = type_schema('remove-launch-permissions')
-    permissions = ('ec2:ResetImageAttribute',)
+    permissions = ('ec2:ResetImageAttribute', )
 
     def process(self, images):
         with self.executor_factory(max_workers=2) as w:
@@ -139,8 +133,10 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
-        days={'type': 'number', 'minimum': 0})
+        op={'type': 'string',
+            'enum': OPERATORS.keys()},
+        days={'type': 'number',
+              'minimum': 0})
 
 
 @filters.register('unused')
@@ -165,9 +161,11 @@ class ImageUnusedFilter(Filter):
     schema = type_schema('unused', value={'type': 'boolean'})
 
     def get_permissions(self):
-        return list(itertools.chain([
-            self.manager.get_resource_manager(m).get_permissions()
-            for m in ('asg', 'launch-config', 'ec2')]))
+        return list(
+            itertools.chain([
+                self.manager.get_resource_manager(m).get_permissions()
+                for m in ('asg', 'launch-config', 'ec2')
+            ]))
 
     def _pull_asg_images(self):
         asgs = self.manager.get_resource_manager('asg').resources()
@@ -175,7 +173,8 @@ class ImageUnusedFilter(Filter):
         lcfg_mgr = self.manager.get_resource_manager('launch-config')
         return set([
             lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
-            if lcfg['LaunchConfigurationName'] in lcfgs])
+            if lcfg['LaunchConfigurationName'] in lcfgs
+        ])
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')

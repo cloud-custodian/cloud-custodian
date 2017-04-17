@@ -14,14 +14,12 @@
 """Ops feedback via log subscription
 """
 import boto3
-from botocore.vendored import requests
-
 import base64
-from datetime import datetime
 import json
 import textwrap
 import zlib
 
+from datetime import datetime
 
 config = logs = sns = None
 
@@ -37,17 +35,17 @@ def init():
 
 
 def message_event(evt):
-    dt = datetime.fromtimestamp(evt['timestamp']/1000.0)
-    return "%s: %s" % (
-        dt.ctime(), "\n".join(textwrap.wrap(evt['message'], 80)))
+    dt = datetime.fromtimestamp(evt['timestamp'] / 1000.0)
+    return "%s: %s" % (dt.ctime(),
+                       "\n".join(textwrap.wrap(evt['message'], 80)))
 
 
 def process_log_event(event, context):
     """Format log events and relay via sns/email"""
     init()
     serialized = event['awslogs'].pop('data')
-    data = json.loads(zlib.decompress(
-        base64.b64decode(serialized), 16+zlib.MAX_WBITS))
+    data = json.loads(
+        zlib.decompress(base64.b64decode(serialized), 16 + zlib.MAX_WBITS))
 
     # Fetch additional logs for context (20s window)
     timestamps = [e['timestamp'] for e in data['logEvents']]
@@ -62,14 +60,10 @@ def process_log_event(event, context):
         startFromHead=True)['events']
 
     message = [
-        "An error was detected",
-        "",
-        "Log Group: %s" % data['logGroup'],
-        "Log Stream: %s" % data['logStream'],
-        "Log Owner: %s" % data['owner'],
-        "",
-        "Log Contents",
-        ""]
+        "An error was detected", "", "Log Group: %s" % data['logGroup'],
+        "Log Stream: %s" % data['logStream'], "Log Owner: %s" % data['owner'],
+        "", "Log Contents", ""
+    ]
 
     # We may get things delivered from log sub that are not in log events
     for evt in data['logEvents']:
@@ -88,16 +82,21 @@ def process_log_event(event, context):
     sns.publish(**params)
 
 
-def get_function(session_factory, name, role, sns_topic, log_groups,
-                 subject="Lambda Error", pattern="Traceback"):
+def get_function(session_factory,
+                 name,
+                 role,
+                 sns_topic,
+                 log_groups,
+                 subject="Lambda Error",
+                 pattern="Traceback"):
     """Lambda function provisioning.
 
     Self contained within the component, to allow for easier reuse.
     """
 
     # Lazy import to avoid runtime dependency
-    from c7n.mu import (
-        LambdaFunction, PythonPackageArchive, CloudWatchLogSubscription)
+    from c7n.mu import (LambdaFunction, PythonPackageArchive,
+                        CloudWatchLogSubscription)
 
     config = dict(
         name=name,
@@ -108,16 +107,16 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
         role=role,
         description='Custodian Ops Error Notify',
         events=[
-            CloudWatchLogSubscription(
-                session_factory, log_groups, pattern)])
+            CloudWatchLogSubscription(session_factory, log_groups, pattern)
+        ])
 
     archive = PythonPackageArchive()
     archive.add_py_file(__file__)
-    archive.add_contents(
-        'config.json', json.dumps({
-            'topic': sns_topic,
-            'subject': subject
-        }))
+    archive.add_contents('config.json',
+                         json.dumps({
+                             'topic': sns_topic,
+                             'subject': subject
+                         }))
     archive.close()
 
     return LambdaFunction(config, archive)

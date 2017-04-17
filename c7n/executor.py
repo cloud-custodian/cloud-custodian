@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from concurrent.futures import (
-    ProcessPoolExecutor, ThreadPoolExecutor)
+from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor)
 
 from c7n.registry import PluginRegistry
 
@@ -21,7 +20,6 @@ import threading
 
 
 class ExecutorRegistry(PluginRegistry):
-
     def __init__(self, plugin_type):
         super(ExecutorRegistry, self).__init__(plugin_type)
 
@@ -45,7 +43,7 @@ class MainThreadExecutor(object):
     async == True  -> catch exceptions and store them in the future.
     async == False -> let exceptions bubble up.
     """
-    
+
     async = True
 
     # For Dev/Unit Testing with concurrent.futures
@@ -106,4 +104,3 @@ class MainThreadFuture(object):
 
 executors = ExecutorRegistry('executor')
 executors.load_plugins()
-

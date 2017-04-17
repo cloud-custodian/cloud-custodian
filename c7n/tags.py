@@ -89,9 +89,12 @@ class TagTrim(Action):
     schema = utils.type_schema(
         'tag-trim',
         space={'type': 'integer'},
-        preserve={'type': 'array', 'items': {'type': 'string'}})
+        preserve={'type': 'array',
+                  'items': {
+                      'type': 'string'
+                  }})
 
-    permissions = ('ec2:DeleteTags',)
+    permissions = ('ec2:DeleteTags', )
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -107,8 +110,9 @@ class TagTrim(Action):
         # without some more complex matching wrt to grouping resources
         # by common tags populations.
         tag_map = {
-            t['Key']:t['Value'] for t in i.get('Tags', [])
-            if not t['Key'].startswith('aws:')}
+            t['Key']: t['Value']
+            for t in i.get('Tags', []) if not t['Key'].startswith('aws:')
+        }
 
         # Space == 0 means remove all but specified
         if self.space and len(tag_map) + self.space <= self.max_tag_count:
@@ -120,8 +124,8 @@ class TagTrim(Action):
 
         if self.space:
             # Free up slots to fit
-            remove = len(candidates) - (
-                self.max_tag_count - (self.space + len(preserve)))
+            remove = len(candidates) - (self.max_tag_count -
+                                        (self.space + len(preserve)))
             candidates = list(sorted(candidates))[:remove]
 
         if not candidates:
@@ -136,7 +140,9 @@ class TagTrim(Action):
             self.manager.session_factory).client('ec2')
         self.manager.retry(
             client.delete_tags,
-            Tags=[{'Key': c} for c in tags],
+            Tags=[{
+                'Key': c
+            } for c in tags],
             Resources=[resource[self.id_key]],
             DryRun=self.manager.config.dryrun)
 
@@ -175,7 +181,8 @@ class TagActionFilter(Filter):
     schema = utils.type_schema(
         'marked-for-op',
         tag={'type': 'string'},
-        skew={'type': 'number', 'minimum': 0},
+        skew={'type': 'number',
+              'minimum': 0},
         op={'type': 'string'})
 
     current_date = None
@@ -210,9 +217,9 @@ class TagActionFilter(Filter):
 
         try:
             action_date = parse(action_date_str)
-        except:
-            self.log.warning("could not parse tag:%s value:%s on %s" % (
-                tag, v, i['InstanceId']))
+        except BaseException:
+            self.log.warning("could not parse tag:%s value:%s on %s" %
+                             (tag, v, i['InstanceId']))
 
         if self.current_date is None:
             self.current_date = datetime.now()
@@ -239,7 +246,8 @@ class TagCountFilter(Filter):
     """
     schema = utils.type_schema(
         'tag-count',
-        count={'type': 'integer', 'minimum': 0},
+        count={'type': 'integer',
+               'minimum': 0},
         op={'enum': OPERATORS.keys()})
 
     def __call__(self, i):
@@ -248,7 +256,8 @@ class TagCountFilter(Filter):
         op = OPERATORS.get(op_name)
         tag_count = len([
             t['Key'] for t in i.get('Tags', [])
-            if not t['Key'].startswith('aws:')])
+            if not t['Key'].startswith('aws:')
+        ])
         return op(tag_count, count)
 
 
@@ -260,14 +269,14 @@ class Tag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'tag', aliases=('mark',),
+        'tag',
+        aliases=('mark', ),
         tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
-        tag={'type': 'string'},
-        )
+        tag={'type': 'string'}, )
 
-    permissions = ('ec2:CreateTags',)
+    permissions = ('ec2:CreateTags', )
 
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
@@ -301,18 +310,16 @@ class Tag(Action):
         with self.executor_factory(max_workers=self.concurrency) as w:
             futures = {}
             for resource_set in utils.chunks(resources, size=batch_size):
-                futures[
-                    w.submit(
-                        self.process_resource_set, resource_set, tags)
-                ] = resource_set
+                futures[w.submit(self.process_resource_set, resource_set,
+                                 tags)] = resource_set
 
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Exception removing tags: %s on resources:%s \n %s" % (
-                            tags,
-                            ", ".join([r[self.id_key] for r in resource_set]),
-                            f.exception()))
+                        "Exception removing tags: %s on resources:%s \n %s" %
+                        (tags,
+                         ", ".join([r[self.id_key]
+                                    for r in resource_set]), f.exception()))
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(
@@ -333,10 +340,14 @@ class RemoveTag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
-        tags={'type': 'array', 'items': {'type': 'string'}})
+        'untag',
+        aliases=('unmark', 'remove-tag'),
+        tags={'type': 'array',
+              'items': {
+                  'type': 'string'
+              }})
 
-    permissions = ('ec2:DeleteTags',)
+    permissions = ('ec2:DeleteTags', )
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -347,19 +358,17 @@ class RemoveTag(Action):
         with self.executor_factory(max_workers=self.concurrency) as w:
             futures = {}
             for resource_set in utils.chunks(resources, size=batch_size):
-                futures[
-                    w.submit(
-                        self.process_resource_set, resource_set, tags)
-                ] = resource_set
+                futures[w.submit(self.process_resource_set, resource_set,
+                                 tags)] = resource_set
 
             for f in as_completed(futures):
                 if f.exception():
                     resource_set = futures[f]
                     self.log.error(
-                        "Exception removing tags: %s on resources:%s \n %s" % (
-                            tags,
-                            ", ".join([r[self.id_key] for r in resource_set]),
-                            f.exception()))
+                        "Exception removing tags: %s on resources:%s \n %s" %
+                        (tags,
+                         ", ".join([r[self.id_key]
+                                    for r in resource_set]), f.exception()))
 
     def process_resource_set(self, vol_set, tag_keys):
         client = utils.local_session(
@@ -367,7 +376,8 @@ class RemoveTag(Action):
         return self.manager.retry(
             client.delete_tags,
             Resources=[v[self.id_key] for v in vol_set],
-            Tags=[{'Key': k for k in tag_keys}],
+            Tags=[{'Key': k
+                   for k in tag_keys}],
             DryRun=self.manager.config.dryrun)
 
 
@@ -376,23 +386,17 @@ class RenameTag(Action):
     """
 
     schema = utils.type_schema(
-        'rename-tag',
-        old_key={'type': 'string'},
-        new_key={'type': 'string'})
+        'rename-tag', old_key={'type': 'string'}, new_key={'type': 'string'})
 
     permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
     tag_count_max = 50
 
     def delete_tag(self, client, ids, key, value):
-        client.delete_tags(
-            Resources=ids,
-            Tags=[{'Key': key, 'Value': value}])
+        client.delete_tags(Resources=ids, Tags=[{'Key': key, 'Value': value}])
 
     def create_tag(self, client, ids, key, value):
-        client.create_tags(
-            Resources=ids,
-            Tags=[{'Key': key, 'Value': value}])
+        client.create_tags(Resources=ids, Tags=[{'Key': key, 'Value': value}])
 
     def process_rename(self, tag_value, resource_set):
         """
@@ -409,17 +413,21 @@ class RenameTag(Action):
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
         # We have a preference to creating the new tag when possible first
-        resource_ids = [r[self.id_key] for r in resource_set if len(
-            r.get('Tags', [])) < self.tag_count_max]
+        resource_ids = [
+            r[self.id_key] for r in resource_set
+            if len(r.get('Tags', [])) < self.tag_count_max
+        ]
         if resource_ids:
             self.create_tag(c, resource_ids, new_key, tag_value)
 
-        self.delete_tag(
-            c, [r[self.id_key] for r in resource_set], old_key, tag_value)
+        self.delete_tag(c, [r[self.id_key]
+                            for r in resource_set], old_key, tag_value)
 
         # For resources with 50 tags, we need to delete first and then create.
-        resource_ids = [r[self.id_key] for r in resource_set if len(
-            r.get('Tags', [])) > self.tag_count_max - 1]
+        resource_ids = [
+            r[self.id_key] for r in resource_set
+            if len(r.get('Tags', [])) > self.tag_count_max - 1
+        ]
         if resource_ids:
             self.create_tag(c, resource_ids, new_key, tag_value)
 
@@ -446,8 +454,8 @@ class RenameTag(Action):
     def process(self, resources):
         count = len(resources)
         resources = self.filter_resources(resources)
-        self.log.info(
-            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.log.info("Filtered from %s resources to %s" % (count,
+                                                            len(resources)))
         self.id_key = self.manager.get_model().id
         resource_set = self.create_set(resources)
         with self.executor_factory(max_workers=3) as w:
@@ -457,9 +465,8 @@ class RenameTag(Action):
                     w.submit(self.process_rename, r, resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Exception renaming tag set \n %s" % (
-                            f.exception()))
+                    self.log.error("Exception renaming tag set \n %s" %
+                                   (f.exception()))
         return resources
 
 
@@ -486,10 +493,12 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
+        days={'type': 'number',
+              'minimum': 0,
+              'exclusiveMinimum': True},
         op={'type': 'string'})
 
-    permissions = ('ec2:CreateTags',)
+    permissions = ('ec2:CreateTags', )
 
     batch_size = 200
 
@@ -520,8 +529,8 @@ class TagDelayedAction(Action):
         msg = msg_tmpl.format(
             op=op, action_date=action_date.strftime('%Y/%m/%d'))
 
-        self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+        self.log.info("Tagging %d resources for %s on %s" %
+                      (len(resources), op, action_date.strftime('%Y/%m/%d')))
 
         tags = [{'Key': tag, 'Value': msg}]
 
@@ -534,11 +543,12 @@ class TagDelayedAction(Action):
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Exception tagging resource set: %s  \n %s" % (
-                            tags, f.exception()))
+                        "Exception tagging resource set: %s  \n %s" %
+                        (tags, f.exception()))
 
     def process_resource_set(self, resource_set, tags):
-        client = utils.local_session(self.manager.session_factory).client('ec2')
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         return self.manager.retry(
             client.create_tags,
             Resources=[v[self.id_key] for v in resource_set],
@@ -587,19 +597,26 @@ class NormalizeTag(Action):
     schema = utils.type_schema(
         'normalize-tag',
         key={'type': 'string'},
-        action={'type': 'string',
-                'items': {
-                    'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        action={
+            'type': 'string',
+            'items': {
+                'enum': ['upper', 'lower', 'title'
+                         'strip', 'replace']
+            }
+        },
         value={'type': 'string'})
 
-    permissions = ('ec2:CreateTags',)
+    permissions = ('ec2:CreateTags', )
 
     def create_tag(self, client, ids, key, value):
 
         self.manager.retry(
             client.create_tags,
             Resources=ids,
-            Tags=[{'Key': key, 'Value': value}])
+            Tags=[{
+                'Key': key,
+                'Value': value
+            }])
 
     def process_transform(self, tag_value, resource_set):
         """
@@ -609,17 +626,15 @@ class NormalizeTag(Action):
         - Transform Tag value
         - Assign new value for key
         """
-        self.log.info("Transforming tag value on %s instances" % (
-            len(resource_set)))
+        self.log.info("Transforming tag value on %s instances" %
+                      (len(resource_set)))
         key = self.data.get('key')
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            key, tag_value)
+        self.create_tag(c, [
+            r[self.id_key] for r in resource_set if len(r.get('Tags', [])) < 50
+        ], key, tag_value)
 
     def create_set(self, instances):
         key = self.data.get('key', None)
@@ -644,8 +659,8 @@ class NormalizeTag(Action):
     def process(self, resources):
         count = len(resources)
         resources = self.filter_resources(resources)
-        self.log.info(
-            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.log.info("Filtered from %s resources to %s" % (count,
+                                                            len(resources)))
         self.id_key = self.manager.get_model().id
         resource_set = self.create_set(resources)
         with self.executor_factory(max_workers=3) as w:
@@ -658,14 +673,15 @@ class NormalizeTag(Action):
                     new_value = r.upper()
                 elif self.data.get('action') == 'title' and not r.istitle():
                     new_value = r.title()
-                elif self.data.get('action') == 'strip' and self.data.get('value') and self.data.get('value') in r:
+                elif self.data.get('action') == 'strip' and self.data.get(
+                        'value') and self.data.get('value') in r:
                     new_value = r.strip(self.data.get('value'))
                 if new_value:
                     futures.append(
-                        w.submit(self.process_transform, new_value, resource_set[r]))
+                        w.submit(self.process_transform, new_value,
+                                 resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error(
-                        "Exception renaming tag set \n %s" % (
-                            f.exception()))
+                    self.log.error("Exception renaming tag set \n %s" %
+                                   (f.exception()))
         return resources
