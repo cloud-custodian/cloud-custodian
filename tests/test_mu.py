@@ -411,14 +411,14 @@ class PythonArchiveTest(unittest.TestCase):
         archive.add_file(__file__)
         archive.close()
         filenames = archive.get_filenames()
-        self.assertTrue('test_mu.py' in filenames)
+        self.assertTrue(os.path.basename(__file__) in filenames)
 
     def test_can_set_path_when_adding_files(self):
         archive = self.make_open_archive()
         archive.add_file(__file__, 'cheese/is/yummy.txt')
         archive.close()
         filenames = archive.get_filenames()
-        self.assertTrue('test_mu.py' not in filenames)
+        self.assertTrue(os.path.basename(__file__) not in filenames)
         self.assertTrue('cheese/is/yummy.txt' in filenames)
 
     def test_can_add_a_file_with_contents_from_a_string(self):

@@ -100,7 +100,7 @@ class S3(QueryResourceManager):
 
     def augment(self, buckets):
         with self.executor_factory(
-                max_workers=min((10, len(buckets)))) as w:
+                max_workers=min((10, len(buckets) + 1))) as w:
             results = w.map(
                 assemble_bucket,
                 zip(itertools.repeat(self.session_factory), buckets))
