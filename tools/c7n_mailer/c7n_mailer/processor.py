@@ -24,7 +24,8 @@ from boto3 import Session
 import jinja2
 
 from address import get_user
-from record import resource_tag, resource_owner, resource_format, format_struct
+from record import date_time_format, format_struct
+from record import resource_format, resource_owner, resource_tag
 
 import yaml
 
@@ -50,6 +51,7 @@ class Processor(object):
         self.cache = cache
         self.env = jinja2.Environment(
             trim_blocks=True, autoescape=False)
+        self.env.filters['date_time_format'] = date_time_format
         self.env.filters['yaml_safe'] = yaml.safe_dump
 
         self.env.globals['format_resource'] = resource_format
