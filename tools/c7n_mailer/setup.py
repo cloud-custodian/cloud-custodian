@@ -28,6 +28,5 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-mailer = c7n_mailer.cli:main']},
-    install_requires=["Jinja2", "boto3", "jsonschema"],
+    install_requires=["Jinja2", "boto3", "jsonschema", "pytz"],
 )
-

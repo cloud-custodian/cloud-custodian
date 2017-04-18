@@ -13,6 +13,14 @@
 # limitations under the License.
 import json
 from cStringIO import StringIO
+from dateutil import parser
+from pytz import timezone
+
+
+def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
+    tz = timezone(tz_str)
+    local_datetime_object = parser.parse(utc_str).astimezone(tz)
+    return local_datetime_object.strftime(format)
 
 
 def format_struct(evt):

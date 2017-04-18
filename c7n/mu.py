@@ -73,6 +73,7 @@ class PythonPackageArchive(object):
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
         self._closed = False
+        self.install_entire_package = ['pytz']
         self.add_modules(*modules)
 
     @property
@@ -101,7 +102,7 @@ class PythonPackageArchive(object):
                 for root, dirs, files in os.walk(path):
                     arc_prefix = os.path.relpath(root, os.path.dirname(path))
                     for f in files:
-                        if not f.endswith('.py'):
+                        if not f.endswith('.py') and module not in self.install_entire_package:
                             continue
                         f_path = os.path.join(root, f)
                         dest_path = os.path.join(arc_prefix, f)
