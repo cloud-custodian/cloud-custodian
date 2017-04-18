@@ -19,8 +19,8 @@ setup(
     version='0.1',
     description="Cloud Custodian - Reference Mailer",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +30,3 @@ setup(
             'c7n-mailer = c7n_mailer.cli:main']},
     install_requires=["Jinja2", "boto3", "jsonschema"],
 )
-
