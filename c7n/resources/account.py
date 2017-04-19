@@ -151,7 +151,7 @@ class CloudTrailEnabled(Filter):
                     running.append(t)
             trails = running
         if trails:
-            return []
+            return trails
         return resources
 
 
