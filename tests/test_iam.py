@@ -34,7 +34,8 @@ from c7n.resources.iam import (
     UsedIamRole, UnusedIamRole,
     IamGroupUsers, UserPolicy,
     UserCredentialReport, UserAccessKey,
-    IamRoleInlinePolicy, IamGroupInlinePolicy)
+    IamRoleInlinePolicy, IamGroupInlinePolicy,
+    SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
 from c7n.executor import MainThreadExecutor
 
 
@@ -328,6 +329,36 @@ class IamGroupFilterUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+class IamManagedPolicyUsage(BaseTest):
+
+    def test_iam_role_has_specific_managed_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_has_specific_managed_policy')
+        self.patch(
+            SpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-with-specific-managed-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'has-specific-managed-policy',
+                 'value': 'TestForSpecificMP' }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_role_no_specific_managed_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_no_specific_managed_policy')
+        self.patch(
+            NoSpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-no-specific-managed-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'no-specific-managed-policy',
+                 'value': 'DoesNotExistPolicy' }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 7)
 
 
 class IamInlinePolicyUsage(BaseTest):
