@@ -521,6 +521,7 @@ class AutoTagUser(EventAction):
                       ]}},
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
+           'principal_id_tag': {'type': 'string'}
            }
     )
 
@@ -545,10 +546,12 @@ class AutoTagUser(EventAction):
 
         user = None
         if utype == "IAMUser":
-            user = event['userIdentity']['userName']
+            user               = event['userIdentity']['userName']
+            principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
-            user = event['userIdentity']['arn']
-            prefix, user = user.rsplit('/', 1)
+            user               = event['userIdentity']['arn']
+            principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
+            prefix, user       = user.rsplit('/', 1)
             # instance role
             if user.startswith('i-'):
                 return
@@ -557,24 +560,36 @@ class AutoTagUser(EventAction):
                 return
         if user is None:
             return
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
-            untagged = []
-            for r in resources:
-                found = False
-                for t in r.get('Tags', ()):
-                    if t['Key'] == self.data['tag']:
-                        found = True
+            untagged_resources = []
+            # iterating over all the resources the user spun up in this event
+            for resource in resources:
+                tag_already_set = False
+                for tag in resource.get('Tags', ()):
+                    if tag['Key'] == self.data['tag']:
+                        tag_already_set = True
                         break
-                if not found:
-                    untagged.append(r)
+                if not tag_already_set:
+                    untagged_resources.append(resource)
+        # if update is set to True, we will overwrite the userName tag even if
+        # the user already set a value
         else:
-            untagged = resources
+            untagged_resources = resources
 
         tag_action = self.manager.action_registry.get('tag')
-        tag_action(
-            {'key': self.data['tag'], 'value': user},
-            self.manager).process(untagged)
-        return untagged
+        new_tags = {
+            self.data['tag']: user
+        }
+        principal_id_key = self.data.get('principal_id_tag', None)
+        # if principal_id_key is set (and value), we'll set the principalId tag.
+        principal_id_key = self.data.get('principal_id_tag', None)
+        if principal_id_key and principal_id_value:
+            new_tags[principal_id_key] = principal_id_value
+        for key, value in new_tags.iteritems():
+            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        return new_tags
 
 
 class PutMetric(BaseAction):
