@@ -230,6 +230,23 @@ class S3Metrics(MetricsFilter):
              'Value': 'AllStorageTypes'}]
 
 
+@filters.register('location-restriction')
+class LocationRestriction(Filter):
+    """
+    Filters for returning S3 buckets that do not match location restriction
+
+    - type: location-restriction
+      value: us-west-2
+
+    """
+    schema = type_schema('location-restriction', value={'type': 'string'})
+    permissions = ('s3:GetBucketLocation',)
+    def process(self, buckets, event=None):
+        if self.data.get('value'):
+            return [b for b in buckets if not self.data.get('value').lower() == b.get('Location').get('LocationConstraint') ]
+        return []
+
+
 @filters.register('cross-account')
 class S3CrossAccountFilter(CrossAccountAccessFilter):
     """Filters cross-account access to S3 buckets
