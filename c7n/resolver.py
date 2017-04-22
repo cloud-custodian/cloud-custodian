@@ -61,7 +61,7 @@ class ValuesFrom(object):
     - on json, a jmespath expr is evaluated
     - on csv, an integer column or jmespath expr can be specified
     - on csv2dict, a jmespath expr (the csv is parsed into a dictionary where
-      the keys are the headers and the values are the remaining columns)
+    the keys are the headers and the values are the remaining columns)
 
     Text files are expected to be line delimited values.
 
