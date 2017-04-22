@@ -120,7 +120,7 @@ class UrlValueTest(BaseTest):
         writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
         writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': 'bb[1]', 'csv2dict': True}, out.getvalue())
+            {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'}, out.getvalue())
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
