@@ -470,7 +470,7 @@ class RequestLimitIncrease(BaseAction):
            'required': ['percent-increase'],
            })
 
-    permissions = ('support:DescribeTrustedAdvisorCheckResult',)
+    permissions = ('support:CreateCase',)
 
     default_subject = 'Raise the account limit of {service}'
     default_template = 'Please raise the account limit of {service} by {percent}%'
