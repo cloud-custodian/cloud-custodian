@@ -14,12 +14,18 @@
 import json
 from botocore.exceptions import ClientError
 
-from c7n.actions import BaseAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.actions import ActionRegistry, AutoTagUser, BaseAction
+from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.utils import get_retry, local_session, type_schema
+
+filters = FilterRegistry('lambda.filters')
+actions = ActionRegistry('lambda.actions')
+filters.register('marked-for-op', TagActionFilter)
+actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('lambda')
@@ -34,20 +40,73 @@ class AWSLambda(QueryResourceManager):
         date = 'LastModified'
         dimension = 'FunctionName'
 
+    filter_registry = filters
+    action_registry = actions
+    retry = staticmethod(get_retry(('Throttled',)))
 
-@AWSLambda.filter_registry.register('security-group')
+    def augment(self, functions):
+        resources = super(AWSLambda, self).augment(functions)
+        return filter(None, _lambda_function_tags(
+            self.get_model(),
+            resources,
+            self.session_factory,
+            self.executor_factory,
+            self.retry,
+            self.log))
+
+
+def _lambda_function_tags(
+        model, functions, session_factory, executor_factory, retry, log):
+    """ Augment Lambda function with their respective tags
+    """
+
+    def process_tags(function):
+        client = local_session(session_factory).client('lambda')
+        arn = function['FunctionArn']
+        try:
+            tag_dict = retry(client.list_tags, Resource=arn)['Tags']
+        except ClientError as e:
+            log.warning("Exception getting Lambda tags  \n %s", e)
+            return None
+        tag_list = []
+        for k, v in tag_dict.items():
+            tag_list.append({'Key': k, 'Value': v})
+        function['Tags'] = tag_list
+        return function
+
+    with executor_factory(max_workers=2) as w:
+        return list(w.map(process_tags, functions))
+
+
+def tag_function(session_factory, functions, tags, log):
+    client = local_session(session_factory).client('lambda')
+    tag_dict = {}
+    for t in tags:
+        tag_dict[t['Key']] = t['Value']
+    for f in functions:
+        arn = f['FunctionArn']
+        try:
+            client.tag_resource(Resource=arn, Tags=tag_dict)
+        except Exception as err:
+            log.exception(
+                'Exception tagging lambda function %s: %s',
+                f['FunctionName'], err)
+            continue
+
+
+@filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
 
 
-@AWSLambda.filter_registry.register('subnet')
+@filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
-@AWSLambda.filter_registry.register('event-source')
+@filters.register('event-source')
 class LambdaEventSource(ValueFilter):
     # this uses iam policy, it should probably use
     # event source mapping api
@@ -94,7 +153,7 @@ class LambdaEventSource(ValueFilter):
         return self.match(r)
 
 
-@AWSLambda.filter_registry.register('cross-account')
+@filters.register('cross-account')
 class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filters lambda functions with cross-account permissions
 
@@ -142,7 +201,86 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
             resources, event)
 
 
-@AWSLambda.action_registry.register('delete')
+@actions.register('mark-for-op')
+class TagDelayedAction(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-delete-unused
+                resource: lambda
+                filters:
+                  - "tag:custodian_cleanup": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Unused lambda"
+                    op: delete
+                    days: 7
+    """
+
+    permissions = ('lambda:TagResource',)
+
+    def process_resource_set(self, functions, tags):
+        tag_function(self.manager.session_factory, functions, tags, self.log)
+
+
+@actions.register('tag')
+class Tag(Tag):
+    """Action to add tag(s) to Lambda Function(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-add-owner-tag
+                resource: lambda
+                filters:
+                  - "tag:OwnerName": missing
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
+
+    permissions = ('lambda:TagResource',)
+
+    def process_resource_set(self, functions, tags):
+        tag_function(self.manager.session_factory, functions, tags, self.log)
+
+
+@actions.register('remove-tag')
+class RemoveTag(RemoveTag):
+    """Action to remove tag(s) from Lambda Function(s)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-remove-old-tag
+                resource: lambda
+                filters:
+                  - "tag:OldTagKey": present
+                actions:
+                  - type: remove-tag
+                    tags: [OldTagKey1, OldTagKey2]
+    """
+
+    permissions = ('lambda:UntagResource',)
+
+    def process_resource_set(self, functions, tag_keys):
+        client = local_session(self.manager.session_factory).client('lambda')
+        for f in functions:
+            arn = f['FunctionArn']
+            client.untag_resource(Resource=arn, TagKeys=tag_keys)
+
+
+@actions.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
 
