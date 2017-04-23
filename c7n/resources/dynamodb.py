@@ -18,8 +18,9 @@ from c7n.actions import BaseAction
 from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
+from c7n.utils import (
+    local_session, get_retry, chunks, type_schema)
 
 
 filters = FilterRegistry('dynamodb-table.filters')
