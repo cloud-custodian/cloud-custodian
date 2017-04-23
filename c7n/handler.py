@@ -18,7 +18,6 @@ Mostly this serves to load up the policy and dispatch
 an event.
 """
 
-import boto3
 import logging
 import os
 import uuid
@@ -43,13 +42,19 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
-        session = boto3.Session()
+        try:
+            import boto3
+            session = boto3.Session()
+            account_id = get_account_id_from_sts(session)
+        except:
+            account_id = None
+
         d = {}
         d.update({
             'region': os.environ.get('AWS_DEFAULT_REGION'),
             'cache': '',
             'profile': None,
-            'account_id': get_account_id_from_sts(session),
+            'account_id': account_id,
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': True,
