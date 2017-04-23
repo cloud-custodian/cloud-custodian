@@ -27,6 +27,7 @@ actions = ActionRegistry('lambda.actions')
 filters.register('marked-for-op', TagActionFilter)
 actions.register('auto-tag-user', AutoTagUser)
 
+
 @resources.register('lambda')
 class AWSLambda(QueryResourceManager):
 
@@ -53,6 +54,7 @@ class AWSLambda(QueryResourceManager):
             self.retry,
             self.log))
 
+
 def _lambda_function_tags(
         model, functions, session_factory, executor_factory, retry, log):
     """ Augment Lambda function with their respective tags
@@ -67,13 +69,29 @@ def _lambda_function_tags(
             log.warning("Exception getting Lambda tags  \n %s", e)
             return None
         tag_list = []
-        for k,v in tag_dict.items():
-            tag_list.append({'Key':k,'Value':v})
-        function['Tags'] = tag_list or []
+        for k, v in tag_dict.items():
+            tag_list.append({'Key': k, 'Value': v})
+        function['Tags'] = tag_list
         return function
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, functions))
+
+
+def tag_function(session_factory, functions, tags, log):
+    client = local_session(session_factory).client('lambda')
+    tag_dict = {}
+    for t in tags:
+        tag_dict[t['Key']] = t['Value']
+    for f in functions:
+        arn = f['FunctionArn']
+        try:
+            client.tag_resource(Resource=arn, Tags=tag_dict)
+        except Exception as err:
+            log.exception(
+                'Exception tagging lambda function %s: %s',
+                f['FunctionName'], err)
+            continue
 
 
 @filters.register('security-group')
@@ -207,13 +225,7 @@ class TagDelayedAction(TagDelayedAction):
     permissions = ('lambda:TagResource',)
 
     def process_resource_set(self, functions, tags):
-        client = local_session(self.manager.session_factory).client('lambda')
-        tag_dict = {}
-        for t in tags:
-            tag_dict[t['Key']] = t['Value']
-        for f in functions:
-            arn = f['FunctionArn']
-            client.tag_resource(Resource=arn, Tags=tag_dict)
+        tag_function(self.manager.session_factory, functions, tags, self.log)
 
 
 @actions.register('tag')
@@ -238,13 +250,7 @@ class Tag(Tag):
     permissions = ('lambda:TagResource',)
 
     def process_resource_set(self, functions, tags):
-        client = local_session(self.manager.session_factory).client('lambda')
-        tag_dict = {}
-        for t in tags:
-            tag_dict[t['Key']] = t['Value']
-        for f in functions:
-            arn = f['FunctionArn']
-            client.tag_resource(Resource=arn, Tags=tag_dict)
+        tag_function(self.manager.session_factory, functions, tags, self.log)
 
 
 @actions.register('remove-tag')
