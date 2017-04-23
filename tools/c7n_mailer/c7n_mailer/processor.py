@@ -24,8 +24,10 @@ from boto3 import Session
 import jinja2
 
 from address import get_user
-from record import resource_tag, resource_owner, resource_format, format_struct
+from record import date_time_format, format_struct
+from record import resource_format, resource_owner, resource_tag
 
+import yaml
 
 log = logging.getLogger('custodian.mail')
 
@@ -43,12 +45,14 @@ class Processor(object):
 
     def __init__(self, config, session, cache):
         self.config = config
-        self.ses = session.client('ses')
+        self.ses = session.client('ses', region_name=config.get('ses_region'))
         self.sts = session.client('sts')
         self.sns_cache = {}
         self.cache = cache
         self.env = jinja2.Environment(
             trim_blocks=True, autoescape=False)
+        self.env.filters['date_time_format'] = date_time_format
+        self.env.filters['yaml_safe'] = yaml.safe_dump
 
         self.env.globals['format_resource'] = resource_format
         self.env.globals['format_struct'] = format_struct
@@ -102,12 +106,13 @@ class Processor(object):
     def send_resource_owner_messages(self, data):
         owners = {}
         for r in data['resources']:
-            owner = self.find_resource_owner(r)
-            if owner is None:
+            contact_tags = self.find_resource_owners(r)
+            if not contact_tags:
                 log.info("No resource owner found for %s" % (
                     resource_format(r, data['policy']['resource'])))
                 continue
-            owners.setdefault(owner, []).append(r)
+            for contact_tag in contact_tags:
+                owners.setdefault(contact_tag, []).append(r)
 
         # Address resolution can take some time, try to do it upfront
         t = time.time()
@@ -120,13 +125,15 @@ class Processor(object):
         for o, resources in owners.items():
             self.send_resource_set_message([owner_addrs[o]], data, resources)
 
-    def find_resource_owner(self, resource):
+    def find_resource_owners(self, resource):
         if 'Tags' not in resource:
-            return
+            return []
         tags = {t['Key']: t['Value'] for t in resource['Tags']}
+        owners = []
         for t in self.OwnerTags:
             if t in tags:
-                return tags[t]
+                owners.append(tags[t])
+        return owners
 
     def send_resource_set_message(self, targets, data, resources):
         for t in targets:

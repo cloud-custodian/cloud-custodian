@@ -21,24 +21,28 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import ActionRegistry
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, get_account_id, type_schema
+from c7n.utils import local_session, type_schema
+
+from c7n.resources.iam import CredentialReport
 
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
 
 
-def get_account(session_factory):
+def get_account(session_factory, config):
     session = local_session(session_factory)
     client = session.client('iam')
     aliases = client.list_account_aliases().get(
         'AccountAliases', ('',))
     name = aliases and aliases[0] or ""
-    return {'account_id': get_account_id(session),
+    return {'account_id': config.account_id,
             'account_name': name}
 
 
@@ -60,10 +64,26 @@ class Account(ResourceManager):
         return self.resource_type
 
     def resources(self):
-        return self.filter_resources([get_account(self.session_factory)])
+        return self.filter_resources([get_account(self.session_factory, self.config)])
 
     def get_resources(self, resource_ids):
-        return [get_account(self.session_factory)]
+        return [get_account(self.session_factory, self.config)]
+
+@filters.register('credential')
+class AccountCredentialReport(CredentialReport):
+
+    def process(self, resources, event=None):
+        super(AccountCredentialReport, self).process(resources, event)
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        info = report.get('<root_account>')
+        for r in resources:
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
 
 
 @filters.register('check-cloudtrail')
@@ -71,6 +91,9 @@ class CloudTrailEnabled(Filter):
     """Verify cloud trail enabled for this account per specifications.
 
     Returns an annotated account resource if trail is not enabled.
+
+    Of particular note, the current-region option will evaluate whether cloudtrail is available
+    in the current region, either as a multi region trail or as a trail with it as the home region.
 
     :example:
 
@@ -90,6 +113,7 @@ class CloudTrailEnabled(Filter):
         'check-cloudtrail',
         **{'multi-region': {'type': 'boolean'},
            'global-events': {'type': 'boolean'},
+           'current-region': {'type': 'boolean'},
            'running': {'type': 'boolean'},
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
@@ -99,12 +123,15 @@ class CloudTrailEnabled(Filter):
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
 
     def process(self, resources, event=None):
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
+        session = local_session(self.manager.session_factory)
+        client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
+        if self.data.get('current-region'):
+            current_region = session.region_name
+            trails  = [t for t in trails if t.get('HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
         if self.data.get('kms-key'):
@@ -265,7 +292,10 @@ class IAMSummary(ValueFilter):
 
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
-    """Check an account's password policy
+    """Check an account's password policy.
+
+    Note that on top of the default password policy fields, we also add an extra key, PasswordPolicyConfigured
+    which will be set to true or false to signify if the given account has attempted to set a policy at all.
 
     :example:
 
@@ -288,13 +318,22 @@ class AccountPasswordPolicy(ValueFilter):
     permissions = ('iam:GetAccountPasswordPolicy',)
 
     def process(self, resources, event=None):
-        if not resources[0].get('c7n:password_policy'):
-            client = local_session(self.manager.session_factory).client('iam')
-            policy = client.get_account_password_policy().get('PasswordPolicy', {})
-            resources[0]['c7n:password_policy'] = policy
-        if self.match(resources[0]['c7n:password_policy']):
-            return resources
-        return []
+      account = resources[0]
+      if not account.get('c7n:password_policy'):
+          client = local_session(self.manager.session_factory).client('iam')
+          policy = {}
+          try:
+              policy = client.get_account_password_policy().get('PasswordPolicy', {})
+              policy['PasswordPolicyConfigured'] = True
+          except ClientError as e:
+              if e.response['Error']['Code'] == 'NoSuchEntity':
+                  policy['PasswordPolicyConfigured'] = False
+              else:
+                raise
+          account['c7n:password_policy'] = policy
+      if self.match(account['c7n:password_policy']):
+          return resources
+      return []
 
 
 @filters.register('service-limit')

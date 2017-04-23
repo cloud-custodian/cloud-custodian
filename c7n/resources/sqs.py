@@ -40,9 +40,8 @@ class SQS(QueryResourceManager):
             'ApproximateNumberOfMessages',
         )
 
-    @classmethod
-    def get_permissions(cls):
-        perms = super(SQS, cls).get_permissions()
+    def get_permissions(self):
+        perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
         return perms
 

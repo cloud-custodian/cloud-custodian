@@ -1,0 +1,110 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstances": [
+            {
+                "PubliclyAccessible": true, 
+                "MasterUsername": "eric", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "general-public-license", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-f9cc4d9f"
+                    }
+                ], 
+                "InstanceCreateTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 45, 
+                    "microsecond": 320000, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 53
+                }, 
+                "CopyTagsToSnapshot": false, 
+                "OptionGroupMemberships": [
+                    {
+                        "Status": "in-sync", 
+                        "OptionGroupName": "default:mariadb-10-0"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "Engine": "mariadb", 
+                "MultiAZ": false, 
+                "DBSecurityGroups": [], 
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.mariadb10.0", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "AutoMinorVersionUpgrade": true, 
+                "PreferredBackupWindow": "12:41-13:11", 
+                "DBSubnetGroup": {
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-15452171", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-63c97615", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-5fb47507", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            }
+                        }
+                    ], 
+                    "DBSubnetGroupName": "default", 
+                    "VpcId": "vpc-4a9ff72e", 
+                    "DBSubnetGroupDescription": "default", 
+                    "SubnetGroupStatus": "Complete"
+                }, 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 6, 
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f", 
+                "BackupRetentionPeriod": 0, 
+                "PreferredMaintenanceWindow": "wed:09:24-wed:09:54", 
+                "Endpoint": {
+                    "HostedZoneId": "Z1PVIF0B656C1W", 
+                    "Port": 3306, 
+                    "Address": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f.cnhganveedh2.us-west-2.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "EngineVersion": "10.0.24", 
+                "AvailabilityZone": "us-west-2c", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-LM6AURZI53JHTTNKNL5GLMKCNM", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "StorageEncrypted": false, 
+                "DBInstanceClass": "db.r3.large", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "350f7cfd-2041-11e7-aead-cf8edc276fa4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "350f7cfd-2041-11e7-aead-cf8edc276fa4", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4188", 
+                "content-type": "text/xml", 
+                "date": "Thu, 13 Apr 2017 12:03:28 GMT"
+            }
+        }
+    }
+}

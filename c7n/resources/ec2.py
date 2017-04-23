@@ -27,6 +27,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -40,6 +41,7 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 actions.register('auto-tag-user', AutoTagUser)
+filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -195,7 +197,10 @@ class StateTransitionAge(AgeFilter):
         v = i.get('StateTransitionReason')
         if not v:
             return None
-        return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
+        dates = self.RE_PARSE_AGE.findall(v)
+        if dates:
+            return parse(dates[0][1:-1])
+        return None
 
 
 class StateTransitionFilter(object):
@@ -264,6 +269,8 @@ class AttachedVolume(ValueFilter):
                         continue
                     volume_ids.append(bd['Ebs']['VolumeId'])
             for v in manager.get_resources(volume_ids):
+                if not v['Attachments']:
+                    continue
                 volume_map.setdefault(
                     v['Attachments'][0]['InstanceId'], []).append(v)
         return volume_map
@@ -480,7 +487,9 @@ class InstanceAgeFilter(AgeFilter):
     schema = type_schema(
         'instance-age',
         op={'type': 'string', 'enum': OPERATORS.keys()},
-        days={'type': 'number'})
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
@@ -820,7 +829,7 @@ class Snapshot(BaseAction):
 
     def process(self, resources):
         for resource in resources:
-            with self.executor_factory(max_workers=3) as w:
+            with self.executor_factory(max_workers=2) as w:
                 futures = []
                 futures.append(w.submit(self.process_volume_set, resource))
                 for f in as_completed(futures):

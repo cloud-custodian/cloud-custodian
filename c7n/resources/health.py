@@ -11,27 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from c7n.actions import (
-    ActionRegistry, BaseAction
-)
-from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS
-)
+import itertools
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-
-from c7n import utils
-from c7n.utils import type_schema
-
-filters = FilterRegistry('health.actions')
-actions = ActionRegistry('health.filters')
+from c7n.utils import local_session, chunks
 
 
-@resources.register('health-events')
+@resources.register('health-event')
 class HealthEvents(QueryResourceManager):
-    """Query resource manager for AWS health events"""
+    """Query resource manager for AWS health events
+    """
 
     class resource_type(object):
         service = 'health'
@@ -43,23 +33,23 @@ class HealthEvents(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'startTime'
-        config_type = 'AWS::Health::Event'
 
-    filter_registry = filters
-    action_registry = actions
+    permissions = (
+        'health:DescribeEvents',
+        'health:DescribeEventDetails',
+        'health:DescribeAffectedEntities')
 
     def __init__(self, ctx, data):
         super(HealthEvents, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [{'eventStatusCodes': 'open'}]))
-
-    permissions = ('health:DescribeEvents',)
+            self.data.get('query', [
+                {'eventStatusCodes': 'open'},
+                {'eventTypeCategories': ['issue', 'accountNotification']}]))
 
     def resource_query(self):
         qf = {}
         for q in self.queries:
             qd = q.query()
-            print qd
             if qd['Name'] in qf:
                 for qv in qf[qd['Name']]:
                     if qv in qf[qd['Name']]:
@@ -78,10 +68,36 @@ class HealthEvents(QueryResourceManager):
             query['filter'] = q
         return super(HealthEvents, self).resources(query=query)
 
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('health')
+        for resource_set in chunks(resources, 10):
+            event_map = {r['arn']: r for r in resource_set}
+            event_details = client.describe_event_details(
+                eventArns=event_map.keys())['successfulSet']
+            for d in event_details:
+                event_map[d['event']['arn']][
+                    'Description'] = d['eventDescription']['latestDescription']
+
+            event_arns = [r['arn'] for r in resource_set
+                          if r['eventTypeCategory'] != 'accountNotification']
+
+            if not event_arns:
+                continue
+            paginator = client.get_paginator('describe_affected_entities')
+            entities = list(itertools.chain(
+                *[p['entities']for p in paginator.paginate(
+                    filter={'eventArns': event_arns})]))
+
+            for e in entities:
+                event_map[e.pop('eventArn')].setdefault(
+                    'AffectedEntities', []).append(e)
+
+        return resources
+
 
 HEALTH_VALID_FILTERS = {
     'availability-zone': str,
-    'eventTypeCategory': {'issue', 'accountNotification', 'scheduledChange'},
+    'eventTypeCategories': {'issue', 'accountNotification', 'scheduledChange'},
     'regions': str,
     'services': str,
     'eventStatusCodes': {'open', 'closed', 'upcoming'},

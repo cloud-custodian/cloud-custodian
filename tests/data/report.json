@@ -109,13 +109,13 @@
         "LaunchTime-1",
         "VpcId-1",
         "PrivateIpAddress-1",
-	"CustomValue",
-	"",
-	"Custom-1"
+      	"CustomValue",
+      	"",
+      	"Custom-1"
       ],
       "minimal_custom": [
         "CustomValue",
-	"",
+        "",
         "Custom-1"
       ]
     }
@@ -164,23 +164,98 @@
     "rows": {
       "full": [
           "AutoScalingGroupName-1",
-	  "",
-	  "",
+      	  "",
+      	  "",
           "3",
-	  "",
-	  "",
-	  ""
+          "",
+          "",
+      	  ""
       ],
       "minimal": [
           "AutoScalingGroupName-2",
-	  "",
-	  "",
+      	  "",
+      	  "",
           "0",
           "",
           "",
           ""
       ]
     }
+  },
+  "elb": {
+    "records": {
+      "full": {
+        "CustodianDate": "2015-12-23",
+        "LoadBalancerName": "LoadBalancerName-1",
+        "CreatedTime": "CreatedTime-1",
+        "VPCId": "VPCId-1",
+        "Instances": [{"InstanceId": "InstanceId-1"}],
+        "DNSName": "DNSName-1",
+        "ListenerDescriptions": [
+          {
+            "Listener": {
+              "InstancePort": 80,
+              "LoadBalancerPort": 80,
+              "Protocol": "TCP",
+              "InstanceProtocol": "TCP"
+            },
+            "PolicyNames": []
+          },
+          {
+            "Listener": {
+              "InstancePort": 443,
+              "LoadBalancerPort": 443,
+              "Protocol": "TCP",
+              "InstanceProtocol": "TCP"
+            },
+            "PolicyNames": []
+          }
+        ],
+        "PrivateIpAddress": "PrivateIpAddress-1",
+        "IgnoredField": "IgnoredValue",
+        "Tags": [{"Key": "Name", "Value": "Name-1"}]
+      },
+      "minimal": {
+        "CustodianDate": "2015-12-22",
+        "LoadBalancerName": "LoadBalancerName-2",
+        "Instances": [],
+        "DNSName": "DNSName-2",
+        "CreatedTime": "CreatedTime-2",
+        "Tags": [],
+        "IgnoredField": "IgnoredValue"
+      },
+      "duplicate": {
+        "CustodianDate": "2015-12-20",
+        "LoadBalancerName": "LoadBalancerName-2",
+        "Instances": [],
+        "DNSName": "DNSName-2",
+        "CreatedTime": "CreatedTime-2",
+        "Tags": [],
+        "IgnoredField": "IgnoredValue"
+      }
+    },
+    "headers": [
+      "LoadBalancerName",
+      "DNSName",
+      "VPCId",
+      "count:Instances",
+      "list:ListenerDescriptions[].Listener.LoadBalancerPort"
+    ],
+    "rows": {
+      "full": [
+          "LoadBalancerName-1",
+      	  "DNSName-1",
+      	  "VPCId-1",
+          "1",
+      	  "80, 443"
+      ],
+      "minimal": [
+          "LoadBalancerName-2",
+      	  "DNSName-2",
+      	  "",
+          "0",
+          ""
+      ]
+    }
   }
 }
-

@@ -74,9 +74,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        from c7n.resources.rds import RDSSubnetGroup
-        self.groups = {r['DBSubnetGroupName']: r for r in
-                       RDSSubnetGroup(self.manager.ctx, {}).resources()}
+        self.groups = {
+            r['DBSubnetGroupName']: r for r in
+            self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
 
 

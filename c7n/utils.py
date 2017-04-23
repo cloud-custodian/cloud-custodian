@@ -167,10 +167,10 @@ def camelResource(obj):
     return obj
 
 
-def get_account_id(session):
-    iam = session.client('iam')
-    return iam.list_roles(MaxItems=1)['Roles'][0]['Arn'].split(":")[4]
-
+def get_account_id_from_sts(session):
+    response = session.client('sts').get_caller_identity()
+    return response.get('Account')
+    
 
 def query_instances(session, client=None, **query):
     """Return a list of ec2 instances for the query.

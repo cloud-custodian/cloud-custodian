@@ -1,7 +1,7 @@
-.. _developer:
+.. _developer-installing:
 
-Developer Install and Testing
-=============================
+Installing for Developers
+=========================
 
 Requirements
 ------------
@@ -38,31 +38,14 @@ Then build the software:
 
    $ make develop
 
+Once that completes, make sure you load the virtualenv into your current shell:
+
+.. code-block:: bash
+
+   $ source bin/activate
+
 You should have the ``custodian`` command available now:
 
 .. code-block:: bash
 
    $ custodian -h
-
-Running tests
--------------
-
-Unit tests can be run with:
-
-.. code-block:: bash
-
-   $ make test
-
-Coverage reports can be generated and viewed with the following:
-
-.. code-block:: bash
-
-   $ make coverage
-
-   # Open the reports in a browser
-
-   # on osx
-   $ open coverage/index.html
-
-   # on gnomeish linux
-   $ gnome-open coverage/index.html

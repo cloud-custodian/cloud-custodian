@@ -76,7 +76,7 @@ class Worker(object):
         self.processor = Processor(self.config, session, self.cache)
 
     def run(self):
-        self.ses = self.session.client('ses')
+        self.ses = self.session.client('ses', region_name=self.config.get('ses_region'))
 
         log.info("Queue poll loop")
         while True:

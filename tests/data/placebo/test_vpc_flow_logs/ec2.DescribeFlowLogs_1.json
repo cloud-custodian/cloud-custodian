@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "FlowLogs": [
+            {
+                "ResourceId": "vpc-4a9ff72e", 
+                "CreationTime": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 17
+                }, 
+                "LogGroupName": "/aws/lambda/myIOTFunction", 
+                "TrafficType": "ALL", 
+                "FlowLogStatus": "ACTIVE", 
+                "FlowLogId": "fl-84d63aed", 
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2bb11182-8edf-4f73-a61c-84598d337e63", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 18 Feb 2017 23:37:34 GMT"
+            }
+        }
+    }
+}

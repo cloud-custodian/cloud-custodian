@@ -15,7 +15,6 @@ from common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
-from nose.tools import raises
 
 
 class ELBTagTest(BaseTest):
@@ -162,27 +161,25 @@ class SSLPolicyTest(BaseTest):
             resources[0]['LoadBalancerName'],
             'test-elb-invalid-policy')
 
-    @raises(FilterValidationError)
     def test_filter_validation_no_blacklist(self):
-        self.load_policy({
-            'name': 'test-ssl-ciphers',
-            'resource': 'elb',
-            'filters': [
-                {'type': 'ssl-policy'}
-            ]},
-            session_factory=None, validate=False)
-        self.fail("validtion error should have been thrown")
+        self.assertRaises(FilterValidationError,
+            self.load_policy, {
+                'name': 'test-ssl-ciphers',
+                'resource': 'elb',
+                'filters': [
+                    {'type': 'ssl-policy'}
+                ]},
+                session_factory=None, validate=False)
 
-    @raises(FilterValidationError)
     def test_filter_validation_blacklist_not_iterable(self):
-        self.load_policy({
-            'name': 'test-ssl-ciphers',
-            'resource': 'elb',
-            'filters': [
-                {'type': 'ssl-policy', 'blacklist': 'single-value'}
-            ]},
-            session_factory=None, validate=False)
-        self.fail("validtion error should have been thrown")
+        self.assertRaises(FilterValidationError,
+            self.load_policy, {
+                'name': 'test-ssl-ciphers',
+                'resource': 'elb',
+                'filters': [
+                    {'type': 'ssl-policy', 'blacklist': 'single-value'}
+                ]},
+                session_factory=None, validate=False)
 
 
 class TestDefaultVpc(BaseTest):
