@@ -18,12 +18,13 @@ Mostly this serves to load up the policy and dispatch
 an event.
 """
 
+import boto3
 import logging
 import os
 import uuid
 
 from c7n.policy import load
-from c7n.utils import format_event
+from c7n.utils import format_event, get_account_id_from_sts
 
 
 logging.root.setLevel(logging.DEBUG)
@@ -42,11 +43,13 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
+        session = boto3.Session()
         d = {}
         d.update({
             'region': os.environ.get('AWS_DEFAULT_REGION'),
             'cache': '',
             'profile': None,
+            'account_id': get_account_id_from_sts(session),
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': True,
