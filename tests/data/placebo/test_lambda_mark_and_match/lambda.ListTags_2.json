@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "b8df5ed0-27c0-11e7-9a86-a946245cb1ed",
+            "HTTPHeaders": {
+                "date": "Sun, 23 Apr 2017 01:03:54 GMT",
+                "x-amzn-requestid": "b8df5ed0-27c0-11e7-9a86-a946245cb1ed",
+                "content-length": "98",
+                "content-type": "application/json",
+                "connection": "keep-alive"
+            }
+        },
+        "Tags": {
+            "Language": "Python",
+            "custodian_next": "Resource does not meet policy: delete@2016/05/01"
+        }
+    }
+}

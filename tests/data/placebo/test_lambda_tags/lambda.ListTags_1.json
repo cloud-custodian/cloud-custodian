@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3c2c0c12-2717-11e7-80b6-2f0a6b93f724", 
+            "HTTPHeaders": {
+                "date": "Sat, 22 Apr 2017 04:50:40 GMT", 
+                "x-amzn-requestid": "3c2c0c12-2717-11e7-80b6-2f0a6b93f724", 
+                "content-length": "30", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": {
+            "Language": "Python"
+        }
+    }
+}
