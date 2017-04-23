@@ -24,7 +24,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import ActionRegistry
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, get_account_id, type_schema
+from c7n.utils import local_session, type_schema
 
 from c7n.resources.iam import CredentialReport
 
@@ -33,13 +33,13 @@ filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
 
 
-def get_account(session_factory):
+def get_account(session_factory, config):
     session = local_session(session_factory)
     client = session.client('iam')
     aliases = client.list_account_aliases().get(
         'AccountAliases', ('',))
     name = aliases and aliases[0] or ""
-    return {'account_id': get_account_id(session),
+    return {'account_id': config.account_id,
             'account_name': name}
 
 
@@ -61,10 +61,10 @@ class Account(ResourceManager):
         return self.resource_type
 
     def resources(self):
-        return self.filter_resources([get_account(self.session_factory)])
+        return self.filter_resources([get_account(self.session_factory, self.config)])
 
     def get_resources(self, resource_ids):
-        return [get_account(self.session_factory)]
+        return [get_account(self.session_factory, self.config)]
 
 @filters.register('credential')
 class AccountCredentialReport(CredentialReport):

@@ -3,114 +3,105 @@
     "data": {
         "DBInstance": {
             "PubliclyAccessible": true, 
-            "MasterUsername": "scot", 
+            "MasterUsername": "eric", 
             "MonitoringInterval": 0, 
             "LicenseModel": "general-public-license", 
             "VpcSecurityGroups": [
                 {
                     "Status": "active", 
-                    "VpcSecurityGroupId": "sg-e6d44399"
+                    "VpcSecurityGroupId": "sg-f9cc4d9f"
                 }
             ], 
             "InstanceCreateTime": {
-                "hour": 4, 
+                "hour": 11, 
                 "__class__": "datetime", 
-                "month": 3, 
-                "second": 53, 
-                "microsecond": 652000, 
+                "month": 4, 
+                "second": 45, 
+                "microsecond": 320000, 
                 "year": 2017, 
-                "day": 30, 
-                "minute": 5
+                "day": 13, 
+                "minute": 53
             }, 
             "CopyTagsToSnapshot": false, 
             "OptionGroupMemberships": [
                 {
                     "Status": "in-sync", 
-                    "OptionGroupName": "default:aurora-5-6"
+                    "OptionGroupName": "default:mariadb-10-0"
                 }
             ], 
             "PendingModifiedValues": {}, 
-            "Engine": "aurora", 
+            "Engine": "mariadb", 
             "MultiAZ": false, 
             "DBSecurityGroups": [], 
             "DBParameterGroups": [
                 {
-                    "DBParameterGroupName": "default.aurora5.6", 
+                    "DBParameterGroupName": "default.mariadb10.0", 
                     "ParameterApplyStatus": "in-sync"
                 }
             ], 
             "AutoMinorVersionUpgrade": true, 
-            "PreferredBackupWindow": "05:07-05:37", 
-            "PromotionTier": 1, 
+            "PreferredBackupWindow": "12:41-13:11", 
             "DBSubnetGroup": {
                 "Subnets": [
                     {
                         "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-3a334610", 
+                        "SubnetIdentifier": "subnet-15452171", 
                         "SubnetAvailabilityZone": {
-                            "Name": "us-east-1d"
+                            "Name": "us-west-2a"
                         }
                     }, 
                     {
                         "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-efbcccb7", 
+                        "SubnetIdentifier": "subnet-63c97615", 
                         "SubnetAvailabilityZone": {
-                            "Name": "us-east-1b"
+                            "Name": "us-west-2b"
                         }
                     }, 
                     {
                         "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-e3b194de", 
+                        "SubnetIdentifier": "subnet-5fb47507", 
                         "SubnetAvailabilityZone": {
-                            "Name": "us-east-1e"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-914763e7", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1a"
+                            "Name": "us-west-2c"
                         }
                     }
                 ], 
                 "DBSubnetGroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
+                "VpcId": "vpc-4a9ff72e", 
                 "DBSubnetGroupDescription": "default", 
                 "SubnetGroupStatus": "Complete"
             }, 
             "ReadReplicaDBInstanceIdentifiers": [], 
-            "AllocatedStorage": 1, 
-            "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:scot-test", 
-            "BackupRetentionPeriod": 1, 
-            "PreferredMaintenanceWindow": "mon:23:00-tue:01:00", 
+            "AllocatedStorage": 6, 
+            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f", 
+            "BackupRetentionPeriod": 0, 
+            "PreferredMaintenanceWindow": "wed:09:24-wed:09:54", 
             "Endpoint": {
-                "HostedZoneId": "Z2R2ITUGPM61AM", 
+                "HostedZoneId": "Z1PVIF0B656C1W", 
                 "Port": 3306, 
-                "Address": "scot-test.cz6wy8cci3uf.us-east-1.rds.amazonaws.com"
+                "Address": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f.cnhganveedh2.us-west-2.rds.amazonaws.com"
             }, 
-            "DBInstanceStatus": "available", 
-            "EngineVersion": "5.6.10a", 
-            "AvailabilityZone": "us-east-1d", 
+            "DBInstanceStatus": "deleting", 
+            "EngineVersion": "10.0.24", 
+            "AvailabilityZone": "us-west-2c", 
             "DomainMemberships": [], 
-            "DBClusterIdentifier": "scot-test-cluster", 
-            "StorageType": "aurora", 
-            "DbiResourceId": "db-4WL4S3GSOTYBE7LCM56JMWV3LQ", 
+            "StorageType": "gp2", 
+            "DbiResourceId": "db-LM6AURZI53JHTTNKNL5GLMKCNM", 
             "CACertificateIdentifier": "rds-ca-2015", 
             "StorageEncrypted": false, 
-            "DBInstanceClass": "db.t2.small", 
+            "DBInstanceClass": "db.r3.large", 
             "DbInstancePort": 0, 
-            "DBInstanceIdentifier": "scot-test"
+            "DBInstanceIdentifier": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "db7332c5-1501-11e7-b466-3bd6281a8167", 
+            "RequestId": "352dda70-2041-11e7-aead-cf8edc276fa4", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "db7332c5-1501-11e7-b466-3bd6281a8167", 
+                "x-amzn-requestid": "352dda70-2041-11e7-aead-cf8edc276fa4", 
                 "vary": "Accept-Encoding", 
-                "content-length": "4175", 
+                "content-length": "3970", 
                 "content-type": "text/xml", 
-                "date": "Thu, 30 Mar 2017 04:32:17 GMT"
+                "date": "Thu, 13 Apr 2017 12:03:28 GMT"
             }
         }
     }
