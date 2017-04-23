@@ -65,7 +65,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, type_schema, get_account_id,
+    local_session, type_schema,
     get_retry, chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
 
@@ -111,19 +111,12 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('rds:ListTagsForResource',)
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -828,15 +821,8 @@ class RDSSnapshot(QueryResourceManager):
     action_registry = ActionRegistry('rds-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
 
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
