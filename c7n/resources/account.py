@@ -478,7 +478,7 @@ class RequestLimitIncrease(BaseAction):
 
     service_code_mapping = {
         'AutoScaling': 'auto-scaling',
-        'CloudFormation': 'elastic-load-balancing',  # Is this the correct service name?
+        'ELB': 'elastic-load-balancing',
         'EBS': 'amazon-elastic-block-store',
         'EC2': 'amazon-elastic-compute-cloud-linux',
         'RDS': 'amazon-relational-database-service-aurora',
