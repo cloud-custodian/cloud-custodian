@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from common import BaseTest
-
+from c7n.executor import MainThreadExecutor
+from c7n.resources.awslambda import AWSLambda
 
 class LambdaTest(BaseTest):
 
@@ -64,3 +65,82 @@ class LambdaTest(BaseTest):
         self.assertEqual(
             resources[0]['c7n.matched-security-groups'],
             ['sg-f9cc4d9f'])
+
+
+class LambdaTagTest(BaseTest):
+
+    def test_lambda_tag_and_remove(self):
+        self.patch(AWSLambda, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_lambda_tag_and_remove')
+        client = session_factory().client('lambda')
+
+        policy = self.load_policy({
+            'name': 'lambda-tag',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': 'CloudCustodian'}],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'abcdef'}]
+            },
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['FunctionArn']
+        tags = client.list_tags(Resource=arn)['Tags']
+        self.assertTrue('xyz' in tags.keys())
+
+        policy = self.load_policy({
+            'name': 'lambda-tag',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': 'CloudCustodian'}],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['xyz']}]
+            },
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['FunctionArn']
+        tags = client.list_tags(Resource=arn)['Tags']
+        self.assertFalse('xyz' in tags.keys())
+
+    def test_lambda_tags(self):
+        self.patch(AWSLambda, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_lambda_tags')
+        policy = self.load_policy({
+            'name': 'lambda-mark',
+            'resource': 'lambda',
+            'filters': [{"tag:Language": "Python"}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_mark_and_match(self):
+        session_factory = self.replay_flight_data(
+            'test_lambda_mark_and_match')
+        client = session_factory().client('lambda')
+        policy = self.load_policy({
+            'name': 'lambda-mark',
+            'resource': 'lambda',
+            'filters': [{"FunctionName": 'CloudCustodian'}],
+            'actions': [{
+                'type': 'mark-for-op', 'op': 'delete',
+                'tag': 'custodian_next', 'days': 1}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['FunctionArn']
+        tags = client.list_tags(Resource=arn)['Tags']
+        self.assertTrue('custodian_next' in tags.keys())
+
+        policy = self.load_policy({
+            'name': 'lambda-mark-filter',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
