@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 8,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 56,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 16,
+                    "minute": 23
+                },
+                "Name": "custodian-attach-encrypt-test"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HostId": "BaowWU2EnFoTvf0QokMDEU9eA89WvXu1+WdDFKHft16u+nCWZAQGYC/qLRgse3wi4MhzTyKZ3Ng=",
+            "RequestId": "C58C5948C4CF3504",
+            "HTTPHeaders": {
+                "x-amz-id-2": "BaowWU2EnFoTvf0QokMDEU9eA89WvXu1+WdDFKHft16u+nCWZAQGYC/qLRgse3wi4MhzTyKZ3Ng=",
+                "server": "AmazonS3",
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "C58C5948C4CF3504",
+                "date": "Thu, 16 Mar 2017 08:23:58 GMT",
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
