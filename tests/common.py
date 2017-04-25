@@ -18,6 +18,7 @@ import StringIO
 import shutil
 import tempfile
 import yaml
+import unittest
 
 from c7n import policy
 from c7n.schema import generate, validate as schema_validate
@@ -36,6 +37,10 @@ load_resources()
 
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
+
+
+skip_if_not_validating = unittest.skipIf(
+    not C7N_VALIDATE, reason='We are not validating schemas.')
 
 
 class BaseTest(PillTest):

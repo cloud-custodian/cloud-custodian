@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "trailList": [
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "nosetest", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/nosetest", 
+                "LogFileValidationEnabled": false, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": false, 
+                "S3BucketName": "nosetest-bucket", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "skunk-trails", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": false, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41", 
+                "HomeRegion": "us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "72ed2980-ed84-11e6-b9d9-b595a348f3d8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "72ed2980-ed84-11e6-b9d9-b595a348f3d8", 
+                "date": "Tue, 07 Feb 2017 22:26:19 GMT", 
+                "content-length": "664", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

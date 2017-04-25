@@ -11,6 +11,8 @@ install:
   - pip install --upgrade pytest pytest-xdist pytest-cov
   - pip install --upgrade coveralls
   - python setup.py develop
-script: make sphinx && py.test -v -n auto --cov=c7n tests tools/c7n_*
+script:
+  - flake8 tools/c7n_mailer
+  - make sphinx && py.test -v -n auto --cov=c7n tests tools/c7n_*
 after_success:
   coveralls

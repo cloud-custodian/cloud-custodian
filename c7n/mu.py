@@ -825,8 +825,8 @@ class CloudWatchEventSource(object):
             self.client.delete_rule(Name=func.name)
 
 
-class BucketNotification(object):
-    """ Subscribe a lambda to bucket notifications. """
+class BucketLambdaNotification(object):
+    """ Subscribe a lambda to bucket notifications directly. """
 
     def __init__(self, data, session_factory, bucket):
         self.data = data
@@ -1056,6 +1056,49 @@ class SNSSubscription(object):
                         raise Done  # break out of both for loops
             except Done:
                 pass
+
+
+class BucketSNSNotification(SNSSubscription):
+    """ Subscribe a lambda to bucket notifications via SNS. """
+
+    def __init__(self, session_factory, bucket, topic=None):
+        # NB: We are overwriting __init__ vs. extending.
+        self.session_factory = session_factory
+        self.session = session_factory()
+        self.topic_arns = self.get_topic(bucket) if topic is None else [topic]
+        self.client = self.session.client('sns')
+
+    def get_topic(self, bucket):
+        session = local_session(self.session_factory)
+        sns = session.client('sns')
+        s3 = session.client('s3')
+
+        notifies = bucket['Notification']
+        if 'TopicConfigurations' not in notifies:
+            notifies['TopicConfigurations'] = []
+        all_topics = notifies['TopicConfigurations']
+        topic_arns = [t['TopicArn'] for t in all_topics
+                      if 's3:ObjectCreated:*' in t['Events']]
+        if not topic_arns:
+            # No suitable existing topic. Create one.
+            topic_arn = sns.create_topic(Name=bucket['Name'])['TopicArn']
+            policy = {
+                'Statement': [{
+                    'Action': 'SNS:Publish',
+                    'Effect': 'Allow',
+                    'Resource': topic_arn,
+                    'Principal': {'Service': 's3.amazonaws.com'}}]}
+            sns.set_topic_attributes(
+                TopicArn=topic_arn,
+                AttributeName='Policy',
+                AttributeValue=json.dumps(policy))
+            notifies['TopicConfigurations'].append({
+                'TopicArn': topic_arn,
+                'Events': ['s3:ObjectCreated:*']})
+            s3.put_bucket_notification_configuration(Bucket=bucket['Name'],
+                NotificationConfiguration=notifies)
+            topic_arns = [topic_arn]
+        return topic_arns
 
 
 class ConfigRule(object):
