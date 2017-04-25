@@ -27,7 +27,7 @@ from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 
-from common import BaseTest, event_data
+from common import BaseTest, event_data, skip_if_not_validating
 
 
 class RestoreCompletionTest(TestCase):
@@ -715,6 +715,15 @@ class S3Test(BaseTest):
              'resource': 's3',
              'actions': [{'type': 'attach-encrypt'}]})
 
+    @skip_if_not_validating
+    def test_attach_encrypt_accepts_topic(self):
+        p = self.load_policy(
+            {'name': 'attach-encrypt',
+             'resource': 's3',
+             'actions': [{
+                 'type': 'attach-encrypt', 'role': '-', 'topic': 'default'}]})
+        self.assertEqual(p.data['actions'][0]['topic'], 'default')
+
     def test_create_bucket_event(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),
@@ -762,11 +771,12 @@ class S3Test(BaseTest):
                  u'Sid': u'RequireEncryptedPutObject'}],
              u'Version': u'2012-10-17'})
 
-    def test_attach_encrypt(self):
+    def test_attach_encrypt_via_bucket_notification(self):
         self.patch(s3, 'S3_AUGMENT_TABLE',
                    [('get_bucket_location', 'Location', None, None)])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_s3_attach_encrypt')
+        session_factory = self.replay_flight_data(
+            'test_s3_attach_encrypt_via_bucket_notification')
         bname = "custodian-attach-encrypt-test"
         role = "arn:aws:iam::644160558196:role/custodian-mu"
         self.maxDiff = None
@@ -789,7 +799,7 @@ class S3Test(BaseTest):
 
         self.addCleanup(
             LambdaManager(functools.partial(session_factory, region='us-west-2')).remove,
-            s3crypt.get_function(None, role))
+            s3crypt.get_function(None, role, False))
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -802,7 +812,206 @@ class S3Test(BaseTest):
             {'LambdaFunctionConfigurations': [{
                 'Events': ['s3:ObjectCreated:*'],
                 'Id': 'c7n-s3-encrypt',
-                'LambdaFunctionArn': 'arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt'}]})
+                'LambdaFunctionArn':'arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt'}]})
+        client.put_object(
+            Bucket=bname, Key='hello-world.txt',
+            Body='hello world', ContentType='text/plain')
+        #time.sleep(30)
+        info = client.head_object(Bucket=bname, Key='hello-world.txt')
+        self.assertTrue('ServerSideEncryption' in info)
+
+    def test_attach_encrypt_via_new_topic(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_attach_encrypt_via_new_topic')
+        bname = "custodian-attach-encrypt-test"
+        role = "arn:aws:iam::644160558196:role/custodian-mu"
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 'attach-encrypt',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{
+                'type': 'attach-encrypt',
+                'role': role,
+                'topic': 'default'}]
+            }, session_factory=session_factory)
+
+        self.addCleanup(
+            LambdaManager(
+                functools.partial(session_factory, region='us-east-1')).remove,
+            s3crypt.get_function(None, role, True))
+        arn = 'arn:aws:sns:us-east-1:644160558196:custodian-attach-encrypt-test'
+        self.addCleanup(session.client('sns').delete_topic, TopicArn=arn)
+        self.addCleanup(session.client('logs').delete_log_group,
+            logGroupName='/aws/lambda/c7n-s3-encrypt')
+
+        # Check that the policy sets stuff up properly.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        topic_notifications = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        us = [t for t in topic_notifications if t.get('TopicArn') == arn]
+        self.assertEqual(len(us), 1)
+
+        # Check that the stuff behaves properly.
+        client.put_object(
+            Bucket=bname, Key='hello-world.txt',
+            Body='hello world', ContentType='text/plain')
+        #time.sleep(30)
+        info = client.head_object(Bucket=bname, Key='hello-world.txt')
+        self.assertTrue('ServerSideEncryption' in info)
+
+    def test_attach_encrypt_via_implicit_existing_topic(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_attach_encrypt_via_implicit_existing_topic')
+        bname = "custodian-attach-encrypt-test"
+        role = "arn:aws:iam::644160558196:role/custodian-mu"
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        # Create two sns topics
+        topic_configs = []
+        for suffix in ('.jpg', '.txt'):
+            sns = session.client('sns')
+            existing_topic_arn = sns.create_topic(
+                Name='existing-{}-{}'.format(bname, suffix[1:]))['TopicArn']
+            policy = {
+                'Statement': [{
+                    'Action': 'SNS:Publish',
+                    'Effect': 'Allow',
+                    'Resource': existing_topic_arn,
+                    'Principal': {'Service': 's3.amazonaws.com'}}]}
+            sns.set_topic_attributes(
+                TopicArn=existing_topic_arn,
+                AttributeName='Policy',
+                AttributeValue=json.dumps(policy))
+            self.addCleanup(session.client('sns').delete_topic,
+                TopicArn=existing_topic_arn)
+            topic_configs.append({
+                'TopicArn': existing_topic_arn,
+                'Events': ['s3:ObjectCreated:*'],
+                'Filter': {'Key': {'FilterRules': [{
+                    'Name': 'suffix',
+                    'Value': suffix}]}}})
+        session.resource('s3').BucketNotification(bname).put(
+            NotificationConfiguration={'TopicConfigurations': topic_configs})
+
+        # Now define the policy.
+        p = self.load_policy({
+            'name': 'attach-encrypt',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{
+                'type': 'attach-encrypt',
+                'role': role,
+                'topic': 'default'}]
+            }, session_factory=session_factory)
+        self.addCleanup(
+            LambdaManager(
+                functools.partial(session_factory, region='us-east-1')).remove,
+            s3crypt.get_function(None, role, True))
+        self.addCleanup(session.client('logs').delete_log_group,
+            logGroupName='/aws/lambda/c7n-s3-encrypt')
+
+        # Check that the policy sets stuff up properly.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        notifies = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        existing = [t for t in notifies if 'existing' in t['TopicArn']]
+        self.assertEqual(len(existing), 2)
+
+        # Check that the stuff behaves properly.
+        client.put_object(
+            Bucket=bname, Key='hello-world.txt',
+            Body='hello world', ContentType='text/plain')
+        #time.sleep(30)
+        info = client.head_object(Bucket=bname, Key='hello-world.txt')
+        self.assertTrue('ServerSideEncryption' in info)
+
+    def test_attach_encrypt_via_explicit_existing_topic(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_attach_encrypt_via_explicit_existing_topic')
+        bname = "custodian-attach-encrypt-test"
+        role = "arn:aws:iam::644160558196:role/custodian-mu"
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        # Create an sns topic
+        topic_configs = []
+        sns = session.client('sns')
+        existing_topic_arn = sns.create_topic(
+            Name='preexisting-{}'.format(bname))['TopicArn']
+        policy = {
+            'Statement': [{
+                'Action': 'SNS:Publish',
+                'Effect': 'Allow',
+                'Resource': existing_topic_arn,
+                'Principal': {'Service': 's3.amazonaws.com'}}]}
+        sns.set_topic_attributes(
+            TopicArn=existing_topic_arn,
+            AttributeName='Policy',
+            AttributeValue=json.dumps(policy))
+        self.addCleanup(session.client('sns').delete_topic,
+            TopicArn=existing_topic_arn)
+        topic_configs.append({
+            'TopicArn': existing_topic_arn,
+            'Events': ['s3:ObjectCreated:*']})
+        session.resource('s3').BucketNotification(bname).put(
+            NotificationConfiguration={'TopicConfigurations': topic_configs})
+
+        # Now define the policy.
+        p = self.load_policy({
+            'name': 'attach-encrypt',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{
+                'type': 'attach-encrypt',
+                'role': role,
+                'topic': existing_topic_arn}]
+            }, session_factory=session_factory)
+        self.addCleanup(
+            LambdaManager(
+                functools.partial(session_factory, region='us-east-1')).remove,
+            s3crypt.get_function(None, role, True))
+        self.addCleanup(session.client('logs').delete_log_group,
+            logGroupName='/aws/lambda/c7n-s3-encrypt')
+
+        # Check that the policy sets stuff up properly.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        notifies = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        existing = [t for t in notifies if 'existing' in t['TopicArn']]
+        self.assertEqual(len(existing), 1)
+
+        # Check that the stuff behaves properly.
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
