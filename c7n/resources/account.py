@@ -540,10 +540,10 @@ class EnableTrail(BaseAction):
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
         except ClientError:
             current_policy = None
-        account_id = get_account_id(session)
+
         policy_json = cloudtrail_policy(
-            current_policy, bucket_name, account_id
-        )
+            current_policy, bucket_name, self.manager.config.account_id)
+
         s3client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)
         trails = client.describe_trails().get('trailList', ())
         if trail_name not in [t.get('Name') for t in trails]:
