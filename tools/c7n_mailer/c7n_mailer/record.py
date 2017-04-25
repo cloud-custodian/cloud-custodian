@@ -58,7 +58,7 @@ def resource_format(resource, resource_type):
     elif resource_type == 's3':
         return "%s" % (resource['Name'])
     elif resource_type == 'ebs':
-        return "%s %s %s %s" %(
+        return "%s %s %s %s" % (
             resource['VolumeId'],
             resource['Size'],
             resource['State'],
@@ -138,7 +138,7 @@ def resource_format(resource, resource_type):
             resource['SnapshotId'],
             resource['StartTime'])
     elif resource_type == 'subnet':
-        return "%s %s %s %s %s %s" %(
+        return "%s %s %s %s %s %s" % (
             resource['SubnetId'],
             resource['VpcId'],
             resource['AvailabilityZone'],

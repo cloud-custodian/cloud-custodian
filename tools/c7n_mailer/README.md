@@ -51,6 +51,7 @@ policies:
     actions:
       - type: notify
         template: default
+        priority_header: 2
         subject: testing the c7n mailer
         to:
           - you@example.com
@@ -107,6 +108,11 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 | &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
 | &#x2705;  | `from_address`       | string           | default from address                |
 |           | `contact_tags`       | array of strings | tags that we should look at for address information |
+|           | `smtp_server`        | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
+|           | `smtp_port`          | integer          | smtp port                           |
+|           | `smtp_ssl`           | boolean          | this defaults to True               |
+|           | `smtp_username`      | string           |                                     |
+|           | `smtp_password`      | string           |                                     |
 
 
 #### Standard Lambda Function Config
@@ -156,6 +162,7 @@ policies:
     actions:
       - type: notify
         template: default
+        priority_header: 1
         subject: fix your tags
         to:
           - resource-owner
@@ -176,6 +183,7 @@ are either
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
+- `priority_header` indicate the importannce of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
@@ -191,6 +199,7 @@ For reference purposes, the JSON Schema of the `notify` action:
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
+    "priority_header": {"type": "integer"},
     "template": {"type": "string"},
     "transport": {
       "type": "object",
