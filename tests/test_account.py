@@ -270,7 +270,7 @@ class AccountTests(BaseTest):
                         'notify': 'test',
                         'file-digest': True,
                         'kms': True,
-                        'kms_key': 'arn:aws:kms:us-east-1:1234:key/fake',
+                        'kms-key': 'arn:aws:kms:us-east-1:1234:key/fake',
                     },
                 ],
             },
