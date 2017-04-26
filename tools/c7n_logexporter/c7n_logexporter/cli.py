@@ -69,7 +69,7 @@ def export(group, bucket, prefix, start, end, role, task_name, stream_prefix):
                     date.replace(minute=59, hour=23, microsecond=0
                     ).timetuple()) * 1000),
                 'destination': bucket,
-                'destionationPrefix': export_prefix
+                'destinationPrefix': export_prefix
             }
 
             if stream_prefix:
