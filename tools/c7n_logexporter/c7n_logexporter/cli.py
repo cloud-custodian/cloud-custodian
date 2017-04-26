@@ -57,8 +57,8 @@ def export(group, bucket, prefix, start, end, role, task_name, stream_prefix):
         for d in range(abs((start-end).days)):
             date = start + datetime.timedelta(d)
             date = date.replace(minute=0, microsecond=0, hour=0)
-            prefix += date.strftime("/%Y-%m-%d")
-
+            export_prefix = "%s%s" % (prefix, date.strftime("/%Y-%m-%d"))
+            
             params = {
                 'taskName': "%s-%s" % (task_name, date.strftime("%Y-%m-%d")),
                 'logGroupName': group,
@@ -69,12 +69,11 @@ def export(group, bucket, prefix, start, end, role, task_name, stream_prefix):
                     date.replace(minute=59, hour=23, microsecond=0
                     ).timetuple()) * 1000),
                 'destination': bucket,
+                'destionationPrefix': export_prefix
             }
 
             if stream_prefix:
                 params['logStreamPrefix'] = stream_prefix
-            if prefix:
-                params['destinationPrefix'] = prefix
 
             futures[w.submit(retry, client.create_export_task, **params)] = params
 
