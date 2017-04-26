@@ -101,7 +101,7 @@ def process_log_event(event, context):
     # Grab the actual error log payload
     serialized = event['awslogs'].pop('data')
     data = json.loads(zlib.decompress(
-        base64.b64decode(serialized), 16+zlib.MAX_WBITS))
+        base64.b64decode(serialized), 16 + zlib.MAX_WBITS))
     msg = get_sentry_message(config, data)
     if msg is None:
         return
@@ -151,7 +151,7 @@ def process_log_group(config):
     event_count = 0
     log.debug("Querying log events with %s", params)
     for p in paginator.paginate(**params):
-        #log.debug("Searched streams\n %s", ", ".join(
+        # log.debug("Searched streams\n %s", ", ".join(
         #    [s['logStreamName'] for s in p['searchedLogStreams']]))
         for e in p['events']:
             event_count += 1
@@ -180,7 +180,7 @@ def send_sentry_message(sentry_dsn, msg):
     auth_header_keys = [
         ('sentry_timestamp', time.time()),
         ('sentry_client', client),
-        ('sentry_version', '7'), # try 7?
+        ('sentry_version', '7'),  # try 7?
         ('sentry_key', key),
         ('sentry_secret', secret)]
     auth_header = "Sentry %s" % ', '.join(
@@ -250,7 +250,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
     sentry_msg = {
         'event_id': uuid.uuid4().hex,
         'timestamp': datetime.fromtimestamp(
-            data['logEvents'][0]['timestamp']/1000).isoformat(),
+            data['logEvents'][0]['timestamp'] / 1000).isoformat(),
         'user': {
             'id': config['account_id'],
             'username': config['account_name']},
@@ -271,7 +271,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         sentry_msg['breadcrumbs'] = [
             {'category': 'policy',
              'message': e['message'],
-             'timestamp': e['timestamp']/1000} for e in breadcrumbs]
+             'timestamp': e['timestamp'] / 1000} for e in breadcrumbs]
     return sentry_msg
 
 
@@ -393,7 +393,7 @@ def orgreplay(options):
             log.info("creating account project %s", a['name'])
             spost(endpoint + "teams/%s/%s/projects/" % (
                 options.sentry_org, team_name),
-                  json={'name': a['name']})
+                json={'name': a['name']})
 
         bagger = partial(
             Bag,
@@ -429,7 +429,6 @@ def orgreplay(options):
 
     return [process_account(a) for a in accounts]
 
-
     with ThreadPoolExecutor(max_workers=3) as w:
         futures = {}
         for a in accounts:
@@ -453,7 +452,9 @@ def deploy(options):
 
 def deploy_one(region_name, account, policy, sentry_dsn):
     from c7n.mu import LambdaManager
-    session_factory = lambda: boto3.Session(region_name=region_name)
+
+    def session_factory():
+        return boto3.Session(region_name=region_name)
     log_group_name = '/aws/lambda/custodian-{}'.format(policy['name'])
     arn = 'arn:aws:logs:{}:{}:log-group:{}:*'.format(
         region_name, account['account_id'], log_group_name)
@@ -484,7 +485,7 @@ def setup_parser():
     common_parser(cmd_orgreplay)
     cmd_orgreplay.set_defaults(command=orgreplay)
     cmd_orgreplay.add_argument('--profile')
-    #cmd_orgreplay.add_argument('--role')
+    # cmd_orgreplay.add_argument('--role')
     cmd_orgreplay.add_argument('--start')
     cmd_orgreplay.add_argument('--end')
     cmd_orgreplay.add_argument('--sentry-org', default="c7n")
