@@ -271,4 +271,3 @@ class S3Output(FSOutput):
 
 
 s3_join = S3Output.join
-

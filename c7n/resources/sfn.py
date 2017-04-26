@@ -30,5 +30,3 @@ class StepFunction(QueryResourceManager):
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
-
-

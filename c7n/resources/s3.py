@@ -112,15 +112,15 @@ class S3(QueryResourceManager):
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),
     ('get_bucket_tagging', 'Tags', [], 'TagSet'),
-    ('get_bucket_policy',  'Policy', None, 'Policy'),
+    ('get_bucket_policy', 'Policy', None, 'Policy'),
     ('get_bucket_acl', 'Acl', None, None),
     ('get_bucket_replication', 'Replication', None, None),
     ('get_bucket_versioning', 'Versioning', None, None),
     ('get_bucket_website', 'Website', None, None),
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None)
-#        ('get_bucket_lifecycle', 'Lifecycle', None, None),
-#        ('get_bucket_cors', 'Cors'),
+    #        ('get_bucket_lifecycle', 'Lifecycle', None, None),
+    #        ('get_bucket_cors', 'Cors'),
 )
 
 
@@ -149,7 +149,7 @@ def assemble_bucket(item):
                         e)
             continue
         except ClientError as e:
-            code =  e.response['Error']['Code']
+            code = e.response['Error']['Code']
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
             elif code == 'PermanentRedirect':
@@ -161,7 +161,7 @@ def assemble_bucket(item):
             else:
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
-                        b['Name'], m, e.response['Error']['Message'])
+                    b['Name'], m, e.response['Error']['Message'])
                 return None
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
@@ -223,6 +223,7 @@ class S3Metrics(MetricsFilter):
     """S3 CW Metrics need special handling for attribute/dimension
     mismatch, and additional required dimension.
     """
+
     def get_dimensions(self, resource):
         return [
             {'Name': 'BucketName',
@@ -310,7 +311,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
                 '859597730677',  # eu-west-1
                 '282025262664',  # eu-west-2
                 '814480443879',  # sa-east-1
-             ])
+            ])
 
 
 @filters.register('global-grants')
@@ -410,12 +411,12 @@ class HasStatementFilter(Filter):
 
 
 ENCRYPTION_STATEMENT_GLOB = {
-            'Effect': 'Deny',
-            'Principal': '*',
-            'Action': 's3:PutObject',
-            "Condition": {
-                "StringNotEquals": {
-                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
+    'Effect': 'Deny',
+    'Principal': '*',
+    'Action': 's3:PutObject',
+    "Condition": {
+        "StringNotEquals": {
+            "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
 
 
 @filters.register('no-encryption-statement')
@@ -725,7 +726,6 @@ class AttachLambdaEncrypt(BucketActionBase):
         from c7n.mu import LambdaManager
         from c7n.ufuncs.s3crypt import get_function
 
-        session = local_session(self.manager.session_factory)
         account_id = self.manager.config.account_id
         topic_arn = self.data.get('topic')
 
@@ -883,6 +883,7 @@ class BucketScanLog(object):
      - [] # Empty list of keys at end when we close the buffer
 
     """
+
     def __init__(self, log_dir, name):
         self.log_dir = log_dir
         self.name = name
@@ -932,13 +933,13 @@ class ScanBucket(BucketActionBase):
             'iterator': 'list_objects',
             'contents_key': ['Contents'],
             'key_processor': 'process_key'
-            },
+        },
         'versioned': {
             'iterator': 'list_object_versions',
             'contents_key': ['Versions'],
             'key_processor': 'process_version'
-            }
         }
+    }
 
     def __init__(self, data, manager=None):
         super(ScanBucket, self).__init__(data, manager)
@@ -947,8 +948,7 @@ class ScanBucket(BucketActionBase):
     def get_bucket_style(self, b):
         return (
             b.get('Versioning', {'Status': ''}).get('Status') in (
-                'Enabled', 'Suspended')
-            and 'versioned' or 'standard')
+                'Enabled', 'Suspended') and 'versioned' or 'standard')
 
     def get_bucket_op(self, b, op_name):
         bucket_style = self.get_bucket_style(b)
@@ -1110,13 +1110,13 @@ class EncryptExtantKeys(ScanBucket):
             'large': {'type': 'boolean'},
             'crypto': {'enum': ['AES256', 'aws:kms']},
             'key-id': {'type': 'string'}
-            },
+        },
         'dependencies': {
             'key-id': {
-              'properties': {
-                'crypto': {'pattern': 'aws:kms'}
-              },
-              'required': ['crypto']
+                'properties': {
+                    'crypto': {'pattern': 'aws:kms'}
+                },
+                'required': ['crypto']
             }
         }
     }
@@ -1291,7 +1291,7 @@ class EncryptExtantKeys(ScanBucket):
 
         try:
             with self.executor_factory(max_workers=2) as w:
-                parts = list(w.map(upload_part, range(1, num_parts+1)))
+                parts = list(w.map(upload_part, range(1, num_parts + 1)))
         except Exception:
             log.warning(
                 "Error during large key copy bucket: %s key: %s, "
@@ -1630,13 +1630,13 @@ class DeleteBucket(ScanBucket):
             'iterator': 'list_objects',
             'contents_key': ['Contents'],
             'key_processor': 'process_key'
-            },
+        },
         'versioned': {
             'iterator': 'list_object_versions',
             'contents_key': ['Versions', 'DeleteMarkers'],
             'key_processor': 'process_version'
-            }
         }
+    }
 
     def process_delete_enablement(self, b):
         """Prep a bucket for deletion.
@@ -1655,9 +1655,8 @@ class DeleteBucket(ScanBucket):
 
         # Suspend versioning, so we don't get new delete markers
         # as we walk and delete versions
-        if (self.get_bucket_style(b) == 'versioned'
-            and b['Versioning']['Status'] == 'Enabled'
-                and self.data.get('remove-contents', True)):
+        if (self.get_bucket_style(b) == 'versioned' and b['Versioning']['Status'] == 'Enabled' and
+        self.data.get('remove-contents', True)):
             client.put_bucket_versioning(
                 Bucket=b['Name'],
                 VersioningConfiguration={'Status': 'Suspended'})

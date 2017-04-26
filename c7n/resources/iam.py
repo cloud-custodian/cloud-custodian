@@ -164,7 +164,7 @@ class IamRoleUsage(Filter):
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
             services = client.list_services(
-                    cluster=cluster['clusterName'])['serviceArns']
+                cluster=cluster['clusterName'])['serviceArns']
             if services:
                 for service in client.describe_services(
                         cluster=cluster['clusterName'],
@@ -277,7 +277,7 @@ class SpecificIamRoleManagedPolicy(Filter):
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         if self.data.get('value'):
-            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r) ]
+            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r)]
         return []
 
 
@@ -307,7 +307,8 @@ class NoSpecificIamRoleManagedPolicy(Filter):
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         if self.data.get('value'):
-            return [r for r in resources if not self.data.get('value') in self._managed_policies(c, r) ]
+            return [r for r in resources if not self.data.get('value') in
+            self._managed_policies(c, r)]
         return []
 
 
@@ -438,8 +439,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if (r['Arn'] not in profiles or
-                        r['InstanceProfileName'] not in profiles):
+            if (r['Arn'] not in profiles or r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (
@@ -515,7 +515,7 @@ class CredentialReport(Filter):
                  'certs',
                  'certs.active',
                  'certs.last_rotated',
-                 ]},
+             ]},
         value={'oneOf': [
             {'type': 'array'},
             {'type': 'string'},
@@ -629,6 +629,7 @@ class CredentialReport(Filter):
         for v in info.get(prefix, ()):
             if vf.match(v):
                 return True
+
 
 @User.filter_registry.register('credential')
 class UserCredentialReport(CredentialReport):
@@ -826,7 +827,6 @@ class IamGroupUsers(Filter):
 
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')
-        value = self.data.get('value')
         if self.data.get('value', True):
             return [r for r in resources if self._user_count(c, r) > 0]
         return [r for r in resources if self._user_count(c, r) == 0]

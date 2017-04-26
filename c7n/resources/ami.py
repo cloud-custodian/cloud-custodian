@@ -21,8 +21,6 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-from c7n.resources.asg import ASG, LaunchConfig
-
 
 log = logging.getLogger('custodian.ami')
 

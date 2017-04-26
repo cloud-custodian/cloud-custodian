@@ -80,7 +80,7 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
     log.debug("Found %d records", len(records))
-    
+
     rows = formatter.to_csv(records)
     if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers())
@@ -219,7 +219,7 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     key_count = 0
 
     marker = key_prefix.strip("/") + "/" + start_date.strftime(
-         '%Y/%m/%d/00') + "/resources.json.gz"
+        '%Y/%m/%d/00') + "/resources.json.gz"
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,

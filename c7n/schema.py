@@ -57,7 +57,11 @@ def validate(data, schema=None):
         return []
     try:
         resp = specific_error(errors[0])
-        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        name = isinstance(
+            errors[0].instance,
+            dict) and errors[0].instance.get(
+            'name',
+            'unknown') or 'unknown'
         return [resp, name]
     except Exception:
         logging.exception(
@@ -197,7 +201,7 @@ def generate(resource_types=()):
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
                              'event': {'type': 'string'}}}]
-                    }}
+                }}
             },
         },
     }
@@ -222,8 +226,8 @@ def generate(resource_types=()):
                 'type': 'array',
                 'additionalItems': False,
                 'items': {'anyOf': resource_refs}
-                }
             }
+        }
     }
 
     return schema
@@ -262,7 +266,7 @@ def process_resource(type_name, resource_type, resource_defs):
         {'$ref': '#/definitions/filters/valuekv'})
 
     filter_refs = []
-    filters_seen = set() # for aliases
+    filters_seen = set()  # for aliases
     for filter_name, f in sorted(resource_type.filter_registry.items()):
         if f in filters_seen:
             continue
@@ -302,7 +306,7 @@ def process_resource(type_name, resource_type, resource_defs):
                 'actions': {
                     'type': 'array',
                     'items': {'anyOf': action_refs}}}},
-            ]
+        ]
     }
 
     if type_name == 'ec2':

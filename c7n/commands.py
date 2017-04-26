@@ -61,7 +61,9 @@ def policy_command(f):
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(file))
             else:
-                log.debug('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
+                log.debug(
+                    'Loaded file {}. Contains {} policies (after filtering)'.format(
+                        file, len(collection)))
                 policies.extend(collection.policies)
                 all_policies.extend(collection.unfiltered_policies)
 
@@ -167,8 +169,8 @@ def validate(options):
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.
 #
-#@policy_command
-#def access(options, policies):
+# @policy_command
+# def access(options, policies):
 #    permissions = set()
 #    for p in policies:
 #        permissions.update(p.get_permissions())
@@ -197,7 +199,7 @@ def report(options, policies):
     if len(policies) != 1:
         eprint("Error: Report subcommand requires exactly one policy")
         sys.exit(1)
-    
+
     policy = policies.pop()
     odir = options.output_dir.rstrip(os.path.sep)
     if os.path.sep in odir and os.path.basename(odir) == policy.name:
@@ -242,23 +244,23 @@ def _schema_get_docstring(starting_class):
 
 def schema_completer(prefix):
     """ For tab-completion via argcomplete, return completion options.
-    
+
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
     load_resources()
     components = prefix.split('.')
-    
+
     # Completions for resource
     if len(components) == 1:
         choices = [r for r in resources.keys() if r.startswith(prefix)]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     if components[0] not in resources.keys():
         return []
-    
+
     # Completions for category
     if len(components) == 2:
         choices = ['{}.{}'.format(components[0], x)
@@ -266,11 +268,11 @@ def schema_completer(prefix):
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     # Completions for item
     elif len(components) == 3:
         resource_mapping = schema.resource_vocabulary()
-        return ['{}.{}.{}'.format(components[0], components[1], x) 
+        return ['{}.{}.{}'.format(components[0], components[1], x)
                 for x in resource_mapping[components[0]][components[1]]]
 
     return []
@@ -304,7 +306,7 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(resources.keys()) }
+        resource_list = {'resources': sorted(resources.keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
 
@@ -348,7 +350,7 @@ def schema_cmd(options):
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
         eprint('Error: {} is not in the {} list for resource {}'.format(
-                item, category, resource))
+            item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
@@ -418,7 +420,7 @@ def version_cmd(options):
 
     print("\nPlease copy/paste the following info along with any bug reports:\n")
     print("Custodian:  ", version)
-    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
+    pyversion = sys.version.replace('\n', '\n' + ' ' * indent)  # For readability
     print("Python:     ", pyversion)
     # os.uname is only available on recent versions of Unix
     try:
