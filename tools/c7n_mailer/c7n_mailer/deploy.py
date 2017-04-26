@@ -23,12 +23,16 @@ from c7n.mu import (
 
 entry_source = """\
 import logging
-logging.root.setLevel(logging.DEBUG)
 
 from c7n_mailer import handle
 
+logger = logging.getLogger('custodian.mailer')
+log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(level=logging.DEBUG, format=log_format)
+logging.getLogger('botocore').setLevel(logging.WARNING)
+
 def dispatch(event, context):
-    return handle.run(event, context)
+    return handle.start_c7n_mailer(event, context, logger)
 """
 
 
@@ -69,7 +73,6 @@ def provision(config, session_factory):
                 session_factory,
                 prefix="")
         ])
-
 
     archive = get_archive(config)
     func = LambdaFunction(func_config, archive)

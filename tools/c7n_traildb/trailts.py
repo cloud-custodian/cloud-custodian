@@ -85,7 +85,7 @@ def process_traildb(db, influx, account_name, region, since=None):
 
     qt = time.time()
     log.debug("query account:%s region:%s services time:%0.2f incremental:%s",
-              account_name, region, time.time()-qt, since)
+              account_name, region, time.time() - qt, since)
 
     record_count = 0
     for b in ['console', 'program']:
@@ -98,7 +98,7 @@ def process_traildb(db, influx, account_name, region, since=None):
 
             log.debug(
                 "query account:%s region:%s bucket:%s field:%s points:%d time:%0.2f",
-                account_name, region, b, f, len(results), time.time()-qt)
+                account_name, region, b, f, len(results), time.time() - qt)
             measurements = []
             for p in results:
                 if f == 'user_id':
@@ -126,7 +126,7 @@ def process_traildb(db, influx, account_name, region, since=None):
             record_count += len(measurements)
             log.debug(
                 "post account:%s region:%s bucket:%s field:%s points:%d time:%0.2f",
-                account_name, region, b, f, len(measurements), time.time()-pt)
+                account_name, region, b, f, len(measurements), time.time() - pt)
     return record_count
 
 
@@ -145,7 +145,7 @@ def query_by(
             rdb.text('call_count > 3'))
 
     if field == 'error_code':
-        query = query.where(t.c.error_code != None)
+        query = query.where(t.c.error_code is not None)
 
     query = query.group_by(t.c.event_source)
 
@@ -168,7 +168,7 @@ def query_by(
     elif error:
         query = query.where(
             rdb.and_(
-                t.c.error_code != None,
+                t.c.error_code is not None,
                 rdb.or_(
                     t.c.error_code != 'ThrottlingException',
                     t.c.error_code != 'Client.RequestLimitExceeded')))
@@ -213,11 +213,11 @@ def index_account(config, region, account, day, incremental):
                 return
             raise
         s3.download_file(bucket, key, fh.name)
-        log.debug("downloaded %s in %0.2f", key, time.time()-st)
+        log.debug("downloaded %s in %0.2f", key, time.time() - st)
 
         t = time.time()
         subprocess.check_call(["lbzip2", "-d", fh.name])
-        log.debug("decompressed %s in %0.2f",  fh.name, time.time()-t)
+        log.debug("decompressed %s in %0.2f", fh.name, time.time() - t)
 
         t = time.time()
         since = incremental and day or None
@@ -225,15 +225,15 @@ def index_account(config, region, account, day, incremental):
         record_count = process_traildb(
             rdb.create_engine("sqlite:////%s" % fh.name[:-4]),
             influx, name, region, since)
-        log.debug("indexed %s in %0.2f",  fh.name, time.time()-t)
+        log.debug("indexed %s in %0.2f", fh.name, time.time() - t)
         os.remove(fh.name[:-4])
         log.debug("account:%s day:%s region:%s records:%d complete:%0.2f",
                   name, day.strftime("%Y-%m-%d"), region,
                   record_count,
-                  time.time()-st)
+                  time.time() - st)
 
-    return {'time': time.time()-st, 'records': record_count, 'region': region,
-            'account':  name, 'day': day.strftime("%Y-%m-%d"),
+    return {'time': time.time() - st, 'records': record_count, 'region': region,
+            'account': name, 'day': day.strftime("%Y-%m-%d"),
             'db-date': key_info['LastModified']}
 
 
@@ -254,7 +254,7 @@ def get_date_range(start, end):
 
     days = []
     n_start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-    for n in range(1, (end-n_start).days):
+    for n in range(1, (end - n_start).days):
         days.append(n_start + datetime.timedelta(n))
     days.insert(0, start)
     if n_start != end:
@@ -397,6 +397,7 @@ def index(config, start, end, incremental=False, concurrency=5, accounts=None,
                 ("processed account:%(account)s day:%(day)s region:%(region)s "
                  "records:%(records)s time:%(time)0.2f db-date:%(db-date)s"
                  ) % result)
+
 
 if __name__ == '__main__':
     trailts(auto_envvar_prefix='TRAIL')
