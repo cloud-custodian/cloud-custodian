@@ -253,10 +253,17 @@ class IamRoleInlinePolicy(Filter):
 
 @Role.filter_registry.register('has-specific-managed-policy')
 class SpecificIamRoleManagedPolicy(Filter):
-    """
-        Filter IAM roles that has a specific policy attached
+    """Filter IAM roles that has a specific policy attached
+
+    For example, if the user wants to check all roles with 'admin-policy':
+
+    .. code-block: yaml
+
+     - name: iam-roles-have-admin
+       resource: iam-role
+       filters:
         - type: has-specific-managed-policy
-          value: policy-name
+          value: admin-policy
 
     """
 
@@ -276,10 +283,17 @@ class SpecificIamRoleManagedPolicy(Filter):
 
 @Role.filter_registry.register('no-specific-managed-policy')
 class NoSpecificIamRoleManagedPolicy(Filter):
-    """
-        Filter IAM roles that does not have a specific policy attached
+    """Filter IAM roles that do not have a specific policy attached
+
+    For example, if the user wants to check all roles without 'ip-restriction':
+
+    .. code-block: yaml
+
+     - name: iam-roles-no-ip-restriction
+       resource: iam-role
+       filters:
         - type: no-specific-managed-policy
-          value: policy-name
+          value: ip-restriction
 
     """
 
