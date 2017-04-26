@@ -21,8 +21,6 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
-from botocore.exceptions import ClientError
-
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
@@ -650,4 +648,4 @@ class EnableTrail(BaseAction):
                 update_args['KmsKeyId'] = kms_key
             if update_args:
                 update_args['Name'] = trail_name
-                client.update_trail(**update_arg
+                client.update_trail(**update_args)
