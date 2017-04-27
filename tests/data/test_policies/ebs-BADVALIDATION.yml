@@ -1,0 +1,12 @@
+policies:
+
+- name: ebs-delete-on-expiresat-tag 
+  resource: eb
+  filters:
+     - type: value
+       value_type: age
+       op: gt
+       key: tag:ExpiresAt
+       value: 0
+  actions:
+    - type: delete
