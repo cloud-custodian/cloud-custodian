@@ -102,7 +102,8 @@ def setup_parser():
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
     parser.add_argument(
-        "-v", dest="verbose", action="store_true", default=False)
+        "-v", dest="verbose", action="store_true", default=False,
+        help='toggle verbose logging')
     return parser
 
 
