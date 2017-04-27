@@ -1097,3 +1097,25 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+class LocationRestricted(BaseTest):
+
+    def test_s3_location_restrction(self):
+
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_location',  'Location', None, None),
+        ])
+        session_factory = self.replay_flight_data('test_s3_location_restriction')
+
+        session = session_factory()
+        client = session.client('s3')
+        self.patch(
+           s3.LocationRestriction , 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 's3_location_restriction',
+            'resource': 's3',
+            'filters': [
+                {'type': 'location-restriction',
+                 'value': ['ap-southeast-1','us-west-2'] }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 4)
