@@ -1,6 +1,6 @@
 
 destination:
-  bucket: c7n-log-archive
+  bucket: custodian-log-archive
   prefix: logs
 
 accounts:

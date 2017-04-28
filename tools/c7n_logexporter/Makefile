@@ -1,4 +1,9 @@
 
+region=us-east-1
+stack_name=custodian-log-exporter
+s3_bucket=custodian-log-archive
+s3_prefix=build
+period=1h
 
 install:
 	virtualenv .venv
@@ -21,7 +26,7 @@ destroy:
 
 deploy: package
 	AWS_DEFAULT_REGION=$(region) .venv/bin/aws cloudformation package \
-		--template-file cfn/api.yml \
+		--template-file cfn.yml \
 		--s3-bucket $(s3_bucket) \
                 --s3-prefix $(s3_prefix) \
 		--output-template-file stage/built-api.yml
@@ -32,8 +37,8 @@ deploy: package
 	rm -Rf stage
 
 logs:
-	awslogs get -w /aws/lambda/$(shell aws cloudformation describe-stacks --stack-name $(stack_name)| --query "Stacks[0].Outputs[?OutputKey==\`Function\`].OutputValue | [0]") \
-z2	-s$(period)
+	awslogs get -w /aws/lambda/$(shell aws cloudformation describe-stacks --stack-name $(stack_name) --query "Stacks[0].Outputs[?OutputKey==\`Function\`].OutputValue | [0]") \
+	-s$(period)
 
 error-logs:
 	awslogs get /aws/lambda/$(shell aws cloudformation describe-stacks --stack-name $(stack_name) --query "Stacks[0].Outputs[?OutputKey==\`Function\`].OutputValue | [0]") \

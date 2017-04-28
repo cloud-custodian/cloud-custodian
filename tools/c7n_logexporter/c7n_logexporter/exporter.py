@@ -20,9 +20,11 @@ import datetime
 from dateutil.tz import tzutc, tzlocal
 from dateutil.parser import parse
 import fnmatch
+import functools
 import jsonschema
 import logging
 import time
+import os
 import yaml
 
 logging.basicConfig(level=logging.INFO)
@@ -70,6 +72,23 @@ CONFIG_SCHEMA = {
     }
 
 
+
+def debug(func):
+
+    @functools.wraps(func)
+    def run(*args, **kw):
+        try:
+            return cli()
+        except SystemExit:
+            raise
+        except Exception:
+            import traceback, pdb, sys
+            traceback.print_exc()
+            pdb.post_mortem(sys.exc_info()[-1])
+            raise
+    return run
+
+
 @click.group()
 def cli():
     """c7n cloudwatch log group exporter"""
@@ -97,6 +116,7 @@ def validate(config):
     return data
 
 
+
 @cli.command()
 @click.option('--config', type=click.Path())
 @click.option('--start', required=True)
@@ -109,7 +129,7 @@ def run(config, start, end):
     for account in config.get('accounts', ()):
         process_account(account, start, end, destination)
 
-
+        
 def lambdafan(func):
     """simple decorator that will auto fan out async style in lambda."""
 
@@ -138,36 +158,46 @@ def process_account(account, start, end, destination):
     
     paginator = client.get_paginator('describe_log_groups')
     group_names = []
-    for p in paginator.page():
+    for p in paginator.paginate():
         group_names.extend([g['logGroupName'] for g in p.get('logGroups', ())])
 
+    groups_creation = {g['logGroupName']: datetime.datetime.fromtimestamp(g['creationTime']/1000.0)
+                       for g in p.get('logGroups', ())}
     matched_groups = set()
     for g in account['groups']:
         matched_groups.update(fnmatch.filter(group_names, g))
 
     account_id = session.client('sts').get_caller_identity()['Account']
-    prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id,
+    prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
 
     log.info("matched %d groups of %d", len(matched_groups), len(group_names))
     for g in matched_groups:
+        group_start = start
+        if group_start < groups_creation[g]:
+            group_start = groups_creation[g]
+        if group_start > end:
+            log.info("Skipping group %s end: %s before start/creation: %s",
+                     g, end.strftime('%y/%m/%d'), group_start.strftime('%Y/%m/%d'))
+            continue
         export.callback(
             g,
             destination['bucket'],
             prefix,
-            start,
+            group_start,
             end,
             None, None, None,
             session)
             
 
-def get_session(role, session_name):
+def get_session(role, session_name="c7n-log-exporter"):
     if role == 'self':
         session = boto3.Session()
     elif role:
-        session = assumed_session(role, task_name)
+        session = assumed_session(role, session_name)
     else:
         session = boto3.Session()
     return session
+
 
 
 @cli.command()
@@ -183,20 +213,27 @@ def get_session(role, session_name):
 @click.option('--stream-prefix')
 def export(group, bucket, prefix, start, end, role, task_name, stream_prefix, session=None):
     start = start and isinstance(start, basestring) and parse(start) or start
-    end = end and parse(end) or datetime.datetime.now()
+    end = end and isinstance(start, basestring) and parse(end) or end or datetime.datetime.now()
     start = start.replace(tzinfo=tzlocal()).astimezone(tzutc())
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())
 
     if session is None:
-        session = get_session(role, task_name)
+        session = get_session(role)
     
     client = session.client('logs')
     retry = get_retry(('LimitExceededException',))
 
     if prefix:
-        prefix = "%s/%s" % (prefix.rstrip('/'), bucket)
+        prefix = "%s/%s" % (prefix.rstrip('/'), group)
     else:
         prefix = group
+
+    log.info("Log exporting group:%s start:%s end:%s bucket:%s prefix:%s",
+             group,
+             start.strftime('%Y/%m/%d'),
+             end.strftime('%Y/%m/%d'),
+             bucket,
+             prefix)
 
     for d in range(abs((start-end).days)):
         date = start + datetime.timedelta(d)
@@ -220,15 +257,13 @@ def export(group, bucket, prefix, start, end, role, task_name, stream_prefix, se
             params['logStreamPrefix'] = stream_prefix
 
         result = retry(client.create_export_task, **params)
-        log.info("Log export group:%s day:%s bucket:%s prefix:%s task:%s",
+        log.debug("Log export group:%s day:%s bucket:%s prefix:%s task:%s",
                  group,
                  params['taskName'],
                  bucket,
                  params['destinationPrefix'],
                  result['taskId'])
 
-
+    
 if __name__ == '__main__':
     cli()
-    
-    
