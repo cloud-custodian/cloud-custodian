@@ -12,7 +12,7 @@ install:
   - pip install --upgrade coveralls
   - python setup.py develop
 script:
-  - flake8 tools/c7n_mailer
+  - flake8 tools
   - make sphinx && py.test -v -n auto --cov=c7n tests tools/c7n_*
 after_success:
   coveralls

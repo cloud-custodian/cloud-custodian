@@ -35,7 +35,7 @@ def debug(f):
     def _f(*args, **kw):
         try:
             f(*args, **kw)
-        except (SystemExit, KeyboardInterrupt) as e:
+        except (SystemExit, KeyboardInterrupt):
             raise
         except:
             import traceback, sys, pdb

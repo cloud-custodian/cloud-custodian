@@ -408,6 +408,66 @@ class HasStatementFilter(Filter):
         return None
 
 
+ENCRYPTION_STATEMENT_GLOB = {
+            'Effect': 'Deny',
+            'Principal': '*',
+            'Action': 's3:PutObject',
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]}}}
+
+
+@filters.register('no-encryption-statement')
+class EncryptionEnabledFilter(Filter):
+    """Find buckets with missing encryption policy statements.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-bucket-not-encrypted
+                resource: s3
+                filters:
+                  - type: no-encryption-statement
+    """
+    schema = type_schema(
+        'no-encryption-statement')
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('s3').get_permissions()
+        return perms
+
+    def process(self, buckets, event=None):
+        return filter(None, map(self.process_bucket, buckets))
+
+    def process_bucket(self, b):
+        p = b.get('Policy')
+        if p is None:
+            return b
+        p = json.loads(p)
+        encryption_statement = ENCRYPTION_STATEMENT_GLOB
+
+        statements = p.get('Statement', [])
+        check = False
+        for s in list(statements):
+            try:
+                encryption_statement["Sid"] = s["Sid"]
+            except:
+                log.info("Bucket:%s doesn't have Sid" % b['Name'])
+
+            encryption_statement["Resource"] = s["Resource"]
+            if s == encryption_statement:
+                log.info(
+                    "Bucket:%s contains correct encryption policy", b['Name'])
+                check = True
+                break
+        if check:
+            return None
+        else:
+            return b
+
+
 @filters.register('missing-statement')
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):
