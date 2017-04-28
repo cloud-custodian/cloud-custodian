@@ -22,7 +22,6 @@ def main(event, context):
 
 
 def get_function(session_factory, name, role, events):
-    import os
     from c7n.mu import (LambdaFunction, PythonPackageArchive)
 
     config = dict(
@@ -35,12 +34,8 @@ def get_function(session_factory, name, role, events):
         description='Hello World',
         events=events)
 
-    archive = PythonPackageArchive(
-        # Directory to lambda file
-        os.path.abspath(__file__),
-        # Don't include virtualenv deps
-        lib_filter=lambda x, y, z: ([], []))
-    archive.create()
+    archive = PythonPackageArchive()
+    archive.add_py_file(__file__)
     archive.close()
 
     return LambdaFunction(config, archive)

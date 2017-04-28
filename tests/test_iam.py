@@ -511,8 +511,7 @@ class LambdaCrossAccount(BaseTest):
 
         tmp_dir = tempfile.mkdtemp()
         self.addCleanup(os.rmdir, tmp_dir)
-        archive = PythonPackageArchive(tmp_dir, tmp_dir)
-        archive.create()
+        archive = PythonPackageArchive()
         archive.add_contents('handler.py', LAMBDA_SRC)
         archive.close()
 

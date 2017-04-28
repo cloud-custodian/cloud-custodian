@@ -1,5 +1,6 @@
 *.pyc
 *.egg-info/
+*.swp
 deps/
 include/
 lib/
@@ -20,3 +21,4 @@ local/
 *~
 share/
 out/
+.DS_STORE

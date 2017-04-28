@@ -1,0 +1,82 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "75644193-07e1-11e7-91e2-bfd5af170b83", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "75644193-07e1-11e7-91e2-bfd5af170b83", 
+                "date": "Mon, 13 Mar 2017 11:37:37 GMT", 
+                "content-length": "849", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "pipelineDescriptionList": [
+            {
+                "fields": [
+                    {
+                        "stringValue": "2017-03-13T11:37:36", 
+                        "key": "@lastActivationTime"
+                    }, 
+                    {
+                        "stringValue": "[{\"key\":\"foo\",\"value\":\"bar\"}]", 
+                        "key": "*tags"
+                    }, 
+                    {
+                        "stringValue": "2017-03-13T11:37:34", 
+                        "key": "@creationTime"
+                    }, 
+                    {
+                        "stringValue": "PIPELINE", 
+                        "key": "@sphere"
+                    }, 
+                    {
+                        "stringValue": "AIDAIXI7ULG2SDYI3RBNM", 
+                        "key": "pipelineCreator"
+                    }, 
+                    {
+                        "stringValue": "1", 
+                        "key": "@version"
+                    }, 
+                    {
+                        "stringValue": "PipelinesFTW", 
+                        "key": "name"
+                    }, 
+                    {
+                        "stringValue": "df-0993359USAD6HT96D2W", 
+                        "key": "@id"
+                    }, 
+                    {
+                        "stringValue": "SCHEDULING", 
+                        "key": "@pipelineState"
+                    }, 
+                    {
+                        "stringValue": "644160558196", 
+                        "key": "@accountId"
+                    }, 
+                    {
+                        "stringValue": "PipelinesFTW", 
+                        "key": "uniqueId"
+                    }, 
+                    {
+                        "stringValue": "AIDAIXI7ULG2SDYI3RBNM", 
+                        "key": "@userId"
+                    }, 
+                    {
+                        "stringValue": "2017-03-13T11:37:36", 
+                        "key": "@firstActivationTime"
+                    }
+                ], 
+                "pipelineId": "df-0993359USAD6HT96D2W", 
+                "name": "PipelinesFTW", 
+                "tags": [
+                    {
+                        "value": "bar", 
+                        "key": "foo"
+                    }
+                ]
+            }
+        ]
+    }
+}

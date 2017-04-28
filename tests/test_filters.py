@@ -389,8 +389,22 @@ class TestInstanceAge(BaseFilterTest):
                 (i(two_months), True),
                 (i(one_month), False)
         ]:
-            self.assertFilter({'type': 'instance-uptime'}, ii, v)
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'days': 60}, ii, v)
 
+class TestInstanceAgeMinute(BaseFilterTest):
+
+    def test_filter_instance_age(self):
+        now = datetime.now(tz=tz.tzutc())
+        five_minute = now - timedelta(minutes=5)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        for ii, v in [
+                (i(now), False),
+                (i(five_minute), True)
+        ]:
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'minutes': 5}, ii, v)
 
 class TestMarkedForAction(BaseFilterTest):
 

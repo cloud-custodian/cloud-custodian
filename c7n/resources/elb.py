@@ -290,7 +290,8 @@ class SetSslListenerPolicy(BaseAction):
                 PolicyAttributes=policy_attributes)
         except ClientError as e:
             if e.response['Error']['Code'] not in (
-                    'DuplicatePolicyName', 'DuplicationPolicyNameException'):
+                    'DuplicatePolicyName', 'DuplicatePolicyNameException',
+                    'DuplicationPolicyNameException'):
                 raise
 
         # Apply it to all SSL listeners.
