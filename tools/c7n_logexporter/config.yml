@@ -1,7 +1,7 @@
 
 destination:
   bucket: custodian-log-archive
-  prefix: logs
+  prefix: logs2
 
 accounts:
   - name: custodian-demo

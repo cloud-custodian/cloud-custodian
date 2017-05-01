@@ -16,7 +16,7 @@ package:
 	cp -Rf .venv/lib/python2.7/site-packages/pkg_resources stage
 	.venv/bin/pip install -r requirements.txt -t stage --no-deps
 	cp config.yml stage
-	find stage -name \*.pyc -delete
+	find stage -name \*.py -delete
 
 clean:
 	rm -Rf .venv
