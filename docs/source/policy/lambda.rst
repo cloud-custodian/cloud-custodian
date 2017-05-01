@@ -78,7 +78,7 @@ have been defined to allow for easier policy writing as for the
      events:
       - source: ec2.amazonaws.com
         event: RunInstances
-        ids: "detail.responseElements.instancesSet.items[].instanceId"
+        ids: "responseElements.instancesSet.items[].instanceId"
 
 
 EC2 Instance State Events

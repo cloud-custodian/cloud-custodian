@@ -47,6 +47,7 @@ import itertools
 import logging
 import operator
 import re
+from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
@@ -64,7 +65,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, type_schema, get_account_id,
+    local_session, type_schema,
     get_retry, chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
 
@@ -110,19 +111,12 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('rds:ListTagsForResource',)
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -656,6 +650,72 @@ class Snapshot(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
 
 
+@actions.register('resize')
+class ResizeInstance(BaseAction):
+    """Change the allocated storage of an rds instance.
+
+    :example:
+
+       This will find databases using over 85% of their allocated
+       storage, and resize them to have an additional 30% storage
+       the resize here is async during the next maintenance.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: 30
+
+
+       This will find databases using under 20% of their allocated
+       storage, and resize them to be 30% smaller, the resize here
+       is configured to be immediate.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: -30
+                    immediate: true
+    """
+    schema = type_schema(
+        'resize',
+        percent={'type': 'number'},
+        immediate={'type': 'boolean'})
+
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, resources):
+        c = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            old_val = D(r['AllocatedStorage'])
+            _100 = D(100)
+            new_val = ((_100 + D(self.data['percent'])) / _100) * old_val
+            rounded = int(new_val.quantize(D('0'), ROUND_HALF_UP))
+            c.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                AllocatedStorage=rounded,
+                ApplyImmediately=self.data.get('immediate', False))
+
+
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots
@@ -761,15 +821,8 @@ class RDSSnapshot(QueryResourceManager):
     action_registry = ActionRegistry('rds-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
 
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):

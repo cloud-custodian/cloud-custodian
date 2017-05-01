@@ -33,6 +33,7 @@ except ImportError:
     setproctitle = lambda t: None
 
 from c7n.commands import schema_completer
+from c7n.utils import get_account_id_from_sts
 
 DEFAULT_REGION = 'us-east-1'
 
@@ -112,6 +113,16 @@ def _default_region(options):
         log.debug("using default region:%s from boto" % options.region)
     except:
         return
+
+
+def _default_account_id(options):
+    profile = getattr(options, 'profile', None)
+    try:
+        import boto3
+        session = boto3.Session(profile_name=profile)
+        options.account_id = get_account_id_from_sts(session)
+    except:
+        options.account_id = None
 
 
 def _report_options(p):
@@ -311,6 +322,7 @@ def main():
         options.configs.append(options.config)
 
     _default_region(options)
+    _default_account_id(options)
 
     try:
         command = options.command
