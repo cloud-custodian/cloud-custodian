@@ -586,10 +586,14 @@ class ToggleVersioning(BucketActionBase):
             policies:
               - name: s3-enable-versioning
                 resource: s3
-                filter:
-                  - type: value
-                    key: Versioning
-                    value: Suspended
+                filters:
+                  - or:
+                    - type: value
+                      key: Versioning.Status
+                      value: Suspended
+                    - type: value
+                      key: Versioning.Status
+                      value: absent
                 actions:
                   - type: toggle-versioning
                     enabled: true

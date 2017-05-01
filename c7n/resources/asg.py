@@ -689,9 +689,9 @@ class Resize(Action):
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
-        if self.data['desired_size'] != 'current':
-            raise FilterValidationError(
-                "only resizing desired/min to current capacity is supported")
+        #if self.data['desired_size'] != 'current':
+        #    raise FilterValidationError(
+        #        "only resizing desired/min to current capacity is supported")
         return self
 
     def process(self, asgs):
@@ -700,13 +700,16 @@ class Resize(Action):
         for a in asgs:
             current_size = len(a['Instances'])
             min_size = a['MinSize']
-            desired = a['DesiredCapacity']
+            if self.data['desired_size'] is 'current':
+                desired = min((current_size, a['DesiredCapacity']))
+            else:
+                desired = int(self.data['desired_size'])
             log.debug('desired %d to %s, min %d to %d',
                       desired, current_size, min_size, current_size)
             self.manager.retry(
                 client.update_auto_scaling_group,
                 AutoScalingGroupName=a['AutoScalingGroupName'],
-                DesiredCapacity=min((current_size, desired)),
+                DesiredCapacity=desired,
                 MinSize=min((current_size, min_size)))
 
 
