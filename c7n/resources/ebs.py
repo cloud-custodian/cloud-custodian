@@ -30,6 +30,7 @@ from c7n.query import QueryResourceManager
 from c7n.utils import (
     camelResource,
     chunks,
+    get_retry,
     local_session,
     set_annotation,
     type_schema,
@@ -887,6 +888,33 @@ class EncryptInstanceVolumes(BaseAction):
             waiter.wait(InstanceIds=[instance_id])
             if self.verbose:
                 self.log.debug("Instance: %s stopped" % instance_id)
+
+
+@actions.register('snapshot')
+class CreateSnapshot(BaseAction):
+    """Snapshot an EBS volume
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: snapshot-volumes
+                resource: ebs
+                filters:
+                  - Attachments: []
+                  - State: available
+                actions:
+                  - snapshot
+    """
+    permissions = ('ec2:CreateSnapshot',)
+
+    def process(self, volumes):
+        client = local_session(self.manager.session_factory).client('ec2')
+        retry = get_retry(['Throttled'], max_attempts=5)
+        for vol in volumes:
+            vol_id = vol['VolumeId']
+            retry(client.create_snapshot, VolumeId=vol_id)
 
 
 @actions.register('delete')
