@@ -28,7 +28,13 @@ from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    local_session, set_annotation, chunks, type_schema, worker, camelResource)
+    camelResource,
+    chunks,
+    local_session,
+    set_annotation,
+    type_schema,
+    worker,
+)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
