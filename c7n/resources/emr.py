@@ -39,7 +39,7 @@ class EMRCluster(QueryResourceManager):
     class resource_type(object):
         service = 'emr'
         type = 'emr'
-        enum_spec = ('list_clusters', 'Clusters', None)
+        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']})
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
