@@ -251,6 +251,66 @@ class IamRoleInlinePolicy(Filter):
         return [r for r in resources if self._inline_policies(c, r) == 0]
 
 
+@Role.filter_registry.register('has-specific-managed-policy')
+class SpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that has a specific policy attached
+
+    For example, if the user wants to check all roles with 'admin-policy':
+
+    .. code-block: yaml
+
+     - name: iam-roles-have-admin
+       resource: iam-role
+       filters:
+        - type: has-specific-managed-policy
+          value: admin-policy
+
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r) ]
+        return []
+
+
+@Role.filter_registry.register('no-specific-managed-policy')
+class NoSpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that do not have a specific policy attached
+
+    For example, if the user wants to check all roles without 'ip-restriction':
+
+    .. code-block: yaml
+
+     - name: iam-roles-no-ip-restriction
+       resource: iam-role
+       filters:
+        - type: no-specific-managed-policy
+          value: ip-restriction
+
+    """
+
+    schema = type_schema('no-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if not self.data.get('value') in self._managed_policies(c, r) ]
+        return []
+
+
 ######################
 #    IAM Policies    #
 ######################
