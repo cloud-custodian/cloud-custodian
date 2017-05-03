@@ -86,7 +86,7 @@ class TestHealthEventsFilter(BaseTest):
             ]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
 
 class TestTagTrim(BaseTest):

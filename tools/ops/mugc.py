@@ -101,6 +101,9 @@ def setup_parser():
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
+    parser.add_argument(
+        "-v", dest="verbose", action="store_true", default=False,
+        help='toggle verbose logging')
     return parser
 
 
@@ -111,8 +114,11 @@ def main():
     options.log_group = None
     options.cache_period = 0
     options.cache = None
+    log_level = logging.INFO
+    if options.verbose:
+        log_level = logging.DEBUG
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=log_level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('c7n.cache').setLevel(logging.WARNING)

@@ -48,4 +48,11 @@ class HealthResource(BaseTest):
             self.assertTrue(
                 (r['eventTypeCategory'] == 'accountNotification'
              ) ^ ('AffectedEntities' in r))
-            
+
+    def test_health_region(self):
+        self.change_environment(AWS_DEFAULT_REGION='us-west-2')
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {'name': 'account-health-query',
+             'resource': 'health-event'})

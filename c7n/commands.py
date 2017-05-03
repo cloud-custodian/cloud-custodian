@@ -129,7 +129,7 @@ def validate(options):
             if format in ('json',):
                 data = json.load(fh)
 
-        errors = schema.validate(data, schm)
+        errors += schema.validate(data, schm)
         conf_policy_names = {p['name'] for p in data.get('policies', ())}
         dupes = conf_policy_names.intersection(used_policy_names)
         if len(dupes) >= 1:
