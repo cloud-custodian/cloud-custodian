@@ -116,6 +116,13 @@ def _default_region(options):
 
 
 def _default_account_id(options):
+    if options.assume_role:
+        try:
+            options.account_id = options.assume_role.split(':')[4]
+            return
+        except IndexError:
+            pass
+
     profile = getattr(options, 'profile', None)
     try:
         import boto3
