@@ -328,7 +328,7 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    if options.command in ('report', 'logs', 'metrics', 'run'):
+    if options.subparser in ('report', 'logs', 'metrics', 'run'):
         _default_region(options)
         _default_account_id(options)
 
