@@ -220,8 +220,10 @@ class AppELBDeleteAction(BaseAction):
                   - delete
     """
 
-    schema = type_schema('delete')
-    permissions = ("elasticloadbalancing:DeleteLoadBalancer",)
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = (
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",)
 
     def process(self, load_balancers):
         with self.executor_factory(max_workers=2) as w:
@@ -229,7 +231,23 @@ class AppELBDeleteAction(BaseAction):
 
     def process_alb(self, alb):
         client = local_session(self.manager.session_factory).client('elbv2')
-        client.delete_load_balancer(LoadBalancerArn=alb['LoadBalancerArn'])
+        try:
+            if self.data.get('force'):
+                client.modify_load_balancer_attributes(
+                    LoadBalancerArn=alb['LoadBalancerArn'],
+                    Attributes=[{
+                        'Key': 'deletion_protection.enabled',
+                        'Value': 'false',
+                    }])
+            self.manager.retry(
+                client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
+        except Exception as e:
+            if e.response['Error']['Code'] in ['OperationNotPermitted',
+                                               'LoadBalancerNotFound']:
+                self.log.warning(
+                    "Exception trying to delete ALB: %s", alb['LoadBalancerArn'])
+                return
+            raise
 
 
 class AppELBListenerFilterBase(object):
@@ -292,8 +310,67 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
         return super(AppELBListenerFilter, self).process(albs, event)
 
     def __call__(self, alb):
-        listeners = self.listener_map[alb['LoadBalancerArn']]
-        return self.match(listeners)
+        matched = []
+        for listener in self.listener_map[alb['LoadBalancerArn']]:
+            if self.match(listener):
+                matched.append(listener)
+        if not matched:
+            return False
+        alb['c7n:MatchedListeners'] = matched
+        return True
+
+
+@actions.register('modify-listener')
+class AppELBModifyListenerPolicy(BaseAction):
+    """Action to modify the policy for an App ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-modify-listener
+                resource: app-elb
+                filters:
+                  - type: listener
+                    key: Protocol
+                    value: HTTP
+                actions:
+                  - type: modify-listener
+                    protocol: HTTPS
+                    sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+    """
+
+    schema = type_schema(
+        'modify-listener',
+        port={'type': 'integer'},
+        protocol={'enum': ['HTTP', 'HTTPS']},
+        sslpolicy={'type': 'string'},
+        certificate={'type': 'string'}
+    )
+
+    permissions = ("elasticloadbalancing:ModifyListener",)
+
+    def process(self, load_balancers):
+        args = {}
+        if 'port' in self.data:
+            args['Port'] = self.data.get('port')
+        if 'protocol' in self.data:
+            args['Protocol'] = self.data.get('protocol')
+        if 'sslpolicy' in self.data:
+            args['SslPolicy'] = self.data.get('sslpolicy')
+        if 'certificate' in self.data:
+            args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_alb, load_balancers, [args]))
+
+    def process_alb(self, alb, args):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for matched_listener in alb['c7n:MatchedListeners']:
+            client.modify_listener(
+                ListenerArn=matched_listener['ListenerArn'],
+                **args)
 
 
 @filters.register('healthcheck-protocol-mismatch')
