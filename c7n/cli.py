@@ -328,8 +328,9 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    _default_region(options)
-    _default_account_id(options)
+    if options.command in ('report', 'logs', 'metrics', 'run'):
+        _default_region(options)
+        _default_account_id(options)
 
     try:
         command = options.command
