@@ -774,7 +774,7 @@ class UserRemoveAccessKey(BaseAction):
     schema = type_schema(
         'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
     permissions = ('iam:ListAccessKeys', 'iam:UpdateAccessKey',
-                   'iam:DeleteAccssKey')
+                   'iam:DeleteAccessKey')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
