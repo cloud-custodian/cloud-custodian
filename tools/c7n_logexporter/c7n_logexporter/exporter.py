@@ -46,7 +46,7 @@ CONFIG_SCHEMA = {
             'properties': {
                 'bucket': {'type': 'string'},
                 'prefix': {'type': 'string'},
-                },
+            },
         },
         'account': {
             'type': 'object',
@@ -58,7 +58,7 @@ CONFIG_SCHEMA = {
                 'groups': {
                     'type': 'array', 'items': {'type': 'string'}
                 }
-            },
+            }
         }
     },
     'type': 'object',
@@ -68,10 +68,10 @@ CONFIG_SCHEMA = {
         'accounts': {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
-            },
+        },
         'destination': {'$ref': '#/definitions/destination'}
-        }
     }
+}
 
 
 def debug(func):
@@ -315,8 +315,8 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
                 continue
             month = int(part)
             date_key = (y, month)
-            if (date_key < (start.year, start.month)
-                    or date_key > (end.year, end.month)):
+            if (date_key < (start.year, start.month) or
+                    date_key > (end.year, end.month)):
                 continue
             months.append(month)
 
@@ -349,8 +349,8 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
 @lambdafan
 def export(group, bucket, prefix, start, end, role, session=None):
     start = start and isinstance(start, basestring) and parse(start) or start
-    end = (end and isinstance(start, basestring)
-           and parse(end) or end or datetime.now())
+    end = (end and isinstance(start, basestring) and
+           parse(end) or end or datetime.now())
     start = start.replace(tzinfo=tzlocal()).astimezone(tzutc())
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())
 
@@ -374,7 +374,7 @@ def export(group, bucket, prefix, start, end, role, session=None):
               prefix)
 
     t = time.time()
-    days = [start + timedelta(i) for i in range((end-start).days)]
+    days = [start + timedelta(i) for i in range((end - start).days)]
     day_count = len(days)
     days = filter_extant_exports(
         boto3.Session().client('s3'), bucket, prefix, days, start, end)
@@ -414,7 +414,7 @@ def export(group, bucket, prefix, start, end, role, session=None):
     log.info(("Exported log group:%s time:%0.2f days:%d start:%s"
               " end:%s bucket:%s prefix:%s"),
              group,
-             time.time()-t,
+             time.time() - t,
              idx,
              start.strftime('%Y/%m/%d'),
              end.strftime('%Y/%m/%d'),

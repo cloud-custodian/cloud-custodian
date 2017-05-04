@@ -19,8 +19,8 @@ setup(
     version='0.1',
     description="Cloud Custodian - Cloud Watch Log S3 exporter",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +30,3 @@ setup(
             'c7n-log-exporter = c7n_logexporter.exporter:cli']},
     install_requires=["c7n", "click", "jsonschema"],
 )
-
