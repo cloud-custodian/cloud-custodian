@@ -1,0 +1,17 @@
+
+destination:
+  bucket: custodian-log-archive
+  prefix: logs2
+
+accounts:
+  - name: custodian-demo
+    role: "arn:aws:iam::114002464496:role/CloudCustodianRole"
+    groups:
+      - "/aws/lambda/*"
+
+  - name: custodian-dev
+    role: "self"
+    groups:
+      - "/aws/lambda/*"
+      - "API-Gateway-Execution-Logs*"
+      
