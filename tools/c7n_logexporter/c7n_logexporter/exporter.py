@@ -131,7 +131,7 @@ def run(config, start, end):
     for account in config.get('accounts', ()):
         process_account(account, start, end, destination)
 
-        
+
 def lambdafan(func):
     """simple decorator that will auto fan out async style in lambda.
 
@@ -159,7 +159,7 @@ def lambdafan(func):
 def process_account(account, start, end, destination, incremental=True):
     session = get_session(account['role'])
     client = session.client('logs')
-    
+
     paginator = client.get_paginator('describe_log_groups')
     groups = []
     for p in paginator.paginate():
@@ -288,7 +288,7 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
     """Filter days where the bucket already has extant export keys.
     """
     end = end or datetime.now()
-    #days = [start + timedelta(i) for i in range((end-start).days)]
+    # days = [start + timedelta(i) for i in range((end-start).days)]
     periods = {(d.year, d.month, d.day): d for d in days}
 
     keys = client.list_objects_v2(
@@ -308,7 +308,7 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
         keys = client.list_objects_v2(
             Bucket=bucket, Prefix="%s/%s" % (prefix.strip('/'), str(y)),
             Delimiter='/').get('CommonPrefixes', [])
-        months = []        
+        months = []
         for m in keys:
             part = m['Prefix'].rsplit('/', 1)[-1]
             if not part.isdigit():
@@ -343,19 +343,20 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end')
 @click.option('--role', help="sts role to assume for log group access")
-#@click.option('--period', type=float)
-#@click.option('--bucket-role', help="role to scan destination bucket")
-#@click.option('--stream-prefix)
+# @click.option('--period', type=float)
+# @click.option('--bucket-role', help="role to scan destination bucket")
+# @click.option('--stream-prefix)
 @lambdafan
 def export(group, bucket, prefix, start, end, role, session=None):
     start = start and isinstance(start, basestring) and parse(start) or start
-    end = end and isinstance(start, basestring) and parse(end) or end or datetime.now()
+    end = (end and isinstance(start, basestring)
+           and parse(end) or end or datetime.now())
     start = start.replace(tzinfo=tzlocal()).astimezone(tzutc())
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())
 
     if session is None:
         session = get_session(role)
-    
+
     client = session.client('logs')
     retry = get_retry(('LimitExceededException',), min_delay=4)
 
@@ -384,9 +385,10 @@ def export(group, bucket, prefix, start, end, role, session=None):
 
     for idx, d in enumerate(days):
         date = d.replace(minute=0, microsecond=0, hour=0)
-        export_prefix = "%s%s" % (prefix, date.strftime("/%Y/%m/%d"))            
+        export_prefix = "%s%s" % (prefix, date.strftime("/%Y/%m/%d"))
         params = {
-            'taskName': "%s-%s" % ("c7n-log-exporter", date.strftime("%Y-%m-%d")),
+            'taskName': "%s-%s" % ("c7n-log-exporter",
+                                   date.strftime("%Y-%m-%d")),
             'logGroupName': group['logGroupName'],
             'fromTime': int(time.mktime(
                 date.replace(
@@ -398,7 +400,7 @@ def export(group, bucket, prefix, start, end, role, session=None):
             'destinationPrefix': export_prefix
         }
 
-        #if stream_prefix:
+        # if stream_prefix:
         #    params['logStreamPrefix'] = stream_prefix
 
         result = retry(client.create_export_task, **params)
@@ -409,7 +411,8 @@ def export(group, bucket, prefix, start, end, role, session=None):
                   params['destinationPrefix'],
                   result['taskId'])
 
-    log.info("Exported log group:%s time:%0.2f days:%d start:%s end:%s bucket:%s prefix:%s",
+    log.info(("Exported log group:%s time:%0.2f days:%d start:%s"
+              " end:%s bucket:%s prefix:%s"),
              group,
              time.time()-t,
              idx,
