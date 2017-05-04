@@ -21,10 +21,7 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
-from botocore.exceptions import ClientError
-
-from c7n.actions import ActionRegistry
-from c7n.actions import BaseAction
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
@@ -437,6 +434,85 @@ class ServiceLimit(Filter):
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
         return []
+
+
+@actions.register('request-limit-increase')
+class RequestLimitIncrease(BaseAction):
+    """ File support ticket to raise limit
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: account-service-limits
+            resource: account
+            filters:
+             - type: service-limit
+               services:
+                 - EBS
+               threshold: 60.5
+             actions:
+               - type: request-limit-increase
+                 notify: [email, email2]
+                 percent-increase: 50
+                 message: "Raise {service} by {percent}%"
+    """
+
+    schema = type_schema(
+        'request-limit-increase',
+        **{'notify': {'type': 'array'},
+           'percent-increase': {'type': 'number'},
+           'subject': {'type': 'string'},
+           'message': {'type': 'string'},
+           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']},
+           'required': ['percent-increase'],
+           })
+
+    permissions = ('support:CreateCase',)
+
+    default_subject = 'Raise the account limit of {service}'
+    default_template = 'Please raise the account limit of {service} by {percent}%'
+    default_severity = 'normal'
+
+    service_code_mapping = {
+        'AutoScaling': 'auto-scaling',
+        'ELB': 'elastic-load-balancing',
+        'EBS': 'amazon-elastic-block-store',
+        'EC2': 'amazon-elastic-compute-cloud-linux',
+        'RDS': 'amazon-relational-database-service-aurora',
+        'VPC': 'amazon-virtual-private-cloud',
+    }
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('support')
+
+        services_done = set()
+        for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
+            service = resource['service']
+            if service in services_done:
+                continue
+
+            services_done.add(service)
+            service_code = self.service_code_mapping.get(service)
+
+            subject = self.data.get('subject', self.default_subject)
+            subject = subject.format(service=service)
+
+            body = self.data.get('message', self.default_template)
+            body = body.format(**{
+                    'service': service,
+                    'percent': self.data.get('percent-increase')
+                    })
+            
+            client.create_case(
+                subject=subject,
+                communicationBody=body,
+                serviceCode=service_code,
+                categoryCode='general-guidance',
+                severityCode=self.data.get('severity', self.default_severity),
+                ccEmailAddresses=self.data.get('notify', []))
 
 
 def cloudtrail_policy(original, bucket_name, account_id):

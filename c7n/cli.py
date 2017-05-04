@@ -116,6 +116,13 @@ def _default_region(options):
 
 
 def _default_account_id(options):
+    if options.assume_role:
+        try:
+            options.account_id = options.assume_role.split(':')[4]
+            return
+        except IndexError:
+            pass
+
     profile = getattr(options, 'profile', None)
     try:
         import boto3
@@ -321,8 +328,9 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    _default_region(options)
-    _default_account_id(options)
+    if options.subparser in ('report', 'logs', 'metrics', 'run'):
+        _default_region(options)
+        _default_account_id(options)
 
     try:
         command = options.command

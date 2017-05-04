@@ -254,6 +254,38 @@ class AccountTests(BaseTest):
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status['IsLogging'])
 
+    def test_raise_service_limit(self):
+        magic_string = 'Programmatic test'
+
+        session_factory = self.replay_flight_data('test_account_raise_service_limit')
+        p = self.load_policy({
+            'name': 'raise-service-limit-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'services': ['EBS'],
+                'threshold': 0.01,
+            }],
+            'actions': [{
+                'type': 'request-limit-increase',
+                'percent-increase': 50,
+                'subject': magic_string,
+            }]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+        # Validate that a case was created
+        support = session_factory().client('support')
+        cases = support.describe_cases()
+        found = False
+        for case in cases['cases']:
+            if case['subject'] == magic_string:
+                found = True
+                break
+        self.assertTrue(found)
+
     def test_enable_trail(self):
         factory = self.replay_flight_data('test_cloudtrail_enable')
         p = self.load_policy(

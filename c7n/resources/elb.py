@@ -16,6 +16,7 @@ Elastic Load Balancers
 """
 from concurrent.futures import as_completed
 import logging
+import re
 
 from botocore.exceptions import ClientError
 
@@ -425,6 +426,10 @@ class SSLPolicyFilter(Filter):
     Cannot specify both whitelist & blacklist in the same policy. These must
     be done seperately (seperate policy statements).
 
+    Likewise, if you want to reduce the consideration set such that we only
+    compare certain keys (e.g. you only want to compare the `Protocol-` keys),
+    you can use the `matching` option with a regular expression:
+
     :example:
 
         .. code-block: yaml
@@ -437,6 +442,14 @@ class SSLPolicyFilter(Filter):
                     blacklist:
                         - "Protocol-SSLv2"
                         - "Protocol-SSLv3"
+              - name: elb-modern-tls
+                resource: elb
+                filters:
+                  - type: ssl-policy
+                    matching: "^Protocol-"
+                    whitelist:
+                        - "Protocol-TLSv1.1"
+                        - "Protocol-TLSv1.2"
     """
 
     schema = {
@@ -448,6 +461,7 @@ class SSLPolicyFilter(Filter):
             ],
         'properties': {
             'type': {'enum': ['ssl-policy']},
+            'matching': {'type': 'string'},
             'whitelist': {'type': 'array', 'items': {'type': 'string'}},
             'blacklist': {'type': 'array', 'items': {'type': 'string'}}
             }
@@ -466,6 +480,14 @@ class SSLPolicyFilter(Filter):
                 not isinstance(self.data['blacklist'], list)):
             raise FilterValidationError("blacklist must be a list")
 
+        if 'matching' in self.data:
+                # Sanity check that we can compile
+                try:
+                    re.compile(self.data['matching'])
+                except re.error as e:
+                    raise FilterValidationError(
+                        "Invalid regex: %s %s" % (e, self.data))
+
         return self
 
     def process(self, balancers, event=None):
@@ -477,6 +499,15 @@ class SSLPolicyFilter(Filter):
         blacklist = set(self.data.get('blacklist', []))
 
         invalid_elbs = []
+
+        if 'matching' in self.data:
+            regex = self.data.get('matching')
+            filtered_pairs = []
+            for (elb, active_policies) in active_policy_attribute_tuples:
+                filtered_policies =  [policy for policy in active_policies if bool(re.match(regex, policy, flags=re.IGNORECASE))]
+                if filtered_policies:
+                    filtered_pairs.append((elb, filtered_policies))
+            active_policy_attribute_tuples = filtered_pairs
 
         if blacklist:
             for elb, active_policies in active_policy_attribute_tuples:
