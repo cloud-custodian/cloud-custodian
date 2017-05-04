@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  LogExporter:
+    Type: 'AWS::Serverless::Function'
+    FunctionName: "c7n-log-exporter"
+    Description: "CloudWatch Logs S3 Exporter"
+    MemorySize: 1024
+    Timeout: 600
+    Properties:
+      Handler: exporter.handler
+      Runtime: python2.7
+      CodeUri: './stage'
+      Role: "arn:aws:iam::644160558196:role/custodian-mu"
+      Events:
+        Timer:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 day)
+
+Outputs:
+  Function:
+    Description: Exporter Lambda
+    Value: !Ref LogExporter
