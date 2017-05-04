@@ -18,7 +18,8 @@ import logging
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, DefaultVpcBase, ValueFilter
+from c7n.filters import (
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -245,7 +246,8 @@ class AppELBDeleteAction(BaseAction):
             if e.response['Error']['Code'] in ['OperationNotPermitted',
                                                'LoadBalancerNotFound']:
                 self.log.warning(
-                    "Exception trying to delete ALB: %s", alb['LoadBalancerArn'])
+                    "Exception trying to delete ALB: %s error: %s",
+                    alb['LoadBalancerArn'], e)
                 return
             raise
 
@@ -352,6 +354,13 @@ class AppELBModifyListenerPolicy(BaseAction):
 
     permissions = ("elasticloadbalancing:ModifyListener",)
 
+    def validate(self):
+        for f in self.manager.data.get('filters', ()):
+            if 'listener' in f.get('type', ()):
+                return self
+        raise FilterValidationError(
+            "modify-listener action requires the listener filter")
+
     def process(self, load_balancers):
         args = {}
         if 'port' in self.data:
@@ -367,7 +376,7 @@ class AppELBModifyListenerPolicy(BaseAction):
 
     def process_alb(self, alb, args):
         client = local_session(self.manager.session_factory).client('elbv2')
-        for matched_listener in alb['c7n:MatchedListeners']:
+        for matched_listener in alb.get('c7n:MatchedListeners', ()):
             client.modify_listener(
                 ListenerArn=matched_listener['ListenerArn'],
                 **args)
