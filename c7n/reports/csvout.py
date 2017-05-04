@@ -50,6 +50,7 @@ import json
 import jmespath
 import logging
 import os
+from tabulate import tabulate
 
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
@@ -79,10 +80,15 @@ def report(policy, start_date, options, output_fh, raw_output_fh=None):
         records = fs_record_set(policy.ctx.output_path, policy.name)
 
     log.debug("Found %d records", len(records))
+    
     rows = formatter.to_csv(records)
-    writer = csv.writer(output_fh, formatter.headers())
-    writer.writerow(formatter.headers())
-    writer.writerows(rows)
+    if options.format == 'csv':
+        writer = csv.writer(output_fh, formatter.headers())
+        writer.writerow(formatter.headers())
+        writer.writerows(rows)
+    else:
+        # We special case CSV, and for other formats we pass to tabulate
+        print(tabulate(rows, formatter.headers(), tablefmt=options.format))
 
     if raw_output_fh is not None:
         dumps(records, raw_output_fh, indent=2)
@@ -103,7 +109,7 @@ def _get_values(record, field_list, tag_map):
             if value is None:
                 value = ''
             else:
-                value = ', '.join(value)
+                value = ', '.join([str(v) for v in value])
         elif field.startswith(count_prefix):
             count_field = field.replace(count_prefix, '', 1)
             value = jmespath.search(count_field, record)
@@ -130,7 +136,7 @@ class Formatter(object):
         # Lookup default fields for resource type.
         model = resource_manager.resource_type
         self._id_field = model.id
-        self._date_field = model.date
+        self._date_field = getattr(model, 'date', None)
 
         mfields = getattr(model, 'default_report_fields', None)
         if mfields is None:
@@ -172,18 +178,16 @@ class Formatter(object):
     def to_csv(self, records, reverse=True):
         if not records:
             return []
-        filtered = filter(self.resource_manager.filter_record, records)
-        log.debug("Filtered from %d to %d" % (len(records), len(filtered)))
 
         # Sort before unique to get the first/latest record
         date_sort = ('CustodianDate' in records[0] and 'CustodianDate' or
                      self._date_field)
         if date_sort:
-            filtered.sort(
+            records.sort(
                 key=lambda r: r[date_sort], reverse=reverse)
 
-        uniq = self.uniq_by_id(filtered)
-        log.debug("Uniqued from %d to %d" % (len(filtered), len(uniq)))
+        uniq = self.uniq_by_id(records)
+        log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         rows = map(self.extract_csv, uniq)
         return rows
 
@@ -217,10 +221,10 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     marker = key_prefix.strip("/") + "/" + start_date.strftime(
          '%Y/%m/%d/00') + "/resources.json.gz"
 
-    p = s3.get_paginator('list_objects').paginate(
+    p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
         Prefix=key_prefix.strip('/') + '/',
-        Marker=marker
+        StartAfter=marker,
     )
 
     with ThreadPoolExecutor(max_workers=20) as w:
@@ -230,7 +234,8 @@ def record_set(session_factory, bucket, key_prefix, start_date):
             keys = [k for k in key_set['Contents']
                     if k['Key'].endswith('resources.json.gz')]
             key_count += len(keys)
-            futures = map(lambda k: w.submit(get_records, bucket, k, session_factory), keys)
+            futures = map(lambda k: w.submit(
+                get_records, bucket, k, session_factory), keys)
 
             for f in as_completed(futures):
                 records.extend(f.result())

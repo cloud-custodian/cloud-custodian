@@ -91,6 +91,8 @@ class TagTrim(Action):
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
+    permissions = ('ec2:DeleteTags',)
+
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
@@ -254,7 +256,7 @@ class Tag(Action):
     """Tag an ec2 resource.
     """
 
-    batch_size = 150
+    batch_size = 25
     concurrency = 2
 
     schema = utils.type_schema(
@@ -262,7 +264,16 @@ class Tag(Action):
         tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
+        tag={'type': 'string'},
         )
+
+    permissions = ('ec2:CreateTags',)
+
+    def validate(self):
+        if self.data.get('key') and self.data.get('tag'):
+            raise FilterValidationError(
+                "Can't specify both key and tag, choose one")
+        return self
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -325,6 +336,8 @@ class RemoveTag(Action):
         'untag', aliases=('unmark', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
 
+    permissions = ('ec2:DeleteTags',)
+
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
@@ -367,6 +380,10 @@ class RenameTag(Action):
         old_key={'type': 'string'},
         new_key={'type': 'string'})
 
+    permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
+
+    tag_count_max = 50
+
     def delete_tag(self, client, ids, key, value):
         client.delete_tags(
             Resources=ids,
@@ -391,20 +408,20 @@ class RenameTag(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            new_key, tag_value)
+        # We have a preference to creating the new tag when possible first
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) < self.tag_count_max]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
         self.delete_tag(
             c, [r[self.id_key] for r in resource_set], old_key, tag_value)
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) > 49],
-            new_key, tag_value)
+        # For resources with 50 tags, we need to delete first and then create.
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) > self.tag_count_max - 1]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
     def create_set(self, instances):
         old_key = self.data.get('old_key', None)
@@ -471,6 +488,8 @@ class TagDelayedAction(Action):
         msg={'type': 'string'},
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
+
+    permissions = ('ec2:CreateTags',)
 
     batch_size = 200
 
@@ -573,6 +592,8 @@ class NormalizeTag(Action):
                     'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
         value={'type': 'string'})
 
+    permissions = ('ec2:CreateTags',)
+
     def create_tag(self, client, ids, key, value):
 
         self.manager.retry(
@@ -594,23 +615,11 @@ class NormalizeTag(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        if self.data.get('action') == 'lower':
-            new_value = tag_value.lower()
-        elif self.data.get('action') == 'upper':
-            new_value = tag_value.upper()
-        elif self.data.get('action') == 'title':
-            new_value = tag_value.title()
-        elif self.data.get('action') == 'strip' and self.data.get('value'):
-            new_value = tag_value.strip(self.data.get('value'))
-        else:
-            self.log.error(
-                "%s is an invalid action type" % (self.data.get('action')))
-
         self.create_tag(
             c,
             [r[self.id_key] for r in resource_set if len(
                 r.get('Tags', [])) < 50],
-            key, new_value)
+            key, tag_value)
 
     def create_set(self, instances):
         key = self.data.get('key', None)
@@ -642,8 +651,18 @@ class NormalizeTag(Action):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for r in resource_set:
-                futures.append(
-                    w.submit(self.process_transform, r, resource_set[r]))
+                new_value = False
+                if self.data.get('action') == 'lower' and not r.islower():
+                    new_value = r.lower()
+                elif self.data.get('action') == 'upper' and not r.isupper():
+                    new_value = r.upper()
+                elif self.data.get('action') == 'title' and not r.istitle():
+                    new_value = r.title()
+                elif self.data.get('action') == 'strip' and self.data.get('value') and self.data.get('value') in r:
+                    new_value = r.strip(self.data.get('value'))
+                if new_value:
+                    futures.append(
+                        w.submit(self.process_transform, new_value, resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(

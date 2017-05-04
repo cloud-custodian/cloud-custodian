@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "entities": [
+            {
+                "entityValue": "vol-12345", 
+                "lastUpdatedTime": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 57, 
+                    "microsecond": 255000, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 18
+                }, 
+                "tags": {
+                    "K": "V"
+                }, 
+                "eventArn": "arn:aws:health:us-east-1::event/EBS_12345678-1234-1234-1234-123456789012", 
+                "statusCode": "IMPAIRED"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8323a5f0-ff65-11e6-a2b7-a95efeece90c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8323a5f0-ff65-11e6-a2b7-a95efeece90c", 
+                "date": "Thu, 02 Mar 2017 16:30:14 GMT", 
+                "content-length": "579", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

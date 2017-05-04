@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 51
+                }, 
+                "Maximum": 14.0, 
+                "Unit": "Count"
+            }, 
+            {
+                "Timestamp": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 5
+                }, 
+                "Maximum": 15.0, 
+                "Unit": "Count"
+            }, 
+            {
+                "Timestamp": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 31
+                }, 
+                "Maximum": 21.0, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b6c32fa6-d771-11e6-b4ed-570c367c004b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b6c32fa6-d771-11e6-b4ed-570c367c004b", 
+                "date": "Tue, 10 Jan 2017 20:16:47 GMT", 
+                "content-length": "31611", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Label": "VolumeConsumedReadWriteOps"
+    }
+}

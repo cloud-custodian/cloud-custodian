@@ -16,6 +16,7 @@ import os
 import tempfile
 
 from unittest import TestCase
+from c7n.logs_support import _timestamp_from_string
 from c7n.ufuncs import logsub
 
 
@@ -41,9 +42,7 @@ class TestLogsub(TestCase):
     def test_message_event(self):
         event = {
             'message': 'This is a test',
-            'timestamp': 1234567891011,
+            'timestamp': _timestamp_from_string('Fri Feb 13 18:31:31 2009'),
         }
         msg = logsub.message_event(event)
-        # self.assertEqual(msg, 'Fri Feb 13 18:31:31 2009: This is a test')
-        self.assertIn('Fri Feb 13', msg)
-        self.assertIn('2009: This is a test', msg)
+        self.assertEqual(msg, 'Fri Feb 13 18:31:31 2009: This is a test')

@@ -17,10 +17,10 @@ from setuptools import setup
 setup(
     name="c7n_sentry",
     version='0.1',
-    description="Cloud Custodian - Salactus S3",
+    description="Cloud Custodian - Sentry",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +30,3 @@ setup(
             'c7n-sentry = c7n_sentry.c7nsentry:main']},
     install_requires=["c7n"],
 )
-

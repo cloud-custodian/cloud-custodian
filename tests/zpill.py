@@ -146,6 +146,9 @@ class PillTest(unittest.TestCase):
     placebo_dir = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', 'placebo')
 
+    output_dir = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), 'data', 'output')
+
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
         self.assertEqual(value, expected)

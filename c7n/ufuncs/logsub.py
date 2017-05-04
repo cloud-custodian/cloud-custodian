@@ -96,10 +96,6 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
     """
 
     # Lazy import to avoid runtime dependency
-    import inspect
-    import os
-
-    import c7n
     from c7n.mu import (
         LambdaFunction, PythonPackageArchive, CloudWatchLogSubscription)
 
@@ -115,13 +111,8 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
             CloudWatchLogSubscription(
                 session_factory, log_groups, pattern)])
 
-    archive = PythonPackageArchive(
-        # Directory to lambda file
-        os.path.join(
-            os.path.dirname(inspect.getabsfile(c7n)), 'ufuncs', 'logsub.py'),
-        # Don't include virtualenv deps
-        lib_filter=lambda x, y, z: ([], []))
-    archive.create()
+    archive = PythonPackageArchive()
+    archive.add_py_file(__file__)
     archive.add_contents(
         'config.json', json.dumps({
             'topic': sns_topic,

@@ -25,6 +25,9 @@ class RelatedResourceFilter(ValueFilter):
     AnnotationKey = None
     FetchThreshold = 10
 
+    def get_permissions(self):
+        return self.get_resource_manager().get_permissions()
+
     def validate(self):
         name = self.__class__.__name__
         if self.RelatedIdsExpression is None:

@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Unsuccessful": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "991570d1-456d-4c5f-b052-b47ae6b474e5", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 18 Feb 2017 23:37:35 GMT"
+            }
+        }, 
+        "FlowLogIds": [
+            "fl-61d73b08"
+        ], 
+        "ClientToken": "pYLcwXrA2A01+LCeGg1dKukbv/g1tBAqEudqlBxTsfI="
+    }
+}

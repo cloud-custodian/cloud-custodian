@@ -58,7 +58,7 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager).validate()
 
 
-class BaseAction(object):
+class Action(object):
 
     permissions = ()
     metrics = ()
@@ -66,13 +66,16 @@ class BaseAction(object):
     log = logging.getLogger("custodian.actions")
 
     executor_factory = ThreadPoolExecutor
-
+    permissions = ()
     schema = {'type': 'object'}
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
+
+    def get_permissions(self):
+        return self.permissions
 
     def validate(self):
         return self
@@ -82,11 +85,8 @@ class BaseAction(object):
         return self.__class__.__name__.lower()
 
     def process(self, resources):
-        raise NotImplemented(
+        raise NotImplementedError(
             "Base action class does not implement behavior")
-
-    def get_permissions(self):
-        return self.permissions
 
     def _run_api(self, cmd, *args, **kw):
         try:
@@ -100,16 +100,17 @@ class BaseAction(object):
                         self.__class__.__name__.lower()))
             raise
 
-Action = BaseAction
+
+BaseAction = Action
 
 
-class ModifyVpcSecurityGroupsAction(BaseAction):
+class ModifyVpcSecurityGroupsAction(Action):
     """Common actions for modifying security groups on a resource
-    
+
     Can target either physical groups as a list of group ids or
     symbolic groups like 'matched' or 'all'. 'matched' uses
     the annotations of the 'security-group' interface filter.
-    
+
     Note an interface always gets at least one security group, so
     we mandate the specification of an isolation/quarantine group
     that can be specified if there would otherwise be no groups.
@@ -119,77 +120,31 @@ class ModifyVpcSecurityGroupsAction(BaseAction):
         remove: [] | matched
         isolation-group: sg-xyz
     """
-
-    schema = utils.type_schema(
-        'modify-security-groups',
-        **{
-        'add': {'oneOf': [{'type': 'string', 'pattern': '^sg-*'},
-                          {'type': 'array', 'items': {
-                              'pattern': '^sg-*',
-                              'type': 'string'}}]},
-        'remove': {'oneOf': [
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}},
-            {'enum': ['matched', 'all',
-                      {'type': 'string', 'pattern': '^sg-*'}]}]},
-        'isolation-group': {
-            'oneOf': [
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-security-groups']},
+            'add': {'oneOf': [
                 {'type': 'string', 'pattern': '^sg-*'},
-                {'type': 'array', 'items': {'type': 'string', 'pattern': '^sg-*'}}]}
+                {'type': 'array', 'items': {
+                    'pattern': '^sg-*',
+                    'type': 'string'}}]},
+            'remove': {'oneOf': [
+                {'type': 'array', 'items': {
+                    'type': 'string', 'pattern': '^sg-*'}},
+                {'enum': [
+                    'matched', 'all',
+                    {'type': 'string', 'pattern': '^sg-*'}]}]},
+            'isolation-group': {'oneOf': [
+                {'type': 'string', 'pattern': '^sg-*'},
+                {'type': 'array', 'items': {
+                    'type': 'string', 'pattern': '^sg-*'}}]}},
+        'oneOf': [
+            {'required': ['isolation-group', 'remove']},
+            {'required': ['add', 'remove']},
+            {'required': ['add']}]
         }
-    )
-
-    def validate(self):
-        """ Validate the schema for modify-security-groups action
-
-        Must specify 'add' or 'remove' parameters.
-
-        If 'remove' is specified, one of 'add' or 'isolation-group' must also
-        be specified in the event that the 'remove' operation marks all extant
-        security groups on the interface for removal.
-
-        Valid input types:
-        'add': list, string
-        'remove': list, string, keywords: 'matched' or 'all'
-        'isolation-group': list, string
-
-        """
-        # must specify add and remove params
-        if 'add' not in self.data and 'remove' not in self.data:
-            raise ValueError(
-                "Must specify either 'add' or 'remove' parameters")
-        if 'remove' in self.data:
-            # need 'add' or 'isolation-group'
-            if 'isolation-group' not in self.data and 'add' not in self.data:
-                raise ValueError(
-                    "Must specify 'isolation-group' or 'add\' parameters "
-                    "when using the 'remove' action")
-            # type validation
-            if isinstance(self.data['remove'], basestring):
-                if ('sg-' not in self.data['remove'] and
-                    'all' not in self.data['remove'] and
-                    'matched' not in self.data['remove']):
-                    raise ValueError(
-                        "Must specify valid input for the 'remove' parameter")
-            if isinstance(self.data['remove'], list) and any(
-                    'sg-' not in g for g in self.data['remove']):
-                raise ValueError(
-                    "Must specify valid security group ids "
-                    "for the 'remove' parameter")
-        # type validations: str with 'sg-' or list with all 'sg-' strs
-        if 'add' in self.data:
-            if isinstance(self.data['add'], basestring) and 'sg-' not in self.data['add']:
-                raise ValueError('Must specify a valid security group id for the \'add\' parameter')
-            if isinstance(self.data['add'], list) and any('sg-' not in g for g in self.data['add']):
-                raise ValueError('Must specify valid security group ids for the \'add\' parameter')
-        if 'isolation-group' in self.data:
-            if isinstance(self.data['isolation-group'], basestring) and 'sg-' not in self.data['isolation-group']:
-                raise ValueError('Must specify a valid security group id for the \'isolation-group\' parameter')
-            if isinstance(self.data['isolation-group'], list) and any('sg-' not in g for g in self.data['isolation-group']):
-                raise ValueError(
-                    "Must specify valid security group ids "
-                    "for the 'isolation-group' parameter")
-
-        return self
 
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
@@ -319,6 +274,13 @@ class LambdaInvoke(EventAction):
         batch_size={'type': 'integer'},
         required=('function',))
 
+    def get_permissions(self):
+        if self.data.get('async', True):
+            return ('lambda:InvokeAsync',)
+        return ('lambda:Invoke',)
+
+    permissions = ('lambda:InvokeFunction',)
+
     def process(self, resources, event=None):
         client = utils.local_session(
             self.manager.session_factory).client('lambda')
@@ -391,16 +353,30 @@ class Notify(EventAction):
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
             'transport': {
-                'type': 'object',
-                'required': ['type', 'queue'],
-                'properties': {
-                    'queue': {'type': 'string'},
-                    'region': {'type': 'string'},
-                    'type': {'enum': ['sqs']}}
+                'oneOf': [
+                    {'type': 'object',
+                     'required': ['type', 'queue'],
+                     'properties': {
+                         'queue': {'type': 'string'},
+                         'type': {'enum': ['sqs']}}},
+                    {'type': 'object',
+                     'required': ['type', 'topic'],
+                     'properties': {
+                         'topic': {'type': 'string'},
+                         'type': {'enum': ['sns']},
+                         }}]
             }
         }
     }
+
     batch_size = 250
+
+    def get_permissions(self):
+        if self.data.get('transport', {}).get('type') == 'sns':
+            return ('sns:Publish',)
+        if self.data.get('transport', {'type': 'sqs'}).get('type') == 'sqs':
+            return ('sqs:SendMessage',)
+        return ()
 
     def process(self, resources, event=None):
         aliases = self.manager.session_factory().client(
@@ -421,6 +397,17 @@ class Notify(EventAction):
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)
+        elif self.data['transport']['type'] == 'sns':
+            return self.send_sns(message)
+
+    def send_sns(self, message):
+        topic = self.data['transport']['topic']
+        region = topic.split(':', 5)[3]
+        client = self.manager.session_factory(region=region).client('sns')
+        client.publish(
+            TopicArn=topic,
+            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
+            )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -484,11 +471,15 @@ class AutoTagUser(EventAction):
            }
     )
 
+    def get_permissions(self):
+        return self.manager.action_registry.get(
+            'tag')({}, self.manager).get_permissions()
+
     def validate(self):
         if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
             raise ValueError("Auto tag owner requires an event")
         if self.manager.action_registry.get('tag') is None:
-            raise ValueError("Resources does not support tagging")
+            raise ValueError("Resource does not support tagging")
         return self
 
     def process(self, resources, event):

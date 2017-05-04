@@ -63,7 +63,8 @@ Features
 Links
 #####
 
-- `Docs <http://www.capitalone.io/cloud-custodian/>`_
+- `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
+- `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
 - `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
 
 
@@ -72,9 +73,15 @@ Quick Install
 
 ::
 
-  $ virtualenv custodian
+  $ virtualenv --python=python2 custodian
   $ source custodian/bin/activate
-  $ pip install c7n
+  (custodian) $ pip install c7n
+
+(Note that Custodian's `Lambda features
+<http://www.capitalone.io/cloud-custodian/docs/policy/lambda.html>`_ currently
+`do not work <https://github.com/capitalone/cloud-custodian/issues/193>`_
+outside of a virtualenv.)
+
 
 Usage
 #####
@@ -109,7 +116,7 @@ First a policy file needs to be created in YAML format, as an example::
 
   - name: tag-compliance
     resource: ec2
-    description:
+    description: |
       Schedule a resource that does not meet tag compliance policies
       to be stopped in four days.
     filters:
@@ -128,14 +135,14 @@ First a policy file needs to be created in YAML format, as an example::
 Given that, you can run cloud-custodian with::
 
   # Validate the configuration (note this happens by default on run)
-  $ custodian validate -c policy.yml
+  $ custodian validate policy.yml
 
   # Dryrun on the policies (no actions executed) to see what resources
   # match each policy.
-  $ custodian run --dryrun -c policy.yml -s out
+  $ custodian run --dryrun -s out policy.yml
 
   # Run the policy
-  $ custodian run -c policy.yml -s out
+  $ custodian run -s out policy.yml
 
 
 Custodian supports a few other useful subcommands and options, including

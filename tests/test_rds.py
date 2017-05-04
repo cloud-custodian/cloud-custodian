@@ -11,9 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
+import json
 import logging
+import os
+import re
 import time
+import uuid
+from collections import OrderedDict
 
+import boto3
 from common import BaseTest
 
 from c7n.executor import MainThreadExecutor
@@ -35,6 +42,34 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rds_autopatch_with_window(self):
+        window = 'mon:23:00-tue:01:00'
+
+        session_factory = self.replay_flight_data('test_rds_auto_patch_with_window')
+        p = self.load_policy({
+            'name': 'rds-tags',
+            'resource': 'rds',
+            'filters': [{
+                'AutoMinorVersionUpgrade': False,
+                }],
+            'actions': [{
+                    'type': 'auto-patch',
+                    'minor': True,
+                    'window': window,
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        rds = session_factory().client('rds')
+        details = rds.describe_db_instances(
+            DBInstanceIdentifier=resources[0]['DBInstanceIdentifier'])
+        details = details['DBInstances'][0]
+
+        self.assertTrue(details['AutoMinorVersionUpgrade'])
+        self.assertEqual(details['PreferredMaintenanceWindow'], window)
 
     def test_rds_tags(self):
         session_factory = self.replay_flight_data('test_rds_tags')
@@ -648,38 +683,43 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_rds_remove_matched_security_groups(self):
         #
         # Test conditions:
-        #    - running 2 Aurora DB clusters in default VPC with 2 instances each
+        #    - running 2 Aurora DB clusters in default VPC with 2 instances
+        #      each.
         #        - translates to 4 actual instances
         #    - a default security group with id 'sg-7a3fcb13' exists
-        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to one set of DB instances
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to one set of DB instances
         #        - translates to 2 instances marked non-compliant
         #
         # Results in 4 DB Instances with default Security Group attached
 
-        session_factory = self.replay_flight_data('test_rds_remove_matched_security_groups')
-        client = session_factory().client('rds', region_name='ca-central-1')
-
+        session_factory = self.replay_flight_data(
+            'test_rds_remove_matched_security_groups')
         p = self.load_policy(
             {'name': 'rds-remove-matched-security-groups',
              'resource': 'rds',
              'filters': [
-                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+                 {'type': 'security-group',
+                  'key': 'GroupName',
+                  'value': '(.*PROD-ONLY.*)',
+                  'op': 'regex'}],
              'actions': [
-                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': 'sg-7a3fcb13'}]
+                 {'type': 'modify-security-groups',
+                  'remove': 'matched',
+                  'isolation-group': 'sg-7a3fcb13'}]
              },
-        session_factory=session_factory)
+            session_factory=session_factory)
         clean_p = self.load_policy(
             {'name': 'rds-verify-remove-matched-security-groups',
              'resource': 'rds',
              'filters': [
-                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}]
+                 {'type': 'security-group',
+                  'key': 'GroupName',
+                  'value': 'default'}]
              },
-        session_factory=session_factory)
+            session_factory=session_factory)
 
         resources = p.run()
-
-        waiter = client.get_waiter('db_instance_available')
-        waiter.wait()
         clean_resources = clean_p.run()
 
         # clusters autoscale across AZs, so they get -001, -002, etc appended
@@ -696,40 +736,46 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # Test conditions:
         #   - running 2 Aurora DB clusters in default VPC with 2 instances each
         #        - translates to 4 actual instances
-        #    - a default security group with id 'sg-7a3fcb13' exists - attached to all instances
-        #    - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 2/4
-        #      instances
+        #    - a default security group with id 'sg-7a3fcb13' exists -
+        #      attached to all instances
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to 2/4 instances
         #        - translates to 2 instances marked to get new group attached
         #
-        # Results in 4 instances with default Security Group and PROD-ONLY-Test-Security-Group
-        session_factory = self.replay_flight_data('test_rds_add_security_group')
-        client = session_factory().client('rds', region_name='ca-central-1')
-
+        # Results in 4 instances with default Security Group and
+        # PROD-ONLY-Test-Security-Group
+        session_factory = self.replay_flight_data(
+            'test_rds_add_security_group')
         p = self.load_policy({
             'name': 'add-sg-to-prod-rds',
             'resource': 'rds',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'value', 'key': 'DBInstanceIdentifier', 'value': 'test-sg-fail.*', 'op': 'regex'}
+                {'type': 'security-group',
+                 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'value',
+                 'key': 'DBInstanceIdentifier',
+                 'value': 'test-sg-fail.*', 'op': 'regex'}
             ],
             'actions': [
                 {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
             ]
         },
-        session_factory=session_factory)
+            session_factory=session_factory)
+
         clean_p = self.load_policy({
             'name': 'validate-add-sg-to-prod-rds',
             'resource': 'rds',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'PROD-ONLY-Test-Security-Group'}
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'PROD-ONLY-Test-Security-Group'}
             ]
         },
-        session_factory=session_factory)
+            session_factory=session_factory)
 
         resources = p.run()
-        waiter = client.get_waiter('db_instance_available')
-        waiter.wait()
         clean_resources = clean_p.run()
 
         self.assertEqual(len(resources), 2)
@@ -738,3 +784,150 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources[0]['VpcSecurityGroups']), 2)
         self.assertEqual(len(clean_resources), 4)
 
+
+class TestHealthEventsFilter(BaseTest):
+    def test_rds_health_events_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_health_events_filter')
+        policy = self.load_policy({
+            'name': 'rds-health-events-filter',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'health-event'}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+
+class Resize(BaseTest):
+
+    def get_waiting_client(self, session_factory, session, name):
+        if session_factory.__name__ == '<lambda>':  # replaying
+            return None
+        else:                                       # recording
+            return boto3.Session(region_name=session.region_name).client(name)
+
+    def get_dbid(self, recording, flight_data):
+        if recording:
+            return 'test-' + str(uuid.uuid4())
+        else:
+            pill_path = os.path.join(os.path.dirname(__file__), 'data',
+                'placebo', flight_data, 'rds.CreateDBInstance_1.json')
+            pill = json.load(open(pill_path))
+            return pill['data']['DBInstance']['DBInstanceIdentifier']
+
+    def install_modification_pending_waiter(self, waiters):
+        if 'DBInstanceModificationPending' in waiters:
+            return
+        pattern = waiters['DBInstanceAvailable']
+        acceptors = [OrderedDict(eg) for eg in pattern['acceptors'][1:]]
+        acceptors.insert(0, OrderedDict(
+            expected=True,
+            matcher='path',
+            state='success',
+            argument='!!length(DBInstances[].PendingModifiedValues)'))
+        waiter = OrderedDict(pattern)
+        waiter['acceptors'] = acceptors
+        waiters['DBInstanceModificationPending'] = waiter
+
+    def install_modifying_waiter(self, waiters):
+        if 'DBInstanceModifying' in waiters:
+            return
+        pattern = waiters['DBInstanceAvailable']
+        acceptors = [OrderedDict(eg) for eg in pattern['acceptors']]
+        acceptors[0]['expected'] = 'modifying'
+        waiter = OrderedDict(pattern)
+        waiter['acceptors'] = acceptors
+        waiters['DBInstanceModifying'] = waiter
+
+    def install_waiters(self, client):
+        # Not provided by boto otb.
+        client._get_waiter_config()  # primes cache if needed
+        waiters = client._cache['waiter_config']['waiters']
+        self.install_modification_pending_waiter(waiters)
+        self.install_modifying_waiter(waiters)
+
+    def wait_until(self, client, dbid, status):
+        if client is None:
+            return  # We're in replay mode. Don't bother waiting.
+        self.install_waiters(client)
+        waiter = client.get_waiter('db_instance_'+status)
+        waiter.wait(Filters=[{'Name': 'db-instance-id', 'Values': [dbid]}])
+
+    def create_instance(self, client, dbid, gb=5):
+        client.create_db_instance(
+            Engine='mariadb',
+            DBInstanceIdentifier=dbid,
+            DBInstanceClass='db.r3.large',
+            MasterUsername='eric',
+            MasterUserPassword='cheese42',
+            StorageType='gp2',
+            AllocatedStorage=gb,
+            BackupRetentionPeriod=0)  # disable automatic backups
+        def delete():
+            client.delete_db_instance(
+                DBInstanceIdentifier=dbid,
+                SkipFinalSnapshot=True)
+        self.addCleanup(delete)
+        return dbid
+
+    @staticmethod
+    def get_window_now():
+        start = datetime.datetime.utcnow()
+        end = start + datetime.timedelta(seconds=60*60)  # hour long
+        fmt = '%a:%H:%M'
+        return '{}-{}'.format(start.strftime(fmt), end.strftime(fmt))
+
+    def test_can_get_a_window_now(self):
+        assert re.match(r'[A-Za-z]{3}:\d\d:\d\d', self.get_window_now())
+
+
+    def start(self, flight_data):
+        session_factory = self.replay_flight_data(flight_data)
+        session = session_factory(region='us-west-2')
+        client = session.client('rds')
+        waiting_client = self.get_waiting_client(session_factory, session, 'rds')
+        dbid = self.get_dbid(bool(waiting_client), flight_data)
+        self.create_instance(client, dbid)
+
+        wait_until = lambda state: self.wait_until(waiting_client, dbid, state)
+        wait_until('available')
+
+        describe = lambda: client.describe_db_instances(
+            DBInstanceIdentifier=dbid)['DBInstances'][0]
+
+        def resize(**kw):
+            action = {'type': 'resize', 'percent': 10}
+            action.update(kw)
+            policy = self.load_policy({
+                'name': 'rds-resize-up',
+                'resource': 'rds',
+                'filters': [{'type': 'value',
+                    'key': 'DBInstanceIdentifier', 'value': dbid}],
+                'actions': [action]},
+                config={'region': 'us-west-2'},
+                session_factory=session_factory)
+            policy.run()
+
+        return client, dbid, resize, wait_until, describe
+
+    def test_can_resize_up_asynchronously(self):
+        flight = 'test_rds_resize_up_asynchronously'
+        client, dbid, resize, wait_until, describe = self.start(flight)
+        resize()
+        wait_until('modification_pending')
+        client.modify_db_instance(
+            DBInstanceIdentifier=dbid,
+            PreferredMaintenanceWindow=self.get_window_now())
+        wait_until('modifying')
+        wait_until('available')
+        self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
+
+    def test_can_resize_up_immediately(self):
+        flight = 'test_rds_resize_up_immediately'
+        _, _, resize, wait_until, describe  = self.start(flight)
+        resize(immediate=True)
+        wait_until('modifying')
+        wait_until('available')
+        self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte

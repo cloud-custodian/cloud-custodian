@@ -35,7 +35,7 @@ def debug(f):
     def _f(*args, **kw):
         try:
             f(*args, **kw)
-        except (SystemExit, KeyboardInterrupt) as e:
+        except (SystemExit, KeyboardInterrupt):
             raise
         except:
             import traceback, sys, pdb
@@ -110,7 +110,6 @@ def reset(dbpath):
         click.echo('Abort!')
     else:
         click.echo('Invalid input :(')
-
 
 
 @cli.command()
@@ -234,7 +233,7 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
 
 @cli.command()
 def queues():
-    """Reeport on progress by queues."""
+    """Report on progress by queues."""
     conn = worker.connection
     failure_q = None
 

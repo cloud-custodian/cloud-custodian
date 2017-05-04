@@ -20,8 +20,8 @@ class Database(object):
         for k in self.data['bucket-size'].keys():
             a, b = k.split(':')
             accounts.setdefault(a, []).append(k)
-        return [Account(a, [Bucket(b, self.data) for b in buckets])
-                for a, buckets in accounts.items()]
+        return [Account(aa, [Bucket(bb, self.data) for bb in buckets])
+                for aa, buckets in accounts.items()]
 
     def buckets(self, accounts=()):
         if accounts:
@@ -89,15 +89,15 @@ class Bucket(object):
 
     @property
     def size(self):
-        return self.data['bucket-size'].get(self.bucket_id, 0.0)
+        return int(self.data['bucket-size'].get(self.bucket_id, 0.0))
 
     @property
     def matched(self):
-        return self.data['keys-matched'].get(self.bucket_id, 0.0)
+        return int(self.data['keys-matched'].get(self.bucket_id, 0.0))
 
     @property
     def scanned(self):
-        return self.data['keys-scanned'].get(self.bucket_id, 0.0)
+        return int(self.data['keys-scanned'].get(self.bucket_id, 0.0))
 
     @property
     def percent_scanned(self):
@@ -111,11 +111,11 @@ class Bucket(object):
 
     @property
     def partitions(self):
-        return self.data['bucket-partitions'].get(self.bucket_id, 0.0)
+        return int(self.data['bucket-partitions'].get(self.bucket_id, 0.0))
 
     @property
     def keys_denied(self):
-        return self.data['keys-denied'].get(self.bucket_id, 0)
+        return int(self.data['keys-denied'].get(self.bucket_id, 0))
 
     @property
     def denied(self):
@@ -124,10 +124,6 @@ class Bucket(object):
     @property
     def error_count(self):
         return len(self.data['buckets-error'].get(self.bucket_id, ()))
-
-    @property
-    def partitions(self):
-        return self.data['bucket-partitions'].get(self.bucket_id, 0)
 
 
 def get_data():

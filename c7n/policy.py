@@ -40,8 +40,9 @@ from c7n.resources import load_resources
 
 
 def load(options, path, format='yaml', validate=True):
+    # should we do os.path.expanduser here?
     if not os.path.exists(path):
-        raise ValueError("Invalid path for config %r" % path)
+        raise IOError("Invalid path for config %r" % path)
 
     load_resources()
     with open(path) as fh:
@@ -50,6 +51,11 @@ def load(options, path, format='yaml', validate=True):
         elif format == 'json':
             data = utils.loads(fh.read())
             validate = False
+
+    # Test for empty policy file
+    if not data or data.get('policies') is None:
+        return None
+            
     if validate:
         from c7n.schema import validate
         errors = validate(data)
@@ -64,29 +70,60 @@ class PolicyCollection(object):
         self.data = data
         self.options = options
 
-    def policies(self, filters=None, resource_type=None):
-        # self.options is the CLI options specified in cli.setup_parser()
-        policies = []
+        # We store all the policies passed in so we can refilter later
+        self._all_policies = []
         for p in self.data.get('policies', []):
-            policy = Policy(p, self.options)
-            if 'resource_type' in self.options and self.options.resource_type:
-                if policy.resource_type == self.options.resource_type:
-                    policies.append(policy)
-            else:
-                policies.append(policy)
+            self._all_policies.append(
+                Policy(p, options, session_factory=self.test_session_factory()))
+        
+        # Do an initial filtering
+        self.policies = []
+        resource_type = getattr(self.options, 'resource_type', None)
+        policy_name = getattr(self.options, 'policy_filter', None)
+        self.policies = self.filter(policy_name, resource_type)
 
-        if not filters:
-            return policies
+    @property
+    def unfiltered_policies(self):
+        return self._all_policies
 
-        return [p for p in policies if fnmatch.fnmatch(p.name, filters)]
+    def filter(self, policy_name=None, resource_type=None):
+        policies = []
+        for policy in self.unfiltered_policies:
+            if resource_type:
+                if policy.resource_type != resource_type:
+                    continue
 
-    filter = policies
+            if policy_name:
+                if not fnmatch.fnmatch(policy.name, policy_name):
+                    continue
 
+            policies.append(policy)
+
+        return policies
+    
     def __iter__(self):
-        return iter(self.policies())
+        return iter(self.policies)
 
     def __contains__(self, policy_name):
-        return policy_name in [p['name'] for p in self.data['policies']]
+        for p in self.policies:
+            if p.name == policy_name:
+                return True
+        return False
+
+    def __len__(self):
+        return len(self.policies)
+
+    @property
+    def resource_types(self):
+        """resource types used by the collection."""
+        rtypes = set()
+        for p in self.policies:
+            rtypes.add(p.resource_type)
+        return rtypes
+
+    def test_session_factory(self):
+        """ For testing: patched by tests to use a custom session_factory """
+        return None
 
 
 class PolicyExecutionMode(object):
@@ -167,7 +204,7 @@ class PullMode(PolicyExecutionMode):
             self.policy.log.info(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
-                self.policy.options.region,
+                self.policy.options.region or 'default',
                 version)
 
             s = time.time()
@@ -268,8 +305,8 @@ class LambdaMode(PolicyExecutionMode):
         mode = self.policy.data.get('mode', {})
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
-            raise ValueError("Unknown push event mode %s" % self.data)
-        self.policy.log.info('Found resource ids: %s' % resource_ids)
+            raise ValueError("Unknown push event mode %s", self.data)
+        self.policy.log.info('Found resource ids: %s', resource_ids)
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:
@@ -507,6 +544,23 @@ class Policy(object):
     def get_metrics(self, start, end, period):
         mode = self.get_execution_mode()
         return mode.get_metrics(start, end, period)
+
+    def get_permissions(self):
+        """get permissions needed by this policy"""
+        permissions = set()
+        permissions.update(self.resource_manager.get_permissions())
+        for f in self.resource_manager.filters:
+            permissions.update(f.get_permissions())
+        for a in self.resource_manager.actions:
+            permissions.update(a.get_permissions())
+        return permissions
+
+    def validate(self):
+        """validate settings, else raise validation error"""
+        for f in self.resource_manager.filters:
+            f.validate()
+        for a in self.resource_manager.actions:
+            a.validate()
 
     def __call__(self):
         """Run policy in default mode"""

@@ -26,7 +26,7 @@ class SQS(QueryResourceManager):
         service = 'sqs'
         type = 'queue'
         enum_spec = ('list_queues', 'QueueUrls', None)
-        detail_spec = ('get_queue_attributes', 'QueueUrl', 'QueueUrl')
+        detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
         filter_name = 'QueueNamePrefix'
         filter_type = 'scalar'
@@ -39,6 +39,11 @@ class SQS(QueryResourceManager):
             'CreatedTimestamp',
             'ApproximateNumberOfMessages',
         )
+
+    def get_permissions(self):
+        perms = super(SQS, self).get_permissions()
+        perms.append('sqs:GetQueueAttributes')
+        return perms
 
     def augment(self, resources):
 
@@ -62,4 +67,6 @@ class SQS(QueryResourceManager):
             return filter(None, w.map(_augment, resources))
 
 
-SQS.filter_registry.register('cross-account', CrossAccountAccessFilter)
+@SQS.filter_registry.register('cross-account')
+class SQSCrossAccount(CrossAccountAccessFilter):
+    permissions = ('sqs:GetQueueAttributes',)

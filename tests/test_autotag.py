@@ -95,3 +95,18 @@ class AutoTagCreator(BaseTest):
             session, InstanceIds=[resources[0]['InstanceId']])
         tags = {t['Key']: t['Value'] for t in instances[0]['Tags']}
         self.assertEqual(tags['Owner'], 'Bob')
+
+    def test_error_auto_tag_bad_mode(self):
+        # mode type is not cloudtrail
+        self.assertRaises(ValueError,
+            self.load_policy, {
+                'name': 'auto-tag-error',
+                'resource': 'ec2',
+                'mode': {
+                    'type': 'not-cloudtrail',
+                    'events': ['RunInstances']},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'update': True,
+                     'tag': 'Owner'}]
+            }, session_factory=None, validate=False)

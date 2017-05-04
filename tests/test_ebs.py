@@ -261,3 +261,40 @@ class EbsFaultToleranceTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VolumeId'], 'vol-abdb8d37')
+
+class PiopsMetricsFilterTest(BaseTest):
+
+    def test_ebs_metrics_percent_filter(self):
+        session = self.replay_flight_data('test_ebs_metrics_percent_filter')
+        policy = self.load_policy({
+            'name': 'ebs-unused-piops',
+            'resource': 'ebs',
+            'filters': [{
+                'type': 'metrics',
+                'name': 'VolumeConsumedReadWriteOps',
+                'op': 'lt',
+                'value': 50,
+                'statistics': 'Maximum',
+                'days': 1,
+                'percent-attr': 'Iops'}]
+            }, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources),1)
+
+
+class HealthEventsFilterTest(BaseTest):
+    def test_ebs_health_events_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ebs_health_events_filter')
+        policy = self.load_policy({
+            'name': 'ebs-health-events-filter',
+            'resource': 'ebs',
+            'filters': [{
+                'type': 'health-event',
+                'types': ['AWS_EBS_VOLUME_LOST']}]
+                }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue(('c7n:HealthEvent' in r) and
+                            ('Description' in e for e in r['c7n:HealthEvent']))

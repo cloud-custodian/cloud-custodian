@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
+# PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
+# is failing, move this above the license)
+
+import argcomplete
 import argparse
 import importlib
 import logging
@@ -22,7 +27,17 @@ import traceback
 from datetime import datetime
 from dateutil.parser import parse as date_parse
 
+try:
+    from setproctitle import setproctitle
+except ImportError:
+    setproctitle = lambda t: None
+
+from c7n.commands import schema_completer
+from c7n.utils import get_account_id_from_sts
+
 DEFAULT_REGION = 'us-east-1'
+
+log = logging.getLogger('custodian.cli')
 
 
 def _default_options(p, blacklist=""):
@@ -45,9 +60,11 @@ def _default_options(p, blacklist=""):
                           help="Role to assume")
 
     config = p.add_argument_group(
-        "config", "Policy config file and policy selector")
-    config.add_argument("-c", "--config", required=True,
-                        help="Policy Configuration File")
+        "config", "Policy config file(s) and policy selectors")
+    # -c is deprecated.  Supported for legacy reasons
+    config.add_argument("-c", "--config", help=argparse.SUPPRESS)
+    config.add_argument("configs", nargs='*',
+                          help="Policy configuration file(s)")
     config.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
@@ -80,6 +97,34 @@ def _default_options(p, blacklist=""):
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
 
 
+def _default_region(options):
+    marker = object()
+    value = getattr(options, 'region', marker)
+    if value is marker:
+        return
+
+    if value is not None:
+        return
+
+    profile = getattr(options, 'profile', None)
+    try:
+        import boto3
+        options.region = boto3.Session(profile_name=profile).region_name
+        log.debug("using default region:%s from boto" % options.region)
+    except:
+        return
+
+
+def _default_account_id(options):
+    profile = getattr(options, 'profile', None)
+    try:
+        import boto3
+        session = boto3.Session(profile_name=profile)
+        options.account_id = get_account_id_from_sts(session)
+    except:
+        options.account_id = None
+
+
 def _report_options(p):
     """ Add options specific to the report subcommand. """
     _default_options(p, blacklist=['region', 'cache', 'log-group'])
@@ -97,6 +142,10 @@ def _report_options(p):
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
+    p.add_argument(
+        '--format', default='csv', choices=['csv', 'grid', 'simple'],
+        help="Format to output data in (default: %(default)s). "\
+            "Options include simple, grid, rst")
 
     # We don't include `region` because the report command ignores it
     p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
@@ -134,10 +183,20 @@ def _logs_options(p):
     )
 
 
+def _schema_tab_completer(prefix, parsed_args, **kwargs):
+    # If we are printing the summary we discard the resource
+    if parsed_args.summary:
+        return []
+
+    return schema_completer(prefix)
+
+
 def _schema_options(p):
     """ Add options specific to schema subcommand. """
 
-    p.add_argument('resource', metavar='selector', nargs='?', default=None)
+    p.add_argument(
+        'resource', metavar='selector', nargs='?',
+        default=None).completer = _schema_tab_completer
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
@@ -151,7 +210,7 @@ def _schema_options(p):
 def _dryrun_option(p):
     p.add_argument(
         "-d", "--dryrun", action="store_true",
-        help="Don't change infrastructure but verify access.")
+        help="Don't execute actions but filter resources")
 
 
 def _key_val_pair(value):
@@ -172,7 +231,9 @@ def setup_parser():
     # later on when doing post-parsing validation.
     subs = parser.add_subparsers(dest='subparser')
 
-    report_desc = "CSV report of resources that a policy matched/ran on"
+    report_desc = ("Report of resources that a policy matched/ran on. "
+                   "The default output format is csv, but other formats "
+                   "are available.")
     report = subs.add_parser(
         "report", description=report_desc, help=report_desc)
     report.set_defaults(command="c7n.commands.report")
@@ -192,19 +253,21 @@ def setup_parser():
 
     version = subs.add_parser(
         'version', help="Display installed version of custodian")
-    version.set_defaults(command=cmd_version)
+    version.set_defaults(command='c7n.commands.version_cmd')
     version.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose Logging")
+    version.add_argument(
+        "--debug", action="store_true",
+        help="Print info for bug reports")
 
     validate_desc = (
-        "Validate config files against the custodian jsonschema")
+        "Validate config files against the json schema")
     validate = subs.add_parser(
         'validate', description=validate_desc, help=validate_desc)
     validate.set_defaults(command="c7n.commands.validate")
     validate.add_argument(
-        "-c", "--config",
-        help="Policy Configuration File (old; use configs instead)")
+        "-c", "--config", help=argparse.SUPPRESS)
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
     validate.add_argument("-v", "--verbose", action="store_true",
@@ -221,6 +284,14 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
+    #access_desc = ("Show permissions needed to execute the policies")
+    #access = subs.add_parser(
+    #    'access', description=access_desc, help=access_desc)
+    #access.set_defaults(command='c7n.commands.access')
+    #_default_options(access)
+    #access.add_argument(
+    #    '-m', '--access', default=False, action='store_true')
+
     run_desc = ("Execute the policies in a config file")
     run = subs.add_parser("run", description=run_desc, help=run_desc)
     run.set_defaults(command="c7n.commands.run")
@@ -234,13 +305,9 @@ def setup_parser():
     return parser
 
 
-def cmd_version(options):
-    from c7n.version import version
-    print(version)
-
-
 def main():
     parser = setup_parser()
+    argcomplete.autocomplete(parser)
     options = parser.parse_args()
 
     level = options.verbose and logging.DEBUG or logging.INFO
@@ -250,12 +317,25 @@ def main():
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.ERROR)
 
+    # Support the deprecated -c option
+    if getattr(options, 'config', None) is not None:
+        options.configs.append(options.config)
+
+    _default_region(options)
+    _default_account_id(options)
+
     try:
         command = options.command
         if not callable(command):
             command = getattr(
                 importlib.import_module(command.rsplit('.', 1)[0]),
                 command.rsplit('.', 1)[-1])
+
+        # Set the process name to something cleaner
+        process_name = [os.path.basename(sys.argv[0])]
+        process_name.extend(sys.argv[1:])
+        setproctitle(' '.join(process_name))
+
         command(options)
     except Exception:
         if not options.debug:

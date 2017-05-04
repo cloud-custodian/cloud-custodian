@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import logging
 
 from c7n.actions import ActionRegistry, BaseAction
@@ -20,7 +21,6 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-from c7n.resources.ec2 import EC2
 from c7n.resources.asg import ASG, LaunchConfig
 
 
@@ -73,6 +73,7 @@ class Deregister(BaseAction):
     """
 
     schema = type_schema('deregister')
+    permissions = ('ec2:DeregisterImage',)
 
     def process(self, images):
         with self.executor_factory(max_workers=10) as w:
@@ -107,6 +108,7 @@ class RemoveLaunchPermissions(BaseAction):
     """
 
     schema = type_schema('remove-launch-permissions')
+    permissions = ('ec2:ResetImageAttribute',)
 
     def process(self, images):
         with self.executor_factory(max_workers=2) as w:
@@ -162,18 +164,21 @@ class ImageUnusedFilter(Filter):
 
     schema = type_schema('unused', value={'type': 'boolean'})
 
-    def _pull_asg_images(self):
-        asg_manager = ASG(self.manager.ctx, {})
-        asgs = asg_manager.resources()
-        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
+    def get_permissions(self):
+        return list(itertools.chain([
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ec2')]))
 
-        lcfg_mgr = LaunchConfig(self.manager.ctx, {})
+    def _pull_asg_images(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
         return set([
             lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
             if lcfg['LaunchConfigurationName'] in lcfgs])
 
     def _pull_ec2_images(self):
-        ec2_manager = EC2(self.manager.ctx, {})
+        ec2_manager = self.manager.get_resource_manager('ec2')
         return set([i['ImageId'] for i in ec2_manager.resources()])
 
     def process(self, resources, event=None):

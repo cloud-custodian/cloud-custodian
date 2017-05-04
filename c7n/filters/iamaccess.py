@@ -35,7 +35,7 @@ import json
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import get_account_id, local_session, type_schema
+from c7n.utils import local_session, type_schema
 
 
 class CrossAccountAccessFilter(Filter):
@@ -54,7 +54,7 @@ class CrossAccountAccessFilter(Filter):
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
     def get_accounts(self):
-        owner_id = get_account_id(local_session(self.manager.session_factory))
+        owner_id = self.manager.config.account_id
         accounts = set(self.data.get('whitelist', ()))
         if 'whitelist_from' in self.data:
             values = ValuesFrom(self.data['whitelist_from'], self.manager)
@@ -202,7 +202,10 @@ def check_cross_account(policy_text, allowed_accounts):
                         violations.append(s)
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
-            v = s['Condition']['ArnLike']['aws:SourceArn']
+            for k in ('aws:SourceArn', 'AWS:SourceArn'):
+                v = s['Condition']['ArnLike'].get(k)
+                if v:
+                    break
             v = isinstance(v, basestring) and (v,) or v
             principal_ok = True
             for arn in v:

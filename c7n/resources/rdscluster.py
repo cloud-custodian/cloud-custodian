@@ -61,6 +61,10 @@ class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager(
+            'rds-subnet-group').get_permissions()
+
     def get_related_ids(self, resources):
         group_ids = set()
         for r in resources:
@@ -70,9 +74,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        from c7n.resources.rds import RDSSubnetGroup
-        self.groups = {r['DBSubnetGroupName']: r for r in
-                       RDSSubnetGroup(self.manager.ctx, {}).resources()}
+        self.groups = {
+            r['DBSubnetGroupName']: r for r in
+            self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
 
 
@@ -105,6 +109,8 @@ class Delete(BaseAction):
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'},
                      'delete-instances': {'type': 'boolean'}})
+
+    permissions = ('rds:DeleteDBCluster',)
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
@@ -169,6 +175,7 @@ class RetentionWindow(BaseAction):
     schema = type_schema(
         'retention',
         **{'days': {'type': 'number'}})
+    permissions = ('rds:ModifyDBCluster',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
@@ -218,6 +225,7 @@ class Snapshot(BaseAction):
     """
 
     schema = type_schema('snapshot')
+    permissions = ('rds:CreateDBClusterSnapshot',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -310,6 +318,7 @@ class RDSClusterSnapshotDelete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('rds:DeleteDBClusterSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d RDS cluster snapshots", len(snapshots))

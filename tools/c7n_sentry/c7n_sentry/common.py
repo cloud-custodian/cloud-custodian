@@ -48,11 +48,3 @@ def get_accounts(options):
     else:
         accounts = account_data.values()
     return accounts
-
-
-def find_policies(accounts, matcher):
-    for a in accounts:
-        for cname, config in a['config_files'].items():
-            for p in config['policies']:
-                if matcher(p):
-                    yield (a, cname, p)

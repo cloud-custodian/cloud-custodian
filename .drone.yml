@@ -11,7 +11,7 @@ build:
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
       - python setup.py develop
-      - nosetests -s -v tests
+      - nosetests -s -v tests tools/c7n_*
 
   pypy_unit_tests:
     # just enough variation to make a matrix not viable

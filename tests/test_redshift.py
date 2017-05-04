@@ -171,16 +171,37 @@ class TestRedshift(BaseTest):
 
     def test_redshift_snapshot(self):
         factory = self.replay_flight_data('test_redshift_snapshot')
+        client = factory().client('redshift')
+        cluster_tags = []
         p = self.load_policy({
             'name': 'redshift-snapshot',
             'resource': 'redshift',
             'filters': [
-                {'ClusterIdentifier': 'aaa'}],
+                {'type': 'value',
+                 'key': 'ClusterIdentifier',
+                 'value': 'test-cluster',
+                 'op': 'eq'}],
             'actions': [
                 {'type': 'snapshot'}]},
             session_factory=factory)
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        cluster = client.describe_clusters(
+            ClusterIdentifier=resources[0]['ClusterIdentifier'])
+        id_cluster = cluster.get('Clusters')[0].get('ClusterIdentifier')
+        snapshot = client.describe_cluster_snapshots(
+            SnapshotIdentifier='backup-test-cluster-2017-01-12')
+        get_snapshots = snapshot.get('Snapshots')
+        id_snapshot = get_snapshots[0].get('ClusterIdentifier')
+        tag_snapshot = get_snapshots[0].get('Tags')
+        self.assertEqual(id_cluster, id_snapshot)
+        arn = p.resource_manager.generate_arn(
+            resources[0]['ClusterIdentifier'])
+        cluster_tags_array = client.describe_tags(ResourceName=arn)['TaggedResources']
+        for cluster_tag_elem in cluster_tags_array:
+            cluster_tags.append(cluster_tag_elem['Tag'])
+        self.assertEqual(cluster_tags, tag_snapshot)
 
     def test_redshift_vpc_routing(self):
         factory = self.replay_flight_data('test_redshift_vpc_routing')
@@ -303,40 +324,37 @@ class TestRedshiftSnapshot(BaseTest):
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_redshift_remove_matched_security_groups(self):
-        """
-        Test conditions:
-            - running 2 Redshift clusters in default VPC
-            - a default security group with id 'sg-7a3fcb13' exists
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is
-              attached to one of the clusters
-                - translates to 1 cluster marked non-compliant
-
-        Results in 2 clusters with default Security Group attached
-        """
-        session_factory = self.replay_flight_data('test_redshift_remove_matched_security_groups')
-        client = session_factory().client('redshift', region_name='ca-central-1')
-
+        # Test conditions:
+        # - running 2 Redshift clusters in default VPC
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to one of the clusters
+        #        - translates to 1 cluster marked non-compliant
+        #
+        # Results in 2 clusters with default Security Group attached
+        session_factory = self.replay_flight_data(
+            'test_redshift_remove_matched_security_groups')
         p = self.load_policy(
             {'name': 'redshift-remove-matched-security-groups',
              'resource': 'redshift',
              'filters': [
-                 {'type': 'security-group', 'key': 'GroupName', 'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
+                 {'type': 'security-group', 'key': 'GroupName',
+                  'value': '(.*PROD-ONLY.*)', 'op': 'regex'}],
              'actions': [
-                 {'type': 'modify-security-groups', 'remove': 'matched', 'isolation-group': 'sg-7a3fcb13'}]
+                 {'type': 'modify-security-groups', 'remove': 'matched',
+                  'isolation-group': 'sg-7a3fcb13'}]
              },
-        session_factory=session_factory)
+            session_factory=session_factory)
         clean_p = self.load_policy(
             {'name': 'redshift-verify-remove-matched-security-groups',
              'resource': 'redshift',
              'filters': [
-                 {'type': 'security-group', 'key': 'GroupName', 'value': 'default'}]
+                 {'type': 'security-group', 'key': 'GroupName',
+                  'value': 'default'}]
              },
-        session_factory=session_factory)
+            session_factory=session_factory)
 
         resources = p.run()
-
-        waiter = client.get_waiter('cluster_available')
-        waiter.wait()
         clean_resources = clean_p.run()
 
         # clusters autoscale across AZs, so they get -001, -002, etc appended
@@ -349,25 +367,28 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources), 2)
 
     def test_redshift_add_security_group(self):
-        """
-        Test conditions:
-            - running 2 redshift clusters in default VPC
-            - a default security group with id 'sg-7a3fcb13' exists - attached to both clusters
-            - security group named PROD-ONLY-Test-Security-Group exists in VPC and is attached to 1/2
-              clusters
-                - translates to 1 cluster marked to get new group attached
+        # Test conditions:
+        #    - running 2 redshift clusters in default VPC
+        #    - a default security group with id 'sg-7a3fcb13' exists
+        #      attached to both clusters
+        #    - security group named PROD-ONLY-Test-Security-Group exists in
+        #      VPC and is attached to 1/2 clusters
+        #        - translates to 1 cluster marked to get new group attached
+        #
+        # Results in 1 cluster with default Security Group and
+        # PROD-ONLY-Test-Security-Group
 
-        Results in 1 cluster with default Security Group and PROD-ONLY-Test-Security-Group
-        """
-        session_factory = self.replay_flight_data('test_redshift_add_security_group')
-        client = session_factory().client('redshift', region_name='ca-central-1')
+        session_factory = self.replay_flight_data(
+            'test_redshift_add_security_group')
 
         p = self.load_policy({
             'name': 'add-sg-to-prod-redshift',
             'resource': 'redshift',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'value', 'key': 'ClusterIdentifier', 'value': 'test-sg-fail.*', 'op': 'regex'}
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'value', 'key': 'ClusterIdentifier',
+                 'value': 'test-sg-fail.*', 'op': 'regex'}
             ],
             'actions': [
                 {'type': 'modify-security-groups', 'add': 'sg-6360920a'}
@@ -378,15 +399,15 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
             'name': 'validate-add-sg-to-prod-redshift',
             'resource': 'redshift',
             'filters': [
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'default'},
-                {'type': 'security-group', 'key': 'GroupName', 'value': 'PROD-ONLY-Test-Security-Group'}
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'default'},
+                {'type': 'security-group', 'key': 'GroupName',
+                 'value': 'PROD-ONLY-Test-Security-Group'}
             ]
         },
             session_factory=session_factory)
 
         resources = p.run()
-        waiter = client.get_waiter('cluster_available')
-        waiter.wait()
         clean_resources = clean_p.run()
 
         self.assertEqual(len(resources), 1)

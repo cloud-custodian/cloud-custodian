@@ -14,22 +14,22 @@
 """
 Query capability built on skew metamodel
 
-
 tags_spec -> s3, elb, rds
-
-detail_spec
-   - aws.route53.healthcheck -> health check info
-   - aws.cloudformation.stack -> stack resources
-   - aws.dymanodb.table ->
 """
+import functools
+import itertools
 import jmespath
+import json
 
 from botocore.client import ClientError
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.tags import register_tags
-from c7n.utils import local_session, get_retry
+from c7n.utils import (
+    local_session, get_retry, chunks, camelResource)
+from c7n.registry import PluginRegistry
 from c7n.manager import ResourceManager
 
 
@@ -69,7 +69,7 @@ class ResourceQuery(object):
             data = []
         return data
 
-    def get(self, resource_type, identity):
+    def get(self, resource_type, identities):
         """Get resources by identities
         """
         m = self.resolve(resource_type)
@@ -79,16 +79,16 @@ class ResourceQuery(object):
         # Try to formulate server side query
         if m.filter_name:
             if m.filter_type == 'list':
-                params[m.filter_name] = identity
+                params[m.filter_name] = identities
             elif m.filter_type == 'scalar':
-                assert len(identity) == 1, "Scalar server side filter"
-                params[m.filter_name] = identity[0]
+                assert len(identities) == 1, "Scalar server side filter"
+                params[m.filter_name] = identities[0]
         else:
             client_filter = True
 
         resources = self.filter(resource_type, **params)
         if client_filter:
-            resources = [r for r in resources if r[m.id] in identity]
+            resources = [r for r in resources if r[m.id] in identities]
 
         return resources
 
@@ -120,18 +120,136 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
+def _napi(op_name):
+    return op_name.title().replace('_', '')
+
+
+sources = PluginRegistry('sources')
+
+
+class Source(object):
+
+    def __init__(self, manager):
+        self.manager = manager
+
+
+@sources.register('describe')
+class DescribeSource(Source):
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = ResourceQuery(self.manager.session_factory)
+
+    def get_resources(self, ids, cache=True):
+        return self.query.get(self.manager.resource_type, ids)
+
+    def resources(self, query):
+        if self.manager.retry:
+            resources = self.manager.retry(
+                self.query.filter, self.manager.resource_type, **query)
+        else:
+            resources = self.query.filter(self.manager.resource_type, **query)
+        return resources
+
+    def get_permissions(self):
+        m = self.manager.get_model()
+        perms = ['%s:%s' % (m.service, _napi(m.enum_spec[0]))]
+        if getattr(m, 'detail_spec', None):
+            perms.append("%s:%s" % (m.service, _napi(m.detail_spec[0])))
+        return perms
+
+    def augment(self, resources):
+        model = self.manager.get_model()
+        if getattr(model, 'detail_spec', None):
+            detail_spec = getattr(model, 'detail_spec', None)
+            _augment = _scalar_augment
+        elif getattr(model, 'batch_detail_spec', None):
+            detail_spec = getattr(model, 'batch_detail_spec', None)
+            _augment = _batch_augment
+        else:
+            return resources
+        _augment = functools.partial(
+            _augment, self.manager, model, detail_spec)
+        with self.manager.executor_factory(
+                max_workers=self.manager.max_workers) as w:
+            results = list(w.map(
+                _augment, chunks(resources, self.manager.chunk_size)))
+            return list(itertools.chain(*results))
+
+
+@sources.register('config')
+class ConfigSource(Source):
+
+    def get_permissions(self):
+        return ["config:GetResourceConfigHistory",
+                "config:ListDiscoveredResources"]
+
+    def get_resources(self, ids, cache=True):
+        client = local_session(self.manager.session_factory).client('config')
+        results = []
+        m = self.manager.get_model()
+        for i in ids:
+            results.append(
+                camelResource(
+                    json.loads(
+                        client.get_resource_config_history(
+                            resourceId=i,
+                            resourceType=m.config_type,
+                            limit=1)[
+                                'configurationItems'][0]['configuration'])))
+        return results
+
+    def resources(self, query=None):
+        client = local_session(self.manager.session_factory).client('config')
+        paginator = client.get_paginator('list_discovered_resources')
+        pages = paginator.paginate(
+            resourceType=self.manager.get_model().config_type)
+        results = []
+        with self.manager.executor_factory(max_workers=5) as w:
+            resource_ids = [
+                r['resourceId'] for r in
+                pages.build_full_result()['resourceIdentifiers']]
+            self.manager.log.debug(
+                "querying %d %s resources",
+                len(resource_ids),
+                self.manager.__class__.__name__.lower())
+
+            for resource_set in chunks(resource_ids, 50):
+                futures = []
+                futures.append(w.submit(self.get_resources, resource_set))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.log.error(
+                            "Exception creating snapshot set \n %s" % (
+                                f.exception()))
+                    results.extend(f.result())
+        return results
+
+    def augment(self, resources):
+        return resources
+
+
 class QueryResourceManager(ResourceManager):
 
     __metaclass__ = QueryMeta
 
     resource_type = ""
-    id_field = ""
-    report_fields = []
+
     retry = None
+
+    # TODO Check if we can move to describe source
+    max_workers = 3
+    chunk_size = 20
+
+    permissions = ()
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
-        self.query = ResourceQuery(self.session_factory)
+        self.source = sources.get(self.source_type)(self)
+
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe')
 
     @classmethod
     def get_model(cls):
@@ -145,6 +263,12 @@ class QueryResourceManager(ResourceManager):
             return [i for i in ids if i.startswith(id_prefix)]
         return ids
 
+    def get_permissions(self):
+        perms = self.source.get_permissions()
+        if getattr(self, 'permissions', None):
+            perms.extend(self.permissions)
+        return perms
+
     def resources(self, query=None):
         key = {'region': self.config.region,
                'resource': str(self.__class__.__name__),
@@ -154,7 +278,7 @@ class QueryResourceManager(ResourceManager):
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (
+                   "%s.%s" % (
                         self.__class__.__module__,
                         self.__class__.__name__),
                     len(resources)))
@@ -163,12 +287,7 @@ class QueryResourceManager(ResourceManager):
         if query is None:
             query = {}
 
-        if self.retry:
-            resources = self.retry(
-                self.query.filter, self.resource_type, **query)
-        else:
-            resources = self.query.filter(self.resource_type, **query)
-        resources = self.augment(resources)
+        resources = self.augment(self.source.resources(query))
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
@@ -184,8 +303,7 @@ class QueryResourceManager(ResourceManager):
                 id_set = set(ids)
                 return [r for r in resources if r[m.id] in id_set]
         try:
-            resources = self.query.get(self.resource_type, ids)
-            resources = self.augment(resources)
+            resources = self.augment(self.source.get_resources(ids))
             return resources
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
@@ -197,9 +315,55 @@ class QueryResourceManager(ResourceManager):
         ie. we want tags by default (rds, elb), and policy, location, acl for
         s3 buckets.
         """
-        return resources
+        return self.source.augment(resources)
 
-    def filter_record(self, record):
-        '''Filters records for report formatters'''
-        # Override in subclass if filtering needed.
-        return True
+    @property
+    def account_id(self):
+        """ Return the current account ID. 
+        
+        This should now be passed in using the --account-id flag, but for a
+        period of time we will support the old behavior of inferring this from
+        IAM.
+        """
+        return self.config.account_id
+
+
+def _batch_augment(manager, model, detail_spec, resource_set):
+    detail_op, param_name, param_key, detail_path = detail_spec
+    client = local_session(manager.session_factory).client(model.service)
+    op = getattr(client, detail_op)
+    if manager.retry:
+        args = (op,)
+        op = manager.retry
+    else:
+        args = ()
+    kw = {param_name: [param_key and r[param_key] or r for r in resource_set]}
+    response = op(*args, **kw)
+    return response[detail_path]
+
+
+def _scalar_augment(manager, model, detail_spec, resource_set):
+    detail_op, param_name, param_key, detail_path = detail_spec
+    client = local_session(manager.session_factory).client(model.service)
+    op = getattr(client, detail_op)
+    if manager.retry:
+        args = (op,)
+        op = manager.retry
+    else:
+        args = ()
+    results = []
+    for r in resource_set:
+        kw = {param_name: param_key and r[param_key] or r}
+        response = op(*args, **kw)
+        if detail_path:
+            response = response[detail_path]
+        else:
+            response.pop('ResponseMetadata')
+        if param_key is None:
+            response[model.id] = r
+            r = response
+        else:
+            r.update(response)
+        results.append(r)
+    return results
+

@@ -17,7 +17,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
 @resources.register('alarm')
@@ -33,6 +33,43 @@ class Alarm(QueryResourceManager):
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
+
+    retry = staticmethod(get_retry(('Throttled',)))
+
+
+@Alarm.action_registry.register('delete')
+class AlarmDelete(BaseAction):
+    """Delete a cloudwatch alarm.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-alarms
+                resource: alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
 @resources.register('event-rule')
@@ -80,8 +117,8 @@ class Retention(BaseAction):
                     days: 200
     """
 
-    schema = type_schema(
-        'retention', days={'type': 'integer'})
+    schema = type_schema('retention', days={'type': 'integer'})
+    permissions = ('logs:PutRetentionPolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -111,6 +148,7 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('logs:DeleteLogGroup',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -136,6 +174,7 @@ class LastWriteDays(Filter):
 
     schema = type_schema(
         'last-write', days={'type': 'number'})
+    permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
         self.date_threshold = datetime.utcnow() - timedelta(

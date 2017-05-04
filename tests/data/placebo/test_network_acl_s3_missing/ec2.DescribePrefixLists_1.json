@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PrefixLists": [
+            {
+                "PrefixListName": "com.amazonaws.us-west-2.s3", 
+                "Cidrs": [
+                    "54.231.160.0/19", 
+                    "52.218.128.0/17", 
+                    "52.92.32.0/22"
+                ], 
+                "PrefixListId": "pl-68a54001"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4a969693-a0fa-4fa8-973c-ca3db1014a08", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 26 Feb 2017 17:18:08 GMT"
+            }
+        }
+    }
+}

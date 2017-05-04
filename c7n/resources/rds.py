@@ -47,6 +47,7 @@ import itertools
 import logging
 import operator
 import re
+from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
 from botocore.exceptions import ClientError
@@ -58,12 +59,13 @@ from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
     FilterValidationError)
 
+from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, type_schema, get_account_id,
+    local_session, type_schema,
     get_retry, chunks, generate_arn, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
 
@@ -74,6 +76,7 @@ actions = ActionRegistry('rds.actions')
 
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
+filters.register('health-event', HealthEventFilter)
 actions.register('auto-tag-user', AutoTagUser)
 
 
@@ -108,18 +111,12 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
+    permissions = ('rds:ListTagsForResource',)
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -146,7 +143,8 @@ def _rds_tags(
         arn = generator(db[model.id])
         tag_list = None
         try:
-            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+            tag_list = retry(client.list_tags_for_resource,
+                             ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBInstanceNotFound']:
                 log.warning("Exception getting rds tags  \n %s", e)
@@ -184,7 +182,8 @@ def _db_instance_eligible_for_backup(resource):
             "DB instance %s is a postgres read-replica",
             db_instance_id)
         return False
-    # DB Backups not supported on a read replica running a mysql version before 5.6
+    # DB Backups not supported on a read replica running a mysql
+    # version before 5.6
     if (resource.get('ReadReplicaSourceDBInstanceIdentifier', '') and
             resource.get('Engine', '') == 'mysql'):
         engine_version = resource.get('EngineVersion', '')
@@ -216,7 +215,8 @@ def _db_instance_eligible_for_final_snapshot(resource):
             db_instance_id)
         return False
 
-    # FinalDBSnapshotIdentifier can not be specified when deleting a replica instance
+    # FinalDBSnapshotIdentifier can not be specified when deleting a
+    # replica instance
     if resource.get('ReadReplicaSourceDBInstanceIdentifier', ''):
         log.debug(
             "DB instance %s is a read-replica",
@@ -262,7 +262,7 @@ def _get_available_engine_upgrades(client, major=False):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(Filter):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
 
     :example:
@@ -275,30 +275,10 @@ class DefaultVpc(Filter):
                 filters:
                   - default-vpc
     """
-
     schema = type_schema('default-vpc')
 
-    vpcs = None
-    default_vpc = None
-
     def __call__(self, rdb):
-        vpc_id = rdb['DBSubnetGroup']['VpcId']
-        if self.vpcs is None:
-            self.vpcs = set((vpc_id,))
-            query_vpc = vpc_id
-        else:
-            query_vpc = vpc_id not in self.vpcs and vpc_id or None
-
-        if query_vpc:
-            client = local_session(self.manager.session_factory).client('ec2')
-            self.log.debug("querying vpc %s", vpc_id)
-            vpcs = [v['VpcId'] for v
-                    in client.describe_vpcs(VpcIds=[vpc_id])['Vpcs']
-                    if v['IsDefault']]
-            if not vpcs:
-                return []
-            self.default_vpc = vpcs.pop()
-        return vpc_id == self.default_vpc and True or False
+        return self.match(rdb['DBSubnetGroup']['VpcId'])
 
 
 @filters.register('security-group')
@@ -334,6 +314,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     """
     schema = type_schema(
         'mark-for-op', rinherit=tags.TagDelayedAction.schema)
+    permissions = ('rds:AddTagsToResource',)
 
     batch_size = 5
 
@@ -374,6 +355,7 @@ class AutoPatch(BaseAction):
     schema = type_schema(
         'auto-patch',
         minor={'type': 'boolean'}, window={'type': 'string'})
+    permissions = ('rds:ModifyDBInstance',)
 
     def process(self, dbs):
         client = local_session(
@@ -381,7 +363,7 @@ class AutoPatch(BaseAction):
 
         params = {'AutoMinorVersionUpgrade': self.data.get('minor', True)}
         if self.data.get('window'):
-            params['PreferredMaintenanceWindow'] = self.data['minor']
+            params['PreferredMaintenanceWindow'] = self.data['window']
 
         for db in dbs:
             client.modify_db_instance(
@@ -415,6 +397,7 @@ class UpgradeAvailable(Filter):
     schema = type_schema('upgrade-available',
                          major={'type': 'boolean'},
                          value={'type': 'boolean'})
+    permissions = ('rds:DescribeDBEngineVersions',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('rds')
@@ -461,7 +444,10 @@ class UpgradeMinor(BaseAction):
     """
 
     schema = type_schema(
-        'upgrade', major={'type': 'boolean'}, immediate={'type': 'boolean'})
+        'upgrade',
+        major={'type': 'boolean'},
+        immediate={'type': 'boolean'})
+    permissions = ('rds:ModifyDBInstance',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -510,6 +496,7 @@ class Tag(tags.Tag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('rds:AddTagsToResource',)
 
     def process_resource_set(self, dbs, ts):
         client = local_session(
@@ -540,6 +527,7 @@ class RemoveTag(tags.RemoveTag):
 
     concurrency = 2
     batch_size = 5
+    permissions = ('rds:RemoveTagsFromResource',)
 
     def process_resource_set(self, dbs, tag_keys):
         client = local_session(
@@ -552,6 +540,8 @@ class RemoveTag(tags.RemoveTag):
 
 @actions.register('tag-trim')
 class TagTrim(tags.TagTrim):
+
+    permissions = ('rds:RemoveTagsFromResource',)
 
     def process_tag_removal(self, resource, candidates):
         client = local_session(
@@ -589,9 +579,10 @@ class Delete(BaseAction):
             }
         }
 
+    permissions = ('rds:DeleteDBInstance',)
+
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -602,14 +593,16 @@ class Delete(BaseAction):
             else:
                 params['FinalDBSnapshotIdentifier'] = snapshot_identifier(
                     'Final', db['DBInstanceIdentifier'])
+            self.log.info(
+                "Deleting rds: %s snapshot: %s",
+                db['DBInstanceIdentifier'],
+                params.get('FinalDBSnapshotIdentifier', False))
             try:
                 client.delete_db_instance(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidDBInstanceState":
                     continue
                 raise
-
-            self.log.info("Deleted rds: %s", db['DBInstanceIdentifier'])
         return dbs
 
 
@@ -628,9 +621,8 @@ class Snapshot(BaseAction):
                   - snapshot
     """
 
-    schema = {'properties': {
-        'type': {
-            'enum': ['snapshot']}}}
+    schema = type_schema('snapshot')
+    permissions = ('rds:CreateDBSnapshot',)
 
     def process(self, dbs):
         with self.executor_factory(max_workers=3) as w:
@@ -656,6 +648,72 @@ class Snapshot(BaseAction):
                 'Backup',
                 resource['DBInstanceIdentifier']),
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
+
+
+@actions.register('resize')
+class ResizeInstance(BaseAction):
+    """Change the allocated storage of an rds instance.
+
+    :example:
+
+       This will find databases using over 85% of their allocated
+       storage, and resize them to have an additional 30% storage
+       the resize here is async during the next maintenance.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: 30
+
+
+       This will find databases using under 20% of their allocated
+       storage, and resize them to be 30% smaller, the resize here
+       is configured to be immediate.
+
+       .. code-block: yaml
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: metrics
+                    name: FreeStorageSpace
+                    percent-attr: AllocatedStorage
+                    attr-multiplier: 1073741824
+                    value: 90
+                    op: greater-than
+                actions:
+                  - type: resize
+                    percent: -30
+                    immediate: true
+    """
+    schema = type_schema(
+        'resize',
+        percent={'type': 'number'},
+        immediate={'type': 'boolean'})
+
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, resources):
+        c = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            old_val = D(r['AllocatedStorage'])
+            _100 = D(100)
+            new_val = ((_100 + D(self.data['percent'])) / _100) * old_val
+            rounded = int(new_val.quantize(D('0'), ROUND_HALF_UP))
+            c.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                AllocatedStorage=rounded,
+                ApplyImmediately=self.data.get('immediate', False))
 
 
 @actions.register('retention')
@@ -684,6 +742,7 @@ class RetentionWindow(BaseAction):
     schema = type_schema(
         'retention',
         **{'days': {'type': 'number'}, 'copy-tags': {'type': 'boolean'}})
+    permissions = ('rds:ModifyDBInstance',)
 
     def process(self, dbs):
         with self.executor_factory(max_workers=3) as w:
@@ -762,15 +821,8 @@ class RDSSnapshot(QueryResourceManager):
     action_registry = ActionRegistry('rds-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
 
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -802,7 +854,9 @@ def _rds_snap_tags(
                 client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
             if e.response['Error']['Code'] not in ['DBSnapshotNotFound']:
-                log.warning("Exception getting rds snapshot:%s tags  \n %s", e)
+                log.error(
+                    "Exception getting rds snapshot:%s tags  \n %s",
+                    snap['DBSnapshotIdentifier'], e)
             return None
         snap['Tags'] = tag_list or []
         return snap
@@ -816,6 +870,7 @@ class LatestSnapshot(Filter):
     """Return the latest snapshot for each database.
     """
     schema = type_schema('latest', automatic={'type': 'boolean'})
+    permissions = ('rds:DescribeDBSnapshots',)
 
     def process(self, resources, event=None):
         results = []
@@ -956,6 +1011,8 @@ class RDSSnapshotRemoveTag(tags.RemoveTag):
 @RDSSnapshot.filter_registry.register('cross-account')
 class CrossAccountAccess(CrossAccountAccessFilter):
 
+    permissions = ('rds:DescribeDBSnapshotAttributes',)
+
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
         results = []
@@ -1029,6 +1086,7 @@ class RegionCopySnapshot(BaseAction):
         tags={'type': 'object'},
         required=('target_region',))
 
+    permissions = ('rds:CopyDBSnapshot',)
     min_delay = 120
     max_attempts = 30
 
@@ -1119,6 +1177,7 @@ class RDSSnapshotDelete(BaseAction):
     """
 
     schema = type_schema('delete')
+    permissions = ('rds:DeleteDBSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d rds snapshots", len(snapshots))
@@ -1143,6 +1202,8 @@ class RDSSnapshotDelete(BaseAction):
 
 @actions.register('modify-security-groups')
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    permissions = ('rds:ModifyDBInstance', 'rds:ModifyDBCluster')
 
     def process(self, rds_instances):
         replication_group_map = {}
