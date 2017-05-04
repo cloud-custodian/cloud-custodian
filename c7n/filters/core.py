@@ -441,8 +441,7 @@ class ValueFilter(Filter):
                 # EMR not having more functionality.
                 try:
                     value = parse(value, default=datetime.now(tz=tzutc()))
-
-                except (AttributeError, TypeError):
+                except (AttributeError, TypeError, ValueError):
                     value = 0
 
             # Reverse the age comparison, we want to compare the value being
@@ -468,7 +467,10 @@ class ValueFilter(Filter):
                 sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)
 
             if not isinstance(value, datetime):
-                value = parse(value, default=datetime.now(tz=tzutc()))
+                try:
+                    value = parse(value, default=datetime.now(tz=tzutc()))
+                except (AttributeError, TypeError, ValueError):
+                    value = 0
 
             return sentinel, value
         return sentinel, value

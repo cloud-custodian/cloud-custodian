@@ -32,7 +32,8 @@ class TestLogsub(TestCase):
             json.dump(self.config_data, conf)
 
     def tearDown(self):
-        os.remove('config.json')
+        if os.path.isfile('config.json'):
+            os.remove('config.json')
         os.chdir(self.old_dir)
 
     def test_init(self):
