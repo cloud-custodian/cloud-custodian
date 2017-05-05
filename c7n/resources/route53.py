@@ -56,5 +56,3 @@ class ResourceRecordSet(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
-
-

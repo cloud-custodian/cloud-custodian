@@ -66,6 +66,7 @@ class Account(ResourceManager):
     def get_resources(self, resource_ids):
         return [get_account(self.session_factory, self.config)]
 
+
 @filters.register('credential')
 class AccountCredentialReport(CredentialReport):
 
@@ -128,7 +129,8 @@ class CloudTrailEnabled(Filter):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
             current_region = session.region_name
-            trails  = [t for t in trails if t.get('HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
+            trails  = [t for t in trails if t.get(
+                'HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
         if self.data.get('kms-key'):
@@ -203,12 +205,10 @@ class ConfigEnabled(Filter):
         if self.data.get('running', True) and recorders:
             status = {s['name']: s for
                       s in client.describe_configuration_recorder_status(
-                      )['ConfigurationRecordersStatus']}
+            )['ConfigurationRecordersStatus']}
             resources[0]['c7n:config_status'] = status
-            recorders = [r for r in recorders
-                         if status[r['name']]['recording']
-                         and status[r['name']]['lastStatus'].lower() in (
-                             'pending', 'success')]
+            recorders = [r for r in recorders if status[r['name']]['recording'] and
+                status[r['name']]['lastStatus'].lower() in ('pending', 'success')]
         if channels and recorders:
             return []
         return resources
@@ -281,7 +281,7 @@ class IAMSummary(ValueFilter):
             client = local_session(
                 self.manager.session_factory).client('iam')
             resources[0]['c7n:iam_summary'] = client.get_account_summary(
-                )['SummaryMap']
+            )['SummaryMap']
         if self.match(resources[0]['c7n:iam_summary']):
             return resources
         return []
@@ -291,8 +291,9 @@ class IAMSummary(ValueFilter):
 class AccountPasswordPolicy(ValueFilter):
     """Check an account's password policy.
 
-    Note that on top of the default password policy fields, we also add an extra key, PasswordPolicyConfigured
-    which will be set to true or false to signify if the given account has attempted to set a policy at all.
+    Note that on top of the default password policy fields, we also add an extra key,
+    PasswordPolicyConfigured which will be set to true or false to signify if the given
+    account has attempted to set a policy at all.
 
     :example:
 
@@ -315,22 +316,22 @@ class AccountPasswordPolicy(ValueFilter):
     permissions = ('iam:GetAccountPasswordPolicy',)
 
     def process(self, resources, event=None):
-      account = resources[0]
-      if not account.get('c7n:password_policy'):
-          client = local_session(self.manager.session_factory).client('iam')
-          policy = {}
-          try:
-              policy = client.get_account_password_policy().get('PasswordPolicy', {})
-              policy['PasswordPolicyConfigured'] = True
-          except ClientError as e:
-              if e.response['Error']['Code'] == 'NoSuchEntity':
-                  policy['PasswordPolicyConfigured'] = False
-              else:
-                raise
-          account['c7n:password_policy'] = policy
-      if self.match(account['c7n:password_policy']):
-          return resources
-      return []
+        account = resources[0]
+        if not account.get('c7n:password_policy'):
+            client = local_session(self.manager.session_factory).client('iam')
+            policy = {}
+            try:
+                policy = client.get_account_password_policy().get('PasswordPolicy', {})
+                policy['PasswordPolicyConfigured'] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntity':
+                    policy['PasswordPolicyConfigured'] = False
+                else:
+                    raise
+            account['c7n:password_policy'] = policy
+        if self.match(account['c7n:password_policy']):
+            return resources
+        return []
 
 
 @filters.register('service-limit')
@@ -502,10 +503,10 @@ class RequestLimitIncrease(BaseAction):
 
             body = self.data.get('message', self.default_template)
             body = body.format(**{
-                    'service': service,
-                    'percent': self.data.get('percent-increase')
-                    })
-            
+                'service': service,
+                'percent': self.data.get('percent-increase')
+            })
+
             client.create_case(
                 subject=subject,
                 communicationBody=body,

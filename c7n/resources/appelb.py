@@ -341,7 +341,8 @@ class AppELBModifyListenerPolicy(BaseAction):
                   - type: modify-listener
                     protocol: HTTPS
                     sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
-                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-\
+                    1234-1234-1234-123456789012"
     """
 
     schema = type_schema(

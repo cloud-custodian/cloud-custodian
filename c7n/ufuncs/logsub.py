@@ -14,7 +14,6 @@
 """Ops feedback via log subscription
 """
 import boto3
-from botocore.vendored import requests
 
 import base64
 from datetime import datetime
@@ -37,7 +36,7 @@ def init():
 
 
 def message_event(evt):
-    dt = datetime.fromtimestamp(evt['timestamp']/1000.0)
+    dt = datetime.fromtimestamp(evt['timestamp'] / 1000.0)
     return "%s: %s" % (
         dt.ctime(), "\n".join(textwrap.wrap(evt['message'], 80)))
 
@@ -47,7 +46,7 @@ def process_log_event(event, context):
     init()
     serialized = event['awslogs'].pop('data')
     data = json.loads(zlib.decompress(
-        base64.b64decode(serialized), 16+zlib.MAX_WBITS))
+        base64.b64decode(serialized), 16 + zlib.MAX_WBITS))
 
     # Fetch additional logs for context (20s window)
     timestamps = [e['timestamp'] for e in data['logEvents']]

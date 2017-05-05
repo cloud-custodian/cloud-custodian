@@ -56,7 +56,7 @@ def load(options, path, format='yaml', validate=True):
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
@@ -88,7 +88,7 @@ class PolicyCollection(object):
                 options_copy.region = str(region)
                 self._all_policies.append(
                     Policy(p, options_copy, session_factory=self.test_session_factory()))
-        
+
         # Do an initial filtering
         self.policies = []
         resource_type = getattr(self.options, 'resource_type', None)
@@ -113,7 +113,7 @@ class PolicyCollection(object):
             policies.append(policy)
 
         return policies
-    
+
     def __iter__(self):
         return iter(self.policies)
 
@@ -257,7 +257,7 @@ class PullMode(PolicyExecutionMode):
                     " resources: %d"
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
-                        len(resources), time.time()-s))
+                        len(resources), time.time() - s))
                 self.policy._write_file(
                     "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(

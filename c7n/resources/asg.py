@@ -189,7 +189,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(ConfigValidFilter, self).initialize(asgs)
-        #pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
         self.subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
@@ -400,8 +400,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 asg['LaunchConfigurationName'])
             return False
         unencrypted = []
-        if (not self.data.get('exclude_image')
-                and cfg['ImageId'] in self.unencrypted_images):
+        if (not self.data.get('exclude_image') and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
         if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
             unencrypted.append('LaunchConfig')
@@ -424,7 +423,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     msg = e.response['Error']['Message']
                     e_ami_ids = [
                         e_ami_id.strip() for e_ami_id
-                        in msg[msg.find("'[")+2:msg.rfind("]'")].split(',')]
+                        in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
                     self.log.warning(
                         "asg:not-encrypted filter image not found %s",
                         e_ami_ids)
@@ -493,7 +492,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
                     msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     self.log.warning("Snapshot not found %s" % e_snap_id)
                     snap_ids.remove(e_snap_id)
                     continue
@@ -689,7 +688,7 @@ class Resize(Action):
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
-        #if self.data['desired_size'] != 'current':
+        # if self.data['desired_size'] != 'current':
         #    raise FilterValidationError(
         #        "only resizing desired/min to current capacity is supported")
         return self
@@ -893,8 +892,7 @@ class PropagateTags(Action):
         client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
-                   if t['PropagateAtLaunch']
-                   and not t['Key'].startswith('aws:')}
+                   if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
 
         if self.data.get('tags'):
             tag_map = {
