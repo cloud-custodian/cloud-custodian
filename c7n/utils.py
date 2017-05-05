@@ -13,6 +13,7 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 
+import boto3
 import copy
 from datetime import datetime
 import functools
@@ -375,3 +376,14 @@ def reformat_schema(model):
             ret[key]['required'] = True
 
     return ret
+
+
+_profile_session = None
+def get_profile_session(options):
+    global _profile_session
+    if _profile_session:
+        return _profile_session
+
+    profile = getattr(options, 'profile', None)
+    _profile_session = boto3.Session(profile_name=profile)
+    return _profile_session

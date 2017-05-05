@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import print_function
 
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
@@ -77,12 +77,17 @@ def policy_command(f):
             if len(all_policies) > 0:
                 sys.exit(1)
 
-        # Do not allow multiple policies with the same name, even across files
-        counts = Counter([p.name for p in policies])
-        for policy, count in counts.iteritems():
-            if count > 1:
-                eprint("Error: duplicate policy name '{}'".format(policy))
-                sys.exit(1)
+        # Do not allow multiple policies in a region with the same name,
+        # even across files
+        policies_by_region = defaultdict(list)
+        for p in policies:
+            policies_by_region[p.options.region].append(p)
+        for region in policies_by_region.keys():
+            counts = Counter([p.name for p in policies_by_region[region]])
+            for policy, count in counts.iteritems():
+                if count > 1:
+                    eprint("Error: duplicate policy name '{}'".format(policy))
+                    sys.exit(1)
 
         return f(options, policies)
 
@@ -196,6 +201,7 @@ def report(options, policies):
     policy = policies.pop()
     odir = options.output_dir.rstrip(os.path.sep)
     if os.path.sep in odir and os.path.basename(odir) == policy.name:
+        options.region = options.regions[0]
         # policy sub-directory passed - ignore
         options.output_dir = os.path.split(odir)[0]
         # regenerate the execution context based on new path
