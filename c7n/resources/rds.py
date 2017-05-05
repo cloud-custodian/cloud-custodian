@@ -764,12 +764,8 @@ class RetentionWindow(BaseAction):
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
 
-        if (current_copy_tags != new_copy_tags and
-                _db_instance_eligible_for_backup(resource)):
-            self.set_retention_window(
-                resource,
-                new_retention,
-                new_copy_tags)
+        if ((current_copy_tags != new_copy_tags) and _db_instance_eligible_for_backup(resource)):
+            self.set_retention_window(resource, new_retention, new_copy_tags)
             return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
