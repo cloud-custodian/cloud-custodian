@@ -161,6 +161,52 @@ class SSLPolicyTest(BaseTest):
             resources[0]['LoadBalancerName'],
             'test-elb-invalid-policy')
 
+    def test_set_ssl_listener_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_set_ssl_listener')
+        client = session_factory().client('elb')
+        policy = self.load_policy({
+            'name': 'test-set-ssl-listerner',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'ssl-policy',
+                 'whitelist': ['AES128-SHA256','Protocol-TLSv1']},
+                {
+                   'type': 'value',
+                   'key': 'LoadBalancerName',
+                   'value': 'test-elb',
+                   'op': 'eq' }],
+            'actions': [
+                {'type': 'set-ssl-listener-policy',
+                 'name': 'testpolicy',
+                 'attributes': ['AES128-SHA256','Protocol-TLSv1']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        response_pol = client.describe_load_balancers(
+            LoadBalancerNames=[
+                'test-elb'
+            ]
+        )
+        response_ciphers = client.describe_load_balancer_policies(
+            LoadBalancerName='test-elb',
+            PolicyNames=['testpolicy-1493768308000']
+        )
+        curr_pol = [t.encode('UTF8') for t in response_pol[
+            'LoadBalancerDescriptions'][0]['ListenerDescriptions'][0]['PolicyNames']]
+
+        curr_ciphers = []
+        for x in response_ciphers['PolicyDescriptions'][0]['PolicyAttributeDescriptions']:
+            curr_ciphers.append({str(k): str(v) for k, v in x.items()})
+        active_ciphers = [x['AttributeName'] for x in curr_ciphers if x['AttributeValue'] == 'true']
+        self.assertEqual(
+            curr_pol,
+            ['AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333',
+             'testpolicy-1493768308000'])
+        self.assertEqual(
+            active_ciphers,
+            ['Protocol-TLSv1', 'AES128-SHA256'])
+
     def test_ssl_matching(self):
         session_factory = self.replay_flight_data(
             'test_ssl_ciphers')

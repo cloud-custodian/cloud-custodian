@@ -25,6 +25,8 @@ from c7n.actions import (
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
+from datetime import datetime
+from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -273,12 +275,13 @@ class SetSslListenerPolicy(BaseAction):
 
         client = local_session(self.manager.session_factory).client('elb')
 
-        # Create a custom policy.
-        attrs = self.data.get('attributes')
-        # This name must be unique within the
+        # Create a custom policy with epoch timestamp.
+        # to make it unique within the
         # set of policies for this load balancer.
-        policy_name = self.data.get('name')
+        policy_name = self.data.get('name') + '-' + \
+                      str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
         lb_name = elb['LoadBalancerName']
+        attrs = self.data.get('attributes')
         policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
             for attr in attrs]
 
@@ -297,15 +300,16 @@ class SetSslListenerPolicy(BaseAction):
         # Apply it to all SSL listeners.
         ssl_policies = ()
         if 'c7n.ssl-policies' in elb:
-            ssl_policies = set(elb['c7n.ssl-policies'])
+            ssl_policies = elb['c7n.ssl-policies']
 
         for ld in elb['ListenerDescriptions']:
             if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
                 policy_names = [policy_name]
                 # Preserve extant non-ssl listener policies
+                policy_names.extend(ld.get('PolicyNames', ()))
+                # Remove extant ssl listener policy
                 if ssl_policies:
-                    policy_names.extend(
-                        ssl_policies.difference(ld.get('PolicyNames', ())))
+                    policy_names.remove(ssl_policies[0])
                 client.set_load_balancer_policies_of_listener(
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
