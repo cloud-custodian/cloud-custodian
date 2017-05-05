@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import json
 import fnmatch
 import itertools
@@ -61,6 +62,7 @@ def load(options, path, format='yaml', validate=True):
         errors = validate(data)
         if errors:
             raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
+
     return PolicyCollection(data, options)
 
 
@@ -72,9 +74,20 @@ class PolicyCollection(object):
 
         # We store all the policies passed in so we can refilter later
         self._all_policies = []
+        session = utils.get_profile_session(options)
         for p in self.data.get('policies', []):
-            self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
+            all_regions = session.get_available_regions(p['resource'])
+            if 'all' in options.regions:
+                options.regions = all_regions
+            for region in options.regions:
+                if region not in all_regions:
+                    # TODO - do we want a message
+                    continue
+                options_copy = copy.copy(options)
+                # TODO - why doesn't aws like unicode regions?
+                options_copy.region = str(region)
+                self._all_policies.append(
+                    Policy(p, options_copy, session_factory=self.test_session_factory()))
         
         # Do an initial filtering
         self.policies = []
