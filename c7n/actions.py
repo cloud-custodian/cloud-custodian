@@ -27,11 +27,14 @@ from c7n.executor import ThreadPoolExecutor
 from c7n import utils
 from c7n.version import version as VERSION
 
+
 def average(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
+
 def distinct_count(values):
-    return float( len( set(values)))
+    return float(len(set(values)))
+
 
 METRIC_OPS = {
     'count': len,
@@ -73,6 +76,7 @@ METRIC_UNITS = [
     'Count',
     'None'
 ]
+
 
 class ActionRegistry(PluginRegistry):
 
@@ -141,9 +145,9 @@ class Action(object):
         try:
             return cmd(*args, **kw)
         except ClientError, e:
-            if (e.response['Error']['Code'] == 'DryRunOperation'
-                    and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
-                    and 'would have succeeded' in e.message):
+            if (e.response['Error']['Code'] == 'DryRunOperation' and
+            e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
+            'would have succeeded' in e.message):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))
@@ -193,7 +197,7 @@ class ModifyVpcSecurityGroupsAction(Action):
             {'required': ['isolation-group', 'remove']},
             {'required': ['add', 'remove']},
             {'required': ['add']}]
-        }
+    }
 
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
@@ -413,7 +417,7 @@ class Notify(EventAction):
                      'properties': {
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
-                         }}]
+                     }}]
             }
         }
     }
@@ -456,7 +460,7 @@ class Notify(EventAction):
         client.publish(
             TopicArn=topic,
             Message=base64.b64encode(zlib.compress(utils.dumps(message)))
-            )
+        )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -466,8 +470,8 @@ class Notify(EventAction):
             'mtype': {
                 'DataType': 'String',
                 'StringValue': self.C7N_DATA_MESSAGE,
-                },
-            }
+            },
+        }
         result = client.send_message(
             QueueUrl=queue,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
@@ -575,11 +579,11 @@ class AutoTagUser(EventAction):
 
 class PutMetric(BaseAction):
     """Action to put metrics based on an expression into CloudWatch metrics
-    
+
     :example:
-    
+
         .. code-block: yaml
-        
+
             policies:
               - name: track-attached-ebs
                 resource: ec2
@@ -607,10 +611,11 @@ class PutMetric(BaseAction):
             'key': {'type': 'string'},  # jmes path
             'namespace': {'type': 'string'},
             'metric_name': {'type': 'string'},
-            'dimensions': {'type':'array',
-                           'items': {
-                               'type':'object'
-                            },
+            'dimensions':
+                {'type':'array',
+                'items': {
+                    'type':'object'
+                },
             },
             'op': {'enum': METRIC_OPS.keys()},
             'units': {'enum': METRIC_UNITS}
@@ -634,8 +639,8 @@ class PutMetric(BaseAction):
         try:
             values = jmespath.search("Resources[]." + key_expression,
                                      {'Resources': resources})
-            # I had to wrap resourses in a dict like this in order to not have jmespath expressions start with []
-            # in the yaml files.  It fails to parse otherwise.
+            # I had to wrap resourses in a dict like this in order to not have jmespath expressions
+            # start with [] in the yaml files.  It fails to parse otherwise.
         except TypeError, oops:
             self.log.error(oops.message)
 
@@ -643,13 +648,12 @@ class PutMetric(BaseAction):
         try:
             f = METRIC_OPS[operation]
             value = f(values)
-        except KeyError, bad_op:
+        except KeyError:
             self.log.error("Bad op for put-metric action: %s", operation)
 
         # for demo purposes
         # from math import sin, pi
         # value = sin((now.minute * 6 * 4 * pi) / 180) * ((now.hour + 1) * 4.0)
-
 
         metrics_data = [
             {
@@ -673,6 +677,6 @@ class PutMetric(BaseAction):
         ]
 
         client = self.manager.session_factory().client('cloudwatch')
-        res = client.put_metric_data(Namespace=ns, MetricData=metrics_data)
+        client.put_metric_data(Namespace=ns, MetricData=metrics_data)
 
         return resources

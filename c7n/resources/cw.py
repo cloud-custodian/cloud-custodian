@@ -197,6 +197,6 @@ class LastWriteDays(Filter):
         else:
             last_timestamp = streams[0]['lastIngestionTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp/1000.0)
+        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write

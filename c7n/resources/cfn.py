@@ -75,4 +75,3 @@ class Delete(BaseAction):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
         client.delete_stack(StackName=stack['StackName'])
-

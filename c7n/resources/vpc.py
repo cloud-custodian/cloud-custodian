@@ -135,7 +135,10 @@ class FlowLogFilter(Filter):
                 fl_matches = []
                 for fl in flogs:
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
-                    traffic_type_match = (traffic_type is None) or op(fl['TrafficType'], traffic_type.upper())
+                    traffic_type_match = (
+                        traffic_type is None) or op(
+                        fl['TrafficType'],
+                        traffic_type.upper())
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
@@ -167,7 +170,9 @@ class Subnet(QueryResourceManager):
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
+
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
@@ -275,7 +280,7 @@ class SecurityGroupDiff(object):
             rule.get('FromPort', 0) or 0,
             rule.get('ToPort', 0) or 0,
             rule.get('IpProtocol', '-1') or '-1'
-            )
+        )
         for a, ke in self.RULE_ATTRS:
             if a not in rule:
                 continue
@@ -482,8 +487,7 @@ class UnusedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         return unused and self.filter_peered_refs(unused) or []
 
 
@@ -510,8 +514,7 @@ class UsedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
         return [r for r in resources if r['GroupId'] not in unused]
 
@@ -807,12 +810,12 @@ class IPPermission(SGPermission):
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
@@ -838,11 +841,11 @@ class IPPermissionEgress(SGPermission):
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['egress']},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
@@ -943,6 +946,7 @@ class NetworkInterface(QueryResourceManager):
         date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+
 
 NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
 
@@ -1248,4 +1252,3 @@ class KeyPair(QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
-

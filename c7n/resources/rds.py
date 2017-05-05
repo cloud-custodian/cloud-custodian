@@ -576,8 +576,8 @@ class Delete(BaseAction):
         'properties': {
             'type': {'enum': ['delete'],
                      'skip-snapshot': {'type': 'boolean'}}
-            }
         }
+    }
 
     permissions = ('rds:DeleteDBInstance',)
 
@@ -790,8 +790,8 @@ class RDSSubscription(QueryResourceManager):
         dimension = None
         # SubscriptionName isn't part of describe events results?! all the
         # other subscription apis.
-        #filter_name = 'SubscriptionName'
-        #filter_type = 'scalar'
+        # filter_name = 'SubscriptionName'
+        # filter_type = 'scalar'
         filter_name = None
         filter_type = None
 
@@ -1138,8 +1138,6 @@ class RegionCopySnapshot(BaseAction):
         target_key = self.data.get('target_key')
         tags = [{'Key': k, 'Value': v} for k, v
                 in self.data.get('tags', {}).items()]
-        source_client = local_session(
-            self.manager.session_factory).client('rds')
 
         for snapshot_set in chunks(resource_set, 5):
             for r in snapshot_set:

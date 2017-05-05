@@ -36,6 +36,7 @@ log = logging.getLogger('custodian.ebs')
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
 
+
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
@@ -94,8 +95,8 @@ class SnapshotAge(AgeFilter):
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
         return snapshots
-    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    #This will populate the cache.
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    # This will populate the cache.
     amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
@@ -209,15 +210,15 @@ class SnapshotDelete(BaseAction):
     permissions = ('ec2.DeleteSnapshot',)
 
     def process(self, snapshots):
-        self.image_snapshots = snaps = set()
-         # Be careful re image snapshots, we do this by default
+        self.image_snapshots = set()
+        # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         pre = len(snapshots)
         snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
         post = len(snapshots)
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
-                 post, pre-post)
+                 post, pre - post)
 
         with self.executor_factory(max_workers=2) as w:
             futures = []
@@ -435,7 +436,7 @@ class FaultTolerantSnapshots(Filter):
     def pull_check_results(self):
         result = set()
         client = local_session(self.manager.session_factory).client('support')
-        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
+        client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
         for r in results['flaggedResources']:

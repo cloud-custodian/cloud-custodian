@@ -59,6 +59,3 @@ class CodeDeployPipeline(QueryResourceManager):
         dimension = filter_name = None
         name = id = 'name'
         date = 'created'
-
-
-

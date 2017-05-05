@@ -31,7 +31,8 @@ from dateutil.parser import parse as date_parse
 try:
     from setproctitle import setproctitle
 except ImportError:
-    setproctitle = lambda t: None
+    def setproctitle(t):
+        return None
 
 from c7n.commands import schema_completer
 from c7n.utils import get_account_id_from_sts
@@ -66,7 +67,7 @@ def _default_options(p, blacklist=""):
     # -c is deprecated.  Supported for legacy reasons
     config.add_argument("-c", "--config", help=argparse.SUPPRESS)
     config.add_argument("configs", nargs='*',
-                          help="Policy configuration file(s)")
+                        help="Policy configuration file(s)")
     config.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
@@ -122,8 +123,6 @@ def _default_account_id(options):
             return
         except IndexError:
             pass
-
-    profile = getattr(options, 'profile', None)
     try:
         session = utils.get_profile_session(options)
         options.account_id = get_account_id_from_sts(session)
@@ -143,15 +142,15 @@ def _report_options(p):
     p.add_argument(
         '--field', action='append', default=[], type=_key_val_pair,
         metavar='HEADER=FIELD',
-        help='Repeatable. JMESPath of field to include in the output OR '\
-            'for a tag use prefix `tag:`')
+        help='Repeatable. JMESPath of field to include in the output OR '
+        'for a tag use prefix `tag:`')
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
-        help="Format to output data in (default: %(default)s). "\
-            "Options include simple, grid, rst")
+        help="Format to output data in (default: %(default)s). "
+        "Options include simple, grid, rst")
 
     # We don't include `region` because the report command ignores it
     p.add_argument("--region", dest='regions', default=[DEFAULT_REGION],
@@ -170,7 +169,7 @@ def _metrics_options(p):
     p.add_argument(
         '--days', type=int, default=14,
         help='Number of days of history to consider (default: %(default)i)')
-    p.add_argument('--period', type=int, default=60*24*24)
+    p.add_argument('--period', type=int, default=60 * 24 * 24)
 
 
 def _logs_options(p):
@@ -290,12 +289,12 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    #access_desc = ("Show permissions needed to execute the policies")
-    #access = subs.add_parser(
+    # access_desc = ("Show permissions needed to execute the policies")
+    # access = subs.add_parser(
     #    'access', description=access_desc, help=access_desc)
-    #access.set_defaults(command='c7n.commands.access')
-    #_default_options(access)
-    #access.add_argument(
+    # access.set_defaults(command='c7n.commands.access')
+    # _default_options(access)
+    # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
     run_desc = ("Execute the policies in a config file")
