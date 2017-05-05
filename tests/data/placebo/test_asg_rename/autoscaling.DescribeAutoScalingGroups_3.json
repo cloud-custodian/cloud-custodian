@@ -13,7 +13,7 @@
                         "ResourceId": "scot-asg-test", 
                         "PropagateAtLaunch": true, 
                         "Value": "ubuntu", 
-                        "Key": "Platform"
+                        "Key": "Linux"
                     }
                 ], 
                 "EnabledMetrics": [], 
@@ -58,13 +58,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5bd21868-30ec-11e7-bb00-1547c7e6d37a", 
+            "RequestId": "5cb1f11c-30ec-11e7-bb00-1547c7e6d37a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "5bd21868-30ec-11e7-bb00-1547c7e6d37a", 
+                "x-amzn-requestid": "5cb1f11c-30ec-11e7-bb00-1547c7e6d37a", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2218", 
+                "content-length": "2215", 
                 "content-type": "text/xml", 
-                "date": "Thu, 04 May 2017 17:08:56 GMT"
+                "date": "Thu, 04 May 2017 17:08:57 GMT"
             }
         }
     }
