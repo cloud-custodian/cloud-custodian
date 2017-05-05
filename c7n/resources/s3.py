@@ -51,7 +51,7 @@ from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser
+from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
 from c7n.manager import resources
@@ -67,6 +67,7 @@ filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
 filters.register('marked-for-op', TagActionFilter)
 actions.register('auto-tag-user', AutoTagUser)
+actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
