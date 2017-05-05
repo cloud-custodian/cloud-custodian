@@ -118,8 +118,8 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_versioning', 'Versioning', None, None),
     ('get_bucket_website', 'Website', None, None),
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
-    ('get_bucket_notification_configuration', 'Notification', None, None)
-#        ('get_bucket_lifecycle', 'Lifecycle', None, None),
+    ('get_bucket_notification_configuration', 'Notification', None, None),
+    ('get_bucket_lifecycle', 'Lifecycle', None, None)
 #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -508,6 +508,46 @@ class MissingPolicyStatementFilter(Filter):
             return False
         return True
 
+@filters.register('missing-lifecycle-rule')
+class MissingLifecycleRuleFilter(Filter):
+    """Find buckets missing a set of named Lifecycle rules.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-bucket-missing-lifecycle-rule
+                resource: s3
+                filters:
+                  - type: missing-lifecycle-rule
+                    rule_names:
+                      - AbortIncompleteMultipartUpload
+    """
+
+    schema = type_schema(
+        'missing-lifecycle-rule',
+        aliases=('missing-lifecycle',),
+        rule_names={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('s3:GetBucketLifecycle',)
+
+    def __call__(self, b):
+
+        lc = b.get('Lifecycle')
+        if lc is None:
+            return b
+
+        required = list(self.data.get('rule_names', []))
+        rules = lc.get('Rules', [])
+
+        for l in list(rules):
+            for n in l:
+                if str(n) in required:
+                    required.remove(str(n))
+        if not required:
+            return False
+        return True
 
 @actions.register('no-op')
 class NoOp(BucketActionBase):
