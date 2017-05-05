@@ -764,12 +764,11 @@ class RetentionWindow(BaseAction):
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
 
-        if ((current_retention < new_retention or
-             current_copy_tags != new_copy_tags) and
+        if (current_copy_tags != new_copy_tags and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
                 resource,
-                max(current_retention, new_retention),
+                new_retention,
                 new_copy_tags)
             return resource
 
@@ -1243,4 +1242,3 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
-

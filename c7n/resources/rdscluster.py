@@ -194,10 +194,9 @@ class RetentionWindow(BaseAction):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
 
-        if current_retention < new_retention:
             self.set_retention_window(
                 cluster,
-                max(current_retention, new_retention))
+                new_retention)
             return cluster
 
     def set_retention_window(self, cluster, retention):
