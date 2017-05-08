@@ -546,3 +546,9 @@ class MiscTest(CliTest):
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file, yaml_file],
             1)
+
+
+class AllRegionsTest(CliTest):
+    
+    def test_all_regions(self):
+        pass
