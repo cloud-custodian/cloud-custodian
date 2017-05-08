@@ -908,6 +908,7 @@ class CreateSnapshot(BaseAction):
                   - snapshot
     """
     permissions = ('ec2:CreateSnapshot',)
+    schema = type_schema('snapshot')
 
     def process(self, volumes):
         client = local_session(self.manager.session_factory).client('ec2')
