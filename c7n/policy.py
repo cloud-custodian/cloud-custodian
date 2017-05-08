@@ -83,7 +83,8 @@ class PolicyCollection(object):
                 options.regions = all_regions
             for region in options.regions:
                 if all_regions and region not in all_regions:
-                    log.info('Skipping invalid region {} for resource {}.'.format(region, p['resource']))
+                    log.info('Skipping invalid region {} for resource {}.'.format(
+                            region, p['resource']))
                     continue
                 options_copy = copy.copy(options)
                 # TODO - why doesn't aws like unicode regions?
