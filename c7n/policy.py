@@ -77,10 +77,10 @@ class PolicyCollection(object):
         session = utils.get_profile_session(options)
         for p in self.data.get('policies', []):
             all_regions = session.get_available_regions(p['resource'])
-            if 'all' in options.regions:
+            if 'all' in options.regions and all_regions:
                 options.regions = all_regions
             for region in options.regions:
-                if region not in all_regions:
+                if all_regions and region not in all_regions:
                     # TODO - do we want a message
                     continue
                 options_copy = copy.copy(options)
