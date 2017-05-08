@@ -85,10 +85,14 @@ class PolicyCollection(object):
                 itertools.chain(resource_service_map.values()))}
 
         for p in self.data.get('policies', []):
-            available_regions = service_region_map[resource_service_map[p['resource']]]
-
+            available_regions = service_region_map.get(
+                resource_service_map[p['resource']], ())
+    
             if 'all' in options.regions:
-                options.regions = available_regions
+                if not available_regions:
+                    options.regions = ['us-east-1']
+                else:
+                    options.regions = available_regions
             for region in options.regions:
                 if region not in available_regions:
                     self.log.debug("policy:%s resources:%s not available in region:%s",
