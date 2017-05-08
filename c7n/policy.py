@@ -87,7 +87,7 @@ class PolicyCollection(object):
         for p in self.data.get('policies', []):
             available_regions = service_region_map.get(
                 resource_service_map[p['resource']], ())
-    
+
             if 'all' in options.regions:
                 if not available_regions:
                     options.regions = ['us-east-1']
