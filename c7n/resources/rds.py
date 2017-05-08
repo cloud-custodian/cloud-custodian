@@ -715,15 +715,11 @@ class ResizeInstance(BaseAction):
                 AllocatedStorage=rounded,
                 ApplyImmediately=self.data.get('immediate', False))
 
-
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots
-
     :example:
-
         .. code-block: yaml
-
             policies:
               - name: rds-snapshot-retention
                 resource: rds
@@ -759,21 +755,85 @@ class RetentionWindow(BaseAction):
         return dbs
 
     def process_snapshot_retention(self, resource):
+        current_retention = int(resource.get('BackupRetentionPeriod', 0))
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
 
-        if (1 <= new_retention <= 35):
-            if ((current_copy_tags != new_copy_tags) and
+        if ((current_retention < new_retention or
+             current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
-                self.set_retention_window(resource, new_retention, new_copy_tags)
-                return resource
+            self.set_retention_window(
+                resource,
+                max(current_retention, new_retention),
+                new_copy_tags)
+            return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=retention,
+            CopyTagsToSnapshot=copy_tags)
+
+@actions.register('retention1to35')
+class Retention1to35Window(BaseAction):
+    """Sets the 'BackupRetentionPeriod' value for automated snapshots, between
+    1 and 35
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-snapshot-retention
+                resource: rds
+                filters:
+                  - type: value
+                    key: BackupRetentionPeriod
+                    value: 7
+                    op: gt
+                actions:
+                  - type: retention
+                    days: 7
+                    copy-tags: true
+    """
+
+    date_attribute = "BackupRetentionPeriod"
+    schema = type_schema(
+        'retention1to35',
+        **{'days': {'type': 'number'}, 'copy-tags': {'type': 'boolean'}})
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, dbs):
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for db in dbs:
+                futures.append(w.submit(
+                    self.process_snapshot_retention1to35,
+                    db))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting rds retention  \n %s",
+                        f.exception())
+        return dbs
+
+    def process_snapshot_retention1to35(self, resource):
+        current_copy_tags = resource['CopyTagsToSnapshot']
+        new_retention = self.data['days']
+        new_copy_tags = self.data.get('copy-tags', True)
+
+        if (1 <= new_retention <= 35):
+            if ((current_copy_tags != new_copy_tags) and _db_instance_eligible_for_backup(resource)):
+                self.set_retention1to35_window(resource, new_retention, new_copy_tags)
+                return resource
+
+    def set_retention1to35_window(self, resource, retention1to35, copy_tags):
+        c = local_session(self.manager.session_factory).client('rds')
+        c.modify_db_instance(
+            DBInstanceIdentifier=resource['DBInstanceIdentifier'],
+            BackupRetentionPeriod=retention1to35,
             CopyTagsToSnapshot=copy_tags)
 
 

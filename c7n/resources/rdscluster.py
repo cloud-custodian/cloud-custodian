@@ -147,15 +147,11 @@ class Delete(BaseAction):
                 'Deleted RDS cluster: %s',
                 cluster['DBClusterIdentifier'])
 
-
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Action to set the retention period on rds cluster snapshots
-
     :example:
-
         .. code-block: yaml
-
             policies:
               - name: rds-cluster-backup-retention
                 resource: rds-cluster
@@ -191,10 +187,13 @@ class RetentionWindow(BaseAction):
                         f.exception())
 
     def process_snapshot_retention(self, cluster):
+        current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
 
-        if (1 <= new_retention <= 35):
-            self.set_retention_window(cluster, new_retention)
+        if current_retention < new_retention:
+            self.set_retention_window(
+                cluster,
+                max(current_retention, new_retention))
             return cluster
 
     def set_retention_window(self, cluster, retention):
@@ -202,6 +201,65 @@ class RetentionWindow(BaseAction):
         c.modify_db_cluster(
             DBClusterIdentifier=cluster['DBClusterIdentifier'],
             BackupRetentionPeriod=retention,
+            PreferredBackupWindow=cluster['PreferredBackupWindow'],
+            PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
+
+
+@actions.register('retention1to35')
+class Retention1to35Window(BaseAction):
+    """Action to set the retention period on rds cluster snapshots between
+    1 to 35
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-backup-retention
+                resource: rds-cluster
+                filters:
+                  - type: value
+                    key: BackupRetentionPeriod
+                    value: 21
+                    op: ne
+                actions:
+                  - type: retention
+                    days: 21
+    """
+
+    date_attribute = "BackupRetentionPeriod"
+    # Tag copy not yet available for Aurora:
+    #   https://forums.aws.amazon.com/thread.jspa?threadID=225812
+    schema = type_schema(
+        'retention1to35',
+        **{'days': {'type': 'number'}})
+    permissions = ('rds:ModifyDBCluster',)
+
+    def process(self, clusters):
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for cluster in clusters:
+                futures.append(w.submit(
+                    self.process_snapshot_retention1to35,
+                    cluster))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting RDS cluster retention  \n %s",
+                        f.exception())
+
+    def process_snapshot_retention1to35(self, cluster):
+        new_retention = self.data['days']
+
+        if (1 <= new_retention <= 35):
+            self.set_retention1to35_window(cluster, new_retention)
+            return cluster
+
+    def set_retention1to35_window(self, cluster, retention):
+        c = local_session(self.manager.session_factory).client('rds')
+        c.modify_db_cluster(
+            DBClusterIdentifier=cluster['DBClusterIdentifier'],
+            BackupRetentionPeriod=retention1to35,
             PreferredBackupWindow=cluster['PreferredBackupWindow'],
             PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
 
