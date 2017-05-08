@@ -19,7 +19,6 @@ from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
 from c7n import cli, version, commands
-from c7n.PolicyCollection
 from datetime import datetime, timedelta
 
 
