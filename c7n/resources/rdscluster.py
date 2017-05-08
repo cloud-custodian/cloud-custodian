@@ -191,10 +191,11 @@ class RetentionWindow(BaseAction):
                         f.exception())
 
     def process_snapshot_retention(self, cluster):
-        current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
-        self.set_retention_window(cluster, new_retention)
-        return cluster
+
+        if (1 <= new_retention <= 35):
+            self.set_retention_window(cluster, new_retention)
+            return cluster
 
     def set_retention_window(self, cluster, retention):
         c = local_session(self.manager.session_factory).client('rds')

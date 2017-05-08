@@ -759,14 +759,14 @@ class RetentionWindow(BaseAction):
         return dbs
 
     def process_snapshot_retention(self, resource):
-        current_retention = int(resource.get('BackupRetentionPeriod', 0))
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
 
-        if ((current_copy_tags != new_copy_tags) and _db_instance_eligible_for_backup(resource)):
-            self.set_retention_window(resource, new_retention, new_copy_tags)
-            return resource
+        if (1 <= new_retention <= 35):
+            if ((current_copy_tags != new_copy_tags) and _db_instance_eligible_for_backup(resource)):
+                self.set_retention_window(resource, new_retention, new_copy_tags)
+                return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
         c = local_session(self.manager.session_factory).client('rds')
