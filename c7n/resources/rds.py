@@ -715,6 +715,7 @@ class ResizeInstance(BaseAction):
                 AllocatedStorage=rounded,
                 ApplyImmediately=self.data.get('immediate', False))
 
+
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots
@@ -776,6 +777,7 @@ class RetentionWindow(BaseAction):
             BackupRetentionPeriod=retention,
             CopyTagsToSnapshot=copy_tags)
 
+
 @actions.register('retention1to35')
 class Retention1to35Window(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots, between
@@ -825,7 +827,8 @@ class Retention1to35Window(BaseAction):
         new_copy_tags = self.data.get('copy-tags', True)
 
         if (1 <= new_retention <= 35):
-            if ((current_copy_tags != new_copy_tags) and _db_instance_eligible_for_backup(resource)):
+            if ((current_copy_tags != new_copy_tags) and
+                    _db_instance_eligible_for_backup(resource)):
                 self.set_retention1to35_window(resource, new_retention, new_copy_tags)
                 return resource
 

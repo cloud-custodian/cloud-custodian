@@ -147,6 +147,7 @@ class Delete(BaseAction):
                 'Deleted RDS cluster: %s',
                 cluster['DBClusterIdentifier'])
 
+
 @actions.register('retention')
 class RetentionWindow(BaseAction):
     """Action to set the retention period on rds cluster snapshots
@@ -255,7 +256,7 @@ class Retention1to35Window(BaseAction):
             self.set_retention1to35_window(cluster, new_retention)
             return cluster
 
-    def set_retention1to35_window(self, cluster, retention):
+    def set_retention1to35_window(self, cluster, retention1to35):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_cluster(
             DBClusterIdentifier=cluster['DBClusterIdentifier'],
