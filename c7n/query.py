@@ -278,9 +278,7 @@ class QueryResourceManager(ResourceManager):
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                   "%s.%s" % (
-                        self.__class__.__module__,
-                        self.__class__.__name__),
+                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
                     len(resources)))
                 return self.filter_resources(resources)
 
@@ -319,8 +317,8 @@ class QueryResourceManager(ResourceManager):
 
     @property
     def account_id(self):
-        """ Return the current account ID. 
-        
+        """ Return the current account ID.
+
         This should now be passed in using the --account-id flag, but for a
         period of time we will support the old behavior of inferring this from
         IAM.
@@ -366,4 +364,3 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
             r.update(response)
         results.append(r)
     return results
-

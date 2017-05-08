@@ -80,12 +80,37 @@ class AppELBTest(BaseTest):
             'resource': 'app-elb',
             'filters': [
                 {'type': 'listener',
-                 'key': "length([?Protocol=='HTTPS'])", 'value': 1,
-                 'op': 'gte'}
+                 'key': "Protocol",
+                 'value': "HTTPS"}
             ]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_appelb_modify_listener(self):
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appelb_modify_listener')
+        client = session_factory().client('elbv2')
+        p = self.load_policy({
+            'name': 'appelb-modify-listener-policy',
+            'resource': 'app-elb',
+            'filters': [{
+                'type': 'listener',
+                'key': 'Port',
+                'value': 8080
+            }],
+            'actions': [{
+                'type': 'modify-listener',
+                'port': 80
+            }]
+            },
+            session_factory=session_factory
+            )
+        resources = p.run()
+        arn = resources[0]['LoadBalancerArn']
+        listeners = client.describe_listeners(LoadBalancerArn=arn)['Listeners']
+        self.assertEqual(listeners[0]['Port'],80)
+
 
     def test_appelb_target_group_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
@@ -203,6 +228,46 @@ class AppELBTest(BaseTest):
             'actions': [
                 {'type': 'delete'}]},
             session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_delete_force(self):
+        self.patch(AppELB, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appelb_delete_force')
+        client = session_factory().client('elbv2')
+        p = self.load_policy({
+            'name': 'appelb-modify-listener-policy',
+            'resource': 'app-elb',
+            'filters': [{
+                'type': 'listener',
+                'key': 'Port',
+                'value': 80
+            }],
+            'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+            )
+        resources = p.run()
+        arn = resources[0]['LoadBalancerArn']
+        attributes = client.describe_load_balancer_attributes(LoadBalancerArn=arn)['Attributes']
+        for attribute in attributes:
+            for key,value in attribute.iteritems():
+                if 'deletion_protection.enabled' in key:
+                    self.assertTrue(value)
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'appelb-modify-listener-policy',
+            'resource': 'app-elb',
+            'filters': [{
+                'type': 'listener',
+                'key': 'Port',
+                'value': 80
+            }],
+            'actions': [{'type': 'delete', 'force': True}]
+            },
+            session_factory=session_factory
+            )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 

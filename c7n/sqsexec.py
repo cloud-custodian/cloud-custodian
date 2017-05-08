@@ -64,7 +64,7 @@ class SQSExecutor(Executor):
                 'op': {
                     'StringValue': named(func),
                     'DataType': 'String',
-                    },
+                },
                 'ser': {
                     'StringValue': 'json',
                     'DataType': 'String'}}
@@ -77,15 +77,13 @@ class SQSExecutor(Executor):
     def gather(self):
         """Fetch results from separate queue
         """
-        client = utils.local_session(self.session_factory).client('sqs')
         limit = self.op_sequence - self.op_sequence_start
         results = MessageIterator(self.sqs, self.reduce_queue, limit)
         for m in results:
             # sequence_id from above
             msg_id = int(m['MessageAttributes']['sequence_id']['StringValue'])
-            if (not msg_id > self.op_sequence_start
-                or not msg_id <= self.op_sequence
-                or not msg_id in self.futures):
+            if (not msg_id > self.op_sequence_start or not msg_id <= self.op_sequence or
+            msg_id not in self.futures):
                 raise RuntimeError(
                     "Concurrent queue user from different "
                     "process or previous results")

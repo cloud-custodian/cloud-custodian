@@ -265,7 +265,7 @@ class Tag(Action):
         key={'type': 'string'},
         value={'type': 'string'},
         tag={'type': 'string'},
-        )
+    )
 
     permissions = ('ec2:CreateTags',)
 
@@ -651,15 +651,17 @@ class NormalizeTag(Action):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for r in resource_set:
+                action    = self.data.get('action')
+                value     = self.data.get('value')
                 new_value = False
-                if self.data.get('action') == 'lower' and not r.islower():
+                if action == 'lower' and not r.islower():
                     new_value = r.lower()
-                elif self.data.get('action') == 'upper' and not r.isupper():
+                elif action == 'upper' and not r.isupper():
                     new_value = r.upper()
-                elif self.data.get('action') == 'title' and not r.istitle():
+                elif action == 'title' and not r.istitle():
                     new_value = r.title()
-                elif self.data.get('action') == 'strip' and self.data.get('value') and self.data.get('value') in r:
-                    new_value = r.strip(self.data.get('value'))
+                elif action == 'strip' and value and value in r:
+                    new_value = r.strip(value)
                 if new_value:
                     futures.append(
                         w.submit(self.process_transform, new_value, resource_set[r]))

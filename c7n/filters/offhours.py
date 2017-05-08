@@ -165,8 +165,8 @@ class Time(Filter):
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
             'debug': {'type': 'boolean'},
-            }
         }
+    }
 
     time_type = None
 
@@ -190,13 +190,14 @@ class Time(Filter):
         'bst': 'Europe/London',
         'ist': 'Europe/Dublin',
         'cet': 'Europe/Berlin',
-        'it': 'Asia/Kolkata', # Technically IST (Indian Standard Time), but that's the same as Ireland
+        # Technically IST (Indian Standard Time), but that's the same as Ireland
+        'it': 'Asia/Kolkata',
         'jst': 'Asia/Tokyo',
         'kst': 'Asia/Seoul',
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
         'brt': 'America/Sao_Paulo'
-        }
+    }
 
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
@@ -245,15 +246,14 @@ class Time(Filter):
         # but unit testing is calling this direct.
         if self.id_key is None:
             self.id_key = (
-                self.manager is None and 'InstanceId'
-                or self.manager.get_model().id)
+                self.manager is None and 'InstanceId' or self.manager.get_model().id)
 
         # The resource tag is not present, if we're not running in an opt-out
         # mode, we're done.
         if value is False:
             if not self.opt_out:
                 return False
-            value = "" # take the defaults
+            value = ""  # take the defaults
 
         # Resource opt out, track and record
         if 'off' == value:
@@ -528,5 +528,5 @@ class ScheduleParser(object):
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1]+1)
+            return range(day_range[0], 7) + range(day_range[1] + 1)
         return range(min(day_range), max(day_range) + 1)
