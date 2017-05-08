@@ -39,6 +39,8 @@ from c7n.version import version
 
 from c7n.resources import load_resources
 
+log = logging.getLogger('custodian.policy')
+
 
 def load(options, path, format='yaml', validate=True):
     # should we do os.path.expanduser here?
@@ -81,7 +83,7 @@ class PolicyCollection(object):
                 options.regions = all_regions
             for region in options.regions:
                 if all_regions and region not in all_regions:
-                    # TODO - do we want a message
+                    log.info('Skipping invalid region {} for resource {}.'.format(region, p['resource']))
                     continue
                 options_copy = copy.copy(options)
                 # TODO - why doesn't aws like unicode regions?
