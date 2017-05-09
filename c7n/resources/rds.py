@@ -720,7 +720,7 @@ class ResizeInstance(BaseAction):
 class RetentionWindow(BaseAction):
     """
     Sets the 'BackupRetentionPeriod' value for automated snapshots
-    
+
     :example:
         .. code-block: yaml
             policies:
