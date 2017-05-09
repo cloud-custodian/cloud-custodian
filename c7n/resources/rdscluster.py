@@ -152,7 +152,7 @@ class Delete(BaseAction):
 class RetentionWindow(BaseAction):
     """
     Action to set the retention period on rds cluster snapshots
-    
+
     :example:
         .. code-block: yaml
             policies:
