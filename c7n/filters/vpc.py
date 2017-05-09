@@ -33,7 +33,8 @@ class SecurityGroupFilter(MatchResourceValidator, RelatedResourceFilter):
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
+           'operator': {'enum': ['and', 'or']},
+           'filters': {'type': 'array'}})
     schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
@@ -45,7 +46,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
+           'operator': {'enum': ['and', 'or']},
+           'filters': {'type': 'array'}})
     schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.Subnet"

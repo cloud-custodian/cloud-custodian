@@ -37,14 +37,14 @@ class RelatedResourceFilter(ValueFilter):
         if self.RelatedIdsExpression is None:
             raise ValueError(
                 "%s Filter requires resource expression" % name)
-        # if self.AnnotationKey is None:
-        #    raise ValueError(
-        #        "%s Filter requires annotation key" % name)
-
         if self.RelatedResource is None:
             raise ValueError(
                 "%s Filter requires resource manager spec" % name)
-        return super(RelatedResourceFilter, self).validate()
+        if self.data.get('filters') is None:
+            return super(RelatedResourceFilter, self).validate()
+        else:
+            return self
+
 
     def get_related_ids(self, resources):
         return set(jmespath.search(
@@ -61,18 +61,22 @@ class RelatedResourceFilter(ValueFilter):
         return {r[model.id]: r for r in related
                 if r[model.id] in related_ids}
 
-    def get_resource_manager(self):
+    def get_resource_manager(self, with_filter=False):
         mod_path, class_name = self.RelatedResource.rsplit('.', 1)
         module = importlib.import_module(mod_path)
         manager_class = getattr(module, class_name)
-        return manager_class(self.manager.ctx, {})
+
+        data = {}
+        if self.data.get('filters') and with_filter:
+            data['filters'] = self.data['filters']
+        return manager_class(self.manager.ctx, data)
 
     def process_resource(self, resource, related):
         related_ids = self.get_related_ids([resource])
         model = self.manager.get_model()
         op = self.data.get('operator', 'or')
         found = []
-
+        items = []
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
@@ -93,15 +97,30 @@ class RelatedResourceFilter(ValueFilter):
                     self.RelatedResource.rsplit('.', 1)[-1],
                     rid)
                 continue
-            if self.match(robj):
-                found.append(rid)
+            items.append(robj)
+
+        filtered = []
+
+        # Now, we filter accordingly...
+        related_manager = self.get_resource_manager(True)
+        related_model = related_manager.get_model()
+        if self.data.get('filters'):
+            filtered = related_manager.filter_resources(items)
+        else:
+            filtered = filter(self.match, items)
+
 
         if found:
             self._add_annotations(found, resource)
+        if self.AnnotationKey is not None:
+            akey = 'c7n:%s' % self.AnnotationKey
+            found =  map(lambda r: r[related_model.id], filtered)
+            resource[akey] = list(set(found).union(resource.get(akey, [])))
+            resource['c7n:full:%s' % self.AnnotationKey] = filtered
 
-        if op == 'or' and found:
+        if op == 'or' and filtered:
             return True
-        elif op == 'and' and len(found) == len(related_ids):
+        elif op == 'and' and len(filtered) == len(items):
             return True
         return False
 
