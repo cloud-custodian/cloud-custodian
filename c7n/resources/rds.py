@@ -781,7 +781,7 @@ class RetentionWindow(BaseAction):
 @actions.register('retention1to35')
 class Retention1to35Window(BaseAction):
     """Sets the 'BackupRetentionPeriod' value for automated snapshots, between
-    1 and 35
+         valid 1 and 35 days
 
     :example:
 
