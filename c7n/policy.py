@@ -68,6 +68,8 @@ def load(options, path, format='yaml', validate=True):
 
 class PolicyCollection(object):
 
+    log = logging.getLogger('c7n.policies')
+
     def __init__(self, data, options):
         self.data = data
         self.options = options
@@ -75,13 +77,26 @@ class PolicyCollection(object):
         # We store all the policies passed in so we can refilter later
         self._all_policies = []
         session = utils.get_profile_session(options)
+        resource_types = set([p['resource'] for p in self.data.get('policies', [])])
+        resource_service_map = {r: resources.get(r).resource_type.service
+                                for r in resource_types if r != 'account'}
+        service_region_map = {
+            s: session.get_available_regions(s) for s in set(
+                itertools.chain(resource_service_map.values()))}
+
         for p in self.data.get('policies', []):
-            all_regions = session.get_available_regions(p['resource'])
+            available_regions = service_region_map.get(
+                resource_service_map[p['resource']], ())
+
             if 'all' in options.regions:
-                options.regions = all_regions
+                if not available_regions:
+                    options.regions = ['us-east-1']
+                else:
+                    options.regions = available_regions
             for region in options.regions:
-                if region not in all_regions:
-                    # TODO - do we want a message
+                if region not in available_regions:
+                    self.log.debug("policy:%s resources:%s not available in region:%s",
+                                   p['name'], p['resource'], region)
                     continue
                 options_copy = copy.copy(options)
                 # TODO - why doesn't aws like unicode regions?
