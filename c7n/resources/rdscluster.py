@@ -150,7 +150,9 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Action to set the retention period on rds cluster snapshots
+    """
+    Action to set the retention period on rds cluster snapshots
+    
     :example:
         .. code-block: yaml
             policies:
@@ -208,8 +210,9 @@ class RetentionWindow(BaseAction):
 
 @actions.register('retention1to35')
 class Retention1to35Window(BaseAction):
-    """Action to set the retention period on rds cluster snapshots between
-    1 to 35
+    """
+    Action to set the retention period on rds cluster snapshots between
+    valid 1 to 35 days
 
     :example:
 
