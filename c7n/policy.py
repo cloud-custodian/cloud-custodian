@@ -86,7 +86,7 @@ class PolicyCollection(object):
 
         for p in self.data.get('policies', []):
             available_regions = service_region_map.get(
-                resource_service_map[p['resource']], ())
+                resource_service_map.get(p['resource']), ())
 
             if 'all' in options.regions:
                 if not available_regions:
@@ -94,7 +94,7 @@ class PolicyCollection(object):
                 else:
                     options.regions = available_regions
             for region in options.regions:
-                if region not in available_regions:
+                if available_regions and region not in available_regions:
                     self.log.debug("policy:%s resources:%s not available in region:%s",
                                    p['name'], p['resource'], region)
                     continue

@@ -17,6 +17,7 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.manager import resources
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 
@@ -394,3 +395,16 @@ class PullModeTest(BaseTest):
         self.assertIn(
             "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(policy_name),
             lines)
+
+
+class AllResourcesTest(BaseTest):
+    """ Make sure we can load a policy for all the resources we support """
+    
+    def test_all_resources(self):
+        failures = []
+        for resource in sorted(resources.keys()):
+            data = {'policies': [{'name': 'test', 'resource': resource}]}
+            if len(policy.PolicyCollection(data, Config.empty())) == 0:
+                failures.append(resource)
+        
+        self.assertFalse(failures)
