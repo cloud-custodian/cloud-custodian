@@ -15,7 +15,7 @@
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-
+from c7n.filters import ( FilterRegistry, Filter )
 
 @resources.register('hostedzone')
 class HostedZone(QueryResourceManager):
@@ -56,3 +56,25 @@ class ResourceRecordSet(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
+
+
+@resources.register('r53domain')
+class R53Domain(QueryResourceManager):
+    class resource_type(object):
+        service = 'route53domains'
+        type = 'r53domain'
+        enum_spec = ('list_domains', 'Domains', None)
+        name = id = 'Route53Domains'
+        filter_name = None
+        date = None
+        dimension = None
+    filter_registry = FilterRegistry('r53domain.filters')
+
+
+@R53Domain.filter_registry.register('transfer-lock')
+class TransferLock(Filter):
+    schema = type_schema('transfer-lock', value={'type': 'boolean'})
+    permissions = ('route53domains:ListDomains',)
+    def process(self):
+        print('processing function call')
+        return []
