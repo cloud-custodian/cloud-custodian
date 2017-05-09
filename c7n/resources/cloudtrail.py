@@ -20,6 +20,7 @@ import re
 
 filters = FilterRegistry('cloudtrail.filters')
 
+
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
 
@@ -38,11 +39,12 @@ class CloudTrail(QueryResourceManager):
 
     filter_registry = filters
 
+
 @filters.register('monitored-metric')
 class MonitoredCloudtrailMetric(ValueFilter):
-    """Finds cloudtrails with logging and a metric filter. Is a subclass of ValueFilter, filtering the metric filter
-    objects. Optionally, verifies an alarm exists (true by default), and for said alarm, there is atleast one SNS
-    subscription (again, true by default).
+    """Finds cloudtrails with logging and a metric filter. Is a subclass of ValueFilter,
+    filtering the metric filter objects. Optionally, verifies an alarm exists (true by default),
+    and for said alarm, there is atleast one SNS subscription (again, true by default).
 
     :example:
 
@@ -63,23 +65,34 @@ class MonitoredCloudtrailMetric(ValueFilter):
         'topic-subscription': {'type': 'boolean'},
         'alarm': {'type': 'boolean'}
     })
-    permissions = ('logs:DescribeMetricFilters', 'cloudwatch:DescribeAlarms', 'sns:ListSubscriptionsByTopic')
+
+    permissions = ('logs:DescribeMetricFilters', 'cloudwatch:DescribeAlarms',
+        'sns:ListSubscriptionsByTopic')
 
     def _filterTopicArnsToSubscribed(self, session, topicArns):
         sns = session.client('sns')
-        return filter(lambda arn: any(sns.list_subscriptions_by_topic(TopicArn=arn)['Subscriptions']), topicArns)
+
+        def arnHasSubscriptions(arn):
+            subscriptions = sns.list_subscriptions_by_topic(TopicArn=arn)['Subscriptions']
+            return any(subscriptions)
+        return filter(arnHasSubscriptions, topicArns)
 
     def _allAlarms(self, session):
         # TODO: We should cache this better.
         cloudwatch = session.client('cloudwatch')
-        results = cloudwatch.get_paginator('describe_alarms').paginate().build_full_result()
+        paginator = cloudwatch.get_paginator('describe_alarms')
+        results = paginator.paginate().build_full_result()
         return results['MetricAlarms']
 
     def _metricFiltersForLogGroup(self, session, groupName):
         logs = session.client('logs')
-        results = logs.get_paginator('describe_metric_filters').paginate(logGroupName=groupName).build_full_result()
+        paginator = logs.get_paginator('describe_metric_filters')
+        results = paginator.paginate(logGroupName=groupName).build_full_result()
         return results['metricFilters']
 
+    def _alarmInMetrics(self, alarm, metrics):
+        pair = (alarm['Namespace'], alarm['MetricName'])
+        return pair in metrics
 
     def checkResourceMetricFilters(self, resource):
         logGroupArn = resource.get('CloudWatchLogsLogGroupArn')
@@ -97,8 +110,9 @@ class MonitoredCloudtrailMetric(ValueFilter):
 
         # We need to filter the list of transformations to those that emit a value, and then put
         # it into a format we can easily cross compare on.
-        metricTransformations = sum(map(lambda filter: filter['metricTransformations'], matchingFilters), [])
-        emittedMetrics = map(lambda t: (t['metricNamespace'], t['metricName']), metricTransformations)
+        allTransformations = map(lambda filter: filter['metricTransformations'], matchingFilters)
+        transformations = sum(allTransformations, [])
+        emittedMetrics = map(lambda t: (t['metricNamespace'], t['metricName']), transformations)
         if not emittedMetrics:
             return False
         resource['c7n:emitted-metric-filters'] = emittedMetrics
@@ -107,7 +121,10 @@ class MonitoredCloudtrailMetric(ValueFilter):
 
         if self.data.get('alarm', True):
             metricAlarms = self._allAlarms(session)
-            filteredAlarms = filter(lambda alarm: any(map(lambda mf: alarm['Namespace'] == mf[0] and alarm['MetricName'] == mf[1], emittedMetrics)), metricAlarms)
+
+            def alarmFilter(alarm):
+                return self._alarmInMetrics(alarm, emittedMetrics)
+            filteredAlarms = filter(alarmFilter, metricAlarms)
             if not filteredAlarms:
                 return False
             consideredSet = filteredAlarms
@@ -120,7 +137,6 @@ class MonitoredCloudtrailMetric(ValueFilter):
                 resource['c7n:subscribed-metric-filter-alarm-topics'] = consideredSet
 
         return any(consideredSet)
-
 
     def process(self, resources, event=None):
         return [resource for resource in resources if self.checkResourceMetricFilters(resource)]
