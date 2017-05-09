@@ -14,7 +14,11 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.filters import FilterRegistry, ValueFilter
+from c7n.utils import local_session, type_schema
+import re
 
+filters = FilterRegistry('cloudtrail.filters')
 
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
@@ -31,3 +35,92 @@ class CloudTrail(QueryResourceManager):
         name = 'Name'
         dimension = None
         config_type = "AWS::CloudTrail::Trail"
+
+    filter_registry = filters
+
+@filters.register('monitored-metric')
+class MonitoredCloudtrailMetric(ValueFilter):
+    """Finds cloudtrails with logging and a metric filter. Is a subclass of ValueFilter, filtering the metric filter
+    objects. Optionally, verifies an alarm exists (true by default), and for said alarm, there is atleast one SNS
+    subscription (again, true by default).
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudtrail-trail-with-login-attempts
+                resource: cloudtrail
+                region: us-east-1
+                filters:
+                  - type: monitored-metric
+                    alarm: true
+                    topic-subscription: false
+                    filter: '$.eventName = DeleteTrail'
+    """
+
+    schema = type_schema('monitored-metric', rinherit=ValueFilter.schema, **{
+        'topic-subscription': {'type': 'boolean'},
+        'alarm': {'type': 'boolean'}
+    })
+    permissions = ('logs:DescribeMetricFilters', 'cloudwatch:DescribeAlarms', 'sns:ListSubscriptionsByTopic')
+
+    def _filterTopicArnsToSubscribed(self, session, topicArns):
+        sns = session.client('sns')
+        return filter(lambda arn: any(sns.list_subscriptions_by_topic(TopicArn=arn)['Subscriptions']), topicArns)
+
+    def _allAlarms(self, session):
+        # TODO: We should cache this better.
+        cloudwatch = session.client('cloudwatch')
+        results = cloudwatch.get_paginator('describe_alarms').paginate().build_full_result()
+        return results['MetricAlarms']
+
+    def _metricFiltersForLogGroup(self, session, groupName):
+        logs = session.client('logs')
+        results = logs.get_paginator('describe_metric_filters').paginate(logGroupName=groupName).build_full_result()
+        return results['metricFilters']
+
+
+    def checkResourceMetricFilters(self, resource):
+        logGroupArn = resource.get('CloudWatchLogsLogGroupArn')
+        if not logGroupArn:
+            return False
+
+        session = local_session(self.manager.session_factory)
+
+        groupName = re.search(':log-group:([^:]+)', logGroupArn).group(1)
+        filters = self._metricFiltersForLogGroup(session, groupName)
+        matchingFilters = filter(lambda mf: self.match(mf), filters)
+        if not matchingFilters:
+            return False
+        resource['c7n:matching-metric-filters'] = matchingFilters
+
+        # We need to filter the list of transformations to those that emit a value, and then put
+        # it into a format we can easily cross compare on.
+        metricTransformations = sum(map(lambda filter: filter['metricTransformations'], matchingFilters), [])
+        emittedMetrics = map(lambda t: (t['metricNamespace'], t['metricName']), metricTransformations)
+        if not emittedMetrics:
+            return False
+        resource['c7n:emitted-metric-filters'] = emittedMetrics
+
+        consideredSet = emittedMetrics
+
+        if self.data.get('alarm', True):
+            metricAlarms = self._allAlarms(session)
+            filteredAlarms = filter(lambda alarm: any(map(lambda mf: alarm['Namespace'] == mf[0] and alarm['MetricName'] == mf[1], emittedMetrics)), metricAlarms)
+            if not filteredAlarms:
+                return False
+            consideredSet = filteredAlarms
+            resource['c7n:metric-filter-alarms'] = filteredAlarms
+            if self.data.get('topic-subscription'):
+                alarmSNSTopics = sum(map(lambda alarm: alarm['AlarmActions'], filteredAlarms), [])
+                if not alarmSNSTopics:
+                    return False
+                consideredSet = self._filterTopicArnsToSubscribed(session, alarmSNSTopics)
+                resource['c7n:subscribed-metric-filter-alarm-topics'] = consideredSet
+
+        return any(consideredSet)
+
+
+    def process(self, resources, event=None):
+        return [resource for resource in resources if self.checkResourceMetricFilters(resource)]
