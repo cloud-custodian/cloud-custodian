@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import json
 import fnmatch
 import itertools
@@ -55,16 +56,19 @@ def load(options, path, format='yaml', validate=True):
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
         if errors:
             raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
+
     return PolicyCollection(data, options)
 
 
 class PolicyCollection(object):
+
+    log = logging.getLogger('c7n.policies')
 
     def __init__(self, data, options):
         self.data = data
@@ -72,10 +76,34 @@ class PolicyCollection(object):
 
         # We store all the policies passed in so we can refilter later
         self._all_policies = []
+        session = utils.get_profile_session(options)
+        resource_types = set([p['resource'] for p in self.data.get('policies', [])])
+        resource_service_map = {r: resources.get(r).resource_type.service
+                                for r in resource_types if r != 'account'}
+        service_region_map = {
+            s: session.get_available_regions(s) for s in set(
+                itertools.chain(resource_service_map.values()))}
+
         for p in self.data.get('policies', []):
-            self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
-        
+            available_regions = service_region_map.get(
+                resource_service_map[p['resource']], ())
+
+            if 'all' in options.regions:
+                if not available_regions:
+                    options.regions = ['us-east-1']
+                else:
+                    options.regions = available_regions
+            for region in options.regions:
+                if region not in available_regions:
+                    self.log.debug("policy:%s resources:%s not available in region:%s",
+                                   p['name'], p['resource'], region)
+                    continue
+                options_copy = copy.copy(options)
+                # TODO - why doesn't aws like unicode regions?
+                options_copy.region = str(region)
+                self._all_policies.append(
+                    Policy(p, options_copy, session_factory=self.test_session_factory()))
+
         # Do an initial filtering
         self.policies = []
         resource_type = getattr(self.options, 'resource_type', None)
@@ -100,7 +128,7 @@ class PolicyCollection(object):
             policies.append(policy)
 
         return policies
-    
+
     def __iter__(self):
         return iter(self.policies)
 
@@ -244,7 +272,7 @@ class PullMode(PolicyExecutionMode):
                     " resources: %d"
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
-                        len(resources), time.time()-s))
+                        len(resources), time.time() - s))
                 self.policy._write_file(
                     "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(

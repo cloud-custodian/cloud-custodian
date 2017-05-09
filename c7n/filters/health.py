@@ -62,7 +62,7 @@ class HealthEventFilter(Filter):
                     'c7n:HealthEvent', []).append(event_map[e['eventArn']])
                 found.add(rid)
             seen.update(event_map.keys())
-        return [resource_map[rid] for rid in found]
+        return [resource_map[resource_id] for resource_id in found]
 
     def get_filter_parameters(self):
         m = self.manager

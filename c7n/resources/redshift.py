@@ -56,7 +56,7 @@ class Redshift(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
 
-    permissions = ('iam:ListRoles',) # account id retrieval
+    permissions = ('iam:ListRoles',)  # account id retrieval
     _generate_arn = None
 
     @property
@@ -329,6 +329,7 @@ class Snapshot(BaseAction):
                         "Exception creating Redshift snapshot  \n %s",
                         f.exception())
         return clusters
+
     def process_cluster_snapshot(self, cluster):
         c = local_session(self.manager.session_factory).client('redshift')
         cluster_tags = cluster.get('Tags')
