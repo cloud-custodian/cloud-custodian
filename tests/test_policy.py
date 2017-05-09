@@ -397,9 +397,10 @@ class PullModeTest(BaseTest):
             lines)
 
 
-class AllRegionsTest(BaseTest):
+class AllResourcesTest(BaseTest):
+    """ Make sure we can load a policy for all the resources we support """
     
-    def test_all_regions(self):
+    def test_all_resources(self):
         failures = []
         for resource in sorted(resources.keys()):
             data = {'policies': [{'name': 'test', 'resource': resource}]}
