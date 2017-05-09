@@ -718,7 +718,9 @@ class ResizeInstance(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Sets the 'BackupRetentionPeriod' value for automated snapshots
+    """
+    Sets the 'BackupRetentionPeriod' value for automated snapshots
+    
     :example:
         .. code-block: yaml
             policies:
@@ -780,8 +782,9 @@ class RetentionWindow(BaseAction):
 
 @actions.register('retention1to35')
 class Retention1to35Window(BaseAction):
-    """Sets the 'BackupRetentionPeriod' value for automated snapshots, between
-         valid 1 and 35 days
+    """
+    Sets the 'BackupRetentionPeriod' value for automated snapshots, between
+    the valid 1 and 35 days
 
     :example:
 
