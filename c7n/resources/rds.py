@@ -777,7 +777,7 @@ class RetentionWindow(BaseAction):
         if (1 <= new_retention1to35 <= 35):
             if ((current_copy_tags != new_copy_tags) and
               _db_instance_eligible_for_backup(resource)):
-                self.set_retention_window(resource, new_retention1t035, new_copy_tags)
+                self.set_retention_window(resource, new_retention1to35, new_copy_tags)
                 return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
