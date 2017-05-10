@@ -15,7 +15,7 @@
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.filters import ( FilterRegistry, Filter )
+
 
 @resources.register('hostedzone')
 class HostedZone(QueryResourceManager):
@@ -69,4 +69,3 @@ class Route53Domain(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
-
