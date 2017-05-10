@@ -59,22 +59,14 @@ class ResourceRecordSet(QueryResourceManager):
 
 
 @resources.register('r53domain')
-class R53Domain(QueryResourceManager):
+class Route53Domain(QueryResourceManager):
+
     class resource_type(object):
         service = 'route53domains'
         type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
-        name = id = 'Route53Domains'
+        name = id = 'Route53Domain'
         filter_name = None
         date = None
         dimension = None
-    filter_registry = FilterRegistry('r53domain.filters')
 
-
-@R53Domain.filter_registry.register('transfer-lock')
-class TransferLock(Filter):
-    schema = type_schema('transfer-lock', value={'type': 'boolean'})
-    permissions = ('route53domains:ListDomains',)
-    def process(self):
-        print('processing function call')
-        return []
