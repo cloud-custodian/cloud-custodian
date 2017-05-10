@@ -546,16 +546,16 @@ class AutoTagUser(EventAction):
 
         user = None
         if utype == "IAMUser":
-            user               = event['userIdentity']['userName']
+            user = event['userIdentity']['userName']
             principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
-            user               = event['userIdentity']['arn']
+            user = event['userIdentity']['arn']
+            prefix, user = user.rsplit('/', 1)
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
-            prefix, user       = user.rsplit('/', 1)
             # instance role
             if user.startswith('i-'):
                 return
-            # lambda function
+            # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
         if user is None:
@@ -582,7 +582,6 @@ class AutoTagUser(EventAction):
         new_tags = {
             self.data['tag']: user
         }
-        principal_id_key = self.data.get('principal_id_tag', None)
         # if principal_id_key is set (and value), we'll set the principalId tag.
         principal_id_key = self.data.get('principal_id_tag', None)
         if principal_id_key and principal_id_value:
