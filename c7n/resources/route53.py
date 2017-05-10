@@ -15,7 +15,7 @@
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-
+from c7n.filters import ( FilterRegistry, Filter )
 
 @resources.register('hostedzone')
 class HostedZone(QueryResourceManager):
@@ -56,3 +56,17 @@ class ResourceRecordSet(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
+
+
+@resources.register('r53domain')
+class Route53Domain(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'route53domains'
+        type = 'r53domain'
+        enum_spec = ('list_domains', 'Domains', None)
+        name = id = 'Route53Domain'
+        filter_name = None
+        date = None
+        dimension = None
+
