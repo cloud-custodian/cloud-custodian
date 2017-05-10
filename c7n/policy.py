@@ -66,6 +66,10 @@ def load(options, path, format='yaml', validate=True):
     return PolicyCollection(data, options)
 
 
+class ValidationError(Exception):
+    pass
+
+
 class PolicyCollection(object):
 
     log = logging.getLogger('c7n.policies')
@@ -403,9 +407,13 @@ class LambdaMode(PolicyExecutionMode):
                 # it for the lambda
                 manager = LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
-            return manager.publish(
-                PolicyLambda(self.policy), 'current',
-                role=self.policy.options.assume_role)
+
+            try:
+                return manager.publish(
+                    PolicyLambda(self.policy), 'current',
+                    role=self.policy.options.assume_role)
+            except AttributeError as e:
+                raise ValidationError(e)
 
     def get_logs(self, start, end):
         manager = mu.LambdaManager(self.policy.session_factory)
