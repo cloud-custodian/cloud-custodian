@@ -69,3 +69,4 @@ class Route53Domain(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
+
