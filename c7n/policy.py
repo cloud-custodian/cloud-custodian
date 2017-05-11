@@ -127,6 +127,12 @@ class PolicyCollection(object):
                     continue
                 options_copy = copy.copy(self.options)
                 options_copy.region = str(region)
+
+                if len(regions) > 1 or 'all' in regions and getattr(
+                        self.options, 'output_dir', None):
+                    options_copy.output_dir = (
+                        self.options.output_dir.rstrip('/') + '/%s' % region)
+
                 policies.append(
                     Policy(p.data, options_copy, session_factory=self.test_session_factory()))
         return PolicyCollection(policies, self.options)
