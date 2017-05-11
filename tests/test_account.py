@@ -219,6 +219,38 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_account_virtual_mfa(self):
+        # only warns when the default threshold goes to warning or above
+        session_factory = self.replay_flight_data('test_account_virtual_mfa')
+        p1 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa'}]},
+            session_factory=session_factory)
+        resources = p1.run()
+        self.assertEqual(len(resources), 1)
+
+        p2 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa',
+                'value': True}]},
+            session_factory=session_factory)
+        resources = p2.run()
+        self.assertEqual(len(resources), 1)
+
+        p3 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa',
+                'value': False}]},
+            session_factory=session_factory)
+        resources = p3.run()
+        self.assertEqual(len(resources), 0)
+
     def test_missing_password_policy(self):
         session_factory = self.replay_flight_data('test_account_missing_password_policy')
         p = self.load_policy({

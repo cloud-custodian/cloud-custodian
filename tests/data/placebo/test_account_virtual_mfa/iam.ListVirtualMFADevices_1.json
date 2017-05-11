@@ -1,0 +1,110 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1cecdfec-35e8-11e7-8dba-0776c02973bd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1cecdfec-35e8-11e7-8dba-0776c02973bd", 
+                "date": "Thu, 11 May 2017 01:21:09 GMT", 
+                "content-length": "1873", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "VirtualMFADevices": [
+            {
+                "SerialNumber": "arn:aws:iam::123456789123:mfa/root-account-mfa-device", 
+                "EnableDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 13, 
+                    "minute": 56
+                }
+            }, 
+            {
+                "SerialNumber": "arn:aws:iam::123456789123:mfa/fake.person", 
+                "EnableDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 16
+                }, 
+                "User": {
+                    "UserName": "fake.person", 
+                    "PasswordLastUsed": {
+                        "hour": 22, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 34, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 8, 
+                        "minute": 36
+                    }, 
+                    "CreateDate": {
+                        "hour": 5, 
+                        "__class__": "datetime", 
+                        "month": 12, 
+                        "second": 8, 
+                        "microsecond": 0, 
+                        "year": 2015, 
+                        "day": 14, 
+                        "minute": 30
+                    }, 
+                    "UserId": "FAKEUSER2", 
+                    "Path": "/", 
+                    "Arn": "arn:aws:iam::123456789123:user/fake.person"
+                }
+            }, 
+            {
+                "SerialNumber": "arn:aws:iam::123456789123:mfa/other.person", 
+                "EnableDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 31
+                }, 
+                "User": {
+                    "UserName": "other.person", 
+                    "PasswordLastUsed": {
+                        "hour": 1, 
+                        "__class__": "datetime", 
+                        "month": 4, 
+                        "second": 23, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 11, 
+                        "minute": 28
+                    }, 
+                    "CreateDate": {
+                        "hour": 0, 
+                        "__class__": "datetime", 
+                        "month": 4, 
+                        "second": 39, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 11, 
+                        "minute": 55
+                    }, 
+                    "UserId": "FAKEUSER3", 
+                    "Path": "/", 
+                    "Arn": "arn:aws:iam::123456789123:user/other.person"
+                }
+            }
+        ]
+    }
+}
