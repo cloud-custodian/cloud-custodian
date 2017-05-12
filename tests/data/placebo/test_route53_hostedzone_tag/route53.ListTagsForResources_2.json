@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceTagSets": [
+            {
+                "ResourceType": "hostedzone", 
+                "ResourceId": "Z2Z4E3FM478G79", 
+                "Tags": []
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2d76ed2a-367d-11e7-9a7a-6bcf1acab425", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2d76ed2a-367d-11e7-9a7a-6bcf1acab425", 
+                "date": "Thu, 11 May 2017 19:08:12 GMT", 
+                "content-length": "290", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

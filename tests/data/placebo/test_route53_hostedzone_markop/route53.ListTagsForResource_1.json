@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceTagSet": {
+            "ResourceType": "hostedzone",
+            "ResourceId": "Z2Z4E3FM478G79",
+            "Tags": [
+                {
+                    "Value": "xyz",
+                    "Key": "abc"
+                },
+                {
+                    "Value": "Resource does not meet policy: notify@2017/05/15",
+                    "Key": "maid_status"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "e6eee4a1-3687-11e7-9a7a-6bcf1acab425",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e6eee4a1-3687-11e7-9a7a-6bcf1acab425",
+                "date": "Thu, 11 May 2017 20:24:57 GMT",
+                "content-length": "398",
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
