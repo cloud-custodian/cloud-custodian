@@ -26,7 +26,7 @@ import time
 
 import yaml
 
-from c7n.policy import Policy, load as policy_load
+from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
@@ -43,14 +43,17 @@ def policy_command(f):
     def _load_policies(options):
         load_resources()
 
-        policies = []
-        all_policies = []
         errors = 0
-        for file in options.configs:
+        all_policies = PolicyCollection.from_data({}, options)
+
+        # for a default region for policy loading, we'll expand regions later.
+        options.region = options.regions[0]
+
+        for fp in options.configs:
             try:
-                collection = policy_load(options, file)
+                collection = policy_load(options, fp)
             except IOError:
-                eprint('Error: policy file does not exist ({})'.format(file))
+                eprint('Error: policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
             except ValueError as e:
@@ -59,17 +62,24 @@ def policy_command(f):
                 continue
 
             if collection is None:
-                log.debug('Loaded file {}. Contained no policies.'.format(file))
+                log.debug('Loaded file {}. Contained no policies.'.format(fp))
             else:
                 log.debug(
-                    'Loaded file {}. Contains {} policies (after filtering)'.format(
-                        file, len(collection)))
-                policies.extend(collection.policies)
-                all_policies.extend(collection.unfiltered_policies)
+                    'Loaded file {}. Contains {} policies'.format(
+                        fp, len(collection)))
+                all_policies = all_policies + collection
 
         if errors > 0:
             eprint('Found {} errors.  Exiting.'.format(errors))
             sys.exit(1)
+
+        # filter by name and resource type
+        policies = all_policies.filter(
+            getattr(options, 'policy_filter', None),
+            getattr(options, 'resource_type', None))
+
+        # expand by region, this results in a separate policy instance per region of execution.
+        policies = policies.expand_regions(options.regions)
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
@@ -91,7 +101,7 @@ def policy_command(f):
                     eprint("Error: duplicate policy name '{}'".format(policy))
                     sys.exit(1)
 
-        return f(options, policies)
+        return f(options, list(policies))
 
     return _load_policies
 

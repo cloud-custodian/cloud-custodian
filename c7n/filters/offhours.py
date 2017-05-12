@@ -122,8 +122,8 @@ Options
 
 - tag: the tag name to use when configuring
 - default_tz: the default timezone to use when interpreting offhours
-- offhour: the time to turn instances off, specified in 0-24
-- onhour: the time to turn instances on, specified in 0-24
+- offhour: the time to turn instances off, specified in 0-23
+- onhour: the time to turn instances on, specified in 0-23
 - opt-out: default behavior is opt in, as in ``tag`` must be present,
   with opt-out: true, the tag doesn't need to be present.
 
@@ -164,7 +164,6 @@ class Time(Filter):
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
-            'debug': {'type': 'boolean'},
         }
     }
 
@@ -263,17 +262,21 @@ class Time(Filter):
             self.enabled_count += 1
 
         try:
-            return self.process_resource_schedule(i, value)
+            return self.process_resource_schedule(i, value, self.time_type)
         except:
             log.exception(
                 "%s failed to process resource:%s value:%s",
                 self.__class__.__name__, i[self.id_key], value)
             return False
 
-    def process_resource_schedule(self, i, value):
+    def process_resource_schedule(self, i, value, time_type):
         """Does the resource tag schedule and policy match the current time."""
         rid = i[self.id_key]
-        if self.parser.has_resource_schedule(value):
+        # this is to normalize trailing semicolons which when done allows
+        # dateutil.parser.parse to process: value='off=(m-f,1);' properly.
+        # before this normalization, some cases would silently fail.
+        value = ';'.join(filter(None, value.split(';')))
+        if self.parser.has_resource_schedule(value, time_type):
             schedule = self.parser.parse(value)
         elif self.parser.keys_are_valid(value):
             # respect timezone from tag
@@ -340,7 +343,7 @@ class OffHour(Time):
 
     schema = type_schema(
         'offhour', rinherit=Time.schema, required=['offhour', 'default_tz'],
-        offhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        offhour={'type': 'integer', 'minimum': 0, 'maximum': 23})
     time_type = "off"
 
     DEFAULT_HR = 19
@@ -362,7 +365,7 @@ class OnHour(Time):
 
     schema = type_schema(
         'onhour', rinherit=Time.schema, required=['onhour', 'default_tz'],
-        onhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        onhour={'type': 'integer', 'minimum': 0, 'maximum': 23})
     time_type = "on"
 
     DEFAULT_HR = 7
@@ -495,9 +498,10 @@ class ScheduleParser(object):
         return schedule
 
     @staticmethod
-    def has_resource_schedule(tag_value):
+    def has_resource_schedule(tag_value, time_type):
         raw_data = ScheduleParser.raw_data(tag_value)
-        return 'on' in raw_data and 'off' in raw_data
+        # note time_type is set to 'on' or 'off' and raw_data is a dict
+        return time_type in raw_data
 
     def parse_resource_schedule(self, lexeme):
         parsed = []
