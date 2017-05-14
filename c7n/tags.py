@@ -710,7 +710,7 @@ class UniversalTag(Tag):
             ResourceARNList=arns,
             Tags=tags)
 
-        for f in response['FailedResourcesMap']:
+        for f in response.get('FailedResourcesMap', ()):
             raise Exception("Resource:{} ".format(f) +
                             "ErrorCode:{} ".format(
                             response['FailedResourcesMap'][f]['ErrorCode']) +
@@ -747,7 +747,7 @@ class UniversalUntag(RemoveTag):
             ResourceARNList=arns,
             TagKeys=tag_keys)
 
-        for f in response['FailedResourcesMap']:
+        for f in response.get('FailedResourcesMap', ()):
             raise Exception("Resource:{} ".format(f) +
                             "ErrorCode:{} ".format(
                             response['FailedResourcesMap'][f]['ErrorCode']) +
@@ -830,7 +830,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
             ResourceARNList=arns,
             Tags=tags)
 
-        for f in response['FailedResourcesMap']:
+        for f in response.get('FailedResourcesMap', ()):
             raise Exception("Resource:{} ".format(f) +
                             "ErrorCode:{} ".format(
                             response['FailedResourcesMap'][f]['ErrorCode']) +
