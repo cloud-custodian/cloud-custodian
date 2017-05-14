@@ -201,6 +201,11 @@ def local_session(factory):
     return s
 
 
+def reset_session_cache():
+    setattr(CONN_CACHE, 'session', None)
+    setattr(CONN_CACHE, 'time', 0)
+
+
 def annotation(i, k):
     return i.get(k, ())
 

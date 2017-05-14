@@ -152,9 +152,7 @@ def _report_options(p):
         help="Format to output data in (default: %(default)s). "
         "Options include simple, grid, rst")
 
-    # We don't include `region` because the report command ignores it
-    p.add_argument("--region", dest='regions', default=[DEFAULT_REGION],
-                   help=argparse.SUPPRESS)
+    p.set_defaults(regions=[])
 
 
 def _metrics_options(p):
