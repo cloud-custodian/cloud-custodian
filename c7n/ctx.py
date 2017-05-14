@@ -33,7 +33,7 @@ class ExecutionContext(object):
         output_dir = getattr(options, 'output_dir', '')
         if output_dir:
             factory = FSOutput.select(output_dir)
-            self.output_path = factory.join(output_dir, policy.name)
+            self.output_path = factory.join(output_dir, policy.name, self.options.region)
             self.output = factory(self)
         else:
             self.output_path = self.output = None

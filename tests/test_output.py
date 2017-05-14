@@ -100,7 +100,7 @@ class S3OutputTest(unittest.TestCase):
 
     def test_upload(self):
         output = self.get_s3_output()
-        self.assertEqual(output.key_prefix, "/policies/xyz")
+        self.assertEqual(output.key_prefix, "/policies/xyz/us-east-1")
 
         with open(os.path.join(output.root_dir, 'foo.txt'), 'w') as fh:
             fh.write('abc')
@@ -112,7 +112,7 @@ class S3OutputTest(unittest.TestCase):
 
         m.assert_called_with(
             fh.name, 'cloud-custodian',
-            'policies/xyz/%s/foo.txt' % output.date_path ,
+            'policies/xyz/us-east-1/%s/foo.txt' % output.date_path ,
             extra_args={
                 'ServerSideEncryption': 'AES256'})
 
@@ -129,6 +129,6 @@ class S3OutputTest(unittest.TestCase):
 
         m.assert_called_with(
             fh.name, 'cloud-custodian',
-            'policies/xyz/%s/foo.txt' % output.date_path,
+            'policies/xyz/us-east-1/%s/foo.txt' % output.date_path,
             extra_args={
                 'ServerSideEncryption': 'AES256'})

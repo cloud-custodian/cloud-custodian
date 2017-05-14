@@ -81,6 +81,7 @@ class OffHoursFilterTest(BaseTest):
         with open(os.path.join(
                 p.options['output_dir'],
                 'offhours-records',
+                'us-east-1',
                 'parse_errors.json')) as fh:
             data = json.load(fh)
             self.assertEqual(len(data), 1)
@@ -89,6 +90,7 @@ class OffHoursFilterTest(BaseTest):
         with open(os.path.join(
                 p.options['output_dir'],
                 'offhours-records',
+                'us-east-1',
                 'opted_out.json')) as fh:
             data = json.load(fh)
             self.assertEqual(len(data), 1)

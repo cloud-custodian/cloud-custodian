@@ -29,6 +29,7 @@ def log_lines():
             'data',
             'logs',
             'test-policy',
+            'us-east-1',
             'custodian-run.log',
         )
     ) as fh:
