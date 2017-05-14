@@ -705,10 +705,19 @@ class UniversalTag(Tag):
                 _id = _id.split("/")[-1]
                 arns.append(self.manager.generate_arn(_id))
 
-        self.manager.retry(
+        response = self.manager.retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)
+
+        for f in response['FailedResourcesMap']:
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
 
 
 class UniversalUntag(RemoveTag):
@@ -733,10 +742,19 @@ class UniversalUntag(RemoveTag):
                 _id = _id.split("/")[-1]
                 arns.append(self.manager.generate_arn(_id))
 
-        self.manager.retry(
+        response = self.manager.retry(
             client.untag_resources,
             ResourceARNList=arns,
             TagKeys=tag_keys)
+
+        for f in response['FailedResourcesMap']:
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
 
 
 class UniversalTagDelayedAction(TagDelayedAction):
@@ -807,7 +825,16 @@ class UniversalTagDelayedAction(TagDelayedAction):
                 _id = _id.split("/")[-1]
                 arns.append(self.manager.generate_arn(_id))
 
-        self.manager.retry(
+        response = self.manager.retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)
+
+        for f in response['FailedResourcesMap']:
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
