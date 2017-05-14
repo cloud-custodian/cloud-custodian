@@ -297,8 +297,20 @@ def setup_parser():
     # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
-    run_desc = ("Execute the policies in a config file")
-    run = subs.add_parser("run", description=run_desc, help=run_desc)
+    run_desc = "\n".join((
+        "Execute the policies in a config file",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "Policies targeting resources in regions where they do not exist will ",
+        "not be run. The output directory when passing multiple regions is suffixed ",
+        "with the region.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc, help=run_desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
