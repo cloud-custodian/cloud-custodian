@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import datetime
 import time
 import logging
 
@@ -39,7 +38,8 @@ class EMRCluster(QueryResourceManager):
     class resource_type(object):
         service = 'emr'
         type = 'emr'
-        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']})
+        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'

@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:c3ba9110-56ea-412e-a6ec-aaec45330901:autoScalingGroupName/scot-asg-test", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "scot-asg-test", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "ubuntu", 
+                        "Key": "Linux"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "scot-asg-test", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-04ec879cd823dc92a", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "scot-test2"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "scot-test2", 
+                "CreatedTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 10, 
+                    "microsecond": 961000, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 9
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5cb1f11c-30ec-11e7-bb00-1547c7e6d37a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5cb1f11c-30ec-11e7-bb00-1547c7e6d37a", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2215", 
+                "content-type": "text/xml", 
+                "date": "Thu, 04 May 2017 17:08:57 GMT"
+            }
+        }
+    }
+}

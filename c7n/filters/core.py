@@ -32,7 +32,8 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr
 
 
-class FilterValidationError(Exception): pass
+class FilterValidationError(Exception):
+    pass
 
 
 # Matching filters annotate their key onto objects
@@ -204,7 +205,7 @@ class And(Filter):
 
 
 class Not(Filter):
-    
+
     def __init__(self, data, registry, manager):
         super(Not, self).__init__(data)
         self.registry = registry
@@ -237,7 +238,7 @@ class Not(Filter):
         after = set([r[resource_type.id] for r in resources])
         results = before - after
         return [resource_map[r_id] for r_id in results]
-        
+
 
 class ValueFilter(Filter):
     """Generic value filter using jmespath
@@ -270,7 +271,7 @@ class ValueFilter(Filter):
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
-        
+
         The `resource_count` type works a little differently because it operates
         on the entire set of resources.  It:
           - does not require `key`
@@ -297,12 +298,12 @@ class ValueFilter(Filter):
     def validate(self):
         if len(self.data) == 1:
             return self
-        
+
         # `resource_count` requires a slightly different schema than the rest of
         # the value filters because it operates on the full resource list
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
-        
+
         if 'key' not in self.data:
             raise FilterValidationError(
                 "Missing 'key' in value filter %s" % self.data)
@@ -442,8 +443,7 @@ class ValueFilter(Filter):
         elif self.vtype == 'cidr':
             s = parse_cidr(sentinel)
             v = parse_cidr(value)
-            if (isinstance(s, ipaddress._BaseAddress)
-                    and isinstance(v, ipaddress._BaseNetwork)):
+            if (isinstance(s, ipaddress._BaseAddress) and isinstance(v, ipaddress._BaseNetwork)):
                 return v, s
             return s, v
         elif self.vtype == 'cidr_size':

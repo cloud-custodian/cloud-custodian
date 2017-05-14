@@ -38,7 +38,7 @@ log = logging.getLogger('custodian.elasticache')
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
-#registered marked-for-op filter
+# registered marked-for-op filter
 filters.register('marked-for-op', tags.TagActionFilter)
 
 TTYPE = re.compile('cache.t')
@@ -477,6 +477,8 @@ class DeleteElastiCacheSnapshot(BaseAction):
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
 # added mark-for-op
+
+
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an elasticache snapshot
@@ -569,6 +571,8 @@ class CopyClusterTags(BaseAction):
                 client.add_tags_to_resource, ResourceName=arn, Tags=copy_tags)
 
 # added unmark
+
+
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
 @ElastiCacheSnapshot.action_registry.register('unmark')
 class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
@@ -648,4 +652,4 @@ def _cluster_eligible_for_snapshot(cluster):
     return (
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
-        )
+    )

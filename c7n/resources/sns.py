@@ -37,10 +37,9 @@ class SNS(QueryResourceManager):
             'SubscriptionsConfirmed',
             'SubscriptionsPending',
             'SubscriptionsDeleted'
-            )
+        )
 
 
 @SNS.filter_registry.register('cross-account')
 class SNSCrossAccount(CrossAccountAccessFilter):
     permissions = ('sns:GetTopicAttributes',)
-
