@@ -43,6 +43,7 @@ class PluginRegistry(object):
       PluginRegistry('ec2.filters').load_plugins()
 
     """
+
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
@@ -87,5 +88,3 @@ class PluginRegistry(object):
         for ep in iter_entry_points(group="custodian.%s" % self.plugin_type):
             f = ep.load()
             f()
-
-

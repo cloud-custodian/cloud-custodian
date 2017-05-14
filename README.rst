@@ -34,7 +34,7 @@ tag policies, and cost management via garbage collection of unused resources
 and off-hours resource management.
 
 Custodian policies are written in simple YAML configuration files that
-enable users to specify policies on a resource type (ec2, asg, redshift, etc) 
+enable users to specify policies on a resource type (ec2, asg, redshift, etc)
 and are constructed from a vocabulary of filters and actions.
 
 It integrates with lambda and cloudwatch events to provide for
@@ -65,7 +65,7 @@ Links
 
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
 - `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
+- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer/installing.html>`_
 
 
 Quick Install
@@ -180,4 +180,3 @@ Code of Conduct
 
 This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_. By participating, you are
 expected to honor this code.
-
