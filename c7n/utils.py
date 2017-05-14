@@ -195,7 +195,7 @@ def local_session(factory):
     r = getattr(CONN_CACHE, 'region', None)
     t = getattr(CONN_CACHE, 'time', 0)
     n = time.time()
-    if (s is not None and
+    if (s is not None and r is not None and
             r == factory_region and
             t + (60 * 45) > n):
         return s
