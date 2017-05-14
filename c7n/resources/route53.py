@@ -27,7 +27,6 @@ class Route53Base(object):
 
     permissions = ('route53:ListTagsForResources',)
     retry = staticmethod(get_retry(('Throttled',)))
-    _generate_arn = None
 
     @property
     def generate_arn(self):
