@@ -299,9 +299,12 @@ def setup_parser():
         "Execute the policies in a config file",
         "",
         "Multiple regions can be passed in, as can the symbolic region 'all'. ",
-        "Policies targeting resources in regions where they do not exist will ",
-        "not be run. The output directory when passing multiple regions is suffixed ",
-        "with the region.",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
         ""
     ))
 
