@@ -551,7 +551,6 @@ class PolicyLambda(AbstractLambdaFunction):
     """
     handler = "custodian_policy.run"
     runtime = "python2.7"
-    timeout = 60
 
     def __init__(self, policy):
         self.policy = policy
@@ -573,6 +572,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def memory_size(self):
         return self.policy.data['mode'].get('memory', 512)
+
+    @property
+    def timeout(self):
+        return self.policy.data['mode'].get('timeout', 60)
 
     @property
     def security_groups(self):
