@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import json
 import fnmatch
 import itertools
@@ -18,6 +19,7 @@ import logging
 import os
 import time
 
+import boto3
 from botocore.client import ClientError
 
 from c7n.actions import EventAction
@@ -55,52 +57,99 @@ def load(options, path, format='yaml', validate=True):
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
         if errors:
             raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
-    return PolicyCollection(data, options)
+
+    collection = PolicyCollection.from_data(data, options)
+    return collection
 
 
 class PolicyCollection(object):
 
-    def __init__(self, data, options):
-        self.data = data
+    log = logging.getLogger('c7n.policies')
+
+    def __init__(self, policies, options):
         self.options = options
+        self.policies = policies
 
-        # We store all the policies passed in so we can refilter later
-        self._all_policies = []
-        for p in self.data.get('policies', []):
-            self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
-        
-        # Do an initial filtering
-        self.policies = []
-        resource_type = getattr(self.options, 'resource_type', None)
-        policy_name = getattr(self.options, 'policy_filter', None)
-        self.policies = self.filter(policy_name, resource_type)
+    @classmethod
+    def from_data(cls, data, options):
+        policies = [Policy(p, options, session_factory=cls.test_session_factory())
+                    for p in data.get('policies', ())]
+        return PolicyCollection(policies, options)
 
-    @property
-    def unfiltered_policies(self):
-        return self._all_policies
+    def __add__(self, other):
+        return PolicyCollection(self.policies + other.policies, self.options)
+
+    def expand_regions(self, regions):
+        """Return a set of policies targetted to the given regions.
+
+        Supports symbolic regions like 'all'. This will automatically filter out policies
+        if their being targetted to a region that does not support the service. Global
+        services will target a single region (us-east-1 if only all specified, else
+        first region in the list).
+        """
+        # we're not interacting with the apis just using the sdk meta information.
+        session = boto3.Session(
+            region_name='us-east-1',
+            aws_access_key_id='never',
+            aws_secret_access_key='found')
+        resource_service_map = {r: resources.get(r).resource_type.service
+                                for r in self.resource_types if r != 'account'}
+        service_region_map = {
+            s: session.get_available_regions(s) for s in set(
+                itertools.chain(resource_service_map.values()))}
+
+        policies = []
+        for p in self.policies:
+            available_regions = service_region_map.get(
+                resource_service_map.get(p.resource_type), ())
+
+            # its a global service/endpoint, use user provided region or us-east-1.
+            if not available_regions and regions:
+                candidates = [r for r in regions if r != 'all']
+                candidate = candidates and candidates[0] or 'us-east-1'
+                svc_regions = [candidate]
+            elif 'all' in regions:
+                svc_regions = available_regions
+            else:
+                svc_regions = regions
+
+            for region in svc_regions:
+                if available_regions and region not in available_regions:
+                    level = 'all' in self.options.regions and logging.DEBUG or logging.WARNING
+                    self.log.log(
+                        level, "policy:%s resources:%s not available in region:%s",
+                        p.name, p.resource_type, region)
+                    continue
+                options_copy = copy.copy(self.options)
+                options_copy.region = str(region)
+
+                if len(regions) > 1 or 'all' in regions and getattr(
+                        self.options, 'output_dir', None):
+                    options_copy.output_dir = (
+                        self.options.output_dir.rstrip('/') + '/%s' % region)
+
+                policies.append(
+                    Policy(p.data, options_copy, session_factory=self.test_session_factory()))
+        return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
-        policies = []
-        for policy in self.unfiltered_policies:
+        results = []
+        for policy in self.policies:
             if resource_type:
                 if policy.resource_type != resource_type:
                     continue
-
             if policy_name:
                 if not fnmatch.fnmatch(policy.name, policy_name):
                     continue
+            results.append(policy)
+        return PolicyCollection(results, self.options)
 
-            policies.append(policy)
-
-        return policies
-    
     def __iter__(self):
         return iter(self.policies)
 
@@ -121,6 +170,7 @@ class PolicyCollection(object):
             rtypes.add(p.resource_type)
         return rtypes
 
+    @classmethod
     def test_session_factory(self):
         """ For testing: patched by tests to use a custom session_factory """
         return None
@@ -201,7 +251,7 @@ class PullMode(PolicyExecutionMode):
             return
 
         with self.policy.ctx:
-            self.policy.log.info(
+            self.policy.log.debug(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
                 self.policy.options.region or 'default',
@@ -211,9 +261,10 @@ class PullMode(PolicyExecutionMode):
             resources = self.policy.resource_manager.resources()
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s has count:%d time:%0.2f" % (
+                "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
                     self.policy.name,
                     self.policy.resource_type,
+                    self.policy.options.region,
                     len(resources), rt))
             self.policy.ctx.metrics.put_metric(
                 "ResourceCount", len(resources), "Count", Scope="Policy")
@@ -244,7 +295,7 @@ class PullMode(PolicyExecutionMode):
                     " resources: %d"
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
-                        len(resources), time.time()-s))
+                        len(resources), time.time() - s))
                 self.policy._write_file(
                     "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
@@ -490,8 +541,8 @@ class Policy(object):
         self.resource_manager = self.get_resource_manager()
 
     def __repr__(self):
-        return "<Policy resource: %s name: %s>" % (
-            self.resource_type, self.name)
+        return "<Policy resource: %s name: %s region: %s>" % (
+            self.resource_type, self.name, self.options.region)
 
     @property
     def name(self):

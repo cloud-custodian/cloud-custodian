@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import print_function
 
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
@@ -26,7 +26,7 @@ import time
 
 import yaml
 
-from c7n.policy import Policy, load as policy_load
+from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps
 from c7n.manager import resources
@@ -43,14 +43,17 @@ def policy_command(f):
     def _load_policies(options):
         load_resources()
 
-        policies = []
-        all_policies = []
         errors = 0
-        for file in options.configs:
+        all_policies = PolicyCollection.from_data({}, options)
+
+        # for a default region for policy loading, we'll expand regions later.
+        options.region = options.regions[0]
+
+        for fp in options.configs:
             try:
-                collection = policy_load(options, file)
+                collection = policy_load(options, fp)
             except IOError:
-                eprint('Error: policy file does not exist ({})'.format(file))
+                eprint('Error: policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
             except ValueError as e:
@@ -59,15 +62,24 @@ def policy_command(f):
                 continue
 
             if collection is None:
-                log.debug('Loaded file {}. Contained no policies.'.format(file))
+                log.debug('Loaded file {}. Contained no policies.'.format(fp))
             else:
-                log.debug('Loaded file {}. Contains {} policies (after filtering)'.format(file, len(collection)))
-                policies.extend(collection.policies)
-                all_policies.extend(collection.unfiltered_policies)
+                log.debug(
+                    'Loaded file {}. Contains {} policies'.format(
+                        fp, len(collection)))
+                all_policies = all_policies + collection
 
         if errors > 0:
             eprint('Found {} errors.  Exiting.'.format(errors))
             sys.exit(1)
+
+        # filter by name and resource type
+        policies = all_policies.filter(
+            getattr(options, 'policy_filter', None),
+            getattr(options, 'resource_type', None))
+
+        # expand by region, this results in a separate policy instance per region of execution.
+        policies = policies.expand_regions(options.regions)
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
@@ -77,14 +89,19 @@ def policy_command(f):
             if len(all_policies) > 0:
                 sys.exit(1)
 
-        # Do not allow multiple policies with the same name, even across files
-        counts = Counter([p.name for p in policies])
-        for policy, count in counts.iteritems():
-            if count > 1:
-                eprint("Error: duplicate policy name '{}'".format(policy))
-                sys.exit(1)
+        # Do not allow multiple policies in a region with the same name,
+        # even across files
+        policies_by_region = defaultdict(list)
+        for p in policies:
+            policies_by_region[p.options.region].append(p)
+        for region in policies_by_region.keys():
+            counts = Counter([p.name for p in policies_by_region[region]])
+            for policy, count in counts.iteritems():
+                if count > 1:
+                    eprint("Error: duplicate policy name '{}'".format(policy))
+                    sys.exit(1)
 
-        return f(options, policies)
+        return f(options, list(policies))
 
     return _load_policies
 
@@ -162,8 +179,8 @@ def validate(options):
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.
 #
-#@policy_command
-#def access(options, policies):
+# @policy_command
+# def access(options, policies):
 #    permissions = set()
 #    for p in policies:
 #        permissions.update(p.get_permissions())
@@ -192,10 +209,11 @@ def report(options, policies):
     if len(policies) != 1:
         eprint("Error: Report subcommand requires exactly one policy")
         sys.exit(1)
-    
+
     policy = policies.pop()
     odir = options.output_dir.rstrip(os.path.sep)
     if os.path.sep in odir and os.path.basename(odir) == policy.name:
+        options.region = options.regions[0]
         # policy sub-directory passed - ignore
         options.output_dir = os.path.split(odir)[0]
         # regenerate the execution context based on new path
@@ -236,23 +254,23 @@ def _schema_get_docstring(starting_class):
 
 def schema_completer(prefix):
     """ For tab-completion via argcomplete, return completion options.
-    
+
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
     load_resources()
     components = prefix.split('.')
-    
+
     # Completions for resource
     if len(components) == 1:
         choices = [r for r in resources.keys() if r.startswith(prefix)]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     if components[0] not in resources.keys():
         return []
-    
+
     # Completions for category
     if len(components) == 2:
         choices = ['{}.{}'.format(components[0], x)
@@ -260,11 +278,11 @@ def schema_completer(prefix):
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
-    
+
     # Completions for item
     elif len(components) == 3:
         resource_mapping = schema.resource_vocabulary()
-        return ['{}.{}.{}'.format(components[0], components[1], x) 
+        return ['{}.{}.{}'.format(components[0], components[1], x)
                 for x in resource_mapping[components[0]][components[1]]]
 
     return []
@@ -298,7 +316,7 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(resources.keys()) }
+        resource_list = {'resources': sorted(resources.keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
 
@@ -342,7 +360,7 @@ def schema_cmd(options):
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
         eprint('Error: {} is not in the {} list for resource {}'.format(
-                item, category, resource))
+            item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
@@ -412,7 +430,7 @@ def version_cmd(options):
 
     print("\nPlease copy/paste the following info along with any bug reports:\n")
     print("Custodian:  ", version)
-    pyversion = sys.version.replace('\n', '\n' + ' '*indent)  # For readability
+    pyversion = sys.version.replace('\n', '\n' + ' ' * indent)  # For readability
     print("Python:     ", pyversion)
     # os.uname is only available on recent versions of Unix
     try:

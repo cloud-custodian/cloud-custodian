@@ -26,5 +26,5 @@ class MLModel(QueryResourceManager):
         name = 'Name'
         date = 'CreatedAt'
         # need to specify request-mode dimension as well
-        #dimension = 'MLModelId'
+        # dimension = 'MLModelId'
         dimension = None

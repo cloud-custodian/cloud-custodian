@@ -370,7 +370,8 @@ class RunTest(CliTest):
         )
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({
@@ -438,7 +439,8 @@ class MetricsTest(CliTest):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         yaml_file = self.write_policy_file({
             'policies': [{

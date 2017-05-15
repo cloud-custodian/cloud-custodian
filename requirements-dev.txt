@@ -5,8 +5,9 @@ mock==2.0.0
 Sphinx>=1.4.6
 placebo==0.8.1
 flake8
-sphinx-rtd-theme==0.1.9
-nose-timer==0.6.0
+sphinx-rtd-theme==0.2.4
+nose-timer==0.7.0
+twine
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext

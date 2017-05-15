@@ -168,6 +168,31 @@ class CopyInstanceTagsTest(BaseTest):
         self.assertEqual(tags['Name'], 'CompileLambda')
 
 
+class VolumeSnapshotTest(BaseTest):
+
+    def test_volume_snapshot(self):
+        factory = self.replay_flight_data('test_ebs_snapshot')
+        policy = self.load_policy(
+            {
+                'name': 'test-ebs-snapshot',
+                'resource': 'ebs',
+                'filters': [{'VolumeId': 'vol-01adbb6a4f175941d'}],
+                'actions': ['snapshot'],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        snapshot_data = factory().client('ec2').describe_snapshots(
+            Filters=[
+                {
+                    'Name': 'volume-id',
+                    'Values': ['vol-01adbb6a4f175941d'],
+                },
+            ]
+        )
+        self.assertEqual(len(snapshot_data['Snapshots']), 1)
+        
+
 class VolumeDeleteTest(BaseTest):
 
     def test_volume_delete_force(self):

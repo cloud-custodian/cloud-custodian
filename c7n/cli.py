@@ -24,13 +24,15 @@ import os
 import pdb
 import sys
 import traceback
+import utils
 from datetime import datetime
 from dateutil.parser import parse as date_parse
 
 try:
     from setproctitle import setproctitle
 except ImportError:
-    setproctitle = lambda t: None
+    def setproctitle(t):
+        return None
 
 from c7n.commands import schema_completer
 from c7n.utils import get_account_id_from_sts
@@ -51,8 +53,9 @@ def _default_options(p, blacklist=""):
 
     if 'region' not in blacklist:
         provider.add_argument(
-            "-r", "--region", default=None,
-            help="AWS Region to target (Default: %(default)s)")
+            "-r", "--region", action='append', default=[],
+            dest='regions', metavar='REGION',
+            help="AWS Region to target.  Can be used multiple times")
     provider.add_argument(
         "--profile",
         help="AWS Account Config File Profile to utilize")
@@ -64,7 +67,7 @@ def _default_options(p, blacklist=""):
     # -c is deprecated.  Supported for legacy reasons
     config.add_argument("-c", "--config", help=argparse.SUPPRESS)
     config.add_argument("configs", nargs='*',
-                          help="Policy configuration file(s)")
+                        help="Policy configuration file(s)")
     config.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
@@ -99,27 +102,29 @@ def _default_options(p, blacklist=""):
 
 def _default_region(options):
     marker = object()
-    value = getattr(options, 'region', marker)
+    value = getattr(options, 'regions', marker)
     if value is marker:
         return
 
-    if value is not None:
+    if len(value) > 0:
         return
 
-    profile = getattr(options, 'profile', None)
     try:
-        import boto3
-        options.region = boto3.Session(profile_name=profile).region_name
-        log.debug("using default region:%s from boto" % options.region)
+        options.regions = [utils.get_profile_session(options).region_name]
+        log.debug("using default region:%s from boto" % options.regions[0])
     except:
         return
 
 
 def _default_account_id(options):
-    profile = getattr(options, 'profile', None)
+    if options.assume_role:
+        try:
+            options.account_id = options.assume_role.split(':')[4]
+            return
+        except IndexError:
+            pass
     try:
-        import boto3
-        session = boto3.Session(profile_name=profile)
+        session = utils.get_profile_session(options)
         options.account_id = get_account_id_from_sts(session)
     except:
         options.account_id = None
@@ -137,18 +142,17 @@ def _report_options(p):
     p.add_argument(
         '--field', action='append', default=[], type=_key_val_pair,
         metavar='HEADER=FIELD',
-        help='Repeatable. JMESPath of field to include in the output OR '\
-            'for a tag use prefix `tag:`')
+        help='Repeatable. JMESPath of field to include in the output OR '
+        'for a tag use prefix `tag:`')
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
-        help="Format to output data in (default: %(default)s). "\
-            "Options include simple, grid, rst")
+        help="Format to output data in (default: %(default)s). "
+        "Options include simple, grid, rst")
 
-    # We don't include `region` because the report command ignores it
-    p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
+    p.set_defaults(regions=[])
 
 
 def _metrics_options(p):
@@ -163,7 +167,7 @@ def _metrics_options(p):
     p.add_argument(
         '--days', type=int, default=14,
         help='Number of days of history to consider (default: %(default)i)')
-    p.add_argument('--period', type=int, default=60*24*24)
+    p.add_argument('--period', type=int, default=60 * 24 * 24)
 
 
 def _logs_options(p):
@@ -227,8 +231,7 @@ def setup_parser():
     c7n_desc = "Cloud fleet management"
     parser = argparse.ArgumentParser(description=c7n_desc)
 
-    # Setting `dest` means we capture which subparser was used.  We'll use it
-    # later on when doing post-parsing validation.
+    # Setting `dest` means we capture which subparser was used.
     subs = parser.add_subparsers(dest='subparser')
 
     report_desc = ("Report of resources that a policy matched/ran on. "
@@ -284,16 +287,31 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    #access_desc = ("Show permissions needed to execute the policies")
-    #access = subs.add_parser(
+    # access_desc = ("Show permissions needed to execute the policies")
+    # access = subs.add_parser(
     #    'access', description=access_desc, help=access_desc)
-    #access.set_defaults(command='c7n.commands.access')
-    #_default_options(access)
-    #access.add_argument(
+    # access.set_defaults(command='c7n.commands.access')
+    # _default_options(access)
+    # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
-    run_desc = ("Execute the policies in a config file")
-    run = subs.add_parser("run", description=run_desc, help=run_desc)
+    run_desc = "\n".join((
+        "Execute the policies in a config file",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc, help=run_desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
@@ -321,8 +339,9 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    _default_region(options)
-    _default_account_id(options)
+    if options.subparser in ('report', 'logs', 'metrics', 'run'):
+        _default_region(options)
+        _default_account_id(options)
 
     try:
         command = options.command
@@ -335,11 +354,9 @@ def main():
         process_name = [os.path.basename(sys.argv[0])]
         process_name.extend(sys.argv[1:])
         setproctitle(' '.join(process_name))
-
         command(options)
     except Exception:
         if not options.debug:
             raise
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
-

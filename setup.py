@@ -12,8 +12,8 @@ setup(
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +30,3 @@ setup(
         "tabulate",
     ],
 )
-

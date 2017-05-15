@@ -45,7 +45,7 @@ class MainThreadExecutor(object):
     async == True  -> catch exceptions and store them in the future.
     async == False -> let exceptions bubble up.
     """
-    
+
     async = True
 
     # For Dev/Unit Testing with concurrent.futures
@@ -106,4 +106,3 @@ class MainThreadFuture(object):
 
 executors = ExecutorRegistry('executor')
 executors.load_plugins()
-

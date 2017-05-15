@@ -35,7 +35,7 @@ import json
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema
 
 
 class CrossAccountAccessFilter(Filter):
@@ -117,9 +117,7 @@ def check_cross_account(policy_text, allowed_accounts):
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         # At this point principal is required?
-        p = (
-            isinstance(s['Principal'], basestring) and s['Principal']
-            or s['Principal']['AWS'])
+        p = (isinstance(s['Principal'], basestring) and s['Principal'] or s['Principal']['AWS'])
 
         p = isinstance(p, basestring) and (p,) or p
         for pid in p:
@@ -155,11 +153,11 @@ def check_cross_account(policy_text, allowed_accounts):
                 if so in allowed_accounts:
                     principal_ok = True
 
-        ## BEGIN S3 WhiteList
-        ## Note these are transient white lists for s3
-        ## we need to refactor this to verify ip against a
-        ## cidr white list, and verify vpce/vpc against the
-        ## accounts.
+        # BEGIN S3 WhiteList
+        # Note these are transient white lists for s3
+        # we need to refactor this to verify ip against a
+        # cidr white list, and verify vpce/vpc against the
+        # accounts.
 
             # For now allow vpce/vpc conditions as sufficient on s3
             if s['Condition']['StringEquals'].keys()[0] in (
@@ -180,7 +178,7 @@ def check_cross_account(policy_text, allowed_accounts):
         if 'IpAddress' in s['Condition']:
             principal_ok = True
 
-        ## END S3 WhiteList
+        # END S3 WhiteList
 
         if 'ArnEquals' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
