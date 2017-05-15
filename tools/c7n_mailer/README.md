@@ -268,3 +268,6 @@ Install the extensions:
 ```
 python setup.py develop
 ```
+
+## Testing
+
