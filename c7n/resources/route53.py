@@ -96,6 +96,13 @@ class HostedZone(Route53Base, QueryResourceManager):
         date = None
         dimension = None
 
+    def get_arns(self, resource_set):
+        arns = []
+        for r in resource_set:
+            _id = r[self.get_model().id].split("/")[-1]
+            arns.append(self.generate_arn(_id))
+        return arns
+
 
 @resources.register('healthcheck')
 class HealthCheck(Route53Base, QueryResourceManager):

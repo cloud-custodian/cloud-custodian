@@ -695,15 +695,7 @@ class UniversalTag(Tag):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
-        arns = []
-        for r in resource_set:
-            _id = r[self.id_key]
-            if 'arn' in _id[:3]:
-                arns.append(_id)
-            else:
-                # catch edge-case e.g. ID is like /hostedzone/ZXB8XVP18AKH8
-                _id = _id.split("/")[-1]
-                arns.append(self.manager.generate_arn(_id))
+        arns = self.manager.get_arns(resource_set)
 
         response = self.manager.retry(
             client.tag_resources,
@@ -732,15 +724,7 @@ class UniversalUntag(RemoveTag):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
-        arns = []
-        for r in resource_set:
-            _id = r[self.id_key]
-            if 'arn' in _id[:3]:
-                arns.append(_id)
-            else:
-                # catch edge-case e.g. ID is like /hostedzone/ZXB8XVP18AKH8
-                _id = _id.split("/")[-1]
-                arns.append(self.manager.generate_arn(_id))
+        arns = self.manager.get_arns(resource_set)
 
         response = self.manager.retry(
             client.untag_resources,
@@ -815,15 +799,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
-        arns = []
-        for r in resource_set:
-            _id = r[self.id_key]
-            if 'arn' in _id[:3]:
-                arns.append(_id)
-            else:
-                # catch edge-case e.g. ID is like /hostedzone/ZXB8XVP18AKH8
-                _id = _id.split("/")[-1]
-                arns.append(self.manager.generate_arn(_id))
+        arns = self.manager.get_arns(resource_set)
 
         response = self.manager.retry(
             client.tag_resources,

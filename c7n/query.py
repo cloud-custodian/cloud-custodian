@@ -327,6 +327,15 @@ class QueryResourceManager(ResourceManager):
         """
         return self.config.account_id
 
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            _id = r[self.manager.get_model().id]
+            if 'arn' in _id[:3]:
+                arns.append(_id)
+            else:
+                arns.append(self.generate_arn(_id))
+
     @property
     def generate_arn(self):
         """ Generates generic arn if ID is not already arn format.
