@@ -418,11 +418,16 @@ class Notify(EventAction):
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
                      }}]
-            }
+            },
+            'assume_role': {'type': 'boolean'}
         }
     }
 
     batch_size = 250
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Notify, self).__init__(data, manager, log_dir)
+        self.assume_role = data.get('assume_role', True)
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -456,7 +461,7 @@ class Notify(EventAction):
     def send_sns(self, message):
         topic = self.data['transport']['topic']
         region = topic.split(':', 5)[3]
-        client = self.manager.session_factory(region=region).client('sns')
+        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sns')
         client.publish(
             TopicArn=topic,
             Message=base64.b64encode(zlib.compress(utils.dumps(message)))
@@ -465,7 +470,7 @@ class Notify(EventAction):
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
         region = queue.split('.', 2)[1]
-        client = self.manager.session_factory(region=region).client('sqs')
+        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
                 'DataType': 'String',
