@@ -2,13 +2,20 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d3b1bc73-2e2f-11e6-98ee-b9574c144d7a"
+            "RequestId": "816d1101-eace-11e6-9b9e-adc80b5213ef", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "816d1101-eace-11e6-9b9e-adc80b5213ef", 
+                "date": "Sat, 04 Feb 2017 11:38:53 GMT", 
+                "content-length": "203", 
+                "content-type": "application/x-amz-json-1.1"
+            }
         }, 
         "logGroups": [
             {
-                "arn": "arn:aws:logs:us-east-1:619193117841:log-group:custodian-test-log-sub:*", 
-                "creationTime": 1465469363080, 
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:custodian-test-log-sub:*", 
+                "creationTime": 1486208333573, 
                 "metricFilterCount": 0, 
                 "logGroupName": "custodian-test-log-sub", 
                 "storedBytes": 0
