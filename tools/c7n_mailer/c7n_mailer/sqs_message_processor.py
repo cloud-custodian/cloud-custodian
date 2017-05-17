@@ -331,9 +331,11 @@ class SqsMessageProcessor(object):
         """Get the AWS Username from an event object
 
         :param event: The event object
-        :param user_identity_field: The field in the `userIdentity` property of the cloudtrail event to get the username.
+        :param user_identity_field: The field in the `userIdentity` property of the cloudtrail
+                                    event to get the username.
                                     By default it will use `principalId`.
-        :return: The string value of AWS username that is mapped to the value of `user_identity_field`
+        :return: The string value of AWS username that is mapped to the
+                 value of `user_identity_field`
         """
         if event is None:
             return None
