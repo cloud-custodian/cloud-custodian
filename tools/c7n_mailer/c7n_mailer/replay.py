@@ -101,7 +101,8 @@ class MailerTester(object):
 
     def do_dry_run(self, msg):
         def sre(RawMessage):
-            logger.info("SEND RAW MESSAGE: <<EOF\n%s\nEOF", RawMessage['Data'])
+            logger.info("SEND RAW MESSAGE:")
+            print(RawMessage['Data'])
 
         if self.config.get('smtp_server'):
             del self.config['smtp_server']
@@ -111,8 +112,8 @@ class MailerTester(object):
 
     def do_print(self):
         def sce(_, email_to, subject, body):
-            logger.info('Send mail with subject "%s":<<EOF\n%s\nEOF',
-                        subject, body)
+            logger.info('Send mail with subject "%s":', subject)
+            print(body)
             raise SystemExit(0)
 
         smp = SqsMessageProcessor(self.config, self.session, None, logger)
