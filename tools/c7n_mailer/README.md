@@ -182,12 +182,13 @@ are either
 - `resource-owner`, in which case the email will be sent to the listed
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
-  that was responsible for the underlying event.
+  that was responsible for the underlying event. This is based on the IAM username.
 - `priority_header` indicate the importannce of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
-specified then `resource-owner` email will not be delivered, and in the case of
-`event-owner` an instance role or system account will not result in an email.
+specified then `resource-owner` email will not be delivered. 
+In the case of `event-owner` an instance role or system account will not result 
+in an email because the IAM username would not be a valid email address.
 
 For reference purposes, the JSON Schema of the `notify` action:
 

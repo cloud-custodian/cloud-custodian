@@ -106,7 +106,7 @@ class SqsMessageProcessor(object):
             self.send_resource_owner_messages(data)
         if 'event-owner' in targets:
             targets.remove('event-owner')
-            recipient = self.get_aws_username_from_event(data['event'])
+            recipient = self.get_aws_username_from_event(data['event'], "userName")
             if recipient is not None:
                 targets.add(recipient)
         if not targets:
@@ -327,7 +327,14 @@ class SqsMessageProcessor(object):
         else:
             return None
 
-    def get_aws_username_from_event(self, event):
+    def get_aws_username_from_event(self, event, user_identity_field="principalId"):
+        """Get the AWS Username from an event object
+
+        :param event: The event object
+        :param user_identity_field: The field in the `userIdentity` property of the cloudtrail event to get the username.
+                                    By default it will use `principalId`.
+        :return: The string value of AWS username that is mapped to the value of `user_identity_field`
+        """
         if event is None:
             return None
         identity = event.get('detail', {}).get('userIdentity', {})
@@ -339,8 +346,8 @@ class SqsMessageProcessor(object):
         if identity['type'] == 'Root':
             return None
 
-        if ':' in identity['principalId']:
-            user_id = identity['principalId'].split(':', 1)[-1]
+        if ':' in identity[user_identity_field]:
+            user_id = identity[user_identity_field].split(':', 1)[-1]
         else:
-            user_id = identity['principalId']
+            user_id = identity[user_identity_field]
         return user_id
