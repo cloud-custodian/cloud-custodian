@@ -75,6 +75,8 @@ class ResourceManager(object):
         return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):
+        if not resources:
+            return []
         original = len(resources)
         if event and event.get('debug', False):
             self.log.info(
