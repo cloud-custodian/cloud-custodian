@@ -116,7 +116,7 @@ def _default_region(options):
         return
 
     if options.regions[0] is None:
-        log.warning('The default region is None. Set a default region in ~/.aws/config')
+        log.warning('No default region set. Specify a default region in ~/.aws/config')
     else:
         log.debug("using default region:%s from boto" % options.regions[0])
 
