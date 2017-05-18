@@ -62,24 +62,32 @@ from c7n.utils import local_session, dumps
 log = logging.getLogger('custodian.reports')
 
 
-def report(policy, start_date, options, output_fh, raw_output_fh=None):
+def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
     formatter = Formatter(
-        policy.resource_manager,
+        policies[0].resource_manager,
         extra_fields=options.field,
         no_default_fields=options.no_default_fields,
     )
 
-    if policy.ctx.output.use_s3():
-        records = record_set(
-            policy.session_factory,
-            policy.ctx.output.bucket,
-            policy.ctx.output.key_prefix,
-            start_date)
-    else:
-        records = fs_record_set(policy.ctx.output_path, policy.name)
+    records = []
+    for policy in policies:
+        if policy.ctx.output.use_s3():
+            policy_records = record_set(
+                policy.session_factory,
+                policy.ctx.output.bucket,
+                policy.ctx.output.key_prefix,
+                start_date)
+        else:
+            policy_records = fs_record_set(policy.ctx.output_path, policy.name)
 
-    log.debug("Found %d records", len(records))
+        log.debug("Found %d records for region %s", len(policy_records), policy.options.region)
+
+        for record in policy_records:
+            record['cc_policy'] = policy.name
+            record['cc_region'] = policy.options.region
+
+        records += policy_records
 
     rows = formatter.to_csv(records)
     if options.format == 'csv':
@@ -155,6 +163,11 @@ class Formatter(object):
             # TODO this type coercion should be done at cli input, not here
             h, cexpr = field.split('=', 1)
             fields[h] = cexpr
+
+        # Add in policy name and region fields
+        fields['region'] = 'cc_region'
+        fields['policy'] = 'cc_policy'
+
         self.fields = fields
 
     def headers(self):

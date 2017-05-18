@@ -132,7 +132,7 @@ def _default_account_id(options):
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    _default_options(p, blacklist=['region', 'cache', 'log-group'])
+    _default_options(p, blacklist=['cache', 'log-group'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -151,8 +151,6 @@ def _report_options(p):
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
         help="Format to output data in (default: %(default)s). "
         "Options include simple, grid, rst")
-
-    p.set_defaults(regions=[])
 
 
 def _metrics_options(p):
