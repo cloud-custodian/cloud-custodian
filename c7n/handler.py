@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Cloud-Maid Lambda Entry Point
+Cloud-Custodian Lambda Entry Point
 
 Mostly this serves to load up the policy and dispatch
 an event.
@@ -23,7 +23,7 @@ import os
 import uuid
 
 from c7n.policy import load
-from c7n.utils import format_event
+from c7n.utils import format_event, get_account_id_from_sts
 
 
 logging.root.setLevel(logging.DEBUG)
@@ -42,11 +42,19 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
+        try:
+            import boto3
+            session = boto3.Session()
+            account_id = get_account_id_from_sts(session)
+        except:
+            account_id = None
+
         d = {}
         d.update({
             'region': os.environ.get('AWS_DEFAULT_REGION'),
             'cache': '',
             'profile': None,
+            'account_id': account_id,
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': True,
@@ -73,6 +81,7 @@ def dispatch_event(event, context):
         log.info("Processing event\n %s", format_event(event))
 
     policies = load(Config.empty(), 'config.json', format='json')
-    for p in policies:
-        p.push(event, context)
+    if policies:
+        for p in policies:
+            p.push(event, context)
     return True

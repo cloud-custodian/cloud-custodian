@@ -2,53 +2,61 @@
     "status_code": 200,
     "data": {
         "Snapshot": {
-            "MasterUsername": "admin",
-            "OwnerAccount": "54321",
+            "MasterUsername": "test123",
+            "OwnerAccount": "111111",
             "CurrentBackupRateInMegaBytesPerSecond": 0.0,
             "ActualIncrementalBackupSizeInMegaBytes": -1.0,
             "NumberOfNodes": 1,
             "Status": "creating",
-            "VpcId": "vpc-54321",
+            "VpcId": "vpc-45678",
             "ClusterVersion": "1.0",
             "Tags": [],
             "EstimatedSecondsToCompletion": -1,
+            "EnhancedVpcRouting": false,
             "TotalBackupSizeInMegaBytes": -1.0,
-            "DBName": "dev",
+            "DBName": "test",
             "BackupProgressInMegaBytes": 0.0,
             "ClusterCreateTime": {
-                "hour": 13,
+                "hour": 0,
                 "__class__": "datetime",
-                "month": 8,
-                "second": 26,
-                "microsecond": 191000,
-                "year": 2016,
-                "day": 23,
-                "minute": 11
+                "month": 1,
+                "second": 47,
+                "microsecond": 233000,
+                "year": 2017,
+                "day": 16,
+                "minute": 3
             },
             "EncryptedWithHSM": false,
-            "ClusterIdentifier": "aaa",
+            "ClusterIdentifier": "test-cluster",
             "SnapshotCreateTime": {
-                "hour": 13,
+                "hour": 0,
                 "__class__": "datetime",
-                "month": 8,
-                "second": 24,
-                "microsecond": 707000,
-                "year": 2016,
-                "day": 23,
-                "minute": 21
+                "month": 1,
+                "second": 49,
+                "microsecond": 239000,
+                "year": 2017,
+                "day": 16,
+                "minute": 36
             },
-            "AvailabilityZone": "us-east-1b",
+            "AvailabilityZone": "us-east-1d",
             "NodeType": "dc1.large",
             "Encrypted": true,
             "ElapsedTimeInSeconds": 0,
-            "KmsKeyId": "arn:aws:kms:us-east-1:54321:key/k2", 
+            "KmsKeyId": "arn:aws:kms:us-east-1:111111:key/k1", 
             "SnapshotType": "manual",
             "Port": 5439,
-            "SnapshotIdentifier": "aaa-backup-1"
+            "SnapshotIdentifier": "backup-2017-01-15"
         },
         "ResponseMetadata": {
+            "RetryAttempts": 0,
             "HTTPStatusCode": 200,
-            "RequestId": "7d8a9a90-6934-11e6-a715-c351be468770"
+            "RequestId": "ddef87f4-db83-11e6-b12e-8399b05d7730",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ddef87f4-db83-11e6-b12e-8399b05d7730",
+                "date": "Mon, 16 Jan 2017 00:36:48 GMT",
+                "content-length": "1705",
+                "content-type": "text/xml"
+            }
         }
     }
 }

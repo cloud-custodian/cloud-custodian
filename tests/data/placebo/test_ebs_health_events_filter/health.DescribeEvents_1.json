@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "events": [
+            {
+                "lastUpdatedTime": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 18
+                }, 
+                "service": "EBS", 
+                "eventTypeCode": "AWS_EBS_VOLUME_LOST", 
+                "startTime": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 18
+                }, 
+                "eventTypeCategory": "issue", 
+                "region": "us-east-1", 
+                "arn": "arn:aws:health:us-east-1::event/EBS_12345678-1234-1234-1234-123456789012", 
+                "statusCode": "open"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8261678e-ff65-11e6-b4c3-2148f3546464", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8261678e-ff65-11e6-b4c3-2148f3546464", 
+                "date": "Thu, 02 Mar 2017 16:30:13 GMT", 
+                "content-length": "293", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

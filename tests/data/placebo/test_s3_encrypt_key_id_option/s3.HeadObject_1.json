@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AcceptRanges": "bytes", 
+        "ContentType": "text/plain", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "uyZiseMP2YDkhLmf9WWbFGRvhnpA1nwbHJ5l49fUag0H8XlSshSrMMqbSlziHW0zcvwaMRZPDdk=", 
+            "RequestId": "DFBF03A73100C33C", 
+            "HTTPHeaders": {
+                "content-length": "3", 
+                "x-amz-id-2": "uyZiseMP2YDkhLmf9WWbFGRvhnpA1nwbHJ5l49fUag0H8XlSshSrMMqbSlziHW0zcvwaMRZPDdk=", 
+                "accept-ranges": "bytes", 
+                "server": "AmazonS3", 
+                "last-modified": "Sun, 19 Feb 2017 02:16:39 GMT", 
+                "x-amz-request-id": "DFBF03A73100C33C", 
+                "etag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+                "date": "Sun, 19 Feb 2017 02:16:40 GMT", 
+                "content-type": "text/plain"
+            }
+        }, 
+        "LastModified": {
+            "hour": 2, 
+            "__class__": "datetime", 
+            "month": 2, 
+            "second": 39, 
+            "microsecond": 0, 
+            "year": 2017, 
+            "day": 19, 
+            "minute": 16
+        }, 
+        "ContentLength": 3, 
+        "ETag": "\"c68271a63ddbc431c307beb7d2918275\"", 
+        "Metadata": {}
+    }
+}

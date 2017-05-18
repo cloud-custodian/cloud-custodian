@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "events": [
+            {
+                "lastUpdatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 48
+                }, 
+                "service": "EC2", 
+                "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE", 
+                "startTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 38
+                }, 
+                "eventTypeCategory": "issue", 
+                "endTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 48
+                }, 
+                "region": "us-east-1", 
+                "arn": "arn:aws:health:us-east-1::event/AWS_EC2_OPERATIONAL_ISSUE_1484933886", 
+                "statusCode": "closed"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a8dfa828-e801-11e6-a473-17d59925b598", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a8dfa828-e801-11e6-a473-17d59925b598", 
+                "date": "Tue, 31 Jan 2017 22:07:30 GMT", 
+                "content-length": "2494", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

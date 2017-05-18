@@ -18,7 +18,8 @@ import logging
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, DefaultVpcBase, ValueFilter
+from c7n.filters import (
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -39,7 +40,7 @@ class AppELB(QueryResourceManager):
     """Resource manager for v2 ELBs (AKA ALBs).
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'elbv2'
         type = 'app-elb'
@@ -52,10 +53,15 @@ class AppELB(QueryResourceManager):
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
 
-    resource_type = Meta
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
+
+    @classmethod
+    def get_permissions(cls):
+        # override as the service is not the iam prefix
+        return ("elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeTags")
 
     def augment(self, albs):
         _describe_appelb_tags(
@@ -108,8 +114,28 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 @actions.register('mark-for-op')
 class AppELBMarkForOpAction(tags.TagDelayedAction):
+    """Action to create a delayed action on an ELB to start at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-failed-mark-for-op
+                resource: app-elb
+                filters:
+                  - "tag:custodian_elb_cleanup": absent
+                  - State: failed
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_elb_cleanup
+                    msg: "AppElb failed: {op}@{action_date}"
+                    op: delete
+                    days: 1
+    """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_appelb_tags(
@@ -120,8 +146,25 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
 
 @actions.register('tag')
 class AppELBTagAction(tags.Tag):
+    """Action to create tag/tags on an ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-create-required-tag
+                resource: app-elb
+                filters:
+                  - "tag:RequiredTag": absent
+                actions:
+                  - type: tag
+                    key: RequiredTag
+                    value: RequiredValue
+    """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_appelb_tags(
@@ -132,8 +175,24 @@ class AppELBTagAction(tags.Tag):
 
 @actions.register('remove-tag')
 class AppELBRemoveTagAction(tags.RemoveTag):
+    """Action to remove tag/tags from an ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-delete-expired-tag
+                resource: app-elb
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["ExpiredTag"]
+    """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:RemoveTags",)
 
     def process_resource_set(self, resource_set, tag_keys):
         _remove_appelb_tags(
@@ -144,8 +203,28 @@ class AppELBRemoveTagAction(tags.RemoveTag):
 
 @actions.register('delete')
 class AppELBDeleteAction(BaseAction):
+    """Action to delete an ELB
 
-    schema = type_schema('delete')
+    To avoid unwanted deletions of ELB, it is recommended to apply a filter
+    to the rule
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-delete-failed-elb
+                resource: app-elb
+                filters:
+                  - State: failed
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = (
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",)
 
     def process(self, load_balancers):
         with self.executor_factory(max_workers=2) as w:
@@ -153,12 +232,31 @@ class AppELBDeleteAction(BaseAction):
 
     def process_alb(self, alb):
         client = local_session(self.manager.session_factory).client('elbv2')
-        client.delete_load_balancer(LoadBalancerArn=alb['LoadBalancerArn'])
+        try:
+            if self.data.get('force'):
+                client.modify_load_balancer_attributes(
+                    LoadBalancerArn=alb['LoadBalancerArn'],
+                    Attributes=[{
+                        'Key': 'deletion_protection.enabled',
+                        'Value': 'false',
+                    }])
+            self.manager.retry(
+                client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
+        except Exception as e:
+            if e.response['Error']['Code'] in ['OperationNotPermitted',
+                                               'LoadBalancerNotFound']:
+                self.log.warning(
+                    "Exception trying to delete ALB: %s error: %s",
+                    alb['LoadBalancerArn'], e)
+                return
+            raise
 
 
 class AppELBListenerFilterBase(object):
     """ Mixin base class for filters that query LB listeners.
     """
+    permissions = ("elasticloadbalancing:DescribeListeners",)
+
     def initialize(self, albs):
         def _process_listeners(alb):
             client = local_session(
@@ -175,6 +273,7 @@ class AppELBListenerFilterBase(object):
 class AppELBAttributeFilterBase(object):
     """ Mixin base class for filters that query LB attributes.
     """
+
     def initialize(self, albs):
         def _process_attributes(alb):
             if 'Attributes' not in alb:
@@ -191,11 +290,11 @@ class AppELBAttributeFilterBase(object):
 class AppELBTargetGroupFilterBase(object):
     """ Mixin base class for filters that query LB target groups.
     """
+
     def initialize(self, albs):
         self.target_group_map = defaultdict(list)
-
-        target_group_manager = AppELBTargetGroup(self.manager.ctx, {})
-        target_groups = target_group_manager.resources()
+        target_groups = self.manager.get_resource_manager(
+            'app-elb-target-group').resources()
         for target_group in target_groups:
             for load_balancer_arn in target_group['LoadBalancerArns']:
                 self.target_group_map[load_balancer_arn].append(target_group)
@@ -203,27 +302,108 @@ class AppELBTargetGroupFilterBase(object):
 
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
-    """
-    """
+    """Filter ALB based on matching listener attributes"""
 
     schema = type_schema('listener', rinherit=ValueFilter.schema)
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
 
     def process(self, albs, event=None):
         self.initialize(albs)
         return super(AppELBListenerFilter, self).process(albs, event)
 
     def __call__(self, alb):
-        listeners = self.listener_map[alb['LoadBalancerArn']]
-        return self.match(listeners)
+        matched = []
+        for listener in self.listener_map[alb['LoadBalancerArn']]:
+            if self.match(listener):
+                matched.append(listener)
+        if not matched:
+            return False
+        alb['c7n:MatchedListeners'] = matched
+        return True
+
+
+@actions.register('modify-listener')
+class AppELBModifyListenerPolicy(BaseAction):
+    """Action to modify the policy for an App ELB
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-modify-listener
+                resource: app-elb
+                filters:
+                  - type: listener
+                    key: Protocol
+                    value: HTTP
+                actions:
+                  - type: modify-listener
+                    protocol: HTTPS
+                    sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-\
+                    1234-1234-1234-123456789012"
+    """
+
+    schema = type_schema(
+        'modify-listener',
+        port={'type': 'integer'},
+        protocol={'enum': ['HTTP', 'HTTPS']},
+        sslpolicy={'type': 'string'},
+        certificate={'type': 'string'}
+    )
+
+    permissions = ("elasticloadbalancing:ModifyListener",)
+
+    def validate(self):
+        for f in self.manager.data.get('filters', ()):
+            if 'listener' in f.get('type', ()):
+                return self
+        raise FilterValidationError(
+            "modify-listener action requires the listener filter")
+
+    def process(self, load_balancers):
+        args = {}
+        if 'port' in self.data:
+            args['Port'] = self.data.get('port')
+        if 'protocol' in self.data:
+            args['Protocol'] = self.data.get('protocol')
+        if 'sslpolicy' in self.data:
+            args['SslPolicy'] = self.data.get('sslpolicy')
+        if 'certificate' in self.data:
+            args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_alb, load_balancers, [args]))
+
+    def process_alb(self, alb, args):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for matched_listener in alb.get('c7n:MatchedListeners', ()):
+            client.modify_listener(
+                ListenerArn=matched_listener['ListenerArn'],
+                **args)
 
 
 @filters.register('healthcheck-protocol-mismatch')
 class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
-    """
+    """Filter AppELBs with mismatched health check protocols
+
+    A mismatched health check protocol is where the protocol on the target group
+    does not match the load balancer health check protocol
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-healthcheck-mismatch
+                resource: app-elb
+                filters:
+                  - healthcheck-protocol-mismatch
     """
 
     schema = type_schema('healthcheck-protocol-mismatch')
+    permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):
         def _healthcheck_protocol_mismatch(alb):
@@ -240,10 +420,10 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
 
 @filters.register('target-group')
 class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
-    """
-    """
+    """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
+    permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):
         self.initialize(albs)
@@ -256,6 +436,18 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 @filters.register('default-vpc')
 class AppELBDefaultVpcFilter(DefaultVpcBase):
+    """Filter all ELB that exist within the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-in-default-vpc
+                resource: app-elb
+                filters:
+                  - default-vpc
+    """
 
     schema = type_schema('default-vpc')
 
@@ -268,7 +460,7 @@ class AppELBTargetGroup(QueryResourceManager):
     """Resource manager for v2 ELB target groups.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'elbv2'
         type = 'app-elb-target-group'
@@ -280,13 +472,18 @@ class AppELBTargetGroup(QueryResourceManager):
         dimension = None
         date = None
 
-    resource_type = Meta
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')
     retry = staticmethod(get_retry(('Throttling',)))
 
     filter_registry.register('tag-count', tags.TagCountFilter)
     filter_registry.register('marked-for-op', tags.TagActionFilter)
+
+    @classmethod
+    def get_permissions(cls):
+        # override as the service is not the iam prefix
+        return ("elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTags")
 
     def augment(self, target_groups):
         def _describe_target_group_health(target_group):
@@ -348,8 +545,10 @@ def _remove_target_group_tags(target_groups, session_factory, tag_keys):
 
 @AppELBTargetGroup.action_registry.register('mark-for-op')
 class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
+    """Action to specify a delayed action on an ELB target group"""
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_target_group_tags(
@@ -360,8 +559,25 @@ class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
 
 @AppELBTargetGroup.action_registry.register('tag')
 class AppELBTargetGroupTagAction(tags.Tag):
+    """Action to create tag/tags on an ELB target group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroup-add-required-tag
+                resource: app-elb-target-group
+                filters:
+                  - "tag:RequiredTag": absent
+                actions:
+                  - type: tag
+                    key: RequiredTag
+                    value: RequiredValue
+    """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:AddTags",)
 
     def process_resource_set(self, resource_set, ts):
         _add_target_group_tags(
@@ -372,8 +588,24 @@ class AppELBTargetGroupTagAction(tags.Tag):
 
 @AppELBTargetGroup.action_registry.register('remove-tag')
 class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
+    """Action to remove tag/tags from ELB target group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroup-remove-expired-tag
+                resource: app-elb-target-group
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["ExpiredTag"]
+    """
 
     batch_size = 1
+    permissions = ("elasticloadbalancing:RemoveTags",)
 
     def process_resource_set(self, resource_set, tag_keys):
         _remove_target_group_tags(
@@ -384,6 +616,18 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
 class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+    """Filter all application elb target groups within the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroups-default-vpc
+                resource: app-elb-target-group
+                filters:
+                  - default-vpc
+    """
 
     schema = type_schema('default-vpc')
 

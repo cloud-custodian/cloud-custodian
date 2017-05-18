@@ -57,7 +57,11 @@ def validate(data, schema=None):
         return []
     try:
         resp = specific_error(errors[0])
-        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        name = isinstance(
+            errors[0].instance,
+            dict) and errors[0].instance.get(
+            'name',
+            'unknown') or 'unknown'
         return [resp, name]
     except Exception:
         logging.exception(
@@ -155,6 +159,7 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
+                'source': {'enum': ['describe', 'config']},
                 'actions': {
                     'type': 'array',
                 },
@@ -196,7 +201,7 @@ def generate(resource_types=()):
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
                              'event': {'type': 'string'}}}]
-                    }}
+                }}
             },
         },
     }
@@ -221,8 +226,8 @@ def generate(resource_types=()):
                 'type': 'array',
                 'additionalItems': False,
                 'items': {'anyOf': resource_refs}
-                }
             }
+        }
     }
 
     return schema
@@ -261,14 +266,14 @@ def process_resource(type_name, resource_type, resource_defs):
         {'$ref': '#/definitions/filters/valuekv'})
 
     filter_refs = []
-    filters_seen = set() # for aliases
+    filters_seen = set()  # for aliases
     for filter_name, f in sorted(resource_type.filter_registry.items()):
         if f in filters_seen:
             continue
         else:
             filters_seen.add(f)
 
-        if filter_name in ('or', 'and'):
+        if filter_name in ('or', 'and', 'not'):
             continue
         elif filter_name == 'value':
             r['filters'][filter_name] = {
@@ -278,14 +283,6 @@ def process_resource(type_name, resource_type, resource_defs):
         elif filter_name == 'event':
             r['filters'][filter_name] = {
                 '$ref': '#/definitions/filters/event'}
-        elif filter_name == 'or':
-            r['filters'][filter_name] = {
-                'type': 'array',
-                'items': {'anyOf': nested_filter_refs}}
-        elif filter_name == 'and':
-            r['filters'][filter_name] = {
-                'type': 'array',
-                'items': {'anyOf': nested_filter_refs}}
         else:
             r['filters'][filter_name] = f.schema
         filter_refs.append(
@@ -309,7 +306,7 @@ def process_resource(type_name, resource_type, resource_defs):
                 'actions': {
                     'type': 'array',
                     'items': {'anyOf': action_refs}}}},
-            ]
+        ]
     }
 
     if type_name == 'ec2':
@@ -362,10 +359,4 @@ def summary(vocabulary):
 
 def json_dump(resource=None):
     load_resources()
-    try:
-        print(json.dumps(generate(resource), indent=2))
-    except:
-        import traceback, pdb, sys
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
-
+    print(json.dumps(generate(resource), indent=2))

@@ -18,7 +18,7 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
 import c7n.filters.vpc as net_filters
@@ -28,7 +28,7 @@ from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, generate_arn, get_retry,
-    get_account_id, snapshot_identifier)
+    snapshot_identifier)
 
 log = logging.getLogger('custodian.redshift')
 
@@ -40,19 +40,24 @@ filters.register('marked-for-op', tags.TagActionFilter)
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
 
-    resource_type = "aws.redshift.cluster"
+    class resource_type(object):
+        service = 'redshift'
+        type = 'cluster'
+        enum_spec = ('describe_clusters', 'Clusters', None)
+        detail_spec = None
+        name = id = 'ClusterIdentifier'
+        filter_name = 'ClusterIdentifier'
+        filter_type = 'scalar'
+        date = 'ClusterCreateTime'
+        dimension = 'ClusterIdentifier'
+        config_type = "AWS::Redshift::Cluster"
+
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
 
-    _generate_arn = _account_id = None
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
+    permissions = ('iam:ListRoles',)  # account id retrieval
+    _generate_arn = None
 
     @property
     def generate_arn(self):
@@ -67,6 +72,16 @@ class Redshift(QueryResourceManager):
 @filters.register('default-vpc')
 class DefaultVpc(DefaultVpcBase):
     """ Matches if an redshift database is in the default vpc
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-default-vpc
+                resource: redshift
+                filters:
+                  - default-vpc
     """
 
     schema = type_schema('default-vpc')
@@ -87,6 +102,9 @@ class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
 
+    def get_permissions(self):
+        return RedshiftSubnetGroup(self.manager.ctx, {}).get_permissions()
+
     def get_related_ids(self, resources):
         group_ids = set()
         for r in resources:
@@ -103,9 +121,26 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 @filters.register('param')
 class Parameter(ValueFilter):
+    """Filter redshift clusters based on parameter values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-no-ssl
+                resource: redshift
+                filters:
+                  - type: param
+                    key: require_ssl
+                    value: false
+                    op: eq
+    """
 
     schema = type_schema('param', rinherit=ValueFilter.schema)
     group_params = ()
+
+    permissions = ("redshift:DescribeClusterParameters",)
 
     def process(self, clusters, event=None):
         groups = {}
@@ -142,9 +177,31 @@ class Parameter(ValueFilter):
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete a redshift cluster
+
+    To prevent unwanted deletion of redshift clusters, it is recommended to
+    apply a filter to the rule
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-no-ssl
+                resource: redshift
+                filters:
+                  - type: param
+                    key: require_ssl
+                    value: false
+                    op: eq
+                actions:
+                  - type: delete
+    """
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'}})
+
+    permissions = ('redshift:DeleteCluster',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
@@ -181,11 +238,30 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
+    """Action to set the snapshot retention period (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-snapshot-retention
+                resource: redshift
+                filters:
+                  - type: value
+                    key: AutomatedSnapshotRetentionPeriod
+                    value: 21
+                    op: ne
+                actions:
+                  - type: retention
+                    days: 21
+    """
 
     date_attribute = 'AutomatedSnapshotRetentionPeriod'
     schema = type_schema(
         'retention',
         **{'days': {'type': 'number'}})
+    permissions = ('redshift:ModifyCluster',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
@@ -219,8 +295,26 @@ class RetentionWindow(BaseAction):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Action to take a snapshot of a redshift cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-snapshot
+                resource: redshift
+                filters:
+                  - type: value
+                    key: ClusterStatus
+                    value: available
+                    op: eq
+                actions:
+                  - snapshot
+    """
 
     schema = type_schema('snapshot')
+    permissions = ('redshift:CreateClusterSnapshot',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -238,19 +332,41 @@ class Snapshot(BaseAction):
 
     def process_cluster_snapshot(self, cluster):
         c = local_session(self.manager.session_factory).client('redshift')
+        cluster_tags = cluster.get('Tags')
         c.create_cluster_snapshot(
             SnapshotIdentifier=snapshot_identifier(
                 'Backup',
                 cluster['ClusterIdentifier']),
-            ClusterIdentifier=cluster['ClusterIdentifier'])
+            ClusterIdentifier=cluster['ClusterIdentifier'],Tags=cluster_tags)
 
 
 @actions.register('enable-vpc-routing')
 class EnhancedVpcRoutine(BaseAction):
+    """Action to enable enhanced vpc routing on a redshift cluster
+
+    More: https://goo.gl/espcOF
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-enable-enhanced-routing
+                resource: redshift
+                filters:
+                  - type: value
+                    key: EnhancedVpcRouting
+                    value: false
+                    op: eq
+                actions:
+                  - type: enable-vpc-routing
+                    value: true
+    """
 
     schema = type_schema(
         'enable-vpc-routing',
         value={'type': 'boolean'})
+    permissions = ('redshift:ModifyCluster',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -279,8 +395,31 @@ class EnhancedVpcRoutine(BaseAction):
 
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
+    """Action to create an action to be performed at a later time
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-terminate-unencrypted
+                resource: redshift
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - type: value
+                    key: Encrypted
+                    value: false
+                    op: eq
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    op: delete
+                    days: 5
+                    msg: "Unencrypted Redshift cluster: {op}@{action_date}"
+    """
 
     schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
+    permissions = ('redshift.CreateTags',)
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -291,9 +430,26 @@ class TagDelayedAction(tags.TagDelayedAction):
 
 @actions.register('tag')
 class Tag(tags.Tag):
+    """Action to add tag/tags to a redshift cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-tag
+                resource: redshift
+                filters:
+                  - "tag:RedshiftTag": absent
+                actions:
+                  - type: tag
+                    key: RedshiftTag
+                    value: "Redshift Tag Value"
+    """
 
     concurrency = 2
     batch_size = 5
+    permissions = ('redshift:CreateTags',)
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -305,9 +461,25 @@ class Tag(tags.Tag):
 @actions.register('unmark')
 @actions.register('remove-tag')
 class RemoveTag(tags.RemoveTag):
+    """Action to remove tag/tags from a redshift cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-remove-tag
+                resource: redshift
+                filters:
+                  - "tag:RedshiftTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["RedshiftTags"]
+    """
 
     concurrency = 2
     batch_size = 5
+    permissions = ('redshift:DeleteTags',)
 
     def process_resource_set(self, resources, tag_keys):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -318,8 +490,31 @@ class RemoveTag(tags.RemoveTag):
 
 @actions.register('tag-trim')
 class TagTrim(tags.TagTrim):
+    """Action to remove tags from a redshift cluster
+
+    This can be used to prevent reaching the ceiling limit of tags on a
+    resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-tag-trim
+                resource: redshift
+                filters:
+                  - type: tag-count
+                    count: 10
+                actions:
+                  - type: tag-trim
+                    space: 1
+                    preserve:
+                      - RequiredTag1
+                      - RequiredTag2
+    """
 
     max_tag_count = 10
+    permissions = ('redshift:DeleteTags',)
 
     def process_tag_removal(self, resource, candidates):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -341,6 +536,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+        config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')
@@ -353,14 +549,7 @@ class RedshiftSnapshot(QueryResourceManager):
 
     filter_registry.register('marked-for-op', tags.TagActionFilter)
 
-    _generate_arn = _account_id = None
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
+    _generate_arn = None
 
     @property
     def generate_arn(self):
@@ -372,7 +561,6 @@ class RedshiftSnapshot(QueryResourceManager):
         return self._generate_arn
 
     class resource_type(object):
-
         service = 'redshift'
         type = 'redshift-snapshot'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
@@ -381,10 +569,41 @@ class RedshiftSnapshot(QueryResourceManager):
         filter_type = None
         dimension = None
         date = 'SnapshotCreateTime'
+        config_type = "AWS::Redshift::ClusterSnapshot"
+
+
+@actions.register('modify-security-groups')
+class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on a Redshift cluster"""
+
+    permissions = ('redshift:ModifyCluster',)
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('redshift')
+        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(
+            clusters, metadata_key='VpcSecurityGroupId')
+        for idx, c in enumerate(clusters):
+            client.modify_cluster(
+                ClusterIdentifier=c['ClusterIdentifier'],
+                VpcSecurityGroupIds=groups[idx])
 
 
 @RedshiftSnapshot.filter_registry.register('age')
 class RedshiftSnapshotAge(AgeFilter):
+    """Filters redshift snapshots based on age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-old-snapshots
+                resource: redshift-snapshot
+                filters:
+                  - type: age
+                    days: 21
+                    op: gt
+    """
 
     schema = type_schema(
         'age', days={'type': 'number'},
@@ -395,6 +614,25 @@ class RedshiftSnapshotAge(AgeFilter):
 
 @RedshiftSnapshot.action_registry.register('delete')
 class RedshiftSnapshotDelete(BaseAction):
+    """Filters redshift snapshots based on age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-delete-old-snapshots
+                resource: redshift-snapshot
+                filters:
+                  - type: age
+                    days: 21
+                    op: gt
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('redshift:DeleteClusterSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d Redshift snapshots", len(snapshots))
@@ -420,8 +658,30 @@ class RedshiftSnapshotDelete(BaseAction):
 
 @RedshiftSnapshot.action_registry.register('mark-for-op')
 class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
+    """Action to create a delayed actions to be performed on a redshift snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-snapshot-expiring
+                resource: redshift-snapshot
+                filters:
+                  - "tag:custodian_cleanup": absent
+                  - type: age
+                    days: 14
+                    op: eq
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Snapshot expiring: {op}@{action_date}"
+                    op: delete
+                    days: 7
+    """
 
     schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
+    permissions = ('redshift:CreateTags',)
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -433,9 +693,26 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
 
 @RedshiftSnapshot.action_registry.register('tag')
 class RedshiftSnapshotTag(tags.Tag):
+    """Action to add tag/tags to a redshift snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-required-tags
+                resource: redshift-snapshot
+                filters:
+                  - "tag:RequiredTag1": absent
+                actions:
+                  - type: tag
+                    key: RequiredTag1
+                    value: RequiredValue1
+    """
 
     concurrency = 2
     batch_size = 5
+    permissions = ('redshift:CreateTags',)
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
@@ -447,9 +724,25 @@ class RedshiftSnapshotTag(tags.Tag):
 @RedshiftSnapshot.action_registry.register('unmark')
 @RedshiftSnapshot.action_registry.register('remove-tag')
 class RedshiftSnapshotRemoveTag(tags.RemoveTag):
+    """Action to remove tag/tags from a redshift snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-remove-tags
+                resource: redshift-snapshot
+                filters:
+                  - "tag:UnusedTag1": present
+                actions:
+                  - type: remove-tag
+                    tags: ["UnusedTag1"]
+    """
 
     concurrency = 2
     batch_size = 5
+    permissions = ('redshift:DeleteTags',)
 
     def process_resource_set(self, resources, tag_keys):
         client = local_session(self.manager.session_factory).client('redshift')

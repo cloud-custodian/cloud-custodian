@@ -46,6 +46,7 @@ def register_tags(filters, actions):
     actions.register('untag', RemoveTag)
     actions.register('remove-tag', RemoveTag)
     actions.register('rename-tag', RenameTag)
+    actions.register('normalize-tag', NormalizeTag)
 
 
 class TagTrim(Action):
@@ -89,6 +90,8 @@ class TagTrim(Action):
         'tag-trim',
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ec2:DeleteTags',)
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -253,7 +256,7 @@ class Tag(Action):
     """Tag an ec2 resource.
     """
 
-    batch_size = 150
+    batch_size = 25
     concurrency = 2
 
     schema = utils.type_schema(
@@ -261,7 +264,16 @@ class Tag(Action):
         tags={'type': 'object'},
         key={'type': 'string'},
         value={'type': 'string'},
-        )
+        tag={'type': 'string'},
+    )
+
+    permissions = ('ec2:CreateTags',)
+
+    def validate(self):
+        if self.data.get('key') and self.data.get('tag'):
+            raise FilterValidationError(
+                "Can't specify both key and tag, choose one")
+        return self
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -324,6 +336,8 @@ class RemoveTag(Action):
         'untag', aliases=('unmark', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
 
+    permissions = ('ec2:DeleteTags',)
+
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
@@ -366,6 +380,10 @@ class RenameTag(Action):
         old_key={'type': 'string'},
         new_key={'type': 'string'})
 
+    permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
+
+    tag_count_max = 50
+
     def delete_tag(self, client, ids, key, value):
         client.delete_tags(
             Resources=ids,
@@ -390,20 +408,20 @@ class RenameTag(Action):
 
         c = utils.local_session(self.manager.session_factory).client('ec2')
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            new_key, tag_value)
+        # We have a preference to creating the new tag when possible first
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) < self.tag_count_max]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
         self.delete_tag(
             c, [r[self.id_key] for r in resource_set], old_key, tag_value)
 
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) > 49],
-            new_key, tag_value)
+        # For resources with 50 tags, we need to delete first and then create.
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) > self.tag_count_max - 1]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
 
     def create_set(self, instances):
         old_key = self.data.get('old_key', None)
@@ -471,6 +489,8 @@ class TagDelayedAction(Action):
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
 
+    permissions = ('ec2:CreateTags',)
+
     batch_size = 200
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
@@ -524,3 +544,130 @@ class TagDelayedAction(Action):
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
+
+
+class NormalizeTag(Action):
+    """Transform the value of a tag.
+
+    Set the tag value to uppercase, title, lowercase, or strip text
+    from a tag key.
+
+    .. code-block :: yaml
+
+        policies:
+          - name: ec2-service-transform-lower
+            resource: ec2
+            comment: |
+              ec2-service-tag-value-to-lower
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: lower_key
+                action: lower
+
+          - name: ec2-service-strip
+            resource: ec2
+            comment: |
+              ec2-service-tag-strip-blah
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:testing8882": present
+            actions:
+              - type: normalize-tag
+                key: strip_key
+                action: strip
+                value: blah
+
+    """
+
+    schema = utils.type_schema(
+        'normalize-tag',
+        key={'type': 'string'},
+        action={'type': 'string',
+                'items': {
+                    'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        value={'type': 'string'})
+
+    permissions = ('ec2:CreateTags',)
+
+    def create_tag(self, client, ids, key, value):
+
+        self.manager.retry(
+            client.create_tags,
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_transform(self, tag_value, resource_set):
+        """
+        Transform tag value
+
+        - Collect value from tag
+        - Transform Tag value
+        - Assign new value for key
+        """
+        self.log.info("Transforming tag value on %s instances" % (
+            len(resource_set)))
+        key = self.data.get('key')
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+
+        self.create_tag(
+            c,
+            [r[self.id_key] for r in resource_set if len(
+                r.get('Tags', [])) < 50],
+            key, tag_value)
+
+    def create_set(self, instances):
+        key = self.data.get('key', None)
+        resource_set = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags[key] not in resource_set:
+                resource_set[tags[key]] = []
+            resource_set[tags[key]].append(r)
+        return resource_set
+
+    def filter_resources(self, resources):
+        key = self.data.get('key', None)
+        res = 0
+        for r in resources:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if key not in tags.keys():
+                resources.pop(res)
+            res += 1
+        return resources
+
+    def process(self, resources):
+        count = len(resources)
+        resources = self.filter_resources(resources)
+        self.log.info(
+            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.id_key = self.manager.get_model().id
+        resource_set = self.create_set(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resource_set:
+                action    = self.data.get('action')
+                value     = self.data.get('value')
+                new_value = False
+                if action == 'lower' and not r.islower():
+                    new_value = r.lower()
+                elif action == 'upper' and not r.isupper():
+                    new_value = r.upper()
+                elif action == 'title' and not r.istitle():
+                    new_value = r.title()
+                elif action == 'strip' and value and value in r:
+                    new_value = r.strip(value)
+                if new_value:
+                    futures.append(
+                        w.submit(self.process_transform, new_value, resource_set[r]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception renaming tag set \n %s" % (
+                            f.exception()))
+        return resources

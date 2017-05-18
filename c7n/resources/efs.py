@@ -27,12 +27,16 @@ class ElasticFileSystem(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         dimension = None
+        detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
 
 
 @ElasticFileSystem.action_registry.register('delete')
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ('efs:DescribeMountTargets',
+                   'efs:DeleteMountTargets',
+                   'efs:DeleteFileSystem')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')

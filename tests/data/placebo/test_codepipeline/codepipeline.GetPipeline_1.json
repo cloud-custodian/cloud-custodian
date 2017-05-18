@@ -1,0 +1,81 @@
+{
+    "status_code": 200, 
+    "data": {
+        "pipeline": {
+            "roleArn": "arn:aws:iam::619193117841:role/AWS-CodePipeline-Service", 
+            "stages": [
+                {
+                    "name": "Source", 
+                    "actions": [
+                        {
+                            "inputArtifacts": [], 
+                            "name": "Source", 
+                            "actionTypeId": {
+                                "category": "Source", 
+                                "owner": "ThirdParty", 
+                                "version": "1", 
+                                "provider": "GitHub"
+                            }, 
+                            "outputArtifacts": [
+                                {
+                                    "name": "MyApp"
+                                }
+                            ], 
+                            "configuration": {
+                                "Owner": "kapilt", 
+                                "Repo": "cloud-custodian", 
+                                "Branch": "master", 
+                                "OAuthToken": "****"
+                            }, 
+                            "runOrder": 1
+                        }
+                    ]
+                }, 
+                {
+                    "name": "Build", 
+                    "actions": [
+                        {
+                            "inputArtifacts": [
+                                {
+                                    "name": "MyApp"
+                                }
+                            ], 
+                            "name": "CodeBuild", 
+                            "actionTypeId": {
+                                "category": "Build", 
+                                "owner": "AWS", 
+                                "version": "1", 
+                                "provider": "CodeBuild"
+                            }, 
+                            "outputArtifacts": [
+                                {
+                                    "name": "MyAppBuild"
+                                }
+                            ], 
+                            "configuration": {
+                                "ProjectName": "custodian-build-python"
+                            }, 
+                            "runOrder": 1
+                        }
+                    ]
+                }
+            ], 
+            "artifactStore": {
+                "type": "S3", 
+                "location": "codepipeline-us-east-1-935864261324"
+            }, 
+            "name": "custodian-deploy", 
+            "version": 1
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b5bbf5a-d17f-11e6-8c53-d522893c963e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b5bbf5a-d17f-11e6-8c53-d522893c963e", 
+                "content-length": "851", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

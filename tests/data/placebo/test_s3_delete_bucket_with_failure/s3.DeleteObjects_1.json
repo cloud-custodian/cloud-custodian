@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Deleted": [
+            {
+                "Key": "AWSLogs/2015/10/10"
+            }, 
+            {
+                "Key": "AWSLogs/2015/10/11"
+            }, 
+            {
+                "Key": "home.txt"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "MKK4/lgEZAO/2/rWA0y/IP+Lt9faIRCERA5NYXlW3c0wXMIX2TCcy32m5R1SZmWTB2h+GKwox7w=", 
+            "RequestId": "AF0503BFB6D0DFE7", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "MKK4/lgEZAO/2/rWA0y/IP+Lt9faIRCERA5NYXlW3c0wXMIX2TCcy32m5R1SZmWTB2h+GKwox7w=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "connection": "close", 
+                "x-amz-request-id": "AF0503BFB6D0DFE7", 
+                "date": "Sat, 18 Feb 2017 05:03:34 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

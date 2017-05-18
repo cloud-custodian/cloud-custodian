@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "repositoryName": "custodian-config-repo", 
+                "cloneUrlSsh": "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo", 
+                "lastModifiedDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 48, 
+                    "microsecond": 447000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 14
+                }, 
+                "repositoryId": "44b2224c-7f2a-497c-a6c8-b70013069b59", 
+                "cloneUrlHttp": "https://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo", 
+                "creationDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 48, 
+                    "microsecond": 447000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 14
+                }, 
+                "Arn": "arn:aws:codecommit:us-east-2:644160558196:custodian-config-repo", 
+                "accountId": "644160558196"
+            }
+        ], 
+        "repositoriesNotFound": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b70eb477-d17d-11e6-a4d0-2b02666d9cf9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b70eb477-d17d-11e6-a4d0-2b02666d9cf9", 
+                "date": "Tue, 03 Jan 2017 06:27:35 GMT", 
+                "content-length": "495", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

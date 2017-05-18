@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import unittest
+import tempfile
 import time
 
 from botocore.exceptions import ClientError
@@ -100,6 +101,17 @@ class WorkerDecorator(BaseTest):
 
 
 class UtilTest(unittest.TestCase):
+
+    def write_temp_file(self, contents, suffix='.tmp'):
+        """ Write a temporary file and return the filename.
+
+        The file will be cleaned up after the test.
+        """
+        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        file.write(contents)
+        file.flush()
+        self.addCleanup(file.close)
+        return file.name
 
     def test_ipv4_network(self):
         n1 = utils.IPv4Network(u'10.0.0.0/16')
@@ -215,3 +227,40 @@ class UtilTest(unittest.TestCase):
             utils.parse_s3('s3://things'),
             ('s3://things', 'things', ''),
         )
+
+    def test_reformat_schema(self):
+        # Not a real schema, just doing a smoke test of the function
+        properties = 'target'
+
+        class FakeResource(object):
+            schema = {
+                'additionalProperties': False,
+                'properties': {
+                    'type': 'foo',
+                    'default': {'type': 'object'},
+                    'key': {'type': 'string'},
+                    'op': {'enum': ['regex',
+                                    'ni',
+                                    'gt',
+                                    'not-in']},
+                    'value': {'oneOf': [{'type': 'array'},
+                                        {'type': 'string'},
+                                        {'type': 'boolean'},
+                                        {'type': 'number'}]},
+                },
+                'required': ['key'],
+            }
+
+        ret = utils.reformat_schema(FakeResource)
+        self.assertIsInstance(ret, dict)
+
+        # Test error conditions
+        # Instead of testing for specific keywords, just make sure that strings
+        # are returned instead of a dictionary.
+        FakeResource.schema = {}
+        ret = utils.reformat_schema(FakeResource)
+        self.assertIsInstance(ret, str)
+
+        delattr(FakeResource, 'schema')
+        ret = utils.reformat_schema(FakeResource)
+        self.assertIsInstance(ret, str)

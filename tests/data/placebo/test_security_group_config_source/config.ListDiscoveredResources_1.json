@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0c87b6c8-e9b2-11e6-88cd-3bd72eb352d1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0c87b6c8-e9b2-11e6-88cd-3bd72eb352d1", 
+                "date": "Fri, 03 Feb 2017 01:42:40 GMT", 
+                "content-length": "1495", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::EC2::SecurityGroup", 
+                "resourceId": "sg-6c7fa917"
+            }
+        ]
+    }
+}

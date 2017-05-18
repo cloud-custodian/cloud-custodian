@@ -47,7 +47,16 @@ Navigate below and get started with Cloud Custodian!
    :caption: Contributing
 
    contribute
-   developer   
+   developer/index.rst
+   developer/installing.rst
+   developer/tests.rst
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference
+
+   generated/modules
 
 
 Indices and tables

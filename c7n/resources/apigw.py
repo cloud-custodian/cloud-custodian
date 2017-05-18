@@ -18,5 +18,12 @@ from c7n.query import QueryResourceManager
 @resources.register('rest-api')
 class RestAPI(QueryResourceManager):
 
-    resource_type = "aws.apigateway.restapis"
-
+    class resource_type(object):
+        service = 'apigateway'
+        type = 'restapis'
+        enum_spec = ('get_rest_apis', 'items', None)
+        id = 'id'
+        filter_name = None
+        name = 'name'
+        date = 'createdDate'
+        dimension = 'GatewayName'

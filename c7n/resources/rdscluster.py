@@ -35,7 +35,7 @@ class RDSCluster(QueryResourceManager):
     """Resource manager for RDS clusters.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'rds'
         type = 'rds-cluster'
@@ -46,7 +46,6 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         date = None
 
-    resource_type = Meta
     filter_registry = filters
     action_registry = actions
 
@@ -62,6 +61,10 @@ class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager(
+            'rds-subnet-group').get_permissions()
+
     def get_related_ids(self, resources):
         group_ids = set()
         for r in resources:
@@ -71,18 +74,43 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        from c7n.resources.rds import RDSSubnetGroup
-        self.groups = {r['DBSubnetGroupName']: r for r in
-                       RDSSubnetGroup(self.manager.ctx, {}).resources()}
+        self.groups = {
+            r['DBSubnetGroupName']: r for r in
+            self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
 
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete a RDS cluster
+
+    To prevent unwanted deletion of clusters, it is recommended to apply a
+    filter to the rule
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-delete-unused
+                resource: rds-cluster
+                filters:
+                  - type: metrics
+                    name: CPUUtilization
+                    days: 21
+                    value: 1.0
+                    op: le
+                actions:
+                  - type: delete
+                    skip-snapshot: false
+                    delete-instances: true
+    """
 
     schema = type_schema(
         'delete', **{'skip-snapshot': {'type': 'boolean'},
                      'delete-instances': {'type': 'boolean'}})
+
+    permissions = ('rds:DeleteDBCluster',)
 
     def process(self, clusters):
         skip = self.data.get('skip-snapshot', False)
@@ -122,6 +150,24 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
+    """Action to set the retention period on rds cluster snapshots
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-backup-retention
+                resource: rds-cluster
+                filters:
+                  - type: value
+                    key: BackupRetentionPeriod
+                    value: 21
+                    op: ne
+                actions:
+                  - type: retention
+                    days: 21
+    """
 
     date_attribute = "BackupRetentionPeriod"
     # Tag copy not yet available for Aurora:
@@ -129,6 +175,7 @@ class RetentionWindow(BaseAction):
     schema = type_schema(
         'retention',
         **{'days': {'type': 'number'}})
+    permissions = ('rds:ModifyDBCluster',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
@@ -164,8 +211,21 @@ class RetentionWindow(BaseAction):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
+    """Action to create a snapshot of a rds cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-snapshot
+                resource: rds-cluster
+                actions:
+                  - snapshot
+    """
 
     schema = type_schema('snapshot')
+    permissions = ('rds:CreateDBClusterSnapshot',)
 
     def process(self, clusters):
         with self.executor_factory(max_workers=3) as w:
@@ -195,7 +255,7 @@ class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
-    class Meta(object):
+    class resource_type(object):
 
         service = 'rds'
         type = 'rds-cluster-snapshot'
@@ -207,14 +267,26 @@ class RDSClusterSnapshot(QueryResourceManager):
         dimension = None
         date = 'SnapshotCreateTime'
 
-    resource_type = Meta
-
     filter_registry = FilterRegistry('rdscluster-snapshot.filters')
     action_registry = ActionRegistry('rdscluster-snapshot.actions')
 
 
 @RDSClusterSnapshot.filter_registry.register('age')
 class RDSSnapshotAge(AgeFilter):
+    """Filters rds cluster snapshots based on age (in days)
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-snapshots-expired
+                resource: rds-cluster-snapshot
+                filters:
+                  - type: age
+                    days: 30
+                    op: gt
+    """
 
     schema = type_schema(
         'age', days={'type': 'number'},
@@ -225,6 +297,28 @@ class RDSSnapshotAge(AgeFilter):
 
 @RDSClusterSnapshot.action_registry.register('delete')
 class RDSClusterSnapshotDelete(BaseAction):
+    """Action to delete rds cluster snapshots
+
+    To prevent unwanted deletion of rds cluster snapshots, it is recommended
+    to apply a filter to the rule
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-snapshots-expired-delete
+                resource: rds-cluster-snapshot
+                filters:
+                  - type: age
+                    days: 30
+                    op: gt
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteDBClusterSnapshot',)
 
     def process(self, snapshots):
         log.info("Deleting %d RDS cluster snapshots", len(snapshots))

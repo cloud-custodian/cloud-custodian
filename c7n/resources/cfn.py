@@ -30,22 +30,48 @@ actions = ActionRegistry('cfn.actions')
 @resources.register('cfn')
 class CloudFormation(QueryResourceManager):
 
-    resource_type = "aws.cloudformation.stack"
+    class resource_type(object):
+        service = 'cloudformation'
+        type = 'stack'
+        enum_spec = ('describe_stacks', 'Stacks[]', None)
+        id = 'StackName'
+        filter_name = 'StackName'
+        filter_type = 'scalar'
+        name = 'StackName'
+        date = 'CreationTime'
+        dimension = None
+
     action_registry = actions
     filter_registry = filters
 
 
 @actions.register('delete')
 class Delete(BaseAction):
+    """Action to delete cloudformation stacks
+
+    It is recommended to use a filter to avoid unwanted deletion of stacks
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudformation-delete-failed-stacks
+                resource: cfn
+                filters:
+                  - StackStatus: ROLLBACK_COMPLETE
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
+    permissions = ("cloudformation:DeleteStack",)
 
     def process(self, stacks):
         with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_stack, stacks))
+            list(w.map(self.process_stacks, stacks))
 
     def process_stacks(self, stack):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
         client.delete_stack(StackName=stack['StackName'])
-

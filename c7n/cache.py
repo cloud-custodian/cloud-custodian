@@ -21,7 +21,7 @@ import os
 import logging
 import time
 
-log = logging.getLogger('c7n.cache')
+log = logging.getLogger('custodian.cache')
 
 
 def factory(config):

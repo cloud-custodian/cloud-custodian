@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
-TODO make filters package
-  - offhours
-  - metrics
-  -
+CloudWatch Metrics suppport for resources
 """
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
@@ -35,7 +31,7 @@ class MetricsFilter(Filter):
     - GetMetricStatistics - http://goo.gl/w8mMEY
     - Supported Metrics - http://goo.gl/n0E0L7
 
-    usage:: yaml
+    .. code-block:: yaml
 
       - name: ec2-underutilized
         resource: ec2
@@ -56,17 +52,21 @@ class MetricsFilter(Filter):
 
     schema = type_schema(
         'metrics',
-        namespace={'type': 'string'},
-        name={'type': 'string'},
-        dimensions={'type': 'array', 'items': {'type': 'string'}},
-        # Type choices
-        statistics={'type': 'string', 'enum': [
-            'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
-        days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()},
-        value={'type': 'number'},
-        period={'type': 'number'},
-        required=('value', 'name'))
+        **{'namespace': {'type': 'string'},
+           'name': {'type': 'string'},
+           'dimensions': {'type': 'array', 'items': {'type': 'string'}},
+           # Type choices
+           'statistics': {'type': 'string', 'enum': [
+               'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
+           'days': {'type': 'number'},
+           'op': {'type': 'string', 'enum': OPERATORS.keys()},
+           'value': {'type': 'number'},
+           'period': {'type': 'number'},
+           'attr-multiplier': {'type': 'number'},
+           'percent-attr': {'type': 'string'},
+           'required': ('value', 'name')})
+
+    permissions = ("cloudwatch:GetMetricStatistics",)
 
     MAX_QUERY_POINTS = 50850
     MAX_RESULT_POINTS = 1440
@@ -115,7 +115,7 @@ class MetricsFilter(Filter):
 
         ns = self.data.get('namespace')
         if not ns:
-            ns = getattr(self.model, 'default_namespace', None)
+            ns = getattr(self.model, 'metrics_namespace', None)
             if not ns:
                 ns = self.DEFAULT_NAMESPACE[self.model.service]
         self.namespace = ns
@@ -166,6 +166,14 @@ class MetricsFilter(Filter):
                     Dimensions=dimensions)['Datapoints']
             if len(collected_metrics[key]) == 0:
                 continue
-            if self.op(collected_metrics[key][0][self.statistics], self.value):
+            if self.data.get('percent-attr'):
+                rvalue = r[self.data.get('percent-attr')]
+                if self.data.get('attr-multiplier'):
+                    rvalue = rvalue * self.data['attr-multiplier']
+                percent = (collected_metrics[key][0][self.statistics] /
+                           rvalue * 100)
+                if self.op(percent, self.value):
+                    matched.append(r)
+            elif self.op(collected_metrics[key][0][self.statistics], self.value):
                 matched.append(r)
         return matched

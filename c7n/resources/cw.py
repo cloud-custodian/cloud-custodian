@@ -17,20 +17,65 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
 
-    resource_type = 'aws.cloudwatch.alarm'
+    class resource_type(object):
+        service = 'cloudwatch'
+        type = 'alarm'
+        enum_spec = ('describe_alarms', 'MetricAlarms', None)
+        id = 'AlarmArn'
+        filter_name = 'AlarmNames'
+        filter_type = 'list'
+        name = 'AlarmName'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        dimension = None
+
+    retry = staticmethod(get_retry(('Throttled',)))
+
+
+@Alarm.action_registry.register('delete')
+class AlarmDelete(BaseAction):
+    """Delete a cloudwatch alarm.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-alarms
+                resource: alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
 
     class resource_type(object):
-
         service = 'events'
         type = 'event-rule'
         enum_spec = ('list_rules', 'Rules', None)
@@ -44,12 +89,10 @@ class EventRule(QueryResourceManager):
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
 
-    class Meta(object):
-
+    class resource_type(object):
         service = 'logs'
         type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
-
         name = 'logGroupName'
         id = 'arn'
         filter_name = 'logGroupNamePrefix'
@@ -57,14 +100,25 @@ class LogGroup(QueryResourceManager):
         dimension = 'LogGroupName'
         date = 'creationTime'
 
-    resource_type = Meta
-
 
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
+    """Action to set the retention period (in days) for CloudWatch log groups
 
-    schema = type_schema(
-        'retention', days={'type': 'integer'})
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-set-log-group-retention
+                resource: log-group
+                actions:
+                  - type: retention
+                    days: 200
+    """
+
+    schema = type_schema('retention', days={'type': 'integer'})
+    permissions = ('logs:PutRetentionPolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -77,8 +131,24 @@ class Retention(BaseAction):
 
 @LogGroup.action_registry.register('delete')
 class Delete(BaseAction):
+    """
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-log-group
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 182.5
+                actions:
+                  - delete
+    """
 
     schema = type_schema('delete')
+    permissions = ('logs:DeleteLogGroup',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
@@ -88,9 +158,23 @@ class Delete(BaseAction):
 
 @LogGroup.filter_registry.register('last-write')
 class LastWriteDays(Filter):
+    """Filters CloudWatch log groups by last write
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: cloudwatch-stale-groups
+                resource: log-group
+                filters:
+                  - type: last-write
+                    days: 60
+    """
 
     schema = type_schema(
         'last-write', days={'type': 'number'})
+    permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
         self.date_threshold = datetime.utcnow() - timedelta(
@@ -113,6 +197,6 @@ class LastWriteDays(Filter):
         else:
             last_timestamp = streams[0]['lastIngestionTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp/1000.0)
+        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write

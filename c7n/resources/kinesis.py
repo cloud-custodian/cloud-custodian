@@ -11,41 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
-
-from botocore.exceptions import ClientError
-
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
 
-    resource_type = "aws.kinesis.stream"
-
-    def augment(self, resources):
-
-        def _augment(resource_set):
-            resources = []
-            client = local_session(self.session_factory).client('kinesis')
-            for stream_name in resource_set:
-                resources.append(
-                    client.describe_stream(
-                        StreamName=stream_name)['StreamDescription'])
-            return resources
-                        
-        with self.executor_factory(max_workers=2) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))
+    class resource_type(object):
+        service = 'kinesis'
+        type = 'stream'
+        enum_spec = ('list_streams', 'StreamNames', None)
+        detail_spec = (
+            'describe_stream', 'StreamName', None, 'StreamDescription')
+        name = id = 'StreamName'
+        filter_name = None
+        filter_type = None
+        date = None
+        dimension = 'StreamName'
 
 
 @KinesisStream.action_registry.register('delete')
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ("kinesis:DeleteStream",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
@@ -64,27 +56,25 @@ class Delete(Action):
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
-    resource_type = "aws.firehose.deliverystream"
-
-    def augment(self, resources):
-
-        def _augment(resource_set):
-            resources = []
-            client = local_session(self.session_factory).client('firehose')
-            for stream_name in resource_set:
-                resources.append(
-                    client.describe_delivery_stream(
-                        DeliveryStreamName=stream_name)[
-                            'DeliveryStreamDescription'])
-            return resources
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))        
+    class resource_type(object):
+        service = 'firehose'
+        type = 'deliverystream'
+        enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', None)
+        detail_spec = (
+            'describe_delivery_stream', 'DeliveryStreamName', None,
+            'DeliveryStreamDescription')
+        name = id = 'DeliveryStreamName'
+        filter_name = None
+        filter_type = None
+        date = 'CreateTimestamp'
+        dimension = 'DeliveryStreamName'
 
 
 @DeliveryStream.action_registry.register('delete')
 class FirehoseDelete(Action):
+
+    schema = type_schema('delete')
+    permissions = ("firehose:DeleteDeliveryStream",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('firehose')
@@ -99,35 +89,28 @@ class FirehoseDelete(Action):
                 continue
             client.delete_delivery_stream(
                 DeliveryStreamName=r['DeliveryStreamName'])
-        
-        
+
+
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
     class resource_type(object):
         service = "kinesisanalytics"
         enum_spec = ('list_applications', 'ApplicationSummaries', None)
+        detail_spec = ('describe_application', 'ApplicationName',
+                       'ApplicationName', 'ApplicationDetail')
         name = "ApplicationName"
         id = "ApplicationARN"
         dimension = None
-
-    def augment(self, resources):
-        client = local_session(
-            self.session_factory).client('kinesisanalytics')
-        results = []
-        for r in resources:
-            try:
-                info = client.describe_application(
-                    ApplicationName=r['ApplicationName'])['ApplicationDetail']
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFound':
-                    continue
-            r.update(info)
-        return resources
+        filter_name = None
+        filter_type = None
 
 
 @AnalyticsApp.action_registry.register('delete')
 class AppDelete(Action):
+
+    schema = type_schema('delete')
+    permissions = ("kinesisanalytics:DeleteApplication",)
 
     def process(self, resources):
         client = local_session(
@@ -136,4 +119,3 @@ class AppDelete(Action):
             client.delete_application(
                 ApplicationName=r['ApplicationName'],
                 CreateTimestamp=r['CreateTimestamp'])
-        
