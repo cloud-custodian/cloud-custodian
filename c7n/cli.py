@@ -111,9 +111,14 @@ def _default_region(options):
 
     try:
         options.regions = [utils.get_profile_session(options).region_name]
-        log.debug("using default region:%s from boto" % options.regions[0])
     except:
+        log.warning('Could not determine default region')
         return
+
+    if options.regions[0] is None:
+        log.warning('The default region is None. Set a default region in ~/.aws/config')
+    else:
+        log.debug("using default region:%s from boto" % options.regions[0])
 
 
 def _default_account_id(options):
