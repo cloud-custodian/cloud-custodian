@@ -555,6 +555,23 @@ class TestSnapshot(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+class TestAssociateInstanceProfile(BaseTest):
+
+    def test_ec2_associate_instance_profile(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_associate_instance_profile')
+        policy = self.load_policy({
+            'name': 'ec2-test-associate-instance-profile',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'MissingInstanceProfile'}],
+            'actions': [
+                {'type': 'associate-instance-profile',
+                 'name': 'ec2-default'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEC2QueryFilter(unittest.TestCase):
 
