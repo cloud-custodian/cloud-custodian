@@ -60,9 +60,11 @@ def resources_gc_prefix(options, policy_collection):
             result = client.get_policy(FunctionName=n['FunctionName'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                log.warn("Lambda Function or Access Policy Statement missing: {}".format(n['FunctionName']))
+                log.warn("Lambda Function or Access Policy Statement missing: {}".
+                    format(n['FunctionName']))
             else:
-                log.warn("Unexpected error: {} for function {}".format(e, n['FunctionName']))
+                log.warn("Unexpected error: {} for function {}".
+                    format(e, n['FunctionName']))
 
             # Continue on with next function instead of raising an exception
             continue
