@@ -548,3 +548,18 @@ class MiscTest(CliTest):
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file, yaml_file],
             1)
+
+    def test_failure_with_no_default_region(self):
+        policy = {
+            'policies':
+            [{
+                'name': 'will-never-run',
+                'resource': 'ec2',
+            }]
+        }
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file(policy)
+        self.change_environment(AWS_DEFAULT_REGION=None)
+        self.run_and_expect_failure(
+            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            1)
