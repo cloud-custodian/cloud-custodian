@@ -14,6 +14,8 @@
 """
 Authentication utilities
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import base64
 import jinja2
 import json
@@ -20,13 +22,13 @@ import time
 import yaml
 import zlib
 
-from address import get_user
 from boto3 import Session
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 from functools import partial
-from record import date_time_format, get_date_time_delta, format_struct
-from record import resource_format, resource_owner, resource_tag
+from .address import get_user
+from .record import date_time_format, get_date_time_delta, format_struct
+from .record import resource_format, resource_owner, resource_tag
 
 
 class SqsMessageProcessor(object):
