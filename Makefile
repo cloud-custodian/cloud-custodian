@@ -21,10 +21,8 @@ lint:
 	flake8 c7n --ignore=W293,W291,W503,W391,E123
 
 test:
-	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 nosetests  --processes=-1 tests
-
-ftests:
-	AWS_DEFAULT_REGION=us-east-1 nosetests -s -v ftests
+	flake8 c7n
+	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 C7N_VALIDATE=true nosetests  --processes=-1 --process-timeout=42 tests
 
 depcache:
 	mkdir -p deps

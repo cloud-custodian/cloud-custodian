@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "61a50b15-f6d2-11e6-aa71-e7fe982c91c5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "61a50b15-f6d2-11e6-aa71-e7fe982c91c5", 
+                "date": "Sun, 19 Feb 2017 18:36:51 GMT", 
+                "content-length": "1252", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MetricAlarms": [
+            {
+                "EvaluationPeriods": 5, 
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-delete", 
+                "StateUpdatedTimestamp": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 810000, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 36
+                }, 
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 810000, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 36
+                }, 
+                "ComparisonOperator": "GreaterThanThreshold", 
+                "AlarmActions": [], 
+                "Namespace": "AWS/EC2", 
+                "Period": 3600, 
+                "StateValue": "INSUFFICIENT_DATA", 
+                "Threshold": 10.0, 
+                "AlarmName": "c7n-test-alarm-delete", 
+                "Dimensions": [], 
+                "Statistic": "Average", 
+                "StateReason": "Unchecked: Initial alarm creation", 
+                "InsufficientDataActions": [], 
+                "OKActions": [], 
+                "ActionsEnabled": true, 
+                "MetricName": "CPUUtilization"
+            }
+        ]
+    }
+}

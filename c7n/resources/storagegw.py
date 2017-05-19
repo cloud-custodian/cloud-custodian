@@ -25,4 +25,3 @@ class StorageGateway(QueryResourceManager):
         id = 'GatewayArn'
         name = 'GatewayName'
         dimension = None
-        

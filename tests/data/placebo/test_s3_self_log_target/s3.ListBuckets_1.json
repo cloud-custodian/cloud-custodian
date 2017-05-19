@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 34
+                }, 
+                "Name": "custodian-log-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "0wHtB9lpDFSSdxUix1YugwYgEay+LagjqvHCJdqO7Fwu9ibOoPgIhwqJodYVwolgx1zpJdgMM7o=", 
+            "RequestId": "276933F0EC3BB988", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "0wHtB9lpDFSSdxUix1YugwYgEay+LagjqvHCJdqO7Fwu9ibOoPgIhwqJodYVwolgx1zpJdgMM7o=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "276933F0EC3BB988", 
+                "date": "Mon, 27 Feb 2017 17:34:52 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

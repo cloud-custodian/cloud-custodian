@@ -24,7 +24,10 @@ and run a policy that triggers an email to your inbox.
 1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 1. Make sure your email address is verified in SES, and set it as
-   `from_address` in `mailer.yml`.
+   `from_address` in `mailer.yml`. By default SES is in sandbox mode where
+   you must verify every individual receipient of emails. If need be, make
+   an AWS support ticket to be taken out of SES sandbox mode.
+   AWS SES Docs: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html
 
 Your `mailer.yml` should now look something like this:
 
@@ -48,6 +51,7 @@ policies:
     actions:
       - type: notify
         template: default
+        priority_header: 2
         subject: testing the c7n mailer
         to:
           - you@example.com
@@ -104,6 +108,11 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 | &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
 | &#x2705;  | `from_address`       | string           | default from address                |
 |           | `contact_tags`       | array of strings | tags that we should look at for address information |
+|           | `smtp_server`        | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
+|           | `smtp_port`          | integer          | smtp port                           |
+|           | `smtp_ssl`           | boolean          | this defaults to True               |
+|           | `smtp_username`      | string           |                                     |
+|           | `smtp_password`      | string           |                                     |
 
 
 #### Standard Lambda Function Config
@@ -128,7 +137,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_user`     | string           | ldap server for resolving users     |
 |           | `ldap_bind_password` | string           | ldap server for resolving users     |
 |           | `ldap_uri`           | string           | ldap server for resolving users     |
-
+|           | `ses_region`         | string           | AWS region that handles SES API calls |
 
 #### SDK Config
 
@@ -153,6 +162,7 @@ policies:
     actions:
       - type: notify
         template: default
+        priority_header: 1
         subject: fix your tags
         to:
           - resource-owner
@@ -173,6 +183,7 @@ are either
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
+- `priority_header` indicate the importannce of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
@@ -188,6 +199,7 @@ For reference purposes, the JSON Schema of the `notify` action:
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
+    "priority_header": {"type": "integer"},
     "template": {"type": "string"},
     "transport": {
       "type": "object",
@@ -231,6 +243,12 @@ The following extra global functions are available:
 | `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string |
 | `resource_owner(resource)` | retrieve the contact field value for a resource from tags, if not found returns `Unknown` |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
+
+The following extra jinja filters are available:
+
+| filter | behavior |
+|:----------|:-----------|
+| `{{ utc_string|date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z') }}` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
 
 
 ## Developer Install (OS X El Capitan)

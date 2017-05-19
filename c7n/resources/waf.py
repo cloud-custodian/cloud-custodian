@@ -38,4 +38,3 @@ class RegionalWAF(QueryResourceManager):
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
-

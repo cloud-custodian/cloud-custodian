@@ -27,11 +27,17 @@ CONFIG_SCHEMA = {
 
         # Mailer Infrastructure Config
         'cache': {'type': 'string'},
+        'smtp_server': {'type': 'string'},
+        'smtp_port': {'type': 'integer'},
+        'smtp_ssl': {'type': 'boolean'},
+        'smtp_username': {'type': 'string'},
+        'smtp_password': {'type': 'string'},
         'ldap_uri': {'type': 'string'},
         'ldap_bind_dn': {'type': 'string'},
         'ldap_bind_user': {'type': 'string'},
         'ldap_bind_password': {'type': 'string'},
         'cross_accounts': {'type': 'object'},
+        'ses_region': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
@@ -58,7 +64,8 @@ def main():
     options = parser.parse_args()
 
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
     logging.getLogger('botocore').setLevel(logging.WARNING)
 
     with open(options.config) as fh:

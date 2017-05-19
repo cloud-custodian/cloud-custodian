@@ -95,6 +95,39 @@ class TestAndFilter(unittest.TestCase):
             [])
 
 
+class TestNotFilter(unittest.TestCase):
+    
+    def test_not(self):
+
+        results = [
+            instance(Architecture='x86_64', Color='green'),
+            instance(Architecture='x86_64', Color='blue'),
+            instance(Architecture='x86_64', Color='yellow'),
+        ]
+
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86_64'},
+                {'Color': 'green'}]})
+        self.assertEqual(len(f.process(results)), 2)
+        
+        """
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86'}]})
+        self.assertEqual(len(f.process(results)), 3)
+
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86_64'},
+                {'or': [
+                    {'Color': 'green'},
+                    {'Color': 'blue'},
+                    {'Color': 'yellow'},
+                ]}]})
+        self.assertEqual(len(f.process(results)), 0)
+        """
+
 class TestValueFilter(unittest.TestCase):
 
     # TODO test_manager needs a valid session_factory object
@@ -290,6 +323,54 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
 
+    def test_resource_count_filter(self):
+        fdata = {
+            'type': 'value',
+            'value_type': 'resource_count',
+            'op': 'lt',
+            'value': 2
+        }
+        self.assertFilter(fdata, instance(file='ec2-instances.json'), [])
+
+        f = filters.factory({
+            'type': 'value',
+            'value_type': 'resource_count',
+            'op': 'eq',
+            'value': 2
+        })
+        i = instance(file='ec2-instances.json')
+        self.assertEqual(i, f(i))
+
+    def test_resource_count_filter_validation(self):
+        # Bad `op`
+        f = {
+            'type': 'value',
+            'value_type': 'resource_count',
+            'op': 'regex',
+            'value': 1,
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
+        # Bad `value`
+        f = {
+            'type': 'value',
+            'value_type': 'resource_count',
+            'op': 'eq',
+            'value': 'foo',
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
+        # Missing `op`
+        f = {
+            'type': 'value',
+            'value_type': 'resource_count',
+            'value': 1,
+        }
+        self.assertRaises(
+            base_filters.FilterValidationError, filters.factory, f, {})
+
 
 class TestInstanceAge(BaseFilterTest):
 
@@ -308,8 +389,22 @@ class TestInstanceAge(BaseFilterTest):
                 (i(two_months), True),
                 (i(one_month), False)
         ]:
-            self.assertFilter({'type': 'instance-uptime'}, ii, v)
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'days': 60}, ii, v)
 
+class TestInstanceAgeMinute(BaseFilterTest):
+
+    def test_filter_instance_age(self):
+        now = datetime.now(tz=tz.tzutc())
+        five_minute = now - timedelta(minutes=5)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        for ii, v in [
+                (i(now), False),
+                (i(five_minute), True)
+        ]:
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'minutes': 5}, ii, v)
 
 class TestMarkedForAction(BaseFilterTest):
 

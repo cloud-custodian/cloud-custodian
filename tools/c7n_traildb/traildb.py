@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 from cStringIO import StringIO
 from dateutil.parser import parse
@@ -26,6 +27,8 @@ import time
 import sqlite3
 
 import boto3
+
+from botocore.client import Config
 
 
 log = logging.getLogger('c7n_traildb')
@@ -53,7 +56,7 @@ def chunks(iterable, size=50):
 
 def process_trail_set(
         object_set, map_records, reduce_results=None, trail_bucket=None):
-    s3 = boto3.Session().client('s3')
+    s3 = boto3.Session().client('s3', config=Config(signature_version='s3v4'))
     previous = None
     for o in object_set:
         body = s3.get_object(Key=o['Key'], Bucket=trail_bucket)['Body']
@@ -90,6 +93,7 @@ class TrailDB(object):
 #              response     text,
 #              request      text,
 #              user         text,
+
     def insert(self, records):
         self.cursor.executemany(
             "insert into events values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -108,9 +112,9 @@ def reduce_records(x, y):
     return y
 
 
-#STOP = 42
+# STOP = 42
 #
-#def store_records(output, q):
+# def store_records(output, q):
 #    db = TrailDB(output)
 #    while True:
 #        results = q.get()
@@ -144,11 +148,13 @@ def process_records(records,
         if not_service_filter and r['eventSource'] == not_service_filter:
             continue
 
-        utype = r['userIdentity']['type']
+        utype = r['userIdentity'].get('type', None)
         if utype == 'Root':
             uid = 'root'
         elif utype == 'SAMLUser':
             uid = r['userIdentity']['userName']
+        elif utype is None and r['userIdentity']['invokedBy'] == 'AWS Internal':
+            uid = r['userIdentity']['invokedBy']
         else:
             uid = r['userIdentity'].get('arn', '')
 
@@ -164,15 +170,15 @@ def process_records(records,
             r['eventSource'],
             r.get('userAgent', ''),
             r.get('requestID', ''),
-            r['sourceIPAddress'],
+            r.get('sourceIPAddress', ''),
             uid,
-# TODO make this optional, for now omit for size
-#            json.dumps(r['requestParameters']),
-#            json.dumps(r['responseElements']),
-#            json.dumps(r['userIdentity']),
+            # TODO make this optional, for now omit for size
+            #            json.dumps(r['requestParameters']),
+            #            json.dumps(r['responseElements']),
+            #            json.dumps(r['userIdentity']),
             r.get('errorCode', None),
             r.get('errorMessage', None)
-            ))
+        ))
     if data_dir:
         if not user_records:
             return
@@ -190,12 +196,14 @@ def process_bucket(
         output=None, uid_filter=None, event_filter=None,
         service_filter=None, not_service_filter=None, data_dir=None):
 
-    s3 = boto3.Session().client('s3')
+    s3 = boto3.Session().client(
+        's3', config=Config(signature_version='s3v4'))
+
     paginator = s3.get_paginator('list_objects')
     # PyPy has some memory leaks.... :-(
     pool = Pool(maxtasksperchild=10)
     t = time.time()
-    object_count = object_size = idx = 0
+    object_count = object_size = 0
 
     log.info("Processing:%d cloud-trail %s" % (
         cpu_count(),
@@ -216,7 +224,7 @@ def process_bucket(
         trail_bucket=bucket_name)
     db = TrailDB(output)
 
-    bsize = math.ceil(1000/float(cpu_count()))
+    bsize = math.ceil(1000 / float(cpu_count()))
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
         objects = page.get('Contents', ())
         object_count += len(objects)
@@ -229,7 +237,7 @@ def process_bucket(
             results = map(object_processor, chunks(objects, bsize))
 
         st = time.time()
-        log.info("Loaded page time:%0.2fs", st-pt)
+        log.info("Loaded page time:%0.2fs", st - pt)
 
         for r in results:
             for fpath in r:
@@ -241,11 +249,12 @@ def process_bucket(
         l = t
         t = time.time()
 
-        log.info("Stored page time:%0.2fs", t-st)
+        log.info("Stored page time:%0.2fs", t - st)
         log.info(
             "Processed paged time:%0.2f size:%s count:%s" % (
-                t-l, object_size, object_count))
-        log.info('Last Page Key: %s', objects[-1]['Key'])
+                t - l, object_size, object_count))
+        if objects:
+            log.info('Last Page Key: %s', objects[-1]['Key'])
 
 
 def get_bucket_path(options):
@@ -287,7 +296,6 @@ def main():
     parser = setup_parser()
     options = parser.parse_args()
 
-
     if options.tmpdir and not os.path.exists(options.tmpdir):
         os.makedirs(options.tmpdir)
     prefix = get_bucket_path(options)
@@ -301,7 +309,7 @@ def main():
         options.source,
         options.not_source,
         options.tmpdir
-        )
+    )
 
 
 if __name__ == '__main__':

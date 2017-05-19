@@ -25,7 +25,7 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, chunks
 
 
 @resources.register('iam-group')
@@ -163,12 +163,14 @@ class IamRoleUsage(Filter):
         results = []
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
-            svcs = client.list_services(cluster=cluster)['serviceArns']
-            for svc in client.describe_services(
-                    cluster=cluster, services=svcs)['services']:
-                if 'roleArn' not in svc:
-                    continue
-                results.append(svc['roleArn'])
+            services = client.list_services(
+                cluster=cluster['clusterName'])['serviceArns']
+            if services:
+                for service in client.describe_services(
+                        cluster=cluster['clusterName'],
+                        services=services)['services']:
+                    if 'roleArn' in service:
+                        results.append(service['roleArn'])
         return results
 
     def scan_asg_roles(self):
@@ -219,7 +221,7 @@ class UnusedIamRole(IamRoleUsage):
         roles = self.service_role_usage()
         results = []
         for r in resources:
-            if r['Arn'] not in roles or r['RoleName'] not in roles:
+            if r['Arn'] not in roles and r['RoleName'] not in roles:
                 results.append(r)
         self.log.info("%d of %d iam roles not currently used.",
                       len(results), len(resources))
@@ -247,6 +249,67 @@ class IamRoleInlinePolicy(Filter):
         if self.data.get('value', True):
             return [r for r in resources if self._inline_policies(c, r) > 0]
         return [r for r in resources if self._inline_policies(c, r) == 0]
+
+
+@Role.filter_registry.register('has-specific-managed-policy')
+class SpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that has a specific policy attached
+
+    For example, if the user wants to check all roles with 'admin-policy':
+
+    .. code-block: yaml
+
+     - name: iam-roles-have-admin
+       resource: iam-role
+       filters:
+        - type: has-specific-managed-policy
+          value: admin-policy
+
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r)]
+        return []
+
+
+@Role.filter_registry.register('no-specific-managed-policy')
+class NoSpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that do not have a specific policy attached
+
+    For example, if the user wants to check all roles without 'ip-restriction':
+
+    .. code-block: yaml
+
+     - name: iam-roles-no-ip-restriction
+       resource: iam-role
+       filters:
+        - type: no-specific-managed-policy
+          value: ip-restriction
+
+    """
+
+    schema = type_schema('no-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if not self.data.get('value') in
+            self._managed_policies(c, r)]
+        return []
 
 
 ######################
@@ -376,8 +439,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if (r['Arn'] not in profiles or
-                        r['InstanceProfileName'] not in profiles):
+            if (r['Arn'] not in profiles or r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (
@@ -389,8 +451,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
 #    IAM Users    #
 ###################
 
-@User.filter_registry.register('credential')
-class UserCredentialReport(Filter):
+class CredentialReport(Filter):
     """Use IAM Credential report to filter users.
 
     The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
@@ -454,7 +515,7 @@ class UserCredentialReport(Filter):
                  'certs',
                  'certs.active',
                  'certs.last_rotated',
-                 ]},
+             ]},
         value={'oneOf': [
             {'type': 'array'},
             {'type': 'string'},
@@ -552,16 +613,7 @@ class UserCredentialReport(Filter):
         if '.' in self.data['key']:
             self.matcher_config = dict(self.data)
             self.matcher_config['key'] = self.data['key'].split('.', 1)[1]
-        report = self.get_credential_report()
-        if report is None:
-            return []
-        results = []
-        for r in resources:
-            info = report.get(r['UserName'])
-            if self.match(info):
-                r['c7n:credential-report'] = info
-                results.append(r)
-        return results
+        return []
 
     def match(self, info):
         if info is None:
@@ -580,61 +632,108 @@ class UserCredentialReport(Filter):
                 return True
 
 
-@User.filter_registry.register('policy')
-class UserAttachedPolicy(Filter):
-
-    schema = type_schema('policy')
-    permissions = ('iam:ListAttachedUserPolicies',)
+@User.filter_registry.register('credential')
+class UserCredentialReport(CredentialReport):
 
     def process(self, resources, event=None):
+        super(UserCredentialReport, self).process(resources, event)
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        for r in resources:
+            info = report.get(r['UserName'])
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
 
-        def _user_policies(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AttachedPolicies'] = client.list_attached_user_policies(
-                UserName=resource['UserName'])['AttachedPolicies']
 
+@User.filter_registry.register('policy')
+class UserPolicy(ValueFilter):
+    """Filter IAM users based on attached policy values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-admin-access
+                resource: iam-user
+                filters:
+                  - type: policy
+                    key: 'PolicyName'
+                    value: 'AdministratorAccess'
+    """
+
+    schema = type_schema('policy', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListAttachedUserPolicies',)
+
+    def user_policies(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            if 'c7n:Policies' not in u:
+                u['c7n:Policies'] = []
+            aps = client.list_attached_user_policies(
+                UserName=u['UserName'])['AttachedPolicies']
+            for ap in aps:
+                u['c7n:Policies'].append(
+                    client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AttachedPolicies' not in r]
             self.log.debug(
-                "Querying %d users policies" % len(query_resources))
-            list(w.map(_user_policies, query_resources))
+                "Querying %d users policies" % len(resources))
+            list(w.map(self.user_policies, user_set))
 
         matched = []
         for r in resources:
-            for p in r['AttachedPolicies']:
-                if self.match(p):
+            for p in r['c7n:Policies']:
+                print p
+                if self.match(p) and r not in matched:
                     matched.append(r)
-                    break
         return matched
 
 
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
+    """Filter IAM users based on access-key values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-active-keys
+                resource: iam-user
+                filters:
+                  - type: access-key
+                    key: 'Status'
+                    value: 'Active'
+    """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
 
+    def user_keys(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u['c7n:AccessKeys'] = client.list_access_keys(
+                UserName=u['UserName'])['AccessKeyMetadata']
+
     def process(self, resources, event=None):
-
-        def _user_keys(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AccessKeys'] = client.list_access_keys(
-                UserName=resource['UserName'])['AccessKeyMetadata']
-
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AccessKeys' not in r]
             self.log.debug(
-                "Querying %d users' api keys" % len(query_resources))
-            list(w.map(_user_keys, query_resources))
+                "Querying %d users' api keys" % len(resources))
+            list(w.map(self.user_keys, user_set))
 
         matched = []
         for r in resources:
-            for p in r['AccessKeys']:
-                if self.match(p):
+            for k in r['c7n:AccessKeys']:
+                if self.match(k):
                     matched.append(r)
-                    break
         return matched
 
 
@@ -677,7 +776,7 @@ class UserRemoveAccessKey(BaseAction):
     schema = type_schema(
         'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
     permissions = ('iam:ListAccessKeys', 'iam:UpdateAccessKey',
-                   'iam:DeleteAccssKey')
+                   'iam:DeleteAccessKey')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -729,7 +828,6 @@ class IamGroupUsers(Filter):
 
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')
-        value = self.data.get('value')
         if self.data.get('value', True):
             return [r for r in resources if self._user_count(c, r) > 0]
         return [r for r in resources if self._user_count(c, r) == 0]

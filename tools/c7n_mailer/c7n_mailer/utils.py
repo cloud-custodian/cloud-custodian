@@ -23,6 +23,7 @@ def format_struct(struct):
 
 def setup_defaults(config):
     config.setdefault('region', 'us-east-1')
+    config.setdefault('ses_region', config.get('region'))
     config.setdefault('memory', 1024)
     config.setdefault('timeout', 300)
     config.setdefault('subnets', None)

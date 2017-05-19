@@ -34,7 +34,7 @@ tag policies, and cost management via garbage collection of unused resources
 and off-hours resource management.
 
 Custodian policies are written in simple YAML configuration files that
-enable users to specify policies on a resource type (ec2, asg, redshift, etc) 
+enable users to specify policies on a resource type (ec2, asg, redshift, etc)
 and are constructed from a vocabulary of filters and actions.
 
 It integrates with lambda and cloudwatch events to provide for
@@ -65,7 +65,7 @@ Links
 
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
 - `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer.html>`_
+- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer/installing.html>`_
 
 
 Quick Install
@@ -73,9 +73,10 @@ Quick Install
 
 ::
 
-  $ virtualenv custodian
+  $ virtualenv --python=python2 custodian
   $ source custodian/bin/activate
-  $ pip install c7n
+  (custodian) $ pip install c7n
+
 
 Usage
 #####
@@ -129,14 +130,14 @@ First a policy file needs to be created in YAML format, as an example::
 Given that, you can run cloud-custodian with::
 
   # Validate the configuration (note this happens by default on run)
-  $ custodian validate -c policy.yml
+  $ custodian validate policy.yml
 
   # Dryrun on the policies (no actions executed) to see what resources
   # match each policy.
-  $ custodian run --dryrun -c policy.yml -s out
+  $ custodian run --dryrun -s out policy.yml
 
   # Run the policy
-  $ custodian run -c policy.yml -s out
+  $ custodian run -s out policy.yml
 
 
 Custodian supports a few other useful subcommands and options, including
@@ -174,4 +175,3 @@ Code of Conduct
 
 This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_. By participating, you are
 expected to honor this code.
-

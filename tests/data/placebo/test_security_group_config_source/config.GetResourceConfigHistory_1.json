@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "configurationItems": [
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 23, 
+                    "microsecond": 464000, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 28
+                }, 
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::NetworkInterface", 
+                        "resourceId": "eni-0fac0bfc", 
+                        "relationshipName": "Is associated with NetworkInterface"
+                    }, 
+                    {
+                        "resourceType": "AWS::EC2::NetworkInterface", 
+                        "resourceId": "eni-23fd50d0", 
+                        "relationshipName": "Is associated with NetworkInterface"
+                    }, 
+                    {
+                        "resourceType": "AWS::EC2::NetworkInterface", 
+                        "resourceId": "eni-dd0bcf23", 
+                        "relationshipName": "Is associated with NetworkInterface"
+                    }, 
+                    {
+                        "resourceType": "AWS::EC2::VPC", 
+                        "resourceId": "vpc-d2d616b5", 
+                        "relationshipName": "Is contained in Vpc"
+                    }
+                ], 
+                "availabilityZone": "Not Applicable", 
+                "awsRegion": "us-east-1", 
+                "tags": {}, 
+                "resourceType": "AWS::EC2::SecurityGroup", 
+                "resourceId": "sg-6c7fa917", 
+                "configurationStateId": "1485408503464", 
+                "relatedEvents": [], 
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-6c7fa917", 
+                "version": "1.2", 
+                "configurationItemMD5Hash": "53f2d3b57aa239238047b5bf2cd75bfb", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "{\"ownerId\":\"644160558196\",\"groupName\":\"default\",\"groupId\":\"sg-6c7fa917\",\"description\":\"default VPC security group\",\"ipPermissions\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[{\"userId\":\"644160558196\",\"groupName\":null,\"groupId\":\"sg-6c7fa917\",\"vpcId\":null,\"vpcPeeringConnectionId\":null,\"peeringStatus\":null}],\"ipRanges\":[\"108.56.181.242/32\"],\"prefixListIds\":[]}],\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]}],\"vpcId\":\"vpc-d2d616b5\",\"tags\":[]}", 
+                "configurationItemStatus": "OK", 
+                "accountId": "644160558196"
+            }
+        ], 
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMTI1LDEwMCwtNzAsLTksLTY3LC0xLC02OSwtNSw1NSwtMTEyLDYsNTIsMTgsLTEyNywtMzIsLTU2LDUsODQsLTExNSwtMjcsLTc5LC0yOSwtNjAsLTEyMywtNjQsMzIsMzcsNDksODksNTksLTg0LC03NSwtODksLTgxLC0xMTYsMTAxLC00NSwtMzksMTIsLTEwNiwtODgsLTEyOCw1NCw2OCw1MCwtOTEsLTcxLDEzLC05NywtMzQsLTc1LC00Nyw0NiwtNDIsNDgsNDYsNzksOTksLTMsLTEwMCwtNzEsLTI1LC0xLC0xMTEsLTkwLDc1LC04NywtMTEwLDkwLC03NiwtODEsNDcsLTE3LC0xMDUsLTc3LC03MiwtMTExLDI4LDUyLC03MCw0MiwtMSwxMTYsLTEwNywxMTIsOCw2Myw2MSwtMjUsLTQsNTgsLTQ5LDM5LDU4LDEwOCwxMTQsMTEwLC02Niw0NSwtMTE3LDEwMywtODUsLTQxLC0zNiwxNywtNTQsOTgsLTYxLDE4LC05NiwxMDMsLTYxLC01NiwtNDAsLTIsOSwxNywtMTEsLTMzLDEyMSwtMTI4LC0xMywtODUsNjcsNjMsNDEsLTExOCwxMTgsLTEwNywtNTMsNjEsMTE1LC0xMjcsLTExMiwtMzcsMzksODEsMzMsMTUsNzEsNjAsNywtODYsNDgsLTEwNCwtMTI3LC0xMTYsLTEwMSwtMTEzLC01LC00NCw2OSw2NCwtMTIwLC02NCwxMjMsNjcsLTUsMTI3LDEwMSw4NSwxMDMsLTg0LDcyLDYzLC0xMDddLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbMTI1LDk1LC0zOCw0LC0yNiwtNDYsLTkzLDg1LDcsMSw3MCwxMjUsLTg4LDEsNjMsMzRdfX0=", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0dcd7d7c-e9b2-11e6-89d1-b91eccf729ed", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0dcd7d7c-e9b2-11e6-89d1-b91eccf729ed", 
+                "date": "Fri, 03 Feb 2017 01:42:42 GMT", 
+                "content-length": "2681", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -35,6 +35,7 @@ def load_resources():
     import c7n.resources.directory
     import c7n.resources.directconnect
     import c7n.resources.dynamodb
+    import c7n.resources.datapipeline
     import c7n.resources.ebs
     import c7n.resources.ec2
     import c7n.resources.ecr

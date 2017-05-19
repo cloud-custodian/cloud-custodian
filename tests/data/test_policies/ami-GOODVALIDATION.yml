@@ -1,0 +1,12 @@
+policies:
+
+- name: ami-delete-on-expiresat-tag
+  resource: ami
+  filters:
+     - type: value
+       value_type: age
+       op: gt
+       key: tag:ExpiresAt
+       value: 0
+  actions:
+    - type: deregister
