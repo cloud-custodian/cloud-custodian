@@ -13,6 +13,8 @@
 # limitations under the License.
 """Ops feedback via log subscription
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import boto3
 
 import base64

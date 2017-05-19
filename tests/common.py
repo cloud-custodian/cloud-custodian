@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import logging
 import os
@@ -26,7 +28,7 @@ from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
 
-from zpill import PillTest
+from .zpill import PillTest
 
 
 logging.getLogger('placebo.pill').setLevel(logging.DEBUG)

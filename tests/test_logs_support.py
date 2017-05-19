@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 
 from unittest import TestCase
@@ -49,7 +51,7 @@ class TestLogsSupport(TestCase):
         self.assertIn('timestamp', entry)
         self.assertIn('message', entry)
         self.assertIsInstance(entry['timestamp'], long)
-        self.assertIsInstance(entry['message'], str)
+        self.assertIsInstance(entry['message'], unicode)
 
     def test_entries_in_range(self):
         raw_entries = log_lines()
