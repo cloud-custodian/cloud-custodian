@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
 # is failing, move this above the license)
@@ -24,7 +24,6 @@ import os
 import pdb
 import sys
 import traceback
-import utils
 from datetime import datetime
 from dateutil.parser import parse as date_parse
 
@@ -34,6 +33,7 @@ except ImportError:
     def setproctitle(t):
         return None
 
+from c7n import utils
 from c7n.commands import schema_completer
 from c7n.utils import get_account_id_from_sts
 

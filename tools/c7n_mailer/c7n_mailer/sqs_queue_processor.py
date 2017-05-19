@@ -16,8 +16,10 @@ SQS Email Relay
 ===============
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import memcache
-from sqs_message_processor import SqsMessageProcessor
+from .sqs_message_processor import SqsMessageProcessor
 
 DATA_MESSAGE = "maidmsg/1.0"
 

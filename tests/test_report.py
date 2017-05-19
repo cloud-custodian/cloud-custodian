@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
 from dateutil.parser import parse as date_parse
 
 from c7n.policy import Policy
 from c7n.reports.csvout import Formatter
-from common import Config, load_data
+from .common import Config, load_data
 
 
 EC2_POLICY = Policy(
