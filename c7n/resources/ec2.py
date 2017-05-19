@@ -932,7 +932,7 @@ class EC2AssociateInstanceProfile(BaseAction):
             query:
               - IamInstanceProfile: absent
             actions:
-              - associate-instance-profile
+              - type: associate-instance-profile
                 name: default
 
     https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
