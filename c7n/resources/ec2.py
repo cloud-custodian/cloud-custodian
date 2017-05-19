@@ -942,7 +942,7 @@ class EC2AssociateInstanceProfile(BaseAction):
         'associate-instance-profile',
         **{'name': {'type': 'string'}})
 
-    permissions = ('ec2:AssociateIamInstanceProfile',)
+    permissions = ('ec2:AssociateIamInstanceProfile', 'iam:PassRole')
 
     def process(self, instances):
         client = utils.local_session(
