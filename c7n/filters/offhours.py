@@ -104,13 +104,13 @@ Here's doing the same with auto scale groups
 
     policies:
       - name: asg-offhours-stop
-        resource: ec2
+        resource: asg
         filters:
            - offhour
         actions:
            - suspend
       - name: asg-onhours-start
-        resource: ec2
+        resource: asg
         filters:
            - onhour
         actions:
