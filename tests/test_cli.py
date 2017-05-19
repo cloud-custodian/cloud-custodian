@@ -11,47 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import argparse
 import json
 import os
-import shutil
 import sys
-import tempfile
-import yaml
 
 from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
 from c7n import cli, version, commands
-from c7n.utils import dumps
 from datetime import datetime, timedelta
 
 
 class CliTest(BaseTest):
     """ A subclass of BaseTest with some handy functions for CLI related tests. """
-
-    def write_policy_file(self, policy, format='yaml'):
-        """ Write a policy file to disk in the specified format.
-
-        Input a dictionary and a format. Valid formats are `yaml` and `json`
-        Returns the file path.
-        """
-        suffix = "." + format
-        file = tempfile.NamedTemporaryFile(suffix=suffix)
-        if format == 'json':
-            json.dump(policy, file)
-        else:
-            file.write(yaml.dump(policy, Dumper=yaml.SafeDumper))
-
-        file.flush()
-        self.addCleanup(file.close)
-        return file.name
-
-    def get_temp_dir(self):
-        """ Return a temporary directory that will get cleaned up. """
-        temp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, temp_dir)
-        return temp_dir
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
@@ -247,7 +219,13 @@ class ReportTest(CliTest):
         yaml_file = self.write_policy_file(valid_policies)
 
         output = self.get_output(
-            ['custodian', 'report', '-c', yaml_file, '-s', self.output_dir])
+            ['custodian', 'report', '-s', self.output_dir, yaml_file])
+        self.assertIn('InstanceId', output)
+        self.assertIn('i-014296505597bf519', output)
+
+        # ASCII formatted test
+        output = self.get_output(
+            ['custodian', 'report', '--format', 'grid', '-s', self.output_dir, yaml_file])
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 
@@ -255,7 +233,7 @@ class ReportTest(CliTest):
         # output_dir gets auto-corrected
         new_output_dir = os.path.join(self.output_dir, policy_name)
         output = self.get_output(
-            ['custodian', 'report', '-c', yaml_file, '-s', new_output_dir])
+            ['custodian', 'report', '-s', new_output_dir, yaml_file])
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 
@@ -264,7 +242,7 @@ class ReportTest(CliTest):
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
         self.run_and_expect_failure(
-            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'report', '-s', temp_dir, yaml_file],
             1)
 
         # more than 1 policy
@@ -276,7 +254,7 @@ class ReportTest(CliTest):
         }
         yaml_file = self.write_policy_file(policies)
         self.run_and_expect_failure(
-            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'report', '-s', temp_dir, yaml_file],
             1)
 
     def test_warning_on_empty_policy_filter(self):
@@ -299,11 +277,18 @@ class ReportTest(CliTest):
 
         bad_policy_name = policy_name + '-nonexistent'
         _, err = self.run_and_expect_failure(
-            ['custodian', 'report', '-c', yaml_file, '-s', temp_dir, '-p', bad_policy_name], 
+            ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file], 
             1)
         
         self.assertIn('Warning', err)
         self.assertIn(policy_name, err)
+
+        bad_resource_name = 'foo'
+        _, err = self.run_and_expect_failure(
+            ['custodian', 'report', '-s', temp_dir, '-t', bad_resource_name, yaml_file],
+            1)
+        
+        self.assertIn('Warning', err)
 
 
 class LogsTest(CliTest):
@@ -315,7 +300,7 @@ class LogsTest(CliTest):
         empty_policies = {'policies': []}
         yaml_file = self.write_policy_file(empty_policies)
         self.run_and_expect_failure(
-            ['custodian', 'logs', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'logs', '-s', temp_dir, yaml_file],
             1)
 
         # Test 2 - more than one policy
@@ -327,7 +312,7 @@ class LogsTest(CliTest):
         }
         yaml_file = self.write_policy_file(policies)
         self.run_and_expect_failure(
-            ['custodian', 'logs', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'logs', '-s', temp_dir, yaml_file],
             1)
 
         # Test 3 - successful test
@@ -350,7 +335,7 @@ class LogsTest(CliTest):
             'logs',
         )
         self.run_and_expect_success(
-            ['custodian', 'logs', '-c', yaml_file, '-s', output_dir],
+            ['custodian', 'logs', '-s', output_dir, yaml_file],
         )
 
 
@@ -385,7 +370,8 @@ class RunTest(CliTest):
         )
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({
@@ -404,7 +390,7 @@ class RunTest(CliTest):
         #self.assertIn('metric:ResourceCount Count:1 policy:ec2-state-transition-age', logs)
 
         self.run_and_expect_success(
-            ['custodian', 'run', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'run', '-s', temp_dir, yaml_file],
         )
 
     def test_error(self):
@@ -428,7 +414,7 @@ class RunTest(CliTest):
         })
 
         self.run_and_expect_failure(
-            ['custodian', 'run', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'run', '-s', temp_dir, yaml_file],
             2
         )
 
@@ -442,7 +428,7 @@ class RunTest(CliTest):
         self.patch(pdb, 'post_mortem', lambda x: (_ for _ in ()).throw(CustomError))
 
         self.run_and_expect_exception(
-            ['custodian', 'run', '-c', yaml_file, '-s', temp_dir, '--debug'],
+            ['custodian', 'run', '-s', temp_dir, '--debug', yaml_file],
             CustomError
         )
 
@@ -453,7 +439,8 @@ class MetricsTest(CliTest):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         yaml_file = self.write_policy_file({
             'policies': [{
@@ -476,7 +463,7 @@ class MetricsTest(CliTest):
         period = 24 * 60 * 60 * 14
 
         out = self.get_output(
-            ['custodian', 'metrics', '-c', yaml_file, '--start', str(start), '--end', str(end), '--period', str(period)])
+            ['custodian', 'metrics', '--start', str(start), '--end', str(end), '--period', str(period), yaml_file])
         
         self.assertEqual(
             json.loads(out),
@@ -522,19 +509,42 @@ class MetricsTest(CliTest):
             }]
         }
         yaml_file = self.write_policy_file(policy)
-        temp_dir = self.get_temp_dir()
 
         self.run_and_expect_failure(
-            ['custodian', 'metrics', '-c', yaml_file, '--start', '1'],
+            ['custodian', 'metrics', '--start', '1', yaml_file],
             1
         )
 
 
 class MiscTest(CliTest):
     
-    def test_empty_policy_file_error(self):
+    def test_empty_policy_file(self):
+        # Doesn't do anything, but should exit 0
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
+        self.run_and_expect_success(
+            ['custodian', 'run', '-s', temp_dir, yaml_file],
+        0)
+
+    def test_nonexistent_policy_file(self):
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file({})
+        nonexistent = yaml_file + '.bad'
         self.run_and_expect_failure(
-            ['custodian', 'run', '-c', yaml_file, '-s', temp_dir],
+            ['custodian', 'run', '-s', temp_dir, yaml_file, nonexistent],
+            1)
+
+    def test_duplicate_policy(self):
+        policy = {
+            'policies':
+            [{
+                'name': 'metrics-test',
+                'resource': 'ec2',
+                'query': [{"instance-state-name": "running"}],
+            }]
+        }
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file(policy)
+        self.run_and_expect_failure(
+            ['custodian', 'run', '-s', temp_dir, yaml_file, yaml_file],
             1)

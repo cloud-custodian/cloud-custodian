@@ -3,9 +3,8 @@
 Example tag compliance policy
 =============================
 
-In this sample policy we are querying for only running EC2
-instances. Based on the list that comes back we are then filtering for EC2
-instances that are: not part of an Auto Scaling Group (ASG), not
+In this sample policy we are filtering for EC2
+instances that are: running, not part of an Auto Scaling Group (ASG), not
 already marked for an operation, have less than 10 tags, and are missing one or more
 of the required tags. Once Custodian has filtered the list, it will
 mark all EC2 instances that match the above criteria with a tag. That tag specifies an action
@@ -22,22 +21,22 @@ with the status to be stopped on that particular day.
      resource: ec2
      comment: |
        Mark non-compliant, Non-ASG EC2 instances with stoppage in 4 days
-     query:
-       - instance-state-name: running ──▶ Only apply filter to running instances
      filters:
-   ▣──────  - "tag:aws:autoscaling:groupName": absent
-   │▣─────  - "tag:c7n_status": absent
-   │ │ ▣─── - type: tag-count
-   │ │ │    - or:                           ─┐
-   │ │ │      - "tag:Owner": absent          ├─If any of these tags are
-   │ │ │      - "tag:CostCenter": absent     │ missing, then select instance
-   │ │ │      - "tag:Project": absent       ─┘
-   │ │ │
-   │ │ │  actions: ─────────────────▶ For selected instances, run this action
-   │ │ │    - type: mark-for-op ────▶ Mark instance for operation
-   │ │ │      op: stop ─────────────▶ Stop instance
-   │ │ │      days: 4 ──────────────▶ After 4 days
-   │ │ │
-   │ │ ▣────▶ If instance has 10 tags, skip
-   │ ▣──────▶ If instance already has a c7n_status, skip
-   ▣────────▶ If instance is part of an ASG, skip
+   ▣───────── - "State.Name": running
+   │ ▣─────── - "tag:aws:autoscaling:groupName": absent
+   │ │ ▣───── - "tag:c7n_status": absent
+   │ │ │ ▣─── - type: tag-count
+   │ │ │ │    - or:                           ─┐
+   │ │ │ │      - "tag:Owner": absent          ├─If any of these tags are
+   │ │ │ │      - "tag:CostCenter": absent     │ missing, then select instance
+   │ │ │ │      - "tag:Project": absent       ─┘
+   │ │ │ │
+   │ │ │ │  actions: ─────────────────▶ For selected instances, run this action
+   │ │ │ │    - type: mark-for-op ────▶ Mark instance for operation
+   │ │ │ │      op: stop ─────────────▶ Stop instance
+   │ │ │ │      days: 4 ──────────────▶ After 4 days
+   │ │ │ │
+   │ │ │ ▣────▶ If instance has 10 tags, skip
+   │ │ ▣──────▶ If instance already has a c7n_status, skip
+   │ ▣────────▶ If instance is part of an ASG, skip
+   ▣──────────▶ If instance is not running, skip

@@ -32,11 +32,10 @@ from c7n.resources.iam import (
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole, UnusedIamRole,
-    IamGroupUsers,
-    UserCredentialReport,
-    IamRoleInlinePolicy, IamGroupInlinePolicy)
-
-
+    IamGroupUsers, UserPolicy,
+    UserCredentialReport, UserAccessKey,
+    IamRoleInlinePolicy, IamGroupInlinePolicy,
+    SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
 from c7n.executor import MainThreadExecutor
 
 
@@ -172,7 +171,7 @@ class IamRoleFilterUsage(BaseTest):
             'resource': 'iam-role',
             'filters': ['used']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
 
     def test_iam_role_unused(self):
         session_factory = self.replay_flight_data('test_iam_role_unused')
@@ -183,7 +182,41 @@ class IamRoleFilterUsage(BaseTest):
             'resource': 'iam-role',
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 6)
+
+
+class IamUserFilterUsage(BaseTest):
+
+    def test_iam_user_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_admin_policy')
+        self.patch(
+            UserPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-policy',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'policy',
+                'key': 'PolicyName',
+                'value': 'AdministratorAccess'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
+
+    def test_iam_user_access_key_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_access_key_active')
+        self.patch(
+            UserAccessKey, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-with-key',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'access-key',
+                'key': 'Status',
+                'value': 'Active'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
 
 class IamInstanceProfileFilterUsage(BaseTest):
@@ -296,6 +329,36 @@ class IamGroupFilterUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+class IamManagedPolicyUsage(BaseTest):
+
+    def test_iam_role_has_specific_managed_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_has_specific_managed_policy')
+        self.patch(
+            SpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-with-specific-managed-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'has-specific-managed-policy',
+                 'value': 'TestForSpecificMP' }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_role_no_specific_managed_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_role_no_specific_managed_policy')
+        self.patch(
+            NoSpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-role-no-specific-managed-policy',
+            'resource': 'iam-role',
+            'filters': [
+                {'type': 'no-specific-managed-policy',
+                 'value': 'DoesNotExistPolicy' }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 7)
 
 
 class IamInlinePolicyUsage(BaseTest):
@@ -479,8 +542,7 @@ class LambdaCrossAccount(BaseTest):
 
         tmp_dir = tempfile.mkdtemp()
         self.addCleanup(os.rmdir, tmp_dir)
-        archive = PythonPackageArchive(tmp_dir, tmp_dir)
-        archive.create()
+        archive = PythonPackageArchive()
         archive.add_contents('handler.py', LAMBDA_SRC)
         archive.close()
 

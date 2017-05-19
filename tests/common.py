@@ -18,6 +18,7 @@ import StringIO
 import shutil
 import tempfile
 import yaml
+import unittest
 
 from c7n import policy
 from c7n.schema import generate, validate as schema_validate
@@ -38,16 +39,42 @@ C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
 
+skip_if_not_validating = unittest.skipIf(
+    not C7N_VALIDATE, reason='We are not validating schemas.')
+
+
 class BaseTest(PillTest):
 
     def cleanUp(self):
         # Clear out thread local session cache
         CONN_CACHE.session = None
 
+    def write_policy_file(self, policy, format='yaml'):
+        """ Write a policy file to disk in the specified format.
+
+        Input a dictionary and a format. Valid formats are `yaml` and `json`
+        Returns the file path.
+        """
+        suffix = "." + format
+        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        if format == 'json':
+            json.dump(policy, file)
+        else:
+            file.write(yaml.dump(policy, Dumper=yaml.SafeDumper))
+
+        file.flush()
+        self.addCleanup(file.close)
+        return file.name
+
+    def get_temp_dir(self):
+        """ Return a temporary directory that will get cleaned up. """
+        temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temp_dir)
+        return temp_dir
+
     def get_context(self, config=None, session_factory=None, policy=None):
         if config is None:
-            self.context_output_dir = tempfile.mkdtemp()
-            self.addCleanup(shutil.rmtree, self.context_output_dir)
+            self.context_output_dir = self.get_temp_dir()
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
             session_factory,
@@ -65,8 +92,7 @@ class BaseTest(PillTest):
 
         config = config or {}
         if not output_dir:
-            temp_dir = tempfile.mkdtemp()
-            self.addCleanup(shutil.rmtree, temp_dir)
+            temp_dir = self.get_temp_dir()
             config['output_dir'] = temp_dir
         if cache:
             config['cache'] = os.path.join(temp_dir, 'c7n.cache')
@@ -75,15 +101,12 @@ class BaseTest(PillTest):
         return policy.Policy(data, conf, session_factory)
 
     def load_policy_set(self, data, config=None):
-        t = tempfile.NamedTemporaryFile()
-        t.write(yaml.dump(data, Dumper=yaml.SafeDumper))
-        t.flush()
-        self.addCleanup(t.close)
+        filename = self.write_policy_file(data)
         if config:
             e = Config.empty(**config)
         else:
             e = Config.empty()
-        return policy.load(e, t.name)
+        return policy.load(e, filename)
 
     def patch(self, obj, attr, new):
         old = getattr(obj, attr, None)
@@ -157,8 +180,8 @@ def load_data(file_name, state=None, **kw):
     return data
 
 
-def instance(state=None, **kw):
-    return load_data('ec2-instance.json', state, **kw)
+def instance(state=None, file='ec2-instance.json', **kw):
+    return load_data(file, state, **kw)
 
 
 class Bag(dict):
@@ -174,11 +197,14 @@ class Config(Bag):
 
     @classmethod
     def empty(cls, **kw):
+        region = os.environ.get('AWS_DEFAULT_REGION', "us-east-1")
         d = {}
         d.update({
-            'region': os.environ.get('AWS_DEFAULT_REGION', "us-east-1"),
+            'region': region,
+            'regions': [region],
             'cache': '',
             'profile': None,
+            'account_id': '644160558196',
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': False,
@@ -207,3 +233,10 @@ class Client(object):
         self.filters = filters
         return [Reservation(
             {'instances': [i for i in self.instances]})]
+
+
+try:
+    import pytest
+    functional = pytest.mark.functional
+except ImportError:
+    functional = lambda func: func  # noop

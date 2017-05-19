@@ -16,7 +16,6 @@ import json
 import shutil
 import tempfile
 
-
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -91,7 +90,6 @@ class PolicyPermissions(BaseTest):
         missing = []
         cfg = Config.empty()
         for k, v in manager.resources.items():
-            self.assertTrue(v.get_permissions())
 
             p = Bag({'name': 'permcheck', 'resource': k})
             ctx = self.get_context(config=cfg, policy=p)
@@ -113,7 +111,7 @@ class PolicyPermissions(BaseTest):
                         k, n))
 
             for n, f in v.filter_registry.items():
-                if n in ('and', 'or'):
+                if n in ('and', 'or', 'not'):
                     continue
                 p['filters'] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -121,6 +119,7 @@ class PolicyPermissions(BaseTest):
                     missing.append("%s.filters.%s" % (
                         k, n))
 
+                # in memory filters
                 if n in ('event', 'value', 'tag-count',
                          'marked-for-op', 'offhour', 'onhour', 'age',
                          'state-age', 'egress', 'ingress',
@@ -139,7 +138,56 @@ class PolicyPermissions(BaseTest):
                 "\n\t".join(sorted(missing))))
 
 
+class TestPolicyCollection(BaseTest):
+
+    def test_policy_account_expand(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'account'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection), 1)
+        
+    def test_policy_region_expand_global(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 's3'},
+                {'name': 'iam',
+                 'resource': 'iam-user'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection.resource_types), 2)
+        self.assertEqual(len(collection), 15)        
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'us-east-1')
+
+        collection = original.expand_regions(['eu-west-1', 'eu-west-2'])
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'eu-west-1')
+        self.assertEqual(len(collection), 3)
+
+
 class TestPolicy(BaseTest):
+
+    def test_load_policy_validation_error(self):
+        invalid_policies = {
+            'policies':
+            [{
+                'name': 'foo',
+                'resource': 's3',
+                'filters': [{"tag:custodian_tagging": "not-null"}],
+                'actions': [{'type': 'untag',
+                             'tags': {'custodian_cleanup': 'yes'}}],
+            }]
+        }
+        self.assertRaises(Exception, self.load_policy_set, invalid_policies)
+
 
     def test_policy_validation(self):
         policy = self.load_policy({
@@ -155,9 +203,9 @@ class TestPolicy(BaseTest):
         policy.validate()
         self.assertEqual(policy.tags, ['abc'])
         self.assertFalse(policy.is_lambda)
-        self.assertEqual(
-            repr(policy),
-            "<Policy resource: ec2 name: ec2-utilization>")
+        self.assertTrue(
+            repr(policy).startswith(
+                "<Policy resource: ec2 name: ec2-utilization"))
 
     def test_policy_name_filtering(self):
 
@@ -174,22 +222,30 @@ class TestPolicy(BaseTest):
                 {'name': 'ec2-tag-compliance-remove',
                  'resource': 'ec2'}]},
             )
-        self.assertEqual(collection.resource_types,
-                         set(('s3', 'ec2')))
+
+        self.assertIn('s3-remediate', collection)
+        self.assertNotIn('s3-argle-bargle', collection)
+
+        # Make sure __iter__ works
+        for p in collection:
+            self.assertTrue(p.name is not None)
+
+        self.assertEqual(collection.resource_types, set(('s3', 'ec2')))
         self.assertTrue('s3-remediate' in collection)
+
         self.assertEqual(
-            [p.name for p in collection.policies('s3*')],
+            [p.name for p in collection.filter('s3*')],
             ['s3-remediate', 's3-global-grants'])
 
         self.assertEqual(
-            [p.name for p in collection.policies('ec2*')],
+            [p.name for p in collection.filter('ec2*')],
             ['ec2-tag-compliance-stop',
              'ec2-tag-compliance-kill',
              'ec2-tag-compliance-remove'])
 
     def test_file_not_found(self):
         self.assertRaises(
-            ValueError, policy.load, Config.empty(), "/asdf12")
+            IOError, policy.load, Config.empty(), "/asdf12")
 
     def test_lambda_policy_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
@@ -291,7 +347,7 @@ class TestPolicy(BaseTest):
                  'filters': [
                      {'tag-key': 'CMDBEnvironment'}
                  ]}]})
-        p = collection.policies()[0]
+        p = collection.policies[0]
         self.assertTrue(
             isinstance(p.get_resource_manager(), EC2))
 
@@ -336,6 +392,40 @@ class TestPolicy(BaseTest):
                 {'name': 'process-instances',
                  'resource': 'dummy'}]},
             {'output_dir': self.output_dir})
-        p = collection.policies()[0]
+        p = collection.policies[0]
         p()
         self.assertEqual(len(p.ctx.metrics.data), 3)
+
+
+class PolicyExecutionModeTest(BaseTest):
+
+    def test_run_unimplemented(self):
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).run)
+
+    def test_get_logs_unimplemented(self):
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).get_logs, 1, 2)
+
+
+class PullModeTest(BaseTest):
+
+    def test_skip_when_region_not_equal(self):
+        log_file = self.capture_logging('custodian.policy')
+
+        policy_name = 'rds-test-policy'
+        p = self.load_policy(
+            {'name': policy_name,
+             'resource': 'rds',
+             'region': 'us-east-1',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=None)
+
+        p.run()
+
+        lines = log_file.getvalue().strip().split('\n')
+        self.assertIn(
+            "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(policy_name),
+            lines)

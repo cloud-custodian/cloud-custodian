@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+	"AttachedPolicies": [
+        {
+            "PolicyName": "IAMReadOnly",
+            "PolicyArn": "arn:aws:iam::aws:policy/IAMReadOnly"
+        },
+        {
+            "PolicyName": "Poweruser",
+            "PolicyArn": "arn:aws:iam::aws:policy/Poweruser"
+        }
+    ],
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "48a16c6a-872f-11e6-acfe-07a6295c8f0a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "48a16c6a-872f-11e6-acfe-07a6295c8f0a", 
+                "date": "Fri, 30 Sep 2016 16:59:43 GMT", 
+                "content-length": "323", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

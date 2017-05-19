@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "test", 
+            "ID": "f4f4c9ae2b9027b24750ee4e0b6fdc9877662cb4c6b9bc2108c752b919b9f78c"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 54
+                }, 
+                "Name": "custodian-static-website-test"
+            } 
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "w/m3oUeVaCDWwdrVQ8zS86aqOR9/05C3Ewy/7NZMJedMNTs5FdmraylAxg4gjxKUPSquw/aWPVo=", 
+            "RequestId": "1CD87F6027CAAD5E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "w/m3oUeVaCDWwdrVQ8zS86aqOR9/05C3Ewy/7NZMJedMNTs5FdmraylAxg4gjxKUPSquw/aWPVo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "1CD87F6027CAAD5E", 
+                "date": "Sat, 04 Mar 2017 02:54:31 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

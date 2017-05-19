@@ -27,6 +27,7 @@ class ElasticFileSystem(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         dimension = None
+        detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
 
 
 @ElasticFileSystem.action_registry.register('delete')

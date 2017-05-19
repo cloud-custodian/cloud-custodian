@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-attach-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "RHyVOpCewc6K9Ck6Aq/JT33krocdtkAYTilOY3Nv66HlGQf8WySLk6AYBiichhejQayKqq3OLFg=", 
+            "RequestId": "224782A65853D1FF", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "RHyVOpCewc6K9Ck6Aq/JT33krocdtkAYTilOY3Nv66HlGQf8WySLk6AYBiichhejQayKqq3OLFg=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "224782A65853D1FF", 
+                "location": "/custodian-attach-encrypt-test", 
+                "date": "Thu, 16 Mar 2017 08:20:18 GMT"
+            }
+        }
+    }
+}

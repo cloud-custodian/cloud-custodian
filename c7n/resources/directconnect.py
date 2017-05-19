@@ -26,5 +26,3 @@ class DirectConnect(QueryResourceManager):
         name = 'connectionName'
         filter_name = 'connectionId'
         dimension = None
-
-

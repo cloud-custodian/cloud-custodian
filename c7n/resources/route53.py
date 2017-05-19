@@ -58,3 +58,14 @@ class ResourceRecordSet(QueryResourceManager):
         dimension = None
 
 
+@resources.register('r53domain')
+class Route53Domain(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'route53domains'
+        type = 'r53domain'
+        enum_spec = ('list_domains', 'Domains', None)
+        name = id = 'Route53Domain'
+        filter_name = None
+        date = None
+        dimension = None

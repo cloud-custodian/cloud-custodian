@@ -47,7 +47,9 @@ Navigate below and get started with Cloud Custodian!
    :caption: Contributing
 
    contribute
-   developer   
+   developer/index.rst
+   developer/installing.rst
+   developer/tests.rst
 
 
 .. toctree::

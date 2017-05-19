@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "onecloud-aws", 
+            "ID": "f4f4c9ae2b9027b24750ee4e0b6fdc9877662cb4c6b9bc2108c752b919b9f78c"
+        }, 
+        "Buckets": [], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ZmTFv7oUOYWWXGj8KsUiV+semzrwQs1pQ1TnS3UTuJSsfcVMSRxGYMiBNshBUtO1FIFR6RC4Yt0=", 
+            "RequestId": "1477DEBEAF488E33", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ZmTFv7oUOYWWXGj8KsUiV+semzrwQs1pQ1TnS3UTuJSsfcVMSRxGYMiBNshBUtO1FIFR6RC4Yt0=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "1477DEBEAF488E33", 
+                "date": "Wed, 08 Mar 2017 03:37:06 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

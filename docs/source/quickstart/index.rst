@@ -18,7 +18,13 @@ Install Cloud Custodian
 
 To install Cloud Custodian, just run::
 
-  $ pip install c7n
+  $ virtualenv --python=python2 custodian
+  $ source custodian/bin/activate
+  (custodian) $ pip install c7n
+
+(Note that Custodian's `Lambda features <../policy/lambda.html>`_ currently `do
+not work <https://github.com/capitalone/cloud-custodian/issues/193>`_ outside
+of a virtualenv.)
 
 
 .. _write-policy:
@@ -58,8 +64,9 @@ Now, run Custodian:
 
 .. code-block:: bash
 
-    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. --config=custodian.yml
+    AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. custodian.yml
 
+Note: If you already have AWS credentials configured for AWS CLI or SDK access, then you may omit providing them on the command line. 
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
@@ -98,14 +105,14 @@ validate it separately:
 
 .. code-block:: bash
 
-  $ custodian validate -c custodian.yml
+  $ custodian validate custodian.yml
 
 You can also check which resources are identified by the policy, without
 running any actions on the resources:
 
 .. code-block:: bash
 
-  $ custodian run --dryrun -c custodian.yml -s .
+  $ custodian run --dryrun -s . custodian.yml
 
 
 .. _explore-cc:
@@ -176,15 +183,15 @@ Additional commands let you monitor your services in detail.
 
 You can generate metrics by specifying the boolean metrics flag::
 
-  $ custodian run -c <policyfile>.yml -s <output_directory> --metrics
+  $ custodian run -s <output_directory> --metrics <policyfile>.yml
 
 You can also upload Cloud Custodian logs to CloudWatch logs::
 
-  $ custodian run -c <policyfile>.yml --log-group=/cloud-custodian/<dev-account>/<region>
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> <policyfile>.yml
 
 And you can output logs and resource records to S3::
 
-  $ custodian run -c <policyfile>.yml -s s3://<my-bucket><my-prefix>
+  $ custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
 
 For details, see :ref:`usage`.
 

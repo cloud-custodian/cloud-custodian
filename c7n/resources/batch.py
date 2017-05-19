@@ -40,4 +40,3 @@ class JobDefinition(QueryResourceManager):
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)
-

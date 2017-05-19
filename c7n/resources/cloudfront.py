@@ -65,4 +65,3 @@ class DistributionMetrics(MetricsFilter):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.id]},
                 {'Name': 'Region', 'Value': 'Global'}]
-

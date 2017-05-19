@@ -102,12 +102,8 @@ class LaunchConfigFilterBase(object):
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
-        config_manager = LaunchConfig(self.manager.ctx, {})
-        if len(asgs) < 20:
-            configs = config_manager.get_resources(
-                [asg['LaunchConfigurationName'] for asg in asgs])
-        else:
-            configs = config_manager.resources()
+        configs = self.manager.get_resource_manager(
+            'launch-config').resources()
         self.configs = {
             cfg['LaunchConfigurationName']: cfg for cfg in configs}
 
@@ -193,7 +189,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(ConfigValidFilter, self).initialize(asgs)
-        #pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
         self.subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
@@ -234,7 +230,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
-                if bd['Ebs']['SnapshotId'] not in self.snapshots:
+                if bd['Ebs']['SnapshotId'].strip() not in self.snapshots:
                     found = False
                     break
             if found:
@@ -253,20 +249,24 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         errors = []
         subnets = asg.get('VPCZoneIdentifier', '').split(',')
 
-        for s in subnets:
-            if s not in self.subnets:
-                errors.append(('invalid-subnet', s))
+        for subnet in subnets:
+            subnet = subnet.strip()
+            if subnet not in self.subnets:
+                errors.append(('invalid-subnet', subnet))
 
         for elb in asg['LoadBalancerNames']:
+            elb = elb.strip()
             if elb not in self.elbs:
                 errors.append(('invalid-elb', elb))
 
         for appelb_target in asg.get('TargetGroupARNs', []):
+            appelb_target = appelb_target.strip()
             if appelb_target not in self.appelb_target_groups:
                 errors.append(('invalid-appelb-target-group', appelb_target))
 
         cfg_id = asg.get(
             'LaunchConfigurationName', asg['AutoScalingGroupName'])
+        cfg_id = cfg_id.strip()
 
         cfg = self.configs.get(cfg_id)
 
@@ -278,19 +278,21 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             return True
 
         for sg in cfg['SecurityGroups']:
+            sg = sg.strip()
             if sg not in self.security_groups:
                 errors.append(('invalid-security-group', sg))
 
-        if cfg['KeyName'] and cfg['KeyName'] not in self.key_pairs:
+        if cfg['KeyName'] and cfg['KeyName'].strip() not in self.key_pairs:
             errors.append(('invalid-key-pair', cfg['KeyName']))
 
-        if cfg['ImageId'] not in self.images:
+        if cfg['ImageId'].strip() not in self.images:
             errors.append(('invalid-image', cfg['ImageId']))
 
         for bd in cfg['BlockDeviceMappings']:
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
-            if bd['Ebs']['SnapshotId'] not in self.snapshots:
+            snapshot_id = bd['Ebs']['SnapshotId'].strip()
+            if snapshot_id not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
 
@@ -398,8 +400,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 asg['LaunchConfigurationName'])
             return False
         unencrypted = []
-        if (not self.data.get('exclude_image')
-                and cfg['ImageId'] in self.unencrypted_images):
+        if (not self.data.get('exclude_image') and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
         if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
             unencrypted.append('LaunchConfig')
@@ -422,7 +423,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     msg = e.response['Error']['Message']
                     e_ami_ids = [
                         e_ami_id.strip() for e_ami_id
-                        in msg[msg.find("'[")+2:msg.rfind("]'")].split(',')]
+                        in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
                     self.log.warning(
                         "asg:not-encrypted filter image not found %s",
                         e_ami_ids)
@@ -491,7 +492,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
                     msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     self.log.warning("Snapshot not found %s" % e_snap_id)
                     snap_ids.remove(e_snap_id)
                     continue
@@ -687,9 +688,9 @@ class Resize(Action):
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
-        if self.data['desired_size'] != 'current':
-            raise FilterValidationError(
-                "only resizing desired/min to current capacity is supported")
+        # if self.data['desired_size'] != 'current':
+        #    raise FilterValidationError(
+        #        "only resizing desired/min to current capacity is supported")
         return self
 
     def process(self, asgs):
@@ -698,13 +699,16 @@ class Resize(Action):
         for a in asgs:
             current_size = len(a['Instances'])
             min_size = a['MinSize']
-            desired = a['DesiredCapacity']
+            if self.data['desired_size'] is 'current':
+                desired = min((current_size, a['DesiredCapacity']))
+            else:
+                desired = int(self.data['desired_size'])
             log.debug('desired %d to %s, min %d to %d',
                       desired, current_size, min_size, current_size)
             self.manager.retry(
                 client.update_auto_scaling_group,
                 AutoScalingGroupName=a['AutoScalingGroupName'],
-                DesiredCapacity=min((current_size, desired)),
+                DesiredCapacity=desired,
                 MinSize=min((current_size, min_size)))
 
 
@@ -888,8 +892,7 @@ class PropagateTags(Action):
         client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
-                   if t['PropagateAtLaunch']
-                   and not t['Key'].startswith('aws:')}
+                   if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
 
         if self.data.get('tags'):
             tag_map = {
@@ -1039,16 +1042,16 @@ class RenameTag(Action):
              'Key': destination_tag,
              'Value': source['Value']}])
         if propagate:
-            self.propogate_instance_tag(source, destination_tag, asg)
+            self.propagate_instance_tag(source, destination_tag, asg)
 
-    def propogate_instance_tag(self, source, destination_tag, asg):
+    def propagate_instance_tag(self, source, destination_tag, asg):
         client = local_session(self.manager.session_factory).client('ec2')
         client.delete_tags(
             Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{"Key": source['Key']}])
         client.create_tags(
             Resources=[i['InstanceId'] for i in asg['Instances']],
-            Tags=[{'Key': source['Key'], 'Value': source['Value']}])
+            Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
 @actions.register('mark-for-op')
@@ -1375,10 +1378,12 @@ class UnusedLaunchConfig(Filter):
     """
 
     schema = type_schema('unused')
-    permissions = ASG.get_permissions()
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
 
     def process(self, configs, event=None):
-        asgs = ASG(self.manager.ctx, {}).resources()
+        asgs = self.manager.get_resource_manager('asg').resources()
         self.used = set([
             a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
             for a in asgs])

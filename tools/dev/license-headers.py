@@ -20,7 +20,7 @@ import inspect
 import c7n
 
 header = """\
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,12 +57,13 @@ def update_headers(src_tree):
                 fh.write(
                     '%s%s%s' % (header, suffix, contents))
 
+
 def main():
     srctree = os.path.dirname(inspect.getabsfile(c7n))
     update_headers(srctree)
     update_headers(os.path.abspath('tests'))
     update_headers(os.path.abspath('ftests'))
- 
+
 
 if __name__ == '__main__':
     main()
