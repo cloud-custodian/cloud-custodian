@@ -1,0 +1,60 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "E2V9CJ7KWVKRTY", 
+        "StreamingDistribution": {
+            "Status": "InProgress", 
+            "DomainName": "s3875bxw96hp8b.cloudfront.net", 
+            "StreamingDistributionConfig": {
+                "S3Origin": {
+                    "OriginAccessIdentity": "", 
+                    "DomainName": "test.s3.amazonaws.com"
+                }, 
+                "Comment": "", 
+                "Logging": {
+                    "Bucket": "", 
+                    "Prefix": "", 
+                    "Enabled": false
+                }, 
+                "PriceClass": "PriceClass_All", 
+                "Enabled": false, 
+                "TrustedSigners": {
+                    "Enabled": false, 
+                    "Quantity": 0
+                }, 
+                "CallerReference": "1495205597751", 
+                "Aliases": {
+                    "Quantity": 0
+                }
+            }, 
+            "ActiveTrustedSigners": {
+                "Enabled": false, 
+                "Quantity": 0
+            }, 
+            "LastModifiedTime": {
+                "hour": 14, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 53, 
+                "microsecond": 386000, 
+                "year": 2017, 
+                "day": 19, 
+                "minute": 55
+            }, 
+            "Id": "E22BCDWSGKFT3R", 
+            "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E22BCDWSGKFT3R"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "416fa18b-3ca3-11e7-9f29-0d58cd459a51", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "416fa18b-3ca3-11e7-9f29-0d58cd459a51", 
+                "date": "Fri, 19 May 2017 14:55:53 GMT", 
+                "content-length": "960", 
+                "etag": "E2V9CJ7KWVKRTY", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

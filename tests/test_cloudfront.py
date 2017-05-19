@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import jmespath
 from common import BaseTest
+
 
 class CloudFront(BaseTest):
 
@@ -32,3 +33,119 @@ class CloudFront(BaseTest):
         resources = p.run()
         self.assertEqual(
             resources[0]['DomainName'], 'd1k7b41j4nj6pa.cloudfront.net')
+
+
+    def test_distribution_set_ssl(self):
+        factory = self.replay_flight_data('test_distrbution_set_ssl')
+
+        k = 'CacheBehaviors.Items[].ViewerProtocolPolicy'
+
+        p = self.load_policy({
+            'name': 'distribution-set-ssl',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': k,
+                'value': 'allow-all',
+                'op': 'contains'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        expr = jmespath.compile(k)
+        r = expr.search(resources[0])
+        self.assertTrue('allow-all' in r)
+
+        p = self.load_policy({
+            'name': 'distribution-set-ssl',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': k,
+                'value': 'allow-all',
+                'op': 'contains'
+            }],
+            'actions': [{
+                'type': 'set-ssl'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'distribution-set-ssl',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': k,
+                'value': 'allow-all',
+                'op': 'contains'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+
+    def test_distribution_disable(self):
+        factory = self.replay_flight_data('test_distrbution_disable')
+
+        p = self.load_policy({
+            'name': 'distribution-disable',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': 'CacheBehaviors.Items[].ViewerProtocolPolicy',
+                'value': 'allow-all',
+                'op': 'contains'
+            }],
+            'actions': [{
+                'type': 'disable'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Enabled'], True)
+
+        p = self.load_policy({
+            'name': 'distribution-disable',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': 'CacheBehaviors.Items[].ViewerProtocolPolicy',
+                'value': 'allow-all',
+                'op': 'contains'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Enabled'], False)
+
+    def test_streaming_distribution_disable(self):
+        factory = self.replay_flight_data('test_streaming_distrbution_disable')
+
+        p = self.load_policy({
+            'name': 'streaming-distribution-disable',
+            'resource': 'streaming-distribution',
+            'filters': [{
+                'type': 'value',
+                'key': 'S3Origin.OriginAccessIdentity',
+                'value': ''
+            }],
+            'actions': [{
+                'type': 'disable'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Enabled'], True)
+
+        p = self.load_policy({
+            'name': 'streaming-distribution-disable',
+            'resource': 'streaming-distribution',
+            'filters': [{
+                'type': 'value',
+                'key': 'S3Origin.OriginAccessIdentity',
+                'value': ''
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Enabled'], False)

@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "E2YJBBPL5LJNDT", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "41603839-3ca3-11e7-9f29-0d58cd459a51", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "41603839-3ca3-11e7-9f29-0d58cd459a51", 
+                "date": "Fri, 19 May 2017 14:55:53 GMT", 
+                "content-length": "575", 
+                "etag": "E2YJBBPL5LJNDT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "StreamingDistributionConfig": {
+            "S3Origin": {
+                "OriginAccessIdentity": "", 
+                "DomainName": "test.s3.amazonaws.com"
+            }, 
+            "Comment": "", 
+            "Logging": {
+                "Bucket": "", 
+                "Prefix": "", 
+                "Enabled": false
+            }, 
+            "PriceClass": "PriceClass_All", 
+            "Enabled": true, 
+            "TrustedSigners": {
+                "Enabled": false, 
+                "Quantity": 0
+            }, 
+            "CallerReference": "1495205597751", 
+            "Aliases": {
+                "Quantity": 0
+            }
+        }
+    }
+}
