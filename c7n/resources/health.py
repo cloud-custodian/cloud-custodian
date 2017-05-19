@@ -40,9 +40,6 @@ class HealthEvents(QueryResourceManager):
         'health:DescribeAffectedEntities')
 
     def __init__(self, ctx, data):
-        if ctx.options.region != 'us-east-1':
-            raise ValueError(
-                'resource:health-event is only available in us-east-1')
         super(HealthEvents, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
             self.data.get('query', [
