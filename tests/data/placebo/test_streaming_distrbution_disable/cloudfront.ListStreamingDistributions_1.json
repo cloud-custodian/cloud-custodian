@@ -10,7 +10,7 @@
                         "OriginAccessIdentity": "", 
                         "DomainName": "test.s3.amazonaws.com"
                     }, 
-                    "DomainName": "s3875bxw96hp8b.cloudfront.net", 
+                    "DomainName": "sjvgg4ushszuv.cloudfront.net", 
                     "Enabled": true, 
                     "PriceClass": "PriceClass_All", 
                     "TrustedSigners": {
@@ -19,17 +19,17 @@
                     }, 
                     "Comment": "", 
                     "LastModifiedTime": {
-                        "hour": 14, 
+                        "hour": 21, 
                         "__class__": "datetime", 
                         "month": 5, 
-                        "second": 17, 
-                        "microsecond": 906000, 
+                        "second": 52, 
+                        "microsecond": 700000, 
                         "year": 2017, 
                         "day": 19, 
-                        "minute": 53
+                        "minute": 15
                     }, 
-                    "Id": "E22BCDWSGKFT3R", 
-                    "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E22BCDWSGKFT3R", 
+                    "Id": "E1MC9NC81TK286", 
+                    "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E1MC9NC81TK286", 
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -42,11 +42,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "410c4b84-3ca3-11e7-a755-17b06dacc8f2", 
+            "RequestId": "620274cc-3cd8-11e7-b241-09b71ace1093", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "410c4b84-3ca3-11e7-a755-17b06dacc8f2", 
-                "date": "Fri, 19 May 2017 14:55:52 GMT", 
-                "content-length": "863", 
+                "x-amzn-requestid": "620274cc-3cd8-11e7-b241-09b71ace1093", 
+                "date": "Fri, 19 May 2017 21:16:10 GMT", 
+                "content-length": "862", 
                 "content-type": "text/xml"
             }
         }

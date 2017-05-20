@@ -31,50 +31,7 @@
                                     "QueryString": false
                                 },
                                 "MaxTTL": 31536000,
-                                "PathPattern": "http-path",
-                                "SmoothStreaming": false,
-                                "DefaultTTL": 86400,
-                                "AllowedMethods": {
-                                    "Items": [
-                                        "HEAD",
-                                        "GET"
-                                    ],
-                                    "CachedMethods": {
-                                        "Items": [
-                                            "HEAD",
-                                            "GET"
-                                        ],
-                                        "Quantity": 2
-                                    },
-                                    "Quantity": 2
-                                },
-                                "MinTTL": 0,
-                                "Compress": false
-                            },
-                            {
-                                "TrustedSigners": {
-                                    "Enabled": false,
-                                    "Quantity": 0
-                                },
-                                "LambdaFunctionAssociations": {
-                                    "Quantity": 0
-                                },
-                                "TargetOriginId": "S3-test",
-                                "ViewerProtocolPolicy": "https-only",
-                                "ForwardedValues": {
-                                    "Headers": {
-                                        "Quantity": 0
-                                    },
-                                    "Cookies": {
-                                        "Forward": "none"
-                                    },
-                                    "QueryStringCacheKeys": {
-                                        "Quantity": 0
-                                    },
-                                    "QueryString": false
-                                },
-                                "MaxTTL": 31536000,
-                                "PathPattern": "mixed-path",
+                                "PathPattern": "allowpath",
                                 "SmoothStreaming": false,
                                 "DefaultTTL": 86400,
                                 "AllowedMethods": {
@@ -95,7 +52,7 @@
                                 "Compress": false
                             }
                         ],
-                        "Quantity": 2
+                        "Quantity": 1
                     },
                     "Restrictions": {
                         "GeoRestriction": {
@@ -119,7 +76,7 @@
                         ],
                         "Quantity": 1
                     },
-                    "DomainName": "d16sazt2qhyiqk.cloudfront.net",
+                    "DomainName": "d2p1t52f7m9vp1.cloudfront.net",
                     "WebACLId": "",
                     "PriceClass": "PriceClass_All",
                     "Enabled": true,
@@ -176,18 +133,18 @@
                         "Quantity": 0
                     },
                     "LastModifiedTime": {
-                        "hour": 14,
+                        "hour": 21,
                         "__class__": "datetime",
                         "month": 5,
-                        "second": 35,
-                        "microsecond": 698000,
+                        "second": 52,
+                        "microsecond": 826000,
                         "year": 2017,
                         "day": 19,
-                        "minute": 32
+                        "minute": 19
                     },
                     "HttpVersion": "HTTP2",
-                    "Id": "E277FFDNQ1095P",
-                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E277FFDNQ1095P",
+                    "Id": "ECKBFYF275ZPH",
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/ECKBFYF275ZPH",
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -200,13 +157,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0,
             "HTTPStatusCode": 200,
-            "RequestId": "00ce8de2-3ca0-11e7-b5a9-ed7dc998e505",
+            "RequestId": "e674b506-3cd8-11e7-8e2b-0176a0c37169",
             "HTTPHeaders": {
-                "x-amzn-requestid": "00ce8de2-3ca0-11e7-b5a9-ed7dc998e505",
+                "x-amzn-requestid": "e674b506-3cd8-11e7-8e2b-0176a0c37169",
                 "vary": "Accept-Encoding",
-                "content-length": "4174",
+                "content-length": "5679",
                 "content-type": "text/xml",
-                "date": "Fri, 19 May 2017 14:32:35 GMT"
+                "date": "Fri, 19 May 2017 21:19:52 GMT"
             }
         }
     }

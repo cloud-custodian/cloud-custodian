@@ -1,10 +1,10 @@
 {
     "status_code": 200, 
     "data": {
-        "ETag": "E2V9CJ7KWVKRTY", 
+        "ETag": "E3T6C0WOHPJBPM", 
         "StreamingDistribution": {
             "Status": "InProgress", 
-            "DomainName": "s3875bxw96hp8b.cloudfront.net", 
+            "DomainName": "sjvgg4ushszuv.cloudfront.net", 
             "StreamingDistributionConfig": {
                 "S3Origin": {
                     "OriginAccessIdentity": "", 
@@ -22,7 +22,7 @@
                     "Enabled": false, 
                     "Quantity": 0
                 }, 
-                "CallerReference": "1495205597751", 
+                "CallerReference": "1495228375713", 
                 "Aliases": {
                     "Quantity": 0
                 }
@@ -32,27 +32,27 @@
                 "Quantity": 0
             }, 
             "LastModifiedTime": {
-                "hour": 14, 
+                "hour": 21, 
                 "__class__": "datetime", 
                 "month": 5, 
-                "second": 53, 
-                "microsecond": 386000, 
+                "second": 11, 
+                "microsecond": 852000, 
                 "year": 2017, 
                 "day": 19, 
-                "minute": 55
+                "minute": 16
             }, 
-            "Id": "E22BCDWSGKFT3R", 
-            "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E22BCDWSGKFT3R"
+            "Id": "E1MC9NC81TK286", 
+            "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E1MC9NC81TK286"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "416fa18b-3ca3-11e7-9f29-0d58cd459a51", 
+            "RequestId": "624c00ef-3cd8-11e7-af79-07e1379b8dee", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "416fa18b-3ca3-11e7-9f29-0d58cd459a51", 
-                "date": "Fri, 19 May 2017 14:55:53 GMT", 
-                "content-length": "960", 
-                "etag": "E2V9CJ7KWVKRTY", 
+                "x-amzn-requestid": "624c00ef-3cd8-11e7-af79-07e1379b8dee", 
+                "date": "Fri, 19 May 2017 21:16:11 GMT", 
+                "content-length": "959", 
+                "etag": "E3T6C0WOHPJBPM", 
                 "content-type": "text/xml"
             }
         }

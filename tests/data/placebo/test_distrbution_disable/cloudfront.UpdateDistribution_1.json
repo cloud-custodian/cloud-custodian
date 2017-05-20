@@ -1,220 +1,177 @@
 {
-    "status_code": 200,
+    "status_code": 200, 
     "data": {
         "Distribution": {
-            "Status": "InProgress",
-            "DomainName": "d16sazt2qhyiqk.cloudfront.net",
-            "InProgressInvalidationBatches": 0,
+            "Status": "InProgress", 
+            "DomainName": "d2p1t52f7m9vp1.cloudfront.net", 
+            "InProgressInvalidationBatches": 0, 
             "DistributionConfig": {
-                "Comment": "",
+                "Comment": "", 
                 "CacheBehaviors": {
                     "Items": [
                         {
                             "TrustedSigners": {
-                                "Enabled": false,
+                                "Enabled": false, 
                                 "Quantity": 0
-                            },
+                            }, 
                             "LambdaFunctionAssociations": {
                                 "Quantity": 0
-                            },
-                            "TargetOriginId": "S3-test",
-                            "ViewerProtocolPolicy": "allow-all",
+                            }, 
+                            "TargetOriginId": "S3-test", 
+                            "ViewerProtocolPolicy": "allow-all", 
                             "ForwardedValues": {
                                 "Headers": {
                                     "Quantity": 0
-                                },
+                                }, 
                                 "Cookies": {
                                     "Forward": "none"
-                                },
+                                }, 
                                 "QueryStringCacheKeys": {
                                     "Quantity": 0
-                                },
+                                }, 
                                 "QueryString": false
-                            },
-                            "MaxTTL": 31536000,
-                            "PathPattern": "http-path",
-                            "SmoothStreaming": false,
-                            "DefaultTTL": 86400,
+                            }, 
+                            "MaxTTL": 31536000, 
+                            "PathPattern": "allowpath", 
+                            "SmoothStreaming": false, 
+                            "DefaultTTL": 86400, 
                             "AllowedMethods": {
                                 "Items": [
-                                    "HEAD",
+                                    "HEAD", 
                                     "GET"
-                                ],
+                                ], 
                                 "CachedMethods": {
                                     "Items": [
-                                        "HEAD",
+                                        "HEAD", 
                                         "GET"
-                                    ],
+                                    ], 
                                     "Quantity": 2
-                                },
+                                }, 
                                 "Quantity": 2
-                            },
-                            "MinTTL": 0,
-                            "Compress": false
-                        },
-                        {
-                            "TrustedSigners": {
-                                "Enabled": false,
-                                "Quantity": 0
-                            },
-                            "LambdaFunctionAssociations": {
-                                "Quantity": 0
-                            },
-                            "TargetOriginId": "S3-test",
-                            "ViewerProtocolPolicy": "https-only",
-                            "ForwardedValues": {
-                                "Headers": {
-                                    "Quantity": 0
-                                },
-                                "Cookies": {
-                                    "Forward": "none"
-                                },
-                                "QueryStringCacheKeys": {
-                                    "Quantity": 0
-                                },
-                                "QueryString": false
-                            },
-                            "MaxTTL": 31536000,
-                            "PathPattern": "mixed-path",
-                            "SmoothStreaming": false,
-                            "DefaultTTL": 86400,
-                            "AllowedMethods": {
-                                "Items": [
-                                    "HEAD",
-                                    "GET"
-                                ],
-                                "CachedMethods": {
-                                    "Items": [
-                                        "HEAD",
-                                        "GET"
-                                    ],
-                                    "Quantity": 2
-                                },
-                                "Quantity": 2
-                            },
-                            "MinTTL": 0,
+                            }, 
+                            "MinTTL": 0, 
                             "Compress": false
                         }
-                    ],
-                    "Quantity": 2
-                },
-                "IsIPV6Enabled": true,
+                    ], 
+                    "Quantity": 1
+                }, 
+                "IsIPV6Enabled": true, 
                 "Logging": {
-                    "Bucket": "",
-                    "Prefix": "",
-                    "Enabled": false,
+                    "Bucket": "", 
+                    "Prefix": "", 
+                    "Enabled": false, 
                     "IncludeCookies": false
-                },
-                "WebACLId": "",
+                }, 
+                "WebACLId": "", 
                 "Origins": {
                     "Items": [
                         {
                             "S3OriginConfig": {
                                 "OriginAccessIdentity": ""
-                            },
-                            "OriginPath": "",
+                            }, 
+                            "OriginPath": "", 
                             "CustomHeaders": {
                                 "Quantity": 0
-                            },
-                            "Id": "S3-test",
+                            }, 
+                            "Id": "S3-test", 
                             "DomainName": "test.s3.amazonaws.com"
                         }
-                    ],
+                    ], 
                     "Quantity": 1
-                },
-                "DefaultRootObject": "",
-                "PriceClass": "PriceClass_All",
-                "Enabled": false,
+                }, 
+                "DefaultRootObject": "", 
+                "PriceClass": "PriceClass_All", 
+                "Enabled": false, 
                 "DefaultCacheBehavior": {
                     "TrustedSigners": {
-                        "Enabled": false,
+                        "Enabled": false, 
                         "Quantity": 0
-                    },
+                    }, 
                     "LambdaFunctionAssociations": {
                         "Quantity": 0
-                    },
-                    "TargetOriginId": "S3-test",
-                    "ViewerProtocolPolicy": "https-only",
+                    }, 
+                    "TargetOriginId": "S3-test", 
+                    "ViewerProtocolPolicy": "allow-all", 
                     "ForwardedValues": {
                         "Headers": {
                             "Quantity": 0
-                        },
+                        }, 
                         "Cookies": {
                             "Forward": "none"
-                        },
+                        }, 
                         "QueryStringCacheKeys": {
                             "Quantity": 0
-                        },
+                        }, 
                         "QueryString": false
-                    },
-                    "MaxTTL": 31536000,
-                    "SmoothStreaming": false,
-                    "DefaultTTL": 86400,
+                    }, 
+                    "MaxTTL": 31536000, 
+                    "SmoothStreaming": false, 
+                    "DefaultTTL": 86400, 
                     "AllowedMethods": {
                         "Items": [
-                            "HEAD",
+                            "HEAD", 
                             "GET"
-                        ],
+                        ], 
                         "CachedMethods": {
                             "Items": [
-                                "HEAD",
+                                "HEAD", 
                                 "GET"
-                            ],
+                            ], 
                             "Quantity": 2
-                        },
+                        }, 
                         "Quantity": 2
-                    },
-                    "MinTTL": 0,
+                    }, 
+                    "MinTTL": 0, 
                     "Compress": false
-                },
-                "CallerReference": "1494876956288",
+                }, 
+                "CallerReference": "1495213368662", 
                 "ViewerCertificate": {
-                    "CloudFrontDefaultCertificate": true,
-                    "MinimumProtocolVersion": "SSLv3",
+                    "CloudFrontDefaultCertificate": true, 
+                    "MinimumProtocolVersion": "SSLv3", 
                     "CertificateSource": "cloudfront"
-                },
+                }, 
                 "CustomErrorResponses": {
                     "Quantity": 0
-                },
-                "HttpVersion": "http2",
+                }, 
+                "HttpVersion": "http2", 
                 "Restrictions": {
                     "GeoRestriction": {
-                        "RestrictionType": "none",
+                        "RestrictionType": "none", 
                         "Quantity": 0
                     }
-                },
+                }, 
                 "Aliases": {
                     "Quantity": 0
                 }
-            },
+            }, 
             "ActiveTrustedSigners": {
-                "Enabled": false,
+                "Enabled": false, 
                 "Quantity": 0
-            },
+            }, 
             "LastModifiedTime": {
-                "hour": 14,
-                "__class__": "datetime",
-                "month": 5,
-                "second": 2,
-                "microsecond": 715000,
-                "year": 2017,
-                "day": 19,
-                "minute": 40
-            },
-            "Id": "E277FFDNQ1095P",
-            "ARN": "arn:aws:cloudfront::644160558196:distribution/E277FFDNQ1095P"
-        },
-        "ETag": "E3BW2S3KULKP58",
+                "hour": 21, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 51, 
+                "microsecond": 514000, 
+                "year": 2017, 
+                "day": 19, 
+                "minute": 17
+            }, 
+            "Id": "ECKBFYF275ZPH", 
+            "ARN": "arn:aws:cloudfront::644160558196:distribution/ECKBFYF275ZPH"
+        }, 
+        "ETag": "E3AJOW1EXRKWXI", 
         "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "0abbcb0a-3ca1-11e7-9e1f-97d93876721a",
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9db18a45-3cd8-11e7-947b-093ccb4741d0", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "0abbcb0a-3ca1-11e7-9e1f-97d93876721a",
-                "content-length": "4411",
-                "vary": "Accept-Encoding",
-                "etag": "E3BW2S3KULKP58",
-                "date": "Fri, 19 May 2017 14:40:02 GMT",
+                "x-amzn-requestid": "9db18a45-3cd8-11e7-947b-093ccb4741d0", 
+                "content-length": "3476", 
+                "vary": "Accept-Encoding", 
+                "etag": "E3AJOW1EXRKWXI", 
+                "date": "Fri, 19 May 2017 21:17:51 GMT", 
                 "content-type": "text/xml"
             }
         }

@@ -161,7 +161,7 @@ class StreamingDistributionDisableAction(BaseAction):
             return
 
 
-@Distribution.action_registry.register('set-ssl')
+@Distribution.action_registry.register('set-protocols')
 class DistributionSSLAction(BaseAction):
     """Action to set mandatory https-only on a Distribution
 
@@ -179,8 +179,26 @@ class DistributionSSLAction(BaseAction):
                     op: contains
                 actions:
                   - type: set-ssl
+                    ViewerProtocolPolicy: https-only
     """
-    schema = type_schema('set-ssl')
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['set-protocols']},
+            'OriginProtocolPolicy': {
+                'enum': ['http-only', 'match-viewer', 'https-only']
+            },
+            'OriginSslProtocols': {
+                'type': 'array',
+                'items': {'enum': ['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2']}
+            },
+            'ViewerProtocolPolicy': {
+                'enum': ['allow-all', 'https-only', 'redirect-to-https']
+            }
+        }
+    }
+
     permissions = ("distribution:GetDistributionConfig",
                    "distribution:UpdateDistribution",)
 
@@ -198,8 +216,25 @@ class DistributionSSLAction(BaseAction):
             dc = res['DistributionConfig']
 
             for item in dc['CacheBehaviors'].get('Items', []):
-                item['ViewerProtocolPolicy'] = 'https-only'
-            dc['DefaultCacheBehavior']['ViewerProtocolPolicy'] = 'https-only'
+                item['ViewerProtocolPolicy'] = self.data.get(
+                    'ViewerProtocolPolicy',
+                    item['ViewerProtocolPolicy'])
+            dc['DefaultCacheBehavior']['ViewerProtocolPolicy'] = self.data.get(
+                'ViewerProtocolPolicy',
+                dc['DefaultCacheBehavior']['ViewerProtocolPolicy'])
+
+            for item in dc['Origins'].get('Items', []):
+                if item.get('CustomOriginConfig', False):
+                    item['CustomOriginConfig']['OriginProtocolPolicy'] = self.data.get(
+                        'OriginProtocolPolicy',
+                        item['CustomOriginConfig']['OriginProtocolPolicy'])
+
+                    item['CustomOriginConfig']['OriginSslProtocols']['Items'] = self.data.get(
+                        'OriginSslProtocols',
+                        item['CustomOriginConfig']['OriginSslProtocols']['Items'])
+
+                    item['CustomOriginConfig']['OriginSslProtocols']['Quantity'] = len(
+                        item['CustomOriginConfig']['OriginSslProtocols']['Items'])
 
             res = client.update_distribution(
                 Id=distribution[self.manager.get_model().id],

@@ -3,57 +3,12 @@
     "data": {
         "Distribution": {
             "Status": "InProgress", 
-            "DomainName": "d2p1t52f7m9vp1.cloudfront.net", 
+            "DomainName": "d3samj04x9xf5a.cloudfront.net", 
             "InProgressInvalidationBatches": 0, 
             "DistributionConfig": {
                 "Comment": "", 
                 "CacheBehaviors": {
-                    "Items": [
-                        {
-                            "TrustedSigners": {
-                                "Enabled": false, 
-                                "Quantity": 0
-                            }, 
-                            "LambdaFunctionAssociations": {
-                                "Quantity": 0
-                            }, 
-                            "TargetOriginId": "S3-test", 
-                            "ViewerProtocolPolicy": "https-only", 
-                            "ForwardedValues": {
-                                "Headers": {
-                                    "Quantity": 0
-                                }, 
-                                "Cookies": {
-                                    "Forward": "none"
-                                }, 
-                                "QueryStringCacheKeys": {
-                                    "Quantity": 0
-                                }, 
-                                "QueryString": false
-                            }, 
-                            "MaxTTL": 31536000, 
-                            "PathPattern": "allowpath", 
-                            "SmoothStreaming": false, 
-                            "DefaultTTL": 86400, 
-                            "AllowedMethods": {
-                                "Items": [
-                                    "HEAD", 
-                                    "GET"
-                                ], 
-                                "CachedMethods": {
-                                    "Items": [
-                                        "HEAD", 
-                                        "GET"
-                                    ], 
-                                    "Quantity": 2
-                                }, 
-                                "Quantity": 2
-                            }, 
-                            "MinTTL": 0, 
-                            "Compress": false
-                        }
-                    ], 
-                    "Quantity": 1
+                    "Quantity": 0
                 }, 
                 "IsIPV6Enabled": true, 
                 "Logging": {
@@ -66,15 +21,26 @@
                 "Origins": {
                     "Items": [
                         {
-                            "S3OriginConfig": {
-                                "OriginAccessIdentity": ""
-                            }, 
                             "OriginPath": "", 
+                            "CustomOriginConfig": {
+                                "OriginSslProtocols": {
+                                    "Items": [
+                                        "TLSv1.1", 
+                                        "TLSv1.2"
+                                    ], 
+                                    "Quantity": 2
+                                }, 
+                                "OriginProtocolPolicy": "https-only", 
+                                "OriginReadTimeout": 30, 
+                                "HTTPPort": 80, 
+                                "HTTPSPort": 443, 
+                                "OriginKeepaliveTimeout": 5
+                            }, 
                             "CustomHeaders": {
                                 "Quantity": 0
                             }, 
-                            "Id": "S3-test", 
-                            "DomainName": "test.s3.amazonaws.com"
+                            "Id": "Custom-custom_origin.com", 
+                            "DomainName": "custom_origin.com"
                         }
                     ], 
                     "Quantity": 1
@@ -90,8 +56,8 @@
                     "LambdaFunctionAssociations": {
                         "Quantity": 0
                     }, 
-                    "TargetOriginId": "S3-test", 
-                    "ViewerProtocolPolicy": "https-only", 
+                    "TargetOriginId": "Custom-custom_origin.com", 
+                    "ViewerProtocolPolicy": "allow-all", 
                     "ForwardedValues": {
                         "Headers": {
                             "Quantity": 0
@@ -124,7 +90,7 @@
                     "MinTTL": 0, 
                     "Compress": false
                 }, 
-                "CallerReference": "1495213368662", 
+                "CallerReference": "1495216138721", 
                 "ViewerCertificate": {
                     "CloudFrontDefaultCertificate": true, 
                     "MinimumProtocolVersion": "SSLv3", 
@@ -152,26 +118,26 @@
                 "hour": 21, 
                 "__class__": "datetime", 
                 "month": 5, 
-                "second": 52, 
-                "microsecond": 826000, 
+                "second": 22, 
+                "microsecond": 777000, 
                 "year": 2017, 
                 "day": 19, 
-                "minute": 19
+                "minute": 54
             }, 
-            "Id": "ECKBFYF275ZPH", 
-            "ARN": "arn:aws:cloudfront::644160558196:distribution/ECKBFYF275ZPH"
+            "Id": "E2CO7J9ZT67Q34", 
+            "ARN": "arn:aws:cloudfront::644160558196:distribution/E2CO7J9ZT67Q34"
         }, 
-        "ETag": "E14DCK7K1XGW5W", 
+        "ETag": "E3IPM0B0MPUKE4", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "e5fe737e-3cd8-11e7-9937-956ff2dbf698", 
+            "RequestId": "b7c5501a-3cdd-11e7-ae90-63445848bf01", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "e5fe737e-3cd8-11e7-9937-956ff2dbf698", 
-                "content-length": "3477", 
+                "x-amzn-requestid": "b7c5501a-3cdd-11e7-ae90-63445848bf01", 
+                "content-length": "2901", 
                 "vary": "Accept-Encoding", 
-                "etag": "E14DCK7K1XGW5W", 
-                "date": "Fri, 19 May 2017 21:19:52 GMT", 
+                "etag": "E3IPM0B0MPUKE4", 
+                "date": "Fri, 19 May 2017 21:54:22 GMT", 
                 "content-type": "text/xml"
             }
         }

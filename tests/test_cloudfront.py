@@ -14,6 +14,7 @@
 
 import jmespath
 from common import BaseTest
+from c7n.utils import local_session
 
 
 class CloudFront(BaseTest):
@@ -66,11 +67,24 @@ class CloudFront(BaseTest):
                 'op': 'contains'
             }],
             'actions': [{
-                'type': 'set-ssl'
+                'type': 'set-protocols',
+                'ViewerProtocolPolicy': 'https-only'
             }]
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_distributions()
+        self.assertEqual(
+            resp['DistributionList']['Items'][0]['CacheBehaviors']['Items'][0]['ViewerProtocolPolicy'],
+            'https-only')
+
+
+    def test_distribution_custom_origin(self):
+        factory = self.replay_flight_data('test_distrbution_custom_origin')
+
+        k = 'Origins.Items[].CustomOriginConfig.OriginSslProtocols.Items[]'
 
         p = self.load_policy({
             'name': 'distribution-set-ssl',
@@ -78,12 +92,41 @@ class CloudFront(BaseTest):
             'filters': [{
                 'type': 'value',
                 'key': k,
-                'value': 'allow-all',
+                'value': 'TLSv1',
                 'op': 'contains'
             }]
         }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
+        expr = jmespath.compile(k)
+        r = expr.search(resources[0])
+        self.assertTrue('TLSv1.1' in r)
+
+        p = self.load_policy({
+            'name': 'distribution-set-ssl',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'value',
+                'key': k,
+                'value': 'TLSv1',
+                'op': 'contains'
+            }],
+            'actions': [{
+                'type': 'set-protocols',
+                'OriginSslProtocols': ['TLSv1.1','TLSv1.2'],
+                'OriginProtocolPolicy': 'https-only'
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_distributions()
+        self.assertEqual(
+            resp['DistributionList']['Items'][0]['Origins']['Items'][0]['CustomOriginConfig']['OriginProtocolPolicy'],
+            'https-only')
+        self.assertTrue('TLSv1.2' in
+            resp['DistributionList']['Items'][0]['Origins']['Items'][0]['CustomOriginConfig']['OriginSslProtocols']['Items'])
 
 
     def test_distribution_disable(self):
@@ -106,18 +149,10 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Enabled'], True)
 
-        p = self.load_policy({
-            'name': 'distribution-disable',
-            'resource': 'distribution',
-            'filters': [{
-                'type': 'value',
-                'key': 'CacheBehaviors.Items[].ViewerProtocolPolicy',
-                'value': 'allow-all',
-                'op': 'contains'
-            }]
-        }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(resources[0]['Enabled'], False)
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_distributions()
+        self.assertEqual(resp['DistributionList']['Items'][0]['Enabled'], False)
+
 
     def test_streaming_distribution_disable(self):
         factory = self.replay_flight_data('test_streaming_distrbution_disable')
@@ -138,14 +173,6 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Enabled'], True)
 
-        p = self.load_policy({
-            'name': 'streaming-distribution-disable',
-            'resource': 'streaming-distribution',
-            'filters': [{
-                'type': 'value',
-                'key': 'S3Origin.OriginAccessIdentity',
-                'value': ''
-            }]
-        }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(resources[0]['Enabled'], False)
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_streaming_distributions()
+        self.assertEqual(resp['StreamingDistributionList']['Items'][0]['Enabled'], False)
