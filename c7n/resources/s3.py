@@ -474,6 +474,90 @@ class HasLifecycle(Filter):
         return results
 
 
+class S3BucketLifecycle(object):
+    """Object representing an S3 lifecycle rule."""
+
+    def __init__(self, prefix, rule_id):
+        self.lifecycle = {
+            'ID': rule_id,
+            'Status': 'Enabled',
+            'Filter': {
+                'Prefix': ''
+            }
+        }
+
+    def set_deletes_objects_days(self, days):
+        self.lifecycle['Expiration'] = {'Days': days}
+
+    def set_expired_delete_marker(self, value):
+        self.lifecycle['Expiration'] = { 'ExpiredObjectDeleteMarker': value }
+
+    def set_stale_multipart_uploads_days(self, days):
+        self.lifecycle['AbortIncompleteMultipartUpload'] = {'DaysAfterInitiation': days}
+
+    def set_ia_transition_days(self, days):
+        if 'Transitions' not in self.lifecycle:
+            self.lifecycle['Transitions'] = []
+
+        for i in range(0, len(self.lifecycle['Transitions'])):
+            if self.lifecycle['Transitions'][i]['StorageClass'] == 'STANDARD_IA':
+                self.lifecycle['Transitions'][i]['Days'] = days
+                return
+
+        self.lifecycle['Transitions'].append({
+            'StorageClass': 'STANDARD_IA',
+            'Days': days
+        })
+
+    def set_glacier_transition_days(self, days):
+        if 'Transitions' not in self.lifecycle:
+            self.lifecycle['Transitions'] = []
+
+        for i in range(0, len(self.lifecycle['Transitions'])):
+            if self.lifecycle['Transitions'][i]['StorageClass'] == 'GLACIER':
+                self.lifecycle['Transitions'][i]['Days'] = days
+                return
+
+        self.lifecycle['Transitions'].append({
+            'StorageClass': 'GLACIER',
+            'Days': days
+        })
+
+    def set_delete_previous_versions(self, days):
+        self.lifecycle['NoncurrentVersionExpiration'] = {'NoncurrentDays': days}
+
+    def set_ia_previous_transition_days(self, days):
+        if 'NoncurrentVersionTransitions' not in self.lifecycle:
+            self.lifecycle['NoncurrentVersionTransitions'] = []
+
+        for i in range(0, len(self.lifecycle['NoncurrentVersionTransitions'])):
+            if self.lifecycle['NoncurrentVersionTransitions'][i]['StorageClass'] == 'STANDARD_IA':
+                self.lifecycle['NoncurrentVersionTransitions'][i]['NoncurrentDays'] = days
+                return
+
+        self.lifecycle['NoncurrentVersionTransitions'].append({
+            'StorageClass': 'STANDARD_IA',
+            'NoncurrentDays': days
+        })
+
+    def set_glacier_previous_transition_days(self, days):
+        if 'NoncurrentVersionTransitions' not in self.lifecycle:
+            self.lifecycle['NoncurrentVersionTransitions'] = []
+
+        for i in range(0, len(self.lifecycle['NoncurrentVersionTransitions'])):
+            if self.lifecycle['NoncurrentVersionTransitions'][i]['StorageClass'] == 'GLACIER':
+                self.lifecycle['NoncurrentVersionTransitions'][i]['NoncurrentDays'] = days
+                return
+
+        self.lifecycle['NoncurrentVersionTransitions'].append({
+            'StorageClass': 'GLACIER',
+            'NoncurrentDays': days
+        })
+
+    def json(self):
+        return self.lifecycle
+
+
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
     """Find buckets with set of named policy statements.
