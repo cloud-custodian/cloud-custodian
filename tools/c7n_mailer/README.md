@@ -41,7 +41,8 @@ from_address: you@example.com
 (Also set `region` if you are in a region other than `us-east-1`.)
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
-`test-policy.yml` file with this content:
+`test-policy.yml` file with this content (update `to` and `queue` to match your
+environment):
 
 ```yaml
 policies:
