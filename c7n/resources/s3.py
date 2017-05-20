@@ -70,6 +70,8 @@ actions.register('auto-tag-user', AutoTagUser)
 actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
+DEFAULT_WORKERS = 10
+CACHE_NAME = 'c7n-s3'
 
 
 @resources.register('s3')
@@ -467,11 +469,52 @@ class HasLifecycle(Filter):
 
         if self.cache_update is True:
             shared_buckets = {b['Name']: b for b in shared_buckets}
-            self.manager._cache.save('s3-lifecycle', shared_buckets)
+            self.manager._cache.save(CACHE_NAME, shared_buckets)
 
         self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets", len(results), len(buckets))
 
         return results
+
+    def call_api(self, bucket):
+        bname = bucket['Name']
+        session = local_session(self.manager.session_factory)
+        s3 = bucket_client(session, bucket)
+
+        try:
+            shared_buckets = self.manager._cache.get(CACHE_NAME)
+            if shared_buckets:
+                if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
+                    return bucket
+                else:
+                    lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+                    shared_buckets[bname] = bucket
+                    shared_buckets[bname]['LifecyclePolicy'] = lifecycle
+                    self.cache_update = True
+                    return shared_buckets[bname]
+            else:
+                lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+                bucket['LifecyclePolicy'] = lifecycle
+                self.cache_update = True
+                return bucket
+        except ClientError as e:
+            # Do nothing
+            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+                return
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                self.log.warn("Bucket `%s` no longer exists", bname)
+                return
+            raise
+
+
+def get_bucket_region(b):
+    bucket_region = b['Location']['LocationConstraint']
+    if bucket_region is None:
+        return 'us-east-1'
+    # EU = eu-west-1. From docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+    elif bucket_region == "EU":
+        return 'eu-west-1'
+    else:
+        return bucket_region
 
 
 class S3BucketLifecycle(object):
@@ -991,7 +1034,6 @@ class ConfigureLifecycle(BucketActionBase):
             'multipart_days': {'type': 'number'},
             'ia_days': {'type': 'number'},
             'glacier_days': {'type': 'number'},
-            'overwrite': {'type': 'boolean'},
             'max_workers': {'type': 'number'}
             }
     }
@@ -1007,12 +1049,10 @@ class ConfigureLifecycle(BucketActionBase):
 
             if self.cache_update:
                 saved_buckets = {b['Name']: b for b in saved_buckets}
-                self.manager._cache.save('s3-lifecycle', saved_buckets)
+                self.manager._cache.save(CACHE_NAME, saved_buckets)
 
-            overwrite = self.data.get('overwrite', False)
-            if overwrite:
-                with self.executor_factory(max_workers=max_workers) as w:
-                    w.map(self.put_lifecycle, buckets)
+            with self.executor_factory(max_workers=max_workers) as w:
+                w.map(self.put_lifecycle, buckets)
 
     def put_lifecycle(self, bucket):
         prefix = self.data.get('prefix', '')
@@ -1141,7 +1181,7 @@ class ConfigureLifecycle(BucketActionBase):
         s3 = bucket_client(session, bucket)
 
         try:
-            shared_buckets = self.manager._cache.get('s3-lifecycle')
+            shared_buckets = self.manager._cache.get(CACHE_NAME)
             if shared_buckets:
                 if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
                     return bucket
