@@ -372,6 +372,108 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
+@filters.register('has-lifecycle')
+class HasLifecycle(Filter):
+    """Filter out S3 buckets that have lifecycle rules for
+    transitioning objects to different storage types."""
+
+    schema = type_schema('has-lifecycle',
+                         id={'type': 'string'},
+                         prefix={'type': 'string'},
+                         deletes_objects={'type': 'boolean'},
+                         delete_days={'type': 'number'},
+                         multipart_days={'type': 'number'},
+                         ia_days={'type': 'number'},
+                         glacier_days={'type': 'number'},
+                         max_workers={'type': 'number'})
+
+    cache_update = False
+
+    def process(self, buckets, event=None):
+        max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
+        with self.executor_factory(max_workers=max_workers) as w:
+            shared_buckets = w.map(self.call_api, buckets)
+            shared_buckets = filter(None, list(shared_buckets))
+
+        # Make sure lifecycle is within configured policy limits
+        ia_days_in_policy = self.data.get('ia_days', None)
+        deletes_objects = self.data.get('deletes_objects')
+        delete_days_in_policy = self.data.get('delete_days')
+        multipart_days_in_policy = self.data.get('multipart_days', None)
+
+        session = local_session(self.manager.session_factory)
+        glacier_supported_regions = session.get_available_regions('glacier')
+
+        prefix = self.data.get('prefix', '')
+        results = []
+        for b in shared_buckets:
+            bucket_region = get_bucket_region(b)
+            if bucket_region in glacier_supported_regions:
+                glacier_days_in_policy = self.data.get('glacier_days', None)
+            else:
+                glacier_days_in_policy = None
+
+            bad_bucket_lifecycle = True
+            if 'LifecyclePolicy' in b:
+                for rule in b['LifecyclePolicy']['Rules']:
+                    if rule['ID'] == self.data.get('id'):
+                        bad_bucket_lifecycle = False
+
+                        if rule['Status'] == 'Disabled':
+                            bad_bucket_lifecycle = True
+
+                        # Handle lifecycles created using new Amazon web interface
+                        if 'Filter' in rule:
+                            if rule['Filter']['Prefix'] != prefix:
+                                bad_bucket_lifecycle = True
+                        else:
+                            if rule['Prefix'] != prefix:
+                                bad_bucket_lifecycle = True
+
+                        if 'Transitions' in rule:
+                            # Can only have STANDARD_IA and GLACIER transitions
+                            if (len(rule['Transitions']) < 2) and ia_days_in_policy and glacier_days_in_policy:
+                                bad_bucket_lifecycle = True
+                            else:
+                                for t in rule['Transitions']:
+                                    if (t['StorageClass'] == 'STANDARD_IA'):
+                                        if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
+                                            bad_bucket_lifecycle = True
+
+                                    if (t['StorageClass'] == 'GLACIER'):
+                                        if glacier_days_in_policy and (t['Days'] != glacier_days_in_policy):
+                                            bad_bucket_lifecycle = True
+
+                        elif ia_days_in_policy or glacier_days_in_policy:
+                            bad_bucket_lifecycle = True
+
+                        if 'Expiration' in rule and 'Days' in rule['Expiration']:
+                            if isinstance(deletes_objects, bool) and (deletes_objects is False):
+                                bad_bucket_lifecycle = True
+                            elif delete_days_in_policy and rule['Expiration']['Days'] != delete_days_in_policy:
+                                bad_bucket_lifecycle = True
+                        elif (deletes_objects is True) or delete_days_in_policy:
+                            bad_bucket_lifecycle = True
+
+                        if 'AbortIncompleteMultipartUpload' in rule:
+                            multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                            if multipart_days_in_policy and (multipart_days_in_rule != multipart_days_in_policy):
+                                bad_bucket_lifecycle = True
+                        elif multipart_days_in_policy:
+                            bad_bucket_lifecycle = True
+
+                if not bad_bucket_lifecycle:
+                    results.append(b)
+
+        if self.cache_update is True:
+            shared_buckets = {b['Name']: b for b in shared_buckets}
+            self.manager._cache.save('s3-lifecycle', shared_buckets)
+
+        self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets", len(results), len(buckets))
+
+        return results
+
+
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
     """Find buckets with set of named policy statements.
