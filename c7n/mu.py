@@ -307,19 +307,28 @@ class LambdaManager(object):
                 yield e
 
     @staticmethod
-    def delta_function(lambda_func, func, role):
-        conf = func.get_config()
-        # TODO feels a little wierd
-        conf['Role'] = role
-        for k in conf:
-            if conf[k] != lambda_func['Configuration'][k]:
+    def delta_function(old_config, new_config):
+        for k in new_config:
+            if k not in old_config or new_config[k] != old_config[k]:
                 return True
+
+    @staticmethod
+    def diff_tags(old_tags, new_tags):
+        add = {}
+        remove = set()
+        for k,v in new_tags.items():
+            if k not in old_tags or old_tags[k] != v:
+                add[k] = v
+        for k in old_tags:
+            if k not in new_tags:
+                remove.add(k)
+        return add, list(remove)
 
     def _create_or_update(self, func, role=None, s3_uri=None, qualifier=None):
         role = func.role or role
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
-        lfunc = self.get(func.name, qualifier)
+        existing = self.get(func.name, qualifier)
 
         if s3_uri:
             # TODO: support versioned buckets
@@ -329,9 +338,9 @@ class LambdaManager(object):
             code_ref = {'ZipFile': archive.get_bytes()}
 
         changed = False
-        if lfunc:
-            result = lfunc['Configuration']
-            if archive.get_checksum() != lfunc['Configuration']['CodeSha256']:
+        if existing:
+            old_config = existing['Configuration']
+            if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
@@ -339,13 +348,36 @@ class LambdaManager(object):
                 changed = True
             # TODO/Consider also set publish above to false, and publish
             # after configuration change?
-            if self.delta_function(lfunc, func, role):
+
+            new_config = func.get_config()
+            new_config['Role'] = role
+            del new_config['Runtime']
+            new_tags = new_config.pop('Tags', {})
+
+            if self.delta_function(old_config, new_config):
                 log.debug("Updating function: %s config" % func.name)
-                params = func.get_config()
-                del params['Runtime']
-                params['Role'] = role
-                result = self.client.update_function_configuration(**params)
+                result = self.client.update_function_configuration(**new_config)
                 changed = True
+
+            # tag dance
+            base_arn = old_config['FunctionArn']
+            if base_arn.count(':') > 6:  # trim version/alias
+                base_arn = base_arn.rsplit(':', 1)[0]
+
+            old_tags = self.client.list_tags(Resource=base_arn)['Tags']
+            tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
+
+            if tags_to_add:
+                log.debug("Adding/updating tags: %s config" % func.name)
+                self.client.tag_resource(
+                    Resource=base_arn, Tags=tags_to_add)
+            if tags_to_remove:
+                log.debug("Removing tags: %s config" % func.name)
+                self.client.untag_resource(
+                    Resource=base_arn, TagKeys=tags_to_remove)
+
+            if not changed:
+                result = old_config
         else:
             log.info('Publishing custodian policy lambda function %s', func.name)
             params = func.get_config()
@@ -457,6 +489,26 @@ class AbstractLambdaFunction:
     def security_groups(self):
         """ """
 
+    @abc.abstractproperty
+    def dead_letter_config(self):
+        """ """
+
+    @abc.abstractproperty
+    def environment(self):
+        """ """
+
+    @abc.abstractproperty
+    def kms_key_arn(self):
+        """ """
+
+    @abc.abstractproperty
+    def tracing_config(self):
+        """ """
+
+    @abc.abstractproperty
+    def tags(self):
+        """ """
+
     @abc.abstractmethod
     def get_events(self, session_factory):
         """event sources that should be bound to this lambda."""
@@ -473,7 +525,12 @@ class AbstractLambdaFunction:
             'Description': self.description,
             'Runtime': self.runtime,
             'Handler': self.handler,
-            'Timeout': self.timeout}
+            'Timeout': self.timeout,
+            'DeadLetterConfig': self.dead_letter_config,
+            'Environment': self.environment,
+            'KMSKeyArn': self.kms_key_arn,
+            'TracingConfig': self.tracing_config,
+            'Tags': self.tags}
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
@@ -530,6 +587,26 @@ class LambdaFunction(AbstractLambdaFunction):
     def subnets(self):
         return self.func_data.get('subnets', None)
 
+    @property
+    def dead_letter_config(self):
+        return self.func_data.get('dead_letter_config', {})
+
+    @property
+    def environment(self):
+        return self.func_data.get('environment', {})
+
+    @property
+    def kms_key_arn(self):
+        return self.func_data.get('kms_key_arn', '')
+
+    @property
+    def tracing_config(self):
+        return self.func_data.get('tracing_config', {})
+
+    @property
+    def tags(self):
+        return self.func_data.get('tags', {})
+
     def get_events(self, session_factory):
         return self.func_data.get('events', ())
 
@@ -584,6 +661,26 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def subnets(self):
         return None
+
+    @property
+    def dead_letter_config(self):
+        return self.policy.data['mode'].get('dead_letter_config', {})
+
+    @property
+    def environment(self):
+        return self.policy.data['mode'].get('environment', {})
+
+    @property
+    def kms_key_arn(self):
+        return self.policy.data['mode'].get('kms_key_arn', '')
+
+    @property
+    def tracing_config(self):
+        return self.policy.data['mode'].get('tracing_config', {})
+
+    @property
+    def tags(self):
+        return self.policy.data['mode'].get('tags', {})
 
     def get_events(self, session_factory):
         events = []
