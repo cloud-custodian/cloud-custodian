@@ -25,7 +25,7 @@ and run a policy that triggers an email to your inbox.
    role ARN and set it as `role` in `mailer.yml`.
 1. Make sure your email address is verified in SES, and set it as
    `from_address` in `mailer.yml`. By default SES is in sandbox mode where
-   you must verify every individual receipient of emails. If need be, make
+   you must verify every individual recipient of emails. If need be, make
    an AWS support ticket to be taken out of SES sandbox mode.
    AWS SES Docs: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html
 
@@ -183,7 +183,7 @@ are either
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
-- `priority_header` indicate the importannce of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
+- `priority_header` to indicate the importance of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
@@ -248,7 +248,7 @@ The following extra jinja filters are available:
 
 | filter | behavior |
 |:----------|:-----------|
-| `{{ utc_string|date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z') }}` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+| `utc_string` | `date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
 
 
 ## Developer Install (OS X El Capitan)
