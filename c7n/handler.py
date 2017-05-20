@@ -21,8 +21,10 @@ an event.
 import logging
 import os
 import uuid
+import json
 
-from c7n.policy import load
+from c7n.policy import PolicyCollection
+from c7n.resources import load_resources
 from c7n.utils import format_event, get_account_id_from_sts
 
 
@@ -80,7 +82,18 @@ def dispatch_event(event, context):
     if event['debug']:
         log.info("Processing event\n %s", format_event(event))
 
-    policies = load(Config.empty(), 'config.json', format='json')
+    # policies file should always be valid in lambda so do loading naively
+    with open('config.json') as f:
+        policy_config = json.load(f)
+
+    if not policy_config or not policy_config.get('policies'):
+        return True
+
+    options_overrides = policy_config['policies'][0]['mode'].get('execution-options', {})
+    options = Config.empty(**options_overrides)
+
+    load_resources()
+    policies = PolicyCollection(policy_config, options)
     if policies:
         for p in policies:
             p.push(event, context)
