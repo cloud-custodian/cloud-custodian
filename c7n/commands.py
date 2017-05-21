@@ -211,14 +211,6 @@ def report(options, policies):
         eprint('Error: Report subcommand can accept multiple policies, but they must all be for the same resource.')
         sys.exit(1)
 
-    #policy = policies.pop()
-    #odir = options.output_dir.rstrip(os.path.sep)
-    #if os.path.sep in odir and os.path.basename(odir) == policy.name:
-    #    options.region = options.regions[0]
-    #    # policy sub-directory passed - ignore
-    #    options.output_dir = os.path.split(odir)[0]
-    #    # regenerate the execution context based on new path
-    #    policy = Policy(policy.data, options)
     delta = timedelta(days=options.days)
     begin_date = datetime.now() - delta
     do_report(policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)

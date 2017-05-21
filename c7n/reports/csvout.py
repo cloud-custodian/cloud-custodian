@@ -68,6 +68,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         policies[0].resource_manager,
         extra_fields=options.field,
         no_default_fields=options.no_default_fields,
+        multipolicy=len(policies) > 1
     )
 
     records = []
@@ -84,8 +85,8 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         log.debug("Found %d records for region %s", len(policy_records), policy.options.region)
 
         for record in policy_records:
-            record['cc_policy'] = policy.name
-            record['cc_region'] = policy.options.region
+            record['policy'] = policy.name
+            record['region'] = policy.options.region
 
         records += policy_records
 
@@ -138,7 +139,7 @@ def _get_values(record, field_list, tag_map):
 class Formatter(object):
 
     def __init__(
-            self, resource_manager, extra_fields=(), no_default_fields=None):
+            self, resource_manager, extra_fields=(), no_default_fields=None, multipolicy=False):
 
         self.resource_manager = resource_manager
         # Lookup default fields for resource type.
@@ -164,9 +165,10 @@ class Formatter(object):
             h, cexpr = field.split('=', 1)
             fields[h] = cexpr
 
-        # Add in policy name and region fields
-        fields['region'] = 'cc_region'
-        fields['policy'] = 'cc_policy'
+        # Add these at the end so that they are the last fields
+        if multipolicy and not no_default_fields:
+            fields['Region'] = 'region'
+            fields['Policy'] = 'policy'
 
         self.fields = fields
 

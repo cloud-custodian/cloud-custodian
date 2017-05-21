@@ -143,7 +143,8 @@ def _report_options(p):
         '--field', action='append', default=[], type=_key_val_pair,
         metavar='HEADER=FIELD',
         help='Repeatable. JMESPath of field to include in the output OR '
-        'for a tag use prefix `tag:`')
+        'for a tag use prefix `tag:`. Special case fields `region` and'
+        '`policy` are available')
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
