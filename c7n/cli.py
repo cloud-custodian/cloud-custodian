@@ -78,6 +78,10 @@ def _default_options(p, blacklist=""):
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                    action="store_true")
 
+    if 'vars' not in blacklist:
+        p.add_argument('--vars', default=None,
+                       help='Vars file to substitute into policy')
+
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
