@@ -28,7 +28,7 @@ import yaml
 
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps
+from c7n.utils import Bag, dumps, load_file
 from c7n.manager import resources
 from c7n.resources import load_resources
 from c7n import schema
@@ -42,6 +42,7 @@ def policy_command(f):
     @wraps(f)
     def _load_policies(options):
         load_resources()
+        vars = _load_vars(options)
 
         errors = 0
         all_policies = PolicyCollection.from_data({}, options)
@@ -51,7 +52,7 @@ def policy_command(f):
 
         for fp in options.configs:
             try:
-                collection = policy_load(options, fp)
+                collection = policy_load(options, fp, vars=vars)
             except IOError:
                 eprint('Error: policy file does not exist ({})'.format(fp))
                 errors += 1
@@ -104,6 +105,20 @@ def policy_command(f):
         return f(options, list(policies))
 
     return _load_policies
+
+
+def _load_vars(options):
+    vars = None
+    if options.vars:
+        try:
+            vars = load_file(options.vars)
+        except IOError as e:
+            eprint('Error loading vars file "{}": {}'.format(options.vars, e.strerror))
+            sys.exit(1)
+
+    # TODO - provide builtin vars here (such as account)
+
+    return vars
 
 
 def _print_no_policies_warning(options, policies):

@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "StreamingDistributionList": {
+            "Marker": "", 
+            "Items": [
+                {
+                    "Status": "InProgress", 
+                    "S3Origin": {
+                        "OriginAccessIdentity": "", 
+                        "DomainName": "test.s3.amazonaws.com"
+                    }, 
+                    "DomainName": "sjvgg4ushszuv.cloudfront.net", 
+                    "Enabled": true, 
+                    "PriceClass": "PriceClass_All", 
+                    "TrustedSigners": {
+                        "Enabled": false, 
+                        "Quantity": 0
+                    }, 
+                    "Comment": "", 
+                    "LastModifiedTime": {
+                        "hour": 21, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 52, 
+                        "microsecond": 700000, 
+                        "year": 2017, 
+                        "day": 19, 
+                        "minute": 15
+                    }, 
+                    "Id": "E1MC9NC81TK286", 
+                    "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E1MC9NC81TK286", 
+                    "Aliases": {
+                        "Quantity": 0
+                    }
+                }
+            ], 
+            "IsTruncated": false, 
+            "MaxItems": 100, 
+            "Quantity": 1
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "620274cc-3cd8-11e7-b241-09b71ace1093", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "620274cc-3cd8-11e7-b241-09b71ace1093", 
+                "date": "Fri, 19 May 2017 21:16:10 GMT", 
+                "content-length": "862", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
