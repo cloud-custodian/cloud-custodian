@@ -104,13 +104,13 @@ Here's doing the same with auto scale groups
 
     policies:
       - name: asg-offhours-stop
-        resource: ec2
+        resource: asg
         filters:
            - offhour
         actions:
            - suspend
       - name: asg-onhours-start
-        resource: ec2
+        resource: asg
         filters:
            - onhour
         actions:
@@ -184,8 +184,8 @@ class Time(Filter):
         'cdt': 'America/Chicago',
         'ct': 'America/Chicago',
         'mt': 'America/Denver',
-        'gmt': 'Europe/London',
-        'gt': 'Europe/London',
+        'gmt': 'Etc/GMT',
+        'gt': 'Etc/GMT',
         'bst': 'Europe/London',
         'ist': 'Europe/Dublin',
         'cet': 'Europe/Berlin',
