@@ -270,3 +270,21 @@ Install the extensions:
 ```
 python setup.py develop
 ```
+
+## Testing Templates and Recipients
+
+A ``c7n-mailer-replay`` entrypoint is provided to assist in testing email notifications
+and templates. This script operates on an actual SQS message from cloud-custodian itself,
+which you can either retrieve from the SQS queue or replicate locally. By default it expects
+the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS. With the
+``-p`` | ``--plain`` argument, it will expect the message file to contain plain JSON.
+
+``c7n-mailer-replay`` has three main modes of operation:
+
+* With no additional arguments, it will render the template specified by the policy the
+  message is for, and actually send mail from the local machine as ``c7n-mailer`` would.
+  This only works with SES, not SMTP.
+* With the ``-t`` | ``--template-print`` argument, it will log the email addresses that would
+  receive mail, and print the rendered message body template to STDOUT.
+* With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
+  that would be sent, for each message that would be sent, to STDOUT.
