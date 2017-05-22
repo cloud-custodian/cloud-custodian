@@ -266,7 +266,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue(result['SuspendedProcesses'])
 
     def test_asg_suspend_when_no_instances(self):
-        factory = self.record_flight_data('test_asg_suspend_when_no_instances')
+        factory = self.replay_flight_data('test_asg_suspend_when_no_instances')
         client = factory().client('autoscaling')
 
         # Ensure we have a non-suspended ASG with no instances
