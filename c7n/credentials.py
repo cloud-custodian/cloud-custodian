@@ -21,9 +21,16 @@ import os
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
+import logging
 
 from c7n.version import version
 from c7n.utils import get_retry
+
+log = logging.getLogger('custodian.credentials')
+
+
+class UnableToAssumeRole(Exception):
+    pass
 
 
 class SessionFactory(object):
@@ -67,6 +74,7 @@ class SessionFactory(object):
         self._subscribers = subscribers
 
 
+current_cached_credentials = None
 def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
@@ -87,24 +95,39 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
 
     retry = get_retry(('Throttling',))
 
-    def refresh():
+    def refresh(allow_cache=False):
+        global current_cached_credentials
+
+        if allow_cache and current_cached_credentials is not None:
+            log.info("Using in-memory assumed credentials cache")
+            return current_cached_credentials
+
+        log.debug("Fetching fresh credentials from STS")
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
-
         if external_id is not None:
             parameters['ExternalId'] = external_id
 
-        credentials = retry(
-            session.client('sts').assume_role, **parameters)['Credentials']
-        return dict(
+        try:
+            credentials = retry(session.client('sts').assume_role, **parameters)['Credentials']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                raise UnableToAssumeRole("Unable to assume the specified role.")
+            else:
+                raise
+        normalised_credentials = dict(
             access_key=credentials['AccessKeyId'],
             secret_key=credentials['SecretAccessKey'],
             token=credentials['SessionToken'],
             # Silly that we basically stringify so it can be parsed again
             expiry_time=credentials['Expiration'].isoformat())
+        log.debug("Updating memory credentials cache.")
+        current_cached_credentials = normalised_credentials
+        return normalised_credentials
+
 
     session_credentials = RefreshableCredentials.create_from_metadata(
-        metadata=refresh(),
+        metadata=refresh(True),
         refresh_using=refresh,
         method='sts-assume-role')
 
