@@ -41,18 +41,16 @@ from c7n.version import version
 from c7n.resources import load_resources
 
 
-def load(options, path, format='yaml', validate=True):
+def load(options, path, format='yaml', validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
-    with open(path) as fh:
-        if format == 'yaml':
-            data = utils.yaml_load(fh.read())
-        elif format == 'json':
-            data = utils.loads(fh.read())
-            validate = False
+    data = utils.load_file(path, format=format, vars=vars)
+
+    if format == 'json':
+        validate = False
 
     # Test for empty policy file
     if not data or data.get('policies') is None:

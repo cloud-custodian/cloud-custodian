@@ -14,6 +14,7 @@
 import logging
 import itertools
 import json
+import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -774,7 +775,7 @@ class EncryptInstanceVolumes(BaseAction):
             client.detach_volume(
                 InstanceId=instance_id, VolumeId=v['VolumeId'])
             # 5/8/2016 The detach isn't immediately consistent
-            self.data.get('delay', 15)
+            time.sleep(self.data.get('delay', 15))
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])

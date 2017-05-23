@@ -78,6 +78,10 @@ def _default_options(p, blacklist=""):
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                    action="store_true")
 
+    if 'vars' not in blacklist:
+        p.add_argument('--vars', default=None,
+                       help='Vars file to substitute into policy')
+
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
@@ -111,9 +115,16 @@ def _default_region(options):
 
     try:
         options.regions = [utils.get_profile_session(options).region_name]
-        log.debug("using default region:%s from boto" % options.regions[0])
     except:
-        return
+        log.warning('Could not determine default region')
+        options.regions = [None]
+
+    if options.regions[0] is None:
+        print('Error: No default region set. Specify a default via AWS_DEFAULT_REGION',
+              'or setting a region in ~/.aws/config', file=sys.stderr)
+        sys.exit(1)
+
+    log.debug("using default region:%s from boto" % options.regions[0])
 
 
 def _default_account_id(options):

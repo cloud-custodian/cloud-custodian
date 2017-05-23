@@ -1,0 +1,145 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Distribution": {
+            "Status": "InProgress", 
+            "DomainName": "d3samj04x9xf5a.cloudfront.net", 
+            "InProgressInvalidationBatches": 0, 
+            "DistributionConfig": {
+                "Comment": "", 
+                "CacheBehaviors": {
+                    "Quantity": 0
+                }, 
+                "IsIPV6Enabled": true, 
+                "Logging": {
+                    "Bucket": "", 
+                    "Prefix": "", 
+                    "Enabled": false, 
+                    "IncludeCookies": false
+                }, 
+                "WebACLId": "", 
+                "Origins": {
+                    "Items": [
+                        {
+                            "OriginPath": "", 
+                            "CustomOriginConfig": {
+                                "OriginSslProtocols": {
+                                    "Items": [
+                                        "TLSv1.1", 
+                                        "TLSv1.2"
+                                    ], 
+                                    "Quantity": 2
+                                }, 
+                                "OriginProtocolPolicy": "https-only", 
+                                "OriginReadTimeout": 30, 
+                                "HTTPPort": 80, 
+                                "HTTPSPort": 443, 
+                                "OriginKeepaliveTimeout": 5
+                            }, 
+                            "CustomHeaders": {
+                                "Quantity": 0
+                            }, 
+                            "Id": "Custom-custom_origin.com", 
+                            "DomainName": "custom_origin.com"
+                        }
+                    ], 
+                    "Quantity": 1
+                }, 
+                "DefaultRootObject": "", 
+                "PriceClass": "PriceClass_All", 
+                "Enabled": true, 
+                "DefaultCacheBehavior": {
+                    "TrustedSigners": {
+                        "Enabled": false, 
+                        "Quantity": 0
+                    }, 
+                    "LambdaFunctionAssociations": {
+                        "Quantity": 0
+                    }, 
+                    "TargetOriginId": "Custom-custom_origin.com", 
+                    "ViewerProtocolPolicy": "allow-all", 
+                    "ForwardedValues": {
+                        "Headers": {
+                            "Quantity": 0
+                        }, 
+                        "Cookies": {
+                            "Forward": "none"
+                        }, 
+                        "QueryStringCacheKeys": {
+                            "Quantity": 0
+                        }, 
+                        "QueryString": false
+                    }, 
+                    "MaxTTL": 31536000, 
+                    "SmoothStreaming": false, 
+                    "DefaultTTL": 86400, 
+                    "AllowedMethods": {
+                        "Items": [
+                            "HEAD", 
+                            "GET"
+                        ], 
+                        "CachedMethods": {
+                            "Items": [
+                                "HEAD", 
+                                "GET"
+                            ], 
+                            "Quantity": 2
+                        }, 
+                        "Quantity": 2
+                    }, 
+                    "MinTTL": 0, 
+                    "Compress": false
+                }, 
+                "CallerReference": "1495216138721", 
+                "ViewerCertificate": {
+                    "CloudFrontDefaultCertificate": true, 
+                    "MinimumProtocolVersion": "SSLv3", 
+                    "CertificateSource": "cloudfront"
+                }, 
+                "CustomErrorResponses": {
+                    "Quantity": 0
+                }, 
+                "HttpVersion": "http2", 
+                "Restrictions": {
+                    "GeoRestriction": {
+                        "RestrictionType": "none", 
+                        "Quantity": 0
+                    }
+                }, 
+                "Aliases": {
+                    "Quantity": 0
+                }
+            }, 
+            "ActiveTrustedSigners": {
+                "Enabled": false, 
+                "Quantity": 0
+            }, 
+            "LastModifiedTime": {
+                "hour": 21, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 22, 
+                "microsecond": 777000, 
+                "year": 2017, 
+                "day": 19, 
+                "minute": 54
+            }, 
+            "Id": "E2CO7J9ZT67Q34", 
+            "ARN": "arn:aws:cloudfront::644160558196:distribution/E2CO7J9ZT67Q34"
+        }, 
+        "ETag": "E3IPM0B0MPUKE4", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b7c5501a-3cdd-11e7-ae90-63445848bf01", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b7c5501a-3cdd-11e7-ae90-63445848bf01", 
+                "content-length": "2901", 
+                "vary": "Accept-Encoding", 
+                "etag": "E3IPM0B0MPUKE4", 
+                "date": "Fri, 19 May 2017 21:54:22 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
