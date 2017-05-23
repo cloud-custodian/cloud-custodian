@@ -129,3 +129,23 @@ class TestELBReport(unittest.TestCase):
             recs = map(lambda x: self.records[x], rec_ids)
             rows = map(lambda x: self.rows[x], row_ids)
             self.assertEqual(formatter.to_csv(recs), rows)
+
+
+class TestMultiReport(unittest.TestCase):
+
+    def setUp(self):
+        data = load_data('report.json')
+        self.records = data['ec2']['records']
+        self.headers = data['ec2']['headers']
+        self.rows = data['ec2']['rows']
+
+    def test_csv(self):
+        # Test the extra headers for multi-policy
+        formatter = Formatter(EC2_POLICY.resource_manager, multipolicy=True)
+        tests = [
+            (['minimal'], ['minimal_multipolicy']),
+        ]
+        for rec_ids, row_ids in tests:
+            recs = map(lambda x: self.records[x], rec_ids)
+            rows = map(lambda x: self.rows[x], row_ids)
+            self.assertEqual(formatter.to_csv(recs), rows)
