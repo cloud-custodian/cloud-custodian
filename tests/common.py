@@ -42,6 +42,10 @@ C7N_SCHEMA = generate()
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason='We are not validating schemas.')
 
+# Set this so that if we run nose directly the tests will not fail
+if 'AWS_DEFAULT_REGION' not in os.environ:
+    os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+
 
 class BaseTest(PillTest):
 
@@ -113,17 +117,18 @@ class BaseTest(PillTest):
         setattr(obj, attr, new)
         self.addCleanup(setattr, obj, attr, old)
 
-    def change_environment(self, **kw):
+    def change_environment(self, **kwargs):
         """Change the environment to the given set of variables.
 
+        To clear an environment variable set it to None.
         Existing environment restored after test.
         """
         # preserve key elements needed for testing
         for env in ["AWS_ACCESS_KEY_ID",
                     "AWS_SECRET_ACCESS_KEY",
                     "AWS_DEFAULT_REGION"]:
-            if env not in kw:
-                kw[env] = os.environ.get(env, "")
+            if env not in kwargs:
+                kwargs[env] = os.environ.get(env, "")
 
         original_environ = dict(os.environ)
 
@@ -133,7 +138,10 @@ class BaseTest(PillTest):
             os.environ.update(original_environ)
 
         os.environ.clear()
-        os.environ.update(kw)
+        for key, value in kwargs.items():
+            if value is None:
+                del(kwargs[key])
+        os.environ.update(kwargs)
 
     def capture_logging(
             self, name=None, level=logging.INFO,

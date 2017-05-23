@@ -77,11 +77,6 @@ Quick Install
   $ source custodian/bin/activate
   (custodian) $ pip install c7n
 
-(Note that Custodian's `Lambda features
-<http://www.capitalone.io/cloud-custodian/docs/policy/lambda.html>`_ currently
-`do not work <https://github.com/capitalone/cloud-custodian/issues/193>`_
-outside of a virtualenv.)
-
 
 Usage
 #####

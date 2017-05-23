@@ -48,7 +48,7 @@ class EMRCluster(QueryResourceManager):
 
     action_registry = actions
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
@@ -135,12 +135,13 @@ class TagDelayedAction(TagDelayedAction):
 
     permission = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('tag')
@@ -164,11 +165,12 @@ class TagTable(Tag):
 
     permissions = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('remove-tag')
