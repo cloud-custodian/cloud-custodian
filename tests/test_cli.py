@@ -18,7 +18,7 @@ import sys
 from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
-from c7n import cli, version, commands
+from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
 
@@ -566,7 +566,7 @@ class MiscTest(CliTest):
         }
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file(policy)
-        self.change_environment(AWS_DEFAULT_REGION=None)
+        self.patch(utils, 'get_profile_session', lambda x: None)
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file],
             1)
