@@ -150,7 +150,7 @@ def generate(resource_types=()):
             'properties': {
                 'name': {
                     'type': 'string',
-                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
+                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
                 'region': {'type': 'string'},
                 'resource': {'type': 'string'},
                 'max-resources': {'type': 'integer'},
@@ -184,6 +184,9 @@ def generate(resource_types=()):
             'type': 'object',
             'required': ['type'],
             'properties': {
+                'timeout': {
+                    'type': 'number',
+                },
                 'type': {
                     'enum': [
                         'cloudtrail',

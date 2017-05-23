@@ -918,6 +918,43 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
+@actions.register('associate-instance-profile')
+class EC2AssociateInstanceProfile(BaseAction):
+    """Associates an instance profile to an existing EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name:
+            resource: ec2
+            query:
+              - IamInstanceProfile: absent
+            actions:
+              - associate-instance-profile
+                name: default
+
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    """
+
+    schema = type_schema(
+        'associate-instance-profile',
+        **{'name': {'type': 'string'}})
+
+    permissions = ('ec2:AssociateIamInstanceProfile',)
+
+    def process(self, instances):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        for i in instances:
+            client.associate_iam_instance_profile(
+                IamInstanceProfile={'Name': self.data.get('name', '')},
+                InstanceId=i['InstanceId'])
+
+        return instances
+
+
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {
