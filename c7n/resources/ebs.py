@@ -795,13 +795,13 @@ class EncryptInstanceVolumes(BaseAction):
         # Clean-up transient tags on newly created encrypted volume.
         for v, vol_id in paired:
             client.delete_tags(
-                    Resources=[vol_id],
-                    Tags=[
-                        {'Key': 'maid-crypt-remediation'},
-                        {'Key': 'maid-origin-volume'},
-                        {'Key': 'maid-instance-device'}
-                    ]
-                )
+                Resources=[vol_id],
+                Tags=[
+                    {'Key': 'maid-crypt-remediation'},
+                    {'Key': 'maid-origin-volume'},
+                    {'Key': 'maid-instance-device'}
+                ]
+            )
 
     def stop_instance(self, instance_id):
         client = local_session(self.manager.session_factory).client('ec2')
