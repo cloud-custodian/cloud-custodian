@@ -918,9 +918,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
-@actions.register('associate-instance-profile')
-class EC2AssociateInstanceProfile(BaseAction):
-    """Associates an instance profile to an existing EC2 instance.
+@actions.register('set-instance-profile')
+class SetInstanceProfile(BaseAction):
+    """Sets (or removes) the instance profile for an existing EC2 instance.
 
     :Example:
 
@@ -932,25 +932,49 @@ class EC2AssociateInstanceProfile(BaseAction):
             query:
               - IamInstanceProfile: absent
             actions:
-              - type: associate-instance-profile
+              - type: set-instance-profile
                 name: default
 
     https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/disassociate-iam-instance-profile.html
     """
 
     schema = type_schema(
-        'associate-instance-profile',
+        'set-instance-profile',
         **{'name': {'type': 'string'}})
 
-    permissions = ('ec2:AssociateIamInstanceProfile', 'iam:PassRole')
+    permissions = (
+        'ec2:AssociateIamInstanceProfile',
+        'ec2:DisassociateIamInstanceProfile',
+        'iam:PassRole')
 
     def process(self, instances):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name', '')
+
         for i in instances:
-            client.associate_iam_instance_profile(
-                IamInstanceProfile={'Name': self.data.get('name', '')},
-                InstanceId=i['InstanceId'])
+            if profile_name:
+                client.associate_iam_instance_profile(
+                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    InstanceId=i['InstanceId'])
+            else:
+                response = client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {
+                            'Name': 'instance-id',
+                            'Values': [i['InstanceId']],
+                        },
+                        {
+                            'Name': 'state',
+                            'Values': ['associating', 'associated']
+                        }
+                    ]
+                )
+                for a in response['IamInstanceProfileAssociations']:
+                    client.disassociate_iam_instance_profile(
+                        AssociationId=a['AssociationId']
+                    )
 
         return instances
 
