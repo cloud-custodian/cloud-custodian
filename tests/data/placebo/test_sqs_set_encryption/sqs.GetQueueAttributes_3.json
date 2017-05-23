@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "ApproximateNumberOfMessagesNotVisible": "0", 
+            "KmsDataKeyReusePeriodSeconds": "300",
+            "KmsMasterKeyId": "c4816d44-73c3-4eed-a7cc-d52a74fa3294",
+            "MessageRetentionPeriod": "345600",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "MaximumMessageSize": "262144",
+            "CreatedTimestamp": "1495123666",
+            "ApproximateNumberOfMessages": "0",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "DelaySeconds": "0",
+            "VisibilityTimeout": "30",
+            "LastModifiedTimestamp": "1495123670",
+            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:sqs-test"
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "fa74f3cb-cc78-581e-bb85-a25c05a32bda",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fa74f3cb-cc78-581e-bb85-a25c05a32bda",
+                "content-length": "1345",
+                "server": "Server",
+                "connection": "keep-alive",
+                "date": "Thu, 18 May 2017 16:11:07 GMT",
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

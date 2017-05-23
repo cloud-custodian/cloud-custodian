@@ -20,6 +20,8 @@ from c7n.credentials import SessionFactory
 from c7n.policy import load as policy_load
 from c7n import mu, resources
 
+from botocore.exceptions import ClientError
+
 log = logging.getLogger('resources')
 
 
@@ -54,7 +56,19 @@ def resources_gc_prefix(options, policy_collection):
 
     for n in remove:
         events = []
-        result = client.get_policy(FunctionName=n['FunctionName'])
+        try:
+            result = client.get_policy(FunctionName=n['FunctionName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                log.warn("Lambda Function or Access Policy Statement missing: {}".
+                    format(n['FunctionName']))
+            else:
+                log.warn("Unexpected error: {} for function {}".
+                    format(e, n['FunctionName']))
+
+            # Continue on with next function instead of raising an exception
+            continue
+
         if 'Policy' not in result:
             pass
         else:
