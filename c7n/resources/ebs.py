@@ -669,9 +669,12 @@ class EncryptInstanceVolumes(BaseAction):
        - Delete transient snapshots
        - Detach Unencrypted Volume
        - Attach Encrypted Volume
+       - Set DeleteOnTermination instance attribute equal to source volume
     - For each volume
        - Delete unencrypted volume
     - Start Instance (if originally running)
+    - For each newly encrypted volume
+       - Delete transient tags
 
     :example:
 
@@ -702,7 +705,9 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DescribeSnapshots',
         'ec2:DescribeVolumes',
         'ec2:StopInstances',
-        'ec2:StartInstances')
+        'ec2:StartInstances',
+        'ec2:DeleteTags',
+        'ec2:ModifyInstanceAttribute')
 
     def validate(self):
         key = self.data.get('key')
@@ -780,6 +785,21 @@ class EncryptInstanceVolumes(BaseAction):
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
 
+            # Set DeleteOnTermination attribute the same as source volume
+            if v['Attachments'][0]['DeleteOnTermination']:
+                client.modify_instance_attribute(
+                    InstanceId=instance_id,
+                    BlockDeviceMappings=[
+                        {
+                            'DeviceName': v['Attachments'][0]['Device'],
+                            'Ebs': {
+                                'VolumeId': vol_id,
+                                'DeleteOnTermination': True
+                            }
+                        }
+                    ]
+                )
+
         if instance_running:
             client.start_instances(InstanceIds=[instance_id])
 
@@ -789,6 +809,17 @@ class EncryptInstanceVolumes(BaseAction):
 
         for v in vol_set:
             client.delete_volume(VolumeId=v['VolumeId'])
+
+        # Clean-up transient tags on newly created encrypted volume.
+        for v, vol_id in paired:
+            client.delete_tags(
+                Resources=[vol_id],
+                Tags=[
+                    {'Key': 'maid-crypt-remediation'},
+                    {'Key': 'maid-origin-volume'},
+                    {'Key': 'maid-instance-device'}
+                ]
+            )
 
     def stop_instance(self, instance_id):
         client = local_session(self.manager.session_factory).client('ec2')
