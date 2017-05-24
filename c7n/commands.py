@@ -113,7 +113,7 @@ def _load_vars(options):
         try:
             vars = load_file(options.vars)
         except IOError as e:
-            eprint('Error loading vars file "{}": {}'.format(options.vars, e.strerror))
+            log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
             sys.exit(1)
 
     # TODO - provide builtin vars here (such as account)
