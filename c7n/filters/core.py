@@ -79,7 +79,8 @@ OPERATORS = {
     'regex': regex_match,
     'in': operator_in,
     'ni': operator_ni,
-    'not-in': operator_ni}
+    'not-in': operator_ni,
+    'contains': operator.contains}
 
 
 class FilterRegistry(PluginRegistry):
@@ -264,7 +265,8 @@ class ValueFilter(Filter):
                 {'type': 'array'},
                 {'type': 'string'},
                 {'type': 'boolean'},
-                {'type': 'number'}]},
+                {'type': 'number'},
+                {'type': 'null'}]},
             'op': {'enum': OPERATORS.keys()}}}
 
     annotate = True
