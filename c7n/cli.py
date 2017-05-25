@@ -120,8 +120,8 @@ def _default_region(options):
         options.regions = [None]
 
     if options.regions[0] is None:
-        print('Error: No default region set. Specify a default via AWS_DEFAULT_REGION',
-              'or setting a region in ~/.aws/config', file=sys.stderr)
+        log.error('No default region set. Specify a default via AWS_DEFAULT_REGION '
+                  'or setting a region in ~/.aws/config')
         sys.exit(1)
 
     log.debug("using default region:%s from boto" % options.regions[0])
