@@ -74,7 +74,11 @@ def _default_options(p, blacklist=""):
                         help="Only use policies with the given resource type")
 
     config.add_argument("-v", "--verbose", action="count", help="Verbose logging")
-    config.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
+    if 'quiet' not in blacklist:
+        config.add_argument("-q", "--quiet", action="count",
+                            help="Less logging (repeatable, -qqq for no output)")
+    else:
+        config.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     config.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                    action="store_true")
 
@@ -143,7 +147,7 @@ def _default_account_id(options):
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    _default_options(p, blacklist=['region', 'cache', 'log-group'])
+    _default_options(p, blacklist=['region', 'cache', 'log-group', 'quiet'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -168,7 +172,7 @@ def _report_options(p):
 
 def _metrics_options(p):
     """ Add options specific to metrics subcommand. """
-    _default_options(p, blacklist=['log-group', 'output-dir', 'cache'])
+    _default_options(p, blacklist=['log-group', 'output-dir', 'cache', 'quiet'])
 
     p.add_argument(
         '--start', type=date_parse,
@@ -183,7 +187,7 @@ def _metrics_options(p):
 
 def _logs_options(p):
     """ Add options specific to logs subcommand. """
-    _default_options(p, blacklist=['cache'])
+    _default_options(p, blacklist=['cache', 'quiet'])
 
     # default time range is 0 to "now" (to include all log entries)
     p.add_argument(
