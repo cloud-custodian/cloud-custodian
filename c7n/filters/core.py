@@ -434,8 +434,7 @@ class ValueFilter(Filter):
                 # EMR not having more functionality.
                 try:
                     value = parse(value, default=datetime.now(tz=tzutc()))
-
-                except (AttributeError, TypeError):
+                except:
                     value = 0
 
             # Reverse the age comparison, we want to compare the value being

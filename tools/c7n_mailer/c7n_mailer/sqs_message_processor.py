@@ -260,10 +260,10 @@ class SqsMessageProcessor(object):
         try:
             template = self.env.get_template("%s.j2" % (
                 data['action'].get('template', 'default')))
-        except jinja2.TemplateNotFound:
-            self.logger.error("Invalid template reference %s.j2" % (
-                data['action'].get('template', 'default')))
-            return
+        except Exception as error:
+            jinja_mailer_file = data['action'].get('template', 'default')
+            error_msg = "Invalid template reference %s.j2\n%s" % (jinja_mailer_file, error)
+            self.logger.error(error_msg)
 
         message = template.render(
             recipient=target,

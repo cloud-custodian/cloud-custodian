@@ -523,19 +523,22 @@ class TagDelayedAction(Action):
         self.log.info("Tagging %d resources for %s on %s" % (
             len(resources), op, action_date.strftime('%Y/%m/%d')))
 
-        tags = [{'Key': tag, 'Value': msg}]
+        maid_tag = [{'Key': tag, 'Value': msg}]
 
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for resource_set in utils.chunks(resources, size=self.batch_size):
+                for resource in resource_set:
+                    if 'Tags' in resource:
+                        resource['Tags'].append(maid_tag[0])
                 futures.append(
-                    w.submit(self.process_resource_set, resource_set, tags))
+                    w.submit(self.process_resource_set, resource_set, maid_tag))
 
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception tagging resource set: %s  \n %s" % (
-                            tags, f.exception()))
+                        maid_tag, f.exception()))
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(self.manager.session_factory).client('ec2')
