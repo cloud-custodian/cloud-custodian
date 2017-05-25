@@ -125,16 +125,17 @@ def _print_no_policies_warning(options, policies):
     if options.policy_filter or options.resource_type:
         log.warning("Warning: no policies matched the filters provided.")
 
-        log.warning("\nFilters:")
+        log.warning("Filters:")
         if options.policy_filter:
-            log.warning("    Policy name filter (-p):" + options.policy_filter)
+            log.warning("    Policy name filter (-p): " + options.policy_filter)
         if options.resource_type:
-            log.warning("    Resource type filter (-t):" + options.resource_type)
+            log.warning("    Resource type filter (-t): " + options.resource_type)
 
-        log.warning("\nAvailable policies:")
+        log.warning("Available policies:")
         for policy in policies:
             log.warning("    - {} ({})".format(policy.name, policy.resource_type))
-        log.warning('')
+        if not policies:
+            log.warning("    (none)")
     else:
         log.warning('Empty policy file(s).  Nothing to do.')
 
