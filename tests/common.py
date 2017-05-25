@@ -35,6 +35,8 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 
 load_resources()
 
+ACCOUNT_ID = '644160558196'
+
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
@@ -163,6 +165,10 @@ class BaseTest(PillTest):
 
         return log_file
 
+    @property
+    def account_id(self):
+        return ACCOUNT_ID
+
 
 def placebo_dir(name):
     return os.path.join(
@@ -212,7 +218,7 @@ class Config(Bag):
             'regions': [region],
             'cache': '',
             'profile': None,
-            'account_id': '644160558196',
+            'account_id': ACCOUNT_ID,
             'assume_role': None,
             'log_group': None,
             'metrics_enabled': False,

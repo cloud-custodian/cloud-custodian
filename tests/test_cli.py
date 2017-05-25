@@ -18,12 +18,16 @@ import sys
 from argparse import ArgumentTypeError
 from common import BaseTest
 from cStringIO import StringIO
-from c7n import cli, version, commands
+from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
 
 class CliTest(BaseTest):
     """ A subclass of BaseTest with some handy functions for CLI related tests. """
+
+    def patch_account_id(self):
+        test_account_id = lambda x: self.account_id
+        self.patch(cli, '_default_account_id', test_account_id)
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
@@ -37,8 +41,9 @@ class CliTest(BaseTest):
         self.patch(sys, 'stderr', err)
         return out, err
 
-    def run_and_expect_success(self, argv, capture=True):
+    def run_and_expect_success(self, argv):
         """ Run cli.main() with supplied argv and expect normal execution. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
         try:
@@ -49,6 +54,7 @@ class CliTest(BaseTest):
 
     def run_and_expect_failure(self, argv, exit_code):
         """ Run cli.main() with supplied argv and expect exit_code. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
         #clear_resources()
@@ -59,6 +65,7 @@ class CliTest(BaseTest):
 
     def run_and_expect_exception(self, argv, exception):
         """ Run cli.main() with supplied argv and expect supplied exception. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         #clear_resources()
         try:
@@ -249,7 +256,7 @@ class ReportTest(CliTest):
         policies = {
             'policies': [
                 {'name': 'foo', 'resource': 's3'},
-                { 'name': 'bar', 'resource': 'ec2'},
+                {'name': 'bar', 'resource': 'ec2'},
             ]
         }
         yaml_file = self.write_policy_file(policies)
@@ -523,8 +530,8 @@ class MiscTest(CliTest):
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
         self.run_and_expect_success(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
-        0)
+            ['custodian', 'run', '-s', temp_dir, yaml_file]
+        )
 
     def test_nonexistent_policy_file(self):
         temp_dir = self.get_temp_dir()
@@ -559,7 +566,7 @@ class MiscTest(CliTest):
         }
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file(policy)
-        self.change_environment(AWS_DEFAULT_REGION=None)
+        self.patch(utils, 'get_profile_session', lambda x: None)
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file],
             1)
