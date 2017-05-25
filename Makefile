@@ -44,4 +44,4 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 clean:
-	rm -rf .Python bin include lib pip-selfcheck.json 
+	rm -rf .Python bin include lib pip-selfcheck.json

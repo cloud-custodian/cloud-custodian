@@ -4,37 +4,41 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "57d42816-b194-4a14-be24-f799fd11a85e", 
+            "RequestId": "18ec197d-bbe3-4480-a1cd-eedb2946f090", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 08 Jun 2017 18:23:33 GMT"
+                "date": "Thu, 08 Jun 2017 18:24:06 GMT"
             }
         }, 
         "Volumes": [
             {
                 "AvailabilityZone": "us-east-1a", 
-                "Attachments": [], 
-                "Tags": [
+                "Attachments": [
                     {
-                        "Value": "/dev/xvda", 
-                        "Key": "maid-instance-device"
-                    }, 
-                    {
-                        "Value": "i-0aaaaec4b77188b69", 
-                        "Key": "maid-crypt-remediation"
-                    }, 
-                    {
-                        "Value": "vol-0f53c81b92b4ecfce", 
-                        "Key": "maid-origin-volume"
+                        "AttachTime": {
+                            "hour": 18, 
+                            "__class__": "datetime", 
+                            "month": 6, 
+                            "second": 5, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 8, 
+                            "minute": 24
+                        }, 
+                        "InstanceId": "i-0aaaaec4b77188b69", 
+                        "VolumeId": "vol-072dfa20eef03dd38", 
+                        "State": "attaching", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/xvda"
                     }
                 ], 
                 "Encrypted": true, 
                 "VolumeType": "gp2", 
                 "VolumeId": "vol-072dfa20eef03dd38", 
-                "State": "available", 
+                "State": "in-use", 
                 "Iops": 100, 
                 "KmsKeyId": "arn:aws:kms:us-east-1:185106417252:key/3cc8863f-09dd-45cd-90cf-d6149710582e", 
                 "SnapshotId": "snap-0bd2772f3c7cafa62", 
