@@ -214,7 +214,7 @@ class RetentionWindow(BaseAction):
         if retention_type == 'exact':
             self.set_retention_window(cluster, new_retention)
             return cluster
-            
+
     def set_retention_window(self, cluster, retention):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_cluster(
