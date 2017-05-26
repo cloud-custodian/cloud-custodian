@@ -721,7 +721,6 @@ class RetentionWindow(BaseAction):
     """
     Sets the 'BackupRetentionPeriod' value for automated snapshots,
     enforce (min, max, exact) sets retention days occordingly.
-    
     :example:
 
         .. code-block: yaml
@@ -746,7 +745,7 @@ class RetentionWindow(BaseAction):
         'retention', **{'days': {'type': 'number'},
                         'copy-tags': {'type': 'boolean'},
                         'enforce': {'type': 'string', 'enum': [
-                          'min', 'max', 'exact']}})
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBInstance',)
 
     def process(self, dbs):
@@ -770,7 +769,7 @@ class RetentionWindow(BaseAction):
         new_copy_tags = self.data.get('copy-tags', True)
         retention_type = self.data['enforce', 'min'].lower()
 
-        if ((retention_type == min or
+        if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
@@ -779,7 +778,7 @@ class RetentionWindow(BaseAction):
                 new_copy_tags)
             return resource
 
-        if ((retention_type == max or
+        if ((retention_type == 'max' or
              current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
@@ -788,7 +787,7 @@ class RetentionWindow(BaseAction):
                 new_copy_tags)
             return resource
 
-        if ((retention_type == exact or
+        if ((retention_type == 'exact' or
              current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(resource, new_retention, new_copy_tags)

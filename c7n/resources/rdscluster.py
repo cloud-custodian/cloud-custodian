@@ -178,7 +178,7 @@ class RetentionWindow(BaseAction):
     schema = type_schema(
         'retention', **{'days': {'type': 'number'},
                         'enforce': {'type': 'string', 'enum': [
-                          'min', 'max', 'exact']}})
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBCluster',)
 
     def process(self, clusters):
@@ -199,23 +199,22 @@ class RetentionWindow(BaseAction):
         new_retention = self.data['days']
         retention_type = self.data['enforce', 'min'].lower()
 
-        if retention_type == min:
+        if retention_type == 'min':
             self.set_retention_window(
                 cluster,
                 max(current_retention, new_retention))
             return cluster
 
-        if retention_type == max:
+        if retention_type == 'max':
             self.set_retention_window(
                 cluster,
                 min(current_retention, new_retention))
             return cluster
 
-        if retention_type == exact:
+        if retention_type == 'exact':
             self.set_retention_window(cluster, new_retention)
             return cluster
-
-
+            
     def set_retention_window(self, cluster, retention):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_cluster(
