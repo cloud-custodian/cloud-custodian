@@ -90,7 +90,8 @@ def dispatch_event(event, context):
         return False
 
     # TODO. This enshrines an assumption of a single policy per lambda.
-    options_overrides = policy_config['policies'][0]['mode'].get('execution-options', {})
+    options_overrides = policy_config[
+        'policies'][0].get('mode', {}).get('execution-options', {})
     options = Config.empty(**options_overrides)
 
     load_resources()
