@@ -258,7 +258,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count']},
+                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -270,6 +270,10 @@ class ValueFilter(Filter):
             'op': {'enum': OPERATORS.keys()}}}
 
     annotate = True
+
+    def __init__(self, data, manager=None):
+        super(ValueFilter, self).__init__(data, manager)
+        self.expr = {}
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
@@ -354,11 +358,11 @@ class ValueFilter(Filter):
                     break
         elif k in i:
             r = i.get(k)
-        elif self.expr:
-            r = self.expr.search(i)
+        elif k not in self.expr:
+            self.expr[k] = jmespath.compile(k)
+            r = self.expr[k].search(i)
         else:
-            self.expr = jmespath.compile(k)
-            r = self.expr.search(i)
+            r = self.expr[k].search(i)
         return r
 
     def match(self, i):
@@ -385,7 +389,7 @@ class ValueFilter(Filter):
 
         # value type conversion
         if self.vtype is not None:
-            v, r = self.process_value_type(self.v, r)
+            v, r = self.process_value_type(self.v, r, i)
         else:
             v = self.v
 
@@ -409,9 +413,12 @@ class ValueFilter(Filter):
 
         return False
 
-    def process_value_type(self, sentinel, value):
+    def process_value_type(self, sentinel, value, resource):
         if self.vtype == 'normalize' and isinstance(value, basestring):
             return sentinel, value.strip().lower()
+
+        elif self.vtype == 'expr':
+            return sentinel, self.get_resource_value(value, resource)
 
         elif self.vtype == 'integer':
             try:
