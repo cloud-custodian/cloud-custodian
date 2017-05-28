@@ -25,7 +25,7 @@ build:
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
       - pypy setup.py develop
-      - nosetests -s -v tests
+      - nosetests -s -v tests tools/c7n_*
     when:
       event: push
       branch: master

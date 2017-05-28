@@ -131,15 +131,20 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Mailer Infrastructure Config
 
-| Required? | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `cache`              | string           | memcached for caching ldap lookups  |
-|           | `cross_accounts`     | object           | account to assume back into for sending to SNS topics |
-|           | `ldap_bind_dn`       | string           | ldap server for resolving users     |
-|           | `ldap_bind_user`     | string           | ldap server for resolving users     |
-|           | `ldap_bind_password` | string           | ldap server for resolving users     |
-|           | `ldap_uri`           | string           | ldap server for resolving users     |
-|           | `ses_region`         | string           | AWS region that handles SES API calls |
+| Required? | Key                        | Type             | Notes                               |
+|:---------:|:---------------------------|:-----------------|:------------------------------------|
+|           | `cache`                    | string           | memcached for caching ldap lookups  |
+|           | `cross_accounts`           | object           | account to assume back into for sending to SNS topics |
+|           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
+|           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
+|           | `ldap_bind_password`       | string           | ldap bind password     |
+|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
+|           | `ldap_email_key`     | string           | eg 'mail'     |
+|           | `ldap_manager_attribute`   | string           | eg 'manager'    |
+|           | `ldap_username_attribute`  | string           | eg 'sAMAccountName'     |
+|           | `ldap_bind_password_in_kms`| boolean           | defaults to true, most people (except capone want to se this to false)     |
+|           | `ses_region`               | string           | AWS region that handles SES API calls |
+
 
 #### SDK Config
 
@@ -164,6 +169,7 @@ policies:
     actions:
       - type: notify
         template: default
+        template_format: 'html'
         priority_header: 1
         subject: fix your tags
         to:

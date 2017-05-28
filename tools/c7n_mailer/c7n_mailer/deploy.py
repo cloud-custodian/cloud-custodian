@@ -30,18 +30,18 @@ from c7n_mailer import handle
 
 logger = logging.getLogger('custodian.mailer')
 log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-logging.basicConfig(level=logging.DEBUG, format=log_format)
+logging.basicConfig(level=logging.INFO, format=log_format)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 
 def dispatch(event, context):
-    return handle.start_c7n_mailer(event, context, logger)
+    return handle.start_c7n_mailer(logger)
 """
 
 
 def get_archive(config):
     archive = PythonPackageArchive(
         'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'yaml',
-        'memcache')
+        'redis')
 
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'msg-templates'))
