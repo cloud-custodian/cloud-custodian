@@ -184,6 +184,9 @@ def generate(resource_types=()):
             'type': 'object',
             'required': ['type'],
             'properties': {
+                'timeout': {
+                    'type': 'number',
+                },
                 'type': {
                     'enum': [
                         'cloudtrail',
