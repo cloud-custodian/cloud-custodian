@@ -114,6 +114,80 @@ class BucketMetrics(BaseTest):
             'AWS/S3.NumberOfObjects.Average' in resources[0]['c7n.metrics'])
 
 
+class BucketInventory(BaseTest):
+
+    def test_inventory(self):
+        bname = 'custodian-test-data'
+        inv_bname = 'custodian-inv'
+        inv_name = 'something'
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_inventory')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        client.create_bucket(Bucket=inv_bname)
+        
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=inv_bname)        
+
+        inv = {
+            'Destination': {
+                'S3BucketDestination': {
+                    'Bucket': "arn:aws:s3:::%s" % inv_bname,
+                    'Format': 'CSV',
+                    'Prefix': 'abcdef'},
+            },
+            'IsEnabled': True,
+            'Id': inv_name,
+            'IncludedObjectVersions': 'All',
+            'OptionalFields': ['LastModifiedDate'],
+            'Schedule': {
+                'Frequency': 'Daily'}
+            }
+            
+        client.put_bucket_inventory_configuration(
+            Bucket=bname,
+            Id=inv_name,
+            InventoryConfiguration=inv)
+        
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': 'custodian-test-data'}],
+            'actions': [
+                {'type': 'set-inventory',
+                 'destination': inv_bname,
+                 'name': inv_name}]
+            }, session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
+        invs = client.list_bucket_inventory_configurations(
+            Bucket=bname).get('InventoryConfigurationList')
+        self.assertTrue(invs)
+        self.assertEqual(sorted(invs[0]['OptionalFields']), ['LastModifiedDate', 'Size'])
+            
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': 'custodian-test-data'}],
+            'actions': [
+                {'type': 'set-inventory',
+                 'destination': inv_bname,
+                 'state': 'absent',
+                 'name': inv_name}]
+            }, session_factory=session_factory)
+
+        self.assertEqual(len(p.run()), 1)
+        self.assertFalse(
+            client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList'))
+        
+        
+        
 class BucketDelete(BaseTest):
 
     def test_delete_replicated_bucket(self):

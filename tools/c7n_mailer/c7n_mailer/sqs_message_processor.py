@@ -25,7 +25,7 @@ from boto3 import Session
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 from functools import partial
-from record import date_time_format, format_struct
+from record import date_time_format, get_date_time_delta, format_struct
 from record import resource_format, resource_owner, resource_tag
 
 
@@ -51,6 +51,7 @@ class SqsMessageProcessor(object):
             trim_blocks=True, autoescape=False)
         self.env.filters['yaml_safe'] = yaml.safe_dump
         self.env.filters['date_time_format'] = date_time_format
+        self.env.filters['get_date_time_delta'] = get_date_time_delta
 
         self.env.globals['format_resource'] = resource_format
         self.env.globals['format_struct'] = format_struct
@@ -109,15 +110,22 @@ class SqsMessageProcessor(object):
             recipient = self.get_aws_username_from_event(data['event'])
             if recipient is not None:
                 targets.add(recipient)
+        # note, since we're processing resource-owner/event-owner and
+        # deleting those above, if there are no other targets, we return
         if not targets:
-            self.logger.info("No intended targets found for message")
+            self.logger.info("No more intended targets found for message")
             return
         self.send_message_to_targets(targets, data, data['resources'])
 
     def send_resource_owner_messages(self, data):
         owners = {}
         for r in data['resources']:
-            contact_tags = self.find_resource_owners(r)
+            # Since we support arbitrary contact tags, eg OwnerEmail _and_ SupportEmail
+            # we run set, to unique the list before it's processed. There is a chance
+            # two different tags are both set to bob@example.com, in which case bob
+            # would get duplicates of every resource. Since contact_tags could be
+            # ['bob@example.com', 'bob@example.com'].
+            contact_tags = set(self.find_resource_owners(r))
             if not contact_tags:
                 self.logger.info("No resource owner found for %s" % (
                     resource_format(r, data['policy']['resource'])))
@@ -260,9 +268,9 @@ class SqsMessageProcessor(object):
         try:
             template = self.env.get_template("%s.j2" % (
                 data['action'].get('template', 'default')))
-        except jinja2.TemplateNotFound:
-            self.logger.error("Invalid template reference %s.j2" % (
-                data['action'].get('template', 'default')))
+        except Exception as error_msg:
+            self.logger.error("Invalid template reference %s.j2\n%s" % (
+                data['action'].get('template', 'default')), error_msg)
             return
 
         message = template.render(

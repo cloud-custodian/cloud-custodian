@@ -79,8 +79,9 @@ def _default_options(p, blacklist=""):
                    action="store_true")
 
     if 'vars' not in blacklist:
-        p.add_argument('--vars', default=None,
-                       help='Vars file to substitute into policy')
+        # p.add_argument('--vars', default=None,
+        #               help='Vars file to substitute into policy')
+        p.set_defaults(vars=None)
 
     if 'log-group' not in blacklist:
         p.add_argument(

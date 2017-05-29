@@ -76,7 +76,7 @@ def get_function(session_factory, role, via_sns, buckets=None, account_id=None):
 
     config = dict(
         name='c7n-s3-encrypt',
-        handler='s3crypt.process_' + 'sns_event' if via_sns else 'key_event',
+        handler='s3crypt.process_%s' % (via_sns and 'sns_event' or 'key_event'),
         memory_size=256,
         timeout=30,
         role=role,

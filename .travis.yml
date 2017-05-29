@@ -14,6 +14,6 @@ install:
 script:
   - flake8
   - make sphinx
-  - py.test -v -n auto --cov=c7n tests tools/c7n_*
+  - py.test -n auto --cov=c7n tests tools/c7n_*
 after_success:
   coveralls
