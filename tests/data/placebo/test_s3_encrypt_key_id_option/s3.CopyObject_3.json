@@ -3,30 +3,30 @@
     "data": {
         "CopyObjectResult": {
             "LastModified": {
-                "hour": 2, 
+                "hour": 0, 
                 "__class__": "datetime", 
-                "month": 2, 
-                "second": 42, 
+                "month": 5, 
+                "second": 5, 
                 "microsecond": 0, 
                 "year": 2017, 
-                "day": 19, 
-                "minute": 16
+                "day": 29, 
+                "minute": 35
             }, 
-            "ETag": "\"91719c54f9eeb80f3a3984170f89f220\""
+            "ETag": "\"d79d08eda750c1171e3fc3f6275331bc\""
         }, 
         "SSEKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/845ab6f1-744c-4edc-b702-efae6836818a", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "oEVFQtBkodp002XGiKzBn80XgmBWPvzRgibeNrPmMdjkfoR3xKgvlKSFNsM093XOkT9GExLFpyI=", 
-            "RequestId": "C62E5C08341438D7", 
+            "HostId": "sbdyqqkVt8pTAEbI2nLp96XSuV+QbD36I9R7Ku886+oJMhxIapqD+tkcv3vz9NrCyCKLRK5NF2E=", 
+            "RequestId": "C5A61B5634F6FF96", 
             "HTTPHeaders": {
                 "content-length": "234", 
-                "x-amz-id-2": "oEVFQtBkodp002XGiKzBn80XgmBWPvzRgibeNrPmMdjkfoR3xKgvlKSFNsM093XOkT9GExLFpyI=", 
+                "x-amz-id-2": "sbdyqqkVt8pTAEbI2nLp96XSuV+QbD36I9R7Ku886+oJMhxIapqD+tkcv3vz9NrCyCKLRK5NF2E=", 
                 "server": "AmazonS3", 
                 "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:644160558196:key/845ab6f1-744c-4edc-b702-efae6836818a", 
-                "x-amz-request-id": "C62E5C08341438D7", 
-                "date": "Sun, 19 Feb 2017 02:16:42 GMT", 
+                "x-amz-request-id": "C5A61B5634F6FF96", 
+                "date": "Mon, 29 May 2017 00:35:05 GMT", 
                 "x-amz-server-side-encryption": "aws:kms", 
                 "content-type": "application/xml"
             }
