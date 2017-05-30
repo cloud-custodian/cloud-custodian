@@ -163,6 +163,16 @@ def assemble_bucket(item):
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
                 return None
+        except AttributeError as e:
+            # occurs during testing against non-skunkworks sandbox
+            # AttributeError: 'FakeHttpResponse' object has no attribute 'content'
+            # during s3.GetBucketLocation
+            # tests/data/placebo/test_cw_put_metrics/s3.GetBucketLocation_2.json
+            log.warning(
+                "Bucket:%s unable to invoke method:%s error:%s ",
+                b['Name'], m, e.message)
+            continue
+
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
@@ -493,6 +503,8 @@ class MissingPolicyStatementFilter(Filter):
         aliases=('missing-statement',),
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
 
+    # implementing this as a call lets us process each bucket 1 at a time,
+    # whereas defining process(bl) will pass all buckets together
     def __call__(self, b):
         p = b.get('Policy')
         if p is None:
@@ -508,6 +520,30 @@ class MissingPolicyStatementFilter(Filter):
         if not required:
             return False
         return True
+
+
+@filters.register('s3-encryption-missing')
+class S3EncryptionMissingFilter(MissingPolicyStatementFilter):
+    """ Use the MissingPolicyStatementFilter to pass only resources that do NOT have RequiredEncryptedPutObject
+    """
+    schema = type_schema('s3-encryption-missing')
+    permissions = ("s3:GetBucketPolicy",)
+    required_statement_id = "RequiredEncryptedPutObject"
+
+    def process(self, resources, event=None):
+        keepers = [b for b in resources if self(b)]
+        if len(keepers):
+            self.log.warn("S3EncryptionMissingFilter: %s missing on %d of %d buckets",
+                          self.required_statement_id,
+                          len(keepers),
+                          len(resources))
+        return keepers
+
+    def __call__(self, b):
+        # force the checked statement_ids to our requirement
+        self.data['statement_ids'] = [self.required_statement_id, ]
+
+        return super(S3EncryptionMissingFilter, self).__call__(b)
 
 
 @actions.register('no-op')

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "S87Gg/R5ZGFoN2hXteUF2evSqwwkZT68Mzewnvko0Kpn3Hv0zeBui0KmGUCxhiDese2lvIgzJ1U=", 
+            "RequestId": "8AB2050C9A83FA15", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "S87Gg/R5ZGFoN2hXteUF2evSqwwkZT68Mzewnvko0Kpn3Hv0zeBui0KmGUCxhiDese2lvIgzJ1U=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "8AB2050C9A83FA15", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified bucket does not have a website configuration", 
+            "Code": "NoSuchWebsiteConfiguration", 
+            "BucketName": "custodian-skunk-trails"
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"Policy1335892530063\",\"Statement\":[{\"Sid\":\"Stmt1335892150622\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::386209384616:root\"},\"Action\":[\"s3:GetBucketAcl\",\"s3:GetBucketPolicy\"],\"Resource\":\"arn:aws:s3:::custodian-skunk-billing\"},{\"Sid\":\"Stmt1335892526596\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::386209384616:root\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-skunk-billing/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "eU9vnCu6cf6Z9xRyxCR+6KBn8POTO2yS8fUDN0EDdsWH0JvS/vKbP5X6o81/dH/kHKako8rmz+0=", 
+            "RequestId": "D92A283E58559C09", 
+            "HTTPHeaders": {
+                "content-length": "437", 
+                "x-amz-id-2": "eU9vnCu6cf6Z9xRyxCR+6KBn8POTO2yS8fUDN0EDdsWH0JvS/vKbP5X6o81/dH/kHKako8rmz+0=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "D92A283E58559C09", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

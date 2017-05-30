@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ecMV+IF6INfAFW0Bvy3djB+WaIUpTGI/dLwNiYWzRTcykG0XdFCcyygCXr5UzGiOvSI4+7zZU0Y=", 
+            "RequestId": "5710A277F94F361D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ecMV+IF6INfAFW0Bvy3djB+WaIUpTGI/dLwNiYWzRTcykG0XdFCcyygCXr5UzGiOvSI4+7zZU0Y=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "5710A277F94F361D", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified bucket does not have a website configuration", 
+            "Code": "NoSuchWebsiteConfiguration", 
+            "BucketName": "scot-test"
+        }
+    }
+}

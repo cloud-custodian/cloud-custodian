@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "cIzD3shbGDhQ2++gV4XiwWxidgLlzFx07F4v8PgPVlZ7x5n8WpT61Weob2v7vJsK6fuZCMLqbnk=", 
+            "RequestId": "E6DCBA0809DF2ED7", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "cIzD3shbGDhQ2++gV4XiwWxidgLlzFx07F4v8PgPVlZ7x5n8WpT61Weob2v7vJsK6fuZCMLqbnk=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E6DCBA0809DF2ED7", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The replication configuration was not found", 
+            "Code": "ReplicationConfigurationNotFoundError", 
+            "BucketName": "sphere11-dev"
+        }
+    }
+}

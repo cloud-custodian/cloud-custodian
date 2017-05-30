@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "DVFdhsjS3OmhQP9EFQWQv+hIZNQrxmPG10wvhwKykquR42b/SJrfeI0+cu/aemmIiLDeDx3x9II=", 
+            "RequestId": "CCC6E4EBC8D2F9A4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "DVFdhsjS3OmhQP9EFQWQv+hIZNQrxmPG10wvhwKykquR42b/SJrfeI0+cu/aemmIiLDeDx3x9II=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CCC6E4EBC8D2F9A4", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified bucket does not have a website configuration", 
+            "Code": "NoSuchWebsiteConfiguration", 
+            "BucketName": "ocampo-test"
+        }
+    }
+}

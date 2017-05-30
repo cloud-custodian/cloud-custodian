@@ -1,0 +1,168 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 6
+                }, 
+                "Name": "config-rule-sanity"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 57
+                }, 
+                "Name": "custodian-replicated-west"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 19
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 18
+                }, 
+                "Name": "ocampo-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 32
+                }, 
+                "Name": "scot-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 16
+                }, 
+                "Name": "scot-test2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 46
+                }, 
+                "Name": "sphere11-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 15
+                }, 
+                "Name": "sphere11-dev-us-west-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 14
+                }, 
+                "Name": "sphere11-us-west-2-dev"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "spEks3dJ1Sh4K/7p8yrUktIU5gDCHzjKkITua+yKbcxtS3b8qmQbJuuq1aiw8zbc94wNMpdTZeM=", 
+            "RequestId": "8DEFC787296E221F", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "spEks3dJ1Sh4K/7p8yrUktIU5gDCHzjKkITua+yKbcxtS3b8qmQbJuuq1aiw8zbc94wNMpdTZeM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "8DEFC787296E221F", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ubbC3H/ukz7sM0m2i4zT7buO/0iqfTLyAk+cNYPoznLZxHXnqVu2BFkiNY4JkVvXhFvLjNFC0yA=", 
+            "RequestId": "16B4AAA1AA935459", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ubbC3H/ukz7sM0m2i4zT7buO/0iqfTLyAk+cNYPoznLZxHXnqVu2BFkiNY4JkVvXhFvLjNFC0yA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "16B4AAA1AA935459", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified bucket does not have a website configuration", 
+            "Code": "NoSuchWebsiteConfiguration", 
+            "BucketName": "custodian-replicated-west"
+        }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "CanonicalUser", 
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Permission": "FULL_CONTROL"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Opj6AWct8WLRj3t1bcFuxPF3+tRtXA8rsi5opGa8BIxLSU3RmVwZytFlacR0s4SdDloPO/Wse1o=", 
+            "RequestId": "ED6FC1E261D87124", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Opj6AWct8WLRj3t1bcFuxPF3+tRtXA8rsi5opGa8BIxLSU3RmVwZytFlacR0s4SdDloPO/Wse1o=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "ED6FC1E261D87124", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

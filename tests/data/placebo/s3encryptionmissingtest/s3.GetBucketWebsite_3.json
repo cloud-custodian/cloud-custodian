@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "vEpgZy9qVjGBv9xDDb3BrMwlKj0SCgihBzl9flkAmwTIz60YglyRiZ2Y1nd3s3HzAEWMDldKHD0=", 
+            "RequestId": "6A9E6E3B14C2E34D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "vEpgZy9qVjGBv9xDDb3BrMwlKj0SCgihBzl9flkAmwTIz60YglyRiZ2Y1nd3s3HzAEWMDldKHD0=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "6A9E6E3B14C2E34D", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified bucket does not have a website configuration", 
+            "Code": "NoSuchWebsiteConfiguration", 
+            "BucketName": "config-rule-sanity"
+        }
+    }
+}

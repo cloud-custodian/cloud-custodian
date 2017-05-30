@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "CanonicalUser", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Permission": "FULL_CONTROL"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "J2yDb/Ws3Hk8QZLLnUdZ8NQEFkytoeQHxiVcm4UVxw7tyImNvAiORzcrFERGBrSwyZYTd/qS9aE=", 
+            "RequestId": "5F10AFC4E7F7B9D9", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "J2yDb/Ws3Hk8QZLLnUdZ8NQEFkytoeQHxiVcm4UVxw7tyImNvAiORzcrFERGBrSwyZYTd/qS9aE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "5F10AFC4E7F7B9D9", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

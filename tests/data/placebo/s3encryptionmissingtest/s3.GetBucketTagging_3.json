@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "tO9olCAhTDz6U95bJ0nThaKRCjwY/nPT187RloVOz8ibmnXhp+csNzhu/WLQazgiPb1p07bOlj4=", 
+            "RequestId": "9721E1FDDDEECD2A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "tO9olCAhTDz6U95bJ0nThaKRCjwY/nPT187RloVOz8ibmnXhp+csNzhu/WLQazgiPb1p07bOlj4=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "9721E1FDDDEECD2A", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The TagSet does not exist", 
+            "Code": "NoSuchTagSet", 
+            "BucketName": "custodian-replicated-west"
+        }
+    }
+}

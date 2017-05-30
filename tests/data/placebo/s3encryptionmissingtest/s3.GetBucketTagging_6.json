@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "1VSpnGLBDnx5ALjPZeABypmVGjVPiHaY7gf7wDwTmCMzEuiZ637SJ/lNWDyl9nDMYXOm7NzUcWM=", 
+            "RequestId": "CC268C4D9D9750D4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "1VSpnGLBDnx5ALjPZeABypmVGjVPiHaY7gf7wDwTmCMzEuiZ637SJ/lNWDyl9nDMYXOm7NzUcWM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CC268C4D9D9750D4", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The TagSet does not exist", 
+            "Code": "NoSuchTagSet", 
+            "BucketName": "ocampo-test"
+        }
+    }
+}

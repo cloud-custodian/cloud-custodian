@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "yTDo6InRjx3wVtQch/Mdh62gcwJe4fRt1UyqW3RTLqhiWs1QnKCuWDUbExSRLF16o6Dx0GEwTng=", 
+            "RequestId": "EBA9B9790EE1E695", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "yTDo6InRjx3wVtQch/Mdh62gcwJe4fRt1UyqW3RTLqhiWs1QnKCuWDUbExSRLF16o6Dx0GEwTng=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "EBA9B9790EE1E695", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "sphere11-us-west-2-dev"
+        }
+    }
+}

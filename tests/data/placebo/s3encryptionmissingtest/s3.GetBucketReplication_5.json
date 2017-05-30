@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "isFulDkq2mjg0FBXdcdVhFRx7BzkxndV861qz/AHHLthzIFxp2xbkOuZrWblehEwtMz2u52V7cs=", 
+            "RequestId": "352935DC05897854", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "isFulDkq2mjg0FBXdcdVhFRx7BzkxndV861qz/AHHLthzIFxp2xbkOuZrWblehEwtMz2u52V7cs=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "352935DC05897854", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The replication configuration was not found", 
+            "Code": "ReplicationConfigurationNotFoundError", 
+            "BucketName": "ocampo-test"
+        }
+    }
+}

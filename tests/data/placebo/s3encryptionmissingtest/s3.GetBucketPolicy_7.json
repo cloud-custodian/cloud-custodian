@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1487362419260\",\"Statement\":[{\"Sid\":\"Stmt1487362416163\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:DeleteBucket\",\"Resource\":\"arn:aws:s3:::scot-test2\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "BJ0bV4IzsroOWvFl/oR0Cl7hjedR5Gep4yed5TVKAw+PQhx2iao2B1bTX7cRMnLx9oqUaE9RIM8=", 
+            "RequestId": "FCC4BC45801C73D3", 
+            "HTTPHeaders": {
+                "content-length": "189", 
+                "x-amz-id-2": "BJ0bV4IzsroOWvFl/oR0Cl7hjedR5Gep4yed5TVKAw+PQhx2iao2B1bTX7cRMnLx9oqUaE9RIM8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "FCC4BC45801C73D3", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "CjOrJd/WRAT7a8JX2nVwW0VDrml0+U++vQtETDjMsvaT1Pqsx181s+xsEIaTZyr0C8f21vIIhEM=", 
+            "RequestId": "3797B57AFEE41F95", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "CjOrJd/WRAT7a8JX2nVwW0VDrml0+U++vQtETDjMsvaT1Pqsx181s+xsEIaTZyr0C8f21vIIhEM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3797B57AFEE41F95", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The replication configuration was not found", 
+            "Code": "ReplicationConfigurationNotFoundError", 
+            "BucketName": "custodian-skunk-trails"
+        }
+    }
+}

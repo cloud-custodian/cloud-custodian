@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"RequiredEncryptedPutObject\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::ocampo-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "XiSdfoQIwWrwXUSJIsz9bDuKJt4kTH6rvUhbdrf4UqTxwSE77+fCuXHniYgSzbxRETNgVWwoT9k=", 
+            "RequestId": "A934B4A990F8EE3B", 
+            "HTTPHeaders": {
+                "content-length": "260", 
+                "x-amz-id-2": "XiSdfoQIwWrwXUSJIsz9bDuKJt4kTH6rvUhbdrf4UqTxwSE77+fCuXHniYgSzbxRETNgVWwoT9k=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "A934B4A990F8EE3B", 
+                "date": "Tue, 28 Mar 2017 21:12:13 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

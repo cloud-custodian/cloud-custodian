@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "JfCO54Y0/+v2PsqoqsoUJ2BcVuS2pG+cwLbxe/VqjYERRbYCih4F7EDIvItptiX8wSLPpRrp7/A=", 
+            "RequestId": "3FB34BE9BDCB2C5E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "JfCO54Y0/+v2PsqoqsoUJ2BcVuS2pG+cwLbxe/VqjYERRbYCih4F7EDIvItptiX8wSLPpRrp7/A=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3FB34BE9BDCB2C5E", 
+                "date": "Tue, 28 Mar 2017 21:12:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The TagSet does not exist", 
+            "Code": "NoSuchTagSet", 
+            "BucketName": "sphere11-dev"
+        }
+    }
+}
