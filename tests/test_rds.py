@@ -26,8 +26,12 @@ from common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
 from c7n.resources import rds
+from c7n.utils import yaml_load
 from c7n import tags
 
+from common import BaseTest
+
+logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
@@ -800,6 +804,143 @@ class TestHealthEventsFilter(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+class TestRDSParameterGroupFilter(BaseTest):
+    """ This test assumes two parameter groups have been created and
+        assigned to two different RDS instances.
+    """
+    DEFAULT_REGION = 'us-east-1'  # N. Virginia
+    REQUIRED_PARAMETERGROUPS = [
+        'rds-pg-group-a',
+        'rds-pg-group-b',
+    ]
+    RECORD = False
+    EXAMPLE_YAML_STRING_SHOULD_EQ = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: log_destination
+                op: eq
+                value: stderr
+    '''
+    EXAMPLE_YAML_STRING_SHOULD_NOT_EQ = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: log_destination
+                op: ne
+                value: s3
+    '''
+
+    EXAMPLE_YAML_INT_DEFAULT = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: autovacuum_multixact_freeze_max_age
+                op: eq
+                value: 7
+                default: 7
+    '''
+    EXAMPLE_YAML_INT_SHOULD_EQ = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: full_page_writes
+                op: eq
+                value: 1
+    '''
+    EXAMPLE_YAML_INT_SHOULD_GT = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: full_page_writes
+                op: gt
+                value: 0
+    '''
+    EXAMPLE_YAML_INT_SHOULD_NOT_LT = '''
+        policies:
+          - name: filter-rds-by-paramgroup
+            resource: rds
+            filters:
+              - type: db-parameter
+                key: full_page_writes
+                op: lt
+                value: 1
+    '''
+
+    def _get_test_policy(self, name, yaml_doc, record=False):
+        if record:
+            logger.warn("%s is RECORDING" % self.__class__.__name__)
+            session_factory = self.record_flight_data(
+                "_".join(['test', self.__class__.__name__, name])
+            )
+
+        else:
+            logger.debug("%s is replaying" % self.__class__.__name__)
+            session_factory = self.replay_flight_data(
+                "_".join(['test', self.__class__.__name__, name])
+            )
+
+        policy = self.load_policy(yaml_load(yaml_doc)['policies'][0],
+                                  session_factory=session_factory)
+
+        return policy
+
+    def test_string_should_eq(self):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        policy = self._get_test_policy('equivalent_value_present',
+                                       self.EXAMPLE_YAML_STRING_SHOULD_EQ,
+                                       record=self.RECORD)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2,
+                         "failed to find rds with log_destination eq stderr")
+
+    def test_string_should_nopt_eq(self):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        policy = self._get_test_policy('nonequivalent_value_present',
+                                       self.EXAMPLE_YAML_STRING_SHOULD_NOT_EQ,
+                                       record=self.RECORD)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2,
+                         "should not find any rds with log_destination eq s3")
+
+    def test_int_with_default(self):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        policy = self._get_test_policy('missing value should use given default',
+                                       self.EXAMPLE_YAML_INT_DEFAULT,
+                                       record=self.RECORD)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2,
+                         "expected to use the given default to match")
+
+    def test_int_gt_zero(self):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        policy = self._get_test_policy('equivalent_value_present',
+                                       self.EXAMPLE_YAML_INT_SHOULD_GT,
+                                       record=self.RECORD)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2,
+                         "expected full_page_writes to be > 0")
+
+    def test_int_not_lt_zero(self):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        policy = self._get_test_policy('equivalent_value_present',
+                                       self.EXAMPLE_YAML_INT_SHOULD_NOT_LT,
+                                       record=self.RECORD)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0,
+                         "should not have passed any resources")
+
+
 class Resize(BaseTest):
 
     def get_waiting_client(self, session_factory, session, name):
@@ -931,3 +1072,4 @@ class Resize(BaseTest):
         wait_until('modifying')
         wait_until('available')
         self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
+
