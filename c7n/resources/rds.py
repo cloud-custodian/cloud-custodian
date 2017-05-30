@@ -294,6 +294,16 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(dbs)
 
 
+@filters.register('age')
+class RdsInstanceAge(AgeFilter):
+
+    schema = type_schema(
+        'age',
+        days={'type': 'number'},
+        op={'type': 'string', 'enum': OPERATORS.keys()})
+    date_attribute = 'InstanceCreateTime'
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Mark a RDS instance for specific custodian action

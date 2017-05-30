@@ -31,6 +31,16 @@ from c7n import tags
 
 class RDSTest(BaseTest):
 
+    def test_rds_instance_age_filter(self):
+        factory = self.replay_flight_data('test_rds_instance_age_filter')
+        p = self.load_policy({
+            'name': 'rds-instance-age-filter',
+            'resource': 'rds',
+            'filters': [{'type': 'age', 'days': 7}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
     def test_rds_autopatch(self):
         session_factory = self.replay_flight_data('test_rds_auto_patch')
         p = self.load_policy({
