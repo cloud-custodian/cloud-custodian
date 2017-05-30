@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import functools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -22,7 +23,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks)
+    type_schema, local_session, get_account_id, generate_arn, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -48,7 +49,22 @@ class RDSCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    _generate_arn = _account_id = None
 
+    @property
+    def account_id(self):
+        if self._account_id is None:
+            session = local_session(self.session_factory)
+            self._account_id = get_account_id(session)
+        return self._account_id
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds-cluster', region=self.config.region,
+                account_id=self.account_id, resource_type='rds-cluster')
+        return self._generate_arn
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
