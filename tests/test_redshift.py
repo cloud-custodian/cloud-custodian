@@ -203,6 +203,33 @@ class TestRedshift(BaseTest):
             cluster_tags.append(cluster_tag_elem['Tag'])
         self.assertEqual(cluster_tags, tag_snapshot)
 
+    def test_redshift_snapshot_copy_cluster_tags(self):
+        session_factory = self.replay_flight_data(
+            'test_redshift_copy_cluster_tags')
+
+        results = session_factory().client(
+            'redshift').describe_tags(
+            ResourceName='arn:aws:redshift:us-east-1:644160558196:cluster:test')
+        tags1 = {t1['Tag']['Key']: t1['Tag']['Value'] for t1 in results['TaggedResources']}
+        self.assertEqual(tags1, {'c1': 'v1'})
+
+        policy = self.load_policy({
+            'name': 'redshiftsnapshot-policy',
+            'resource': 'redshift-snapshot',
+            'actions': [{
+                'type': 'copy-cluster-tags',
+                'tags': ['c1']}]},
+            config={'region': 'us-east-1'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
+        arn = policy.resource_manager.generate_arn(
+            resources[0]['SnapshotIdentifier'])
+        results = session_factory().client('redshift').describe_tags(ResourceName=arn)['TaggedResources']
+        tags2 = {t1['Tag']['Key']: t1['Tag']['Value'] for t1 in results}
+        self.assertEqual(tags1,tags2)
+
     def test_redshift_vpc_routing(self):
         factory = self.replay_flight_data('test_redshift_vpc_routing')
         client = factory().client('redshift')
