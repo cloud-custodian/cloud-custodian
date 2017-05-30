@@ -460,16 +460,20 @@ class Notify(EventAction):
 
     def send_sns(self, message):
         topic = self.data['transport']['topic']
-        region = topic.split(':', 5)[3]
+        region = self.manager.config.region
+        owner_id = self.manager.config.account_id
+        topic_arn="arn:aws:sns:"+region+":"+owner_id+":"+topic
         client = self.manager.session_factory(region=region, assume=self.assume_role).client('sns')
         client.publish(
-            TopicArn=topic,
+            TopicArn=topic_arn,
             Message=base64.b64encode(zlib.compress(utils.dumps(message)))
         )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = queue.split('.', 2)[1]
+        region = self.manager.config.region
+        owner_id = self.manager.config.account_id
+        queue_url="https://sqs."+region+".amazonaws.com/"+owner_id+"/"+queue
         client = self.manager.session_factory(region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
@@ -478,7 +482,7 @@ class Notify(EventAction):
             },
         }
         result = client.send_message(
-            QueueUrl=queue,
+            QueueUrl=queue_url,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
             MessageAttributes=attrs)
         return result['MessageId']
