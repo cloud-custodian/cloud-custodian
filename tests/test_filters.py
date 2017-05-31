@@ -147,25 +147,38 @@ class TestValueFilter(unittest.TestCase):
     def test_value_type(self):
         sentinel = datetime.now()
         value = 5
+        resource = {'a': 1, 'Tags': [{'Key': 'xtra', 'Value': 'hello'}]}
         vf = filters.factory({'tag:ASV': 'absent'})
         vf.vtype = 'size'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
         vf.vtype = 'age'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (0, sentinel))
         vf.vtype = 'cidr'
         sentinel = '10.0.0.0/16'
         value = '10.10.10.10'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(
             (str(res[0]), str(res[1])),
             (sentinel, value),
         )
         vf.vtype = 'cidr_size'
         value = '10.10.10.300'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
+
+        vf.vtype = 'expr'
+        value = 'tag:xtra'
+        sentinel = None
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 'hello'))
+
+        vf.vtype = 'expr'
+        value = 'a'
+        sentinel = None
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 1))
 
 
 class TestAgeFilter(unittest.TestCase):

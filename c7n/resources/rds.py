@@ -287,6 +287,15 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "DBSubnetGroup.Subnets[].SubnetIdentifier"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
 
@@ -718,8 +727,9 @@ class ResizeInstance(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Sets the 'BackupRetentionPeriod' value for automated snapshots
-
+    """
+    Sets the 'BackupRetentionPeriod' value for automated snapshots,
+    enforce (min, max, exact) sets retention days occordingly.
     :example:
 
         .. code-block: yaml
@@ -736,12 +746,15 @@ class RetentionWindow(BaseAction):
                   - type: retention
                     days: 7
                     copy-tags: true
+                    enforce: exact
     """
 
     date_attribute = "BackupRetentionPeriod"
     schema = type_schema(
-        'retention',
-        **{'days': {'type': 'number'}, 'copy-tags': {'type': 'boolean'}})
+        'retention', **{'days': {'type': 'number'},
+                        'copy-tags': {'type': 'boolean'},
+                        'enforce': {'type': 'string', 'enum': [
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBInstance',)
 
     def process(self, dbs):
@@ -763,14 +776,30 @@ class RetentionWindow(BaseAction):
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
+        retention_type = self.data['enforce', 'min'].lower()
 
-        if ((current_retention < new_retention or
+        if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
                 resource,
                 max(current_retention, new_retention),
                 new_copy_tags)
+            return resource
+
+        if ((retention_type == 'max' or
+             current_copy_tags != new_copy_tags) and
+                _db_instance_eligible_for_backup(resource)):
+            self.set_retention_window(
+                resource,
+                min(current_retention, new_retention),
+                new_copy_tags)
+            return resource
+
+        if ((retention_type == 'exact' or
+             current_copy_tags != new_copy_tags) and
+                _db_instance_eligible_for_backup(resource)):
+            self.set_retention_window(resource, new_retention, new_copy_tags)
             return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
