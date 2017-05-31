@@ -119,6 +119,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('param')
 class Parameter(ValueFilter):
     """Filter redshift clusters based on parameter values

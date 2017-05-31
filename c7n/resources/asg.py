@@ -143,6 +143,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return subnet_ids
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes.

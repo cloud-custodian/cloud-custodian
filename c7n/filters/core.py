@@ -37,7 +37,7 @@ class FilterValidationError(Exception):
 
 
 # Matching filters annotate their key onto objects
-ANNOTATION_KEY = "MatchedFilters"
+ANNOTATION_KEY = "c7n:MatchedFilters"
 
 
 def glob_match(value, pattern):

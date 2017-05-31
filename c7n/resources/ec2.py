@@ -168,6 +168,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.

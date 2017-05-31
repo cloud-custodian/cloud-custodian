@@ -287,6 +287,15 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "DBSubnetGroup.Subnets[].SubnetIdentifier"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
 
