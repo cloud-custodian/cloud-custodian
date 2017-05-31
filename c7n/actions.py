@@ -418,11 +418,16 @@ class Notify(EventAction):
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
                      }}]
-            }
+            },
+            'assume_role': {'type': 'boolean'}
         }
     }
 
     batch_size = 250
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Notify, self).__init__(data, manager, log_dir)
+        self.assume_role = data.get('assume_role', True)
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -438,6 +443,7 @@ class Notify(EventAction):
         for batch in utils.chunks(resources, self.batch_size):
             message = {'resources': batch,
                        'event': event,
+                       'account_id': self.manager.config.account_id,
                        'account': account_name,
                        'action': self.data,
                        'region': self.manager.config.region,
@@ -456,7 +462,7 @@ class Notify(EventAction):
     def send_sns(self, message):
         topic = self.data['transport']['topic']
         region = topic.split(':', 5)[3]
-        client = self.manager.session_factory(region=region).client('sns')
+        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sns')
         client.publish(
             TopicArn=topic,
             Message=base64.b64encode(zlib.compress(utils.dumps(message)))
@@ -465,7 +471,7 @@ class Notify(EventAction):
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
         region = queue.split('.', 2)[1]
-        client = self.manager.session_factory(region=region).client('sqs')
+        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
                 'DataType': 'String',
@@ -546,16 +552,16 @@ class AutoTagUser(EventAction):
 
         user = None
         if utype == "IAMUser":
-            user               = event['userIdentity']['userName']
+            user = event['userIdentity']['userName']
             principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
-            user               = event['userIdentity']['arn']
+            user = event['userIdentity']['arn']
+            prefix, user = user.rsplit('/', 1)
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
-            prefix, user       = user.rsplit('/', 1)
             # instance role
             if user.startswith('i-'):
                 return
-            # lambda function
+            # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
         if user is None:
@@ -582,7 +588,6 @@ class AutoTagUser(EventAction):
         new_tags = {
             self.data['tag']: user
         }
-        principal_id_key = self.data.get('principal_id_tag', None)
         # if principal_id_key is set (and value), we'll set the principalId tag.
         principal_id_key = self.data.get('principal_id_tag', None)
         if principal_id_key and principal_id_value:

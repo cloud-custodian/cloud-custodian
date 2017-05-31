@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5682d714-20c4-47f4-bd69-9d7007387bb7", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 30 May 2017 01:17:31 GMT"
+            }
+        }, 
+        "NetworkInterface": {
+            "Status": "pending", 
+            "MacAddress": "06:e2:4d:5d:aa:aa", 
+            "SourceDestCheck": true, 
+            "VpcId": "vpc-fcaa6085", 
+            "Description": "", 
+            "NetworkInterfaceId": "eni-d3b3abdd", 
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true, 
+                    "PrivateIpAddress": "10.4.9.112"
+                }
+            ], 
+            "RequesterManaged": false, 
+            "Groups": [
+                {
+                    "GroupName": "db-tier", 
+                    "GroupId": "sg-09053177"
+                }, 
+                {
+                    "GroupName": "web-tier", 
+                    "GroupId": "sg-a81a2ed6"
+                }
+            ], 
+            "Ipv6Addresses": [], 
+            "AvailabilityZone": "us-east-1e", 
+            "RequesterId": "AIDAJEZOTH6YPO3DY45QW", 
+            "SubnetId": "subnet-ff7f5bc3", 
+            "OwnerId": "644160558196", 
+            "TagSet": [], 
+            "PrivateIpAddress": "10.4.9.112"
+        }
+    }
+}

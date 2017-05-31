@@ -78,6 +78,11 @@ def _default_options(p, blacklist=""):
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                    action="store_true")
 
+    if 'vars' not in blacklist:
+        # p.add_argument('--vars', default=None,
+        #               help='Vars file to substitute into policy')
+        p.set_defaults(vars=None)
+
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
@@ -111,9 +116,16 @@ def _default_region(options):
 
     try:
         options.regions = [utils.get_profile_session(options).region_name]
-        log.debug("using default region:%s from boto" % options.regions[0])
     except:
-        return
+        log.warning('Could not determine default region')
+        options.regions = [None]
+
+    if options.regions[0] is None:
+        print('Error: No default region set. Specify a default via AWS_DEFAULT_REGION',
+              'or setting a region in ~/.aws/config', file=sys.stderr)
+        sys.exit(1)
+
+    log.debug("using default region:%s from boto" % options.regions[0])
 
 
 def _default_account_id(options):
@@ -152,9 +164,7 @@ def _report_options(p):
         help="Format to output data in (default: %(default)s). "
         "Options include simple, grid, rst")
 
-    # We don't include `region` because the report command ignores it
-    p.add_argument("--region", dest='regions', default=[DEFAULT_REGION],
-                   help=argparse.SUPPRESS)
+    p.set_defaults(regions=[])
 
 
 def _metrics_options(p):
@@ -297,8 +307,23 @@ def setup_parser():
     # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
-    run_desc = ("Execute the policies in a config file")
-    run = subs.add_parser("run", description=run_desc, help=run_desc)
+    run_desc = "\n".join((
+        "Execute the policies in a config file",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc, help=run_desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)

@@ -80,6 +80,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @actions.register('delete')
 class Delete(BaseAction):
     """Action to delete a RDS cluster
@@ -150,7 +153,9 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Action to set the retention period on rds cluster snapshots
+    """
+    Action to set the retention period on rds cluster snapshots,
+    enforce (min, max, exact) sets retention days occordingly.
 
     :example:
 
@@ -167,14 +172,16 @@ class RetentionWindow(BaseAction):
                 actions:
                   - type: retention
                     days: 21
+                    enforce: min
     """
 
     date_attribute = "BackupRetentionPeriod"
     # Tag copy not yet available for Aurora:
     #   https://forums.aws.amazon.com/thread.jspa?threadID=225812
     schema = type_schema(
-        'retention',
-        **{'days': {'type': 'number'}})
+        'retention', **{'days': {'type': 'number'},
+                        'enforce': {'type': 'string', 'enum': [
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBCluster',)
 
     def process(self, clusters):
@@ -193,11 +200,22 @@ class RetentionWindow(BaseAction):
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
+        retention_type = self.data['enforce', 'min'].lower()
 
-        if current_retention < new_retention:
+        if retention_type == 'min':
             self.set_retention_window(
                 cluster,
                 max(current_retention, new_retention))
+            return cluster
+
+        if retention_type == 'max':
+            self.set_retention_window(
+                cluster,
+                min(current_retention, new_retention))
+            return cluster
+
+        if retention_type == 'exact':
+            self.set_retention_window(cluster, new_retention)
             return cluster
 
     def set_retention_window(self, cluster, retention):

@@ -41,18 +41,16 @@ from c7n.version import version
 from c7n.resources import load_resources
 
 
-def load(options, path, format='yaml', validate=True):
+def load(options, path, format='yaml', validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
-    with open(path) as fh:
-        if format == 'yaml':
-            data = utils.yaml_load(fh.read())
-        elif format == 'json':
-            data = utils.loads(fh.read())
-            validate = False
+    data = utils.load_file(path, format=format, vars=vars)
+
+    if format == 'json':
+        validate = False
 
     # Test for empty policy file
     if not data or data.get('policies') is None:
@@ -122,11 +120,18 @@ class PolicyCollection(object):
             for region in svc_regions:
                 if available_regions and region not in available_regions:
                     level = 'all' in self.options.regions and logging.DEBUG or logging.WARNING
-                    self.log(level, "policy:%s resources:%s not available in region:%s",
-                             p['name'], p['resource'], region)
+                    self.log.log(
+                        level, "policy:%s resources:%s not available in region:%s",
+                        p.name, p.resource_type, region)
                     continue
                 options_copy = copy.copy(self.options)
                 options_copy.region = str(region)
+
+                if len(regions) > 1 or 'all' in regions and getattr(
+                        self.options, 'output_dir', None):
+                    options_copy.output_dir = (
+                        self.options.output_dir.rstrip('/') + '/%s' % region)
+
                 policies.append(
                     Policy(p.data, options_copy, session_factory=self.test_session_factory()))
         return PolicyCollection(policies, self.options)
@@ -244,7 +249,7 @@ class PullMode(PolicyExecutionMode):
             return
 
         with self.policy.ctx:
-            self.policy.log.info(
+            self.policy.log.debug(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
                 self.policy.options.region or 'default',
@@ -254,9 +259,10 @@ class PullMode(PolicyExecutionMode):
             resources = self.policy.resource_manager.resources()
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s has count:%d time:%0.2f" % (
+                "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
                     self.policy.name,
                     self.policy.resource_type,
+                    self.policy.options.region,
                     len(resources), rt))
             self.policy.ctx.metrics.put_metric(
                 "ResourceCount", len(resources), "Count", Scope="Policy")
