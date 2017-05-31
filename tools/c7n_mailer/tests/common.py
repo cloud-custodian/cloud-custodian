@@ -64,15 +64,7 @@ RESOURCE_1 = {
             'Key': 'CreatorName'
         }
     ],
-    'Encrypted': False,
-    'VolumeType': 'gp2',
-    'VolumeId': 'vol-01a0e6ea6b89f0099',
-    'State': 'available',
-    'Iops': 300,
-    'MatchedFilters': ['Attachments', 'tag:maid_status'],
-    'SnapshotId': '',
-    'CreateTime': '2017-05-02T18:51:36.216000+00:00',
-    'Size': 100
+    'VolumeId': 'vol-01a0e6ea6b89f0099'
 }
 
 SQS_MESSAGE_1 = {
@@ -81,7 +73,7 @@ SQS_MESSAGE_1 = {
     'action': {
         'to': ['resource-owner', 'ldap_uid_tags'],
         'email_ldap_username_manager': True,
-        'template': '/custodian/email/jinja_template.j2',
+        'template': '',
         'priority_header': '1',
         'type': 'notify',
         'transport': {'queue': 'xxx', 'type': 'sqs'},
@@ -99,7 +91,7 @@ SQS_MESSAGE_1 = {
             {
                 'to': ['resource-owner', 'ldap_uid_tags'],
                 'email_ldap_username_manager': True,
-                'template': '/custodian/email/jinja_template.j2',
+                'template': '',
                 'priority_header': '1',
                 'type': 'notify',
                 'subject': 'EBS Volumes will be DELETED in 15 DAYS!'

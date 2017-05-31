@@ -160,7 +160,8 @@ class LocalSqlite(object):
         sqlite_result = self.sqlite.execute(sqlite_query)
         result = sqlite_result.fetchall()
         if len(result) != 1:
-            self.log.error('Did not get 1 result from sqlite, something went wrong.')
+            error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
+            self.log.error(error_msg)
             return None
         return json.loads(result[0][1])
 

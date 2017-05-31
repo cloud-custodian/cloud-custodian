@@ -86,8 +86,8 @@ class MailerSqsQueueProcessor(object):
         for all resources enforce by that policy
     - you put an sns topic in the to: field of the notify of your policy, we send an sns
         message for all resources enforce by that policy
-    - an event does a notify, we lookup the event aws username, get their ldap email
-        and send them an email about a policy enforcement (from lambda) for the event
+    - an lambda enforces a policy based on an event, we lookup the event aws username, get their
+        ldap email and send them an email about a policy enforcement (from lambda) for the event
     - resource-owners has a list of tags, SupportEmail, OwnerEmail, if your resources
         include those tags with valid emails, we'll send an email for those resources
         any others
@@ -99,6 +99,8 @@ class MailerSqsQueueProcessor(object):
         aws_sqs = self.session.client('sqs')
         sqs_messages = MailerSqsQueueIterator(aws_sqs, self.receive_queue, self.logger)
         sqs_messages.msg_attributes = ['mtype', 'recipient']
+        # lambda doesn't support multiprocessing, so we don't instantiate any mp stuff
+        # unless it's being run from CLI on a normal system with SHM
         if parallel:
             import multiprocessing
             process_pool = multiprocessing.Pool(processes=self.max_num_processes)
@@ -148,5 +150,5 @@ class MailerSqsQueueProcessor(object):
         # this sections gets the map of sns_to_addresses to rendered_jinja messages
         # (with resources baked in) and delivers the message to each sns topic
         sns_delivery = SnsDelivery(self.config, self.session, self.logger)
-        sns_addrs_to_messages = sns_delivery.get_sns_addrs_to_messages(sqs_message)
-        sns_delivery.deliver_messages(sns_addrs_to_messages, sqs_message)
+        sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
+        sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)

@@ -116,10 +116,12 @@ class EmailDelivery(object):
             # and finally we'll make it a tuple, since that is hashable and can be a key in a dict
             resource_emails.sort()
             resource_emails = tuple(set(resource_emails))
-            email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
+            # only if there are valid emails available, add it to the map
+            if resource_emails:
+                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
         if email_to_addrs_to_resources_map == {}:
             self.logger.debug('Found no email addresses, sending no emails.')
-        # eg: { ('milton@initech.com', 'peter@initech.com'): ['resource1', 'resource2', 'etc'] }
+        # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
         return email_to_addrs_to_resources_map
 
     def get_to_addrs_email_messages_map(self, sqs_message):

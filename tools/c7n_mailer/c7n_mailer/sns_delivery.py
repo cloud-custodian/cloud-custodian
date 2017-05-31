@@ -24,12 +24,12 @@ class SnsDelivery(object):
         self.aws_sts   = session.client('sts')
         self.sns_cache = {}
 
-    def deliver_messages(self, sns_addrs_to_messages, sqs_message):
-        for sns_message_attrs in sns_addrs_to_messages:
-            topic = sns_message_attrs['topic']
-            subject = sns_message_attrs['subject']
-            sns_message = sns_message_attrs['sns_message']
-            self.deliver_sns(topic, subject, sns_message, sqs_message)
+    def deliver_sns_messages(self, packaged_sns_messages, sqs_message):
+        for packaged_sns_message in packaged_sns_messages:
+            topic = packaged_sns_message['topic']
+            subject = packaged_sns_message['subject']
+            sns_message = packaged_sns_message['sns_message']
+            self.deliver_sns_message(topic, subject, sns_message, sqs_message)
 
     def get_valid_sns_from_list(self, possible_sns_values):
         sns_addresses = []
@@ -38,7 +38,7 @@ class SnsDelivery(object):
                 sns_addresses.append(target)
         return sns_addresses
 
-    def get_packaged_sns_message(self, sqs_message, policy_sns_address, subject, resources):
+    def get_sns_message_package(self, sqs_message, policy_sns_address, subject, resources):
         rendered_jinja_body = get_rendered_jinja(
             policy_sns_address,
             sqs_message,
@@ -51,41 +51,15 @@ class SnsDelivery(object):
             'sns_message': rendered_jinja_body
         }
 
-    def get_sns_addrs_to_messages(self, sqs_message):
-        policy_to_sns_addresses = self.get_valid_sns_from_list(sqs_message['action'].get('to', []))
-        sns_addrs_to_rendered_jinja_messages = []
+    def get_sns_message_packages(self, sqs_message):
+        sns_to_resources_map = self.get_sns_addrs_to_resources_map(sqs_message)
         subject = get_message_subject(sqs_message)
-        # go over all sns_addresses from the to field
-        for policy_sns_address in policy_to_sns_addresses:
-            # add packaged sns message to the list to be sent later
-            # from the notify to field
-            sns_addrs_to_rendered_jinja_messages.append(
-                self.get_packaged_sns_message(
-                    sqs_message,
-                    policy_sns_address,
-                    subject,
-                    sqs_message['resources']
-                )
-            )
-        # get sns topics / messages inside resource-owners tags
-        sns_to_resources_map = {}
-        for resource in sqs_message['resources']:
-            resource_owner_tag_keys = self.config.get('contact_tags', [])
-            possible_sns_tag_values = get_resource_tag_targets(
-                resource,
-                resource_owner_tag_keys
-            )
-            sns_tag_values = self.get_valid_sns_from_list(possible_sns_tag_values)
-            # for each resource, get any valid sns topics, and add them to the map
-            for sns_tag_value in sns_tag_values:
-                if sns_tag_value in policy_to_sns_addresses:
-                    continue
-                sns_to_resources_map.setdefault(sns_tag_value, []).append(resource)
+        sns_addrs_to_rendered_jinja_messages = []
         # take the map with lists of resources, and jinja render them and add them
         # to sns_addrs_to_rendered_jinja_messages as an sns_message package
         for sns_topic, resources in sns_to_resources_map.iteritems():
             sns_addrs_to_rendered_jinja_messages.append(
-                self.get_packaged_sns_message(
+                self.get_sns_message_package(
                     sqs_message,
                     sns_topic,
                     subject,
@@ -97,12 +71,34 @@ class SnsDelivery(object):
             self.logger.debug('Found no sns addresses, delivering no messages.')
         return sns_addrs_to_rendered_jinja_messages
 
+    def get_sns_addrs_to_resources_map(self, sqs_message):
+        policy_to_sns_addresses = self.get_valid_sns_from_list(sqs_message['action'].get('to', []))
+        sns_addrs_to_resources_map = {}
+        # go over all sns_addresses from the to field
+        for policy_sns_address in policy_to_sns_addresses:
+            sns_addrs_to_resources_map[policy_sns_address] = sqs_message['resources']
+        # get sns topics / messages inside resource-owners tags
+        for resource in sqs_message['resources']:
+            resource_owner_tag_keys = self.config.get('contact_tags', [])
+            possible_sns_tag_values = get_resource_tag_targets(
+                resource,
+                resource_owner_tag_keys
+            )
+            sns_tag_values = self.get_valid_sns_from_list(possible_sns_tag_values)
+            # for each resource, get any valid sns topics, and add them to the map
+            for sns_tag_value in sns_tag_values:
+                # skip sns topics in tags if they're already in the to field
+                if sns_tag_value in policy_to_sns_addresses:
+                    continue
+                sns_addrs_to_resources_map.setdefault(sns_tag_value, []).append(resource)
+        return sns_addrs_to_resources_map
+
     def target_is_sns(self, target):
         if target.startswith('arn:aws:sns'):
             return True
         return False
 
-    def deliver_sns(self, topic, subject, rendered_jinja_body, sqs_message):
+    def deliver_sns_message(self, topic, subject, rendered_jinja_body, sqs_message):
         # Max length of subject in sns is 100 chars
         if len(subject) > 100:
             subject = subject[:97] + '..'

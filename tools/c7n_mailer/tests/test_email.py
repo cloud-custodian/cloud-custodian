@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import boto3
+import copy
+import os
 import unittest
 
 from c7n_mailer.email_delivery import EmailDelivery
 from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
+from mock import patch, call
 
 EVENT = {
     'detail': {
@@ -44,6 +47,9 @@ class EmailTest(unittest.TestCase):
         self.aws_session = boto3.Session()
         self.email_delivery = MockEmailDelivery(MAILER_CONFIG, self.aws_session, logger)
         self.email_delivery.ldap_lookup.uid_regex = ''
+        tests_dir = '/tools/c7n_mailer/tests/'
+        template_abs_filename = '%s%sexample.jinja' % (os.path.abspath(os.curdir), tests_dir)
+        SQS_MESSAGE_1['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
         self.assertFalse(self.email_delivery.target_is_email('foobar'))
@@ -99,11 +105,88 @@ class EmailTest(unittest.TestCase):
         to_emails = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
         self.assertEqual(emails_to_resources_map, {to_emails: [RESOURCE_1]})
 
-    def test_emal_to_email_message_map_without_ldap_manager(self):
-        SQS_MESSAGE_1['policy']['actions'][1].pop('email_ldap_username_manager', None)
+    def test_email_to_email_message_map_without_ldap_manager(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['policy']['actions'][1].pop('email_ldap_username_manager', None)
         email_addrs_to_email_message_map = self.email_delivery.get_to_addrs_email_messages_map(
-            SQS_MESSAGE_1
+            SQS_MESSAGE
         )
         to_emails = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
         self.assertEqual(email_addrs_to_email_message_map.items()[0][0], to_emails)
         self.assertEqual(email_addrs_to_email_message_map.items()[0][1]['to'], ', '.join(to_emails))
+
+    def test_smtp_called_once(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        to_addrs_to_email_messages_map = self.email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
+        )
+        with patch("smtplib.SMTP") as mock_smtp:
+            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.iteritems():
+                self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
+                self.assertEqual(mimetext_msg['X-Priority'], '1')
+            # Get instance of mocked SMTP object
+            smtp_instance = mock_smtp.return_value
+            # Checks the mock has been called at least one time
+            self.assertTrue(smtp_instance.sendmail.called)
+            # Check the mock has been called only once
+            self.assertEqual(smtp_instance.sendmail.call_count, 1)
+            # Check the mock' calls are equal to a specific list of calls in a
+            # specific order
+            to_addrs = ['peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com']
+            self.assertEqual(
+                smtp_instance.sendmail.mock_calls,
+                [call(MAILER_CONFIG['from_address'], to_addrs, mimetext_msg.as_string())]
+            )
+
+    def test_smtp_called_multiple_times(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['action'].pop('priority_header', None)
+        RESOURCE_2 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': 'samir@initech.com',
+                    'Key': 'SupportEmail'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
+        }
+        SQS_MESSAGE['resources'].append(RESOURCE_2)
+        to_addrs_to_email_messages_map = self.email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
+        )
+        with patch("smtplib.SMTP") as mock_smtp:
+            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.iteritems():
+                self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
+                self.assertEqual(mimetext_msg.get('X-Priority'), None)
+                # self.assertEqual(mimetext_msg.get('X-Priority'), None)
+            # Get instance of mocked SMTP object
+            smtp_instance = mock_smtp.return_value
+            # Checks the mock has been called at least one time
+            self.assertTrue(smtp_instance.sendmail.called)
+            # Check the mock has been called only once
+            self.assertEqual(smtp_instance.sendmail.call_count, 2)
+
+    def test_emails_resource_mapping_multiples(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['action'].pop('priority_header', None)
+        RESOURCE_2 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': 'samir@initech.com',
+                    'Key': 'SupportEmail'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
+        }
+        SQS_MESSAGE['resources'].append(RESOURCE_2)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
+        )
+        email_1_to_addrs = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
+        email_2_to_addrs = ('samir@initech.com',)
+        self.assertEqual(emails_to_resources_map[email_1_to_addrs], [RESOURCE_1])
+        self.assertEqual(emails_to_resources_map[email_2_to_addrs], [RESOURCE_2])
