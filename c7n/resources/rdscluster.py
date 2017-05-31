@@ -80,6 +80,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @actions.register('delete')
 class Delete(BaseAction):
     """Action to delete a RDS cluster
