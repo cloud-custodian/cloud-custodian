@@ -64,11 +64,14 @@ log = logging.getLogger('custodian.reports')
 
 def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
+    regions = set([p.options.region for p in policies])
+    policy_names = set([p.name for p in policies])
     formatter = Formatter(
         policies[0].resource_manager,
         extra_fields=options.field,
-        no_default_fields=options.no_default_fields,
-        multipolicy=len(policies) > 1
+        include_default_fields=not options.no_default_fields,
+        include_region=len(regions) > 1,
+        include_policy=len(policy_names) > 1
     )
 
     records = []
@@ -138,8 +141,8 @@ def _get_values(record, field_list, tag_map):
 
 class Formatter(object):
 
-    def __init__(
-            self, resource_manager, extra_fields=(), no_default_fields=None, multipolicy=False):
+    def __init__(self, resource_manager, extra_fields=(), include_default_fields=True,
+                 include_region=False, include_policy=False):
 
         self.resource_manager = resource_manager
         # Lookup default fields for resource type.
@@ -155,7 +158,7 @@ class Formatter(object):
             if model.date:
                 mfields.append(model.date)
 
-        if not no_default_fields:
+        if include_default_fields:
             fields = OrderedDict(zip(mfields, mfields))
         else:
             fields = OrderedDict()
@@ -166,9 +169,12 @@ class Formatter(object):
             fields[h] = cexpr
 
         # Add these at the end so that they are the last fields
-        if multipolicy and not no_default_fields:
-            fields['Region'] = 'region'
-            fields['Policy'] = 'policy'
+        if include_default_fields:
+            if include_region:
+                fields['Region'] = 'region'
+
+            if include_policy:
+                fields['Policy'] = 'policy'
 
         self.fields = fields
 

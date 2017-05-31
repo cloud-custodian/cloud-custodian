@@ -84,7 +84,7 @@ class TestEC2Report(unittest.TestCase):
         formatter = Formatter(
             EC2_POLICY.resource_manager,
             extra_fields=extra_fields,
-            no_default_fields=True,
+            include_default_fields=False,
         )
         recs = [self.records['full']]
         rows = [self.rows['minimal_custom']]
@@ -141,7 +141,7 @@ class TestMultiReport(unittest.TestCase):
 
     def test_csv(self):
         # Test the extra headers for multi-policy
-        formatter = Formatter(EC2_POLICY.resource_manager, multipolicy=True)
+        formatter = Formatter(EC2_POLICY.resource_manager, include_region=True, include_policy=True)
         tests = [
             (['minimal'], ['minimal_multipolicy']),
         ]
