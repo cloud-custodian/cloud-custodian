@@ -22,15 +22,17 @@ from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
 from mock import patch, call
 
-EVENT = {
+# note principalId is very org/domain specific for federated?, it would be good to get
+# confirmation from capone on this event / test.
+CLOUDTRAIL_EVENT = {
     'detail': {
-        "userIdentity": {
-            "type": "WebIdentityUser",
-            # note principalId is very org/domain specific?, it would be good to get
-            # confirmation from capone on this event / test.
-            "principalId": "accounts.initech.com:michael_bolton",
-            "userName": "michael_bolton",
-            "identityProvider": "accounts.initech.com"
+        'userIdentity': {
+            "type": "IAMUser",
+            "principalId": "AIDAJ45Q7YFFAREXAMPLE",
+            "arn": "arn:aws:iam::123456789012:user/michael_bolton",
+            "accountId": "123456789012",
+            "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+            "userName": "michael_bolton"
         }
     }
 }
@@ -77,9 +79,9 @@ class EmailTest(unittest.TestCase):
 
     def test_event_owner_ldap_flow(self):
         targets = ['event-owner']
-        username = self.email_delivery.get_aws_username_from_event(EVENT)
+        username = self.email_delivery.get_aws_username_from_event(CLOUDTRAIL_EVENT)
         self.assertEqual(username, 'michael_bolton')
-        michael_bolton_email = self.email_delivery.get_event_owner_email(targets, EVENT)
+        michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
         self.assertEqual(michael_bolton_email, ['michael_bolton@initech.com'])
 
     def test_get_ldap_emails_from_resource(self):
@@ -190,3 +192,12 @@ class EmailTest(unittest.TestCase):
         email_2_to_addrs = ('samir@initech.com',)
         self.assertEqual(emails_to_resources_map[email_1_to_addrs], [RESOURCE_1])
         self.assertEqual(emails_to_resources_map[email_2_to_addrs], [RESOURCE_2])
+
+    def test_no_mapping_if_no_valid_emails(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['action']['to'].remove('ldap_uid_tags')
+        SQS_MESSAGE['resources'][0].pop('Tags', None)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
+        )
+        self.assertEqual(emails_to_resources_map, {})

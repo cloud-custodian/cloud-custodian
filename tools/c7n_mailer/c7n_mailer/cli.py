@@ -88,7 +88,7 @@ def get_and_validate_mailer_config(args):
 
 def get_c7n_mailer_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', required=True, help='mailer.yml config file')
+    parser.add_argument('-c', '--config', required=True, help='mailer.yml config file')
     debug_help_msg = 'sets c7n_mailer logger to debug, for maximum output (the default is INFO)'
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
     max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'

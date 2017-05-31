@@ -65,9 +65,16 @@ class EmailDelivery(object):
         # this whole section grabs any ldap uids (including manager emails if option is on)
         # and gets the emails for them and returns an array with all the emails
         ldap_uid_tag_values = get_resource_tag_targets(resource, ldap_uid_tag_keys)
+        email_manager = sqs_message['action'].get('email_ldap_username_manager', False)
         ldap_uid_emails = []
+        # some types of resources, like iam-user have 'Username' in the resource, if the policy
+        # opted in to resource_ldap_lookup_username: true, we'll do a lookup and send an email
+        if sqs_message['action'].get('resource_ldap_lookup_username'):
+            ldap_uid_emails = ldap_uid_emails + self.ldap_lookup.get_email_to_addrs_from_uid(
+                resource.get('UserName'),
+                manager=email_manager
+            )
         for ldap_uid_tag_value in ldap_uid_tag_values:
-            email_manager = sqs_message['action'].get('email_ldap_username_manager', False)
             ldap_emails_set = self.ldap_lookup.get_email_to_addrs_from_uid(
                 ldap_uid_tag_value,
                 manager=email_manager
@@ -174,7 +181,7 @@ class EmailDelivery(object):
         if priority_header and self.priority_header_is_valid(
             sqs_message['action']['priority_header']
         ):
-            message['X-Priority'] = priority_header
+            message['X-Priority'] = str(priority_header)
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
@@ -207,10 +214,7 @@ class EmailDelivery(object):
             )
         )
 
-    # note there are a few different kinds of userIdentity elements,
-    # it's not clear this function would work for everyone.
-    # https://docs.aws.amazon.com/awscloudtrail/latest/
-    # userguide/cloudtrail-event-reference-user-identity.html
+    # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
     def get_aws_username_from_event(self, event):
         if event is None:
             return None
@@ -219,8 +223,16 @@ class EmailDelivery(object):
             self.logger.warning("Could not get recipient from event \n %s" % (
                 format_struct(event)))
             return None
+        if identity['type'] == 'AssumedRole':
+            assume_role_msg = 'No ldap uid is associated with AssumedRole: %s' % identity['arn']
+            self.logger.debug(assume_role_msg)
+            return None
+        if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
+            return identity['userName']
         if identity['type'] == 'Root':
             return None
+        # this conditional is left here as a last resort, it should
+        # be better documented with an example UserIdentity json
         if ':' in identity['principalId']:
             user_id = identity['principalId'].split(':', 1)[-1]
         else:

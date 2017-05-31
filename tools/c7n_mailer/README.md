@@ -53,7 +53,7 @@ policies:
     actions:
       - type: notify
         template: default
-        priority_header: 2
+        priority_header: '2'
         subject: testing the c7n mailer
         to:
           - you@example.com
@@ -65,7 +65,7 @@ policies:
 Now run:
 
 ```
-c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 ```
 
 You should see output similar to the following:
@@ -170,7 +170,7 @@ policies:
       - type: notify
         template: default
         template_format: 'html'
-        priority_header: 1
+        priority_header: '1'
         subject: fix your tags
         to:
           - resource-owner
@@ -191,7 +191,7 @@ are either
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
-- `priority_header` to indicate the importance of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
+- `priority_header` to indicate the importance of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an string from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
@@ -207,7 +207,7 @@ For reference purposes, the JSON Schema of the `notify` action:
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
-    "priority_header": {"type": "integer"},
+    "priority_header": {"type": "string"},
     "template": {"type": "string"},
     "transport": {
       "type": "object",
