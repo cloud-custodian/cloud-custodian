@@ -28,6 +28,9 @@ from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
+from common import BaseTest
+
+logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
@@ -800,6 +803,46 @@ class TestHealthEventsFilter(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+class TestRDSParameterGroupFilter(BaseTest):
+    """ This test assumes two parameter groups have been created and
+        assigned to two different RDS instances.
+    """
+
+    PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
+        # filter_struct, test_func, err_message
+        ({'key': 'log_destination', 'op': 'eq', 'value': 'stderr'},
+         lambda r: len(r) == 1,
+         "instances with log_destination == stderr should be 2"),
+        ({'key': 'log_destination', 'op': 'eq', 'value': 's3'},
+         lambda r: len(r) == 0,
+         "instances with log_destination == s3 should be 0"),
+        ({'key': 'log_destination', 'op': 'ne', 'value': 'stderr'},
+         lambda r: len(r) == 0,
+         "instances with log_destination != stderr should be 0"),
+        ({'key': 'log_destination', 'op': 'ne', 'value': 's3'},
+         lambda r: len(r) == 1,
+         "instances with log_destination != s3 should be 2"),
+        ({'key': 'full_page_writes', 'op': 'eq', 'value': True},
+         lambda r: len(r) == 1,
+         "full_page_writes ( a boolean ) should be on"),
+    ]
+
+    def test_param_value_cases(self):
+        session_factory = self.replay_flight_data('test_rds_param_filter')
+        policy = self.load_policy(
+            {'name': 'rds-pg-filter', 'resource': 'rds'},
+            session_factory=session_factory)
+        resources = policy.resource_manager.resources()
+
+        for testcase in self.PARAMGROUP_PARAMETER_FILTER_TEST_CASES:
+            fdata, assertion, err_msg = testcase
+            f = policy.resource_manager.filter_registry.get(
+                'db-parameter')(fdata, policy.resource_manager)
+            f_resources = f.process(resources)
+            if not assertion(f_resources):
+                print len(f_resources), fdata, assertion
+                self.fail(err_msg)
+
 class Resize(BaseTest):
 
     def get_waiting_client(self, session_factory, session, name):
@@ -931,3 +974,4 @@ class Resize(BaseTest):
         wait_until('modifying')
         wait_until('available')
         self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
+

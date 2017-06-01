@@ -353,6 +353,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "Subnets[]"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('instance')
 class Instance(ValueFilter):
     """Filter ELB by an associated instance value(s)

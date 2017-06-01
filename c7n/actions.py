@@ -443,6 +443,7 @@ class Notify(EventAction):
         for batch in utils.chunks(resources, self.batch_size):
             message = {'resources': batch,
                        'event': event,
+                       'account_id': self.manager.config.account_id,
                        'account': account_name,
                        'action': self.data,
                        'region': self.manager.config.region,

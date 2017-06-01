@@ -168,6 +168,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
@@ -916,6 +919,67 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=i['NetworkInterfaceId'],
                 Groups=groups[idx])
+
+
+@actions.register('set-instance-profile')
+class SetInstanceProfile(BaseAction):
+    """Sets (or removes) the instance profile for an existing EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name:
+            resource: ec2
+            query:
+              - IamInstanceProfile: absent
+            actions:
+              - type: set-instance-profile
+                name: default
+
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/disassociate-iam-instance-profile.html
+    """
+
+    schema = type_schema(
+        'set-instance-profile',
+        **{'name': {'type': 'string'}})
+
+    permissions = (
+        'ec2:AssociateIamInstanceProfile',
+        'ec2:DisassociateIamInstanceProfile',
+        'iam:PassRole')
+
+    def process(self, instances):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name', '')
+
+        for i in instances:
+            if profile_name:
+                client.associate_iam_instance_profile(
+                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    InstanceId=i['InstanceId'])
+            else:
+                response = client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {
+                            'Name': 'instance-id',
+                            'Values': [i['InstanceId']],
+                        },
+                        {
+                            'Name': 'state',
+                            'Values': ['associating', 'associated']
+                        }
+                    ]
+                )
+                for a in response['IamInstanceProfileAssociations']:
+                    client.disassociate_iam_instance_profile(
+                        AssociationId=a['AssociationId']
+                    )
+
+        return instances
 
 
 # Valid EC2 Query Filters

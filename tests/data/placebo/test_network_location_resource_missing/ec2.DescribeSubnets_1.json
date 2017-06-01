@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "VpcId": "vpc-40523729", 
+                "Tags": [
+                    {
+                        "Value": "web", 
+                        "Key": "Location"
+                    }
+                ], 
+                "AvailableIpAddressCount": 250, 
+                "MapPublicIpOnLaunch": false, 
+                "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "State": "available", 
+                "AvailabilityZone": "us-east-2c", 
+                "SubnetId": "subnet-2f498962", 
+                "CidrBlock": "10.4.9.0/24", 
+                "AssignIpv6AddressOnCreation": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "dec7402c-6203-462c-a292-792b331b8445", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 29 May 2017 11:26:27 GMT"
+            }
+        }
+    }
+}

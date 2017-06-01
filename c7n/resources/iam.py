@@ -690,7 +690,6 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
-                print p
                 if self.match(p) and r not in matched:
                     matched.append(r)
         return matched
@@ -734,6 +733,7 @@ class UserAccessKey(ValueFilter):
             for k in r['c7n:AccessKeys']:
                 if self.match(k):
                     matched.append(r)
+                    break
         return matched
 
 
