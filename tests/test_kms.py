@@ -40,35 +40,3 @@ class KMSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-    def test_kms(self):
-        session_factory = self.replay_flight_data('test_kms_exists')
-        p = self.load_policy({
-            'name': 'kms-count',
-            'resource': 'kms',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'AliasName',
-                    'value': '(.*c7n-test)',
-                    'op': 'regex'
-                }
-            ]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        key_id = resources[0]['TargetKeyId']
-        p = self.load_policy({
-            'name': 'kms-count',
-            'resource': 'kms-key',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'KeyId',
-                    'value': key_id
-                }
-            ]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
