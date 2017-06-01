@@ -39,4 +39,4 @@ class KMSTest(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 2)

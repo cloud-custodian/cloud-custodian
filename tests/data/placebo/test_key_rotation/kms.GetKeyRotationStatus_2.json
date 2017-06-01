@@ -3,14 +3,15 @@
     "data": {
         "KeyRotationEnabled": false, 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "4dd8143e-5506-11e6-b2ab-0b7ca1157ccf", 
+            "RequestId": "3e84aa34-36bd-11e7-822d-fb358a3e3549", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "4dd8143e-5506-11e6-b2ab-0b7ca1157ccf", 
+                "x-amzn-requestid": "3e84aa34-36bd-11e7-822d-fb358a3e3549", 
                 "content-length": "28", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Thu, 28 Jul 2016 21:00:24 GMT", 
+                "date": "Fri, 12 May 2017 02:46:48 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
