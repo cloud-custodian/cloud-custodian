@@ -49,6 +49,25 @@ def register_tags(filters, actions):
     actions.register('normalize-tag', NormalizeTag)
 
 
+def _common_tag_processer(executor_factory, batch_size, concurrency,
+                          process_resource_set, id_key, resources, tags,
+                          log):
+
+    with executor_factory(max_workers=concurrency) as w:
+        futures = []
+        for resource_set in utils.chunks(resources, size=batch_size):
+            futures.append(
+                w.submit(process_resource_set, resource_set, tags))
+
+        for f in as_completed(futures):
+            if f.exception():
+                log.error(
+                    "Exception with tags: %s on resources: %s \n %s" % (
+                        tags,
+                        ", ".join([r[id_key] for r in resource_set]),
+                        f.exception()))
+
+
 class TagTrim(Action):
     """Automatically remove tags from an ec2 resource.
 
@@ -107,7 +126,7 @@ class TagTrim(Action):
         # without some more complex matching wrt to grouping resources
         # by common tags populations.
         tag_map = {
-            t['Key']:t['Value'] for t in i.get('Tags', [])
+            t['Key']: t['Value'] for t in i.get('Tags', [])
             if not t['Key'].startswith('aws:')}
 
         # Space == 0 means remove all but specified
@@ -298,21 +317,9 @@ class Tag(Action):
 
         batch_size = self.data.get('batch_size', self.batch_size)
 
-        with self.executor_factory(max_workers=self.concurrency) as w:
-            futures = {}
-            for resource_set in utils.chunks(resources, size=batch_size):
-                futures[
-                    w.submit(
-                        self.process_resource_set, resource_set, tags)
-                ] = resource_set
-
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception removing tags: %s on resources:%s \n %s" % (
-                            tags,
-                            ", ".join([r[self.id_key] for r in resource_set]),
-                            f.exception()))
+        _common_tag_processer(
+            self.executor_factory, batch_size, self.concurrency,
+            self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(
@@ -344,22 +351,9 @@ class RemoveTag(Action):
         tags = self.data.get('tags', [DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
 
-        with self.executor_factory(max_workers=self.concurrency) as w:
-            futures = {}
-            for resource_set in utils.chunks(resources, size=batch_size):
-                futures[
-                    w.submit(
-                        self.process_resource_set, resource_set, tags)
-                ] = resource_set
-
-            for f in as_completed(futures):
-                if f.exception():
-                    resource_set = futures[f]
-                    self.log.error(
-                        "Exception removing tags: %s on resources:%s \n %s" % (
-                            tags,
-                            ", ".join([r[self.id_key] for r in resource_set]),
-                            f.exception()))
+        _common_tag_processer(
+            self.executor_factory, batch_size, self.concurrency,
+            self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, vol_set, tag_keys):
         client = utils.local_session(
@@ -492,6 +486,7 @@ class TagDelayedAction(Action):
     permissions = ('ec2:CreateTags',)
 
     batch_size = 200
+    concurrency = 2
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
 
@@ -525,17 +520,11 @@ class TagDelayedAction(Action):
 
         tags = [{'Key': tag, 'Value': msg}]
 
-        with self.executor_factory(max_workers=2) as w:
-            futures = []
-            for resource_set in utils.chunks(resources, size=self.batch_size):
-                futures.append(
-                    w.submit(self.process_resource_set, resource_set, tags))
+        batch_size = self.data.get('batch_size', self.batch_size)
 
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception tagging resource set: %s  \n %s" % (
-                            tags, f.exception()))
+        _common_tag_processer(
+            self.executor_factory, batch_size, self.concurrency,
+            self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, resource_set, tags):
         client = utils.local_session(self.manager.session_factory).client('ec2')
@@ -671,3 +660,157 @@ class NormalizeTag(Action):
                         "Exception renaming tag set \n %s" % (
                             f.exception()))
         return resources
+
+
+class UniversalTag(Tag):
+    """Applies one or more tags to the specified resources.
+    """
+
+    batch_size = 20
+    permissions = ('resourcegroupstaggingapi:TagResources',)
+
+    def process(self, resources):
+        self.id_key = self.manager.get_model().id
+
+        # Legacy
+        msg = self.data.get('msg')
+        msg = self.data.get('value') or msg
+
+        tag = self.data.get('tag', DEFAULT_TAG)
+        tag = self.data.get('key') or tag
+
+        # Support setting multiple tags in a single go with a mapping
+        tags = self.data.get('tags', {})
+
+        if msg:
+            tags[tag] = msg
+
+        batch_size = self.data.get('batch_size', self.batch_size)
+
+        _common_tag_processer(
+            self.executor_factory, batch_size, self.concurrency,
+            self.process_resource_set, self.id_key, resources, tags, self.log)
+
+    def process_resource_set(self, resource_set, tags):
+        client = utils.local_session(
+            self.manager.session_factory).client('resourcegroupstaggingapi')
+
+        arns = self.manager.get_arns(resource_set)
+
+        response = self.manager.retry(
+            client.tag_resources,
+            ResourceARNList=arns,
+            Tags=tags)
+
+        for f in response.get('FailedResourcesMap', ()):
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
+
+
+class UniversalUntag(RemoveTag):
+    """Removes the specified tags from the specified resources.
+    """
+
+    batch_size = 20
+
+    permissions = ('resourcegroupstaggingapi:UntagResources',)
+
+    def process_resource_set(self, resource_set, tag_keys):
+        client = utils.local_session(
+            self.manager.session_factory).client('resourcegroupstaggingapi')
+
+        arns = self.manager.get_arns(resource_set)
+
+        response = self.manager.retry(
+            client.untag_resources,
+            ResourceARNList=arns,
+            TagKeys=tag_keys)
+
+        for f in response.get('FailedResourcesMap', ()):
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
+
+
+class UniversalTagDelayedAction(TagDelayedAction):
+    """Tag resources for future action.
+
+    :example:
+
+        .. code-block :: yaml
+
+            policies:
+            - name: ec2-mark-stop
+              resource: ec2
+              filters:
+                - type: image-age
+                  op: ge
+                  days: 90
+              actions:
+                - type: mark-for-op
+                  tag: custodian_cleanup
+                  op: terminate
+                  days: 4
+    """
+
+    batch_size = 20
+    concurrency = 2
+    permissions = ('resourcegroupstaggingapi:TagResources',)
+
+    def process(self, resources):
+        self.id_key = self.manager.get_model().id
+
+        # Move this to policy? / no resources bypasses actions?
+        if not len(resources):
+            return
+
+        msg_tmpl = self.data.get('msg', self.default_template)
+
+        op = self.data.get('op', 'stop')
+        tag = self.data.get('tag', DEFAULT_TAG)
+        date = self.data.get('days', 4)
+
+        n = datetime.now(tz=tzutc())
+        action_date = n + timedelta(days=date)
+        msg = msg_tmpl.format(
+            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+
+        self.log.info("Tagging %d resources for %s on %s" % (
+            len(resources), op, action_date.strftime('%Y/%m/%d')))
+
+        tags = {tag: msg}
+
+        batch_size = self.data.get('batch_size', self.batch_size)
+
+        _common_tag_processer(
+            self.executor_factory, batch_size, self.concurrency,
+            self.process_resource_set, self.id_key, resources, tags, self.log)
+
+    def process_resource_set(self, resource_set, tags):
+        client = utils.local_session(
+            self.manager.session_factory).client('resourcegroupstaggingapi')
+
+        arns = self.manager.get_arns(resource_set)
+
+        response = self.manager.retry(
+            client.tag_resources,
+            ResourceARNList=arns,
+            Tags=tags)
+
+        for f in response.get('FailedResourcesMap', ()):
+            raise Exception("Resource:{} ".format(f) +
+                            "ErrorCode:{} ".format(
+                            response['FailedResourcesMap'][f]['ErrorCode']) +
+                            "StatusCode:{} ".format(
+                            response['FailedResourcesMap'][f]['StatusCode']) +
+                            "ErrorMessage:{}".format(
+                            response['FailedResourcesMap'][f]['ErrorMessage']))
