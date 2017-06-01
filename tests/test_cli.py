@@ -283,19 +283,16 @@ class ReportTest(CliTest):
         temp_dir = self.get_temp_dir()
 
         bad_policy_name = policy_name + '-nonexistent'
-        _, err = self.run_and_expect_failure(
+        log_output = self.capture_logging('custodian.commands')
+        self.run_and_expect_failure(
             ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file], 
             1)
-        
-        self.assertIn('Warning', err)
-        self.assertIn(policy_name, err)
+        self.assertIn(policy_name, log_output.getvalue())
 
         bad_resource_name = 'foo'
-        _, err = self.run_and_expect_failure(
+        self.run_and_expect_failure(
             ['custodian', 'report', '-s', temp_dir, '-t', bad_resource_name, yaml_file],
             1)
-        
-        self.assertIn('Warning', err)
 
 
 class LogsTest(CliTest):

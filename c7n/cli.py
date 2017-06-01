@@ -73,10 +73,15 @@ def _default_options(p, blacklist=""):
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
                         help="Only use policies with the given resource type")
 
-    p.add_argument("-v", "--verbose", action="store_true",
-                   help="Verbose logging")
-    p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
-                   action="store_true")
+    output = p.add_argument_group("output", "Output control")
+    output.add_argument("-v", "--verbose", action="count", help="Verbose logging")
+    if 'quiet' not in blacklist:
+        output.add_argument("-q", "--quiet", action="count",
+                            help="Less logging (repeatable, -qqq for no output)")
+    else:
+        output.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
+    output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
+                        action="store_true")
 
     if 'vars' not in blacklist:
         # p.add_argument('--vars', default=None,
@@ -121,8 +126,8 @@ def _default_region(options):
         options.regions = [None]
 
     if options.regions[0] is None:
-        print('Error: No default region set. Specify a default via AWS_DEFAULT_REGION',
-              'or setting a region in ~/.aws/config', file=sys.stderr)
+        log.error('No default region set. Specify a default via AWS_DEFAULT_REGION '
+                  'or setting a region in ~/.aws/config')
         sys.exit(1)
 
     log.debug("using default region:%s from boto" % options.regions[0])
@@ -144,7 +149,7 @@ def _default_account_id(options):
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    _default_options(p, blacklist=['region', 'cache', 'log-group'])
+    _default_options(p, blacklist=['region', 'cache', 'log-group', 'quiet'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -169,7 +174,7 @@ def _report_options(p):
 
 def _metrics_options(p):
     """ Add options specific to metrics subcommand. """
-    _default_options(p, blacklist=['log-group', 'output-dir', 'cache'])
+    _default_options(p, blacklist=['log-group', 'output-dir', 'cache', 'quiet'])
 
     p.add_argument(
         '--start', type=date_parse,
@@ -184,7 +189,7 @@ def _metrics_options(p):
 
 def _logs_options(p):
     """ Add options specific to logs subcommand. """
-    _default_options(p, blacklist=['cache'])
+    _default_options(p, blacklist=['cache', 'quiet'])
 
     # default time range is 0 to "now" (to include all log entries)
     p.add_argument(
@@ -217,9 +222,8 @@ def _schema_options(p):
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
     p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
-    p.add_argument(
-        '-v', '--verbose', action="store_true",
-        help="Verbose logging")
+    p.add_argument("-v", "--verbose", action="count", help="Verbose logging")
+    p.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
 
@@ -269,9 +273,8 @@ def setup_parser():
     version = subs.add_parser(
         'version', help="Display installed version of custodian")
     version.set_defaults(command='c7n.commands.version_cmd')
-    version.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Verbose Logging")
+    version.add_argument('-v', '--verbose', action="count", help="Verbose logging")
+    version.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     version.add_argument(
         "--debug", action="store_true",
         help="Print info for bug reports")
@@ -285,8 +288,8 @@ def setup_parser():
         "-c", "--config", help=argparse.SUPPRESS)
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
-    validate.add_argument("-v", "--verbose", action="store_true",
-                          help="Verbose Logging")
+    validate.add_argument("-v", "--verbose", action="count", help="Verbose Logging")
+    validate.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
     schema_desc = ("Browse the available vocabularies (resources, filters, and "
@@ -335,17 +338,42 @@ def setup_parser():
     return parser
 
 
+def _setup_logger(options):
+    level = 3 + (options.verbose or 0) - (options.quiet or 0)
+
+    if level <= 0:
+        # print nothing
+        log_level = logging.CRITICAL + 1
+    elif level == 1:
+        log_level = logging.ERROR
+    elif level == 2:
+        log_level = logging.WARNING
+    elif level == 3:
+        # default
+        log_level = logging.INFO
+    else:
+        log_level = logging.DEBUG
+
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+
+    external_log_level = logging.ERROR
+    if level <= 0:
+        external_log_level = logging.CRITICAL + 1
+    elif level >= 5:
+        external_log_level = logging.INFO
+
+    logging.getLogger('botocore').setLevel(external_log_level)
+    logging.getLogger('s3transfer').setLevel(external_log_level)
+
+
 def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
 
-    level = options.verbose and logging.DEBUG or logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
-    logging.getLogger('botocore').setLevel(logging.ERROR)
-    logging.getLogger('s3transfer').setLevel(logging.ERROR)
+    _setup_logger(options)
 
     # Support the deprecated -c option
     if getattr(options, 'config', None) is not None:
