@@ -1199,6 +1199,7 @@ class EncryptExtantKeys(ScanBucket):
         # If the data is already encrypted with KMS and the same key is provided
         # then we don't need to do anything
         if info.get('ServerSideEncryption') == 'aws:kms' and self.kms_id:
+            # Test using `in` because SSEKMSKeyId is the full ARN
             if self.kms_id in info.get('SSEKMSKeyId', ''):
                 return False
 
