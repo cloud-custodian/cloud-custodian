@@ -33,7 +33,46 @@ from common import BaseTest
 
 logger = logging.getLogger(name='c7n.tests')
 
+
 class RDSTest(BaseTest):
+
+    def test_rds_stop(self):
+        session_factory = self.replay_flight_data('test_rds_stop')
+        db_instance_id = 'rds-test-instance-1'
+        client = session_factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-stop',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': db_instance_id}],
+            'actions': ['start']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceStatus'], 'available')
+        result = client.describe_db_instances(
+            DBInstanceIdentifier=db_instance_id)
+        self.assertEqual(
+            result['DBInstances'][0]['DBInstanceStatus'], 'stopping')
+
+    def test_rds_start(self):
+        session_factory = self.replay_flight_data('test_rds_start')
+        db_instance_id = 'rds-test-instance-2'
+        client = session_factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-stop',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': db_instance_id}],
+            'actions': ['start']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceStatus'], 'stopped')
+        result = client.describe_db_instances(
+            DBInstanceIdentifier=db_instance_id)
+        self.assertEqual(
+            result['DBInstances'][0]['DBInstanceStatus'], 'starting')
 
     def test_rds_autopatch(self):
         session_factory = self.replay_flight_data('test_rds_auto_patch')
