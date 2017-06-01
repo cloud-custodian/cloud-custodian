@@ -24,17 +24,18 @@ from c7n.utils import get_retry
 
 class SessionFactory(object):
 
-    def __init__(self, region, profile=None, assume_role=None):
+    def __init__(self, region, profile=None, assume_role=None, external_id=None):
         self.region = region
         self.profile = profile
         self.assume_role = assume_role
+        self.external_id = external_id
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
                 self.assume_role, "CloudCustodian", session,
-                region or self.region)
+                region or self.region, self.external_id)
         else:
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
@@ -44,7 +45,7 @@ class SessionFactory(object):
         return session
 
 
-def assumed_session(role_arn, session_name, session=None, region=None):
+def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
@@ -65,10 +66,14 @@ def assumed_session(role_arn, session_name, session=None, region=None):
     retry = get_retry(('Throttling',))
 
     def refresh():
+
+        parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
+
+        if external_id is not None:
+            parameters['ExternalId'] = external_id
+
         credentials = retry(
-            session.client('sts').assume_role,
-            RoleArn=role_arn,
-            RoleSessionName=session_name)['Credentials']
+            session.client('sts').assume_role, **parameters)['Credentials']
         return dict(
             access_key=credentials['AccessKeyId'],
             secret_key=credentials['SecretAccessKey'],
