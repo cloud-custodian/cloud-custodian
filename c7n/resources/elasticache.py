@@ -125,6 +125,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 # added mark-for-op
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):

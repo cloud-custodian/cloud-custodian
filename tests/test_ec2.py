@@ -555,6 +555,63 @@ class TestSnapshot(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+class TestSetInstanceProfile(BaseTest):
+
+    def test_ec2_set_instance_profile_assocation(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_association')
+        policy = self.load_policy({
+            'name': 'ec2-test-set-instance-profile-association',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'MissingInstanceProfile'},
+                {'IamInstanceProfile': 'absent'}],
+            'actions': [
+                {'type': 'set-instance-profile',
+                 'name': 'ec2-default'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertGreaterEqual(len(resources), 1)
+        ec2 = session_factory().client('ec2')
+        resources = ec2.describe_instances(
+            InstanceIds=[r['InstanceId'] for r in resources]
+        )
+
+        for r in resources['Reservations']:
+            for i in r['Instances']:
+                self.assertIn('IamInstanceProfile', i)
+                self.assertIn('Arn', i['IamInstanceProfile'])
+                self.assertIn(':instance-profile/ec2-default', i['IamInstanceProfile']['Arn'])
+
+    def test_ec2_set_instance_profile_disassocation(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_disassociation')
+        policy = self.load_policy({
+            'name': 'ec2-test-set-instance-profile-disassociation',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'MissingInstanceProfile'},
+                {'type': 'value',
+                 'key': 'IamInstanceProfile.Arn',
+                 'op': 'regex',
+                 'value': '.*/ec2-default'}],
+            'actions': [
+                {'type': 'set-instance-profile'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertGreaterEqual(len(resources), 1)
+        ec2 = session_factory().client('ec2')
+        associations = ec2.describe_iam_instance_profile_associations(
+            Filters=[
+                {
+                    'Name': 'instance-id',
+                    'Values': [r['InstanceId'] for r in resources]
+                }
+            ]
+        )
+
+        for a in associations['IamInstanceProfileAssociations']:
+            self.assertIn(a['State'], ('disassociating', 'disassociated'))
 
 class TestEC2QueryFilter(unittest.TestCase):
 

@@ -2,8 +2,13 @@
     "status_code": 204, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 204, 
-            "RequestId": "GN31A8JpoNJK-TF9rIZ830saQzA6mUROeHgaDwSlEqoQD4g"
+            "RequestId": "CbT_n7TizXm_Rdy-ysFOlLymct5-YkHM82Ef0ckqfqv0E4E", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "CbT_n7TizXm_Rdy-ysFOlLymct5-YkHM82Ef0ckqfqv0E4E", 
+                "date": "Fri, 12 May 2017 00:15:34 GMT"
+            }
         }
     }
 }
