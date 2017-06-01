@@ -44,6 +44,12 @@ class Vpc(QueryResourceManager):
         dimension = None
         config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
+        default_report_fields = (
+            'VpcId',
+            'tag:Name',
+            'CidrBlock'
+
+        )
 
 
 @Vpc.filter_registry.register('flow-logs')
@@ -189,6 +195,11 @@ class SecurityGroup(QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
+        default_report_fields = (
+            'GroupId',
+            'GroupName',
+            'VpcId'
+        )
 
 
 @SecurityGroup.filter_registry.register('diff')
