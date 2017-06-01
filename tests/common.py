@@ -220,6 +220,7 @@ class Config(Bag):
             'profile': None,
             'account_id': ACCOUNT_ID,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': False,
             'output_dir': 's3://test-example/foo',

@@ -1234,19 +1234,34 @@ class S3Test(BaseTest):
         self.addCleanup(destroyBucket, client, bname)
         generateBucketContents(session.resource('s3'), bname)
 
-        key_id = '845ab6f1-744c-4edc-b702-efae6836818a'
+        key_one = '845ab6f1-744c-4edc-b702-efae6836818a'
         p = self.load_policy({
             'name': 'encrypt-keys',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [{'type': 'encrypt-keys',
                          'crypto': 'aws:kms',
-                         'key-id': key_id}]},
+                         'key-id': key_one}]},
             session_factory=session_factory)
         p.run()
         result = client.head_object(Bucket=bname, Key='home.txt')
         self.assertTrue('SSEKMSKeyId' in result)
-        self.assertTrue(key_id in result['SSEKMSKeyId'])
+        self.assertTrue(key_one in result['SSEKMSKeyId'])
+
+        # Now test that we can re-key it to something else
+        key_two = '5fd9f6d6-4294-4926-8719-1e85695e2ad6'
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'encrypt-keys',
+                         'crypto': 'aws:kms',
+                         'key-id': key_two}]},
+            session_factory=session_factory)
+        p.run()
+        result = client.head_object(Bucket=bname, Key='home.txt')
+        self.assertTrue('SSEKMSKeyId' in result)
+        self.assertTrue(key_two in result['SSEKMSKeyId'])
 
     def test_global_grants_filter_option(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)

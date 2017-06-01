@@ -1,0 +1,95 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstance": {
+            "PubliclyAccessible": true, 
+            "MasterUsername": "mxtester", 
+            "MonitoringInterval": 0, 
+            "LicenseModel": "postgresql-license", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-aa6c90c3"
+                }
+            ], 
+            "CopyTagsToSnapshot": true, 
+            "OptionGroupMemberships": [
+                {
+                    "Status": "pending-apply", 
+                    "OptionGroupName": "default:postgres-9-5"
+                }
+            ], 
+            "PendingModifiedValues": {}, 
+            "Engine": "postgres", 
+            "MultiAZ": false, 
+            "DBSecurityGroups": [], 
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.postgres9.5", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ], 
+            "AutoMinorVersionUpgrade": true, 
+            "PreferredBackupWindow": "04:35-05:05", 
+            "DBSubnetGroup": {
+                "Subnets": [
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-db9f62b2", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-2a"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-65dbce1d", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-2b"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-b77a4ffd", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-2c"
+                        }
+                    }
+                ], 
+                "DBSubnetGroupName": "default", 
+                "VpcId": "vpc-5f6c9936", 
+                "DBSubnetGroupDescription": "default", 
+                "SubnetGroupStatus": "Complete"
+            }, 
+            "ReadReplicaDBInstanceIdentifiers": [], 
+            "AllocatedStorage": 5, 
+            "DBInstanceArn": "arn:aws:rds:us-east-2:644160558196:db:mxtest4", 
+            "BackupRetentionPeriod": 7, 
+            "DBName": "mxtest", 
+            "PreferredMaintenanceWindow": "mon:09:26-mon:09:56", 
+            "DBInstanceStatus": "creating", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "EngineVersion": "9.5.4", 
+            "DomainMemberships": [], 
+            "StorageType": "gp2", 
+            "DbiResourceId": "db-HJC7IKBO2ACTLNNZCM7EX66IHE", 
+            "CACertificateIdentifier": "rds-ca-2015", 
+            "KmsKeyId": "arn:aws:kms:us-east-2:644160558196:key/38343899-6a22-4365-8777-3224dc078cab", 
+            "StorageEncrypted": true, 
+            "DBInstanceClass": "db.m4.large", 
+            "DbInstancePort": 0, 
+            "DBInstanceIdentifier": "mxtest4"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fd1e3c83-4191-11e7-94f6-2369bd255e2c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fd1e3c83-4191-11e7-94f6-2369bd255e2c", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3749", 
+                "content-type": "text/xml", 
+                "date": "Thu, 25 May 2017 21:34:54 GMT"
+            }
+        }
+    }
+}
