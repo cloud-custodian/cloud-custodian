@@ -73,14 +73,15 @@ def _default_options(p, blacklist=""):
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
                         help="Only use policies with the given resource type")
 
-    config.add_argument("-v", "--verbose", action="count", help="Verbose logging")
+    output = p.add_argument_group("output", "Output control")
+    output.add_argument("-v", "--verbose", action="count", help="Verbose logging")
     if 'quiet' not in blacklist:
-        config.add_argument("-q", "--quiet", action="count",
+        output.add_argument("-q", "--quiet", action="count",
                             help="Less logging (repeatable, -qqq for no output)")
     else:
-        config.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
-    config.add_argument("--debug", default=False, help=argparse.SUPPRESS,
-                   action="store_true")
+        output.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
+    output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
+                        action="store_true")
 
     if 'vars' not in blacklist:
         # p.add_argument('--vars', default=None,
