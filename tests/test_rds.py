@@ -28,6 +28,9 @@ from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
+from common import BaseTest
+
+logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
@@ -800,6 +803,65 @@ class TestHealthEventsFilter(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
+class TestRDSParameterGroupFilter(BaseTest):
+    """ This test assumes two parameter groups have been created and
+        assigned to two different RDS instances.
+    """
+    DEFAULT_REGION = 'us-east-1'  # N. Virginia
+    REQUIRED_PARAMETERGROUPS = [
+        'rds-pg-group-a',
+        'rds-pg-group-b',
+    ]
+
+    PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
+        # filter_struct, test_func, err_message
+        ({'key': 'log_destination', 'op': 'eq', 'value': 'stderr'},
+         lambda r: len(r) == 2,
+         "instances with log_destination == stderr should be 2"),
+        ({'key': 'log_destination', 'op': 'eq', 'value': 's3'},
+         lambda r: len(r) == 0,
+         "instances with log_destination == s3 should be 0"),
+        ({'key': 'log_destination', 'op': 'ne', 'value': 'stderr'},
+         lambda r: len(r) == 0,
+         "instances with log_destination != stderr should be 0"),
+        ({'key': 'log_destination', 'op': 'ne', 'value': 's3'},
+         lambda r: len(r) == 2,
+         "instances with log_destination != s3 should be 2"),
+        ({'key': 'autovacuum_multixact_freeze_max_age', 'op': 'eq', 'value': 7,
+          'default': 7},
+         lambda r: len(r) == 2,
+         "autovacuum_multixact_freeze_max_age should default to 7"),
+        ({'key': 'full_page_writes', 'op': 'eq', 'value': 1},
+         lambda r: len(r) == 2,
+         "full_page_writes ( a boolean ) should be on"),
+    ]
+
+    def _get_session_factory(self):
+        if not hasattr(self, '_sess_factory'):
+            self._sess_factory = self.replay_flight_data(
+                "_".join(['test', self.__class__.__name__]))
+        return self._sess_factory
+
+    def assert_policy(self, policy_struct, callback, err_msg):
+        self.change_environment(AWS_DEFAULT_REGION=self.DEFAULT_REGION)
+        session_factory = self._get_session_factory()
+        policy = self.load_policy(policy_struct,
+                                  session_factory=session_factory)
+        resources = policy.run()
+        self.assertTrue( callback(resources), err_msg)
+
+    def test_cases(self):
+        for testcase in self.PARAMGROUP_PARAMETER_FILTER_TEST_CASES:
+            policy_struct = {
+                'name': 'RDS_PARAMETERGROUP_FILTER',
+                'resource': 'rds',
+                'filters': [dict(type='db-parameter', **testcase[0]), ]
+            }
+            assertion = testcase[1]
+            error_message = testcase[2]
+            self.assert_policy(policy_struct, assertion, error_message)
+
+
 class Resize(BaseTest):
 
     def get_waiting_client(self, session_factory, session, name):
@@ -931,3 +993,4 @@ class Resize(BaseTest):
         wait_until('modifying')
         wait_until('available')
         self.assertEqual(describe()['AllocatedStorage'], 6)  # nearest gigabyte
+

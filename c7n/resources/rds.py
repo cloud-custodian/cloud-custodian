@@ -56,8 +56,8 @@ from concurrent.futures import as_completed
 from c7n.actions import (
     ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import (
-    CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
-    FilterValidationError)
+    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
+    OPERATORS, FilterValidationError)
 
 from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
@@ -1270,3 +1270,128 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+
+
+@filters.register('db-parameter')
+class ParameterGroupFilter(ValueFilter):
+    """
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-parametergroup-example
+                resource: rds
+                filters:
+                  - type: db-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+
+    based on the `describe_db_instances API`_
+
+    .. _describe_db_instances API: http://boto3.readthedocs.io/en/latest/\
+    reference/services/rds.html#RDS.Client.describe_db_instances
+    """
+
+    schema = {
+        'type': 'object',
+        # Doesn't mix well with inherits that extend
+        'additionalProperties': False,
+        'required': ['type', 'key', 'op', ],  # omit value for future "isnull"
+        'properties': {
+            'type': {'enum': ['db-parameter']},
+            'key': {'type': 'string'},
+            'default': {'oneOf': [
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'}
+            ]},
+            'value': {'oneOf': [
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'}
+            ]},
+            'op': {'enum': OPERATORS.keys()}}}
+
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters', )
+
+    _parametergroup_cache = {}
+
+    @staticmethod
+    def recast(val, datatype):
+        """ Re-cast the value based upon an AWS supplied datatype
+            and treat nulls sensibly.
+        """
+        ret_val = val
+        if datatype == 'string':
+            ret_val = str(val) if val else ""
+        elif datatype == 'boolean':
+            # AWS returns 1s and 0s for this
+            ret_val = 1 if val else 0
+        elif datatype == 'integer':
+            # slice out the literal value
+            # from between the last / and trailing }
+            if type(val) == str and \
+                    val.startswith('{') and \
+                    val.endswith('}') and \
+                    '/' in val:
+                ret_val = val[val.rfind('/') + 1: -1]
+            ret_val = int(val) if val else 0
+        elif datatype == 'float':
+            ret_val = float(val) if val else 0.0
+
+        return ret_val
+
+    def process(self, resources, event=None):
+        pkey = self.data.get('key', '')
+        op = OPERATORS.get(self.data.get('op', 'eq'))
+        target_value = self.data.get('value', '0')
+        default = self.data.get('default', '0')
+        results = []
+
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for resource in resources:
+            for pg in resource['DBParameterGroups']:
+                group_name = pg['DBParameterGroupName']
+
+                # get the params for that group
+                if group_name in self._parametergroup_cache:
+                    db_params = self._parametergroup_cache[group_name]
+                else:
+                    db_params = client.describe_db_parameters(
+                        DBParameterGroupName=group_name)
+                    self._parametergroup_cache[group_name] = db_params
+
+                # hunt for the pkey
+                param_struct = None
+                for ps in db_params['Parameters']:
+                    if ps['ParameterName'] == pkey:
+                        param_struct = ps
+                        break
+
+                if param_struct:
+                    # just because we found a name, doesnt mean a value will
+                    # be present, so use the default here too
+                    param_value = param_struct.get('ParameterValue', default)
+                else:
+                    param_value = default
+
+                # at this point the types of param_value and target_value may
+                # not match, so we let Amazon tell us how to interpret the
+                # values
+                dt = param_struct['DataType']
+                target_value = ParameterGroupFilter.recast(target_value, dt)
+                param_value = ParameterGroupFilter.recast(param_value, dt)
+
+                self.log.debug("%s %s   %s    %s %s\n\n",
+                               param_value,
+                               param_value.__class__,
+                               op,
+                               target_value,
+                               target_value.__class__)
+                if op(param_value, target_value):
+                    results.append(resource)
+        return results
