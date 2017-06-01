@@ -56,8 +56,8 @@ from concurrent.futures import as_completed
 from c7n.actions import (
     ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import (
-    CrossAccountAccessFilter, FilterRegistry, Filter, AgeFilter, OPERATORS,
-    FilterValidationError)
+    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
+    OPERATORS, FilterValidationError)
 
 from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
@@ -285,6 +285,15 @@ class DefaultVpc(net_filters.DefaultVpcBase):
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "DBSubnetGroup.Subnets[].SubnetIdentifier"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @filters.register('kms-alias')
@@ -718,8 +727,9 @@ class ResizeInstance(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Sets the 'BackupRetentionPeriod' value for automated snapshots
-
+    """
+    Sets the 'BackupRetentionPeriod' value for automated snapshots,
+    enforce (min, max, exact) sets retention days occordingly.
     :example:
 
         .. code-block: yaml
@@ -736,12 +746,15 @@ class RetentionWindow(BaseAction):
                   - type: retention
                     days: 7
                     copy-tags: true
+                    enforce: exact
     """
 
     date_attribute = "BackupRetentionPeriod"
     schema = type_schema(
-        'retention',
-        **{'days': {'type': 'number'}, 'copy-tags': {'type': 'boolean'}})
+        'retention', **{'days': {'type': 'number'},
+                        'copy-tags': {'type': 'boolean'},
+                        'enforce': {'type': 'string', 'enum': [
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBInstance',)
 
     def process(self, dbs):
@@ -763,14 +776,30 @@ class RetentionWindow(BaseAction):
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
+        retention_type = self.data['enforce', 'min'].lower()
 
-        if ((current_retention < new_retention or
+        if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
                 _db_instance_eligible_for_backup(resource)):
             self.set_retention_window(
                 resource,
                 max(current_retention, new_retention),
                 new_copy_tags)
+            return resource
+
+        if ((retention_type == 'max' or
+             current_copy_tags != new_copy_tags) and
+                _db_instance_eligible_for_backup(resource)):
+            self.set_retention_window(
+                resource,
+                min(current_retention, new_retention),
+                new_copy_tags)
+            return resource
+
+        if ((retention_type == 'exact' or
+             current_copy_tags != new_copy_tags) and
+                _db_instance_eligible_for_backup(resource)):
+            self.set_retention_window(resource, new_retention, new_copy_tags)
             return resource
 
     def set_retention_window(self, resource, retention, copy_tags):
@@ -1241,3 +1270,77 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = None
         date = None
+
+
+@filters.register('db-parameter')
+class ParameterFilter(ValueFilter):
+    """
+    Applies value type filter on set db parameter values.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-pg
+                resource: rds
+                filters:
+                  - type: db-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+
+    schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters', )
+
+    @staticmethod
+    def recast(val, datatype):
+        """ Re-cast the value based upon an AWS supplied datatype
+            and treat nulls sensibly.
+        """
+        ret_val = val
+        if datatype == 'string':
+            ret_val = str(val)
+        elif datatype == 'boolean':
+            # AWS returns 1s and 0s for this
+            ret_val = bool(int(val))
+        elif datatype == 'integer':
+            if val.isdigit():
+                ret_val = int(val)
+        elif datatype == 'float':
+            ret_val = float(val) if val else 0.0
+
+        return ret_val
+
+    def process(self, resources, event=None):
+        results = []
+        paramcache = {}
+
+        client = local_session(self.manager.session_factory).client('rds')
+        param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
+                        for db in resources}
+
+        for pg in param_groups:
+            cache_key = {
+                'region': self.manager.config.regions,
+                'account_id': self.manager.config.account_id,
+                'rds-pg': pg}
+            pg_values = self.manager._cache.get(cache_key)
+            if pg_values is not None:
+                paramcache[pg] = pg_values
+                continue
+            paramcache[pg] = {
+                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
+                for p in client.describe_db_parameters(
+                    DBParameterGroupName=pg)['Parameters']
+                if 'ParameterValue' in p}
+            self.manager._cache.save(cache_key, paramcache[pg])
+
+        for resource in resources:
+            for pg in resource['DBParameterGroups']:
+                pg_values = paramcache[pg['DBParameterGroupName']]
+                if self.match(pg_values):
+                    results.append(resource)
+                    break
+        return results

@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceTagSets": [
+            {
+                "ResourceType": "hostedzone", 
+                "ResourceId": "Z10JIOLZIZS60E", 
+                "Tags": [
+                    {
+                        "Value": "xyz", 
+                        "Key": "abc"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a5dee069-3847-11e7-989d-11dfb3cd683e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a5dee069-3847-11e7-989d-11dfb3cd683e", 
+                "date": "Sun, 14 May 2017 01:50:03 GMT", 
+                "content-length": "339", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

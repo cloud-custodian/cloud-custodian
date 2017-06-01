@@ -250,7 +250,8 @@ The following extra jinja filters are available:
 
 | filter | behavior |
 |:----------|:-----------|
-| `utc_string` | `date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+| <code>utc_string&#124;date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')</code> | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+| <code>30&#124;get_date_time_delta</code> | Convert a time [delta](https://docs.python.org/2/library/datetime.html#datetime.timedelta) like '30' days in the future, to a datetime string. You can also use negative values for the past. |
 
 
 ## Developer Install (OS X El Capitan)

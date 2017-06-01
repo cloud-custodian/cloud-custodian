@@ -733,6 +733,7 @@ class UserAccessKey(ValueFilter):
             for k in r['c7n:AccessKeys']:
                 if self.match(k):
                     matched.append(r)
+                    break
         return matched
 
 
@@ -771,6 +772,22 @@ class UserMfaDevice(ValueFilter):
 
 @User.action_registry.register('remove-keys')
 class UserRemoveAccessKey(BaseAction):
+    """Delete or disable user's access keys.
+
+    For example if we wanted to disable keys after 90 days of non-use and
+    delete them after 180 days of nonuse:
+
+    .. code-block: yaml
+
+     - name: iam-mfa-active-keys-no-login
+       resource: iam-user
+       actions:
+         - type: remove-keys
+           disable: true
+           age: 90
+         - type: remove-keys
+           age: 180
+    """
 
     schema = type_schema(
         'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})

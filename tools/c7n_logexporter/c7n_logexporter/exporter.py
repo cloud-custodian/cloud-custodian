@@ -99,6 +99,7 @@ def cli():
 @cli.command()
 @click.option('--config', type=click.Path())
 def validate(config):
+    """validate config file."""
     with open(config) as fh:
         content = fh.read()
 
@@ -124,6 +125,7 @@ def validate(config):
 @click.option('--end')
 @debug
 def run(config, start, end):
+    """run export across accounts and log groups specified in config."""
     config = validate.callback(config)
     destination = config.get('destination')
     start = start and parse(start) or start
@@ -348,6 +350,7 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
 # @click.option('--stream-prefix)
 @lambdafan
 def export(group, bucket, prefix, start, end, role, session=None):
+    """Export a single log group to s3."""
     start = start and isinstance(start, basestring) and parse(start) or start
     end = (end and isinstance(start, basestring) and
            parse(end) or end or datetime.now())

@@ -38,7 +38,7 @@ class NotifyTest(BaseTest):
             }, session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_notify(self):
         session_factory = self.replay_flight_data(
             "test_notify_action", zdata=True)
@@ -58,4 +58,4 @@ class NotifyTest(BaseTest):
         }, session_factory=session_factory)
 
         resources = policy.poll()
-        self.assertJmes("[].MatchedFilters", resources, [['tag:Testing']])
+        self.assertJmes('[]."c7n:MatchedFilters"', resources, [['tag:Testing']])

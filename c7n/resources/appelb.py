@@ -112,6 +112,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @actions.register('mark-for-op')
 class AppELBMarkForOpAction(tags.TagDelayedAction):
     """Action to create a delayed action on an ELB to start at a later date
