@@ -461,16 +461,35 @@ class Notify(EventAction):
 
     def send_sns(self, message):
         topic = self.data['transport']['topic']
-        region = topic.split(':', 5)[3]
+        if len(topic.split(':', 5)) == 6:
+            region = region = topic.split(':', 5)[3]
+            topic_arn = topic
+        else:
+            region = self.manager.config.region
+            owner_id = self.manager.config.account_id
+            topic_arn = "arn:aws:sns:" + region + ":" + owner_id + ":" + topic
         client = self.manager.session_factory(region=region, assume=self.assume_role).client('sns')
         client.publish(
-            TopicArn=topic,
+            TopicArn=topic_arn,
             Message=base64.b64encode(zlib.compress(utils.dumps(message)))
         )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = queue.split('.', 2)[1]
+        if len(queue.split('.', 3)) == 4:
+            region = queue.split('.', 2)[1]
+            queue_url = queue
+        elif len(queue.split(':',5)) == 6:
+            queue_arn_split = queue.split(':',5)
+            region = queue_arn_split[3]
+            owner_id = queue_arn_split[4]
+            queue_name = queue_arn_split[5]
+            queue_url = "https://sqs." + region + ".amazonaws.com/" + owner_id + "/" + queue_name
+        else:
+            region = self.manager.config.region
+            owner_id = self.manager.config.account_id
+            queue_name = queue
+            queue_url = "https://sqs." + region + ".amazonaws.com/" + owner_id + "/" + queue_name
         client = self.manager.session_factory(region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
@@ -479,7 +498,7 @@ class Notify(EventAction):
             },
         }
         result = client.send_message(
-            QueueUrl=queue,
+            QueueUrl=queue_url,
             MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
             MessageAttributes=attrs)
         return result['MessageId']
