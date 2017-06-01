@@ -519,6 +519,71 @@ class DefaultVpc(DefaultVpcBase):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
+@filters.register('singleton')
+class SingletonFilter(Filter):
+    """EC2 instances without autoscaling or a recover alarm
+
+    Filters EC2 instances that are not members of an autoscaling group
+    and do not have Cloudwatch recover alarms.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - singleton
+            actions:
+              - type: tag
+                key: problem
+                value: instance is not resilient
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """
+
+    schema = type_schema('singleton')
+
+    permissions = ('cloudwatch:DescribeAlarmsForMetric',)
+
+    def __call__(self, i):
+        if self.in_asg(i):
+            return False
+        else:
+            return not self.has_recover_alarm(i)
+
+    @staticmethod
+    def in_asg(i):
+        if 'Tags' not in i:
+            return False
+        else:
+            return 'aws:autoscaling:groupName' in i['Tags']
+
+    def has_recover_alarm(self, i):
+        client = utils.local_session(self.manager.session_factory).client('cloudwatch')
+        alarms = client.describe_alarms_for_metric(
+            MetricName='StatusCheckFailed_System',
+            Namespace='AWS/EC2',
+            Dimensions=[
+                {
+                    'Name': 'InstanceId',
+                    'Value': i['InstanceId']
+                }
+            ]
+        )
+
+        for i in alarms['MetricAlarms']:
+            for a in i['AlarmActions']:
+                if (
+                    a.startswith('arn:aws:automate:') and
+                    a.endswith(':ec2:recover')
+                ):
+                    return True
+
+        return False
+
+
 @actions.register('start')
 class Start(BaseAction, StateTransitionFilter):
     """Starts a previously stopped EC2 instance.

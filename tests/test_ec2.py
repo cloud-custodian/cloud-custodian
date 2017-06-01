@@ -672,6 +672,23 @@ class TestDefaultVpc(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')
 
+class TestSingletonFilter(BaseTest):
+
+    def test_ec2_singleton_filter(self):
+        session_factory = self.replay_flight_data('test_ec2_singleton')
+        p = self.load_policy(
+            {'name': 'ec2-singleton-filters',
+             'resource': 'ec2',
+             'filters': [
+                 {'tag:Name': 'Singleton'},
+                 {'type': 'singleton'}]},
+            config={'region': 'us-west-1'},
+            session_factory=session_factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-00fe7967fb7167c62')
 
 class TestActions(unittest.TestCase):
 
