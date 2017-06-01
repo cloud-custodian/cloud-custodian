@@ -1,13 +1,13 @@
 
 install:
 	python -m virtualenv --python python2.7 .
-	source bin/activate && pip install -r requirements.txt
-	source bin/activate && python setup.py develop
+	. bin/activate && pip install -r requirements.txt
+	. bin/activate && python setup.py develop
 
 develop:
 	python -m virtualenv --python python2.7 .
-	source bin/activate && pip install -r requirements-dev.txt
-	source bin/activate && python setup.py develop
+	. bin/activate && pip install -r requirements-dev.txt
+	. bin/activate && python setup.py develop
 
 coverage:
 	rm -Rf .coverage
