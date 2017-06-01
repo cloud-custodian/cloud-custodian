@@ -22,8 +22,9 @@ import zlib
 
 from botocore.exceptions import ClientError
 
-from c7n.registry import PluginRegistry
 from c7n.executor import ThreadPoolExecutor
+from c7n.registry import PluginRegistry
+from c7n.resolver import ValuesFrom
 from c7n import utils
 from c7n.version import version as VERSION
 
@@ -400,7 +401,9 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_from': ValuesFrom.schema,
             'cc_manager': {'type': 'boolean'},
             'from': {'type': 'string'},
             'subject': {'type': 'string'},
@@ -436,18 +439,32 @@ class Notify(EventAction):
             return ('sqs:SendMessage',)
         return ()
 
+    def expand_variables(self, message):
+        p = self.data.copy()
+        if 'to_from' in self.data:
+            to_from = self.data['to_from'].copy()
+            to_from['url'] = to_from['url'].format(**message)
+            p['to'] = ValuesFrom(to_from).get_values()
+        if 'cc_from' in self.data:
+            cc_from = self.data['cc_from'].copy()
+            cc_from['url'] = cc_from['url'].format(**message)
+            p['cc'] = ValuesFrom(cc_from).get_values()
+        return p
+
     def process(self, resources, event=None):
         aliases = self.manager.session_factory().client(
             'iam').list_account_aliases().get('AccountAliases', ())
         account_name = aliases and aliases[0] or ''
+        message = {
+            'event': event,
+            'account_id': self.manager.config.account_id,
+            'account': account_name,
+            'action': self.data,
+            'region': self.manager.config.region}
+        message['policy'] = self.expand_variables(message)
+
         for batch in utils.chunks(resources, self.batch_size):
-            message = {'resources': batch,
-                       'event': event,
-                       'account_id': self.manager.config.account_id,
-                       'account': account_name,
-                       'action': self.data,
-                       'region': self.manager.config.region,
-                       'policy': self.manager.data}
+            message['resources'] = batch
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
@@ -461,36 +478,39 @@ class Notify(EventAction):
 
     def send_sns(self, message):
         topic = self.data['transport']['topic']
-        if len(topic.split(':', 5)) == 6:
+        if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
         else:
-            region = self.manager.config.region
-            owner_id = self.manager.config.account_id
-            topic_arn = "arn:aws:sns:" + region + ":" + owner_id + ":" + topic
-        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sns')
+            region = message['region']
+            topic_arn = "arn:aws:sns:%s:%s:%s" % (
+                message['region'], message['account_id'], topic)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sns')
         client.publish(
             TopicArn=topic_arn,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
-        )
+            Message=base64.b64encode(zlib.compress(utils.dumps(message))))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        if len(queue.split('.', 3)) == 4:
+        if queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif len(queue.split(':',5)) == 6:
-            queue_arn_split = queue.split(':',5)
+        elif queue.startswith('arn:sqs'):
+            queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]
             queue_name = queue_arn_split[5]
-            queue_url = "https://sqs." + region + ".amazonaws.com/" + owner_id + "/" + queue_name
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
         else:
             region = self.manager.config.region
             owner_id = self.manager.config.account_id
             queue_name = queue
-            queue_url = "https://sqs." + region + ".amazonaws.com/" + owner_id + "/" + queue_name
-        client = self.manager.session_factory(region=region, assume=self.assume_role).client('sqs')
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
                 'DataType': 'String',
