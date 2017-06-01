@@ -360,3 +360,7 @@ def summary(vocabulary):
 def json_dump(resource=None):
     load_resources()
     print(json.dumps(generate(resource), indent=2))
+
+
+if __name__ == '__main__':
+    json_dump()

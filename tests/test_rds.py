@@ -20,6 +20,7 @@ import time
 import uuid
 from collections import OrderedDict
 
+from botocore.exceptions import ClientError
 import boto3
 from common import BaseTest
 
@@ -223,6 +224,59 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
+
+    def test_rds_restore(self):
+        self.patch(rds.RestoreInstance, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_rds_restore')
+        client = session_factory().client('rds')
+        instance_id = 'mxtest'
+        self.assertRaises(
+            ClientError,
+            client.describe_db_instances,
+            DBInstanceIdentifier=instance_id)
+
+        p = self.load_policy({
+            'name': 'rds-restore',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'MasterUsername': 'mxtester'},
+                'latest'],
+            'actions': [
+                {'type': 'restore',
+                 'restore_options': {'DBInstanceIdentifier': instance_id}}]
+                }, session_factory=session_factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        try:
+            client.describe_db_instances(
+                DBInstanceIdentifier=instance_id)
+        except ClientError:
+            self.fail("DB Not found")
+
+    def test_rds_delete_copy(self):
+        session_factory = self.replay_flight_data('test_rds_delete_copy_restore')
+        client = session_factory().client('rds')
+        instance_id = 'mxtest'
+        db_info = client.describe_db_instances(DBInstanceIdentifier=instance_id)
+        self.assertFalse(db_info['DBInstances'][0]['CopyTagsToSnapshot'])
+        p = self.load_policy(
+            {'name': 'rds-delete',
+             'resource': 'rds',
+             'filters': [
+                 {'DBInstanceIdentifier': instance_id}],
+             'actions': [
+                 {'type': 'delete',
+                  'copy-restore-info': True}]},
+            config={'region': 'us-east-2'},
+            session_factory=session_factory)
+        resources = p.run()
+        db_info = client.describe_db_instances(DBInstanceIdentifier=instance_id)
+        self.assertTrue(db_info['DBInstances'][0]['CopyTagsToSnapshot'])
+        snaps = p.resource_manager.get_resource_manager(
+            'rds-snapshot').get_resources(('final-mxtest-2017-05-25',))
+        snap_keys = {t['Key'] for t in snaps[0]['Tags']}
+        self.assertTrue(snap_keys.issuperset(rds.RestoreInstance.restore_keys))
 
     def test_rds_delete(self):
         session_factory = self.replay_flight_data('test_rds_delete')
