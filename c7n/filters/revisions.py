@@ -160,7 +160,7 @@ class JsonDiff(Diff):
         if config_type is None:
             return
         resource_class.filter_registry.register('json-diff', klass)
-        
+
 
 if HAVE_JSONPATH:
     resources.subscribe(JsonDiff.register_resources)

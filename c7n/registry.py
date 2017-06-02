@@ -61,7 +61,7 @@ class PluginRegistry(object):
         def _register_class(klass):
             self._factories[name] = klass
             klass.type = name
-            self.notify(name, klass)            
+            self.notify(name, klass)
             return klass
         return _register_class
 
