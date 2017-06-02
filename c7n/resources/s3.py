@@ -382,6 +382,8 @@ class HasLifecycle(Filter):
     """Filter out S3 buckets that have lifecycle rules for
     transitioning objects to different storage types."""
 
+    permissions = ("s3:GetLifecycleConfiguration")
+
     schema = type_schema('has-lifecycle',
                          id={'type': 'string'},
                          prefix={'type': 'string'},
@@ -1023,7 +1025,7 @@ class ConfigureLifecycle(BucketActionBase):
     """Action that aggregates all rules with whole bucket prefix and
     changes them to the configured policy values."""
 
-    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration', )
+    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
     schema = {
         'type': 'object',
