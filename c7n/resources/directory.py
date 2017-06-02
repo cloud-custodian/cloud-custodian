@@ -26,3 +26,14 @@ class Directory(QueryResourceManager):
         name = "Name"
         id = "DirectoryId"
         dimension = None
+
+
+@resources.register('cloud-directory')
+class CloudDirectory(QueryResourceManager):
+
+    class resource_type(object):
+        service = "clouddirectory"
+        enum_spec = ("list_directories", "Directories", None)
+        id = "DirectoryArn"
+        name = "Name"
+        dimension = None

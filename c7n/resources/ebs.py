@@ -669,6 +669,7 @@ class EncryptInstanceVolumes(BaseAction):
        - Delete transient snapshots
        - Detach Unencrypted Volume
        - Attach Encrypted Volume
+       - Set DeleteOnTermination instance attribute equal to source volume
     - For each volume
        - Delete unencrypted volume
     - Start Instance (if originally running)
@@ -702,7 +703,8 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DescribeSnapshots',
         'ec2:DescribeVolumes',
         'ec2:StopInstances',
-        'ec2:StartInstances')
+        'ec2:StartInstances',
+        'ec2:ModifyInstanceAttribute')
 
     def validate(self):
         key = self.data.get('key')
@@ -779,6 +781,21 @@ class EncryptInstanceVolumes(BaseAction):
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
+
+            # Set DeleteOnTermination attribute the same as source volume
+            if v['Attachments'][0]['DeleteOnTermination']:
+                client.modify_instance_attribute(
+                    InstanceId=instance_id,
+                    BlockDeviceMappings=[
+                        {
+                            'DeviceName': v['Attachments'][0]['Device'],
+                            'Ebs': {
+                                'VolumeId': vol_id,
+                                'DeleteOnTermination': True
+                            }
+                        }
+                    ]
+                )
 
         if instance_running:
             client.start_instances(InstanceIds=[instance_id])

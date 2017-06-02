@@ -27,6 +27,9 @@ setup(
     packages=find_packages('c7n_mailer'),
     entry_points={
         'console_scripts': [
-            'c7n-mailer = c7n_mailer.cli:main']},
+            'c7n-mailer = c7n_mailer.cli:main',
+            'c7n-mailer-replay = c7n_mailer.replay:main'
+        ]
+    },
     install_requires=["Jinja2", "boto3", "jsonschema"],
 )

@@ -20,6 +20,7 @@ import functools
 import json
 import itertools
 import logging
+import os
 import random
 import threading
 import time
@@ -45,6 +46,10 @@ else:
 from StringIO import StringIO
 
 
+class VarsSubstitutionError(Exception):
+    pass
+
+
 class Bag(dict):
 
     def __getattr__(self, k):
@@ -52,6 +57,32 @@ class Bag(dict):
             return self[k]
         except KeyError:
             raise AttributeError(k)
+
+
+def load_file(path, format=None, vars=None):
+    if format is None:
+        format = 'yaml'
+        _, ext = os.path.splitext(path)
+        if ext[1:] == 'json':
+            format = 'json'
+
+    with open(path) as fh:
+        contents = fh.read()
+
+        if vars:
+            try:
+                contents = contents.format(**vars)
+            except IndexError as e:
+                msg = 'Failed to substitute variable by positional argument.'
+                raise VarsSubstitutionError(msg)
+            except KeyError as e:
+                msg = 'Failed to substitute variables.  KeyError on "{}"'.format(e.message)
+                raise VarsSubstitutionError(msg)
+
+        if format == 'yaml':
+            return yaml_load(contents)
+        elif format == 'json':
+            return loads(contents)
 
 
 def yaml_load(value):

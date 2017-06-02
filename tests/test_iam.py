@@ -28,7 +28,6 @@ from c7n.resources.sns import SNS
 from c7n.resources.iam import (
     UserMfaDevice,
     UsedIamPolicies, UnusedIamPolicies,
-    AllowAllIamPolicies,
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole, UnusedIamRole,
@@ -216,6 +215,7 @@ class IamUserFilterUsage(BaseTest):
                 'key': 'Status',
                 'value': 'Active'}]}, session_factory=session_factory)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
 

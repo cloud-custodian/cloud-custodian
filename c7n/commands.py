@@ -28,7 +28,7 @@ import yaml
 
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps
+from c7n.utils import Bag, dumps, load_file
 from c7n.manager import resources
 from c7n.resources import load_resources
 from c7n import schema
@@ -42,6 +42,7 @@ def policy_command(f):
     @wraps(f)
     def _load_policies(options):
         load_resources()
+        vars = _load_vars(options)
 
         errors = 0
         all_policies = PolicyCollection.from_data({}, options)
@@ -51,13 +52,13 @@ def policy_command(f):
 
         for fp in options.configs:
             try:
-                collection = policy_load(options, fp)
+                collection = policy_load(options, fp, vars=vars)
             except IOError:
-                eprint('Error: policy file does not exist ({})'.format(fp))
+                log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
             except ValueError as e:
-                eprint('Error: problem loading policy file ({})'.format(e.message))
+                log.error('problem loading policy file ({})'.format(e.message))
                 errors += 1
                 continue
 
@@ -70,7 +71,7 @@ def policy_command(f):
                 all_policies = all_policies + collection
 
         if errors > 0:
-            eprint('Found {} errors.  Exiting.'.format(errors))
+            log.error('Found {} errors.  Exiting.'.format(errors))
             sys.exit(1)
 
         # filter by name and resource type
@@ -98,7 +99,7 @@ def policy_command(f):
             counts = Counter([p.name for p in policies_by_region[region]])
             for policy, count in counts.iteritems():
                 if count > 1:
-                    eprint("Error: duplicate policy name '{}'".format(policy))
+                    log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
 
         return f(options, list(policies))
@@ -106,28 +107,43 @@ def policy_command(f):
     return _load_policies
 
 
+def _load_vars(options):
+    vars = None
+    if options.vars:
+        try:
+            vars = load_file(options.vars)
+        except IOError as e:
+            log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
+            sys.exit(1)
+
+    # TODO - provide builtin vars here (such as account)
+
+    return vars
+
+
 def _print_no_policies_warning(options, policies):
     if options.policy_filter or options.resource_type:
-        eprint("Warning: no policies matched the filters provided.")
+        log.warning("Warning: no policies matched the filters provided.")
 
-        eprint("\nFilters:")
+        log.warning("Filters:")
         if options.policy_filter:
-            eprint("    Policy name filter (-p):", options.policy_filter)
+            log.warning("    Policy name filter (-p): " + options.policy_filter)
         if options.resource_type:
-            eprint("    Resource type filter (-t):", options.resource_type)
+            log.warning("    Resource type filter (-t): " + options.resource_type)
 
-        eprint("\nAvailable policies:")
+        log.warning("Available policies:")
         for policy in policies:
-            eprint("    - {} ({})".format(policy.name, policy.resource_type))
-        eprint()
+            log.warning("    - {} ({})".format(policy.name, policy.resource_type))
+        if not policies:
+            log.warning("    (none)")
     else:
-        eprint('Empty policy file(s).  Nothing to do.')
+        log.warning('Empty policy file(s).  Nothing to do.')
 
 
 def validate(options):
     load_resources()
     if len(options.configs) < 1:
-        eprint('Error: no config files specified')
+        log.error('no config files specified')
         sys.exit(1)
 
     used_policy_names = set()
@@ -160,7 +176,8 @@ def validate(options):
             null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
                 try:
-                    Policy(p, null_config, Bag())
+                    p = Policy(p, null_config, Bag())
+                    p.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)
@@ -206,30 +223,25 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
-    if len(policies) != 1:
-        eprint("Error: Report subcommand requires exactly one policy")
+    if len(policies) == 0:
+        log.error('Error: must supply at least one policy')
         sys.exit(1)
 
-    policy = policies.pop()
-    odir = options.output_dir.rstrip(os.path.sep)
-    if os.path.sep in odir and os.path.basename(odir) == policy.name:
-        options.region = options.regions[0]
-        # policy sub-directory passed - ignore
-        options.output_dir = os.path.split(odir)[0]
-        # regenerate the execution context based on new path
-        policy = Policy(policy.data, options)
-    d = datetime.now()
+    resources = set([p.resource_type for p in policies])
+    if len(resources) > 1:
+        log.error('Error: Report subcommand can accept multiple policies, but they must '
+                  'all be for the same resource.')
+        sys.exit(1)
+
     delta = timedelta(days=options.days)
-    begin_date = d - delta
-    do_report(
-        policy, begin_date, options, sys.stdout,
-        raw_output_fh=options.raw)
+    begin_date = datetime.now() - delta
+    do_report(policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
 
 @policy_command
 def logs(options, policies):
     if len(policies) != 1:
-        eprint("Error: Log subcommand requires exactly one policy")
+        log.error("Log subcommand requires exactly one policy")
         sys.exit(1)
 
     policy = policies.pop()
@@ -328,7 +340,7 @@ def schema_cmd(options):
     #
     resource = components[0].lower()
     if resource not in resource_mapping:
-        eprint('Error: {} is not a valid resource'.format(resource))
+        log.error('{} is not a valid resource'.format(resource))
         sys.exit(1)
 
     if len(components) == 1:
@@ -342,8 +354,7 @@ def schema_cmd(options):
     #
     category = components[1].lower()
     if category not in ('actions', 'filters'):
-        eprint(("Error: Valid choices are 'actions' and 'filters'."
-                " You supplied '{}'").format(category))
+        log.error("Valid choices are 'actions' and 'filters'. You supplied '{}'".format(category))
         sys.exit(1)
 
     if len(components) == 2:
@@ -359,8 +370,7 @@ def schema_cmd(options):
     #
     item = components[2].lower()
     if item not in resource_mapping[resource][category]:
-        eprint('Error: {} is not in the {} list for resource {}'.format(
-            item, category, resource))
+        log.error('{} is not in the {} list for resource {}'.format(item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
@@ -387,15 +397,15 @@ def schema_cmd(options):
         return
 
     # We received too much (e.g. s3.actions.foo.bar)
-    eprint("Invalid selector '{}'.  Max of 3 components in the "
-           "format RESOURCE.CATEGORY.ITEM".format(options.resource))
+    log.error("Invalid selector '{}'.  Max of 3 components in the "
+              "format RESOURCE.CATEGORY.ITEM".format(options.resource))
     sys.exit(1)
 
 
 def _metrics_get_endpoints(options):
     """ Determine the start and end dates based on user-supplied options. """
     if bool(options.start) ^ bool(options.end):
-        eprint('Error: --start and --end must be specified together')
+        log.error('--start and --end must be specified together')
         sys.exit(1)
 
     if options.start and options.end:
@@ -440,7 +450,3 @@ def version_cmd(options):
     print("Using venv: ", hasattr(sys, 'real_prefix'))
     print("PYTHONPATH: ")
     pp.pprint(sys.path)
-
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)

@@ -143,6 +143,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return subnet_ids
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes.
@@ -1149,10 +1152,6 @@ class Suspend(Action):
     ASG_PROCESSES = set(ASG_PROCESSES)
 
     def process(self, asgs):
-        original_count = len(asgs)
-        asgs = [a for a in asgs if a['Instances']]
-        self.log.debug("Filtered from %d to %d asgs with instances" % (
-            original_count, len(asgs)))
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 

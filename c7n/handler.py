@@ -58,6 +58,7 @@ class Config(dict):
             'profile': None,
             'account_id': account_id,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': True,
             'output_dir': os.environ.get(
@@ -87,13 +88,15 @@ def dispatch_event(event, context):
         policy_config = json.load(f)
 
     if not policy_config or not policy_config.get('policies'):
-        return True
+        return False
 
-    options_overrides = policy_config['policies'][0]['mode'].get('execution-options', {})
+    # TODO. This enshrines an assumption of a single policy per lambda.
+    options_overrides = policy_config[
+        'policies'][0].get('mode', {}).get('execution-options', {})
     options = Config.empty(**options_overrides)
 
     load_resources()
-    policies = PolicyCollection(policy_config, options)
+    policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
             p.push(event, context)

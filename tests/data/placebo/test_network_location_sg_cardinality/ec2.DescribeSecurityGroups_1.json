@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "for dbs", 
+                "Tags": [
+                    {
+                        "Value": "db", 
+                        "Key": "Location"
+                    }
+                ], 
+                "IpPermissions": [], 
+                "GroupName": "db-tier", 
+                "VpcId": "vpc-fcaa6085", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-09053177"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "for apps", 
+                "Tags": [
+                    {
+                        "Value": "web", 
+                        "Key": "Location"
+                    }
+                ], 
+                "IpPermissions": [], 
+                "GroupName": "web-tier", 
+                "VpcId": "vpc-fcaa6085", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-a81a2ed6"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "aa27da99-bf74-4c56-a527-c37f9fd35a7b", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 30 May 2017 01:17:33 GMT"
+            }
+        }
+    }
+}

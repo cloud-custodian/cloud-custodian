@@ -35,6 +35,8 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 
 load_resources()
 
+ACCOUNT_ID = '644160558196'
+
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
@@ -102,7 +104,9 @@ class BaseTest(PillTest):
             config['cache'] = os.path.join(temp_dir, 'c7n.cache')
             config['cache_period'] = 300
         conf = Config.empty(**config)
-        return policy.Policy(data, conf, session_factory)
+        p = policy.Policy(data, conf, session_factory)
+        p.validate()
+        return p
 
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data)
@@ -163,6 +167,10 @@ class BaseTest(PillTest):
 
         return log_file
 
+    @property
+    def account_id(self):
+        return ACCOUNT_ID
+
 
 def placebo_dir(name):
     return os.path.join(
@@ -212,8 +220,9 @@ class Config(Bag):
             'regions': [region],
             'cache': '',
             'profile': None,
-            'account_id': '644160558196',
+            'account_id': ACCOUNT_ID,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': False,
             'output_dir': 's3://test-example/foo',
