@@ -19,8 +19,14 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 
 from c7n.filters import Filter, FilterValidationError
+from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
+try:
+    import jsonpatch
+    HAVE_JSONPATH = True
+except ImportError:
+    HAVE_JSONPATH = False
 
 ErrNotFound = "ResourceNotDiscoveredException"
 
@@ -135,3 +141,26 @@ class Diff(Filter):
 
     def diff(self, source, target):
         raise NotImplementedError("Subclass responsibility")
+
+
+class JsonDiff(Diff):
+
+    def diff(self, source, target):
+        patch = jsonpatch.JsonPatch.from_diff(source, target)
+        return list(patch)
+
+    @classmethod
+    def register_resources(klass, name, resource_class):
+        """ meta model subscriber on resource registration.
+
+        We watch for new resource types being registered and if they
+        support aws config, automatically register the jsondiff filter.
+        """
+        config_type = getattr(resource_class.resource_type, 'config_type', None)
+        if config_type is None:
+            return
+        resource_class.filter_registry.register('json-diff', klass)
+        
+
+if HAVE_JSONPATH:
+    resources.subscribe(JsonDiff.register_resources)

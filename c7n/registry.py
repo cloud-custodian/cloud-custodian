@@ -47,18 +47,21 @@ class PluginRegistry(object):
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
+        self._subscribers = []
 
     def register(self, name, klass=None):
         # invoked as function
         if klass:
             klass.type = name
             self._factories[name] = klass
+            self.notify(name, klass)
             return klass
 
         # invoked as class decorator
         def _register_class(klass):
             self._factories[name] = klass
             klass.type = name
+            self.notify(name, klass)            
             return klass
         return _register_class
 
@@ -74,6 +77,13 @@ class PluginRegistry(object):
 
     def items(self):
         return self._factories.items()
+
+    def subscribe(self, callback):
+        self._subscribers.append(callback)
+
+    def notify(self, name, klass):
+        for s in self._subscribers:
+            s(name, klass)
 
     def load_plugins(self):
         """ Load external plugins.
