@@ -986,6 +986,63 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
+@actions.register('autorecover-alarm')
+class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+    """Adds a cloudwatch metric alarm to recover an EC2 instance.
+
+    This action takes effect on instances that are NOT part
+    of an ASG.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-autorecover-alarm
+            resource: ec2
+            filters:
+              - singleton
+          actions:
+            - autorecover-alarm
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """
+
+    schema = type_schema('autorecover-alarm')
+    permissions = ('ec2:DescribeInstanceStatus',
+                   'ec2:RecoverInstances',
+                   'ec2:DescribeInstanceRecoveryAttribute')
+
+    def process(self, instances):
+        if not len(instances):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('cloudwatch')
+        for i in instances:
+            client.put_metric_alarm(
+                AlarmName='recover-{}'.format(i['InstanceId']),
+                AlarmDescription='Auto Recover {}'.format(i['InstanceId']),
+                ActionsEnabled=True,
+                AlarmActions=[
+                    'arn:aws:automate:{}:ec2:recover'.format(
+                        i['Placement']['AvailabilityZone'][:-1])
+                ],
+                MetricName='StatusCheckFailed_System',
+                Namespace='AWS/EC2',
+                Statistic='Minimum',
+                Dimensions=[
+                    {
+                        'Name': 'InstanceId',
+                        'Value': i['InstanceId']
+                    }
+                ],
+                Period=60,
+                EvaluationPeriods=2,
+                Threshold=0,
+                ComparisonOperator='GreaterThanThreshold'
+            )
+
+
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction):
     """Sets (or removes) the instance profile for an existing EC2 instance.
