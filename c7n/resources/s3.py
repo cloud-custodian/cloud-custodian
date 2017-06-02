@@ -1153,7 +1153,8 @@ class ConfigureLifecycle(BucketActionBase):
 
                     if 'NoncurrentVersionExpiration' in rule:
                         rem_lifecycle.set_delete_previous_versions(
-                                        rule['NoncurrentVersionExpiration']['NoncurrentDays'])
+                            rule['NoncurrentVersionExpiration']['NoncurrentDays']
+                        )
 
                     if 'Expiration' in rule:
                         if 'Days' in rule['Expiration']:
