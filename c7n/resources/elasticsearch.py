@@ -11,11 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import functools
+import logging
 import itertools
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import chunks, local_session, type_schema
+from c7n.utils import (
+    chunks, local_session, get_retry, type_schema, generate_arn)
+
+log = logging.getLogger('custodian.es')
 
 
 @resources.register('elasticsearch')
@@ -29,23 +34,44 @@ class ElasticSearchDomain(QueryResourceManager):
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
-        filter_name = None
 
-    def augment(self, resources):
+    _generate_arn = _account_id = None
+    retry = staticmethod(get_retry(('Throttled',)))
 
-        def _augment(resource_set):
-            client = local_session(self.session_factory).client('es')
-            return client.describe_elasticsearch_domains(
-                DomainNames=resource_set)['DomainStatusList']
-
-        with self.executor_factory(max_workers=2) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(resources, 20))))
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                'es',
+                region=self.config.region,
+                account_id=self.config.account_id,
+                resource_type='domain',
+                separator='/')
+        return self._generate_arn
 
     def get_resources(self, resource_ids):
         client = local_session(self.session_factory).client('es')
         return client.describe_elasticsearch_domains(
             DomainNames=resource_ids)['DomainStatusList']
+
+    def augment(self, domains):
+        client = local_session(self.session_factory).client('es')
+        model = self.get_model()
+
+        def _augment(resource_set):
+            resources = self.retry(
+                client.describe_elasticsearch_domains,
+                DomainNames=resource_set)['DomainStatusList']
+            for r in resources:
+                rarn = self.generate_arn(r[model.id])
+                r['Tags'] = self.retry(
+                    client.list_tags, ARN=rarn).get('TagList', [])
+            return resources
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(itertools.chain(
+                *w.map(_augment, chunks(domains, 5))))
 
 
 @ElasticSearchDomain.action_registry.register('delete')
