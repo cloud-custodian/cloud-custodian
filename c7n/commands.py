@@ -176,7 +176,8 @@ def validate(options):
             null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
                 try:
-                    Policy(p, null_config, Bag())
+                    p = Policy(p, null_config, Bag())
+                    p.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)

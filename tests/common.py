@@ -104,7 +104,9 @@ class BaseTest(PillTest):
             config['cache'] = os.path.join(temp_dir, 'c7n.cache')
             config['cache_period'] = 300
         conf = Config.empty(**config)
-        return policy.Policy(data, conf, session_factory)
+        p = policy.Policy(data, conf, session_factory)
+        p.validate()
+        return p
 
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data)

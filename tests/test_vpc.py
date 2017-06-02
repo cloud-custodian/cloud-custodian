@@ -1049,6 +1049,6 @@ class SecurityGroupTest(BaseTest):
             {'name': 'sg-find2',
              'resource': 'security-group',
              'filters': [
-                {'type': 'egress',
-                 'InvalidKey': True},
-                {'GroupName': 'sg2'}]})
+                 {'type': 'egress',
+                  'InvalidKey': True},
+                 {'GroupName': 'sg2'}]})

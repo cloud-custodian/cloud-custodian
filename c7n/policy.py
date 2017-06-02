@@ -21,6 +21,7 @@ import time
 
 import boto3
 from botocore.client import ClientError
+import jmespath
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
@@ -63,6 +64,9 @@ def load(options, path, format='yaml', validate=True, vars=None):
             raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
 
     collection = PolicyCollection.from_data(data, options)
+    if validate:
+        # non schema validation of policies
+        [p.validate() for p in collection]
     return collection
 
 
@@ -192,6 +196,9 @@ class PolicyExecutionMode(object):
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
+
+    def validate(self):
+        """Validate configuration settings for execution mode."""
 
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
@@ -450,6 +457,15 @@ class PeriodicMode(LambdaMode, PullMode):
 class CloudTrailMode(LambdaMode):
     """A lambda policy using cloudwatch events rules on cloudtrail api logs."""
 
+    def validate(self):
+        events = self.policy.data['mode'].get('events')
+        assert events, "cloud trail mode requires specifiying events to subscribe"
+        for e in events:
+            if isinstance(e, basestring):
+                assert e in CloudWatchEvents.trail_events, "event shortcut not defined"
+            if isinstance(e, dict):
+                jmespath.compile(e['ids'])
+
 
 class EC2InstanceState(LambdaMode):
     """a lambda policy that executes on ec2 instance state changes."""
@@ -573,6 +589,14 @@ class Policy(object):
             return False
         return True
 
+    def validate(self):
+        m = self.get_execution_mode()
+        m.validate()
+        for f in self.resource_manager.filters:
+            f.validate()
+        for a in self.resource_manager.actions:
+            a.validate()
+
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
         return mode.run(event, lambda_ctx)
@@ -604,13 +628,6 @@ class Policy(object):
         for a in self.resource_manager.actions:
             permissions.update(a.get_permissions())
         return permissions
-
-    def validate(self):
-        """validate settings, else raise validation error"""
-        for f in self.resource_manager.filters:
-            f.validate()
-        for a in self.resource_manager.actions:
-            a.validate()
 
     def __call__(self):
         """Run policy in default mode"""
