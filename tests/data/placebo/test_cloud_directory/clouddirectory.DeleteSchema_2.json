@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SchemaArn": "arn:aws:clouddirectory:us-east-1:644160558196:schema/development/gooseberry", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "86dfdb20-4776-11e7-a547-59a2768c283b, 86dfdb20-4776-11e7-a547-59a2768c283b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "86dfdb20-4776-11e7-a547-59a2768c283b, 86dfdb20-4776-11e7-a547-59a2768c283b", 
+                "date": "Fri, 02 Jun 2017 09:33:24 GMT", 
+                "content-length": "91", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
