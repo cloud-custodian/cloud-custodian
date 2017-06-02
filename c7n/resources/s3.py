@@ -439,7 +439,9 @@ class HasLifecycle(Filter):
 
                         if 'Transitions' in rule:
                             # Can only have STANDARD_IA and GLACIER transitions
-                            if (len(rule['Transitions']) < 2) and ia_days_in_policy and glacier_days_in_policy:
+                            if (len(rule['Transitions']) < 2) and\
+                                    ia_days_in_policy and\
+                                    glacier_days_in_policy:
                                 bad_bucket_lifecycle = True
                             else:
                                 for t in rule['Transitions']:
@@ -448,7 +450,8 @@ class HasLifecycle(Filter):
                                             bad_bucket_lifecycle = True
 
                                     if (t['StorageClass'] == 'GLACIER'):
-                                        if glacier_days_in_policy and (t['Days'] != glacier_days_in_policy):
+                                        if glacier_days_in_policy and\
+                                                (t['Days'] != glacier_days_in_policy):
                                             bad_bucket_lifecycle = True
 
                         elif ia_days_in_policy or glacier_days_in_policy:
@@ -457,14 +460,17 @@ class HasLifecycle(Filter):
                         if 'Expiration' in rule and 'Days' in rule['Expiration']:
                             if isinstance(deletes_objects, bool) and (deletes_objects is False):
                                 bad_bucket_lifecycle = True
-                            elif delete_days_in_policy and rule['Expiration']['Days'] != delete_days_in_policy:
+                            elif delete_days_in_policy and\
+                                    rule['Expiration']['Days'] != delete_days_in_policy:
                                 bad_bucket_lifecycle = True
                         elif (deletes_objects is True) or delete_days_in_policy:
                             bad_bucket_lifecycle = True
 
                         if 'AbortIncompleteMultipartUpload' in rule:
-                            multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
-                            if multipart_days_in_policy and (multipart_days_in_rule != multipart_days_in_policy):
+                            multipart_days_in_rule =\
+                                rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                            if multipart_days_in_policy and\
+                                    (multipart_days_in_rule != multipart_days_in_policy):
                                 bad_bucket_lifecycle = True
                         elif multipart_days_in_policy:
                             bad_bucket_lifecycle = True
@@ -476,7 +482,9 @@ class HasLifecycle(Filter):
             shared_buckets = {b['Name']: b for b in shared_buckets}
             self.manager._cache.save(CACHE_NAME, shared_buckets)
 
-        self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets", len(results), len(buckets))
+        self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets",
+                      len(results),
+                      len(buckets))
 
         return results
 
@@ -515,7 +523,8 @@ def get_bucket_region(b):
     bucket_region = b['Location']['LocationConstraint']
     if bucket_region is None:
         return 'us-east-1'
-    # EU = eu-west-1. From docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+    # EU = eu-west-1.
+    # From docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
     elif bucket_region == "EU":
         return 'eu-west-1'
     else:
@@ -1107,7 +1116,9 @@ class ConfigureLifecycle(BucketActionBase):
 
                     if 'Transitions' in rule:
                         # Can only have STANDARD_IA and GLACIER transitions
-                        if (len(rule['Transitions']) < 2) and ia_days_in_policy and glacier_days_in_policy:
+                        if (len(rule['Transitions']) < 2) and\
+                                ia_days_in_policy and\
+                                glacier_days_in_policy:
                             bad_bucket_lifecycle = True
                         else:
                             for t in rule['Transitions']:
@@ -1119,7 +1130,8 @@ class ConfigureLifecycle(BucketActionBase):
                                         rem_lifecycle.set_ia_transition_days(t['Days'])
 
                                 if (t['StorageClass'] == 'GLACIER'):
-                                    if glacier_days_in_policy and (t['Days'] != glacier_days_in_policy):
+                                    if glacier_days_in_policy and\
+                                            (t['Days'] != glacier_days_in_policy):
                                         rem_lifecycle.set_glacier_transition_days(glacier_days_in_policy)
                                         bad_bucket_lifecycle = True
                                     else:
@@ -1133,29 +1145,35 @@ class ConfigureLifecycle(BucketActionBase):
                             if (t['StorageClass'] == 'STANDARD_IA'):
                                 rem_lifecycle.set_ia_previous_transition_days(t['NoncurrentDays'])
                             if (t['StorageClass'] == 'GLACIER'):
-                                rem_lifecycle.set_glacier_previous_transition_days(t['NoncurrentDays'])
+                                rem_lifecycle.set_glacier_previous_transition_days(
+                                                t['NoncurrentDays'])
 
                     if 'NoncurrentVersionExpiration' in rule:
-                        rem_lifecycle.set_delete_previous_versions(rule['NoncurrentVersionExpiration']['NoncurrentDays'])
+                        rem_lifecycle.set_delete_previous_versions(
+                                        rule['NoncurrentVersionExpiration']['NoncurrentDays'])
 
                     if 'Expiration' in rule:
                         if 'Days' in rule['Expiration']:
                             delete_days_in_rule = rule['Expiration']['Days']
-                            if delete_days_in_policy and (delete_days_in_policy != delete_days_in_rule):
+                            if delete_days_in_policy and\
+                                    (delete_days_in_policy != delete_days_in_rule):
                                 bad_bucket_lifecycle = True
                             else:
                                 rem_lifecycle.set_deletes_objects_days(rule['Expiration']['Days'])
                         if 'ExpiredObjectDeleteMarker' in rule['Expiration']:
-                            rem_lifecycle.set_expired_delete_marker(rule['Expiration']['ExpiredObjectDeleteMarker'])
+                            rem_lifecycle.set_expired_delete_marker(
+                                            rule['Expiration']['ExpiredObjectDeleteMarker'])
                     elif delete_days_in_policy:
                         bad_bucket_lifecycle = True
 
                     if 'AbortIncompleteMultipartUpload' in rule:
                         multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
-                        if multipart_days_in_policy and (multipart_days_in_rule != multipart_days_in_policy):
+                        if multipart_days_in_policy and\
+                                (multipart_days_in_rule != multipart_days_in_policy):
                             bad_bucket_lifecycle = True
                         else:
-                            rem_lifecycle.set_stale_multipart_uploads_days(rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation'])
+                            rem_lifecycle.set_stale_multipart_uploads_days(
+                                    rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation'])
                     elif multipart_days_in_policy:
                         bad_bucket_lifecycle = True
 
