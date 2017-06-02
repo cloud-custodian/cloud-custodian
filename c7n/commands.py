@@ -222,24 +222,19 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
-    if len(policies) != 1:
-        log.error("Report subcommand requires exactly one policy")
+    if len(policies) == 0:
+        log.error('Error: must supply at least one policy')
         sys.exit(1)
 
-    policy = policies.pop()
-    odir = options.output_dir.rstrip(os.path.sep)
-    if os.path.sep in odir and os.path.basename(odir) == policy.name:
-        options.region = options.regions[0]
-        # policy sub-directory passed - ignore
-        options.output_dir = os.path.split(odir)[0]
-        # regenerate the execution context based on new path
-        policy = Policy(policy.data, options)
-    d = datetime.now()
+    resources = set([p.resource_type for p in policies])
+    if len(resources) > 1:
+        log.error('Error: Report subcommand can accept multiple policies, but they must '
+                  'all be for the same resource.')
+        sys.exit(1)
+
     delta = timedelta(days=options.days)
-    begin_date = d - delta
-    do_report(
-        policy, begin_date, options, sys.stdout,
-        raw_output_fh=options.raw)
+    begin_date = datetime.now() - delta
+    do_report(policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
 
 @policy_command

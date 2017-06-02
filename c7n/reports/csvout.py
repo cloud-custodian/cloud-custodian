@@ -62,24 +62,36 @@ from c7n.utils import local_session, dumps
 log = logging.getLogger('custodian.reports')
 
 
-def report(policy, start_date, options, output_fh, raw_output_fh=None):
+def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
+    regions = set([p.options.region for p in policies])
+    policy_names = set([p.name for p in policies])
     formatter = Formatter(
-        policy.resource_manager,
+        policies[0].resource_manager,
         extra_fields=options.field,
-        no_default_fields=options.no_default_fields,
+        include_default_fields=not options.no_default_fields,
+        include_region=len(regions) > 1,
+        include_policy=len(policy_names) > 1
     )
 
-    if policy.ctx.output.use_s3():
-        records = record_set(
-            policy.session_factory,
-            policy.ctx.output.bucket,
-            policy.ctx.output.key_prefix,
-            start_date)
-    else:
-        records = fs_record_set(policy.ctx.output_path, policy.name)
+    records = []
+    for policy in policies:
+        if policy.ctx.output.use_s3():
+            policy_records = record_set(
+                policy.session_factory,
+                policy.ctx.output.bucket,
+                policy.ctx.output.key_prefix,
+                start_date)
+        else:
+            policy_records = fs_record_set(policy.ctx.output_path, policy.name)
 
-    log.debug("Found %d records", len(records))
+        log.debug("Found %d records for region %s", len(policy_records), policy.options.region)
+
+        for record in policy_records:
+            record['policy'] = policy.name
+            record['region'] = policy.options.region
+
+        records += policy_records
 
     rows = formatter.to_csv(records)
     if options.format == 'csv':
@@ -129,8 +141,8 @@ def _get_values(record, field_list, tag_map):
 
 class Formatter(object):
 
-    def __init__(
-            self, resource_manager, extra_fields=(), no_default_fields=None):
+    def __init__(self, resource_manager, extra_fields=(), include_default_fields=True,
+                 include_region=False, include_policy=False):
 
         self.resource_manager = resource_manager
         # Lookup default fields for resource type.
@@ -146,7 +158,7 @@ class Formatter(object):
             if model.date:
                 mfields.append(model.date)
 
-        if not no_default_fields:
+        if include_default_fields:
             fields = OrderedDict(zip(mfields, mfields))
         else:
             fields = OrderedDict()
@@ -155,6 +167,15 @@ class Formatter(object):
             # TODO this type coercion should be done at cli input, not here
             h, cexpr = field.split('=', 1)
             fields[h] = cexpr
+
+        # Add these at the end so that they are the last fields
+        if include_default_fields:
+            if include_region:
+                fields['Region'] = 'region'
+
+            if include_policy:
+                fields['Policy'] = 'policy'
+
         self.fields = fields
 
     def headers(self):

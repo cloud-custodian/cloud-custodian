@@ -236,14 +236,6 @@ class ReportTest(CliTest):
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 
-        # Test for when output dir contains metric name, ensure that the
-        # output_dir gets auto-corrected
-        new_output_dir = os.path.join(self.output_dir, policy_name)
-        output = self.get_output(
-            ['custodian', 'report', '-s', new_output_dir, yaml_file])
-        self.assertIn('InstanceId', output)
-        self.assertIn('i-014296505597bf519', output)
-
         # empty file
         temp_dir = self.get_temp_dir()
         empty_policies = {'policies': []}
