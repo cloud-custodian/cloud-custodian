@@ -1172,7 +1172,7 @@ class ConfigureLifecycle(BucketActionBase):
 
                     if 'AbortIncompleteMultipartUpload' in rule:
                         multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']
-                            ['DaysAfterInitiation']
+                        ['DaysAfterInitiation']
                         if multipart_days_in_policy and\
                                 (multipart_days_in_rule != multipart_days_in_policy):
                             bad_bucket_lifecycle = True
