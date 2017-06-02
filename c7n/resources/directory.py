@@ -37,5 +37,3 @@ class CloudDirectory(QueryResourceManager):
         id = "DirectoryArn"
         name = "Name"
         dimension = None
-
-    
