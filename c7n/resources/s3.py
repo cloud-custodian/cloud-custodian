@@ -162,7 +162,10 @@ def assemble_bucket(item):
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
-                return None
+                # We don't bail out, continue processing if we can.
+                # Note this can lead to missing data, but in general is cleaner than
+                # failing hard.
+                continue
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
