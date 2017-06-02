@@ -547,7 +547,7 @@ class S3BucketLifecycle(object):
         self.lifecycle['Expiration'] = {'Days': days}
 
     def set_expired_delete_marker(self, value):
-        self.lifecycle['Expiration'] = { 'ExpiredObjectDeleteMarker': value }
+        self.lifecycle['Expiration'] = {'ExpiredObjectDeleteMarker': value}
 
     def set_stale_multipart_uploads_days(self, days):
         self.lifecycle['AbortIncompleteMultipartUpload'] = {'DaysAfterInitiation': days}
@@ -1049,7 +1049,7 @@ class ConfigureLifecycle(BucketActionBase):
             'ia_days': {'type': 'number'},
             'glacier_days': {'type': 'number'},
             'max_workers': {'type': 'number'}
-            }
+        }
     }
 
     cache_update = False
@@ -1132,7 +1132,9 @@ class ConfigureLifecycle(BucketActionBase):
                                 if (t['StorageClass'] == 'GLACIER'):
                                     if glacier_days_in_policy and\
                                             (t['Days'] != glacier_days_in_policy):
-                                        rem_lifecycle.set_glacier_transition_days(glacier_days_in_policy)
+                                        rem_lifecycle.set_glacier_transition_days(
+                                            glacier_days_in_policy
+                                        )
                                         bad_bucket_lifecycle = True
                                     else:
                                         rem_lifecycle.set_glacier_transition_days(t['Days'])
@@ -1146,7 +1148,8 @@ class ConfigureLifecycle(BucketActionBase):
                                 rem_lifecycle.set_ia_previous_transition_days(t['NoncurrentDays'])
                             if (t['StorageClass'] == 'GLACIER'):
                                 rem_lifecycle.set_glacier_previous_transition_days(
-                                                t['NoncurrentDays'])
+                                    t['NoncurrentDays']
+                                )
 
                     if 'NoncurrentVersionExpiration' in rule:
                         rem_lifecycle.set_delete_previous_versions(
@@ -1162,18 +1165,21 @@ class ConfigureLifecycle(BucketActionBase):
                                 rem_lifecycle.set_deletes_objects_days(rule['Expiration']['Days'])
                         if 'ExpiredObjectDeleteMarker' in rule['Expiration']:
                             rem_lifecycle.set_expired_delete_marker(
-                                            rule['Expiration']['ExpiredObjectDeleteMarker'])
+                                rule['Expiration']['ExpiredObjectDeleteMarker']
+                            )
                     elif delete_days_in_policy:
                         bad_bucket_lifecycle = True
 
                     if 'AbortIncompleteMultipartUpload' in rule:
-                        multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                        multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']
+                            ['DaysAfterInitiation']
                         if multipart_days_in_policy and\
                                 (multipart_days_in_rule != multipart_days_in_policy):
                             bad_bucket_lifecycle = True
                         else:
                             rem_lifecycle.set_stale_multipart_uploads_days(
-                                    rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation'])
+                                rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                            )
                     elif multipart_days_in_policy:
                         bad_bucket_lifecycle = True
 
@@ -1196,7 +1202,6 @@ class ConfigureLifecycle(BucketActionBase):
                 if e.response['Error']['Code'] == 'NoSuchBucket':
                     return
                 raise
-
 
     def call_api(self, bucket):
         bname = bucket['Name']
