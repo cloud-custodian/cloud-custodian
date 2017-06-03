@@ -13,6 +13,3 @@ script:
   - tox
 after_success:
   coveralls
-matrix:
-  allow_failures:
-    - python: "3.6"
