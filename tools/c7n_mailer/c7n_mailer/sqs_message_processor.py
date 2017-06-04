@@ -200,7 +200,7 @@ class SqsMessageProcessor(object):
             message['X-Priority'] = '1'
         cc_addrs = data['action'].get('cc', [])
         if cc_addrs:
-            message['cc'] = cc_addrs
+            message['cc'] = ', '.join(cc_addrs)
         try:
             # if smtp_server is set in mailer.yml, send through smtp
             smtp_server = self.config.get('smtp_server')
