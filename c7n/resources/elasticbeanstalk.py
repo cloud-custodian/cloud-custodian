@@ -30,3 +30,4 @@ class ElasticBeanstalk(QueryResourceManager):
             'DateCreated',
             'DateUpdated'
         )
+        
