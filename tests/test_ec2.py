@@ -911,17 +911,23 @@ class TestAutoRecoverAlarmAction(BaseTest):
             {'name': 'ec2-autorecover-alarm',
              'resource': 'ec2',
              'filters': [
-                 {'tag:Name': 'Singleton'},
-                 {'type': 'singleton'}],
+                 {'tag:Name': 'Singleton'}],
              'actions': [
                  {'type': 'autorecover-alarm'}]},
-            config={'region': 'us-west-1'},
             session_factory=session_factory)
 
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceId'], 'i-00fe7967fb7167c62')
+        self.assertEqual(resources[0]['InstanceId'], 'i-057cd325d9698ce7f')
+
+        try:
+            client = session_factory().client('cloudwatch')
+            result = client.describe_alarms(
+                AlarmNames=['recover-{}'.format(resources[0]['InstanceId'])])
+            self.assertTrue(result.get('MetricAlarms'))
+        except AssertionError:
+            self.fail('alarm not found')
 
 
 class TestFilter(BaseTest):
