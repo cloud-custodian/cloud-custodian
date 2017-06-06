@@ -520,7 +520,7 @@ class DefaultVpc(DefaultVpcBase):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter):
+class SingletonFilter(Filter, StateTransitionFilter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -546,6 +546,8 @@ class SingletonFilter(Filter):
     schema = type_schema('singleton')
 
     permissions = ('cloudwatch:DescribeAlarmsForMetric',)
+
+    valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
 
     def __call__(self, i):
         if self.in_asg(i):
@@ -1012,6 +1014,8 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
     permissions = ('ec2:DescribeInstanceStatus',
                    'ec2:RecoverInstances',
                    'ec2:DescribeInstanceRecoveryAttribute')
+
+    valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
 
     def process(self, instances):
         if not len(instances):
