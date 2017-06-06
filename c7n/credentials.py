@@ -21,6 +21,7 @@ import os
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
+from botocore.exceptions import ClientError
 import logging
 
 from c7n.version import version
