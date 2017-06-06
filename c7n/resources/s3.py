@@ -1822,7 +1822,16 @@ class DeleteBucket(ScanBucket):
             if 'VersionId' in key:
                 obj['VersionId'] = key['VersionId']
             objects.append(obj)
-        results = s3.delete_objects(
-            Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
+
+        results = s3.delete_objects(Bucket=bucket['Name'], Delete={'Objects': objects})
+        deleted = results.get('Deleted', ())
+
+        if len(deleted) < len(objects):
+            undeleted = set([x['Key'] for x in objects]) - set([x['Key'] for x in deleted])
+            log.error('Failed to delete %i objects in bucket %s',
+                      len(undeleted), bucket['Name'])
+            if len(results.get('Errors', ())) > 0:
+                log.error('First error: %s', results['Errors'][0])
+
         if self.get_bucket_style(bucket) != 'versioned':
-            return results
+            return deleted
