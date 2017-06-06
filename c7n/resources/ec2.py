@@ -206,6 +206,34 @@ class StateTransitionAge(AgeFilter):
         return None
 
 
+class ASGFilter(object):
+    """Filter instances by whether they are members of an ASG"""
+    asg_member = None
+
+    def filter_asg_membership(self, instances, desired=None):
+        if desired is None:
+            desired = self.asg_member
+
+        if self.asg_member is None:
+            # TODO raise exception
+            return []
+
+        result = []
+        for i in instances:
+            if self.in_asg(i) == desired:
+                result.append(i)
+
+        return result
+
+    @staticmethod
+    def in_asg(i):
+        if 'Tags' not in i:
+            return False
+        else:
+            return 'aws:autoscaling:groupName' in [
+                tag['Key'] for tag in i['Tags']]
+
+
 class StateTransitionFilter(object):
     """Filter instances by state.
 
@@ -520,7 +548,7 @@ class DefaultVpc(DefaultVpcBase):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter, StateTransitionFilter):
+class SingletonFilter(Filter, StateTransitionFilter, ASGFilter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -549,18 +577,15 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
 
+    def process(self, instances, event=None):
+        return super(SingletonFilter, self).process(
+            self.filter_instance_state(instances))
+
     def __call__(self, i):
         if self.in_asg(i):
             return False
         else:
             return not self.has_recover_alarm(i)
-
-    @staticmethod
-    def in_asg(i):
-        if 'Tags' not in i:
-            return False
-        else:
-            return 'aws:autoscaling:groupName' in i['Tags']
 
     def has_recover_alarm(self, i):
         client = utils.local_session(self.manager.session_factory).client('cloudwatch')
@@ -989,7 +1014,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @actions.register('autorecover-alarm')
-class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+class AutorecoverAlarm(BaseAction, StateTransitionFilter, ASGFilter):
     """Adds a cloudwatch metric alarm to recover an EC2 instance.
 
     This action takes effect on instances that are NOT part
@@ -1017,7 +1042,11 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
 
+    asg_member = False
+
     def process(self, instances):
+        instances = self.filter_asg_membership(
+            self.filter_instance_state(instances))
         if not len(instances):
             return
         client = utils.local_session(
