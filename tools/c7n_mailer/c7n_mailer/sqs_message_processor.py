@@ -188,7 +188,7 @@ class SqsMessageProcessor(object):
 
     def send_c7n_email(self, data, email_to_addr, subject, body):
         email_format = data['action'].get(
-            'template', 'default').endswith('html') and 'Html' or 'Text'
+            'template', 'default').endswith('html') and 'html' or 'plain'
 
         from_addr          = data['action'].get('from', self.config['from_address'])
         message            = MIMEText(body.encode('utf-8'), email_format)
