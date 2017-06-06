@@ -22,3 +22,4 @@ local/
 share/
 out/
 .DS_STORE
+.tox/

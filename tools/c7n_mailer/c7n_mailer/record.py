@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
 import json
@@ -153,5 +154,5 @@ def resource_format(resource, resource_type):
             resource['CidrBlock'],
             resource['AvailableIpAddressCount'])
     else:
-        print "Unknown resource type", resource_type
+        print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)

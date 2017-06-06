@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import jmespath
 from unittest import TestCase
 
-from common import event_data
+from .common import event_data
 
 from c7n.cwe import CloudWatchEvents
 

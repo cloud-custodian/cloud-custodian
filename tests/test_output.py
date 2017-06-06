@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import gzip
 import logging
@@ -22,7 +23,7 @@ import os
 from c7n.ctx import ExecutionContext
 from c7n.output import S3Output
 
-from common import Config, Bag
+from .common import Config, Bag
 
 
 class S3OutputTest(unittest.TestCase):

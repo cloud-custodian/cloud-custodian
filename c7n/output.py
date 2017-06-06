@@ -18,6 +18,7 @@ a variety of sources.
 See docs/usage/outputs.rst
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
 import gzip

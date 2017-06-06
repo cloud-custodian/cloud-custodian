@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
 from datetime import datetime
@@ -22,7 +24,7 @@ from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class TestTagAugmentation(BaseTest):
