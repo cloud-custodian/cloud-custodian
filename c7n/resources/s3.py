@@ -71,7 +71,7 @@ actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 DEFAULT_WORKERS = 10
-CACHE_NAME = 'c7n-s3'
+CACHE_NAME = 's3-lifecycles'
 
 
 @resources.register('s3')
@@ -385,6 +385,7 @@ class HasLifecycle(Filter):
     permissions = ('s3:GetLifecycleConfiguration', )
 
     schema = type_schema('has-lifecycle',
+                         required=['id'],
                          id={'type': 'string'},
                          prefix={'type': 'string'},
                          deletes_objects={'type': 'boolean'},
@@ -413,8 +414,10 @@ class HasLifecycle(Filter):
 
         prefix = self.data.get('prefix', '')
         results = []
+        print(shared_buckets)
         for b in shared_buckets:
             bucket_region = get_bucket_region(b)
+            # bucket_region = 'us-east-1'
             if bucket_region in glacier_supported_regions:
                 glacier_days_in_policy = self.data.get('glacier_days', None)
             else:
@@ -1043,13 +1046,13 @@ class ConfigureLifecycle(BucketActionBase):
             'type': {'enum': ['configure-lifecycle']},
             'id': {'type': 'string'},
             'prefix': {'type': 'string'},
-            'deletes_objects': {'type': 'boolean'},
             'delete_days': {'type': 'number'},
             'multipart_days': {'type': 'number'},
             'ia_days': {'type': 'number'},
             'glacier_days': {'type': 'number'},
             'max_workers': {'type': 'number'}
-        }
+        },
+        'required': ['id']
     }
 
     cache_update = False
@@ -1095,37 +1098,37 @@ class ConfigureLifecycle(BucketActionBase):
         if delete_days_in_policy:
             rem_lifecycle.set_deletes_objects_days(delete_days_in_policy)
 
-        bad_bucket_lifecycle = True
+        changed_bucket_lifecycle = True
         rules = {'Rules': []}
         if 'LifecyclePolicy' in bucket:
             lifecycle = bucket['LifecyclePolicy']
             for rule in lifecycle['Rules']:
                 if rule['ID'] == self.data.get('id'):
-                    bad_bucket_lifecycle = False
+                    changed_bucket_lifecycle = False
 
                     if rule['Status'] == 'Disabled':
-                        bad_bucket_lifecycle = True
+                        changed_bucket_lifecycle = True
 
                     # Handle lifecycles created using new Amazon web interface
                     if 'Filter' in rule:
                         if rule['Filter']['Prefix'] != prefix:
-                            bad_bucket_lifecycle = True
+                            changed_bucket_lifecycle = True
                     else:
                         if rule['Prefix'] != prefix:
-                            bad_bucket_lifecycle = True
+                            changed_bucket_lifecycle = True
 
                     if 'Transitions' in rule:
                         # Can only have STANDARD_IA and GLACIER transitions
                         if (len(rule['Transitions']) < 2) and\
                                 ia_days_in_policy and\
                                 glacier_days_in_policy:
-                            bad_bucket_lifecycle = True
+                            changed_bucket_lifecycle = True
                         else:
                             for t in rule['Transitions']:
                                 if (t['StorageClass'] == 'STANDARD_IA'):
                                     if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
                                         rem_lifecycle.set_ia_transition_days(ia_days_in_policy)
-                                        bad_bucket_lifecycle = True
+                                        changed_bucket_lifecycle = True
                                     else:
                                         rem_lifecycle.set_ia_transition_days(t['Days'])
 
@@ -1135,12 +1138,12 @@ class ConfigureLifecycle(BucketActionBase):
                                         rem_lifecycle.set_glacier_transition_days(
                                             glacier_days_in_policy
                                         )
-                                        bad_bucket_lifecycle = True
+                                        changed_bucket_lifecycle = True
                                     else:
                                         rem_lifecycle.set_glacier_transition_days(t['Days'])
 
                     elif ia_days_in_policy or glacier_days_in_policy:
-                        bad_bucket_lifecycle = True
+                        changed_bucket_lifecycle = True
 
                     if 'NoncurrentVersionTransitions' in rule:
                         for t in rule['NoncurrentVersionTransitions']:
@@ -1161,7 +1164,7 @@ class ConfigureLifecycle(BucketActionBase):
                             delete_days_in_rule = rule['Expiration']['Days']
                             if delete_days_in_policy and\
                                     (delete_days_in_policy != delete_days_in_rule):
-                                bad_bucket_lifecycle = True
+                                changed_bucket_lifecycle = True
                             else:
                                 rem_lifecycle.set_deletes_objects_days(rule['Expiration']['Days'])
                         if 'ExpiredObjectDeleteMarker' in rule['Expiration']:
@@ -1169,33 +1172,31 @@ class ConfigureLifecycle(BucketActionBase):
                                 rule['Expiration']['ExpiredObjectDeleteMarker']
                             )
                     elif delete_days_in_policy:
-                        bad_bucket_lifecycle = True
+                        changed_bucket_lifecycle = True
 
                     if 'AbortIncompleteMultipartUpload' in rule:
                         multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']
                         ['DaysAfterInitiation']
                         if multipart_days_in_policy and\
                                 (multipart_days_in_rule != multipart_days_in_policy):
-                            bad_bucket_lifecycle = True
+                            changed_bucket_lifecycle = True
                         else:
                             rem_lifecycle.set_stale_multipart_uploads_days(
                                 rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
                             )
                     elif multipart_days_in_policy:
-                        bad_bucket_lifecycle = True
+                        changed_bucket_lifecycle = True
 
-                    if not bad_bucket_lifecycle:
+                    if not changed_bucket_lifecycle:
                         rules['Rules'].append(rule)
                 else:
                     rules['Rules'].append(rule)
 
                     # Convert rule to V2
                     if 'Prefix' in rule:
-                        prefix = rule['Prefix']
-                        rule.pop('Prefix')
-                        rule.update({'Filter': {'Prefix': prefix}})
+                        rule.update({'Filter': {'Prefix': rule.pop('Prefix')}})
 
-        if bad_bucket_lifecycle:
+        if changed_bucket_lifecycle:
             rules['Rules'].append(rem_lifecycle.json())
             try:
                 s3.put_bucket_lifecycle_configuration(Bucket=bname, LifecycleConfiguration=rules)
