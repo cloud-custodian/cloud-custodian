@@ -14,9 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
+import io
 import json
 import os.path
-from StringIO import StringIO
 import urllib2
 import urlparse
 
@@ -130,7 +130,7 @@ class ValuesFrom(object):
             if 'expr' in self.data:
                 return jmespath.search(self.data['expr'], data)
         elif format == 'csv' or format == 'csv2dict':
-            data = csv.reader(StringIO(contents))
+            data = csv.reader(io.BytesIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
             else:
@@ -141,4 +141,4 @@ class ValuesFrom(object):
                 return jmespath.search(self.data['expr'], data)
             return data
         elif format == 'txt':
-            return [s.strip() for s in StringIO(contents).readlines()]
+            return [s.strip() for s in io.StringIO(contents).readlines()]
