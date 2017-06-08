@@ -414,7 +414,6 @@ class HasLifecycle(Filter):
 
         prefix = self.data.get('prefix', '')
         results = []
-        print(shared_buckets)
         for b in shared_buckets:
             bucket_region = get_bucket_region(b)
             # bucket_region = 'us-east-1'
@@ -542,7 +541,7 @@ class S3BucketLifecycle(object):
             'ID': rule_id,
             'Status': 'Enabled',
             'Filter': {
-                'Prefix': ''
+                'Prefix': prefix
             }
         }
 
