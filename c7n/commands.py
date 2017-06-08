@@ -217,6 +217,7 @@ def run(options, policies):
             log.exception(
                 "Error while executing policy %s, continuing" % (
                     policy.name))
+            sys.exit(exit_code)
     if exit_code != 0:
         sys.exit(exit_code)
 
