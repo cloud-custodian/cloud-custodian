@@ -43,10 +43,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from concurrent.futures import as_completed
 
-from cStringIO import StringIO
 import csv
 from datetime import datetime
 import gzip
+import io
 import json
 import jmespath
 import logging
@@ -278,7 +278,7 @@ def get_records(bucket, key, session_factory):
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
-    blob = StringIO(result['Body'].read())
+    blob = io.StringIO(result['Body'].read())
 
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",
