@@ -206,34 +206,6 @@ class StateTransitionAge(AgeFilter):
         return None
 
 
-class ASGFilter(object):
-    """Filter instances by whether they are members of an ASG"""
-    asg_member = None
-
-    def filter_asg_membership(self, instances, desired=None):
-        if desired is None:
-            desired = self.asg_member
-
-        if self.asg_member is None:
-            # TODO raise exception
-            return []
-
-        result = []
-        for i in instances:
-            if self.in_asg(i) == desired:
-                result.append(i)
-
-        return result
-
-    @staticmethod
-    def in_asg(i):
-        if 'Tags' not in i:
-            return False
-        else:
-            return 'aws:autoscaling:groupName' in [
-                tag['Key'] for tag in i['Tags']]
-
-
 class StateTransitionFilter(object):
     """Filter instances by state.
 
@@ -548,7 +520,7 @@ class DefaultVpc(DefaultVpcBase):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter, StateTransitionFilter, ASGFilter):
+class SingletonFilter(Filter, StateTransitionFilter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -576,6 +548,10 @@ class SingletonFilter(Filter, StateTransitionFilter, ASGFilter):
     permissions = ('cloudwatch:DescribeAlarmsForMetric',)
 
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
+
+    in_asg = ValueFilter({
+        'key': 'tag:aws:autoscaling:groupName',
+        'value': 'not-null'}).validate()
 
     def process(self, instances, event=None):
         return super(SingletonFilter, self).process(
@@ -1014,7 +990,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @actions.register('autorecover-alarm')
-class AutorecoverAlarm(BaseAction, StateTransitionFilter, ASGFilter):
+class AutorecoverAlarm(BaseAction, StateTransitionFilter):
     """Adds a cloudwatch metric alarm to recover an EC2 instance.
 
     This action takes effect on instances that are NOT part
@@ -1041,11 +1017,12 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter, ASGFilter):
                    'ec2:DescribeInstanceRecoveryAttribute')
 
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
-
-    asg_member = False
+    filter_asg_membership = ValueFilter({
+        'key': 'tag:aws:autoscaling:groupName',
+        'value': 'empty'}).validate()
 
     def process(self, instances):
-        instances = self.filter_asg_membership(
+        instances = self.filter_asg_membership.process(
             self.filter_instance_state(instances))
         if not len(instances):
             return

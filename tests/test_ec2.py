@@ -911,15 +911,15 @@ class TestAutoRecoverAlarmAction(BaseTest):
             {'name': 'ec2-autorecover-alarm',
              'resource': 'ec2',
              'filters': [
-                 {'tag:Name': 'Singleton'}],
+                 {'tag:c7n-test': 'autorecover-alarm'}],
              'actions': [
                  {'type': 'autorecover-alarm'}]},
             session_factory=session_factory)
 
         resources = p.run()
 
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceId'], 'i-057cd325d9698ce7f')
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['InstanceId'], 'i-0aaaaec4b77188b69')
 
         try:
             client = session_factory().client('cloudwatch')
