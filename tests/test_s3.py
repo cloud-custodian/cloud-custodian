@@ -1433,3 +1433,46 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class S3LifecycleTest(BaseTest):
+
+    def test_lifecycle(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-lifecycle-test2'
+
+        # Make a bucket
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        # Add the lifecycle
+        lifecycle_id = 'test-lifecycle'
+        p = self.load_policy({
+            'name': 's3-lifecycle',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{
+                'type': 'lifecycle',
+                'id': lifecycle_id,
+                'trans-days': 60,
+                'trans-type': 'GLACIER',
+                'prefix': 'foo/',
+            }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Note: when recording this test, I needed to add a delay here or else
+        # the lifecycle was not found.
+        # time.sleep(5)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id)
+
