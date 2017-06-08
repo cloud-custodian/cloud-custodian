@@ -377,8 +377,42 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
+class LifecycleApiMixin(Filter):
+    """Mixin class for calling the s3 lifecycle API in a multuthreaded fashion."""
+
+    def call_lifecycle_api(self, bucket):
+        bname = bucket['Name']
+        session = local_session(self.manager.session_factory)
+        s3 = bucket_client(session, bucket)
+
+        try:
+            shared_buckets = self.manager._cache.get(CACHE_NAME)
+            if shared_buckets:
+                if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
+                    return bucket
+                else:
+                    lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+                    shared_buckets[bname] = bucket
+                    shared_buckets[bname]['LifecyclePolicy'] = lifecycle
+                    self.cache_update = True
+                    return shared_buckets[bname]
+            else:
+                lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+                bucket['LifecyclePolicy'] = lifecycle
+                self.cache_update = True
+                return bucket
+        except ClientError as e:
+            # Do nothing
+            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+                return
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                self.log.warn("Bucket `%s` no longer exists", bname)
+                return
+            raise
+
+
 @filters.register('has-lifecycle')
-class HasLifecycle(Filter):
+class HasLifecycle(Filter, LifecycleApiMixin):
     """Filter out S3 buckets that have lifecycle rules for
     transitioning objects to different storage types."""
 
@@ -400,7 +434,7 @@ class HasLifecycle(Filter):
     def process(self, buckets, event=None):
         max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
         with self.executor_factory(max_workers=max_workers) as w:
-            shared_buckets = w.map(self.call_api, buckets)
+            shared_buckets = w.map(self.call_lifecycle_api, buckets)
             shared_buckets = filter(None, list(shared_buckets))
 
         # Make sure lifecycle is within configured policy limits
@@ -493,36 +527,35 @@ class HasLifecycle(Filter):
                     return True
         return False
 
-    def call_api(self, bucket):
-        bname = bucket['Name']
-        session = local_session(self.manager.session_factory)
-        s3 = bucket_client(session, bucket)
+    # def call_api(self, bucket):
+    #     bname = bucket['Name']
+    #     session = local_session(self.manager.session_factory)
+    #     s3 = bucket_client(session, bucket)
 
-        try:
-            shared_buckets = self.manager._cache.get(CACHE_NAME)
-            if shared_buckets:
-                if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
-                    return bucket
-                else:
-                    lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                    shared_buckets[bname] = bucket
-                    shared_buckets[bname]['LifecyclePolicy'] = lifecycle
-                    self.cache_update = True
-                    return shared_buckets[bname]
-            else:
-                lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                bucket['LifecyclePolicy'] = lifecycle
-                self.cache_update = True
-                return bucket
-        except ClientError as e:
-            # Do nothing
-            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
-                return
-            if e.response['Error']['Code'] == 'NoSuchBucket':
-                self.log.warn("Bucket `%s` no longer exists", bname)
-                return
-            raise
-
+    #     try:
+    #         shared_buckets = self.manager._cache.get(CACHE_NAME)
+    #         if shared_buckets:
+    #             if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
+    #                 return bucket
+    #             else:
+    #                 lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+    #                 shared_buckets[bname] = bucket
+    #                 shared_buckets[bname]['LifecyclePolicy'] = lifecycle
+    #                 self.cache_update = True
+    #                 return shared_buckets[bname]
+    #         else:
+    #             lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+    #             bucket['LifecyclePolicy'] = lifecycle
+    #             self.cache_update = True
+    #             return bucket
+    #     except ClientError as e:
+    #         # Do nothing
+    #         if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+    #             return
+    #         if e.response['Error']['Code'] == 'NoSuchBucket':
+    #             self.log.warn("Bucket `%s` no longer exists", bname)
+    #             return
+    #         raise
 
 def get_bucket_region(b):
     bucket_region = b['Location']['LocationConstraint']
@@ -552,6 +585,8 @@ class S3BucketLifecycle(object):
         self.lifecycle['Expiration'] = {'Days': days}
 
     def set_expired_delete_marker(self, value):
+        if 'Expiration' in self.lifecycle:
+            raise Exception('You cannot enable clean up expired object delete markers if you enable Expiration.')
         self.lifecycle['Expiration'] = {'ExpiredObjectDeleteMarker': value}
 
     def set_stale_multipart_uploads_days(self, days):
@@ -1035,7 +1070,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 
 @actions.register('configure-lifecycle')
-class ConfigureLifecycle(BucketActionBase):
+class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
     """Action that aggregates all rules with whole bucket prefix and
     changes them to the configured policy values."""
 
@@ -1063,7 +1098,7 @@ class ConfigureLifecycle(BucketActionBase):
             max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
 
             with self.executor_factory(max_workers=max_workers) as w:
-                saved_buckets = w.map(self.call_api, buckets)
+                saved_buckets = w.map(self.call_lifecycle_api, buckets)
                 saved_buckets = filter(None, list(saved_buckets))
 
             if self.cache_update:
@@ -1207,35 +1242,35 @@ class ConfigureLifecycle(BucketActionBase):
                     return
                 raise
 
-    def call_api(self, bucket):
-        bname = bucket['Name']
-        session = local_session(self.manager.session_factory)
-        s3 = bucket_client(session, bucket)
+    # def call_api(self, bucket):
+    #     bname = bucket['Name']
+    #     session = local_session(self.manager.session_factory)
+    #     s3 = bucket_client(session, bucket)
 
-        try:
-            shared_buckets = self.manager._cache.get(CACHE_NAME)
-            if shared_buckets:
-                if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
-                    return bucket
-                else:
-                    lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                    shared_buckets[bname] = bucket
-                    shared_buckets[bname]['LifecyclePolicy'] = lifecycle
-                    self.cache_update = True
-                    return shared_buckets[bname]
-            else:
-                lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                bucket['LifecyclePolicy'] = lifecycle
-                self.cache_update = True
-                return bucket
-        except ClientError as e:
-            # Do nothing
-            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
-                return
-            if e.response['Error']['Code'] == 'NoSuchBucket':
-                self.log.warn("Bucket `%s` no longer exists", bname)
-                return
-            raise
+    #     try:
+    #         shared_buckets = self.manager._cache.get(CACHE_NAME)
+    #         if shared_buckets:
+    #             if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
+    #                 return bucket
+    #             else:
+    #                 lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+    #                 shared_buckets[bname] = bucket
+    #                 shared_buckets[bname]['LifecyclePolicy'] = lifecycle
+    #                 self.cache_update = True
+    #                 return shared_buckets[bname]
+    #         else:
+    #             lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
+    #             bucket['LifecyclePolicy'] = lifecycle
+    #             self.cache_update = True
+    #             return bucket
+    #     except ClientError as e:
+    #         # Do nothing
+    #         if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+    #             return
+    #         if e.response['Error']['Code'] == 'NoSuchBucket':
+    #             self.log.warn("Bucket `%s` no longer exists", bname)
+    #             return
+    #         raise
 
 
 @actions.register('encryption-policy')
