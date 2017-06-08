@@ -155,6 +155,51 @@ class FlowLogFilter(Filter):
         return results
 
 
+@Vpc.filter_registry.register('security-group')
+class SecurityGroupFilter(Filter):
+    schema = type_schema(
+        'security-group',
+        **{
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'owner-id': {'type': 'string'},
+            'group-id': {'type': 'string'},
+        }
+    )
+    permissions = ('ec2:DescribeSecurityGroups')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        matching_vpc_ids = []
+        for vpc in resources:
+            vpc_filter = {'Name': 'vpc-id', 'Values': [vpc['VpcId']]}
+            response = client.describe_security_groups(Filters=[vpc_filter])
+            results = response['SecurityGroups']
+            if self.data.get('name'):
+                results = [
+                    sg for sg in results
+                    if sg['GroupName'] == self.data['name']
+                ]
+            if self.data.get('description'):
+                results = [
+                    sg for sg in results
+                    if sg['Description'] == self.data['description']
+                ]
+            if self.data.get('owner-id'):
+                results = [
+                    sg for sg in results
+                    if sg['OwnerId'] == self.data['owner-id']
+                ]
+            if self.data.get('group-id'):
+                results = [
+                    sg for sg in results
+                    if sg['GroupId'] == self.data['group-id']
+                ]
+            matching_vpc_ids.extend([sg['VpcId'] for sg in results])
+        # filter down to VPCs with security groups that matched
+        return [r for r in resources if r['VpcId'] in matching_vpc_ids]
+
+
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
 
