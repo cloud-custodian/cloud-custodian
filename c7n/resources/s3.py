@@ -416,69 +416,59 @@ class HasLifecycle(Filter):
         results = []
         for b in shared_buckets:
             bucket_region = get_bucket_region(b)
-            # bucket_region = 'us-east-1'
             if bucket_region in glacier_supported_regions:
                 glacier_days_in_policy = self.data.get('glacier_days', None)
             else:
                 glacier_days_in_policy = None
 
-            bad_bucket_lifecycle = True
             if 'LifecyclePolicy' in b:
                 for rule in b['LifecyclePolicy']['Rules']:
                     if rule['ID'] == self.data.get('id'):
-                        bad_bucket_lifecycle = False
 
                         if rule['Status'] == 'Disabled':
-                            bad_bucket_lifecycle = True
+                            continue
 
                         # Handle lifecycles created using new Amazon web interface
                         if 'Filter' in rule:
                             if rule['Filter']['Prefix'] != prefix:
-                                bad_bucket_lifecycle = True
+                                continue
                         else:
                             if rule['Prefix'] != prefix:
-                                bad_bucket_lifecycle = True
+                                continue
 
                         if 'Transitions' in rule:
                             # Can only have STANDARD_IA and GLACIER transitions
                             if (len(rule['Transitions']) < 2) and\
                                     ia_days_in_policy and\
                                     glacier_days_in_policy:
-                                bad_bucket_lifecycle = True
+                                continue
                             else:
-                                for t in rule['Transitions']:
-                                    if (t['StorageClass'] == 'STANDARD_IA'):
-                                        if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
-                                            bad_bucket_lifecycle = True
-
-                                    if (t['StorageClass'] == 'GLACIER'):
-                                        if glacier_days_in_policy and\
-                                                (t['Days'] != glacier_days_in_policy):
-                                            bad_bucket_lifecycle = True
+                                if self.mismatched_transitions(rule, ia_days_in_policy, glacier_days_in_policy):
+                                    continue
 
                         elif ia_days_in_policy or glacier_days_in_policy:
-                            bad_bucket_lifecycle = True
+                            continue
 
                         if 'Expiration' in rule and 'Days' in rule['Expiration']:
                             if isinstance(deletes_objects, bool) and (deletes_objects is False):
-                                bad_bucket_lifecycle = True
+                                continue
                             elif delete_days_in_policy and\
                                     rule['Expiration']['Days'] != delete_days_in_policy:
-                                bad_bucket_lifecycle = True
+                                continue
                         elif (deletes_objects is True) or delete_days_in_policy:
-                            bad_bucket_lifecycle = True
+                            continue
 
                         if 'AbortIncompleteMultipartUpload' in rule:
                             multipart_days_in_rule =\
                                 rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
                             if multipart_days_in_policy and\
                                     (multipart_days_in_rule != multipart_days_in_policy):
-                                bad_bucket_lifecycle = True
+                                continue
                         elif multipart_days_in_policy:
-                            bad_bucket_lifecycle = True
+                            continue
 
-                if not bad_bucket_lifecycle:
-                    results.append(b)
+                        results.append(b)
+                        break
 
         if self.cache_update is True:
             shared_buckets = {b['Name']: b for b in shared_buckets}
@@ -489,6 +479,19 @@ class HasLifecycle(Filter):
                       len(buckets))
 
         return results
+
+    def mismatched_transitions(self, rule, ia_days_in_policy, glacier_days_in_policy):
+        """Returns true if user input doesn't match what is in the policy."""
+        for t in rule['Transitions']:
+            if (t['StorageClass'] == 'STANDARD_IA'):
+                if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
+                    return True
+
+            if (t['StorageClass'] == 'GLACIER'):
+                if glacier_days_in_policy and\
+                        (t['Days'] != glacier_days_in_policy):
+                    return True
+        return False
 
     def call_api(self, bucket):
         bname = bucket['Name']
