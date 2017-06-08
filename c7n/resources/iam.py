@@ -13,12 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from cStringIO import StringIO
 import csv
 import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+import io
 import itertools
 import time
 from botocore.exceptions import ClientError
@@ -558,7 +558,7 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(StringIO(data))
+        reader = csv.reader(io.StringIO(data))
         headers = reader.next()
         for line in reader:
             info = dict(zip(headers, line))
