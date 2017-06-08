@@ -221,13 +221,18 @@ CONN_CACHE = threading.local()
 
 def local_session(factory):
     """Cache a session thread local for up to 45m"""
+    factory_region = getattr(factory, 'region', None)
     s = getattr(CONN_CACHE, 'session', None)
+    r = getattr(CONN_CACHE, 'region', None)
     t = getattr(CONN_CACHE, 'time', 0)
     n = time.time()
-    if s is not None and t + (60 * 45) > n:
+    if (s is not None and r is not None and
+            r == factory_region and
+            t + (60 * 45) > n):
         return s
     s = factory()
     CONN_CACHE.session = s
+    CONN_CACHE.region = factory_region
     CONN_CACHE.time = n
     return s
 
