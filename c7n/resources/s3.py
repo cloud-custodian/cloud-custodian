@@ -559,7 +559,7 @@ class S3BucketLifecycle(object):
 
     def set_expired_delete_marker(self, value):
         if 'Expiration' in self.lifecycle:
-            raise Exception('You cannot enable clean up expired object' +\
+            raise Exception('You cannot enable clean up expired object' +
                             'delete markers if you enable Expiration.')
         self.lifecycle['Expiration'] = {'ExpiredObjectDeleteMarker': value}
 
