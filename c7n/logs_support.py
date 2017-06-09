@@ -39,7 +39,7 @@ def _timestamp_from_string(date_text):
     try:
         date_dt = parser.parse(date_text)
         date_ts = time.mktime(date_dt.timetuple())
-        return long(date_ts * 1000)
+        return int(date_ts * 1000)
     except (AttributeError, TypeError, ValueError):
         return 0
 

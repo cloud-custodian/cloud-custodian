@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 
+import six
 from unittest import TestCase
 
 from c7n.logs_support import (
@@ -39,7 +40,7 @@ def log_lines():
 
 class TestLogsSupport(TestCase):
 
-    def test_normailization(self):
+    def test_normalization(self):
         raw_entries = log_lines()
         log_gen = normalized_log_entries(raw_entries)
         nrm_entries = list(log_gen)
@@ -50,8 +51,8 @@ class TestLogsSupport(TestCase):
         entry = nrm_entries[1]
         self.assertIn('timestamp', entry)
         self.assertIn('message', entry)
-        self.assertIsInstance(entry['timestamp'], long)
-        self.assertIsInstance(entry['message'], unicode)
+        self.assertIsInstance(entry['timestamp'], six.integer_types)
+        self.assertIsInstance(entry['message'], six.text_type)
 
     def test_entries_in_range(self):
         raw_entries = log_lines()
@@ -72,5 +73,5 @@ class TestLogsSupport(TestCase):
     def test_timestamp_from_string(self):
         tfs = _timestamp_from_string
         date_text = '2016-11-21 13:13:41'
-        self.assertIsInstance(tfs(date_text), long)
+        self.assertIsInstance(tfs(date_text), six.integer_types)
         self.assertEqual(tfs('not a date'), 0)
