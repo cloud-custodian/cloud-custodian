@@ -12,6 +12,10 @@ EXPECTED_SUCCESSES = '''\
 tests.test_executor.ProcessExecutorTest.test_map_instance
 tests.test_executor.ThreadExecutorTest.test_map_instance
 tests.test_executor.MainExecutorTest.test_map_instance
+tests.test_logs_support.TestLogsSupport.test_entries_in_range
+tests.test_logs_support.TestLogsSupport.test_normalization
+tests.test_logs_support.TestLogsSupport.test_timestamp_from_string
+tests.test_logsub.TestLogsub.test_message_event
 '''
 
 
