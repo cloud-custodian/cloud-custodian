@@ -477,7 +477,9 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                                     glacier_days_in_policy:
                                 continue
                             else:
-                                if self.mismatched_transitions(rule, ia_days_in_policy, glacier_days_in_policy):
+                                if self.mismatched_transitions(rule,
+                                                               ia_days_in_policy,
+                                                               glacier_days_in_policy):
                                     continue
 
                         elif ia_days_in_policy or glacier_days_in_policy:
@@ -557,7 +559,8 @@ class S3BucketLifecycle(object):
 
     def set_expired_delete_marker(self, value):
         if 'Expiration' in self.lifecycle:
-            raise Exception('You cannot enable clean up expired object delete markers if you enable Expiration.')
+            raise Exception('You cannot enable clean up expired object' +\
+                            'delete markers if you enable Expiration.')
         self.lifecycle['Expiration'] = {'ExpiredObjectDeleteMarker': value}
 
     def set_stale_multipart_uploads_days(self, days):
