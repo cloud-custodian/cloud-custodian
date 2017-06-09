@@ -27,6 +27,6 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'c7n-indexer = c7n_indexer.metrics:cli']},
+            'c7n-indexer = c7n_index.metrics:cli']},
     install_requires=["c7n", "click", "influxdb"],
 )
