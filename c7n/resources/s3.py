@@ -498,9 +498,10 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                                     prv_glacier_days_in_policy:
                                 continue
                             else:
-                                if self.mismatched_previous_version_transitions(rule,
-                                                                                prv_ia_days_in_policy,
-                                                                                prv_glacier_days_in_policy):
+                                if self.mismatched_previous_version_transitions(
+                                    rule,
+                                    prv_ia_days_in_policy,
+                                    prv_glacier_days_in_policy):
                                     continue
 
                         elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
@@ -519,11 +520,13 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                             continue
 
                         # Previous version deletions
-                        if 'NoncurrentVersionExpiration' in rule and 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
+                        if 'NoncurrentVersionExpiration' in rule and\
+                                'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
                             # if isinstance(deletes_objects, bool) and (deletes_objects is False):
                             #     continue
                             if prv_delete_days_in_policy and\
-                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'] != prv_delete_days_in_policy:
+                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'] !=\
+                                    prv_delete_days_in_policy:
                                 continue
                         # elif (deletes_objects is True) or prv_delete_days_in_policy:
                         #     continue
@@ -566,7 +569,10 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                     return True
         return False
 
-    def mismatched_previous_version_transitions(self, rule, prv_ia_days_in_policy, prv_glacier_days_in_policy):
+    def mismatched_previous_version_transitions(self,
+                                                rule,
+                                                prv_ia_days_in_policy,
+                                                prv_glacier_days_in_policy):
         """Returns true if user input doesn't match what is in the policy."""
         for t in rule['NoncurrentVersionTransitions']:
             if (t['StorageClass'] == 'STANDARD_IA'):
@@ -1227,11 +1233,14 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                             changed_bucket_lifecycle = True
                         for t in rule['NoncurrentVersionTransitions']:
                             if (t['StorageClass'] == 'STANDARD_IA'):
-                                if prv_ia_days_in_policy and (t['NoncurrentDays'] != prv_ia_days_in_policy):
-                                    rem_lifecycle.set_ia_previous_transition_days(prv_ia_days_in_policy)
+                                if prv_ia_days_in_policy and (t['NoncurrentDays'] !=\
+                                                              prv_ia_days_in_policy):
+                                    rem_lifecycle.set_ia_previous_transition_days(
+                                        prv_ia_days_in_policy)
                                     changed_bucket_lifecycle = True
                                 else:
-                                    rem_lifecycle.set_ia_previous_transition_days(t['NoncurrentDays'])
+                                    rem_lifecycle.set_ia_previous_transition_days(
+                                        t['NoncurrentDays'])
 
                             if (t['StorageClass'] == 'GLACIER'):
                                 if prv_glacier_days_in_policy and\
@@ -1241,7 +1250,8 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                                     )
                                     changed_bucket_lifecycle = True
                                 else:
-                                    rem_lifecycle.set_glacier_previous_transition_days(t['NoncurrentDays'])
+                                    rem_lifecycle.set_glacier_previous_transition_days(
+                                        t['NoncurrentDays'])
 
                     elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
                         changed_bucket_lifecycle = True
@@ -1254,7 +1264,8 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                                     (delete_days_in_policy != prv_delete_days_in_rule):
                                 changed_bucket_lifecycle = True
                             else:
-                                rem_lifecycle.set_deletes_objects_days(rule['NoncurrentVersionExpiration']['NoncurrentDays'])
+                                rem_lifecycle.set_deletes_objects_days(
+                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'])
                         if 'ExpiredObjectDeleteMarker' in rule['NoncurrentVersionExpiration']:
                             rem_lifecycle.set_expired_delete_marker(
                                 rule['NoncurrentVersionExpiration']['ExpiredObjectDeleteMarker']
