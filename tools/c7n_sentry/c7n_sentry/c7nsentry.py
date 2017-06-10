@@ -61,7 +61,6 @@ import json
 import logging
 import os
 import time
-import urlparse
 import uuid
 import zlib
 
@@ -71,6 +70,7 @@ from botocore.exceptions import ClientError
 from botocore.vendored import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
+from six.moves.urllib.parse import urlparse
 
 sqs = logs = config = None
 
@@ -169,7 +169,7 @@ def process_log_group(config):
 
 def send_sentry_message(sentry_dsn, msg):
     # reversed from raven.base along with raven docs
-    parsed = urlparse.urlparse(sentry_dsn)
+    parsed = urlparse(sentry_dsn)
     key, secret = parsed.netloc.split('@')[0].split(':')
     project_id = parsed.path.strip('/')
     msg['project'] = project_id
@@ -283,7 +283,7 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
     """
 
     data = {}
-    lines = filter(None, msg.split('\n'))
+    lines = list(filter(None, msg.split('\n')))
     data['frames'] = []
     err_ctx = None
 
@@ -368,7 +368,7 @@ def orgreplay(options):
     sget = partial(requests.get, headers=auth_headers)
     spost = partial(requests.post, headers=auth_headers)
 
-    dsn = urlparse.urlparse(options.sentry_dsn)
+    dsn = urlparse(options.sentry_dsn)
     endpoint = "%s://%s/api/0/" % (
         dsn.scheme,
         "@" in dsn.netloc and dsn.netloc.rsplit('@', 1)[1] or dsn.netloc)
@@ -521,7 +521,7 @@ if __name__ == '__main__':
 
     try:
         main()
-    except SystemExit, KeyboardInterrupt:
+    except (SystemExit, KeyboardInterrupt):
         raise
     except:
         import traceback, sys, pdb

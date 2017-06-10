@@ -17,6 +17,9 @@ tests.test_logs_support.TestLogsSupport.test_normalization
 tests.test_logs_support.TestLogsSupport.test_timestamp_from_string
 tests.test_logsub.TestLogsub.test_message_event
 tests.test_s3crypt.TestS3Crypt.test_init
+tools.c7n_sentry.test_sentry.SentrySenderTests.test_get_sentry_message
+tools.c7n_sentry.test_sentry.SentrySenderTests.test_parse_traceback
+tools.c7n_sentry.test_sentry.SentrySenderTests.test_preserve_full_message
 '''
 
 
