@@ -1211,6 +1211,10 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
             rules['Rules'].append(rem_lifecycle.json())
             try:
                 s3.put_bucket_lifecycle_configuration(Bucket=bname, LifecycleConfiguration=rules)
+                shared_buckets = self.manager._cache.get(CACHE_NAME)
+                shared_buckets[bucket['Name']]['LifecyclePolicy'] = rules
+                self.manager._cache.save(CACHE_NAME, shared_buckets)
+
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchBucket':
                     return
