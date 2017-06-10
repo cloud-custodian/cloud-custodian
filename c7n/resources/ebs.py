@@ -159,7 +159,8 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    """Filter to remove snapshots of AMIs from results
+    """
+    Filter to remove snapshots of AMIs from results
 
     This filter is 'true' by default.
 
@@ -169,7 +170,7 @@ class SnapshotSkipAmiSnapshots(Filter):
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
@@ -184,7 +185,7 @@ class SnapshotSkipAmiSnapshots(Filter):
         return AMI(self.manager.ctx, {}).get_permissions()
 
     def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
+        if not isinstance(self.data.get('value', true), true, false):
             raise FilterValidationError(
                 "invalid config: expected boolean value")
         return self
@@ -290,7 +291,7 @@ class CopySnapshot(BaseAction):
         'ec2:CreateTags', 'ec2:CopySnapshot', 'ec2:DescribeSnapshots')
 
     def validate(self):
-        if self.data.get('encrypted', True):
+        if self.data.get('encrypted', true):
             key = self.data.get('target_key')
             if not key:
                 raise FilterValidationError(
