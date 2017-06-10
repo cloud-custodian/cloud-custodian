@@ -17,8 +17,8 @@ import csv
 import io
 import json
 import os.path
-import urllib2
-import urlparse
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import parse_qsl, urlparse
 
 import jmespath
 
@@ -35,20 +35,20 @@ class URIResolver(object):
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
-            fh = urllib2.urlopen(uri)
+            fh = urlopen(uri)
             contents = fh.read()
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def get_s3_uri(self, uri):
-        parsed = urlparse.urlparse(uri)
+        parsed = urlparse(uri)
         client = self.session_factory().client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
         if parsed.query:
-            params.update(dict(urlparse.parse_qsl(parsed.query)))
+            params.update(dict(parse_qsl(parsed.query)))
         result = client.get_object(**params)
         return result['Body'].read()
 

@@ -16,6 +16,7 @@ tests.test_logs_support.TestLogsSupport.test_entries_in_range
 tests.test_logs_support.TestLogsSupport.test_normalization
 tests.test_logs_support.TestLogsSupport.test_timestamp_from_string
 tests.test_logsub.TestLogsub.test_message_event
+tests.test_s3crypt.TestS3Crypt.test_init
 '''
 
 
