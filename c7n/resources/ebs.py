@@ -101,7 +101,7 @@ class SnapshotAge(AgeFilter):
 
 
 def _filter_ami_snapshots(self, snapshots):
-    if not self.data.get('value', True):
+    if not self.data.get('value', true):
         return snapshots
     # try using cache first to get a listing of all AMI snapshots and compares resources to the list
     # This will populate the cache.
@@ -159,9 +159,8 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    """Filter to remove snapshots of AMIs from results
-
-    This filter is 'true' by default.
+    """
+    Filter to remove snapshots of AMIs from results
 
     :example:
 
@@ -169,7 +168,7 @@ class SnapshotSkipAmiSnapshots(Filter):
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
@@ -182,12 +181,6 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     def get_permissions(self):
         return AMI(self.manager.ctx, {}).get_permissions()
-
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
 
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
@@ -290,7 +283,7 @@ class CopySnapshot(BaseAction):
         'ec2:CreateTags', 'ec2:CopySnapshot', 'ec2:DescribeSnapshots')
 
     def validate(self):
-        if self.data.get('encrypted', True):
+        if self.data.get('encrypted', true):
             key = self.data.get('target_key')
             if not key:
                 raise FilterValidationError(
