@@ -633,11 +633,14 @@ class Policy(object):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
         if self.options.dryrun:
-            return PullMode(self).run()
+            resources = PullMode(self).run()
         elif isinstance(mode, LambdaMode):
-            return mode.provision()
+            resources = mode.provision()
         else:
-            return mode.run()
+            resources = mode.run()
+        # clear out resource manager post run, to clear cache
+        self.resource_manager = self.get_resource_manager()
+        return resources
 
     run = __call__
 
