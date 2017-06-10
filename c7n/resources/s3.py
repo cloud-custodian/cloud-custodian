@@ -422,11 +422,13 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                          required=['id'],
                          id={'type': 'string'},
                          prefix={'type': 'string'},
-                         deletes_objects={'type': 'boolean'},
                          delete_days={'type': 'number'},
+                         delete_previous_version_days={'type': 'number'},
                          multipart_days={'type': 'number'},
                          ia_days={'type': 'number'},
+                         previous_version_ia_days={'type': 'number'},
                          glacier_days={'type': 'number'},
+                         previous_version_glacier_days={'type': 'number'},
                          max_workers={'type': 'number'})
 
     cache_update = False
@@ -439,8 +441,11 @@ class HasLifecycle(Filter, LifecycleApiMixin):
 
         # Make sure lifecycle is within configured policy limits
         ia_days_in_policy = self.data.get('ia_days', None)
-        deletes_objects = self.data.get('deletes_objects')
+        prv_ia_days_in_policy = self.data.get('previous_version_ia_days', None)
+        glacier_days_in_policy = self.data.get('glacier_days', None)
+        prv_glacier_days_in_policy = self.data.get('previous_version_glacier_days', None)
         delete_days_in_policy = self.data.get('delete_days')
+        prv_delete_days_in_policy = self.data.get('delete_previous_version_days')
         multipart_days_in_policy = self.data.get('multipart_days', None)
 
         session = local_session(self.manager.session_factory)
@@ -470,6 +475,7 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                             if rule['Prefix'] != prefix:
                                 continue
 
+                        # Current version transitions
                         if 'Transitions' in rule:
                             # Can only have STANDARD_IA and GLACIER transitions
                             if (len(rule['Transitions']) < 2) and\
@@ -485,15 +491,46 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                         elif ia_days_in_policy or glacier_days_in_policy:
                             continue
 
-                        if 'Expiration' in rule and 'Days' in rule['Expiration']:
-                            if isinstance(deletes_objects, bool) and (deletes_objects is False):
+                        # Previous version transitions
+                        if 'NoncurrentVersionTransitions' in rule:
+                            if (len(rule['NoncurrentVersionTransitions']) < 2) and\
+                                    prv_ia_days_in_policy and\
+                                    prv_glacier_days_in_policy:
                                 continue
-                            elif delete_days_in_policy and\
-                                    rule['Expiration']['Days'] != delete_days_in_policy:
-                                continue
-                        elif (deletes_objects is True) or delete_days_in_policy:
+                            else:
+                                if self.mismatched_previous_version_transitions(rule,
+                                                                                prv_ia_days_in_policy,
+                                                                                prv_glacier_days_in_policy):
+                                    continue
+
+                        elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
                             continue
 
+                        # Current version deletions
+                        if 'Expiration' in rule and 'Days' in rule['Expiration']:
+                            # if isinstance(deletes_objects, bool) and (deletes_objects is False):
+                            #     continue
+                            if delete_days_in_policy and\
+                                    rule['Expiration']['Days'] != delete_days_in_policy:
+                                continue
+                        # elif (deletes_objects is True) or delete_days_in_policy:
+                        #     continue
+                        elif delete_days_in_policy:
+                            continue
+
+                        # Previous version deletions
+                        if 'NoncurrentVersionExpiration' in rule and 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
+                            # if isinstance(deletes_objects, bool) and (deletes_objects is False):
+                            #     continue
+                            if prv_delete_days_in_policy and\
+                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'] != prv_delete_days_in_policy:
+                                continue
+                        # elif (deletes_objects is True) or prv_delete_days_in_policy:
+                        #     continue
+                        elif prv_delete_days_in_policy:
+                            continue
+
+                        # Multipart uploads
                         if 'AbortIncompleteMultipartUpload' in rule:
                             multipart_days_in_rule =\
                                 rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
@@ -526,6 +563,19 @@ class HasLifecycle(Filter, LifecycleApiMixin):
             if (t['StorageClass'] == 'GLACIER'):
                 if glacier_days_in_policy and\
                         (t['Days'] != glacier_days_in_policy):
+                    return True
+        return False
+
+    def mismatched_previous_version_transitions(self, rule, prv_ia_days_in_policy, prv_glacier_days_in_policy):
+        """Returns true if user input doesn't match what is in the policy."""
+        for t in rule['NoncurrentVersionTransitions']:
+            if (t['StorageClass'] == 'STANDARD_IA'):
+                if prv_ia_days_in_policy and (t['NoncurrentDays'] != prv_ia_days_in_policy):
+                    return True
+
+            if (t['StorageClass'] == 'GLACIER'):
+                if prv_glacier_days_in_policy and\
+                        (t['NoncurrentDays'] != prv_glacier_days_in_policy):
                     return True
         return False
 
@@ -1058,9 +1108,12 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
             'id': {'type': 'string'},
             'prefix': {'type': 'string'},
             'delete_days': {'type': 'number'},
+            'delete_previous_version_days': {'type': 'number'},
             'multipart_days': {'type': 'number'},
             'ia_days': {'type': 'number'},
+            'previous_version_ia_days': {'type': 'number'},
             'glacier_days': {'type': 'number'},
+            'previous_version_glacier_days': {'type': 'number'},
             'max_workers': {'type': 'number'}
         },
         'required': ['id']
@@ -1087,8 +1140,11 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
 
         # Make sure lifecycle is within configured policy limits
         ia_days_in_policy = self.data.get('ia_days', None)
+        prv_ia_days_in_policy = self.data.get('previous_version_ia_days', None)
         glacier_days_in_policy = self.data.get('glacier_days', None)
+        prv_glacier_days_in_policy = self.data.get('previous_version_glacier_days', None)
         delete_days_in_policy = self.data.get('delete_days')
+        prv_delete_days_in_policy = self.data.get('delete_previous_version_days')
         multipart_days_in_policy = self.data.get('multipart_days', None)
 
         session = local_session(self.manager.session_factory)
@@ -1102,12 +1158,18 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
         rem_lifecycle = S3BucketLifecycle(prefix, self.data.get('id'))
         if ia_days_in_policy:
             rem_lifecycle.set_ia_transition_days(ia_days_in_policy)
+        if prv_ia_days_in_policy:
+            rem_lifecycle.set_ia_previous_transition_days(prv_ia_days_in_policy)
         if glacier_days_in_policy and (bucket_region in glacier_supported_regions):
             rem_lifecycle.set_glacier_transition_days(glacier_days_in_policy)
+        if prv_glacier_days_in_policy and (bucket_region in glacier_supported_regions):
+            rem_lifecycle.set_glacier_previous_transition_days(prv_glacier_days_in_policy)
         if multipart_days_in_policy:
             rem_lifecycle.set_stale_multipart_uploads_days(multipart_days_in_policy)
         if delete_days_in_policy:
             rem_lifecycle.set_deletes_objects_days(delete_days_in_policy)
+        if prv_delete_days_in_policy:
+            rem_lifecycle.set_delete_previous_versions(prv_delete_days_in_policy)
 
         changed_bucket_lifecycle = True
         rules = {'Rules': []}
@@ -1128,6 +1190,7 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                         if rule['Prefix'] != prefix:
                             changed_bucket_lifecycle = True
 
+                    # Current version transitions
                     if 'Transitions' in rule:
                         # Can only have STANDARD_IA and GLACIER transitions
                         if (len(rule['Transitions']) < 2) and\
@@ -1156,20 +1219,50 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                     elif ia_days_in_policy or glacier_days_in_policy:
                         changed_bucket_lifecycle = True
 
+                    # Old version transitions
                     if 'NoncurrentVersionTransitions' in rule:
+                        if (len(rule['NoncurrentVersionTransitions']) < 2) and\
+                                prv_ia_days_in_policy and\
+                                prv_glacier_days_in_policy:
+                            changed_bucket_lifecycle = True
                         for t in rule['NoncurrentVersionTransitions']:
                             if (t['StorageClass'] == 'STANDARD_IA'):
-                                rem_lifecycle.set_ia_previous_transition_days(t['NoncurrentDays'])
+                                if prv_ia_days_in_policy and (t['NoncurrentDays'] != prv_ia_days_in_policy):
+                                    rem_lifecycle.set_ia_previous_transition_days(prv_ia_days_in_policy)
+                                    changed_bucket_lifecycle = True
+                                else:
+                                    rem_lifecycle.set_ia_previous_transition_days(t['NoncurrentDays'])
+
                             if (t['StorageClass'] == 'GLACIER'):
-                                rem_lifecycle.set_glacier_previous_transition_days(
-                                    t['NoncurrentDays']
-                                )
+                                if prv_glacier_days_in_policy and\
+                                        (t['NoncurrentDays'] != prv_glacier_days_in_policy):
+                                    rem_lifecycle.set_glacier_previous_transition_days(
+                                        prv_glacier_days_in_policy
+                                    )
+                                    changed_bucket_lifecycle = True
+                                else:
+                                    rem_lifecycle.set_glacier_previous_transition_days(t['NoncurrentDays'])
 
+                    elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    # Old version deletions
                     if 'NoncurrentVersionExpiration' in rule:
-                        rem_lifecycle.set_delete_previous_versions(
-                            rule['NoncurrentVersionExpiration']['NoncurrentDays']
-                        )
+                        if 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
+                            prv_delete_days_in_rule = rule['NoncurrentVersionExpiration']['NoncurrentDays']
+                            if delete_days_in_policy and\
+                                    (delete_days_in_policy != prv_delete_days_in_rule):
+                                changed_bucket_lifecycle = True
+                            else:
+                                rem_lifecycle.set_deletes_objects_days(rule['NoncurrentVersionExpiration']['NoncurrentDays'])
+                        if 'ExpiredObjectDeleteMarker' in rule['NoncurrentVersionExpiration']:
+                            rem_lifecycle.set_expired_delete_marker(
+                                rule['NoncurrentVersionExpiration']['ExpiredObjectDeleteMarker']
+                            )
+                    elif delete_days_in_policy:
+                        changed_bucket_lifecycle = True
 
+                    # Current version deletions
                     if 'Expiration' in rule:
                         if 'Days' in rule['Expiration']:
                             delete_days_in_rule = rule['Expiration']['Days']
@@ -1185,6 +1278,7 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                     elif delete_days_in_policy:
                         changed_bucket_lifecycle = True
 
+                    # Multipart uploads
                     if 'AbortIncompleteMultipartUpload' in rule:
                         multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']
                         ['DaysAfterInitiation']
@@ -1210,7 +1304,8 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
         if changed_bucket_lifecycle:
             rules['Rules'].append(rem_lifecycle.json())
             try:
-                s3.put_bucket_lifecycle_configuration(Bucket=bname, LifecycleConfiguration=rules)
+                s3.put_bucket_lifecycle_configuration(Bucket=bname,
+                                                      LifecycleConfiguration=rules)
                 shared_buckets = self.manager._cache.get(CACHE_NAME)
                 shared_buckets[bucket['Name']]['LifecyclePolicy'] = rules
                 self.manager._cache.save(CACHE_NAME, shared_buckets)
