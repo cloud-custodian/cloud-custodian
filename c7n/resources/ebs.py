@@ -101,7 +101,7 @@ class SnapshotAge(AgeFilter):
 
 
 def _filter_ami_snapshots(self, snapshots):
-    if not self.data.get('value', True):
+    if not self.data.get('value', true):
         return snapshots
     # try using cache first to get a listing of all AMI snapshots and compares resources to the list
     # This will populate the cache.
@@ -162,8 +162,6 @@ class SnapshotSkipAmiSnapshots(Filter):
     """
     Filter to remove snapshots of AMIs from results
 
-    This filter is 'true' by default.
-
     :example:
 
         .. code-block: yaml
@@ -183,12 +181,6 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     def get_permissions(self):
         return AMI(self.manager.ctx, {}).get_permissions()
-
-    def validate(self):
-        if not isinstance(self.data.get('value', true), true, false):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
 
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
