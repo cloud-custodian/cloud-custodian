@@ -499,9 +499,9 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                                 continue
                             else:
                                 if self.mismatched_previous_version_transitions(
-                                    rule,
-                                    prv_ia_days_in_policy,
-                                    prv_glacier_days_in_policy):
+                                        rule,
+                                        prv_ia_days_in_policy,
+                                        prv_glacier_days_in_policy):
                                     continue
 
                         elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
@@ -1233,7 +1233,7 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                             changed_bucket_lifecycle = True
                         for t in rule['NoncurrentVersionTransitions']:
                             if (t['StorageClass'] == 'STANDARD_IA'):
-                                if prv_ia_days_in_policy and (t['NoncurrentDays'] !=\
+                                if prv_ia_days_in_policy and (t['NoncurrentDays'] !=
                                                               prv_ia_days_in_policy):
                                     rem_lifecycle.set_ia_previous_transition_days(
                                         prv_ia_days_in_policy)
@@ -1259,7 +1259,9 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
                     # Old version deletions
                     if 'NoncurrentVersionExpiration' in rule:
                         if 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
-                            prv_delete_days_in_rule = rule['NoncurrentVersionExpiration']['NoncurrentDays']
+                            prv_delete_days_in_rule = rule['NoncurrentVersionExpiration']
+                            ['NoncurrentDays']
+
                             if delete_days_in_policy and\
                                     (delete_days_in_policy != prv_delete_days_in_rule):
                                 changed_bucket_lifecycle = True
