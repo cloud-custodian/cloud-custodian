@@ -31,6 +31,8 @@ References
 - IAM Policy Reference - http://goo.gl/U0a06y
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 
 from c7n.filters import Filter

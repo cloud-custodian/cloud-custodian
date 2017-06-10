@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 from unittest import TestCase
@@ -93,8 +94,8 @@ class FileCacheManagerTest(TestCase):
 
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
-    @mock.patch.object(cache.cPickle, 'dump')
-    @mock.patch.object(cache.cPickle, 'dumps')
+    @mock.patch.object(cache.pickle, 'dump')
+    @mock.patch.object(cache.pickle, 'dumps')
     def test_save_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
         #path exists then we dont need to create the folder
         mock_exists.return_value = True
@@ -116,8 +117,8 @@ class FileCacheManagerTest(TestCase):
 
     @mock.patch.object(cache.os, 'makedirs')
     @mock.patch.object(cache.os.path, 'exists')
-    @mock.patch.object(cache.cPickle, 'dump')
-    @mock.patch.object(cache.cPickle, 'dumps')
+    @mock.patch.object(cache.pickle, 'dump')
+    @mock.patch.object(cache.pickle, 'dumps')
     def test_save_doesnt_exists(
             self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
         temp_cache_file = tempfile.NamedTemporaryFile()

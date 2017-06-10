@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 import unittest
@@ -22,7 +24,7 @@ import ipaddress
 
 from c7n import utils
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class Backoff(BaseTest):
@@ -260,11 +262,11 @@ class UtilTest(unittest.TestCase):
         # are returned instead of a dictionary.
         FakeResource.schema = {}
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, str)
+        self.assertIsInstance(ret, unicode)
 
         delattr(FakeResource, 'schema')
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, str)
+        self.assertIsInstance(ret, unicode)
 
     def test_load_file(self):
         # Basic load

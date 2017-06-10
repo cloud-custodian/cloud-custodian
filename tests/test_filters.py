@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from dateutil import tz
 
 from datetime import datetime, timedelta
@@ -19,7 +21,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from common import instance, event_data, Bag
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -33,7 +35,7 @@ class BaseFilterTest(unittest.TestCase):
         try:
             self.assertEqual(filters.factory(f)(i), v)
         except AssertionError:
-            print f, i['LaunchTime'], i['Tags'], v
+            print(f, i['LaunchTime'], i['Tags'], v)
             raise
 
 
