@@ -164,8 +164,9 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     This filter is 'true' by default.
 
-    :usage example implicit:
+    :example:
 
+        .. implicit with no parameters, 'true' by default
         .. code-block: yaml
 
             policies:
@@ -177,8 +178,9 @@ class SnapshotSkipAmiSnapshots(Filter):
                     op: ge
                   - skip-ami-snapshots
 
-    :usage example explicit:
+    :example:
 
+        .. explicit with parameter
         .. code-block: yaml
 
             policies:
@@ -188,7 +190,7 @@ class SnapshotSkipAmiSnapshots(Filter):
                   - type: age
                     days: 28
                     op: ge
-                  - skip-ami-snapshots
+                  - type: skip-ami-snapshots
                     value: false
     """
 
