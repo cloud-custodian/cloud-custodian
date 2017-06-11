@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import io
 import json
 import logging
 import os
-import StringIO
 import shutil
 import tempfile
 import yaml
@@ -26,7 +28,7 @@ from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
 
-from zpill import PillTest
+from .zpill import PillTest
 
 
 logging.getLogger('placebo.pill').setLevel(logging.DEBUG)
@@ -151,7 +153,7 @@ class BaseTest(PillTest):
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = StringIO.StringIO()
+            log_file = io.StringIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)

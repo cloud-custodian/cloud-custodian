@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
-from common import BaseTest, Bag, Config
+from .common import BaseTest, Bag, Config
 
 
 class TestEMR(BaseTest):

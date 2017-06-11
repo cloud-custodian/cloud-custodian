@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cStringIO import StringIO
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
 import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+import io
 import itertools
 import time
 from botocore.exceptions import ClientError
@@ -556,7 +558,7 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(StringIO(data))
+        reader = csv.reader(io.StringIO(data))
         headers = reader.next()
         for line in reader:
             info = dict(zip(headers, line))
