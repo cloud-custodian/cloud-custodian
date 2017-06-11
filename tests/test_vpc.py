@@ -93,16 +93,18 @@ class VpcTest(BaseTest):
 
     @functional
     def test_flow_logs_misconfiguration(self):
-        """Validate that each VPC has at least one valid configuration
-
-        In terms of filters, we then want to flag VPCs for which every
-        flow log configuration has at least one invalid value
-
-        Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
-        The first has three flow logs which each have different misconfigured properties
-        The second has one correctly configured flow log, and one where all config is bad
-
-        Only the first should be returned by the filter"""
+        # Validate that each VPC has at least one valid configuration
+        #
+        # In terms of filters, we then want to flag VPCs for which every
+        # flow log configuration has at least one invalid value
+        #
+        # Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
+        #
+        # The first has three flow logs which each have different
+        # misconfigured properties The second has one correctly
+        # configured flow log, and one where all config is bad
+        #
+        # Only the first should be returned by the filter
 
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_misconfigured')
@@ -138,7 +140,8 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_sg_missing(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_missing_loc')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_missing_loc')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -162,8 +165,10 @@ class NetworkLocationTest(BaseTest):
 
         nic = client.create_network_interface(
             SubnetId=web_sub_id,
-            Groups=[sg_id, web_sg_id])['NetworkInterface']['NetworkInterfaceId']
-        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+            Groups=[sg_id, web_sg_id]
+            )['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(
+            client.delete_network_interface, NetworkInterfaceId=nic)
 
         client.create_tags(
             Resources=[nic, web_sg_id, web_sub_id],
@@ -188,7 +193,8 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_sg_cardinality(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_cardinality')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)

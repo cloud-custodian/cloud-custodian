@@ -44,12 +44,14 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
-        try:
-            import boto3
-            session = boto3.Session()
-            account_id = get_account_id_from_sts(session)
-        except:
-            account_id = None
+        account_id = None
+        if 'AWS_LAMBDA_FUNCTION_NAME' in os.environ:
+            try:
+                import boto3
+                session = boto3.Session()
+                account_id = get_account_id_from_sts(session)
+            except:
+                pass
 
         d = {}
         d.update({
