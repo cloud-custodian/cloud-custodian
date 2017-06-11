@@ -159,24 +159,39 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    """Filter to remove snapshots of AMIs from results
+    """
+    Filter to remove snapshots of AMIs from results
 
     This filter is 'true' by default.
 
-    :example:
+    :usage example implicit:
 
         .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
                     op: ge
-                  - skip-ami-snapshots: true
+                  - skip-ami-snapshots
 
+    :usage example explicit:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: ebs-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                  - skip-ami-snapshots
+                    value: false
     """
+
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
 
