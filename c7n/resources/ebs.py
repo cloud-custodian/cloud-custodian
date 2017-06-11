@@ -191,8 +191,7 @@ class SnapshotSkipAmiSnapshots(Filter):
                   - skip-ami-snapshots
                     value: false
     """
-
-
+    
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
 
     def get_permissions(self):
