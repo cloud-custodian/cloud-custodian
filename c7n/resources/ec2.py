@@ -168,6 +168,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
@@ -514,6 +517,71 @@ class DefaultVpc(DefaultVpcBase):
 
     def __call__(self, ec2):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
+
+
+@filters.register('singleton')
+class SingletonFilter(Filter):
+    """EC2 instances without autoscaling or a recover alarm
+
+    Filters EC2 instances that are not members of an autoscaling group
+    and do not have Cloudwatch recover alarms.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - singleton
+            actions:
+              - type: tag
+                key: problem
+                value: instance is not resilient
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """
+
+    schema = type_schema('singleton')
+
+    permissions = ('cloudwatch:DescribeAlarmsForMetric',)
+
+    def __call__(self, i):
+        if self.in_asg(i):
+            return False
+        else:
+            return not self.has_recover_alarm(i)
+
+    @staticmethod
+    def in_asg(i):
+        if 'Tags' not in i:
+            return False
+        else:
+            return 'aws:autoscaling:groupName' in i['Tags']
+
+    def has_recover_alarm(self, i):
+        client = utils.local_session(self.manager.session_factory).client('cloudwatch')
+        alarms = client.describe_alarms_for_metric(
+            MetricName='StatusCheckFailed_System',
+            Namespace='AWS/EC2',
+            Dimensions=[
+                {
+                    'Name': 'InstanceId',
+                    'Value': i['InstanceId']
+                }
+            ]
+        )
+
+        for i in alarms['MetricAlarms']:
+            for a in i['AlarmActions']:
+                if (
+                    a.startswith('arn:aws:automate:') and
+                    a.endswith(':ec2:recover')
+                ):
+                    return True
+
+        return False
 
 
 @actions.register('start')
@@ -916,6 +984,67 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=i['NetworkInterfaceId'],
                 Groups=groups[idx])
+
+
+@actions.register('set-instance-profile')
+class SetInstanceProfile(BaseAction):
+    """Sets (or removes) the instance profile for an existing EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name:
+            resource: ec2
+            query:
+              - IamInstanceProfile: absent
+            actions:
+              - type: set-instance-profile
+                name: default
+
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/disassociate-iam-instance-profile.html
+    """
+
+    schema = type_schema(
+        'set-instance-profile',
+        **{'name': {'type': 'string'}})
+
+    permissions = (
+        'ec2:AssociateIamInstanceProfile',
+        'ec2:DisassociateIamInstanceProfile',
+        'iam:PassRole')
+
+    def process(self, instances):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name', '')
+
+        for i in instances:
+            if profile_name:
+                client.associate_iam_instance_profile(
+                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    InstanceId=i['InstanceId'])
+            else:
+                response = client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {
+                            'Name': 'instance-id',
+                            'Values': [i['InstanceId']],
+                        },
+                        {
+                            'Name': 'state',
+                            'Values': ['associating', 'associated']
+                        }
+                    ]
+                )
+                for a in response['IamInstanceProfileAssociations']:
+                    client.disassociate_iam_instance_profile(
+                        AssociationId=a['AssociationId']
+                    )
+
+        return instances
 
 
 # Valid EC2 Query Filters

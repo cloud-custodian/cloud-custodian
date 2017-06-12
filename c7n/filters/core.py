@@ -37,7 +37,7 @@ class FilterValidationError(Exception):
 
 
 # Matching filters annotate their key onto objects
-ANNOTATION_KEY = "MatchedFilters"
+ANNOTATION_KEY = "c7n:MatchedFilters"
 
 
 def glob_match(value, pattern):
@@ -126,7 +126,7 @@ class FilterRegistry(PluginRegistry):
                     self.plugin_type, data))
         filter_class = self.get(filter_type)
         if filter_class is not None:
-            return filter_class(data, manager).validate()
+            return filter_class(data, manager)
         else:
             raise FilterValidationError(
                 "%s Invalid filter type %s" % (

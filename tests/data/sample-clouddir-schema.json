@@ -1,0 +1,88 @@
+{
+  "facets" : {
+    "Employee" : {
+      "facetAttributes" : {
+        "Name" : {
+          "attributeDefinition" : {
+            "attributeType" : "STRING",
+            "isImmutable" : false,
+            "attributeRules" : {
+              "NameLengthRule" : {
+                "parameters" : {
+                  "min" : "3",
+                  "max" : "100"
+                },
+                "ruleType": "STRING_LENGTH"
+              }
+            }
+          },
+          "requiredBehavior" : "REQUIRED_ALWAYS"
+        },
+        "EmailAddress" : {
+          "attributeDefinition" : {
+            "attributeType" : "STRING",
+            "isImmutable" : true,
+            "attributeRules" : {
+              "EmailAddressLengthRule" : {
+                "parameters" : {
+                  "min" : "3",
+                  "max" : "100"
+                },
+                "ruleType": "STRING_LENGTH"
+              }
+            }
+          },
+          "requiredBehavior" : "REQUIRED_ALWAYS"
+        },
+        "Status" : {
+          "attributeDefinition" : {
+            "attributeType" : "STRING",
+            "isImmutable" : false,
+            "attributeRules" : {
+              "rule1" : {
+                "parameters" : {
+                  "allowedValues" : "ACTIVE, INACTIVE, TERMINATED"
+                },
+                "ruleType": "STRING_FROM_SET"
+              }
+            }
+          },
+          "requiredBehavior" : "REQUIRED_ALWAYS"
+        }
+      },
+      "objectType" : "LEAF_NODE"
+    },
+    "DataAccessPolicy" : {
+      "facetAttributes" : {
+        "AccessLevel" : {
+          "attributeDefinition" : {
+            "attributeType" : "STRING",
+            "isImmutable" : true,
+            "attributeRules" : {
+              "rule1" : {
+                "parameters" : {
+                  "allowedValues" : "SENSITIVE, CONFIDENTIAL, PUBLIC"
+                },
+                "ruleType": "STRING_FROM_SET"
+              }
+            }
+          },
+          "requiredBehavior" : "REQUIRED_ALWAYS"
+        }
+      },
+      "objectType" : "POLICY"
+    },
+    "Group" : {
+      "facetAttributes" : {
+        "Name" : {
+          "attributeDefinition" : {
+            "attributeType" : "STRING",
+            "isImmutable" : true
+          },
+          "requiredBehavior" : "REQUIRED_ALWAYS"
+        }
+      },
+      "objectType" : "NODE"
+    }
+  }
+}

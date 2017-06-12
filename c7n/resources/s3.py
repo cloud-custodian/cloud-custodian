@@ -162,7 +162,10 @@ def assemble_bucket(item):
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
-                return None
+                # We don't bail out, continue processing if we can.
+                # Note this can lead to missing data, but in general is cleaner than
+                # failing hard.
+                continue
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
@@ -1191,10 +1194,16 @@ class EncryptExtantKeys(ScanBucket):
         if info is None:
             info = s3.head_object(Bucket=bucket_name, Key=k)
 
-        if 'ServerSideEncryption' in info:
-            if self.kms_id and info.get('SSEKMSKeyId', '') == self.kms_id:
-                return False
-            else:
+        # If the data is already encrypted with AES256 and this request is also
+        # for AES256 then we don't need to do anything
+        if info.get('ServerSideEncryption') == 'AES256' and not self.kms_id:
+            return False
+
+        # If the data is already encrypted with KMS and the same key is provided
+        # then we don't need to do anything
+        if info.get('ServerSideEncryption') == 'aws:kms' and self.kms_id:
+            # Test using `in` because SSEKMSKeyId is the full ARN
+            if self.kms_id in info.get('SSEKMSKeyId', ''):
                 return False
 
         if self.data.get('report-only'):

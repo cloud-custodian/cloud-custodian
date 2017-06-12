@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VaultList": [
+            {
+                "SizeInBytes": 0, 
+                "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/c7n-glacier-test", 
+                "CreationDate": "2017-05-12T00:40:34.842Z", 
+                "VaultName": "c7n-glacier-test", 
+                "NumberOfArchives": 0
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "pDKlfFYp8D_KbLo6IOaa8tbs-bnWgiZAB7VzMeX2s0jTVDk", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "pDKlfFYp8D_KbLo6IOaa8tbs-bnWgiZAB7VzMeX2s0jTVDk", 
+                "date": "Fri, 12 May 2017 00:43:03 GMT", 
+                "content-length": "242", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

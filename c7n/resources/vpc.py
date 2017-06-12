@@ -947,8 +947,15 @@ class NetworkInterface(QueryResourceManager):
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
 
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagSet', [])
+        return resources
+
 
 NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register(
+    'network-location', net_filters.NetworkLocation)
 
 
 @NetworkInterface.filter_registry.register('subnet')

@@ -45,7 +45,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
-            {r['c7n.EventSources'][0] for r in resources},
+            {r['c7n:EventSources'][0] for r in resources},
             set(['iot.amazonaws.com']))
 
     def test_sg_filter(self):
@@ -63,7 +63,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]['FunctionName'], 'mys3')
         self.assertEqual(
-            resources[0]['c7n.matched-security-groups'],
+            resources[0]['c7n:matched-security-groups'],
             ['sg-f9cc4d9f'])
 
 

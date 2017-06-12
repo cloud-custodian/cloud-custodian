@@ -217,11 +217,11 @@ class TestRegexValue(unittest.TestCase):
     def test_regex_validate(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {'type': 'value',
-             'key': 'Color',
-             'value': '*green',
-             'op': 'regex'})
+            filters.factory({
+                'type': 'value',
+                'key': 'Color',
+                'value': '*green',
+                'op': 'regex'}).validate)
 
     def test_regex_match(self):
         f = filters.factory(
@@ -363,7 +363,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Bad `value`
         f = {
@@ -373,7 +373,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 'foo',
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Missing `op`
         f = {
@@ -382,7 +382,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -486,8 +486,9 @@ class EventFilterTest(BaseFilterTest):
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
+        f = filters.factory(f, b)
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, b)
+            base_filters.FilterValidationError,  f.validate)
 
 
 class TestInstanceValue(BaseFilterTest):
@@ -542,21 +543,20 @@ class TestInstanceValue(BaseFilterTest):
     def test_complex_validator(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz", "type": "value"}).validate)
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"value": "xyz",
-             "type": "value"})
+            filters.factory({
+                "value": "xyz", "type": "value"}).validate)
+
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "value": "xyz",
-             "op": "oo",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz",
+                "value": "xyz",
+                "op": "oo",
+                "type": "value"}).validate)
 
     def test_complex_value_filter(self):
         self.assertFilter(

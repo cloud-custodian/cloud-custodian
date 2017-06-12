@@ -40,7 +40,6 @@ class HandleTest(BaseTest):
         self.addCleanup(cleanup)
         self.change_environment(C7N_OUTPUT_DIR=self.run_dir)
 
-
         policy_execution = []
 
         def push(self, event, context):

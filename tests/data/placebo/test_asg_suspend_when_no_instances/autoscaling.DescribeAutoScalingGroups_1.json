@@ -1,0 +1,53 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:85aab8d6-1a95-4be3-a835-093b835ba215:autoScalingGroupName/zero-instances", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 0, 
+                "Tags": [], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "zero-instances", 
+                "DefaultCooldown": 300, 
+                "MinSize": 0, 
+                "Instances": [], 
+                "MaxSize": 0, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "scot-test2", 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 17, 
+                    "microsecond": 577000, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 16
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b249b991-3f32-11e7-8d2b-19c8d3d1f836", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b249b991-3f32-11e7-8d2b-19c8d3d1f836", 
+                "date": "Mon, 22 May 2017 21:07:42 GMT", 
+                "content-length": "1516", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
