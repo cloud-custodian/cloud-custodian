@@ -8,7 +8,7 @@ python:
   - "2.7"
   - "3.6"
 install:
-  - pip install tox-travis
+  - pip install tox-travis coveralls
 script:
   - tox
 after_success:
