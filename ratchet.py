@@ -8,21 +8,6 @@ import sys
 from xml.dom import minidom
 
 
-EXPECTED_SUCCESSES = '''\
-tests.test_executor.ProcessExecutorTest.test_map_instance
-tests.test_executor.ThreadExecutorTest.test_map_instance
-tests.test_executor.MainExecutorTest.test_map_instance
-tests.test_logs_support.TestLogsSupport.test_entries_in_range
-tests.test_logs_support.TestLogsSupport.test_normalization
-tests.test_logs_support.TestLogsSupport.test_timestamp_from_string
-tests.test_logsub.TestLogsub.test_message_event
-tests.test_s3crypt.TestS3Crypt.test_init
-tools.c7n_sentry.test_sentry.SentrySenderTests.test_get_sentry_message
-tools.c7n_sentry.test_sentry.SentrySenderTests.test_parse_traceback
-tools.c7n_sentry.test_sentry.SentrySenderTests.test_preserve_full_message
-'''
-
-
 def handle_testcase(node, havent_passed, shouldnt_pass):
     nchildren = len(node.childNodes)
     if nchildren > 1:
@@ -50,7 +35,8 @@ def walk(node, havent_passed, shouldnt_pass):
             walk(child, havent_passed, shouldnt_pass)
 
 
-def parse_expected_successes(expected_successes):
+def load_expected_successes(txt):
+    expected_successes = open(txt).read()
     parsed = set()
     for line in expected_successes.splitlines():
         if not line:
@@ -64,10 +50,13 @@ def list_tests(tests):
         print(' ', test)
 
 
-def main(filepath):
-    expected = parse_expected_successes(EXPECTED_SUCCESSES)
+def main(xml_path, txt_path):
+    """Takes two paths, one to XML output from pytest, the other to a text file
+    listing expected successes. Walks the former looking for the latter.
+    """
+    expected = load_expected_successes(txt_path)
     unexpected = set()
-    walk(minidom.parse(filepath), expected, unexpected)
+    walk(minidom.parse(xml_path), expected, unexpected)
 
     if expected:
         print("Some tests required to pass under Python 3.6 didn't:")
@@ -75,7 +64,7 @@ def main(filepath):
     if unexpected:
         print("Some tests not required to pass under Python 3.6 did:")
         list_tests(unexpected)
-        print("Please add them to ratchet.py!")
+        print("Please add them to ratchet.txt!")
     if expected or unexpected:
         return 1
     print('All and only tests required to pass under Python 3.6 did.')
@@ -84,11 +73,12 @@ def main(filepath):
 
 if __name__ == '__main__':
     try:
-        filepath = sys.argv[1]
-    except IndexError:
+        xml_path, txt_path = sys.argv[1:3]
+    except ValueError:
         script = sys.argv[0]
-        print('usage: {} <junitxml filepath>'.format(script), file=sys.stderr)
+        print('usage: {} <junitxml filepath> <expected successes filepath>'
+              .format(script), file=sys.stderr)
         result = 1
     else:
-        result = main(filepath)
+        result = main(xml_path, txt_path)
     sys.exit(result)
