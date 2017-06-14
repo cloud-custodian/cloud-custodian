@@ -673,6 +673,8 @@ class EncryptInstanceVolumes(BaseAction):
     - For each volume
        - Delete unencrypted volume
     - Start Instance (if originally running)
+    - For each newly encrypted volume
+       - Delete transient tags
 
     :example:
 
@@ -704,7 +706,8 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DescribeVolumes',
         'ec2:StopInstances',
         'ec2:StartInstances',
-        'ec2:ModifyInstanceAttribute')
+        'ec2:ModifyInstanceAttribute',
+        'ec2:DeleteTags')
 
     def validate(self):
         key = self.data.get('key')
@@ -806,6 +809,17 @@ class EncryptInstanceVolumes(BaseAction):
 
         for v in vol_set:
             client.delete_volume(VolumeId=v['VolumeId'])
+
+        # Clean-up transient tags on newly created encrypted volume.
+        for v, vol_id in paired:
+            client.delete_tags(
+                Resources=[vol_id],
+                Tags=[
+                    {'Key': 'maid-crypt-remediation'},
+                    {'Key': 'maid-origin-volume'},
+                    {'Key': 'maid-instance-device'}
+                ]
+            )
 
     def stop_instance(self, instance_id):
         client = local_session(self.manager.session_factory).client('ec2')

@@ -191,7 +191,7 @@ class VolumeSnapshotTest(BaseTest):
             ]
         )
         self.assertEqual(len(snapshot_data['Snapshots']), 1)
-        
+
 
 class VolumeDeleteTest(BaseTest):
 
@@ -231,17 +231,30 @@ class EncryptExtantVolumesTest(BaseTest):
             'resource': 'ebs',
             'filters': [
                 {'Encrypted': False},
-                {'VolumeId': 'vol-fdd1f844'}],
+                {'VolumeId': 'vol-0f53c81b92b4ecfce'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
-                 'delay': 0.1,
-                 'key': 'alias/ebs/crypto'}]},
+                 'delay': 30,
+                 'key': 'alias/encryptebs'}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['Encrypted'], False)
-
+        for r in resources:
+            volumes = session_factory().client('ec2').describe_volumes(
+                Filters=[{
+                    'Name':'attachment.instance-id',
+                    'Values': [
+                        r['Attachments'][0]['InstanceId']
+                    ]
+                }]
+            )
+            for v in volumes['Volumes']:
+                self.assertTrue(v['Attachments'][0]['DeleteOnTermination'])
+                self.assertTrue(v['Encrypted'])
+                if 'Tags' in v:
+                    self.assertNotIn('maid-crypt-remediation', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-origin-volume', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-instance-device', [i['Key'] for i in v['Tags']])
 
 class TestKmsAlias(BaseTest):
 
