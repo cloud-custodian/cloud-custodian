@@ -906,6 +906,31 @@ class TestModifySecurityGroupAction(BaseTest):
         self.assertEqual(len(
             second_resources[0]['NetworkInterfaces'][0]['Groups']), 2)
 
+class TestAutoRecoverAlarmAction(BaseTest):
+    def test_autorecover_alarm(self):
+        session_factory = self.replay_flight_data('test_ec2_autorecover_alarm')
+        p = self.load_policy(
+            {'name': 'ec2-autorecover-alarm',
+             'resource': 'ec2',
+             'filters': [
+                 {'tag:c7n-test': 'autorecover-alarm'}],
+             'actions': [
+                 {'type': 'autorecover-alarm'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['InstanceId'], 'i-0aaaaec4b77188b69')
+
+        try:
+            client = session_factory().client('cloudwatch')
+            result = client.describe_alarms(
+                AlarmNames=['recover-{}'.format(resources[0]['InstanceId'])])
+            self.assertTrue(result.get('MetricAlarms'))
+        except AssertionError:
+            self.fail('alarm not found')
+
 
 class TestFilter(BaseTest):
     
