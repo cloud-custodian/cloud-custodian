@@ -692,6 +692,10 @@ class ToggleLogging(BucketActionBase):
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
 
+    supports attachment via lambda bucket notification or sns notification
+    to invoke lambda. a special topic value of `default` will utilize
+    an extant notification or create one matching the bucket name.
+
     :example:
 
         .. code-block: yaml
@@ -705,7 +709,9 @@ class AttachLambdaEncrypt(BucketActionBase):
                   - attach-encrypt
     """
     schema = type_schema(
-        'attach-encrypt', role={'type': 'string'}, topic={'type': 'string'})
+        'attach-encrypt',
+        role={'type': 'string'},
+        topic={'type': 'string'})
 
     permissions = (
         "s3:PutBucketNotification", "s3:GetBucketNotification",

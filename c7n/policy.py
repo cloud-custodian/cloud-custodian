@@ -63,13 +63,44 @@ def load(options, path, format='yaml', validate=True, vars=None):
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
+            raise Exception(
+                "Failed to validate on policy %s \n %s" % (
+                    errors[1], errors[0]))
 
     collection = PolicyCollection.from_data(data, options)
     if validate:
         # non schema validation of policies
         [p.validate() for p in collection]
     return collection
+
+
+def get_service_region_map(regions, resource_types):
+    # we're not interacting with the apis just using the sdk meta information.
+    session = boto3.Session(
+        region_name='us-east-1',
+        aws_access_key_id='never',
+        aws_secret_access_key='found')
+
+    resource_service_map = {r: resources.get(r).resource_type.service
+                            for r in resource_types if r != 'account'}
+    # support for govcloud and china, we only utilize these regions if they
+    # are explicitly passed in on the cli.
+    partition_regions = {}
+    for p in ('aws-cn', 'aws-us-gov'):
+        for r in session.get_available_regions('s3', partition_name=p):
+            partition_regions[r] = p
+
+    partitions = ['aws']
+    for r in regions:
+        if r in partition_regions:
+            partitions.append(partition_regions[r])
+
+    service_region_map = {}
+    for s in set(itertools.chain(resource_service_map.values())):
+        for partition in partitions:
+            service_region_map.setdefault(s, []).extend(
+                session.get_available_regions(s, partition_name=partition))
+    return service_region_map, resource_service_map
 
 
 class PolicyCollection(object):
@@ -82,7 +113,8 @@ class PolicyCollection(object):
 
     @classmethod
     def from_data(cls, data, options):
-        policies = [Policy(p, options, session_factory=cls.test_session_factory())
+        policies = [Policy(p, options,
+                           session_factory=cls.test_session_factory())
                     for p in data.get('policies', ())]
         return PolicyCollection(policies, options)
 
@@ -92,28 +124,25 @@ class PolicyCollection(object):
     def expand_regions(self, regions):
         """Return a set of policies targetted to the given regions.
 
-        Supports symbolic regions like 'all'. This will automatically filter out policies
-        if their being targetted to a region that does not support the service. Global
-        services will target a single region (us-east-1 if only all specified, else
-        first region in the list).
-        """
-        # we're not interacting with the apis just using the sdk meta information.
-        session = boto3.Session(
-            region_name='us-east-1',
-            aws_access_key_id='never',
-            aws_secret_access_key='found')
-        resource_service_map = {r: resources.get(r).resource_type.service
-                                for r in self.resource_types if r != 'account'}
-        service_region_map = {
-            s: session.get_available_regions(s) for s in set(
-                itertools.chain(resource_service_map.values()))}
+        Supports symbolic regions like 'all'. This will automatically
+        filter out policies if their being targetted to a region that
+        does not support the service. Global services will target a
+        single region (us-east-1 if only all specified, else first
+        region in the list).
 
+        Note for region partitions (govcloud and china) an explicit
+        region from the partition must be passed in.
+        """
         policies = []
+        service_region_map, resource_service_map = get_service_region_map(
+            regions, self.resource_types)
+
         for p in self.policies:
             available_regions = service_region_map.get(
                 resource_service_map.get(p.resource_type), ())
 
-            # its a global service/endpoint, use user provided region or us-east-1.
+            # its a global service/endpoint, use user provided region
+            # or us-east-1.
             if not available_regions and regions:
                 candidates = [r for r in regions if r != 'all']
                 candidate = candidates and candidates[0] or 'us-east-1'
@@ -125,7 +154,8 @@ class PolicyCollection(object):
 
             for region in svc_regions:
                 if available_regions and region not in available_regions:
-                    level = 'all' in self.options.regions and logging.DEBUG or logging.WARNING
+                    level = ('all' in self.options.regions and
+                             logging.DEBUG or logging.WARNING)
                     self.log.log(
                         level, "policy:%s resources:%s not available in region:%s",
                         p.name, p.resource_type, region)
@@ -139,7 +169,8 @@ class PolicyCollection(object):
                         self.options.output_dir.rstrip('/') + '/%s' % region)
 
                 policies.append(
-                    Policy(p.data, options_copy, session_factory=self.test_session_factory()))
+                    Policy(p.data, options_copy,
+                           session_factory=self.test_session_factory()))
         return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
@@ -285,7 +316,8 @@ class PullMode(PolicyExecutionMode):
             elif (self.policy.max_resources is not None and
                   len(resources) > self.policy.max_resources):
                 msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources), self.policy.max_resources)
+                    self.policy.name, len(resources),
+                    self.policy.max_resources)
                 self.policy.log.warning(msg)
                 raise RuntimeError(msg)
 
