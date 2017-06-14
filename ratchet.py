@@ -50,6 +50,13 @@ def list_tests(tests):
         print(' ', test)
 
 
+def add_to_txt(txt_path, tests):
+    old = set(open(txt_path, 'r'))
+    new = set(t + '\n' for t in tests)
+    merged = sorted(old | new)
+    open(txt_path, 'w+').writelines(merged)
+
+
 def main(xml_path, txt_path):
     """Takes two paths, one to XML output from pytest, the other to a text file
     listing expected successes. Walks the former looking for the latter.
@@ -64,7 +71,9 @@ def main(xml_path, txt_path):
     if unexpected:
         print("Some tests not required to pass under Python 3.6 did:")
         list_tests(unexpected)
-        print("Please add them to ratchet.txt!")
+        add_to_txt(txt_path, unexpected)
+        print("Conveniently, they have been added to {} for you. Perhaps "
+              "commit that?".format(txt_path))
     if expected or unexpected:
         return 1
     print('All and only tests required to pass under Python 3.6 did.')
