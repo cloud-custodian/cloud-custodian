@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import json
 import os
@@ -19,7 +21,7 @@ from dateutil import zoneinfo
 
 from mock import mock
 
-from common import BaseTest, instance
+from .common import BaseTest, instance
 
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
@@ -52,7 +54,7 @@ def mock_datetime_now(tgt, dt):
         # Python2 & Python3 compatible metaclass
 
     MockedDatetime = DatetimeSubclassMeta(
-        'datetime', (BaseMockedDatetime,), {})
+        b'datetime', (BaseMockedDatetime,), {})
     return mock.patch.object(dt, 'datetime', MockedDatetime)
 
 

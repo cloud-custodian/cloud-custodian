@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """A cloudwatch log subscriber that records error messages into getsentry.com
 
 Features
@@ -52,6 +51,7 @@ OrgMode
    to sentry projects
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
 import base64
@@ -360,7 +360,7 @@ def get_function(session_factory, name, handler, role,
 
 
 def orgreplay(options):
-    from common import Bag, get_accounts
+    from .common import Bag, get_accounts
     accounts = get_accounts(options)
 
     auth_headers = {'Authorization': 'Bearer %s' % options.sentry_token}
@@ -440,7 +440,7 @@ def orgreplay(options):
 
 
 def deploy(options):
-    from common import get_accounts
+    from .common import get_accounts
     for account in get_accounts(options):
         for region_name in options.regions:
             for fname, config in account['config_files'].items():
@@ -475,7 +475,7 @@ def deploy_one(region_name, account, policy, sentry_dsn):
 
 
 def setup_parser():
-    from common import setup_parser as common_parser
+    from .common import setup_parser as common_parser
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', default=False, action="store_true")

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.exceptions import ClientError
 
 import boto3
@@ -18,6 +20,7 @@ import copy
 from datetime import datetime
 import functools
 import json
+import io
 import itertools
 import logging
 import os
@@ -41,9 +44,6 @@ else:
             from yaml import SafeLoader
         except ImportError:
             SafeLoader = None
-
-
-from StringIO import StringIO
 
 
 class VarsSubstitutionError(Exception):
@@ -103,9 +103,9 @@ def dumps(data, fh=None, indent=0):
 
 
 def format_event(evt):
-    io = StringIO()
-    json.dump(evt, io, indent=2)
-    return io.getvalue()
+    buf = io.BytesIO()
+    json.dump(evt, buf, indent=2)
+    return buf.getvalue().decode('utf8')
 
 
 def type_schema(

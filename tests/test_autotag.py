@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from c7n.actions import AutoTagUser
 from c7n.utils import query_instances
-from common import BaseTest, event_data
+from .common import BaseTest, event_data
 from mock import MagicMock
 
 

@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
 import json
 import os
 from StringIO import StringIO
 import tempfile
 
-from common import Bag, BaseTest
-from test_s3 import destroyBucket
+from .common import Bag, BaseTest
+from .test_s3 import destroyBucket
 
 from c7n.resolver import ValuesFrom, URIResolver
 

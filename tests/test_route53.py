@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest
 import logging
 
-from  c7n.resources.route53 import HostedZone
+from .common import BaseTest
+from c7n.resources.route53 import HostedZone
 
 
 class Route53HostedZoneTest(BaseTest):

@@ -16,6 +16,8 @@ Query capability built on skew metamodel
 
 tags_spec -> s3, elb, rds
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import functools
 import itertools
 import jmespath

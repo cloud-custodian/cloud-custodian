@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 import random
@@ -22,7 +24,7 @@ from concurrent.futures import as_completed
 from c7n.sqsexec import SQSExecutor, MessageIterator
 from c7n import utils
 
-from common import BaseTest
+from .common import BaseTest
 
 TEST_SQS_PREFIX = os.environ.get("TEST_SQS_PREFIX", "cloud-c7n-test-sqsexec")
 
