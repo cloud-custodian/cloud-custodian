@@ -722,11 +722,8 @@ class GroupPolicy(ValueFilter):
         for u in user_set:
             if 'c7n:Groups' not in u:
                 u['c7n:Groups'] = []
-            aps = client.list_groups_for_user(
+            u['c7n:Groups'] = client.list_groups_for_user(
                 UserName=u['UserName'])['Groups']
-            for ap in aps:
-                u['c7n:Groups'].append(
-                    client.get_group(GroupName=ap['GroupName'])['Group'])
 
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
