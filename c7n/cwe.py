@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import jmespath
+import six
 
 
 class CloudWatchEvents(object):
@@ -91,7 +92,7 @@ class CloudWatchEvents(object):
         # but usage context is lambda entry.
         if k in cls.trail_events:
             v = dict(cls.trail_events[k])
-            if isinstance(v['ids'], basestring):
+            if isinstance(v['ids'], six.string_types):
                 v['ids'] = e = jmespath.compile('detail.%s' % v['ids'])
                 cls.trail_events[k]['ids'] = e
             return v

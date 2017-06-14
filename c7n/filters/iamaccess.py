@@ -35,6 +35,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 
+import six
+
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
@@ -88,7 +90,7 @@ def _account(arn):
 def check_cross_account(policy_text, allowed_accounts):
     """Find cross account access policy grant not explicitly allowed
     """
-    if isinstance(policy_text, basestring):
+    if isinstance(policy_text, six.string_types):
         policy = json.loads(policy_text)
     else:
         policy = policy_text
@@ -119,9 +121,12 @@ def check_cross_account(policy_text, allowed_accounts):
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         # At this point principal is required?
-        p = (isinstance(s['Principal'], basestring) and s['Principal'] or s['Principal']['AWS'])
+        if isinstance(s['Principal'], six.string_types):
+            p = s['Principal']
+        else:
+            p = s['Principal']['AWS']
 
-        p = isinstance(p, basestring) and (p,) or p
+        p = isinstance(p, six.string_types) and (p,) or p
         for pid in p:
             if pid == '*':
                 principal_ok = False
@@ -195,7 +200,7 @@ def check_cross_account(policy_text, allowed_accounts):
             if v is None:
                 violations.append(s)
             else:
-                v = isinstance(v, basestring) and (v,) or v
+                v = isinstance(v, six.string_types) and (v,) or v
                 for arn in v:
                     aid = _account(arn)
                     if aid not in allowed_accounts:
@@ -206,7 +211,7 @@ def check_cross_account(policy_text, allowed_accounts):
                 v = s['Condition']['ArnLike'].get(k)
                 if v:
                     break
-            v = isinstance(v, basestring) and (v,) or v
+            v = isinstance(v, six.string_types) and (v,) or v
             principal_ok = True
             for arn in v:
                 aid = _account(arn)

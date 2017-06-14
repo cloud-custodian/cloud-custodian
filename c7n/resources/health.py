@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import itertools
 
+import six
+
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, chunks
@@ -144,6 +146,6 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
         return {'Name': self.key, 'Values': value}

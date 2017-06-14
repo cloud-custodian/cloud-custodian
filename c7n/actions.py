@@ -22,6 +22,7 @@ import jmespath
 import logging
 import zlib
 
+import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
@@ -266,13 +267,13 @@ class ModifyVpcSecurityGroupsAction(Action):
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
                 remove_groups = remove_target_group_ids
-            elif isinstance(remove_target_group_ids, basestring):
+            elif isinstance(remove_target_group_ids, six.string_types):
                 remove_groups = [remove_target_group_ids]
 
             # Parse add_groups
             if isinstance(add_target_group_ids, list):
                 add_groups = add_target_group_ids
-            elif isinstance(add_target_group_ids, basestring):
+            elif isinstance(add_target_group_ids, six.string_types):
                 add_groups = [add_target_group_ids]
 
             # seems extraneous with list?

@@ -245,10 +245,10 @@ class TestStateTransitionAgeFilter(BaseTest):
         #compare stateTransition reason to expected
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['StateTransitionReason'], 'User initiated (2015-11-25 10:11:55 GMT)')
-        
+
     def test_date_parsing(self):
         instance = ec2.StateTransitionAge(None)
-        
+
         # Missing key
         self.assertIsNone(instance.get_resource_date({}))
 
@@ -258,7 +258,7 @@ class TestStateTransitionAgeFilter(BaseTest):
             instance.get_resource_date,
             {'StateTransitionReason': "User initiated (201-02-06 17:77:00 GMT)"}
         )
-        
+
         # Won't match regex
         self.assertIsNone(
             instance.get_resource_date({
@@ -368,7 +368,7 @@ class TestTag(BaseTest):
             }]
         }
         self.assertRaises(FilterValidationError, self.load_policy, policy)
-        
+
     def test_ec2_untag(self):
         session_factory = self.replay_flight_data(
             'test_ec2_untag')
@@ -722,7 +722,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             ValidationError, self.load_policy, data=policy, validate=True)
 
     def test_invalid_remove_params(self):
-        # basestring invalid
+        # string invalid
         policy = {
             'name': 'remove-with-incorrect-param-string',
             'resource': 'ec2',
@@ -746,7 +746,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             ValidationError, self.load_policy, policy, validate=True)
 
     def test_invalid_add_params(self):
-        # basestring invalid
+        # string invalid
         policy = {
             'name': 'add-with-incorrect-param-string',
             'resource': 'ec2',
@@ -933,7 +933,7 @@ class TestAutoRecoverAlarmAction(BaseTest):
 
 
 class TestFilter(BaseTest):
-    
+
     def test_not_filter(self):
         # This test is to get coverage for the `not` filter's process_set method
         session_factory = self.replay_flight_data(
