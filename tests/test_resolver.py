@@ -14,9 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
+import io
 import json
 import os
-from StringIO import StringIO
 import tempfile
 
 from .common import Bag, BaseTest
@@ -100,7 +100,7 @@ class UrlValueTest(BaseTest):
         self.assertRaises(ValueError, values.get_values)
 
     def test_txt(self):
-        out = StringIO()
+        out = io.StringIO()
         for i in ['a', 'b', 'c', 'd']:
             out.write('%s\n' % i)
         values = self.get_values_from({'url': 'letters.txt'}, out.getvalue())
@@ -109,7 +109,7 @@ class UrlValueTest(BaseTest):
             ['a', 'b', 'c', 'd'])
 
     def test_csv_expr(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
@@ -117,7 +117,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
 
     def test_csv_expr_using_dict(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
         writer.writerows([range(5) for r in range(5)])
@@ -126,7 +126,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
@@ -134,7 +134,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
 
     def test_csv_raw(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(3, 4) for r in range(5)])
         values = self.get_values_from({'url': 'sun.csv'}, out.getvalue())

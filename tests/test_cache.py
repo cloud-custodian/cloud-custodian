@@ -13,11 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
 from unittest import TestCase
 from c7n import cache
 from argparse import Namespace
-import cPickle
+from six.moves import cPickle as pickle
 import tempfile
 import mock
 
@@ -73,9 +72,9 @@ class FileCacheManagerTest(TestCase):
 
     def test_get(self):
         #mock the pick and set it to the data variable
-        test_pickle = cPickle.dumps(
-            {cPickle.dumps(self.test_key): self.test_value}, protocol=2)
-        self.test_cache.data = cPickle.loads(test_pickle)
+        test_pickle = pickle.dumps(
+            {pickle.dumps(self.test_key): self.test_value}, protocol=2)
+        self.test_cache.data = pickle.loads(test_pickle)
 
         #assert
         self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
