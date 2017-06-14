@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import imp
 import json
@@ -30,8 +32,8 @@ from c7n.mu import (
     CloudWatchLogSubscription, SNSSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from common import BaseTest, Config, event_data
-from data import helloworld
+from .common import BaseTest, Config, event_data
+from .data import helloworld
 
 
 class PolicyLambdaProvision(BaseTest):

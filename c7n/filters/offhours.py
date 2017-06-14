@@ -140,6 +140,7 @@ Options
            offhour: 20
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # note we have to module import for our testing mocks
 import datetime
@@ -152,6 +153,14 @@ from c7n.filters import Filter, FilterValidationError
 from c7n.utils import type_schema, dumps
 
 log = logging.getLogger('custodian.offhours')
+
+
+def brackets_removed(u):
+    return u.translate({ord('['): None, ord(']'): None})
+
+
+def parens_removed(u):
+    return u.translate({ord('('): None, ord(')'): None})
 
 
 class Time(Filter):
@@ -505,9 +514,9 @@ class ScheduleParser(object):
 
     def parse_resource_schedule(self, lexeme):
         parsed = []
-        exprs = lexeme.translate(None, '[]').split(',(')
+        exprs = brackets_removed(lexeme).split(',(')
         for e in exprs:
-            tokens = e.translate(None, '()').split(',')
+            tokens = parens_removed(e).split(',')
             # custom hours must have two parts: (<days>, <hour>)
             if not len(tokens) == 2:
                 return None

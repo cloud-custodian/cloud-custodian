@@ -13,6 +13,8 @@
 # limitations under the License.
 """Hello world Lambda function for mu testing.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import sys
 
