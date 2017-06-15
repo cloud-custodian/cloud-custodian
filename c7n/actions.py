@@ -442,14 +442,20 @@ class Notify(EventAction):
         return ()
 
     def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
         p = self.data.copy()
         if 'to_from' in self.data:
             to_from = self.data['to_from'].copy()
             to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
             p['to'] = ValuesFrom(to_from).get_values()
         if 'cc_from' in self.data:
             cc_from = self.data['cc_from'].copy()
             cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
             p['cc'] = ValuesFrom(cc_from).get_values()
         return p
 
@@ -461,9 +467,9 @@ class Notify(EventAction):
             'event': event,
             'account_id': self.manager.config.account_id,
             'account': account_name,
-            'action': self.data,
-            'region': self.manager.config.region}
-        message['policy'] = self.expand_variables(message)
+            'region': self.manager.config.region,
+            'policy': self.manager.data}
+        message['action'] = self.expand_variables(message)
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
