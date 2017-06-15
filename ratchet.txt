@@ -182,6 +182,7 @@ tests.test_policy.TestPolicy.test_file_not_found
 tests.test_policy.TestPolicy.test_get_resource_manager
 tests.test_policy.TestPolicy.test_load_policy_validation_error
 tests.test_policy.TestPolicy.test_policy_name_filtering
+tests.test_policy.TestPolicyCollection.test_expand_partitions
 tests.test_policy.TestPolicyCollection.test_policy_account_expand
 tests.test_policy.TestPolicyCollection.test_policy_region_expand_global
 tests.test_put_metrics.PutMetricsTest.test_putmetrics_ec2
