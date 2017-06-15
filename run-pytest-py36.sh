@@ -4,5 +4,5 @@
 # expect tests to fail here, and in tox.ini we run a second script to ensure that
 # none of our expected successes are failing.
 
-.tox/py36/bin/py.test -v -n auto --cov=c7n --junitxml=results.xml tests tools
+.tox/py36/bin/py.test -v -n auto --cov=c7n --tb=line --junitxml=results.xml tests tools
 exit 0
