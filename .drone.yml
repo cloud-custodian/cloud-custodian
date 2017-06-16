@@ -1,13 +1,14 @@
 build:
 
   unit_tests:
-    image: python:2-alpine
+    image: ubuntu:xenial
     environment:
       - AWS_DEFAULT_REGION=us-east-1
       - AWS_ACCESS_KEY_ID=foo
       - AWS_SECRET_ACCESS_KEY=bar
     commands:
       - mkdir -p cache
+      - apt-get update && apt-get -y install python-pip
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
       - python setup.py develop
@@ -25,7 +26,7 @@ build:
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
       - pypy setup.py develop
-      - nosetests -s -v tests
+      - nosetests -s -v tests tools/c7n_*
     when:
       event: push
       branch: master
@@ -92,3 +93,4 @@ notify:
 cache:
   mount:
     - cache
+    - /var/cache/apt/

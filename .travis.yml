@@ -8,12 +8,13 @@ python:
   - "2.7"
 install:
   - pip install -r requirements-dev.txt
-  - pip install --upgrade pytest pytest-xdist pytest-cov
   - pip install --upgrade coveralls
   - python setup.py develop
 script:
   - flake8
   - make sphinx
-  - py.test -n auto --cov=c7n tests tools/c7n_*
+  - py.test -v -n auto --cov=c7n tests
+  - py.test -v --cov=tools tools/c7n_mailer
+  - py.test -v tools/c7n_sentry
 after_success:
   coveralls
