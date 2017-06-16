@@ -22,3 +22,5 @@ local/
 share/
 out/
 .DS_STORE
+.tox/
+results.xml

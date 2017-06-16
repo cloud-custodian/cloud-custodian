@@ -6,15 +6,10 @@ env:
   - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY="thing" C7N_VALIDATE=yes
 python:
   - "2.7"
+  - "3.6"
 install:
-  - pip install -r requirements-dev.txt
-  - pip install --upgrade coveralls
-  - python setup.py develop
+  - pip install tox-travis coveralls
 script:
-  - flake8
-  - make sphinx
-  - py.test -v -n auto --cov=c7n tests
-  - py.test -v --cov=tools tools/c7n_mailer
-  - py.test -v tools/c7n_sentry
+  - tox
 after_success:
   coveralls
