@@ -24,12 +24,13 @@ import os
 from .sqs_queue_processor import MailerSqsQueueProcessor
 
 
-def config_setup(session):
+def config_setup(session, config=None):
     task_dir = os.environ.get('LAMBDA_TASK_ROOT')
     os.environ['PYTHONPATH'] = "%s:%s" % (task_dir, os.environ.get('PYTHONPATH', ''))
-    with open(os.path.join(task_dir, 'config.json')) as fh:
-        config = json.load(fh)
-    if config['ldap_bind_password']:
+    if not config:
+        with open(os.path.join(task_dir, 'config.json')) as fh:
+            config = json.load(fh)
+    if config['ldap_bind_password'] and config.get('ldap_bind_password_in_kms', True):
         kms = session.client('kms')
         config['ldap_bind_password'] = kms.decrypt(
             CiphertextBlob=base64.b64decode(config['ldap_bind_password']))[
@@ -41,11 +42,13 @@ def config_setup(session):
     return config
 
 
-def start_c7n_mailer(event, context, logger):
+def start_c7n_mailer(logger, config=None, parallel=False):
     try:
         session = boto3.Session()
-        config = config_setup(session)
+        if not config:
+            config = config_setup(session)
+        logger.info('c7n_mailer starting...')
         mailer_sqs_queue_processor = MailerSqsQueueProcessor(config, session, logger)
-        mailer_sqs_queue_processor.run()
+        mailer_sqs_queue_processor.run(parallel)
     except Exception as e:
         logger.exception("Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e))

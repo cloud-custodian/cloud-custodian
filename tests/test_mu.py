@@ -502,8 +502,6 @@ class PythonArchiveTest(unittest.TestCase):
 
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')
-        self.assertTrue('ctypes/__init__.py' in filenames)
-        self.assertTrue('ctypes/macholib/__init__.py' in filenames)
         self.assertTrue('README.ctypes' not in filenames)
 
     def test_cant_get_bytes_when_open(self):
