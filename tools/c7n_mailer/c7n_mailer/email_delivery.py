@@ -121,8 +121,7 @@ class EmailDelivery(object):
             # we allow multiple emails from various places, we'll unique with set to not have any
             # duplicates, and we'll also sort it so we always have the same key for other resources
             # and finally we'll make it a tuple, since that is hashable and can be a key in a dict
-            resource_emails.sort()
-            resource_emails = tuple(set(resource_emails))
+            resource_emails = tuple(sorted(set(resource_emails)))
             # only if there are valid emails available, add it to the map
             if resource_emails:
                 email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
