@@ -1535,8 +1535,14 @@ class ParameterFilter(ValueFilter):
         if datatype == 'string':
             ret_val = str(val)
         elif datatype == 'boolean':
-            # AWS returns 1s and 0s for this
-            ret_val = bool(int(val))
+            # AWS returns 1s and 0s for boolean for most of the cases
+            if val.isdigit():
+                ret_val = bool(int(val))
+            # AWS returns 'TRUE,FALSE' for Oracle engine
+            elif val == 'TRUE':
+                ret_val = True
+            elif val == 'FALSE':
+                ret_val = False
         elif datatype == 'integer':
             if val.isdigit():
                 ret_val = int(val)
@@ -1550,6 +1556,8 @@ class ParameterFilter(ValueFilter):
         paramcache = {}
 
         client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_parameters')
+
         param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
                         for db in resources}
 
@@ -1562,11 +1570,11 @@ class ParameterFilter(ValueFilter):
             if pg_values is not None:
                 paramcache[pg] = pg_values
                 continue
+            param_list = list(itertools.chain(*[p['Parameters']
+                for p in paginator.paginate(DBParameterGroupName=pg)]))
             paramcache[pg] = {
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in client.describe_db_parameters(
-                    DBParameterGroupName=pg)['Parameters']
-                if 'ParameterValue' in p}
+                for p in param_list if 'ParameterValue' in p}
             self.manager._cache.save(cache_key, paramcache[pg])
 
         for resource in resources:
