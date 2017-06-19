@@ -17,12 +17,12 @@ of PolicyExecutionMode.get_logs()
 '''
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import io
 import logging
 import re
 import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from cStringIO import StringIO
 from datetime import datetime
 from dateutil import parser
 from dateutil import tz
@@ -39,7 +39,7 @@ def _timestamp_from_string(date_text):
     try:
         date_dt = parser.parse(date_text)
         date_ts = time.mktime(date_dt.timetuple())
-        return long(date_ts * 1000)
+        return int(date_ts * 1000)
     except (AttributeError, TypeError, ValueError):
         return 0
 
@@ -136,7 +136,7 @@ def log_entries_from_s3(session_factory, output, start, end):
 def get_records(bucket, key, session_factory):
     client = local_session(session_factory).client('s3')
     result = client.get_object(Bucket=bucket, Key=key['Key'])
-    blob = StringIO(result['Body'].read())
+    blob = io.StringIO(result['Body'].read())
 
     records = GzipFile(fileobj=blob).readlines()
     log.debug("bucket: %s key: %s records: %d",

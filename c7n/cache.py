@@ -16,7 +16,7 @@ multiple policies on the same resource type.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import cPickle
+from six.moves import cPickle as pickle
 
 import os
 import logging
@@ -63,7 +63,7 @@ class FileCacheManager(object):
         self.data = {}
 
     def get(self, key):
-        k = cPickle.dumps(key)
+        k = pickle.dumps(key)
         return self.data.get(k)
 
     def load(self):
@@ -75,7 +75,7 @@ class FileCacheManager(object):
                 return False
             with open(self.cache_path) as fh:
                 try:
-                    self.data = cPickle.load(fh)
+                    self.data = pickle.load(fh)
                 except EOFError:
                     return False
             log.debug("Using cache file %s" % self.cache_path)
@@ -84,8 +84,8 @@ class FileCacheManager(object):
     def save(self, key, data):
         try:
             with open(self.cache_path, 'w') as fh:
-                self.data[cPickle.dumps(key)] = data
-                cPickle.dump(self.data, fh, protocol=2)
+                self.data[pickle.dumps(key)] = data
+                pickle.dump(self.data, fh, protocol=2)
         except Exception as e:
             log.warning("Could not save cache %s err: %s" % (
                 self.cache_path, e))

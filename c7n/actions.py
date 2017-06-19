@@ -147,7 +147,7 @@ class Action(object):
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
-        except ClientError, e:
+        except ClientError as e:
             if (e.response['Error']['Code'] == 'DryRunOperation' and
             e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
             'would have succeeded' in e.message):
@@ -708,7 +708,7 @@ class PutMetric(BaseAction):
                                      {'Resources': resources})
             # I had to wrap resourses in a dict like this in order to not have jmespath expressions
             # start with [] in the yaml files.  It fails to parse otherwise.
-        except TypeError, oops:
+        except TypeError as oops:
             self.log.error(oops.message)
 
         value = 0

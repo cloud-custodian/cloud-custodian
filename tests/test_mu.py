@@ -195,8 +195,8 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        start = 0L
-        end = long(time.time() * 1000)
+        start = 0
+        end = time.time() * 1000
         self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
@@ -557,7 +557,7 @@ class PythonArchiveTest(unittest.TestCase):
         return path
 
     def check_readable(self, archive):
-        readable = 0o444 << 16L
+        readable = 0o444 << 16
         with open(archive.path) as fh:
             reader = zipfile.ZipFile(fh, mode='r')
             for i in reader.infolist():

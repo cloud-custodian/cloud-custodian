@@ -268,7 +268,7 @@ class ValueFilter(Filter):
                 {'type': 'boolean'},
                 {'type': 'number'},
                 {'type': 'null'}]},
-            'op': {'enum': OPERATORS.keys()}}}
+            'op': {'enum': list(OPERATORS.keys())}}}
 
     annotate = True
 

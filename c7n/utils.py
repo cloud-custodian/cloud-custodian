@@ -20,6 +20,7 @@ import copy
 from datetime import datetime
 import functools
 import json
+import io
 import itertools
 import logging
 import os
@@ -43,9 +44,6 @@ else:
             from yaml import SafeLoader
         except ImportError:
             SafeLoader = None
-
-
-from StringIO import StringIO
 
 
 class VarsSubstitutionError(Exception):
@@ -105,9 +103,9 @@ def dumps(data, fh=None, indent=0):
 
 
 def format_event(evt):
-    io = StringIO()
-    json.dump(evt, io, indent=2)
-    return io.getvalue()
+    buf = io.BytesIO()
+    json.dump(evt, buf, indent=2)
+    return buf.getvalue().decode('utf8')
 
 
 def type_schema(

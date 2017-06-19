@@ -23,6 +23,7 @@ import itertools
 import jmespath
 import json
 
+import six
 from botocore.client import ClientError
 from concurrent.futures import as_completed
 
@@ -231,9 +232,8 @@ class ConfigSource(Source):
         return resources
 
 
+@six.add_metaclass(QueryMeta)
 class QueryResourceManager(ResourceManager):
-
-    __metaclass__ = QueryMeta
 
     resource_type = ""
 
