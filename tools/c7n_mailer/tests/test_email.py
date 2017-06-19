@@ -104,7 +104,7 @@ class EmailTest(unittest.TestCase):
         )
         # make sure only 1 email is queued to go out
         self.assertEqual(len(emails_to_resources_map.items()), 1)
-        to_emails = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
+        to_emails = ('bill_lumberg@initech.com', 'milton@initech.com', 'peter@initech.com')
         self.assertEqual(emails_to_resources_map, {to_emails: [RESOURCE_1]})
 
     def test_email_to_email_message_map_without_ldap_manager(self):
@@ -113,7 +113,7 @@ class EmailTest(unittest.TestCase):
         email_addrs_to_email_message_map = self.email_delivery.get_to_addrs_email_messages_map(
             SQS_MESSAGE
         )
-        to_emails = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
+        to_emails = ('bill_lumberg@initech.com', 'milton@initech.com', 'peter@initech.com')
         self.assertEqual(email_addrs_to_email_message_map.items()[0][0], to_emails)
         self.assertEqual(email_addrs_to_email_message_map.items()[0][1]['to'], ', '.join(to_emails))
 
@@ -134,7 +134,7 @@ class EmailTest(unittest.TestCase):
             self.assertEqual(smtp_instance.sendmail.call_count, 1)
             # Check the mock' calls are equal to a specific list of calls in a
             # specific order
-            to_addrs = ['peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com']
+            to_addrs = ['bill_lumberg@initech.com', 'milton@initech.com', 'peter@initech.com']
             self.assertEqual(
                 smtp_instance.sendmail.mock_calls,
                 [call(MAILER_CONFIG['from_address'], to_addrs, mimetext_msg.as_string())]
@@ -188,7 +188,7 @@ class EmailTest(unittest.TestCase):
         emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
             SQS_MESSAGE
         )
-        email_1_to_addrs = ('peter@initech.com', 'milton@initech.com', 'bill_lumberg@initech.com')
+        email_1_to_addrs = ('bill_lumberg@initech.com', 'milton@initech.com', 'peter@initech.com')
         email_2_to_addrs = ('samir@initech.com',)
         self.assertEqual(emails_to_resources_map[email_1_to_addrs], [RESOURCE_1])
         self.assertEqual(emails_to_resources_map[email_2_to_addrs], [RESOURCE_2])
