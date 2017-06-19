@@ -3,20 +3,25 @@ import logging
 import math
 import random
 import time
+import thread
 
 import boto3
 import click
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import Elasticsearch, helpers, RequestsHttpConnection
 import jsonschema
 from influxdb import InfluxDBClient
+import sqlite3
 
 import yaml
 
-
+from c7n import schema 
 from c7n.credentials import assumed_session
+from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
+from c7n.reports import csvout as s3_resource_parser
+from c7n.resources import load_resources
 from c7n.utils import chunks, dumps, get_retry, local_session
 
 # from c7n.executor import MainThreadExecutor
@@ -33,6 +38,10 @@ CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': True,
     'properties': {
+        'indexer': {
+            'type': 'object',
+            'additionalProperties': True
+        },
         'accounts': {
             'type': 'array',
             'items': {
@@ -61,23 +70,51 @@ class Indexer(object):
     """
 
 
-def get_indexer(config):
+def get_indexer(config, **kwargs):
     itype = config['indexer']['type']
     klass = indexers.get(itype)
-    return klass(config)
+    return klass(config, **kwargs)
+
+
+class MyConnection(RequestsHttpConnection):
+    def __init__(self, *args, **kwargs):
+        proxies = kwargs.pop('proxies', {})
+        super(MyConnection, self).__init__(*args, **kwargs)
+        self.session.proxies = proxies
 
 
 @indexers.register('es')
 class ElasticSearchIndexer(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
-        self.client = Elasticsearch()
+        self.es_type = kwargs.get('type', 'policy-metric')
+
+        host = [config['indexer'].get('host','localhost')]
+        kwargs = {}
+
+        user = config['indexer'].get('user', False)
+        password = config['indexer'].get('password', False)
+        if user and password:
+            kwargs['http_auth'] = (user,password)
+
+        kwargs['port'] = config['indexer'].get('port', 9200)
+
+        proxy = config['indexer'].get('proxy', False)
+        if proxy:
+            kwargs['connection_class'] = MyConnection
+            kwargs['proxies'] = {'https': proxy} 
+
+        self.client = Elasticsearch(
+            host,
+            **kwargs
+        )
 
     def index(self, points):
         for p in points:
             p['_index'] = self.config['indexer']['idx_name']
-            p['_type'] = 'policy-metric'
+            p['_type'] = self.es_type
+
         results = helpers.streaming_bulk(self.client, points)
         for status, r in results:
             if not status:
@@ -87,7 +124,7 @@ class ElasticSearchIndexer(Indexer):
 @indexers.register('s3')
 class S3Archiver(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
         self.client = boto3.client('s3')
 
@@ -104,7 +141,7 @@ class S3Archiver(Indexer):
 @indexers.register('influx')
 class InfluxIndexer(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
         self.client = InfluxDBClient(
             username=config['indexer']['user'],
@@ -175,8 +212,7 @@ def index_metric_set(indexer, account, region, metric_set, start, end, period):
         indexer.index(points)
     return time.time() - t, point_count
 
-
-def index_account(config, idx_name, region, account, start, end, period):
+def index_account_metrics(config, idx_name, region, account, start, end, period):
     session = assumed_session(account['role'], 'PolicyIndex')
     indexer = get_indexer(config)
 
@@ -229,6 +265,124 @@ def index_account(config, idx_name, region, account, start, end, period):
     return region_time, region_points
 
 
+def index_account_resources(config, account, region, policy, date):
+    indexer = get_indexer(config, type=policy['resource'])
+
+    session_factory = lambda : assumed_session(account['role'], 'PolicyIndex')
+    s3 = local_session(session_factory).client('s3')
+
+    bucket = account['bucket']
+    key_prefix = "accounts/" + account['name'] + "/" + region + \
+                 "/policies/" + policy['name']
+    marker = key_prefix + "/" + date + "/resources.json.gz"
+
+    p = s3.get_paginator('list_objects_v2').paginate(
+        Bucket=bucket,
+        Prefix=key_prefix,
+        StartAfter=marker,
+    )
+
+    records = 0
+    key_count = 0
+
+    with ThreadPoolExecutor(max_workers=20) as w:
+        for key_set in p:
+            if 'Contents' not in key_set:
+                continue
+            keys = [k for k in key_set['Contents']
+                    if k['Key'].endswith('resources.json.gz')]
+            key_count += len(keys)
+            futures = map(lambda k: w.submit(
+                s3_resource_parser.get_records, bucket, k, session_factory), 
+                keys)
+
+            for f in as_completed(futures):
+                records += len(f.result())
+                indexer.index(f.result())
+
+
+    log.info("Fetched %d records across %d files" % (
+        records, key_count))
+
+
+def dict_factory(cursor, row):
+    """Returns a sqlite row factory that returns a dictionary"""
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
+def fetch_events(cursor, query, account_name):
+    """Generator that returns the events"""
+    for event in cursor.execute(query):
+        event['account'] = account_name
+        yield event
+
+
+def get_traildb(bucket, key, session_factory, directory):
+    local_db_file = directory + "/traildb" + \
+                   thread.get_ident() + random.random()
+    local_bz2_file = local_db_file + '.bz2'                   
+
+    s3 = local_session(session_factory).resource('s3')
+    s3.Bucket(bucket).download_file(key['Key'], local_bz2_file)
+
+    # Decompress the traildb file
+    # (use the system bunzip2 command because it's faster than the python bzip2 library)
+    subprocess.call(['bunzip2','-f',local_bz2_file])
+
+    return local_db_file
+
+
+def index_account_trails(config, account, region, date, directory):
+    indexer = get_indexer(config, type='traildb')
+
+    session_factory = lambda : assumed_session(account['role'], 'PolicyIndex')
+    s3 = local_session(session_factory).client('s3')
+
+    bucket = account['bucket']
+    key_prefix = "accounts/" + account['name'] + "/" + region + "/traildb"
+    marker = key_prefix + "/" + date + "/trail.db.bz2"
+
+    p = s3.get_paginator('list_objects_v2').paginate(
+        Bucket=bucket,
+        Prefix=key_prefix,
+        StartAfter=marker,
+    )
+
+    records = 0
+    key_count = 0
+
+    with ThreadPoolExecutor(max_workers=20) as w:
+        for key_set in p:
+            if 'Contents' not in key_set:
+                continue
+            keys = [k for k in key_set['Contents']
+                    if k['Key'].endswith('trail.db.bz2')]
+            key_count += len(keys)
+            futures = map(lambda k: w.submit(
+                get_traildb, bucket, k, session_factory, directory), 
+                keys)
+
+            for f in as_completed(futures):
+                local_db_file = f.result()
+                query = 'select * from events where user_agent glob \'*CloudCustodian*\''
+                connection = sqlite3.connect(local_db_file)
+                connection.row_factory = dict_factory
+                cursor = connection.cursor()
+                indexer.index(fetch_events(cursor, query, account['name']))
+                connection.close()
+
+                try:
+                    os.remove(local_db_file)
+                except:
+                    log.warning("Failed to remove temporary file: {}".format(
+                        local_db_file))
+                    pass
+
+
+
 def get_periods(start, end, period):
     days_delta = (start - end)
 
@@ -263,6 +417,21 @@ def get_date_range(start, end):
     if not end and not start:
         raise ValueError("Missing start and end")
     return start, end
+
+
+def get_date_path(date, with_hour=True, delta=0):
+    # optional input, use default time delta if not provided
+    # delta is 1 hour for resources
+    # delta is 24 hours for trail
+    if not date:
+        date = datetime.datetime.utcnow() - datetime.timedelta(hours=delta)
+    elif date and not isinstance(date, datetime.datetime):
+        date = parse_date(date)
+
+    date_path = date.strftime('%Y/%m/%d')
+    if with_hour:
+        date_path = date_path + date.strftime('/%H')
+    return date_path
 
 
 @click.group()
@@ -335,7 +504,7 @@ def index_metrics(
         for j in jobs:
             log.debug("submit account:%s region:%s start:%s end:%s" % (
                 j[3]['name'], j[2], j[4], j[5]))
-            futures[w.submit(index_account, *j)] = j
+            futures[w.submit(index_account_metrics, *j)] = j
 
         # Process completed
         for f in as_completed(futures):
@@ -361,17 +530,131 @@ def index_metrics(
 
 @cli.command(name='index-resources')
 @click.option('-c', '--config', required=True, help="Config file")
-@click.option('--start', required=True, help="Start date")
-@click.option('--end', required=False, help="End Date")
-@click.option('--incremental/--no-incremental', default=False,
-              help="Sync from last indexed timestamp")
+@click.option('-p', '--policies', required=True, help="Policy file")
+@click.option('--date', required=False, help="Start date")
 @click.option('--concurrency', default=5)
 @click.option('-a', '--accounts', multiple=True)
+@click.option('-t', '--tag')
 @click.option('--verbose/--no-verbose', default=False)
 def index_resources(
-        config, start, end, incremental=False, concurrency=5, accounts=None,
-        verbose=False):
+        config, policies, date=None, concurrency=5, 
+        accounts=None, tag=None, verbose=False):
     """index policy resources"""
+    logging.basicConfig(level=(verbose and logging.DEBUG or logging.INFO))
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('elasticsearch').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('requests').setLevel(logging.WARNING)
+    logging.getLogger('c7n.worker').setLevel(logging.INFO)
+
+    # validating the config and policy files.
+    with open(config) as fh:
+        config = yaml.safe_load(fh.read())
+    jsonschema.validate(config, CONFIG_SCHEMA)
+
+    with open(policies) as fh:
+        policies = yaml.safe_load(fh.read())
+    load_resources()
+    schema.validate(policies)    
+
+    date = get_date_path(date, delta=1)
+
+    with ProcessPoolExecutor(max_workers=concurrency) as w:
+        futures = {}
+        jobs = []
+
+        for account in config.get('accounts'):
+            if accounts and account['name'] not in accounts:
+                continue
+            if tag:
+                found = False
+                for t in account['tags'].values():
+                    if tag == t:
+                        found = True
+                        break
+                if not found:
+                    continue
+            for region in account.get('regions'):
+                for policy in policies.get('policies'):
+                    p = (config, account, region, policy, date)
+                    jobs.append(p)
+
+        for j in jobs:
+            log.debug("submit account:{} region:{} policy:{} date:{}".format(
+                j[1]['name'], j[2], j[3]['name'], j[4]))
+            futures[w.submit(index_account_resources, *j)] = j
+
+        # Process completed
+        for f in as_completed(futures):
+            config, account, region, policy, date = futures[f]
+            if f.exception():
+                log.warning(
+                    "error account:{} region:{} policy:{} error:{}".format(
+                    account['name'], region, policy['name'], f.exception()))
+                continue
+            log.info("complete account:{} region:{} policy:{}".format(
+                account['name'], region, policy['name']))
+
+
+@cli.command(name='index-trails')
+@click.option('-c', '--config', required=True, help="Config file")
+@click.option('--date', required=False, help="Start date")
+@click.option('--dir', required=False, help="Path for temp db file")
+@click.option('--concurrency', default=5)
+@click.option('-a', '--accounts', multiple=True)
+@click.option('-t', '--tag')
+@click.option('--verbose/--no-verbose', default=False)
+def index_trails(
+        config, date=None, directory=None, concurrency=5, accounts=None,
+        tag=None, verbose=False):
+    """index traildb"""
+    logging.basicConfig(level=(verbose and logging.DEBUG or logging.INFO))
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('elasticsearch').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('requests').setLevel(logging.WARNING)
+    logging.getLogger('c7n.worker').setLevel(logging.INFO)
+
+    with open(config) as fh:
+        config = yaml.safe_load(fh.read())
+    jsonschema.validate(config, CONFIG_SCHEMA)
+
+    date = get_date_path(date, with_hour=False, delta=24)
+    directory = directory or "/tmp"
+
+    with ProcessPoolExecutor(max_workers=concurrency) as w:
+        futures = {}
+        jobs = []
+
+        for account in config.get('accounts'):
+            if accounts and account['name'] not in accounts:
+                continue
+            if tag:
+                found = False
+                for t in account['tags'].values():
+                    if tag == t:
+                        found = True
+                        break
+                if not found:
+                    continue
+            for region in account.get('regions'):
+                p = (config, account, region, date, directory)
+                jobs.append(p)
+
+        for j in jobs:
+            log.debug("submit account:{} region:{} date:{}".format(
+                j[1]['name'], j[2], j[3]))
+            futures[w.submit(index_account_trails, *j)] = j
+
+        # Process completed
+        for f in as_completed(futures):
+            config, account, region, date = futures[f]
+            if f.exception():
+                log.warning("error account:{} region:{} error:{}".format(
+                    account['name'], region, f.exception()))
+                continue
+            log.info("complete account:{} region:{}".format(
+                account['name'], region))
 
 
 if __name__ == '__main__':
