@@ -60,29 +60,6 @@ deploy:
       event: push
       branch: master
 
-publish:
-  pypi:
-    repository: https://pypi.python.org/pypi
-    username: c7nbot
-    password: $$PYPI_PASS
-    distributions:
-      - sdist
-    when:
-      event: tag
-      branch: master
-      repo: capitalone/cloud-custodian
-
-  docker:
-    username: c7nbot
-    email: $$HUB_EMAIL
-    password: $$HUB_PASS
-    repo: capitalone/cloud-custodian
-    tag: latest
-    when:
-      event: push
-      branch: master
-      repo: capitalone/cloud-custodian
-
 notify:
   gitter:
     webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
