@@ -13,8 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
 import logging
+import time
+
+import six
 
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
@@ -283,7 +285,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
