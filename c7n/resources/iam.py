@@ -774,6 +774,29 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('username')
+class UserName(ValueFilter):
+    schema = type_schema(
+        'username',
+        value_type={'type': 'string'},
+        key={'type': 'string',
+             'enum': [
+                 'UserName',
+                 'Arn',
+             ]},
+        value={'oneOf': [
+            {'type': 'string'},
+            {'type': 'array'}]},
+        op={'enum': OPERATORS.keys()})
+
+    def process(self, resources, event=None):
+        matched = []
+        for r in resources:
+            if self.match(r):
+                matched.append(r)
+        return matched
+
+
 @User.action_registry.register('delete')
 class UserDelete(BaseAction):
     """Delete a user.
