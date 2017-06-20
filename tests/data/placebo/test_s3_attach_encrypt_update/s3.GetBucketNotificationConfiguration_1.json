@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LambdaFunctionConfigurations": [
+            {
+                "LambdaFunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt", 
+                "Id": "c7n-s3-encrypt", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "99TAbmHmE4iGkchlESnRqZ+T+oGVLIETo1uCsgX+X+Nc3/PKiL9tAorxGYQ3mlOK6urCOMzZ51Y=", 
+            "RequestId": "08FDEE889D61D962", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "99TAbmHmE4iGkchlESnRqZ+T+oGVLIETo1uCsgX+X+Nc3/PKiL9tAorxGYQ3mlOK6urCOMzZ51Y=", 
+                "date": "Wed, 14 Jun 2017 15:51:18 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "08FDEE889D61D962", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

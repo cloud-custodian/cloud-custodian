@@ -934,6 +934,32 @@ class S3Test(BaseTest):
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
+    def test_attach_encrypt_update(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data(
+            'test_s3_attach_encrypt_update')
+        role = 'arn:aws:iam::644160558196:role/custodian-mu'
+        self.maxDiff = None
+        session = session_factory()
+        client = session.client('lambda')
+        fx_orig = client.get_function(
+            FunctionName='c7n-s3-encrypt')['Configuration']
+
+        p = self.load_policy({
+            'name': 'attach-encrypt-update',
+            'resource': 's3',
+            'filters': [
+                {'Name': 'c7n-s3crypt-east-test'}],
+            'actions': [{
+                'type': 'attach-encrypt',
+                'role': role,
+                'update': True}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        fx_new = client.get_function(
+            FunctionName='c7n-s3-encrypt')['Configuration']
+        self.assertNotEqual(fx_orig['LastModified'], fx_new['LastModified'])
+
     def test_attach_encrypt_via_new_topic(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [(
             'get_bucket_notification_configuration', 'Notification', None,

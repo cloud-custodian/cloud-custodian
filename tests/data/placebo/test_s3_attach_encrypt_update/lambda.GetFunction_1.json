@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Code": {
+            "RepositoryType": "S3", 
+            "Location": "https://prod-04-2014-tasks.s3.amazonaws.com/snapshots/644160558196/c7n-s3-encrypt-c388b73d-f3b9-4760-9709-396ad42d6c71?X-Amz-Security-Token=FQoDYXdzEPD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDKbX2qe2VgVNpF%2BCpCK3Ax0A3UkqcuUyEjU1EbF4sKGTb4lk%2F9bWoMbK%2Bt20nCT47AlTicYtmEaCK532XF%2BlWPkkfU%2F8nuXG5F0SuILmacB8B8%2BIPeRmYgXH%2FPVUdNiLNtlgP1f14Etbzzb3U%2BsKk8N8wSL3dtzY4PHZZMVGbd9QFXOfOV%2FMpBocvsHlAyXrsdTQSpf%2FxWEkum%2Ff3SJAeq%2BEbyWSV3m8mTfxcWJUYatGAduhhTw3JXCVh1xfjr2w%2FyNpIYN%2BEu1F6B759utjIT4HgWGxG4fLurCmCDxq%2FWkYP%2FWrcL%2B2Sq3Bi592bLPtuLK8dSDeYpV8Ux2aZ%2FISH6DfCJZ%2BiSzXRSkQ%2F%2BO1Y%2BWBbRnbibfOeVkNMfAhn17r%2FGmCQ253FMxY7%2FKO5SQ%2BJRp0Qx%2FdiYbXI4UEl2i2pBWhDNTnK48Ji4doQOjlo%2BKI6npCb35uUSrWcVbDC0IhsLbySFRzjOQ6CICMEIJyePxnNUgoHNJ%2FPKRUJNhdCPUYb4s2gD%2BXkp5JSWzeTnVSh4p1jFwKsomsvuQMw7i4qs5qSfZGa6rZdBhNO9oREgsQdPta7SAsC8zXN%2BWoPyPtnbXhf5CZliAohqCFygU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20170614T155113Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAJ65VIH2SPDGKYK7A%2F20170614%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6df82a05685b7115887da46f2934665e82fc669a99af09dd368c4128db0ccf69"
+        }, 
+        "Configuration": {
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            }, 
+            "Version": "$LATEST", 
+            "CodeSha256": "m4M7TL095VSAWEXhfRQKkePVUQlX/+WIO3D2snGCKlw=", 
+            "FunctionName": "c7n-s3-encrypt", 
+            "MemorySize": 256, 
+            "CodeSize": 1426582, 
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt", 
+            "Handler": "s3crypt.process_key_event", 
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+            "Timeout": 30, 
+            "LastModified": "2017-06-14T15:46:13.917+0000", 
+            "Runtime": "python2.7", 
+            "Description": "Custodian S3 Key Encrypt"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4b4bcb68-5119-11e7-b844-05b05428c83b", 
+            "HTTPHeaders": {
+                "date": "Wed, 14 Jun 2017 15:51:13 GMT", 
+                "x-amzn-requestid": "4b4bcb68-5119-11e7-b844-05b05428c83b", 
+                "content-length": "1776", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

@@ -222,9 +222,9 @@ class LambdaManager(object):
                 elif f['FunctionName'].startswith(prefix):
                     yield f
 
-    def publish(self, func, alias=None, role=None, s3_uri=None):
+    def publish(self, func, alias=None, role=None, s3_uri=None, update=False):
         result, changed = self._create_or_update(
-            func, role, s3_uri, qualifier=alias)
+            func, role, s3_uri, qualifier=alias, update=update)
         func.arn = result['FunctionArn']
         if alias and changed:
             func.alias = self.publish_alias(result, alias)
@@ -325,7 +325,8 @@ class LambdaManager(object):
                 remove.add(k)
         return add, list(remove)
 
-    def _create_or_update(self, func, role=None, s3_uri=None, qualifier=None):
+    def _create_or_update(self, func, role=None, s3_uri=None,
+                          qualifier=None, update=False):
         role = func.role or role
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
@@ -341,7 +342,7 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
-            if archive.get_checksum() != old_config['CodeSha256']:
+            if archive.get_checksum() != old_config['CodeSha256'] or update:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)

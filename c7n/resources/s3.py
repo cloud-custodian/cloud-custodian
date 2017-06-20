@@ -711,7 +711,8 @@ class AttachLambdaEncrypt(BucketActionBase):
     schema = type_schema(
         'attach-encrypt',
         role={'type': 'string'},
-        topic={'type': 'string'})
+        topic={'type': 'string'},
+        update={'type': 'boolean'})
 
     permissions = (
         "s3:PutBucketNotification", "s3:GetBucketNotification",
@@ -760,7 +761,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
         for r in regions:
             lambda_mgr = LambdaManager(region_sessions[r])
-            lambda_mgr.publish(func)
+            lambda_mgr.publish(func, update=self.data.get('update', True))
             region_funcs[r] = func
 
         with self.executor_factory(max_workers=3) as w:
