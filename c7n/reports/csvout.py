@@ -53,6 +53,7 @@ import logging
 import os
 from tabulate import tabulate
 
+import six
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
@@ -134,7 +135,7 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, basestring):
+            if not isinstance(value, six.string_types):
                 value = unicode(value)
         vals.append(value)
     return vals

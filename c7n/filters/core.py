@@ -26,6 +26,7 @@ from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
 import ipaddress
+import six
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
@@ -42,13 +43,13 @@ ANNOTATION_KEY = "c7n:MatchedFilters"
 
 
 def glob_match(value, pattern):
-    if not isinstance(value, basestring):
+    if not isinstance(value, six.string_types):
         return False
     return fnmatch.fnmatch(value, pattern)
 
 
 def regex_match(value, regex):
-    if not isinstance(value, basestring):
+    if not isinstance(value, six.string_types):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
@@ -116,7 +117,7 @@ class FilterRegistry(PluginRegistry):
             elif data.keys()[0] == 'not':
                 return Not(data, self, manager)
             return ValueFilter(data, manager).validate()
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}
         else:
@@ -415,7 +416,7 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value, resource):
-        if self.vtype == 'normalize' and isinstance(value, basestring):
+        if self.vtype == 'normalize' and isinstance(value, six.string_types):
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':

@@ -18,6 +18,7 @@ import operator
 import random
 import re
 
+import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -1178,7 +1179,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

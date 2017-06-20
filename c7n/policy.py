@@ -24,6 +24,7 @@ import time
 import boto3
 from botocore.client import ClientError
 import jmespath
+import six
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
@@ -253,7 +254,7 @@ class PolicyExecutionMode(object):
         client = session.client('cloudwatch')
 
         for m in metrics:
-            if isinstance(m, basestring):
+            if isinstance(m, six.string_types):
                 dimensions = default_dimensions
             else:
                 m, m_dimensions = m
@@ -495,7 +496,7 @@ class CloudTrailMode(LambdaMode):
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
-            if isinstance(e, basestring):
+            if isinstance(e, six.string_types):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined"
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])
