@@ -13,10 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import io
 import json
 import logging
 import os
-import StringIO
 import shutil
 import tempfile
 import yaml
@@ -153,7 +153,7 @@ class BaseTest(PillTest):
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = StringIO.StringIO()
+            log_file = io.StringIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)

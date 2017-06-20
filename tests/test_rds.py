@@ -897,15 +897,12 @@ class TestHealthEventsFilter(BaseTest):
 
 
 class TestRDSParameterGroupFilter(BaseTest):
-    """ This test assumes two parameter groups have been created and
-        assigned to two different RDS instances.
-    """
 
     PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
         # filter_struct, test_func, err_message
         ({'key': 'log_destination', 'op': 'eq', 'value': 'stderr'},
          lambda r: len(r) == 1,
-         "instances with log_destination == stderr should be 2"),
+         "instances with log_destination == stderr should be 1"),
         ({'key': 'log_destination', 'op': 'eq', 'value': 's3'},
          lambda r: len(r) == 0,
          "instances with log_destination == s3 should be 0"),
@@ -914,7 +911,7 @@ class TestRDSParameterGroupFilter(BaseTest):
          "instances with log_destination != stderr should be 0"),
         ({'key': 'log_destination', 'op': 'ne', 'value': 's3'},
          lambda r: len(r) == 1,
-         "instances with log_destination != s3 should be 2"),
+         "instances with log_destination != s3 should be 1"),
         ({'key': 'full_page_writes', 'op': 'eq', 'value': True},
          lambda r: len(r) == 1,
          "full_page_writes ( a boolean ) should be on"),

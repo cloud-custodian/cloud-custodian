@@ -22,6 +22,7 @@ import jmespath
 import logging
 import zlib
 
+import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
@@ -147,7 +148,7 @@ class Action(object):
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
-        except ClientError, e:
+        except ClientError as e:
             if (e.response['Error']['Code'] == 'DryRunOperation' and
             e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
             'would have succeeded' in e.message):
@@ -266,13 +267,13 @@ class ModifyVpcSecurityGroupsAction(Action):
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
                 remove_groups = remove_target_group_ids
-            elif isinstance(remove_target_group_ids, basestring):
+            elif isinstance(remove_target_group_ids, six.string_types):
                 remove_groups = [remove_target_group_ids]
 
             # Parse add_groups
             if isinstance(add_target_group_ids, list):
                 add_groups = add_target_group_ids
-            elif isinstance(add_target_group_ids, basestring):
+            elif isinstance(add_target_group_ids, six.string_types):
                 add_groups = [add_target_group_ids]
 
             # seems extraneous with list?
@@ -442,14 +443,20 @@ class Notify(EventAction):
         return ()
 
     def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
         p = self.data.copy()
         if 'to_from' in self.data:
             to_from = self.data['to_from'].copy()
             to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
             p['to'] = ValuesFrom(to_from).get_values()
         if 'cc_from' in self.data:
             cc_from = self.data['cc_from'].copy()
             cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
             p['cc'] = ValuesFrom(cc_from).get_values()
         return p
 
@@ -461,9 +468,9 @@ class Notify(EventAction):
             'event': event,
             'account_id': self.manager.config.account_id,
             'account': account_name,
-            'action': self.data,
-            'region': self.manager.config.region}
-        message['policy'] = self.expand_variables(message)
+            'region': self.manager.config.region,
+            'policy': self.manager.data}
+        message['action'] = self.expand_variables(message)
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
@@ -702,7 +709,7 @@ class PutMetric(BaseAction):
                                      {'Resources': resources})
             # I had to wrap resourses in a dict like this in order to not have jmespath expressions
             # start with [] in the yaml files.  It fails to parse otherwise.
-        except TypeError, oops:
+        except TypeError as oops:
             self.log.error(oops.message)
 
         value = 0

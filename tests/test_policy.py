@@ -142,6 +142,19 @@ class PolicyPermissions(BaseTest):
 
 class TestPolicyCollection(BaseTest):
 
+    def test_expand_partitions(self):
+        cfg = Config.empty(
+            regions=['us-gov-west-1', 'cn-north-1', 'us-west-2'])
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'ec2'}]},
+            cfg)
+        collection = original.expand_regions(cfg.regions)
+        self.assertEqual(
+            sorted([p.options.region for p in collection]),
+            ['cn-north-1', 'us-gov-west-1', 'us-west-2'])
+
     def test_policy_account_expand(self):
         original = policy.PolicyCollection.from_data(
             {'policies': [
@@ -151,7 +164,7 @@ class TestPolicyCollection(BaseTest):
 
         collection = original.expand_regions(['all'])
         self.assertEqual(len(collection), 1)
-        
+
     def test_policy_region_expand_global(self):
         original = policy.PolicyCollection.from_data(
             {'policies': [

@@ -229,13 +229,14 @@ def report(options, policies):
 
     resources = set([p.resource_type for p in policies])
     if len(resources) > 1:
-        log.error('Error: Report subcommand can accept multiple policies, but they must '
-                  'all be for the same resource.')
+        log.error('Error: Report subcommand can accept multiple policies, '
+                  'but they must all be for the same resource.')
         sys.exit(1)
 
     delta = timedelta(days=options.days)
     begin_date = datetime.now() - delta
-    do_report(policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
+    do_report(
+        policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
 
 @policy_command

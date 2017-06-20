@@ -159,7 +159,7 @@ class SQSWorker(object):
 
         try:
             func(*msg['args'], **msg['kwargs'])
-        except Exception, e:
+        except Exception as e:
             log.exception(
                 "Error invoking %s %s" % (
                     op_name, e))

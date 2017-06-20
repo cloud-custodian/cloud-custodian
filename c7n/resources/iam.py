@@ -13,14 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from cStringIO import StringIO
 import csv
 import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
+import io
 import itertools
 import time
+
+import six
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -394,9 +396,9 @@ class AllowAllIamPolicies(Filter):
         for s in statements:
             if ('Condition' not in s and
                     'Action' in s and
-                    isinstance(s['Action'], basestring) and
+                    isinstance(s['Action'], six.string_types) and
                     s['Action'] == "*" and
-                    isinstance(s['Resource'], basestring) and
+                    isinstance(s['Resource'], six.string_types) and
                     s['Resource'] == "*" and
                     s['Effect'] == "Allow"):
                 return True
@@ -558,7 +560,7 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(StringIO(data))
+        reader = csv.reader(io.StringIO(data))
         headers = reader.next()
         for line in reader:
             info = dict(zip(headers, line))

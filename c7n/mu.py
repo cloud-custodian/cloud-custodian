@@ -22,10 +22,10 @@ import abc
 import base64
 import imp
 import hashlib
+import io
 import json
 import logging
 import os
-import StringIO
 import sys
 import time
 import tempfile
@@ -183,8 +183,8 @@ class PythonPackageArchive(object):
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
         assert self._closed, "Archive not closed"
-        io = StringIO.StringIO(self.get_bytes())
-        return zipfile.ZipFile(io, mode='r')
+        buf = io.BytesIO(self.get_bytes())
+        return zipfile.ZipFile(buf, mode='r')
 
     def get_filenames(self):
         """Return a list of filenames in the archive."""
@@ -442,7 +442,7 @@ class LambdaManager(object):
 def resource_exists(op, NotFound="ResourceNotFoundException", *args, **kw):
     try:
         return op(*args, **kw)
-    except ClientError, e:
+    except ClientError as e:
         if e.response['Error']['Code'] == NotFound:
             return False
         raise
@@ -719,7 +719,7 @@ def zinfo(fname):
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
     # http://unix.stackexchange.com/questions/14705/
-    info.external_attr = 0o644 << 16L
+    info.external_attr = 0o644 << 16
     return info
 
 

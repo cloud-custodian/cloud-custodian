@@ -18,7 +18,6 @@ import os
 import random
 import string
 
-
 from concurrent.futures import as_completed
 
 from c7n.sqsexec import SQSExecutor, MessageIterator

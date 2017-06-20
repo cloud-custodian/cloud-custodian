@@ -1,17 +1,17 @@
 {
     "status_code": 200, 
     "data": {
-        "Marker": "bG9nX2Rpc2Nvbm5lY3Rpb25z", 
+        "Marker": "bG9nX2RpcmVjdG9yeQ==", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "8c7ef19a-3a7a-11e7-96f9-cf1f58744ebc", 
+            "RequestId": "b862a8a1-521a-11e7-ab28-6d89c50f6e01", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "8c7ef19a-3a7a-11e7-96f9-cf1f58744ebc", 
+                "x-amzn-requestid": "b862a8a1-521a-11e7-ab28-6d89c50f6e01", 
                 "vary": "Accept-Encoding", 
-                "content-length": "44883", 
+                "content-length": "44953", 
                 "content-type": "text/xml", 
-                "date": "Tue, 16 May 2017 20:59:27 GMT"
+                "date": "Thu, 15 Jun 2017 22:33:56 GMT"
             }
         }, 
         "Parameters": [
@@ -862,6 +862,18 @@
             }, 
             {
                 "ApplyMethod": "pending-reboot", 
+                "Description": "Use of huge pages on Linux.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "AllowedValues": "on,off", 
+                "Source": "system", 
+                "ParameterValue": "off", 
+                "ParameterName": "huge_pages", 
+                "MinimumEngineVersion": "9.6.2", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
                 "Description": "Sets the servers ident configuration file.", 
                 "DataType": "string", 
                 "IsModifiable": false, 
@@ -1008,16 +1020,6 @@
                 "Source": "system", 
                 "ParameterValue": "/rdsdbdata/log/error", 
                 "ParameterName": "log_directory", 
-                "ApplyType": "dynamic"
-            }, 
-            {
-                "ApplyMethod": "pending-reboot", 
-                "Description": "Logs end of a session, including duration.", 
-                "DataType": "boolean", 
-                "AllowedValues": "0,1", 
-                "Source": "engine-default", 
-                "IsModifiable": true, 
-                "ParameterName": "log_disconnections", 
                 "ApplyType": "dynamic"
             }
         ]
