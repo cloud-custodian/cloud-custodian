@@ -302,18 +302,20 @@ def index_account_resources(config, account, region, policy, date):
         for key_set in p:
             if 'Contents' not in key_set:
                 continue
-            keys = [k for k in key_set['Contents']
-                    if k['Key'].endswith('resources.json.gz')]
+            keys = []
+            for k in key_set['Contents']:
+                if k['Key'].endswith('resources.json.gz'):
+                    keys.append(k)
             key_count += len(keys)
             futures = map(lambda k: w.submit(
                 s3_resource_parser.get_records, bucket, k, session_factory),
                 keys)
 
             for f in as_completed(futures):
-                # if f.exception():
-                #     log.warning("error account:{} region:{} policy:{} error:{}".format(
-                #         account['name'], region, policy['name'], f.exception()))
-                #     continue
+                if f.exception():
+                    log.warning("Error account:{} region:{} policy:{} error:{}".format(
+                        account['name'], region, policy['name'], f.exception()))
+                    continue
                 records += len(f.result())
                 indexer.index(f.result())
 
@@ -360,7 +362,6 @@ def get_date_range(start, end):
 def get_date_path(date, delta=0):
     # optional input, use default time delta if not provided
     # delta is 1 hour for resources
-    # delta is 24 hours for trail
     if not date:
         date = datetime.datetime.utcnow() - datetime.timedelta(hours=delta)
     elif date and not isinstance(date, datetime.datetime):

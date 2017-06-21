@@ -279,7 +279,7 @@ def get_records(bucket, key, session_factory):
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
-    blob = io.StringIO(result['Body'].read())
+    blob = io.BytesIO(result['Body'].read())
 
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",
