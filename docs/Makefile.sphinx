@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SRCDIR        = docs/source
 SPHINXOPTS    = -W
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = .tox/py27/bin/sphinx-build
 PAPER         =
 BUILDDIR      = $(SRCDIR)/../build
 
@@ -54,7 +54,7 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests
+	.tox/py27/bin/sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
