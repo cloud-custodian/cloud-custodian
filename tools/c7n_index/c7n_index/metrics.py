@@ -281,8 +281,8 @@ def index_account_metrics(config, idx_name, region, account, start, end, period)
 def index_account_resources(config, account, region, policy, date):
     indexer = get_indexer(config, type=policy['resource'])
 
-    session_factory = lambda : assumed_session(account['role'], 'PolicyIndex')
-    s3 = local_session(session_factory).client('s3')
+    s3 = local_session(
+        lambda : assumed_session(account['role'], 'PolicyIndex')).client('s3')
 
     bucket = account['bucket']
     key_prefix = "accounts/" + account['name'] + "/" + region + \
@@ -308,7 +308,8 @@ def index_account_resources(config, account, region, policy, date):
                     keys.append(k)
             key_count += len(keys)
             futures = map(lambda k: w.submit(
-                s3_resource_parser.get_records, bucket, k, session_factory),
+                s3_resource_parser.get_records, bucket, k,
+                lambda : assumed_session(account['role'], 'PolicyIndex')),
                 keys)
 
             for f in as_completed(futures):

@@ -18,7 +18,6 @@ import os
 import subprocess
 import thread
 
-import boto3
 import click
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
@@ -148,8 +147,8 @@ def valid_date(key, config_date):
 def index_account_trails(config, account, region, date, directory):
     es_client = get_es_client(config)
 
-    session_factory = lambda : assumed_session(account['role'], 'PolicyIndex')
-    s3 = local_session(session_factory).client('s3')
+    s3 = local_session(
+        lambda : assumed_session(account['role'], 'TrailIndex')).client('s3')
 
     bucket = account['bucket']
     key_prefix = "accounts/" + account['name'] + "/" + region + "/traildb"
@@ -171,7 +170,8 @@ def index_account_trails(config, account, region, date, directory):
                     keys.append(k)
 
             futures = map(lambda k: w.submit(
-                get_traildb, bucket, k, session_factory, directory),
+                get_traildb, bucket, k,
+                lambda : assumed_session(account['role'], 'TrailIndex'), directory),
                 keys)
 
             for f in as_completed(futures):
