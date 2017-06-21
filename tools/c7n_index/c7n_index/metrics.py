@@ -317,8 +317,11 @@ def index_account_resources(config, account, region, policy, date):
                     log.warning("Error account:{} region:{} policy:{} error:{}".format(
                         account['name'], region, policy['name'], f.exception()))
                     continue
-                records += len(f.result())
-                indexer.index(f.result())
+                points = f.result()
+                records += len(points)
+                for p in points:
+                    p['c7n:MatchedPolicy'] = policy['name']
+                indexer.index(points)
 
     log.info("Fetched %d records across %d files" % (
         records, key_count))
