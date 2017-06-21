@@ -878,14 +878,29 @@ class UserDelete(BaseAction):
                 client.delete_access_key(UserName=r['UserName'],
                         AccessKeyId=access_key['AccessKeyId'])
 
-            self.log.debug('Detaching UserPolicies from user "%s"' % (r['UserName']))
             response = client.list_attached_user_policies(UserName=r['UserName'])
             for user_policy in response['AttachedPolicies']:
                 client.detach_user_policy(UserName=r['UserName'],
                         PolicyArn=user_policy['PolicyArn'])
+                self.log.debug('Detached UserPolicy "%s" from user "%s"' %
+                        (user_policy['PolicyArn'], r['UserName']))
 
-            self.log.debug('Deleting user "%s"' % (r['UserName']))
+            response = client.list_mfa_devices(UserName=r['UserName'])
+            for mfa_device in response['MFADevices']:
+                client.deactivate_mfa_device(UserName=r['UserName'],
+                        SerialNumber=mfa_device['SerialNumber'])
+                self.log.debug('Deactivated MFA Device "%s" for user "%s"' %
+                        (mfa_device['SerialNumber'], r['UserName']))
+
+            response = client.list_groups_for_user(UserName=r['UserName'])
+            for user_group in response['Groups']:
+                client.remove_user_from_group(UserName=r['UserName'],
+                    GroupName=user_group['GroupName'])
+                self.log.debug('Removed user "%s" from group "%s"' %
+                    (r['UserName'], user_group['GroupName']))
+
             client.delete_user(UserName=r['UserName'])
+            self.log.debug('Deleted user "%s"' % (r['UserName']))
 
 
 @User.action_registry.register('remove-keys')
