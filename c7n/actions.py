@@ -541,14 +541,19 @@ class AutoTagUser(EventAction):
       policies:
         - name: ec2-auto-tag-owner
           resource: ec2
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
           filters:
            - tag:Owner: absent
           actions:
-           - type: auto-tag-creator
+           - type: auto-tag-user
              tag: OwnerContact
 
-    There's a number of caveats to usage, resources which don't
-    include tagging as part of their api, may have some delay before
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
     automation kicks in to create a tag. Real world delay may be several
     minutes, with worst case into hours[0]. This creates a race condition
     between auto tagging and automation.
@@ -559,7 +564,7 @@ class AutoTagUser(EventAction):
 
     References
      - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
-     - CloudTrail User - http://goo.gl/XQhIG6 q
+     - CloudTrail User - http://goo.gl/XQhIG6
     """
 
     schema = utils.type_schema(
