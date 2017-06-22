@@ -13,11 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import codecs
 import io
 import json
 import logging
 import os
 import shutil
+import six
 import tempfile
 import yaml
 import unittest
@@ -49,6 +51,20 @@ skip_if_not_validating = unittest.skipIf(
 # Set this so that if we run nose directly the tests will not fail
 if 'AWS_DEFAULT_REGION' not in os.environ:
     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+
+
+class AmbiguousIO(io.BytesIO):
+
+    def write(self, x):
+
+        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
+        # requires us to choose. We don't have control over all of the places
+        # we want to print from (think: traceback.print_exc) so we can't
+        # standardize the arg type up at the call sites. Hack it here.
+
+        if type(x) is six.text_type:
+            x = codecs.encode(x, 'utf8')
+        io.BytesIO.write(self, x)
 
 
 class BaseTest(PillTest):
@@ -153,7 +169,7 @@ class BaseTest(PillTest):
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = io.StringIO()
+            log_file = AmbiguousIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)

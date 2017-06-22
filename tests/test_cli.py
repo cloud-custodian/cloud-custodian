@@ -24,21 +24,7 @@ from argparse import ArgumentTypeError
 from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
-from .common import BaseTest
-
-
-class AmbiguousIO(io.BytesIO):
-
-    def write(self, x):
-
-        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
-        # requires us to choose. We don't have control over all of the places
-        # we want to print from (think: traceback.print_exc) so we can't
-        # standardize the arg type up at the call sites. Hack it here.
-
-        if type(x) is six.text_type:
-            x = codecs.encode(x, 'utf8')
-        io.BytesIO.write(self, x)
+from .common import BaseTest, AmbiguousIO
 
 
 class CliTest(BaseTest):
