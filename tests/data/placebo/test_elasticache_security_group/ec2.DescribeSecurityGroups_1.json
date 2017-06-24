@@ -6,46 +6,47 @@
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
                         "IpRanges": [
                             {
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
                         "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "Description": "default VPC security group", 
                 "IpPermissions": [
                     {
+                        "IpProtocol": "-1", 
                         "PrefixListIds": [], 
-                        "FromPort": 22, 
-                        "IpRanges": [
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
                             {
-                                "CidrIp": "71.163.79.221/32"
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-4b9ada34"
                             }
                         ], 
-                        "ToPort": 22, 
-                        "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": []
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "GroupName": "default", 
-                "VpcId": "vpc-4a9ff72e", 
+                "VpcId": "vpc-f1516b97", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-f9cc4d9f"
+                "GroupId": "sg-4b9ada34"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "160cf9d2-675b-4af8-b001-e04cd4b0a79a", 
+            "RequestId": "4f49e194-08b6-4141-9821-cc852b3e2a6d", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sun, 06 Nov 2016 21:43:23 GMT"
+                "date": "Sat, 24 Jun 2017 02:11:50 GMT"
             }
         }
     }

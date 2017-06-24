@@ -123,6 +123,11 @@ class QueryMeta(type):
             if getattr(m, 'universal_taggable', False):
                 register_universal_tags(
                     attrs['filter_registry'], attrs['action_registry'])
+                attrs['retry'] = staticmethod(get_retry((
+                    'Throttled',
+                    'RequestLimitExceeded',
+                    'Client.RequestLimitExceeded'
+                )))
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
@@ -335,11 +340,12 @@ class QueryResourceManager(ResourceManager):
     def get_arns(self, resources):
         arns = []
         for r in resources:
-            _id = r[self.manager.get_model().id]
+            _id = r[self.get_model().id]
             if 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))
+        return arns
 
     @property
     def generate_arn(self):
@@ -352,7 +358,7 @@ class QueryResourceManager(ResourceManager):
                 region=self.config.region,
                 account_id=self.account_id,
                 resource_type=self.get_model().type,
-                separator=':')
+                separator='/')
         return self._generate_arn
 
 
