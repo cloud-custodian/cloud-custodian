@@ -43,7 +43,6 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('health-event', HealthEventFilter)
 
 
