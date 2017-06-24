@@ -40,6 +40,7 @@ def register_ec2_tags(filters, actions):
     filters.register('marked-for-op', TagActionFilter)
     filters.register('tag-count', TagCountFilter)
 
+    actions.register('auto-tag-user', AutoTagUser)
     actions.register('mark-for-op', TagDelayedAction)
     actions.register('tag-trim', TagTrim)
 
