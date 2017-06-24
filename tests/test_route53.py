@@ -56,7 +56,7 @@ class Route53HostedZoneTest(BaseTest):
         self.assertTrue('abc' in tags['ResourceTagSet']['Tags'][0].values())
 
     def test_route53_hostedzone_tag_exception(self):
-        output = self.capture_logging(level=logging.DEBUG)
+        output = self.capture_logging("custodian.actions")
         # intentionally cause error to be thrown by sending wrong arn
         def generate_arn(*args):
             return 'arn:aws:route53:::hostedzone/Z148QEXAMPLE8V'

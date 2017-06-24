@@ -224,7 +224,6 @@ class EncryptExtantVolumesTest(BaseTest):
     def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
-        output = self.capture_logging(level=logging.DEBUG)
 
         session_factory = self.replay_flight_data('test_encrypt_volumes')
 
