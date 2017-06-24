@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from concurrent.futures import as_completed
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
