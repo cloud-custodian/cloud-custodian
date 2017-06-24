@@ -79,10 +79,12 @@ def universal_augment(self, resources):
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
             ResourceTypeFilters=[resource_type])]))
-
-    resource_tag_map = {r['ResourceArn']: r for r in resource_tag_map_list}
+    resource_tag_map = {r['ResourceARN']: r for r in resource_tag_map_list}
     for r in resources:
-        r['Tags'] = resource_tag_map[self.get_arns([r])]['Tags']
+        arn = self.get_arns([r])[0]
+        t = resource_tag_map.get(arn)
+        if t:
+            r['Tags'] = t['Tags']
 
     return resources
 

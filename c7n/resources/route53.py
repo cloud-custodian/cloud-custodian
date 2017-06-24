@@ -17,13 +17,12 @@ import functools
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import chunks, get_retry, generate_arn, local_session
+from c7n.utils import chunks, generate_arn, local_session
 
 
 class Route53Base(object):
 
     permissions = ('route53:ListTagsForResources',)
-    retry = staticmethod(get_retry(('Throttled',)))
 
     @property
     def generate_arn(self):
