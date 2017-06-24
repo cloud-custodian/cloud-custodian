@@ -32,6 +32,7 @@ from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
+from c7n.resources import load_resources
 from c7n import mu
 from c7n import utils
 from c7n.logs_support import (
@@ -42,7 +43,7 @@ from c7n.logs_support import (
 )
 from c7n.version import version
 
-from c7n.resources import load_resources
+log = logging.getLogger('c7n.policy')
 
 
 def load(options, path, format='yaml', validate=True, vars=None):
@@ -55,6 +56,10 @@ def load(options, path, format='yaml', validate=True, vars=None):
 
     if format == 'json':
         validate = False
+
+    if isinstance(data, list):
+        log.warning('yaml in invalid format. The "policies:" line is probably missing.')
+        return None
 
     # Test for empty policy file
     if not data or data.get('policies') is None:
