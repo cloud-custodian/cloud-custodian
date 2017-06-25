@@ -4,14 +4,14 @@ build:
     image: python:2-slim
     commands:
       - pip install tox
-      - tox -e py27 -- -v
+      - tox -e py27
 
   pypy_unit_tests:
     # just enough variation to make a matrix not viable
     image: pypy:2-5.8.0-slim
     commands:
       - pip install tox
-      - tox -e pypy -- -v
+      - tox -e pypy
     when:
       event: push
       branch: master
@@ -21,8 +21,6 @@ build:
      commands:
        - apk update
        - apk add git make
-       - apt-update
-       - DEBIAN_FRONTEND=noninteractive apt-get install -y git make
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
        - pip install tox
