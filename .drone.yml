@@ -1,19 +1,20 @@
 build:
 
   unit_tests:
-    image: ubuntu:xenial
+    image: python:2-alpine
     commands:
-      - mkdir -p cache
-      - apt update --quiet && apt-get -y install python-pip
-      - pip install tox --cache-dir=cache
+      - echo $HOME      
+      - pip install tox
+      - ls $HOME/.cache/pip      
       - tox -e py27
 
   pypy_unit_tests:
     # just enough variation to make a matrix not viable
     image: pypy:2
     commands:
-      - mkdir -p cache
-      - pip install tox --cache-dir=cache
+      - echo $HOME
+      - pip install tox
+      - ls $HOME/.cache/pip
       - tox -e pypy
     when:
       event: push
@@ -54,9 +55,7 @@ notify:
     when:
       repo: capitalone/cloud-custodian
 
-# TODO explore caching the whole venv for speed
 cache:
   mount:
-    - cache
+    - .cache
     - .tox
-    - /var/cache/apt/
