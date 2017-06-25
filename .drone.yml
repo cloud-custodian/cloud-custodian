@@ -1,34 +1,29 @@
 build:
 
   unit_tests:
-    image: python:2-alpine
+    image: python:2-slim
     commands:
-      - echo $HOME      
       - pip install tox
-      - ls $HOME/.cache/pip      
       - tox -e py27
 
   pypy_unit_tests:
     # just enough variation to make a matrix not viable
     image: pypy:2
     commands:
-      - echo $HOME
       - pip install tox
-      - ls $HOME/.cache/pip
       - tox -e pypy
     when:
       event: push
       branch: master
 
-
   documentation:
-     image: python:2-alpine
+     image: python:2-slim
      commands:
-       - apk update
-       - apk add git make
+       - apt-update
+       - DEBIAN_FRONTEND=noninteractive apt-get install -y git make
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
-       - pip install tox --cache-dir=cache
+       - pip install tox
        - tox -e docs
        - git remote update origin --prune
        - make ghpages
@@ -57,5 +52,5 @@ notify:
 
 cache:
   mount:
-    - .cache
+    - /root/.cache/pip
     - .tox
