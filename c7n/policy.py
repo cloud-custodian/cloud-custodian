@@ -530,6 +530,7 @@ class ConfigRuleMode(LambdaMode):
         self.cfg_event = json.loads(event['invokingEvent'])
         cfg_item = self.cfg_event['configurationItem']
         evaluation = None
+        resources = []
         # TODO config resource type matches policy check
         if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
