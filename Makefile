@@ -8,6 +8,12 @@ coverage:
 	rm -Rf .coverage
 	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=coverage --processes=-1 --cover-inclusive tests  --process-timeout=64
 
+test:
+	./bin/tox -e py27
+
+nose-tests:
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 tests
+
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer --process-timeout=300 tests
 
@@ -34,3 +40,4 @@ ghpages:
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
+

@@ -1,15 +1,16 @@
 language: python
+dist: trusty
 sudo: false
-cache: pip
-env:
-  # Region required, and Bypass credential lookup
-  - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY="thing" C7N_VALIDATE=yes
+cache:
+  directories:
+   - .tox
+
 python:
   - "2.7"
   - "3.6"
 install:
-  - pip install tox-travis coveralls
+  - pip install coveralls tox
 script:
-  - tox
+  - TOXENV=`tools/dev/citoxenv.py` tox
 after_success:
   - coveralls

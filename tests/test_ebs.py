@@ -224,9 +224,7 @@ class EncryptExtantVolumesTest(BaseTest):
     def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
-
         session_factory = self.replay_flight_data('test_encrypt_volumes')
-
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
@@ -235,7 +233,7 @@ class EncryptExtantVolumesTest(BaseTest):
                 {'VolumeId': 'vol-0f53c81b92b4ecfce'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
-                 'delay': 30,
+                 'delay': 0.001,
                  'key': 'alias/encryptebs'}]},
             session_factory=session_factory)
         resources = policy.run()
