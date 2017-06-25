@@ -17,7 +17,7 @@ pytest-cov
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext
-# Local package required for new c7n_mailer tests
+# Local package required for c7n_mailer tests
 -e tools/c7n_mailer
 
 # requires pandoc, fails on ci server, only used for pypi metadata

@@ -8,7 +8,7 @@ build:
       - AWS_SECRET_ACCESS_KEY=bar
     commands:
       - mkdir -p cache
-      - apt-get update && apt-get -y install python-pip
+      - apt update --quiet && apt-get -y install python-pip
       - pip install -r requirements-dev.txt --cache-dir=cache
       - pip install coveralls --cache-dir=cache
       - python setup.py develop

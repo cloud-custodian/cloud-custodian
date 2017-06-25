@@ -19,8 +19,10 @@ import logging
 import os
 import shutil
 import tempfile
-import yaml
 import unittest
+
+import six
+import yaml
 
 from c7n import policy
 from c7n.schema import generate, validate as schema_validate
@@ -153,7 +155,7 @@ class BaseTest(PillTest):
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = io.StringIO()
+            log_file = TextTestIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)
@@ -172,6 +174,14 @@ class BaseTest(PillTest):
     @property
     def account_id(self):
         return ACCOUNT_ID
+
+
+class TextTestIO(io.StringIO):
+
+    def write(self, b):
+        if not isinstance(b, six.types.UnicodeType):
+            b = b.decode('utf8')
+        return super(TextTestIO, self).write(b)
 
 
 def placebo_dir(name):
