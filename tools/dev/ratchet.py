@@ -30,7 +30,7 @@ class TestResults(object):
 
     def process_testcase(self, case):
         key = self.case_key(case)
-        
+
         fails = case.findall('failure')
         if not len(case):
             self.passed.append(key)
@@ -40,7 +40,7 @@ class TestResults(object):
             if tags == set(['system-err']):
                 self.stderr_output.append(key)
                 return
-            raise AssertionError("unknown result" % key)
+            raise AssertionError("unknown result for %s" % key)
         else:
             self.failed.append(key)
             self.failed_aggregates.setdefault(
