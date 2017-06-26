@@ -179,6 +179,12 @@ class BaseTest(PillTest):
 class TextTestIO(io.StringIO):
 
     def write(self, b):
+
+        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
+        # requires us to choose. We don't have control over all of the places
+        # we want to print from (think: traceback.print_exc) so we can't
+        # standardize the arg type up at the call sites. Hack it here.
+
         if not isinstance(b, six.types.UnicodeType):
             b = b.decode('utf8')
         return super(TextTestIO, self).write(b)

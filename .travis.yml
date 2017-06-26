@@ -13,4 +13,4 @@ install:
 script:
   - TOXENV=`tools/dev/citoxenv.py` tox
 after_success:
-  - coveralls
+  - if [ "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then coveralls; fi
