@@ -25,13 +25,20 @@ import jmespath
 
 class URIResolver(object):
 
-    def __init__(self, session_factory, cache):
+    def __init__(self, session_factory, cache, output_dir):
         self.session_factory = session_factory
         self.cache = cache
+        self.output_dir = output_dir
 
     def resolve(self, uri):
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
+        elif uri.startswith('policy://'):
+            policy_name = uri[9:]
+            path_to_resources_file = os.path.join(self.output_dir, policy_name, "resources.json")
+            fh = open(path_to_resources_file, "r")
+            contents = fh.read()
+            fh.close()
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
@@ -105,7 +112,7 @@ class ValuesFrom(object):
     def __init__(self, data, manager):
         self.data = data
         self.manager = manager
-        self.resolver = URIResolver(manager.session_factory, manager._cache)
+        self.resolver = URIResolver(manager.session_factory, manager._cache, manager.config.output_dir)
 
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
@@ -115,10 +122,12 @@ class ValuesFrom(object):
         else:
             format = format[1:]
 
+        if self.data['url'].startswith("policy://"):
+            format = 'json'
+
         if format not in self.supported_formats:
             raise ValueError(
-                "Unsupported format %s for url %s",
-                format, self.data['url'])
+                "Unsupported format %s for url %s" % (format, self.data['url']))
         contents = self.resolver.resolve(self.data['url'])
         return contents, format
 
