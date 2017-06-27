@@ -1,0 +1,76 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-05cf9b60", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetC", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "tagfanncyvalue", 
+                        "Key": "tagfancykey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-5a24303f", 
+                "Tags": [
+                    {
+                        "Value": "web", 
+                        "Key": "Location"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-6f273034", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetPrivate", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Private", 
+                        "Key": "NetworkLocation"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-71bda45c", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetD", 
+                        "Key": "Name"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-ecfb30a4", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetPublic", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bfec174d-5a9f-11e7-9476-cd20aa54f40e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bfec174d-5a9f-11e7-9476-cd20aa54f40e", 
+                "date": "Mon, 26 Jun 2017 18:46:22 GMT", 
+                "content-length": "820", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

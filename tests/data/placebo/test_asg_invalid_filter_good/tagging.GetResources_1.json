@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-05cf9b60", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetC", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "tagfanncyvalue", 
+                        "Key": "tagfancykey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-6f273034", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetPrivate", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Private", 
+                        "Key": "NetworkLocation"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-71bda45c", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetD", 
+                        "Key": "Name"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-ecfb30a4", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetPublic", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "843459bd-5b64-11e7-96cf-23171c1478ad", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "843459bd-5b64-11e7-96cf-23171c1478ad", 
+                "date": "Tue, 27 Jun 2017 18:14:53 GMT", 
+                "content-length": "702", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

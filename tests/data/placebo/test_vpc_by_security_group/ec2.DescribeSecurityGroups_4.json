@@ -122,6 +122,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG4", 
                 "VpcId": "vpc-d2d616b5", 
@@ -283,6 +289,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG3", 
                 "VpcId": "vpc-d2d616b5", 
@@ -338,6 +350,40 @@
                         "Ipv6Ranges": []
                     }
                 ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-4b9ada34"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-f1516b97", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-4b9ada34"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
                 "Description": "launch-wizard-11 created 2017-03-25T10:57:13.203-04:00", 
                 "IpPermissions": [
                     {
@@ -374,11 +420,52 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG2", 
                 "VpcId": "vpc-d2d616b5", 
                 "OwnerId": "644160558196", 
                 "GroupId": "sg-5d4a6520"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "launch-wizard-16 created 2017-06-05T16:32:02.874-04:00", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "launch-wizard-16", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-5fd5dd21"
             }, 
             {
                 "IpPermissionsEgress": [
@@ -544,6 +631,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG8", 
                 "VpcId": "vpc-d2d616b5", 
@@ -600,6 +693,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [
                     {
                         "PrefixListIds": [], 
@@ -705,6 +804,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG7", 
                 "VpcId": "vpc-d2d616b5", 
@@ -760,6 +865,40 @@
                         "Ipv6Ranges": []
                     }
                 ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-b9388dc8"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-9ca119e5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-b9388dc8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
                 "Description": "launch-wizard-8 created 2017-02-25T10:52:27.439-05:00", 
                 "IpPermissions": [
                     {
@@ -796,6 +935,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG6", 
                 "VpcId": "vpc-d2d616b5", 
@@ -1131,6 +1276,51 @@
                         "Ipv6Ranges": []
                     }
                 ], 
+                "Description": "Has a NetworkLocation:Public tag key-value pair", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestGroupPublic", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ], 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 0, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "169.254.169.254/32"
+                            }
+                        ], 
+                        "ToPort": 65535, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "FancyTestGroupPublic", 
+                "VpcId": "vpc-f1516b97", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-f8c78787"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
                 "Description": "launch-wizard-14 created 2017-03-28T10:55:21.637-04:00", 
                 "IpPermissions": [
                     {
@@ -1167,6 +1357,12 @@
                     }
                 ], 
                 "Description": "DeleteMeWhenWeAreDone", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ], 
                 "IpPermissions": [], 
                 "GroupName": "Test-SG5", 
                 "VpcId": "vpc-d2d616b5", 
@@ -1177,13 +1373,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "be2b64f4-abec-4de5-938f-dd4cd9814bdc", 
+            "RequestId": "8cc9bf77-5646-4df6-8b0d-f67072aad064", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 16 May 2017 21:03:05 GMT"
+                "date": "Tue, 27 Jun 2017 17:51:02 GMT"
             }
         }
     }

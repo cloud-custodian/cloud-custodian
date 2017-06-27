@@ -1,0 +1,113 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-2c4a6551", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-424a653f", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-5d4a6520", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-704f840d", 
+                "Tags": [
+                    {
+                        "Value": "Duper", 
+                        "Key": "Super"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-854a65f8", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-8a4b64f7", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-a14a65dc", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-bf4a65c2", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-f8c78787", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestGroupPublic", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-ff4a6582", 
+                "Tags": [
+                    {
+                        "Value": "tagdeletevalue", 
+                        "Key": "tagdeletekey"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "02273fa4-5b4f-11e7-b54b-cf03244b62a5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "02273fa4-5b4f-11e7-b54b-cf03244b62a5", 
+                "date": "Tue, 27 Jun 2017 15:40:55 GMT", 
+                "content-length": "1444", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

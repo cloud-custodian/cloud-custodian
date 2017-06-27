@@ -262,7 +262,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
-                remove_groups = r.get('c7n.matched-security-groups', ())
+                remove_groups = r.get('c7n:matched-security-groups', ())
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
