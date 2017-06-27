@@ -413,30 +413,33 @@ class RDSTest(BaseTest):
     def test_rds_eligible_start_stop(self):
         resource = {
             'DBInstanceIdentifier': 'ABC',
-            'DBInstanceStatus': 'running',
+            'DBInstanceStatus': 'available',
         }
-        self.assertTrue(rds._eligible_start_stop(resource, 'running'))
+        self.assertTrue(rds._eligible_start_stop(resource, 'available'))
 
         resource = {
             'DBInstanceIdentifier': 'ABC',
             'DBInstanceStatus': 'stopped',
         }
-        self.assertFalse(rds._eligible_start_stop(resource, 'running'))
+        self.assertFalse(rds._eligible_start_stop(resource, 'available'))
 
         resource = {
             'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
             'MultiAZ': True,
         }
         self.assertFalse(rds._eligible_start_stop(resource))
 
         resource = {
             'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
             'ReadReplicaDBInstanceIdentifiers': ["sbbdevslave"],
         }
         self.assertFalse(rds._eligible_start_stop(resource))
 
         resource = {
             'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
             'ReadReplicaSourceDBInstanceIdentifier': 'sbbdev',
         }
         self.assertFalse(rds._eligible_start_stop(resource))
