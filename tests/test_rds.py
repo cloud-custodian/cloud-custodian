@@ -45,7 +45,7 @@ class RDSTest(BaseTest):
             'resource': 'rds',
             'filters': [
                 {'DBInstanceIdentifier': db_instance_id}],
-            'actions': ['start']},
+            'actions': ['stop']},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -60,7 +60,7 @@ class RDSTest(BaseTest):
         db_instance_id = 'rds-test-instance-2'
         client = session_factory().client('rds')
         p = self.load_policy({
-            'name': 'rds-stop',
+            'name': 'rds-start',
             'resource': 'rds',
             'filters': [
                 {'DBInstanceIdentifier': db_instance_id}],
