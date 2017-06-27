@@ -14,6 +14,7 @@ fakeredis
 pytest>=2.7.0
 pytest-xdist
 pytest-cov
+tox
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext
