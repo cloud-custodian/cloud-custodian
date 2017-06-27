@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from c7n.actions import ActionRegistry, AutoTagUser
+from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -78,7 +78,6 @@ class HostedZone(Route53Base, QueryResourceManager):
     filter_registry.register('marked-for-op', TagActionFilter)
 
     action_registry = ActionRegistry('hostedzone.actions')
-    action_registry.register('auto-tag-user', AutoTagUser)
     action_registry.register('mark', UniversalTag)
     action_registry.register('tag', UniversalTag)
     action_registry.register('mark-for-op', UniversalTagDelayedAction)
@@ -112,7 +111,6 @@ class HealthCheck(Route53Base, QueryResourceManager):
     filter_registry.register('marked-for-op', TagActionFilter)
 
     action_registry = ActionRegistry('healthcheck.actions')
-    action_registry.register('auto-tag-user', AutoTagUser)
     action_registry.register('mark', UniversalTag)
     action_registry.register('tag', UniversalTag)
     action_registry.register('mark-for-op', UniversalTagDelayedAction)

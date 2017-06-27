@@ -76,3 +76,7 @@ def load_resources():
     # Load external plugins (private sdks etc)
     from c7n.manager import resources
     resources.load_plugins()
+
+    for _, klass in resources.items():
+        klass.action_registry.run_final_events()
+        klass.filter_registry.run_final_events()

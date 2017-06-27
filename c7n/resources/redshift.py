@@ -21,7 +21,7 @@ import itertools
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, AutoTagUser, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
 import c7n.filters.vpc as net_filters
@@ -38,7 +38,6 @@ log = logging.getLogger('custodian.redshift')
 filters = FilterRegistry('redshift.filters')
 actions = ActionRegistry('redshift.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('marked-for-op', tags.TagActionFilter)
 
 

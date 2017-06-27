@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from concurrent.futures import as_completed
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
@@ -43,7 +43,6 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('health-event', HealthEventFilter)
 
 

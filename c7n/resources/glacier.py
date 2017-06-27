@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, AutoTagUser
+from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -31,7 +31,6 @@ class Glacier(QueryResourceManager):
     filter_registry.register('marked-for-op', TagActionFilter)
 
     action_registry = ActionRegistry('glacier.actions')
-    action_registry.register('auto-tag-user', AutoTagUser)
     action_registry.register('mark', UniversalTag)
     action_registry.register('tag', UniversalTag)
     action_registry.register('mark-for-op', UniversalTagDelayedAction)
