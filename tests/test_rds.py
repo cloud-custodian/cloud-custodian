@@ -410,6 +410,37 @@ class RDSTest(BaseTest):
         self.assertEqual(
             resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
 
+    def test_rds_eligible_start_stop(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'running',
+        }
+        self.assertTrue(rds._eligible_start_stop(resource, 'running'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'stopped',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource, 'running'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'MultiAZ': True,
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'ReadReplicaDBInstanceIdentifiers': ["sbbdevslave"],
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'ReadReplicaSourceDBInstanceIdentifier': 'sbbdev',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
             'DBInstanceIdentifier': 'ABC'
