@@ -31,20 +31,19 @@ class TestResults(object):
     def process_testcase(self, case):
         key = self.case_key(case)
 
-        fails = case.findall('failure')
-        if not len(case):
-            self.passed.append(key)
-        elif not fails:
-            self.passed.append(key)
-            tags = set([i.tag for i in case])
-            if tags == set(['system-err']):
-                self.stderr_output.append(key)
-                return
-            raise AssertionError("unknown result for %s" % key)
-        else:
+        # look at children but throw away stderr output
+        nonsuccess = [c for c in case if not c.tag == 'system-err']
+        n = len(nonsuccess)
+        if n > 1:
+            raise AssertionError("multiple results for %s: %s" %
+                (key, nonsuccess))
+        elif n == 1:
+            result = nonsuccess.pop()
             self.failed.append(key)
             self.failed_aggregates.setdefault(
-                fails[0].get('message'), []).append(key)
+                result.get('message'), []).append(key)
+        else:
+            self.passed.append(key)
 
     @staticmethod
     def case_key(case):
@@ -88,28 +87,31 @@ def main(xml_path, txt_path):
     """
     results = TestResults(xml_path).parse()
 
-    if txt_path == 'display':
+    if txt_path == '-':
         results.report()
         return
 
     previous = load_expected_successes(txt_path)
-    expected = previous - set(results.passed)
+    current = set(results.passed)
+
+    expected = previous - current
     if expected:
         print("Some tests required to pass under Python 3.6 didn't:")
         list_tests(expected)
 
-    unexpected = set(results.passed) - previous
+    unexpected = current - previous
     if unexpected:
         print("Some tests not required to pass under Python 3.6 did:")
         list_tests(unexpected)
         add_to_txt(txt_path, unexpected)
         print("Conveniently, they have been added to {} for you. Perhaps "
-              "commit that?".format(txt_path))
+            "commit that?".format(txt_path))
+
     if expected or unexpected:
-        print(
-            "Previously %d passing, now %d" % (
-                len(previous), len(results.passed)))
+        print("Previously %d tests passed under Python 3.6, now %d did." %
+            (len(previous), len(current)))
         return 1
+
     print('All and only tests required to pass under Python 3.6 did.')
     return 0
 
