@@ -13,32 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import codecs
-import io
 import json
 import os
 import sys
 
-import six
 from argparse import ArgumentTypeError
 from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
-from .common import BaseTest
-
-
-class AmbiguousIO(io.BytesIO):
-
-    def write(self, x):
-
-        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
-        # requires us to choose. We don't have control over all of the places
-        # we want to print from (think: traceback.print_exc) so we can't
-        # standardize the arg type up at the call sites. Hack it here.
-
-        if type(x) is six.text_type:
-            x = codecs.encode(x, 'utf8')
-        io.BytesIO.write(self, x)
+from .common import BaseTest, TextTestIO
 
 
 class CliTest(BaseTest):
@@ -54,8 +37,8 @@ class CliTest(BaseTest):
         return out
 
     def capture_output(self):
-        out = AmbiguousIO()
-        err = AmbiguousIO()
+        out = TextTestIO()
+        err = TextTestIO()
         self.patch(sys, 'stdout', out)
         self.patch(sys, 'stderr', err)
         return out, err
