@@ -18,7 +18,6 @@ import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
-import io
 import itertools
 import time
 
