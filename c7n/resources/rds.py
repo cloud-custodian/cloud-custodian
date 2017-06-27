@@ -568,12 +568,12 @@ class TagTrim(tags.TagTrim):
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
-def _elgibile_start_stop(db, state="available"):
+def _eligible_start_stop(db, state="available"):
 
     if db.get('DBInstanceStatus') != state:
         return False
 
-    if db.get('MultiAZ') is False:
+    if db.get('MultiAZ'):
         return False
 
     if db.get('ReadReplicaDBInstanceIdentifiers'):
@@ -600,14 +600,14 @@ class Stop(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        for r in filter(_elgibile_start_stop, resources):
+        for r in filter(_eligible_start_stop, resources):
             try:
                 client.stop_db_instance(
                     DBInstanceIdentifier=r['DBInstanceIdentifier'])
             except ClientError as e:
                 log.exception(
                     "Error stopping db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('start')
@@ -624,7 +624,7 @@ class Start(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        start_filter = functools.partial(_elgibile_start_stop, state='stopped')
+        start_filter = functools.partial(_eligible_start_stop, state='stopped')
         for r in filter(start_filter, resources):
             try:
                 client.start_db_instance(
@@ -632,7 +632,7 @@ class Start(BaseAction):
             except ClientError as e:
                 log.exception(
                     "Error starting db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('delete')
