@@ -50,7 +50,6 @@ class RDSCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
 
     def augment(self, dbs):
