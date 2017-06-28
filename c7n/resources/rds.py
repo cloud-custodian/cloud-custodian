@@ -270,6 +270,11 @@ class RDSOffHour(OffHour):
     """
 
 
+@filters.register('onhour')
+class RDSOnHour(OnHour):
+    """Scheduled action on rds instance."""
+
+
 @filters.register('default-vpc')
 class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
@@ -1014,7 +1019,7 @@ def _rds_snap_tags(
 
 
 @RDSSnapshot.filter_registry.register('onhour')
-class RDSOnHour(OnHour):
+class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
 
 
