@@ -54,14 +54,14 @@ class RDSCluster(QueryResourceManager):
     retry = staticmethod(get_retry(('Throttled',)))
 
     def augment(self, dbs):
-        filter(None, _rds_tags(
+        filter(None, _rds_cluster_tags(
             self.get_model(),
             dbs, self.session_factory, self.executor_factory,
             self.generate_arn, self.retry))
         return dbs
 
 
-def _rds_tags(model, dbs, session_factory, executor_factory, generator, retry):
+def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, retry):
     """Augment rds clusters with their respective tags."""
 
     def process_tags(db):
@@ -69,11 +69,10 @@ def _rds_tags(model, dbs, session_factory, executor_factory, generator, retry):
         arn = generator(db[model.id])
         tag_list = None
         try:
-            tag_list = retry(client.list_tags_for_resource,
-                             ResourceName=arn)['TagList']
+            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
         except ClientError as e:
-            if e.response['Error']['Code'] not in ['DBInstanceNotFound']:
-                log.warning("Exception getting rds tags  \n %s", e)
+            if e.response['Error']['Code'] != 'DBClusterNotFoundFault':
+                log.warning("Exception getting rdscluster tags\n %s", e)
             return None
         db['Tags'] = tag_list or []
         return db
