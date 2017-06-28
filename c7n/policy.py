@@ -502,7 +502,7 @@ class CloudTrailMode(LambdaMode):
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
             if isinstance(e, six.string_types):
-                assert e in CloudWatchEvents.trail_events, "event shortcut not defined"
+                assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])
 
