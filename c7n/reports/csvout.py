@@ -230,7 +230,7 @@ def fs_record_set(output_path, policy_name):
         return records
 
 
-def record_set(session_factory, bucket, key_prefix, start_date):
+def record_set(session_factory, bucket, key_prefix, start_date, specify_hour=False):
     """Retrieve all s3 records for the given policy output url
 
     From the given start date.
@@ -241,8 +241,13 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     records = []
     key_count = 0
 
-    marker = key_prefix.strip("/") + "/" + start_date.strftime(
-        '%Y/%m/%d/00') + "/resources.json.gz"
+    date = start_date.strftime('%Y/%m/%d')
+    if specify_hour:
+        date += "/{}".format(start_date.hour)
+    else:
+        date += "/00"
+
+    marker =  "{}/{}/resources.json.gz".format(key_prefix.strip("/"), date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -266,7 +271,7 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     log.info("Fetched %d records across %d files" % (
         len(records), key_count))
     return records
-
+    
 
 def get_records(bucket, key, session_factory):
     # we're doing a lot of this in memory, worst case

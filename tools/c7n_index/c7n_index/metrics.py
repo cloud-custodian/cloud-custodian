@@ -49,10 +49,46 @@ log = logging.getLogger('c7n.metrics')
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': True,
+    'required': ['indexer', 'accounts'],
     'properties': {
         'indexer': {
-            'type': 'object',
-            'additionalProperties': True
+            'oneOf': [
+                {
+                    'type': 'object',
+                    'required': ['host', 'port', 'idx_name'],
+                    'properties': {
+                        'type': {'enum': ['es']},
+                        'host': {'type': 'string'},
+                        'port': {'type': 'number'},
+                        'user': {'type': 'string'},
+                        'password': {'type': 'string'},
+                        'idx_name': {'type': 'string'},
+                        'query': {'type': 'string'}
+                    }
+                },
+                {
+                    'type': 'object',
+                    'required': ['host', 'db', 'user', 'password'],
+                    'properties': {
+                        'type': {'enum': ['influx']},
+                        'host': {'type': 'string'},
+                        'db': {'type': 'string'},
+                        'user': {'type': 'string'},
+                        'password': {'type': 'string'}
+                    }
+                },
+                {
+                    'type': 'object',
+                    'required': ['template', 'Bucket'],
+                    'properties': {
+                        'type': {'enum': ['s3']},
+                        'template': {'type': 'string'},
+                        'Bucket': {'type': 'string'}
+                    }
+                }
+            ]
+            
+            
         },
         'accounts': {
             'type': 'array',
@@ -88,13 +124,6 @@ def get_indexer(config, **kwargs):
     return klass(config, **kwargs)
 
 
-class MyConnection(RequestsHttpConnection):
-    def __init__(self, *args, **kwargs):
-        proxies = kwargs.pop('proxies', {})
-        super(MyConnection, self).__init__(*args, **kwargs)
-        self.session.proxies = proxies
-
-
 @indexers.register('es')
 class ElasticSearchIndexer(Indexer):
 
@@ -111,11 +140,6 @@ class ElasticSearchIndexer(Indexer):
             kwargs['http_auth'] = (user, password)
 
         kwargs['port'] = config['indexer'].get('port', 9200)
-
-        proxy = config['indexer'].get('proxy', False)
-        if proxy:
-            kwargs['connection_class'] = MyConnection
-            kwargs['proxies'] = {'https': proxy}
 
         self.client = Elasticsearch(
             host,
@@ -285,46 +309,20 @@ def index_account_resources(config, account, region, policy, date):
         lambda : assumed_session(account['role'], 'PolicyIndex')).client('s3')
 
     bucket = account['bucket']
-    key_prefix = "accounts/" + account['name'] + "/" + region + \
-                 "/policies/" + policy['name']
-    marker = key_prefix + "/" + date + "/resources.json.gz"
+    key_prefix = "accounts/{}/{}/policies/{}".format(
+        account['name'], region, policy['name'])
 
-    p = s3.get_paginator('list_objects_v2').paginate(
-        Bucket=bucket,
-        Prefix=key_prefix,
-        StartAfter=marker,
-    )
+    records = s3_resource_parser.record_set(
+        lambda : assumed_session(account['role'], 'PolicyIndex'),
+        bucket,
+        key_prefix,
+        date,
+        specify_hour=True)
 
-    records = 0
-    key_count = 0
-
-    with ThreadPoolExecutor(max_workers=20) as w:
-        for key_set in p:
-            if 'Contents' not in key_set:
-                continue
-            keys = []
-            for k in key_set['Contents']:
-                if k['Key'].endswith('resources.json.gz'):
-                    keys.append(k)
-            key_count += len(keys)
-            futures = map(lambda k: w.submit(
-                s3_resource_parser.get_records, bucket, k,
-                lambda : assumed_session(account['role'], 'PolicyIndex')),
-                keys)
-
-            for f in as_completed(futures):
-                if f.exception():
-                    log.warning("Error account:{} region:{} policy:{} error:{}".format(
-                        account['name'], region, policy['name'], f.exception()))
-                    continue
-                points = f.result()
-                records += len(points)
-                for p in points:
-                    p['c7n:MatchedPolicy'] = policy['name']
-                indexer.index(points)
-
-    log.info("Fetched %d records across %d files" % (
-        records, key_count))
+    for r in records:
+        r['c7n:MatchedPolicy'] = policy['name']
+    
+    indexer.index(records)
 
 
 def get_periods(start, end, period):
@@ -363,7 +361,7 @@ def get_date_range(start, end):
     return start, end
 
 
-def get_date_path(date, delta=0):
+def valid_date(date, delta=0):
     # optional input, use default time delta if not provided
     # delta is 1 hour for resources
     if not date:
@@ -371,7 +369,7 @@ def get_date_path(date, delta=0):
     elif date and not isinstance(date, datetime.datetime):
         date = parse_date(date)
 
-    return date.strftime('%Y/%m/%d/%H')
+    return date
 
 
 @click.group()
@@ -497,7 +495,7 @@ def index_resources(
     load_resources()
     schema.validate(policies)
 
-    date = get_date_path(date, delta=1)
+    date = valid_date(date, delta=1)
 
     with ProcessPoolExecutor(max_workers=concurrency) as w:
         futures = {}

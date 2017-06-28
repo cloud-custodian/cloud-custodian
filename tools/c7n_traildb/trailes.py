@@ -31,9 +31,6 @@ from c7n.credentials import assumed_session
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session
 
-MAX_POINTS = 1440.0
-NAMESPACE = 'CloudMaid'
-
 log = logging.getLogger('c7n.trailes')
 
 CONFIG_SCHEMA = {
@@ -49,7 +46,7 @@ CONFIG_SCHEMA = {
                 'user': {'type': 'string'},
                 'password': {'type': 'string'},
                 'idx_name': {'type': 'string'},
-                'proxy': {'type': 'string'},
+                'query': {'type': 'string'}
             },
             'additionalProperties': True
         },
@@ -71,13 +68,6 @@ CONFIG_SCHEMA = {
 }
 
 
-class MyConnection(RequestsHttpConnection):
-    def __init__(self, *args, **kwargs):
-        proxies = kwargs.pop('proxies', {})
-        super(MyConnection, self).__init__(*args, **kwargs)
-        self.session.proxies = proxies
-
-
 def get_es_client(config):
     host = [config['indexer'].get('host', 'localhost')]
     es_kwargs = {}
@@ -87,11 +77,6 @@ def get_es_client(config):
         es_kwargs['http_auth'] = (user, password)
 
     es_kwargs['port'] = config['indexer'].get('port', 9200)
-
-    proxy = config['indexer'].get('proxy', False)
-    if proxy:
-        es_kwargs['connection_class'] = MyConnection
-        es_kwargs['proxies'] = {'https': proxy}
 
     return Elasticsearch(host, **es_kwargs)
 
@@ -111,8 +96,11 @@ def dict_factory(cursor, row):
     return d
 
 
-def fetch_events(cursor, query, config, account_name):
+def fetch_events(cursor, config, account_name):
     """Generator that returns the events"""
+    query = config['indexer'].get('query', 
+        'select * from events where user_agent glob \'*CloudCustodian*\'')
+
     for event in cursor.execute(query):
         event['account'] = account_name
         event['_index'] = config['indexer']['idx_name']
@@ -151,8 +139,8 @@ def index_account_trails(config, account, region, date, directory):
         lambda : assumed_session(account['role'], 'TrailIndex')).client('s3')
 
     bucket = account['bucket']
-    key_prefix = "accounts/" + account['name'] + "/" + region + "/traildb"
-    marker = key_prefix + "/" + date + "/trail.db.bz2"
+    key_prefix = "accounts/{}/{}/traildb".format(account['name'], region)
+    marker =  + "{}/{}/trail.db.bz2".format(key_prefix, date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -176,11 +164,10 @@ def index_account_trails(config, account, region, date, directory):
 
             for f in as_completed(futures):
                 local_db_file = f.result()
-                query = 'select * from events where user_agent glob \'*CloudCustodian*\''
                 connection = sqlite3.connect(local_db_file)
                 connection.row_factory = dict_factory
                 cursor = connection.cursor()
-                index_events(es_client, fetch_events(cursor, query, config, account['name']))
+                index_events(es_client, fetch_events(cursor, config, account['name']))
                 connection.close()
 
                 try:
@@ -205,7 +192,7 @@ def get_date_path(date, delta=0):
 
 @click.group()
 def trailes():
-    """TrailDB Time Series Index"""
+    """TrailDB Elastic Search"""
 
 
 @trailes.command()
