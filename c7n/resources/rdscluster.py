@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import logging
 
 from botocore.exceptions import ClientError
@@ -25,7 +24,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks, generate_arn, get_retry)
+    type_schema, local_session, snapshot_identifier, chunks, get_retry)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -41,7 +40,7 @@ class RDSCluster(QueryResourceManager):
     class resource_type(object):
 
         service = 'rds'
-        type = 'rds-cluster'
+        type = 'cluster'
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
         filter_name = None
@@ -53,14 +52,6 @@ class RDSCluster(QueryResourceManager):
     action_registry = actions
     _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='cluster', separator=':')
-        return self._generate_arn
 
     def augment(self, dbs):
         filter(None, _rds_tags(
