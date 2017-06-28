@@ -128,6 +128,17 @@ class RDSClusterTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rdscluster_tag_augment(self):
+        session_factory = self.replay_flight_data('test_rdscluster_tag_augment')
+        p = self.load_policy({
+            'name': 'rdscluster-tag-augment',
+            'resource': 'rds-cluster',
+            'filters': [{'tag:cfoo': 'cbar'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSClusterSnapshotTest(BaseTest):
 
