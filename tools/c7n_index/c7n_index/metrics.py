@@ -304,10 +304,6 @@ def index_account_metrics(config, idx_name, region, account, start, end, period)
 
 def index_account_resources(config, account, region, policy, date):
     indexer = get_indexer(config, type=policy['resource'])
-
-    s3 = local_session(
-        lambda : assumed_session(account['role'], 'PolicyIndex')).client('s3')
-
     bucket = account['bucket']
     key_prefix = "accounts/{}/{}/policies/{}".format(
         account['name'], region, policy['name'])
