@@ -110,11 +110,12 @@ class FilterRegistry(PluginRegistry):
 
         # Make the syntax a little nicer for common cases.
         if isinstance(data, dict) and len(data) == 1 and 'type' not in data:
-            if data.keys()[0] == 'or':
+            op = list(data.keys())[0]
+            if op == 'or':
                 return Or(data, self, manager)
-            elif data.keys()[0] == 'and':
+            elif op == 'and':
                 return And(data, self, manager)
-            elif data.keys()[0] == 'not':
+            elif op == 'not':
                 return Not(data, self, manager)
             return ValueFilter(data, manager).validate()
         if isinstance(data, six.string_types):
