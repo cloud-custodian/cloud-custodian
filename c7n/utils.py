@@ -27,6 +27,7 @@ import random
 import threading
 import time
 import ipaddress
+import six
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
@@ -353,7 +354,7 @@ def parse_cidr(value):
     if '/' not in value:
         klass = ipaddress.ip_address
     try:
-        v = klass(unicode(value))
+        v = klass(six.text_type(value))
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v
