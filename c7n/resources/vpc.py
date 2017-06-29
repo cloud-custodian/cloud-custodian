@@ -324,7 +324,7 @@ class SecurityGroupDiff(object):
             ev.sort()
             for e in ev:
                 buf += "%s-" % e
-        return abs(zlib.crc32(buf))
+        return abs(zlib.crc32(buf.encode('ascii')))
 
 
 @SecurityGroup.action_registry.register('patch')

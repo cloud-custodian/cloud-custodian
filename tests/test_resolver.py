@@ -74,7 +74,7 @@ class ResolverTest(BaseTest):
         content = json.dumps({'universe': {'galaxy': {'system': 'sun'}}})
         cache = FakeCache()
         resolver = URIResolver(None, cache)
-        with tempfile.NamedTemporaryFile(dir=os.getcwd()) as fh:
+        with tempfile.NamedTemporaryFile(mode='w+', dir=os.getcwd()) as fh:
             fh.write(content)
             fh.flush()
             self.assertEqual(

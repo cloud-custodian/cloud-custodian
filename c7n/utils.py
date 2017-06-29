@@ -20,7 +20,6 @@ import copy
 from datetime import datetime
 import functools
 import json
-import io
 import itertools
 import logging
 import os
@@ -103,9 +102,7 @@ def dumps(data, fh=None, indent=0):
 
 
 def format_event(evt):
-    buf = io.BytesIO()
-    json.dump(evt, buf, indent=2)
-    return buf.getvalue().decode('utf8')
+    return json.dumps(evt, indent=2)
 
 
 def type_schema(
