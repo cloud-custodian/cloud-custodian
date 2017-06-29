@@ -695,7 +695,7 @@ class PutMetric(BaseAction):
                     'type':'object'
                 },
             },
-            'op': {'enum': METRIC_OPS.keys()},
+            'op': {'enum': list(METRIC_OPS.keys())},
             'units': {'enum': METRIC_UNITS}
         }
     }

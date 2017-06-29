@@ -526,7 +526,7 @@ class CredentialReport(Filter):
             {'type': 'boolean'},
             {'type': 'number'},
             {'type': 'null'}]},
-        op={'enum': OPERATORS.keys()},
+        op={'enum': list(OPERATORS.keys())},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,
