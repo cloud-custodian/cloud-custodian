@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from boto3 import Session
-from utils import get_message_subject, get_resource_tag_targets, get_rendered_jinja
+
+from .utils import (
+    get_message_subject, get_resource_tag_targets, get_rendered_jinja)
 
 
 class SnsDelivery(object):

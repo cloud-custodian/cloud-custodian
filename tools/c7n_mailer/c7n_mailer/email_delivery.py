@@ -13,10 +13,13 @@
 # limitations under the License.
 import smtplib
 
-from ldap_lookup import LdapLookup
 from email.mime.text import MIMEText
 from email.utils import parseaddr
-from utils import format_struct, get_message_subject, get_resource_tag_targets, get_rendered_jinja
+
+from .ldap_lookup import LdapLookup
+from .utils import (
+    format_struct, get_message_subject, get_resource_tag_targets,
+    get_rendered_jinja)
 
 
 class EmailDelivery(object):
