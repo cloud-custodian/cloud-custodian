@@ -133,6 +133,7 @@ class ElasticSearchIndexer(Indexer):
 
         host = [config['indexer'].get('host', 'localhost')]
         kwargs = {}
+        kwargs['connection_class'] = RequestsHttpConnection
 
         user = config['indexer'].get('user', False)
         password = config['indexer'].get('password', False)
