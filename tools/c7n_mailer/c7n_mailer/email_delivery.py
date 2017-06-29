@@ -223,9 +223,10 @@ class EmailDelivery(object):
                 format_struct(event)))
             return None
         if identity['type'] == 'AssumedRole':
-            assume_role_msg = 'No ldap uid is associated with AssumedRole: %s' % identity['arn']
+            assume_role_msg = 'AssumedRole Found: %s' % identity['arn']
             self.logger.debug(assume_role_msg)
-            return None
+            user_id = identity['principalId'].split(':', 1)[-1]
+            return user_id
         if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
             return identity['userName']
         if identity['type'] == 'Root':
