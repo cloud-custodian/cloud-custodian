@@ -207,6 +207,7 @@ tests.test_mu.PythonArchiveTest.test_excludes_non_py_files
 tests.test_mu.PythonArchiveTest.test_handles_packages
 tests.test_mu.PythonArchiveTest.test_handles_stdlib_modules
 tests.test_mu.PythonArchiveTest.test_handles_third_party_modules
+tests.test_offhours.OffHoursFilterTest.test_opt_in_behavior
 tests.test_offhours.OffHoursFilterTest.test_time_filter_usage_errors
 tests.test_offhours.OffHoursFilterTest.test_validate
 tests.test_output.S3OutputTest.test_join_leave_log
