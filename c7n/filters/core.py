@@ -161,7 +161,7 @@ class Filter(object):
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
-        return filter(self, resources)
+        return list(filter(self, resources))
 
 
 class Or(Filter):

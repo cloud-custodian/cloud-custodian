@@ -1015,7 +1015,7 @@ def _rds_snap_tags(
         return snap
 
     with executor_factory(max_workers=1) as w:
-        return filter(None, (w.map(process_tags, snaps)))
+        return list(filter(None, (w.map(process_tags, snaps))))
 
 
 @RDSSnapshot.filter_registry.register('onhour')

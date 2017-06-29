@@ -262,7 +262,7 @@ class AttachedVolume(ValueFilter):
         self.skip = self.data.get('skip-devices', [])
         self.operator = self.data.get(
             'operator', 'or') == 'or' and any or all
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def get_volume_mapping(self, resources):
         volume_map = {}

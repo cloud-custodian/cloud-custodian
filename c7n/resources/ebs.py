@@ -241,7 +241,7 @@ class SnapshotDelete(BaseAction):
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         pre = len(snapshots)
-        snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
+        snapshots = list(filter(None, _filter_ami_snapshots(self, snapshots)))
         post = len(snapshots)
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
                  post, pre - post)
@@ -415,7 +415,7 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug('Filtered from %d volumes to %d attached volumes' % (
             original_count, len(resources)))
         self.instance_map = self.get_instance_mapping(resources)
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def __call__(self, r):
         instance = self.instance_map[r['Attachments'][0]['InstanceId']]

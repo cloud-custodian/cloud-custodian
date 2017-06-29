@@ -48,13 +48,13 @@ class AWSLambda(QueryResourceManager):
 
     def augment(self, functions):
         resources = super(AWSLambda, self).augment(functions)
-        return filter(None, _lambda_function_tags(
+        return list(filter(None, _lambda_function_tags(
             self.get_model(),
             resources,
             self.session_factory,
             self.executor_factory,
             self.retry,
-            self.log))
+            self.log)))
 
 
 def _lambda_function_tags(
@@ -140,7 +140,7 @@ class LambdaEventSource(ValueFilter):
         self.data['key'] = self.annotation_key
 
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
             return super(LambdaEventSource, self).process(resources, event)
 
     def __call__(self, r):
@@ -200,7 +200,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         self.log.debug("fetching policy for %d lambdas" % len(resources))
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
