@@ -239,6 +239,8 @@ class Time(Filter):
         'cst': 'America/Chicago',
         'cdt': 'America/Chicago',
         'ct': 'America/Chicago',
+        'mst': 'America/Denver',
+        'mdt': 'America/Denver',
         'mt': 'America/Denver',
         'gmt': 'Etc/GMT',
         'gt': 'Etc/GMT',
