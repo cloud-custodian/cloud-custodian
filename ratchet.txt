@@ -560,6 +560,7 @@ tests.test_vpc.VpcTest.test_flow_logs
 tests.test_vpc.VpcTest.test_flow_logs_absent
 tests.test_vpc.VpcTest.test_flow_logs_misconfiguration
 tests.test_waf.WAFTest.test_waf_query
+tools.c7n_mailer.tests.test_email.EmailTest.test_email_to_email_message_map_without_ldap_manager
 tools.c7n_mailer.tests.test_email.EmailTest.test_email_to_resources_map_with_ldap_manager
 tools.c7n_mailer.tests.test_email.EmailTest.test_emails_resource_mapping_multiples
 tools.c7n_mailer.tests.test_email.EmailTest.test_event_owner_ldap_flow
@@ -567,6 +568,8 @@ tools.c7n_mailer.tests.test_email.EmailTest.test_get_ldap_emails_from_resource
 tools.c7n_mailer.tests.test_email.EmailTest.test_get_valid_emails_from_list
 tools.c7n_mailer.tests.test_email.EmailTest.test_no_mapping_if_no_valid_emails
 tools.c7n_mailer.tests.test_email.EmailTest.test_priority_header_is_valid
+tools.c7n_mailer.tests.test_email.EmailTest.test_smtp_called_multiple_times
+tools.c7n_mailer.tests.test_email.EmailTest.test_smtp_called_once
 tools.c7n_mailer.tests.test_email.EmailTest.test_valid_email
 tools.c7n_mailer.tests.test_ldap.MailerLdapTest.test_dn_ldap_lookup
 tools.c7n_mailer.tests.test_ldap.MailerLdapTest.test_random_string_dont_hit_ldap_twice_uid_lookup
