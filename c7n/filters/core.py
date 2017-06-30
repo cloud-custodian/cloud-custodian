@@ -170,7 +170,7 @@ class Or(Filter):
     def __init__(self, data, registry, manager):
         super(Or, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):
@@ -200,7 +200,7 @@ class And(Filter):
     def __init__(self, data, registry, manager):
         super(And, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
 
     def process(self, resources, events=None):
         for f in self.filters:
@@ -213,7 +213,7 @@ class Not(Filter):
     def __init__(self, data, registry, manager):
         super(Not, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):
