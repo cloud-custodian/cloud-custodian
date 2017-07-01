@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import datetime
+import io
 from datetime import timedelta
 import itertools
 import time
@@ -560,8 +561,8 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(six.StringIO(data))
-        headers = reader.next()
+        reader = csv.reader(io.StringIO(data))
+        headers = next(reader)
         for line in reader:
             info = dict(zip(headers, line))
             report[info['user']] = self.process_user_record(info)
