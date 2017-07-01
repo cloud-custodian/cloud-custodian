@@ -57,6 +57,9 @@ tests.test_asg.AutoScalingTest.test_asg_tag_and_propagate
 tests.test_asg.AutoScalingTest.test_asg_vpc_filter
 tests.test_asg.LaunchConfigTest.test_config_delete
 tests.test_asg.LaunchConfigTest.test_config_unused
+tests.test_autotag.AutoTagCreator.test_auto_tag_assumed
+tests.test_autotag.AutoTagCreator.test_auto_tag_creator
+tests.test_autotag.AutoTagCreator.test_auto_tag_user_class_method_process
 tests.test_autotag.AutoTagCreator.test_error_auto_tag_bad_mode
 tests.test_cache.FileCacheManagerTest.test_get
 tests.test_cache.FileCacheManagerTest.test_get_set
@@ -66,10 +69,16 @@ tests.test_cache.FileCacheManagerTest.test_save_exists
 tests.test_cache.TestCache.test_factory
 tests.test_cfn.TestCFN.test_delete
 tests.test_cfn.TestCFN.test_query
+tests.test_cli.LogsTest.test_logs
+tests.test_cli.MetricsTest.test_metrics
+tests.test_cli.MetricsTest.test_metrics_get_endpoints
+tests.test_cli.MiscTest.test_duplicate_policy
 tests.test_cli.MiscTest.test_empty_policy_file
 tests.test_cli.MiscTest.test_failure_with_no_default_region
 tests.test_cli.MiscTest.test_nonexistent_policy_file
 tests.test_cli.ReportTest.test_warning_on_empty_policy_filter
+tests.test_cli.RunTest.test_ec2
+tests.test_cli.RunTest.test_error
 tests.test_cli.SchemaTest.test_invalid_options
 tests.test_cli.SchemaTest.test_schema
 tests.test_cli.SchemaTest.test_schema_output
