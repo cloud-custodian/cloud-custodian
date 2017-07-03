@@ -67,10 +67,22 @@ class RDSClusterParamGroup(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-        
+
+
+class PGMixin(object):
+
+    def get_name(self, pg):
+        return pg['DBParameterGroupName']
+
+
+class PGClusterMixin(object):
+
+    def get_name(self, pg):
+        return pg['DBClusterParameterGroupName']
+
 
 @actions.register('copy')
-class Copy(BaseAction):
+class Copy(PGMixin, BaseAction):
     """ Action to copy an RDS parameter group
     """
 
@@ -89,7 +101,7 @@ class Copy(BaseAction):
         client = local_session(self.manager.session_factory).client('rds')
 
         for param_group in param_groups:
-            name = param_group['DBParameterGroupName']
+            name = self.get_name(param_group)
             copy_name = self.data.get('name')
             copy_desc = self.data.get('description', 'Copy of {}'.format(name))
             try:
@@ -98,7 +110,7 @@ class Copy(BaseAction):
                 # TODO - anything we need to catch?
                 raise
 
-            self.log.info('Deleted RDS parameter group: %s', name)
+            self.log.info('Copied RDS parameter group %s to %s', name, copy_name)
 
     def do_copy(self, client, name, copy_name, desc):
         client.copy_db_parameter_group(
@@ -109,7 +121,7 @@ class Copy(BaseAction):
 
 
 @actions.register('copy')
-class ClusterCopy(Copy):
+class ClusterCopy(PGClusterMixin, Copy):
     
     permissions = ('rds:CopyDBClusterParameterGroup')
 
@@ -122,7 +134,7 @@ class ClusterCopy(Copy):
 
 
 @actions.register('delete')
-class Delete(BaseAction):
+class Delete(PGMixin, BaseAction):
     """Action to delete an RDS parameter group
     """
 
@@ -133,16 +145,16 @@ class Delete(BaseAction):
         client = local_session(self.manager.session_factory).client('rds')
 
         for param_group in param_groups:
-            name = param_group['DBParameterGroupName']
+            name = self.get_name(param_group)
             try:
-                client.delete_db_parameter_group(DBParameterGroupName=name)
+                self.do_delete(name)
             except ClientError:
                 # TODO - anything we need to catch?
                 raise
 
             self.log.info('Deleted RDS parameter group: %s', name)
 
-    def do_delete(self):
+    def do_delete(self, name):
         client.delete_db_parameter_group(DBParameterGroupName=name)
 
 
@@ -153,3 +165,45 @@ class ClusterDelete(Delete):
 
     def do_delete(self):
         client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
+        
+
+@actions.register('modify')
+class Modify(PGMixin, BaseAction):
+    """Action to modify an RDS parameter group
+    """
+
+    schema = type_schema(
+        'modify',
+        **{
+            'required': [],
+        }
+    )
+    permissions = ('rds:ModifyDBParameterGroup',)
+
+    def process(self, param_groups):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for param_group in param_groups:
+            name = self.get_name(param_group)
+            try:
+                self.do_modify(name)
+            except ClientError:
+                # TODO - anything we need to catch?
+                raise
+
+            self.log.info('Modified RDS parameter group: %s', name)
+
+    def do_modify(self, name):
+        pass
+        #client.modify_db_parameter_group(DBParameterGroupName=name)
+
+
+@actions.register('modify')
+class ClusterModify(PGClusterMixin, Modify):
+    """ Action to modify an RDS Cluster parameter group
+    """
+
+    permissions = ('rds:ModifyDBClusterParameterGroup',)
+
+    def do_modify(name):
+        pass
