@@ -49,6 +49,78 @@ class RDSParamGroup(QueryResourceManager):
     action_registry = actions
 
 
+@resources.register('rds-cluster-param-group')
+class RDSClusterParamGroup(QueryResourceManager):
+    """ Resource manager for RDS cluster parameter groups.
+    """
+    
+    class resource_type(object):
+
+        service = 'rds'
+        type = 'cluster-pg'
+        enum_spec = ('describe_db_cluster_parameter_groups', 'DBClusterParameterGroups', None)
+        name = id = 'DBClusterParameterGroupName'
+        filter_name = None
+        filter_type = None
+        dimension = 'DBClusterParameterGroupName'
+        date = None
+
+    filter_registry = filters
+    action_registry = actions
+        
+
+@actions.register('copy')
+class Copy(BaseAction):
+    """ Action to copy an RDS parameter group
+    """
+
+    schema = type_schema(
+        'copy',
+        **{
+            'required': ['name'],
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+        }
+    )
+
+    permissions = ('rds:CopyDBParameterGroup',)
+    
+    def process(self, param_groups):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for param_group in param_groups:
+            name = param_group['DBParameterGroupName']
+            copy_name = self.data.get('name')
+            copy_desc = self.data.get('description', 'Copy of {}'.format(name))
+            try:
+                self.do_copy(client, name, copy_name, copy_desc)
+            except ClientError:
+                # TODO - anything we need to catch?
+                raise
+
+            self.log.info('Deleted RDS parameter group: %s', name)
+
+    def do_copy(self, client, name, copy_name, desc):
+        client.copy_db_parameter_group(
+            SourceDBParameterGroupIdentifier=name,
+            TargetDBParameterGroupIdentifier=copy_name,
+            TargetDBParameterGroupDescription=desc
+        )
+
+
+@actions.register('copy')
+class ClusterCopy(Copy):
+    
+    permissions = ('rds:CopyDBClusterParameterGroup')
+
+    def do_copy(self, client, name, copy_name, desc):
+        client.copy_db_parameter_group(
+            SourceDBClusterParameterGroupIdentifier=name,
+            TargetDBClusterParameterGroupIdentifier=copy_name,
+            TargetDBClusterParameterGroupDescription=desc
+        )
+
+
 @actions.register('delete')
 class Delete(BaseAction):
     """Action to delete an RDS parameter group
@@ -69,3 +141,15 @@ class Delete(BaseAction):
                 raise
 
             self.log.info('Deleted RDS parameter group: %s', name)
+
+    def do_delete(self):
+        client.delete_db_parameter_group(DBParameterGroupName=name)
+
+
+@actions.register('delete')
+class ClusterDelete(Delete):
+    
+    permissions = ('rds:DeleteDBClusterParameterGroup',)
+
+    def do_delete(self):
+        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
