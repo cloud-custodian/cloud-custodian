@@ -579,8 +579,8 @@ class CopyInstanceTags(BaseAction):
         self.initialize(volumes)
         with self.executor_factory(max_workers=10) as w:
             futures = []
-            for instance_set in chunks(reversed(
-                    self.instance_map.keys()), size=100):
+            for instance_set in chunks(sorted(
+                    self.instance_map.keys(), reverse=True), size=100):
                 futures.append(
                     w.submit(self.process_instance_set, instance_set))
             for f in as_completed(futures):
@@ -597,7 +597,7 @@ class CopyInstanceTags(BaseAction):
         instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys())}
+                list(instance_vol_map.keys()))}
         self.instance_vol_map = instance_vol_map
         self.instance_map = instance_map
 
@@ -755,7 +755,7 @@ class EncryptInstanceVolumes(BaseAction):
         self.instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys(), cache=False)}
+                list(instance_vol_map.keys()), cache=False)}
 
         with self.executor_factory(max_workers=10) as w:
             futures = {}

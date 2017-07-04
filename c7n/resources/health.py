@@ -77,7 +77,7 @@ class HealthEvents(QueryResourceManager):
         for resource_set in chunks(resources, 10):
             event_map = {r['arn']: r for r in resource_set}
             event_details = client.describe_event_details(
-                eventArns=event_map.keys())['successfulSet']
+                eventArns=list(event_map.keys()))['successfulSet']
             for d in event_details:
                 event_map[d['event']['arn']][
                     'Description'] = d['eventDescription']['latestDescription']

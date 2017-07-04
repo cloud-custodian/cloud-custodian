@@ -110,7 +110,7 @@ class ActionRegistry(PluginRegistry):
         if action_class is None:
             raise ValueError(
                 "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 

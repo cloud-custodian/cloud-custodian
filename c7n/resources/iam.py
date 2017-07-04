@@ -572,7 +572,7 @@ class CredentialReport(Filter):
     @classmethod
     def process_user_record(cls, info):
         """Type convert the csv record, modifies in place."""
-        keys = info.keys()
+        keys = list(info.keys())
         # Value conversion
         for k in keys:
             v = info[k]

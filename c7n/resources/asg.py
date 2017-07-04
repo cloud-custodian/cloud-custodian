@@ -484,7 +484,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             return unencrypted_configs
 
         self.log.debug("querying %d snapshots", len(snaps))
-        for s in self.get_snapshots(ec2, snaps.keys()):
+        for s in self.get_snapshots(ec2, list(snaps.keys())):
             if not s.get('Encrypted'):
                 unencrypted_configs.update(snaps[s['SnapshotId']])
         return unencrypted_configs
