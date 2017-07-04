@@ -52,11 +52,12 @@ class RDSParamGroup(QueryResourceManager):
 pg_cluster_filters = FilterRegistry('rds-cluster-param-groups.filters')
 pg_cluster_actions = ActionRegistry('rds-cluster-param-groups.actions')
 
+
 @resources.register('rds-cluster-param-group')
 class RDSClusterParamGroup(QueryResourceManager):
     """ Resource manager for RDS cluster parameter groups.
     """
-    
+
     class resource_type(object):
 
         service = 'rds'
@@ -85,8 +86,6 @@ class PGClusterMixin(object):
 
 
 class Copy(BaseAction):
-    """ Action to copy an RDS parameter group
-    """
 
     schema = type_schema(
         'copy',
@@ -96,7 +95,7 @@ class Copy(BaseAction):
             'description': {'type': 'string'},
         }
     )
-    
+
     def process(self, param_groups):
         client = local_session(self.manager.session_factory).client('rds')
 
@@ -115,6 +114,21 @@ class Copy(BaseAction):
 
 @pg_actions.register('copy')
 class PGCopy(PGMixin, Copy):
+    """ Action to copy an RDS parameter group.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-param-group-copy
+                resource: rds-param-group
+                filters:
+                  - DBParameterGroupName: original_pg_name
+                actions:
+                  - type: copy
+                    name: copy_name
+    """
 
     permissions = ('rds:CopyDBParameterGroup',)
 
@@ -128,7 +142,22 @@ class PGCopy(PGMixin, Copy):
 
 @pg_cluster_actions.register('copy')
 class ClusterCopy(PGClusterMixin, Copy):
-    
+    """ Action to copy an RDS cluster parameter group.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-param-group-copy
+                resource: rds-cluster-param-group
+                filters:
+                  - DBClusterParameterGroupName: original_pg_name
+                actions:
+                  - type: copy
+                    name: copy_name
+    """
+
     permissions = ('rds:CopyDBClusterParameterGroup',)
 
     def do_copy(self, client, name, copy_name, desc):
@@ -170,7 +199,7 @@ class PGDelete(PGMixin, Delete):
 
 @pg_cluster_actions.register('delete')
 class ClusterDelete(PGClusterMixin, Delete):
-    
+
     permissions = ('rds:DeleteDBClusterParameterGroup',)
 
     def do_delete(self, client, name):
@@ -209,6 +238,7 @@ class Modify(BaseAction):
                 raise
 
             self.log.info('Modified RDS parameter group: %s', name)
+
 
 @pg_actions.register('modify')
 class PGModify(Modify):
