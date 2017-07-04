@@ -1237,7 +1237,14 @@ class ConfigRule(object):
 
         if isinstance(func, PolicyLambda):
             manager = func.policy.get_resource_manager()
-            config_type = manager.get_model().config_type
+            if hasattr(manager.get_model(), 'config_type'):
+                config_type = manager.get_model().config_type
+            else:
+                raise Exception("You may have attempted to deploy a config "
+                        "based lambda function with an unsupported config type. "
+                        "The most recent AWS config types are here: http://docs.aws"
+                        ".amazon.com/config/latest/developerguide/resource"
+                        "-config-reference.html.")
             params['Scope'] = {
                 'ComplianceResourceTypes': [config_type]}
         else:
