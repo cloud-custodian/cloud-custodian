@@ -132,7 +132,7 @@ class ClusterCopy(PGClusterMixin, Copy):
     permissions = ('rds:CopyDBClusterParameterGroup')
 
     def do_copy(self, client, name, copy_name, desc):
-        client.copy_db_parameter_group(
+        client.copy_db_cluster_parameter_group(
             SourceDBClusterParameterGroupIdentifier=name,
             TargetDBClusterParameterGroupIdentifier=copy_name,
             TargetDBClusterParameterGroupDescription=desc

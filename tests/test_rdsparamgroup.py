@@ -55,6 +55,42 @@ class RDSParamGroupTest(BaseTest):
         else:
             self.fail('parameter group {} still exists'.format(name))
 
+    @functional
+    def test_rdsparamgroup_copy(self):
+        session_factory = self.replay_flight_data('test_rdsparamgroup_copy')
+        client = session_factory().client('rds')
+
+        name = 'pg-orig'
+        copy_name = 'pg-copy'
+
+        # Create the PG
+        client.create_db_parameter_group(
+            DBParameterGroupName=name,
+            DBParameterGroupFamily='mysql5.5',
+            Description='test'
+        )
+
+        # Copy it via custodian
+        p = self.load_policy({
+            'name': 'rdspg-copy',
+            'resource': 'rds-param-group',
+            'filters': [{'DBParameterGroupName': name}],
+            'actions': [{
+                'type': 'copy',
+                'name': copy_name,
+            }],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Ensure it exists
+        ret = client.describe_db_parameter_groups(DBParameterGroupName=copy_name)
+        self.assertEqual(len(ret['DBParameterGroups']), 1)
+
+        # Delete both
+        client.delete_db_parameter_group(DBParameterGroupName=name)
+        client.delete_db_parameter_group(DBParameterGroupName=copy_name)
+        
 
 class RDSClusterParamGroupTest(BaseTest):
 
@@ -94,3 +130,39 @@ class RDSClusterParamGroupTest(BaseTest):
         else:
             self.fail('parameter group cluster {} still exists'.format(name))
 
+
+    @functional
+    def test_rdsclusterparamgroup_copy(self):
+        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_copy')
+        client = session_factory().client('rds')
+
+        name = 'pgc-orig'
+        copy_name = 'pgc-copy'
+
+        # Create the PG
+        client.create_db_cluster_parameter_group(
+            DBClusterParameterGroupName=name,
+            DBParameterGroupFamily='aurora5.6',
+            Description='test'
+        )
+
+        # Copy it via custodian
+        p = self.load_policy({
+            'name': 'rdspgc-copy',
+            'resource': 'rds-cluster-param-group',
+            'filters': [{'DBClusterParameterGroupName': name}],
+            'actions': [{
+                'type': 'copy',
+                'name': copy_name,
+            }],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Ensure it exists
+        ret = client.describe_db_cluster_parameter_groups(DBClusterParameterGroupName=copy_name)
+        self.assertEqual(len(ret['DBClusterParameterGroups']), 1)
+
+        # Delete both
+        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
+        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=copy_name)
