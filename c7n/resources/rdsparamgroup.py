@@ -25,8 +25,8 @@ from c7n.utils import (type_schema, local_session)
 
 log = logging.getLogger('custodian.rds-param-group')
 
-filters = FilterRegistry('rds-param-groups.filters')
-actions = ActionRegistry('rds-param-groups.actions')
+pg_filters = FilterRegistry('rds-param-groups.filters')
+pg_actions = ActionRegistry('rds-param-groups.actions')
 
 
 @resources.register('rds-param-group')
@@ -45,9 +45,12 @@ class RDSParamGroup(QueryResourceManager):
         dimension = 'DBParameterGroupName'
         date = None
 
-    filter_registry = filters
-    action_registry = actions
+    filter_registry = pg_filters
+    action_registry = pg_actions
 
+
+pg_cluster_filters = FilterRegistry('rds-cluster-param-groups.filters')
+pg_cluster_actions = ActionRegistry('rds-cluster-param-groups.actions')
 
 @resources.register('rds-cluster-param-group')
 class RDSClusterParamGroup(QueryResourceManager):
@@ -65,24 +68,23 @@ class RDSClusterParamGroup(QueryResourceManager):
         dimension = 'DBClusterParameterGroupName'
         date = None
 
-    filter_registry = filters
-    action_registry = actions
+    filter_registry = pg_cluster_filters
+    action_registry = pg_cluster_actions
 
 
 class PGMixin(object):
 
-    def get_name(self, pg):
+    def get_pg_name(self, pg):
         return pg['DBParameterGroupName']
 
 
 class PGClusterMixin(object):
 
-    def get_name(self, pg):
+    def get_pg_name(self, pg):
         return pg['DBClusterParameterGroupName']
 
 
-@actions.register('copy')
-class Copy(PGMixin, BaseAction):
+class Copy(BaseAction):
     """ Action to copy an RDS parameter group
     """
 
@@ -94,14 +96,12 @@ class Copy(PGMixin, BaseAction):
             'description': {'type': 'string'},
         }
     )
-
-    permissions = ('rds:CopyDBParameterGroup',)
     
     def process(self, param_groups):
         client = local_session(self.manager.session_factory).client('rds')
 
         for param_group in param_groups:
-            name = self.get_name(param_group)
+            name = self.get_pg_name(param_group)
             copy_name = self.data.get('name')
             copy_desc = self.data.get('description', 'Copy of {}'.format(name))
             try:
@@ -112,6 +112,12 @@ class Copy(PGMixin, BaseAction):
 
             self.log.info('Copied RDS parameter group %s to %s', name, copy_name)
 
+
+@pg_actions.register('copy')
+class PGCopy(PGMixin, Copy):
+
+    permissions = ('rds:CopyDBParameterGroup',)
+
     def do_copy(self, client, name, copy_name, desc):
         client.copy_db_parameter_group(
             SourceDBParameterGroupIdentifier=name,
@@ -120,7 +126,7 @@ class Copy(PGMixin, BaseAction):
         )
 
 
-@actions.register('copy')
+@pg_cluster_actions.register('copy')
 class ClusterCopy(PGClusterMixin, Copy):
     
     permissions = ('rds:CopyDBClusterParameterGroup')
@@ -133,77 +139,92 @@ class ClusterCopy(PGClusterMixin, Copy):
         )
 
 
-@actions.register('delete')
-class Delete(PGMixin, BaseAction):
+class Delete(BaseAction):
     """Action to delete an RDS parameter group
     """
 
     schema = type_schema('delete')
-    permissions = ('rds:DeleteDBParameterGroup',)
 
     def process(self, param_groups):
         client = local_session(self.manager.session_factory).client('rds')
 
         for param_group in param_groups:
-            name = self.get_name(param_group)
+            name = self.get_pg_name(param_group)
             try:
-                self.do_delete(name)
+                self.do_delete(client, name)
             except ClientError:
                 # TODO - anything we need to catch?
                 raise
 
             self.log.info('Deleted RDS parameter group: %s', name)
 
-    def do_delete(self, name):
+
+@pg_actions.register('delete')
+class PGDelete(PGMixin, Delete):
+
+    permissions = ('rds:DeleteDBParameterGroup',)
+
+    def do_delete(self, client, name):
         client.delete_db_parameter_group(DBParameterGroupName=name)
 
 
-@actions.register('delete')
-class ClusterDelete(Delete):
+@pg_cluster_actions.register('delete')
+class ClusterDelete(PGClusterMixin, Delete):
     
     permissions = ('rds:DeleteDBClusterParameterGroup',)
 
-    def do_delete(self):
+    def do_delete(self, client, name):
         client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
-        
 
-@actions.register('modify')
-class Modify(PGMixin, BaseAction):
+
+class Modify(BaseAction):
     """Action to modify an RDS parameter group
     """
 
     schema = type_schema(
         'modify',
         **{
-            'required': [],
+            'required': ['name', 'value'],
+            'name': {'type': 'string'},
+            'value': {'type': 'string'},
+            'apply-method': {'type': 'string', 'enum': ['immediate', 'pending-reboot']}
         }
     )
-    permissions = ('rds:ModifyDBParameterGroup',)
 
     def process(self, param_groups):
         client = local_session(self.manager.session_factory).client('rds')
 
+        params = [{
+            'ParameterName': self.data.get('name'),
+            'ParameterValue': self.data.get('value'),
+            'ApplyMethod': self.data.get('apply-method', 'immediate'),
+        }]
+
         for param_group in param_groups:
-            name = self.get_name(param_group)
+            name = self.get_pg_name(param_group)
             try:
-                self.do_modify(name)
+                self.do_modify(client, name, params)
             except ClientError:
                 # TODO - anything we need to catch?
                 raise
 
             self.log.info('Modified RDS parameter group: %s', name)
 
-    def do_modify(self, name):
-        pass
-        #client.modify_db_parameter_group(DBParameterGroupName=name)
+@pg_actions.register('modify')
+class PGModify(Modify):
+
+    permissions = ('rds:ModifyDBParameterGroup',)
+
+    def do_modify(self, client, name, params):
+        client.modify_db_parameter_group(DBParameterGroupName=name, Parameters=params)
 
 
-@actions.register('modify')
+@pg_cluster_actions.register('modify')
 class ClusterModify(PGClusterMixin, Modify):
     """ Action to modify an RDS Cluster parameter group
     """
 
     permissions = ('rds:ModifyDBClusterParameterGroup',)
 
-    def do_modify(name):
-        pass
+    def do_modify(self, client, name, params):
+        client.modify_db_cluster_parameter_group(DBParameterGroupName=name, Parameters=params)
