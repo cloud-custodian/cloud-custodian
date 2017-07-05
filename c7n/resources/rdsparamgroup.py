@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import itertools
 import logging
 
 from botocore.exceptions import ClientError
@@ -213,35 +214,50 @@ class Modify(BaseAction):
     schema = type_schema(
         'modify',
         **{
-            'required': ['name', 'value'],
-            'name': {'type': 'string'},
-            'value': {'type': 'string'},
-            'apply-method': {'type': 'string', 'enum': ['immediate', 'pending-reboot']}
+            'required': ['params'],
+            'params': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'required': ['name', 'value'],
+                    'name': {'type': 'string'},
+                    'value': {'type': 'string'},
+                    'apply-method': {'type': 'string', 'enum': ['immediate', 'pending-reboot']}
+                },
+            },
         }
     )
 
     def process(self, param_groups):
         client = local_session(self.manager.session_factory).client('rds')
 
-        params = [{
-            'ParameterName': self.data.get('name'),
-            'ParameterValue': self.data.get('value'),
-            'ApplyMethod': self.data.get('apply-method', 'immediate'),
-        }]
+        params = []
+        for param in self.data.get('params', []):
+            params.append({
+                'ParameterName': param['name'],
+                'ParameterValue': param['value'],
+                'ApplyMethod': param.get('apply-method', 'immediate'),
+            })
 
-        for param_group in param_groups:
-            name = self.get_pg_name(param_group)
-            try:
-                self.do_modify(client, name, params)
-            except ClientError:
-                # TODO - anything we need to catch?
-                raise
+        # Can only do 20 elements at a time per docs, so if we have more than that we will
+        # break it into multiple requests: https://goo.gl/Z6oGNv
+        params = [iter(params)] * 20
+        params = itertools.izip_longest(*params, fillvalue={})
 
-            self.log.info('Modified RDS parameter group: %s', name)
+        for param_set in params:
+            for param_group in param_groups:
+                name = self.get_pg_name(param_group)
+                try:
+                    self.do_modify(client, name, param_set)
+                except ClientError:
+                    # TODO - anything we need to catch?
+                    raise
+
+                self.log.info('Modified RDS parameter group: %s', name)
 
 
 @pg_actions.register('modify')
-class PGModify(Modify):
+class PGModify(PGMixin, Modify):
 
     permissions = ('rds:ModifyDBParameterGroup',)
 
