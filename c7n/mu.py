@@ -816,7 +816,7 @@ class CloudWatchEventSource(object):
         cwevents = self.data.get('events')
         payload = {}
         if cwevents is None:
-            print('events is None')
+            #'events is None'
         else:
             for e in cwevents:
                 if not isinstance(e, dict):
@@ -834,8 +834,7 @@ class CloudWatchEventSource(object):
             self.resolve_cloudtrail_payload(payload)
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
-            payload['detail-type'] = [
-                "EC2 Instance State-change Notification"]
+            payload['detail-type'] = ["EC2 Instance State-change Notification"]
             # Technically could let empty be all events, but likely misconfig
             payload['detail'] = {"state": self.data.get('events', [])}
         elif event_type == "asg-instance-state":
