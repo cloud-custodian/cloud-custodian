@@ -813,14 +813,18 @@ class CloudWatchEventSource(object):
     def render_event_pattern(self):
         event_type = self.data.get('type')
         sources = self.data.get('sources', [])
-        for e in self.data.get('events'):
-            if not isinstance(e, dict):
-                event_info = CloudWatchEvents.get(e)
-                if event_info is None:
-                    continue
-            else:
-                event_info = e
-            sources.append(event_info['source'])
+        cwevents = self.data.get('events')
+        if cwevents is None:
+            print('events is None')
+        else:
+            for e in cwevents:
+                if not isinstance(e, dict):
+                    event_info = CloudWatchEvents.get(e)
+                    if event_info is None:
+                        continue
+                else:
+                    event_info = e
+                sources.append(event_info['source'])
         payload = {}
         if event_type == 'cloudtrail' and 'signin.amazonaws.com' in sources:
             payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
