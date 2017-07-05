@@ -29,7 +29,7 @@ from influxdb import InfluxDBClient
 import yaml
 
 from c7n import schema
-from c7n.credentials import assumed_session
+from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.reports import csvout as s3_resource_parser
@@ -87,8 +87,8 @@ CONFIG_SCHEMA = {
                     }
                 }
             ]
-            
-            
+
+
         },
         'accounts': {
             'type': 'array',
@@ -309,16 +309,39 @@ def index_account_resources(config, account, region, policy, date):
     key_prefix = "accounts/{}/{}/policies/{}".format(
         account['name'], region, policy['name'])
 
-    records = s3_resource_parser.record_set(
-        lambda : assumed_session(account['role'], 'PolicyIndex'),
-        bucket,
-        key_prefix,
-        date,
-        specify_hour=True)
+    # Look for AWS profile in config before Instance role
+    if account['profile']:
+        records = s3_resource_parser.record_set(
+            lambda: SessionFactory(region, profile=account['profile'])(),
+            bucket,
+            key_prefix,
+            date,
+            specify_hour=True)
+    else:
+        records = s3_resource_parser.record_set(
+            lambda: SessionFactory(region, assume_role=account['role'])(),
+            bucket,
+            key_prefix,
+            date,
+            specify_hour=True)
 
     for r in records:
+        # Adding Custodian vars to each record
         r['c7n:MatchedPolicy'] = policy['name']
-    
+        r['c7n:AccountNumber'] = account['id']
+
+        # Expand tags
+        # Tags are stored in the following format:
+        # Tags: [ {'key': 'mykey', 'val': 'myval'}, {'key': 'mykey2', 'val': 'myval2'} ]
+        # and this makes searching for tags difficult. We will convert them to:
+        # Tags: ['mykey': 'myval', 'mykey2': 'myval2']
+        if r.get('Tags'):
+            tags = {}
+            for tag in r.get('Tags'):
+                tags[tag.get('Key')] = tag.get('Value')
+
+            r['Tags'] = tags
+
     indexer.index(records)
 
 
