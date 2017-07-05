@@ -814,6 +814,7 @@ class CloudWatchEventSource(object):
         event_type = self.data.get('type')
         sources = self.data.get('sources', [])
         cwevents = self.data.get('events')
+        payload = {}
         if cwevents is None:
             print('events is None')
         else:
@@ -828,7 +829,6 @@ class CloudWatchEventSource(object):
         if event_type == 'cloudtrail' and 'signin.amazonaws.com' in sources:
             payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
-        payload = {}
         elif event_type == 'cloudtrail':
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
