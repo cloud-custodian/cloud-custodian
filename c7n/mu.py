@@ -815,9 +815,7 @@ class CloudWatchEventSource(object):
         sources = self.data.get('sources', [])
         cwevents = self.data.get('events')
         payload = {}
-        if cwevents is None:
-            test = 'failed'
-        else:
+        if cwevents is not None:
             for e in cwevents:
                 if not isinstance(e, dict):
                     event_info = CloudWatchEvents.get(e)
