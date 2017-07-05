@@ -812,15 +812,27 @@ class CloudWatchEventSource(object):
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
+        sources = self.data.get('sources', [])
+        cwevents = self.data.get('events')
         payload = {}
-        if event_type == 'cloudtrail':
+        if cwevents is not None:
+            for e in cwevents:
+                if not isinstance(e, dict):
+                    event_info = CloudWatchEvents.get(e)
+                    if event_info is None:
+                        continue
+                else:
+                    event_info = e
+                sources.append(event_info['source'])
+        if event_type == 'cloudtrail' and 'signin.amazonaws.com' in sources:
+            payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
+            self.resolve_cloudtrail_payload(payload)
+        elif event_type == 'cloudtrail':
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
-
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
-            payload['detail-type'] = [
-                "EC2 Instance State-change Notification"]
+            payload['detail-type'] = ["EC2 Instance State-change Notification"]
             # Technically could let empty be all events, but likely misconfig
             payload['detail'] = {"state": self.data.get('events', [])}
         elif event_type == "asg-instance-state":
