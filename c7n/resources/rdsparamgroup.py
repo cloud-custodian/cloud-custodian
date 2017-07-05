@@ -273,4 +273,7 @@ class ClusterModify(PGClusterMixin, Modify):
     permissions = ('rds:ModifyDBClusterParameterGroup',)
 
     def do_modify(self, client, name, params):
-        client.modify_db_cluster_parameter_group(DBClusterParameterGroupName=name, Parameters=params)
+        client.modify_db_cluster_parameter_group(
+            DBClusterParameterGroupName=name,
+            Parameters=params
+        )
