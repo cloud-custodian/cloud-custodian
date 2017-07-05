@@ -812,11 +812,15 @@ class CloudWatchEventSource(object):
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
+        event_source =  self.data.get('events')
+        event_source = event_source[0].get('source')
         payload = {}
-        if event_type == 'cloudtrail':
-            payload['detail-type'] = ['AWS API Call via CloudTrail']
+        if event_type == 'cloudtrail' and event_source == 'signin.amazonaws.com':
+            payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
-
+        elif event_type == 'cloudtrail':
+            payload['detail-type'] = ['AWS API Call via CloudTrail']   
+            self.resolve_cloudtrail_payload(payload)
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [
