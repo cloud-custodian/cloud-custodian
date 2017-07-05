@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusterParameterGroup": {
+            "DBClusterParameterGroupName": "pgc-test", 
+            "DBParameterGroupFamily": "aurora5.6", 
+            "Description": "test", 
+            "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:pgc-test"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a6ff5f4a-61b8-11e7-af76-fbe81bc5cf0d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a6ff5f4a-61b8-11e7-af76-fbe81bc5cf0d", 
+                "date": "Wed, 05 Jul 2017 19:32:15 GMT", 
+                "content-length": "674", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBParameterGroupName": "pg-test", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "be41a7cc-61b8-11e7-8b20-494e4a74cd8f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "be41a7cc-61b8-11e7-8b20-494e4a74cd8f", 
+                "date": "Wed, 05 Jul 2017 19:32:54 GMT", 
+                "content-length": "347", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

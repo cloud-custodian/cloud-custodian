@@ -90,6 +90,53 @@ class RDSParamGroupTest(BaseTest):
         # Delete both
         client.delete_db_parameter_group(DBParameterGroupName=name)
         client.delete_db_parameter_group(DBParameterGroupName=copy_name)
+
+    @functional
+    def test_rdsparamgroup_modify(self):
+        session_factory = self.replay_flight_data('test_rdsparamgroup_modify')
+        client = session_factory().client('rds')
+
+        name = 'pg-test'
+
+        # Create the PG
+        client.create_db_parameter_group(
+            DBParameterGroupName=name,
+            DBParameterGroupFamily='mysql5.5',
+            Description='test'
+        )
+
+        # Modify it via custodian
+        p = self.load_policy({
+            'name': 'rdspg-modify',
+            'resource': 'rds-param-group',
+            'filters': [{'DBParameterGroupName': name}],
+            'actions': [{
+                'type': 'modify',
+                'params': [
+                    {'name': 'autocommit', 'value': '0' },
+                    {'name': 'automatic_sp_privileges', 'value': '1' },
+                ]
+            }],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Ensure that params were set
+        ret = client.describe_db_parameters(DBParameterGroupName=name)
+        count = 0
+        for param in ret['Parameters']:
+            if param['ParameterName'] == 'autocommit':
+                self.assertEqual(param['ParameterValue'], "0")
+                count += 1
+            elif param['ParameterName'] == 'automatic_sp_privileges':
+                self.assertEqual(param['ParameterValue'], "1")
+                count += 1
+            if count == 2:
+                break
+        self.assertEqual(count, 2)
+
+        # Clean up
+        client.delete_db_parameter_group(DBParameterGroupName=name)
         
 
 class RDSClusterParamGroupTest(BaseTest):
@@ -166,3 +213,50 @@ class RDSClusterParamGroupTest(BaseTest):
         # Delete both
         client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
         client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=copy_name)
+
+    @functional
+    def test_rdsclusterparamgroup_modify(self):
+        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_modify')
+        client = session_factory().client('rds')
+
+        name = 'pgc-test'
+
+        # Create the PG
+        client.create_db_cluster_parameter_group(
+            DBClusterParameterGroupName=name,
+            DBParameterGroupFamily='aurora5.6',
+            Description='test'
+        )
+
+        # Modify it via custodian
+        p = self.load_policy({
+            'name': 'rdspgc-modify',
+            'resource': 'rds-cluster-param-group',
+            'filters': [{'DBClusterParameterGroupName': name}],
+            'actions': [{
+                'type': 'modify',
+                'params': [
+                    {'name': 'auto_increment_increment', 'value': "1" },
+                    {'name': 'auto_increment_offset', 'value': "2" },
+                ]
+            }],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Ensure that params were set
+        ret = client.describe_db_cluster_parameters(DBClusterParameterGroupName=name)
+        count = 0
+        for param in ret['Parameters']:
+            if param['ParameterName'] == 'auto_increment_increment':
+                self.assertEqual(param['ParameterValue'], "1")
+                count += 1
+            elif param['ParameterName'] == 'auto_increment_offset':
+                self.assertEqual(param['ParameterValue'], "2")
+                count += 1
+            if count == 2:
+                break
+        self.assertEqual(count, 2)
+
+        # Clean up
+        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
