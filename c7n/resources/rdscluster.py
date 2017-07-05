@@ -24,7 +24,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks)
+    type_schema, local_session, snapshot_identifier, chunks, get_retry)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -40,7 +40,7 @@ class RDSCluster(QueryResourceManager):
     class resource_type(object):
 
         service = 'rds'
-        type = 'rds-cluster'
+        type = 'cluster'
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
         filter_name = None
@@ -50,6 +50,35 @@ class RDSCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(get_retry(('Throttled',)))
+
+    def augment(self, dbs):
+        filter(None, _rds_cluster_tags(
+            self.get_model(),
+            dbs, self.session_factory, self.executor_factory,
+            self.generate_arn, self.retry))
+        return dbs
+
+
+def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, retry):
+    """Augment rds clusters with their respective tags."""
+
+    def process_tags(db):
+        client = local_session(session_factory).client('rds')
+        arn = generator(db[model.id])
+        tag_list = None
+        try:
+            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'DBClusterNotFoundFault':
+                log.warning("Exception getting rdscluster tags\n %s", e)
+            return None
+        db['Tags'] = tag_list or []
+        return db
+
+    # Rds maintains a low api call limit, so this can take some time :-(
+    with executor_factory(max_workers=1) as w:
+        return list(w.map(process_tags, dbs))
 
 
 @filters.register('security-group')
