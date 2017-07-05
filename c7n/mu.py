@@ -825,8 +825,7 @@ class CloudWatchEventSource(object):
                         continue
                 else:
                     event_info = e
-                sources.append(event_info['source'])
-        
+                sources.append(event_info['source'])  
         if event_type == 'cloudtrail' and 'signin.amazonaws.com' in sources:
             payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
