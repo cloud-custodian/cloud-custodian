@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
-from common import BaseTest, load_data
+
+from .common import BaseTest, load_data
 
 
 class CloudDirectoryTest(BaseTest):
@@ -22,7 +25,7 @@ class CloudDirectoryTest(BaseTest):
         client = session_factory().client('clouddirectory')
 
         schema_arn = client.create_schema(Name='gooseberry').get('SchemaArn')
-        self.addCleanup(client.delete_schema, SchemaArn=schema_arn)        
+        self.addCleanup(client.delete_schema, SchemaArn=schema_arn)
         schema_data = load_data('sample-clouddir-schema.json')
 
         client.put_schema_from_json(

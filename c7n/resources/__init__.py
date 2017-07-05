@@ -14,6 +14,7 @@
 #
 # AWS resources to manage
 #
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 def load_resources():
@@ -51,6 +52,7 @@ def load_resources():
     import c7n.resources.health
     import c7n.resources.hsm
     import c7n.resources.iam
+    import c7n.resources.iot
     import c7n.resources.kinesis
     import c7n.resources.kms
     import c7n.resources.ml

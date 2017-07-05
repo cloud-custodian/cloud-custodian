@@ -19,6 +19,7 @@ concurrent.futures implementation over sqs
 Scatter/Gather or Map/Reduce style over two sqs queues.
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import random
 import logging
@@ -158,7 +159,7 @@ class SQSWorker(object):
 
         try:
             func(*msg['args'], **msg['kwargs'])
-        except Exception, e:
+        except Exception as e:
             log.exception(
                 "Error invoking %s %s" % (
                     op_name, e))

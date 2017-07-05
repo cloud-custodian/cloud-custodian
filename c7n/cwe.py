@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import jmespath
+import six
 
 
 class CloudWatchEvents(object):
@@ -64,6 +67,14 @@ class CloudWatchEvents(object):
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
 
+        'CreateElasticsearchDomain': {
+            'ids': 'requestParameters.domainName',
+            'source': 'es.amazonaws.com'},
+
+        'CreateTable': {
+            'ids': 'requestParameters.tableName',
+            'source': 'dynamodb.amazonaws.com"'},
+
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
             'source': 'ec2.amazonaws.com'}}
@@ -89,7 +100,7 @@ class CloudWatchEvents(object):
         # but usage context is lambda entry.
         if k in cls.trail_events:
             v = dict(cls.trail_events[k])
-            if isinstance(v['ids'], basestring):
+            if isinstance(v['ids'], six.string_types):
                 v['ids'] = e = jmespath.compile('detail.%s' % v['ids'])
                 cls.trail_events[k]['ids'] = e
             return v

@@ -1,36 +1,44 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "b700bf35-dbd2-4c41-af4c-c9d8bfc6e438"
-        }, 
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "4675df0b-ff29-438a-b37f-d45c84a7f53c",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Thu, 08 Jun 2017 18:19:57 GMT"
+            }
+        },
         "Snapshots": [
             {
-                "Description": "maid transient snapshot for encryption", 
+                "Description": "maid transient snapshot for encryption",
                 "Tags": [
                     {
-                        "Value": "true", 
+                        "Value": "true",
                         "Key": "maid-crypto-remediation"
                     }
-                ], 
-                "Encrypted": false, 
-                "VolumeId": "vol-fdd1f844", 
-                "State": "completed", 
-                "VolumeSize": 8, 
-                "Progress": "100%", 
+                ],
+                "Encrypted": false,
+                "VolumeId": "vol-0f53c81b92b4ecfce",
+                "State": "completed",
+                "VolumeSize": 8,
+                "Progress": "100%",
                 "StartTime": {
-                    "hour": 11, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 7, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 8, 
-                    "minute": 9
-                }, 
-                "SnapshotId": "snap-c8965395", 
-                "OwnerId": "619193117841"
+                    "hour": 18,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 56,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 8,
+                    "minute": 18
+                },
+                "SnapshotId": "snap-09ab186abf23129b6",
+                "OwnerId": "185106417252"
             }
         ]
     }

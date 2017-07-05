@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import json
 import shutil
@@ -20,7 +22,7 @@ from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 
-from common import BaseTest, Config, Bag
+from .common import BaseTest, Config, Bag
 
 
 class DummyResource(manager.ResourceManager):
@@ -140,6 +142,19 @@ class PolicyPermissions(BaseTest):
 
 class TestPolicyCollection(BaseTest):
 
+    def test_expand_partitions(self):
+        cfg = Config.empty(
+            regions=['us-gov-west-1', 'cn-north-1', 'us-west-2'])
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'ec2'}]},
+            cfg)
+        collection = original.expand_regions(cfg.regions)
+        self.assertEqual(
+            sorted([p.options.region for p in collection]),
+            ['cn-north-1', 'us-gov-west-1', 'us-west-2'])
+
     def test_policy_account_expand(self):
         original = policy.PolicyCollection.from_data(
             {'policies': [
@@ -149,7 +164,7 @@ class TestPolicyCollection(BaseTest):
 
         collection = original.expand_regions(['all'])
         self.assertEqual(len(collection), 1)
-        
+
     def test_policy_region_expand_global(self):
         original = policy.PolicyCollection.from_data(
             {'policies': [

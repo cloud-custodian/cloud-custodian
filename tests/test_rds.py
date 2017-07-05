@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import json
 import logging
@@ -22,14 +24,12 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from common import BaseTest
+from .common import BaseTest
 
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
-
-from common import BaseTest
 
 logger = logging.getLogger(name='c7n.tests')
 
@@ -45,7 +45,7 @@ class RDSTest(BaseTest):
             'resource': 'rds',
             'filters': [
                 {'DBInstanceIdentifier': db_instance_id}],
-            'actions': ['start']},
+            'actions': ['stop']},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -60,7 +60,7 @@ class RDSTest(BaseTest):
         db_instance_id = 'rds-test-instance-2'
         client = session_factory().client('rds')
         p = self.load_policy({
-            'name': 'rds-stop',
+            'name': 'rds-start',
             'resource': 'rds',
             'filters': [
                 {'DBInstanceIdentifier': db_instance_id}],
@@ -409,6 +409,40 @@ class RDSTest(BaseTest):
             resources[1]['EngineVersion'], '5.6.23')
         self.assertEqual(
             resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
+
+    def test_rds_eligible_start_stop(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+        }
+        self.assertTrue(rds._eligible_start_stop(resource, 'available'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'stopped',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource, 'available'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'MultiAZ': True,
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaDBInstanceIdentifiers': ["sbbdevslave"],
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'sbbdev',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
 
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
@@ -897,15 +931,12 @@ class TestHealthEventsFilter(BaseTest):
 
 
 class TestRDSParameterGroupFilter(BaseTest):
-    """ This test assumes two parameter groups have been created and
-        assigned to two different RDS instances.
-    """
 
     PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
         # filter_struct, test_func, err_message
         ({'key': 'log_destination', 'op': 'eq', 'value': 'stderr'},
          lambda r: len(r) == 1,
-         "instances with log_destination == stderr should be 2"),
+         "instances with log_destination == stderr should be 1"),
         ({'key': 'log_destination', 'op': 'eq', 'value': 's3'},
          lambda r: len(r) == 0,
          "instances with log_destination == s3 should be 0"),
@@ -914,7 +945,7 @@ class TestRDSParameterGroupFilter(BaseTest):
          "instances with log_destination != stderr should be 0"),
         ({'key': 'log_destination', 'op': 'ne', 'value': 's3'},
          lambda r: len(r) == 1,
-         "instances with log_destination != s3 should be 2"),
+         "instances with log_destination != s3 should be 1"),
         ({'key': 'full_page_writes', 'op': 'eq', 'value': True},
          lambda r: len(r) == 1,
          "full_page_writes ( a boolean ) should be on"),
@@ -933,7 +964,7 @@ class TestRDSParameterGroupFilter(BaseTest):
                 'db-parameter')(fdata, policy.resource_manager)
             f_resources = f.process(resources)
             if not assertion(f_resources):
-                print len(f_resources), fdata, assertion
+                print(len(f_resources), fdata, assertion)
                 self.fail(err_msg)
 
 class Resize(BaseTest):

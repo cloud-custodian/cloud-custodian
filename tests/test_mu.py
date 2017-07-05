@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import imp
 import json
@@ -30,8 +32,8 @@ from c7n.mu import (
     CloudWatchLogSubscription, SNSSubscription, RUNTIME)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from common import BaseTest, Config, event_data
-from data import helloworld
+from .common import BaseTest, Config, event_data
+from .data import helloworld
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -193,8 +195,8 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        start = 0L
-        end = long(time.time() * 1000)
+        start = 0
+        end = time.time() * 1000
         self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
@@ -500,8 +502,6 @@ class PythonArchiveTest(unittest.TestCase):
 
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')
-        self.assertTrue('ctypes/__init__.py' in filenames)
-        self.assertTrue('ctypes/macholib/__init__.py' in filenames)
         self.assertTrue('README.ctypes' not in filenames)
 
     def test_cant_get_bytes_when_open(self):
@@ -557,7 +557,7 @@ class PythonArchiveTest(unittest.TestCase):
         return path
 
     def check_readable(self, archive):
-        readable = 0o444 << 16L
+        readable = 0o444 << 16
         with open(archive.path) as fh:
             reader = zipfile.ZipFile(fh, mode='r')
             for i in reader.infolist():

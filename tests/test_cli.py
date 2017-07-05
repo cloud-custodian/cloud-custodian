@@ -11,15 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 import sys
 
 from argparse import ArgumentTypeError
-from common import BaseTest
-from cStringIO import StringIO
 from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
+
+from .common import BaseTest, TextTestIO
 
 
 class CliTest(BaseTest):
@@ -35,8 +37,8 @@ class CliTest(BaseTest):
         return out
 
     def capture_output(self):
-        out = StringIO()
-        err = StringIO()
+        out = TextTestIO()
+        err = TextTestIO()
         self.patch(sys, 'stdout', out)
         self.patch(sys, 'stderr', err)
         return out, err
@@ -257,11 +259,9 @@ class ReportTest(CliTest):
             1)
 
     def test_warning_on_empty_policy_filter(self):
-        """
-        This test is to examine the warning output supplied when -p is used and
-        the resulting policy set is empty.  It is not specific to the `report`
-        subcommand - it is also used by `run` and a few other subcommands.
-        """
+        # This test is to examine the warning output supplied when -p is used and
+        # the resulting policy set is empty.  It is not specific to the `report`
+        # subcommand - it is also used by `run` and a few other subcommands.
         policy_name = 'test-policy'
         valid_policies = {
             'policies':
@@ -277,7 +277,7 @@ class ReportTest(CliTest):
         bad_policy_name = policy_name + '-nonexistent'
         log_output = self.capture_logging('custodian.commands')
         self.run_and_expect_failure(
-            ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file], 
+            ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file],
             1)
         self.assertIn(policy_name, log_output.getvalue())
 
@@ -353,13 +353,13 @@ class TabCompletionTest(CliTest):
 
         args = MockArgs()
         self.assertIn('rds', cli._schema_tab_completer('rd', args))
-        
+
         args.summary = True
         self.assertListEqual([], cli._schema_tab_completer('rd', args))
 
-        
+
 class RunTest(CliTest):
-    
+
     def test_ec2(self):
         session_factory = self.replay_flight_data(
             'test_ec2_state_transition_age_filter'
@@ -430,7 +430,7 @@ class RunTest(CliTest):
 
 
 class MetricsTest(CliTest):
-    
+
     def test_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
 
@@ -452,7 +452,7 @@ class MetricsTest(CliTest):
                         {"tag:Env": 'absent'},
                         {"tag:Owner": 'absent'}]}]
             }]
-        }) 
+        })
 
         end = datetime.utcnow()
         start = end - timedelta(14)
@@ -460,27 +460,25 @@ class MetricsTest(CliTest):
 
         out = self.get_output(
             ['custodian', 'metrics', '--start', str(start), '--end', str(end), '--period', str(period), yaml_file])
-        
+
         self.assertEqual(
             json.loads(out),
             {'ec2-tag-compliance-v6':
-                 {u'Durations': [],
-                 u'Errors': [{u'Sum': 0.0,
+             {u'Durations': [],
+              u'Errors': [{u'Sum': 0.0,
+                           u'Timestamp': u'2016-05-30T10:50:00',
+                           u'Unit': u'Count'}],
+              u'Invocations': [{u'Sum': 4.0,
+                                u'Timestamp': u'2016-05-30T10:50:00',
+                                u'Unit': u'Count'}],
+              u'ResourceCount': [{u'Average': 1.0,
+                                  u'Sum': 2.0,
+                                  u'Timestamp': u'2016-05-30T10:50:00',
+                                  u'Unit': u'Count'}],
+              u'Throttles': [{u'Sum': 0.0,
                               u'Timestamp': u'2016-05-30T10:50:00',
-                              u'Unit': u'Count'}],
-                 u'Invocations': [{u'Sum': 4.0,
-                                   u'Timestamp': u'2016-05-30T10:50:00',
-                                   u'Unit': u'Count'}],
-                 u'ResourceCount': [{u'Average': 1.0,
-                                     u'Sum': 2.0,
-                                     u'Timestamp': u'2016-05-30T10:50:00',
-                                     u'Unit': u'Count'}],
-                 u'Throttles': [{u'Sum': 0.0,
-                                 u'Timestamp': u'2016-05-30T10:50:00',
-                                 u'Unit': u'Count'}]}
-             }
-        )
-        
+                              u'Unit': u'Count'}]}})
+
     def test_metrics_get_endpoints(self):
 
         #
@@ -513,7 +511,7 @@ class MetricsTest(CliTest):
 
 
 class MiscTest(CliTest):
-    
+
     def test_empty_policy_file(self):
         # Doesn't do anything, but should exit 0
         temp_dir = self.get_temp_dir()

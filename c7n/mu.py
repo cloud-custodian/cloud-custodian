@@ -16,15 +16,16 @@ Cloud Custodian Lambda Provisioning Support
 
 docs/lambda.rst
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import abc
 import base64
 import imp
 import hashlib
+import io
 import json
 import logging
 import os
-import StringIO
 import sys
 import time
 import tempfile
@@ -182,8 +183,8 @@ class PythonPackageArchive(object):
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
         assert self._closed, "Archive not closed"
-        io = StringIO.StringIO(self.get_bytes())
-        return zipfile.ZipFile(io, mode='r')
+        buf = io.BytesIO(self.get_bytes())
+        return zipfile.ZipFile(buf, mode='r')
 
     def get_filenames(self):
         """Return a list of filenames in the archive."""
@@ -441,7 +442,7 @@ class LambdaManager(object):
 def resource_exists(op, NotFound="ResourceNotFoundException", *args, **kw):
     try:
         return op(*args, **kw)
-    except ClientError, e:
+    except ClientError as e:
         if e.response['Error']['Code'] == NotFound:
             return False
         raise
@@ -718,7 +719,7 @@ def zinfo(fname):
     info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
     # http://unix.stackexchange.com/questions/14705/
-    info.external_attr = 0o644 << 16L
+    info.external_attr = 0o644 << 16
     return info
 
 
@@ -1236,7 +1237,14 @@ class ConfigRule(object):
 
         if isinstance(func, PolicyLambda):
             manager = func.policy.get_resource_manager()
-            config_type = manager.get_model().config_type
+            if hasattr(manager.get_model(), 'config_type'):
+                config_type = manager.get_model().config_type
+            else:
+                raise Exception("You may have attempted to deploy a config "
+                        "based lambda function with an unsupported config type. "
+                        "The most recent AWS config types are here: http://docs.aws"
+                        ".amazon.com/config/latest/developerguide/resource"
+                        "-config-reference.html.")
             params['Scope'] = {
                 'ComplianceResourceTypes': [config_type]}
         else:

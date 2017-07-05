@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
@@ -229,13 +229,14 @@ def report(options, policies):
 
     resources = set([p.resource_type for p in policies])
     if len(resources) > 1:
-        log.error('Error: Report subcommand can accept multiple policies, but they must '
-                  'all be for the same resource.')
+        log.error('Error: Report subcommand can accept multiple policies, '
+                  'but they must all be for the same resource.')
         sys.exit(1)
 
     delta = timedelta(days=options.days)
     begin_date = datetime.now() - delta
-    do_report(policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
+    do_report(
+        policies, begin_date, options, sys.stdout, raw_output_fh=options.raw)
 
 
 @policy_command

@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest, Bag, functional
+from .common import BaseTest, functional
 from c7n.filters import FilterValidationError
 
 
@@ -93,16 +94,18 @@ class VpcTest(BaseTest):
 
     @functional
     def test_flow_logs_misconfiguration(self):
-        """Validate that each VPC has at least one valid configuration
-
-        In terms of filters, we then want to flag VPCs for which every
-        flow log configuration has at least one invalid value
-
-        Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
-        The first has three flow logs which each have different misconfigured properties
-        The second has one correctly configured flow log, and one where all config is bad
-
-        Only the first should be returned by the filter"""
+        # Validate that each VPC has at least one valid configuration
+        #
+        # In terms of filters, we then want to flag VPCs for which every
+        # flow log configuration has at least one invalid value
+        #
+        # Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
+        #
+        # The first has three flow logs which each have different
+        # misconfigured properties The second has one correctly
+        # configured flow log, and one where all config is bad
+        #
+        # Only the first should be returned by the filter
 
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_misconfigured')
@@ -138,7 +141,8 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_sg_missing(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_missing_loc')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_missing_loc')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -162,8 +166,10 @@ class NetworkLocationTest(BaseTest):
 
         nic = client.create_network_interface(
             SubnetId=web_sub_id,
-            Groups=[sg_id, web_sg_id])['NetworkInterface']['NetworkInterfaceId']
-        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+            Groups=[sg_id, web_sg_id]
+            )['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(
+            client.delete_network_interface, NetworkInterfaceId=nic)
 
         client.create_tags(
             Resources=[nic, web_sg_id, web_sub_id],
@@ -188,7 +194,8 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_sg_cardinality(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_cardinality')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1052,3 +1059,23 @@ class SecurityGroupTest(BaseTest):
                  {'type': 'egress',
                   'InvalidKey': True},
                  {'GroupName': 'sg2'}]})
+
+    def test_vpc_by_security_group(self):
+        factory = self.replay_flight_data('test_vpc_by_security_group')
+        p = self.load_policy(
+            {
+                'name': 'vpc-sg',
+                'resource': 'vpc',
+                'filters': [
+                    {
+                        'type': 'security-group',
+                        'key': 'tag:Name',
+                        'value': 'FancyTestGroupPublic',
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')

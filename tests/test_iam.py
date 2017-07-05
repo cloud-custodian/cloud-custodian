@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import datetime
 import os
 import tempfile
 
 from unittest import TestCase
-from common import load_data, BaseTest
-from test_offhours import mock_datetime_now
+from .common import load_data, BaseTest
+from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 

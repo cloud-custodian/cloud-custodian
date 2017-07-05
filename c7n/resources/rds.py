@@ -42,6 +42,8 @@ Find rds instances that are not encrypted
            op: ne
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import functools
 import itertools
 import logging
@@ -266,6 +268,11 @@ def _get_available_engine_upgrades(client, major=False):
 class RDSOffHour(OffHour):
     """Scheduled action on rds instance.
     """
+
+
+@filters.register('onhour')
+class RDSOnHour(OnHour):
+    """Scheduled action on rds instance."""
 
 
 @filters.register('default-vpc')
@@ -566,12 +573,12 @@ class TagTrim(tags.TagTrim):
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
-def _elgibile_start_stop(db, state="available"):
+def _eligible_start_stop(db, state="available"):
 
     if db.get('DBInstanceStatus') != state:
         return False
 
-    if db.get('MultiAZ') is False:
+    if db.get('MultiAZ'):
         return False
 
     if db.get('ReadReplicaDBInstanceIdentifiers'):
@@ -598,14 +605,14 @@ class Stop(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        for r in filter(_elgibile_start_stop, resources):
+        for r in filter(_eligible_start_stop, resources):
             try:
                 client.stop_db_instance(
                     DBInstanceIdentifier=r['DBInstanceIdentifier'])
             except ClientError as e:
                 log.exception(
                     "Error stopping db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('start')
@@ -622,7 +629,7 @@ class Start(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        start_filter = functools.partial(_elgibile_start_stop, state='stopped')
+        start_filter = functools.partial(_eligible_start_stop, state='stopped')
         for r in filter(start_filter, resources):
             try:
                 client.start_db_instance(
@@ -630,7 +637,7 @@ class Start(BaseAction):
             except ClientError as e:
                 log.exception(
                     "Error starting db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('delete')
@@ -1012,7 +1019,7 @@ def _rds_snap_tags(
 
 
 @RDSSnapshot.filter_registry.register('onhour')
-class RDSOnHour(OnHour):
+class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
 
 
@@ -1533,8 +1540,14 @@ class ParameterFilter(ValueFilter):
         if datatype == 'string':
             ret_val = str(val)
         elif datatype == 'boolean':
-            # AWS returns 1s and 0s for this
-            ret_val = bool(int(val))
+            # AWS returns 1s and 0s for boolean for most of the cases
+            if val.isdigit():
+                ret_val = bool(int(val))
+            # AWS returns 'TRUE,FALSE' for Oracle engine
+            elif val == 'TRUE':
+                ret_val = True
+            elif val == 'FALSE':
+                ret_val = False
         elif datatype == 'integer':
             if val.isdigit():
                 ret_val = int(val)
@@ -1548,6 +1561,8 @@ class ParameterFilter(ValueFilter):
         paramcache = {}
 
         client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_parameters')
+
         param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
                         for db in resources}
 
@@ -1560,11 +1575,11 @@ class ParameterFilter(ValueFilter):
             if pg_values is not None:
                 paramcache[pg] = pg_values
                 continue
+            param_list = list(itertools.chain(*[p['Parameters']
+                for p in paginator.paginate(DBParameterGroupName=pg)]))
             paramcache[pg] = {
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in client.describe_db_parameters(
-                    DBParameterGroupName=pg)['Parameters']
-                if 'ParameterValue' in p}
+                for p in param_list if 'ParameterValue' in p}
             self.manager._cache.save(cache_key, paramcache[pg])
 
         for resource in resources:
