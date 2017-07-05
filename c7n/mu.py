@@ -815,7 +815,7 @@ class CloudWatchEventSource(object):
         payload = {}
         sources = self.data.get('sources', [])
         for e in  self.data.get('events'):
-            e = json.dumps(e)
+            e = json.loads(e)
             sources.append(e['source'])
         payload = {}
         if event_type == 'cloudtrail' and 'signin.amazonaws.com' in sources:
