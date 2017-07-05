@@ -142,7 +142,7 @@ class PGCopy(PGMixin, Copy):
 
 
 @pg_cluster_actions.register('copy')
-class ClusterCopy(PGClusterMixin, Copy):
+class PGClusterCopy(PGClusterMixin, Copy):
     """ Action to copy an RDS cluster parameter group.
 
     :example:
@@ -153,7 +153,7 @@ class ClusterCopy(PGClusterMixin, Copy):
               - name: rds-cluster-param-group-copy
                 resource: rds-cluster-param-group
                 filters:
-                  - DBClusterParameterGroupName: original_pg_name
+                  - DBClusterParameterGroupName: original_cluster_pg_name
                 actions:
                   - type: copy
                     name: copy_name
@@ -170,8 +170,6 @@ class ClusterCopy(PGClusterMixin, Copy):
 
 
 class Delete(BaseAction):
-    """Action to delete an RDS parameter group
-    """
 
     schema = type_schema('delete')
 
@@ -191,6 +189,20 @@ class Delete(BaseAction):
 
 @pg_actions.register('delete')
 class PGDelete(PGMixin, Delete):
+    """Action to delete an RDS parameter group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-param-group-delete
+                resource: rds-param-group
+                filters:
+                  - DBParameterGroupName: pg_name
+                actions:
+                  - type: delete
+    """
 
     permissions = ('rds:DeleteDBParameterGroup',)
 
@@ -199,7 +211,21 @@ class PGDelete(PGMixin, Delete):
 
 
 @pg_cluster_actions.register('delete')
-class ClusterDelete(PGClusterMixin, Delete):
+class PGClusterDelete(PGClusterMixin, Delete):
+    """Action to delete an RDS cluster parameter group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-param-group-delete
+                resource: rds-cluster-param-group
+                filters:
+                  - DBClusterParameterGroupName: cluster_pg_name
+                actions:
+                  - type: delete
+    """
 
     permissions = ('rds:DeleteDBClusterParameterGroup',)
 
@@ -208,8 +234,6 @@ class ClusterDelete(PGClusterMixin, Delete):
 
 
 class Modify(BaseAction):
-    """Action to modify an RDS parameter group
-    """
 
     schema = type_schema(
         'modify',
@@ -258,6 +282,25 @@ class Modify(BaseAction):
 
 @pg_actions.register('modify')
 class PGModify(PGMixin, Modify):
+    """Action to modify an RDS parameter group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-param-group-modify
+                resource: rds-param-group
+                filters:
+                  - DBParameterGroupName: pg_name
+                actions:
+                  - type: modify
+                    params:
+                    - name: autocommit
+                      value: "1"
+                    - name: max_connections
+                      value: "100"
+    """
 
     permissions = ('rds:ModifyDBParameterGroup',)
 
@@ -266,8 +309,25 @@ class PGModify(PGMixin, Modify):
 
 
 @pg_cluster_actions.register('modify')
-class ClusterModify(PGClusterMixin, Modify):
-    """ Action to modify an RDS Cluster parameter group
+class PGClusterModify(PGClusterMixin, Modify):
+    """Action to modify an RDS cluster parameter group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-param-group-modify
+                resource: rds-cluster-param-group
+                filters:
+                  - DBClusterParameterGroupName: cluster_pg_name
+                actions:
+                  - type: modify
+                    params:
+                    - name: lower_case_table_names
+                      value: "1"
+                    - name: master_verify_checksum
+                      value: "1"
     """
 
     permissions = ('rds:ModifyDBClusterParameterGroup',)
