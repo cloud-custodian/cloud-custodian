@@ -94,7 +94,11 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {
                 'type': 'object',
-                'required': ['name', 'bucket', 'regions', 'title'],
+                'anyOf': [
+                    {"required": ['profile']},
+                    {"required": ['role']}
+                ],
+                'required': ['name', 'bucket', 'regions', 'title', 'id'],
                 'properties': {
                     'name': {'type': 'string'},
                     'title': {'type': 'string'},
@@ -310,20 +314,14 @@ def index_account_resources(config, account, region, policy, date):
         account['name'], region, policy['name'])
 
     # Look for AWS profile in config before Instance role
-    if account['profile']:
-        records = s3_resource_parser.record_set(
-            lambda: SessionFactory(region, profile=account['profile'])(),
-            bucket,
-            key_prefix,
-            date,
-            specify_hour=True)
-    else:
-        records = s3_resource_parser.record_set(
-            lambda: SessionFactory(region, assume_role=account['role'])(),
-            bucket,
-            key_prefix,
-            date,
-            specify_hour=True)
+    records = s3_resource_parser.record_set(
+    lambda: SessionFactory(region, profile=account.get('profile'),
+        assume_role=account.get('role'))(),
+    bucket,
+    key_prefix,
+    date,
+    specify_hour=True)
+
 
     for r in records:
         # Adding Custodian vars to each record
