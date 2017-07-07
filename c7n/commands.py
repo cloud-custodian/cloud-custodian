@@ -388,9 +388,8 @@ def schema_cmd(options):
 
         # Print schema
         print("\nSchema\n------\n")
-        pp = pprint.PrettyPrinter(indent=4)
         if hasattr(cls, 'schema'):
-            pp.pprint(cls.schema)
+            print(json.dumps(cls.schema, indent=4))
         else:
             # Shouldn't ever hit this, so exclude from cover
             print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
