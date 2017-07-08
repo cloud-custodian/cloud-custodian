@@ -1,5 +1,4 @@
 tests.test_actions.ActionTest.test_run_api
-tests.test_cli.ReportTest.test_report
 tests.test_ebs.HealthEventsFilterTest.test_ebs_health_events_filter
 tests.test_elb.SSLPolicyTest.test_set_ssl_listener_policy
 tests.test_mu.Constructor.test_class_constructor_only_accepts_py_modules_not_pyc
