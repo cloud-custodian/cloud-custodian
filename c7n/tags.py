@@ -35,6 +35,12 @@ from c7n import utils
 
 DEFAULT_TAG = "maid_status"
 
+universal_tag_retry = utils.get_retry((
+    'Throttled',
+    'RequestLimitExceeded',
+    'Client.RequestLimitExceeded'
+))
+
 
 def register_ec2_tags(filters, actions):
     filters.register('marked-for-op', TagActionFilter)
@@ -738,7 +744,7 @@ class UniversalTag(Tag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)
@@ -758,7 +764,6 @@ class UniversalUntag(RemoveTag):
     """
 
     batch_size = 20
-
     permissions = ('resourcegroupstaggingapi:UntagResources',)
 
     def process_resource_set(self, resource_set, tag_keys):
@@ -767,7 +772,7 @@ class UniversalUntag(RemoveTag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.untag_resources,
             ResourceARNList=arns,
             TagKeys=tag_keys)
@@ -842,7 +847,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)

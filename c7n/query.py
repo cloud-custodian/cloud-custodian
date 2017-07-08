@@ -123,11 +123,7 @@ class QueryMeta(type):
             if getattr(m, 'universal_taggable', False):
                 register_universal_tags(
                     attrs['filter_registry'], attrs['action_registry'])
-                attrs['retry'] = staticmethod(get_retry((
-                    'Throttled',
-                    'RequestLimitExceeded',
-                    'Client.RequestLimitExceeded'
-                )))
+
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 

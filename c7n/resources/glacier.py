@@ -18,13 +18,14 @@ from botocore.exceptions import ClientError
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import local_session
+from c7n.utils import get_retry, local_session
 
 
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
 
     permissions = ('glacier:ListTagsForVault',)
+    retry = staticmethod(get_retry(('Throttled',)))
 
     class resource_type(object):
         service = 'glacier'
