@@ -300,6 +300,7 @@ tests.test_iam.IamRoleFilterUsage.test_iam_role_inuse
 tests.test_iam.IamRoleFilterUsage.test_iam_role_unused
 tests.test_iam.IamUserFilterUsage.test_iam_user_access_key_filter
 tests.test_iam.IamUserFilterUsage.test_iam_user_policy
+tests.test_iam.IamUserGroupMembership.test_iam_user_group_membership
 tests.test_iam.KMSCrossAccount.test_kms_cross_account
 tests.test_iam.LambdaCrossAccount.test_lambda_cross_account
 tests.test_iam.SNSCrossAccount.test_sns_cross_account
