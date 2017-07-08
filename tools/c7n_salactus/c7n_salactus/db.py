@@ -20,8 +20,8 @@ class Database(object):
         for k in self.data['bucket-size'].keys():
             a, b = k.split(':')
             accounts.setdefault(a, []).append(k)
-        return [Account(a, [Bucket(b, self.data) for b in buckets])
-                for a, buckets in accounts.items()]
+        return [Account(aa, [Bucket(bb, self.data) for bb in buckets])
+                for aa, buckets in accounts.items()]
 
     def buckets(self, accounts=()):
         if accounts:

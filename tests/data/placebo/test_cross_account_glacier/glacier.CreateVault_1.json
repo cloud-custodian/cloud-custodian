@@ -3,8 +3,16 @@
     "data": {
         "location": "/644160558196/vaults/c7n-cross-check", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "D5Uy0b5nunxSQz0_6Y5t3Jp5w7HUEdPP2H2BWLdCItUcMes"
+            "RequestId": "rj6SsZNK4Dye-9ftAimuA8ZaJZ_4NDpI8-MbplJckDpzVOU", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "rj6SsZNK4Dye-9ftAimuA8ZaJZ_4NDpI8-MbplJckDpzVOU", 
+                "date": "Fri, 12 May 2017 00:15:34 GMT", 
+                "content-length": "2", 
+                "content-type": "application/json", 
+                "location": "/644160558196/vaults/c7n-cross-check"
+            }
         }
     }
 }

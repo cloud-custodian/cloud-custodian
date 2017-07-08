@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
@@ -161,36 +163,102 @@ class SSLPolicyTest(BaseTest):
             resources[0]['LoadBalancerName'],
             'test-elb-invalid-policy')
 
+    def test_set_ssl_listener_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_set_ssl_listener')
+        client = session_factory().client('elb')
+        policy = self.load_policy({
+            'name': 'test-set-ssl-listerner',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'ssl-policy',
+                 'whitelist': ['AES128-SHA256','Protocol-TLSv1']},
+                {
+                   'type': 'value',
+                   'key': 'LoadBalancerName',
+                   'value': 'test-elb',
+                   'op': 'eq' }],
+            'actions': [
+                {'type': 'set-ssl-listener-policy',
+                 'name': 'testpolicy',
+                 'attributes': ['AES128-SHA256','Protocol-TLSv1']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        response_pol = client.describe_load_balancers(
+            LoadBalancerNames=[
+                'test-elb'
+            ]
+        )
+        response_ciphers = client.describe_load_balancer_policies(
+            LoadBalancerName='test-elb',
+            PolicyNames=['testpolicy-1493768308000']
+        )
+        curr_pol = [t.encode('UTF8') for t in response_pol[
+            'LoadBalancerDescriptions'][0]['ListenerDescriptions'][0]['PolicyNames']]
+
+        curr_ciphers = []
+        for x in response_ciphers['PolicyDescriptions'][0]['PolicyAttributeDescriptions']:
+            curr_ciphers.append({str(k): str(v) for k, v in x.items()})
+        active_ciphers = [x['AttributeName'] for x in curr_ciphers if x['AttributeValue'] == 'true']
+        self.assertEqual(
+            curr_pol,
+            ['AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333',
+             'testpolicy-1493768308000'])
+        self.assertEqual(
+            active_ciphers,
+            ['Protocol-TLSv1', 'AES128-SHA256'])
+
+    def test_ssl_matching(self):
+        session_factory = self.replay_flight_data(
+            'test_ssl_ciphers')
+        policy = self.load_policy({
+            'name': 'test-ssl-matching',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'ssl-policy',
+                 'matching': '^Protocol-',
+                 'whitelist': ['Protocol-TLSv1', 'Protocol-TLSv1.1', 'Protocol-TLSv1.2']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['LoadBalancerName'],
+            'test-elb-invalid-policy')
+
     def test_filter_validation_no_blacklist(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy'}
+             ]},
+            session_factory=None, validate=False)
 
     def test_filter_validation_blacklist_not_iterable(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy', 'blacklist': 'single-value'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy', 'blacklist': 'single-value'}
+             ]},
+            session_factory=None, validate=False)
 
 
 class TestDefaultVpc(BaseTest):
 
     def test_elb_default_vpc(self):
         session_factory = self.replay_flight_data('test_elb_default_vpc')
-        p = self.load_policy(
-            {'name': 'elb-default-filters',
-             'resource': 'elb',
-             'filters': [
-                 {'type': 'default-vpc'}]},
+        p = self.load_policy({
+            'name': 'elb-default-filters',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'default-vpc'}]},
             config={'region': 'us-west-2'},
             session_factory=session_factory)
 

@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "events": [
+            {
+                "lastUpdatedTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 4, 
+                    "microsecond": 143000, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 59
+                }, 
+                "service": "EC2", 
+                "eventTypeCode": "AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED", 
+                "startTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 0
+                }, 
+                "eventTypeCategory": "scheduledChange", 
+                "endTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 0
+                }, 
+                "region": "us-west-2", 
+                "arn": "arn:aws:health:us-west-2::event/AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED12345678-1234-1234-1234-123456789012", 
+                "statusCode": "upcoming"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c87bfd4b-2f74-11e7-a362-450705400dc1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c87bfd4b-2f74-11e7-a362-450705400dc1", 
+                "date": "Tue, 02 May 2017 20:20:29 GMT", 
+                "content-length": "403", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

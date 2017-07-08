@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
+import os
 import unittest
 import tempfile
 import time
@@ -21,7 +24,7 @@ import ipaddress
 
 from c7n import utils
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class Backoff(BaseTest):
@@ -259,8 +262,27 @@ class UtilTest(unittest.TestCase):
         # are returned instead of a dictionary.
         FakeResource.schema = {}
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, str)
+        self.assertIsInstance(ret, unicode)
 
         delattr(FakeResource, 'schema')
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, str)
+        self.assertIsInstance(ret, unicode)
+
+    def test_load_file(self):
+        # Basic load
+        yml_file = os.path.join(os.path.dirname(__file__), 'data', 'vars-test.yml')
+        data = utils.load_file(yml_file)
+        self.assertTrue(len(data['policies']) == 1)
+
+        # Load with vars
+        resource = 'ec2'
+        data = utils.load_file(yml_file, vars={'resource': resource})
+        self.assertTrue(data['policies'][0]['resource'] == resource)
+
+        # Fail to substitute
+        self.assertRaises(utils.VarsSubstitutionError, utils.load_file, yml_file, vars={'foo': 'bar'})
+
+        # JSON load
+        json_file = os.path.join(os.path.dirname(__file__), 'data', 'ec2-instance.json')
+        data = utils.load_file(json_file)
+        self.assertTrue(data['InstanceId'] == 'i-1aebf7c0')

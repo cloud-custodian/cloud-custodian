@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 from botocore.exceptions import ClientError
 
@@ -106,23 +108,26 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('event-source')
 class LambdaEventSource(ValueFilter):
     # this uses iam policy, it should probably use
     # event source mapping api
 
-    annotation_key = "c7n.EventSources"
+    annotation_key = "c7n:EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
     permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
         def _augment(r):
-            if 'c7n.Policy' in r:
+            if 'c7n:Policy' in r:
                 return
             client = local_session(
                 self.manager.session_factory).client('lambda')
             try:
-                r['c7n.Policy'] = client.get_policy(
+                r['c7n:Policy'] = client.get_policy(
                     FunctionName=r['FunctionName'])['Policy']
                 return r
             except ClientError as e:
@@ -139,10 +144,10 @@ class LambdaEventSource(ValueFilter):
             return super(LambdaEventSource, self).process(resources, event)
 
     def __call__(self, r):
-        if 'c7n.Policy' not in r:
+        if 'c7n:Policy' not in r:
             return False
         sources = set()
-        data = json.loads(r['c7n.Policy'])
+        data = json.loads(r['c7n:Policy'])
         for s in data.get('Statement', ()):
             if s['Effect'] != 'Allow':
                 continue

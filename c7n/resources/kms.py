@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
@@ -23,6 +25,8 @@ log = logging.getLogger('custodian.kms')
 
 class KeyBase(object):
 
+    permissions = ('kms:ListResourceTags',)
+
     def augment(self, resources):
         client = local_session(
             self.session_factory).client('kms')
@@ -30,6 +34,12 @@ class KeyBase(object):
             key_id = r.get('AliasArn') or r.get('KeyArn')
             info = client.describe_key(KeyId=key_id)['KeyMetadata']
             r.update(info)
+
+            tags = client.list_resource_tags(KeyId=key_id)['Tags']
+            tag_list = []
+            for t in tags:
+                tag_list.append({'Key': t['TagKey'], 'Value': t['TagValue']})
+            r['Tags'] = tag_list
         return resources
 
 

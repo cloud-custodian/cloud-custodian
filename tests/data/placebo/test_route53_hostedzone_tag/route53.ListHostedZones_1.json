@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "HostedZones": [
+            {
+                "ResourceRecordSetCount": 2, 
+                "CallerReference": "20E957C4-EBF6-C278-89AB-DDE7C380F91D", 
+                "Config": {
+                    "PrivateZone": true
+                }, 
+                "Id": "/hostedzone/Z2Z4E3FM478G79", 
+                "Name": "test-zone."
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2cefbc55-367d-11e7-bfe0-cde19abcd2b1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2cefbc55-367d-11e7-bfe0-cde19abcd2b1", 
+                "date": "Thu, 11 May 2017 19:08:10 GMT", 
+                "content-length": "462", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MaxItems": "100"
+    }
+}

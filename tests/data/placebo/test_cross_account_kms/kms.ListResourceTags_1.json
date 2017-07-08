@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Truncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b9b06542-36c2-11e7-8cd1-eb5bb1192ed9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b9b06542-36c2-11e7-8cd1-eb5bb1192ed9", 
+                "content-length": "29", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Fri, 12 May 2017 03:26:02 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": []
+    }
+}

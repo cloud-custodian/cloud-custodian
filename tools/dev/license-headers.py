@@ -57,12 +57,13 @@ def update_headers(src_tree):
                 fh.write(
                     '%s%s%s' % (header, suffix, contents))
 
+
 def main():
     srctree = os.path.dirname(inspect.getabsfile(c7n))
     update_headers(srctree)
     update_headers(os.path.abspath('tests'))
     update_headers(os.path.abspath('ftests'))
- 
+
 
 if __name__ == '__main__':
     main()

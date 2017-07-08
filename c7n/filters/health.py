@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
 
 from c7n.utils import local_session, chunks, type_schema
@@ -40,8 +42,9 @@ class HealthEventFilter(Filter):
         if not resources:
             return resources
 
-        client = local_session(self.manager.session_factory).client('health')
-        f = self.get_filter()
+        client = local_session(self.manager.session_factory).client(
+            'health', region_name='us-east-1')
+        f = self.get_filter_parameters()
         resource_map = {r[self.manager.get_model().id]: r for r in resources}
         found = set()
         seen = set()
@@ -50,8 +53,7 @@ class HealthEventFilter(Filter):
             f['entityValues'] = resource_set
             events = client.describe_events(filter=f)['events']
             events = [e for e in events if e['arn'] not in seen]
-            entities = []
-            self.process_event(events, entities)
+            entities = self.process_event(events)
 
             event_map = {e['arn']: e for e in events}
             for e in entities:
@@ -62,9 +64,9 @@ class HealthEventFilter(Filter):
                     'c7n:HealthEvent', []).append(event_map[e['eventArn']])
                 found.add(rid)
             seen.update(event_map.keys())
-        return [resource_map[rid] for rid in found]
+        return [resource_map[resource_id] for resource_id in found]
 
-    def get_filter(self):
+    def get_filter_parameters(self):
         m = self.manager
         if m.data['resource'] == 'ebs':
             service = 'EBS'
@@ -77,8 +79,10 @@ class HealthEventFilter(Filter):
             f['eventTypeCodes'] = self.data.get('types')
         return f
 
-    def process_event(self, health_events, entities):
-        client = local_session(self.manager.session_factory).client('health')
+    def process_event(self, health_events):
+        entities = []
+        client = local_session(self.manager.session_factory).client(
+            'health', region_name='us-east-1')
         for event_set in chunks(health_events, 10):
             event_map = {e['arn']: e for e in event_set}
             for d in client.describe_event_details(
@@ -89,3 +93,4 @@ class HealthEventFilter(Filter):
             entities.extend(list(itertools.chain(
                             *[p['entities']for p in paginator.paginate(
                                 filter={'eventArns': event_map.keys()})])))
+        return entities

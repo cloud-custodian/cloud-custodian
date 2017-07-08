@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
@@ -197,6 +199,6 @@ class LastWriteDays(Filter):
         else:
             last_timestamp = streams[0]['lastIngestionTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp/1000.0)
+        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write

@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a61559fb-3847-11e7-8925-51975ea142dd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a61559fb-3847-11e7-8925-51975ea142dd", 
+                "date": "Sun, 14 May 2017 01:50:03 GMT", 
+                "content-length": "182", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "FailedResourcesMap": {
+            "arn:aws:route53:::hostedzone/Z148QEXAMPLE8V": {
+                "ErrorCode": "NoSuchHostedZone", 
+                "ErrorMessage": "No hosted zone found with ID: Z148QEXAMPLE8V", 
+                "StatusCode": 404
+            }
+        }
+    }
+}

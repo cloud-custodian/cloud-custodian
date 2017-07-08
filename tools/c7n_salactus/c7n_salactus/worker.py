@@ -70,7 +70,7 @@ REDIS_HOST = os.environ["SALACTUS_REDIS"]
 
 # Minimum size of the bucket before partitioning
 PARTITION_BUCKET_SIZE_THRESHOLD = 100000
-#PARTITION_BUCKET_SIZE_THRESHOLD = 20000
+# PARTITION_BUCKET_SIZE_THRESHOLD = 20000
 
 # Page size for keys found during partition
 PARTITION_KEYSET_THRESHOLD = 500
@@ -83,7 +83,7 @@ BUCKET_OBJ_DESC = {
            ('NextKeyMarker', 'NextVersionIdMarker')),
     False: ('Contents', 'list_objects_v2',
             ('NextContinuationToken',))
-    }
+}
 
 connection = redis.Redis(host=REDIS_HOST)
 # Increase timeouts to assist with non local regions, also
@@ -210,7 +210,7 @@ def bucket_key_count(client, bucket):
             hour=0, minute=0, second=0, microsecond=0) - timedelta(1),
         EndTime=datetime.now().replace(
             hour=0, minute=0, second=0, microsecond=0),
-        Period=60*60*24,
+        Period=60 * 60 * 24,
         Statistics=['Minimum'])
     response = client.get_metric_statistics(**params)
     if not response['Datapoints']:
@@ -297,7 +297,6 @@ class CharSet(object):
     ascii_letters = set(string.ascii_letters)
     ascii_lower_digits = set(string.ascii_lowercase + string.digits)
     ascii_alphanum = set(string.ascii_letters + string.digits)
-
 
     punctuation = set(string.punctuation)
 
@@ -478,7 +477,7 @@ def detect_partition_strategy(account_info, bucket, delimiters=('/', '-'), prefi
         process_bucket_iterator, [account_info, bucket], prefixes)
 
 
-@job('bucket-partition', timeout=3600*12, connection=connection)
+@job('bucket-partition', timeout=3600 * 12, connection=connection)
 def process_bucket_partitions(
         account_info, bucket, prefix_set=('',), partition='/',
         strategy=None, limit=4):
@@ -547,8 +546,8 @@ def process_bucket_partitions(
         if len(prefix_queue) > PARTITION_QUEUE_THRESHOLD:
             log.info("Partition add friends, %s", statm(prefix))
             for s_prefix_set in chunks(
-                    prefix_queue[PARTITION_QUEUE_THRESHOLD-1:],
-                    PARTITION_QUEUE_THRESHOLD-1):
+                    prefix_queue[PARTITION_QUEUE_THRESHOLD - 1:],
+                    PARTITION_QUEUE_THRESHOLD - 1):
 
                 for s in list(s_prefix_set):
                     if strategy.is_depth_exceeded(prefix):
@@ -562,13 +561,13 @@ def process_bucket_partitions(
                        account_info, bucket,
                        prefix_set=s_prefix_set, partition=partition,
                        strategy=strategy, limit=limit)
-            prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD-1]
+            prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD - 1]
 
     if keyset:
         invoke(process_keyset, account_info, bucket, {contents_key: keyset})
 
 
-@job('bucket-page-iterator', timeout=3600*24, connection=connection)
+@job('bucket-page-iterator', timeout=3600 * 24, connection=connection)
 def process_bucket_iterator(account_info, bucket,
                             prefix="", delimiter="", **continuation):
     """Bucket pagination
@@ -595,7 +594,7 @@ def process_bucket_iterator(account_info, bucket,
                 invoke(process_keyset, account_info, bucket, page)
 
 
-@job('bucket-keyset-scan', timeout=3600*12, connection=connection)
+@job('bucket-keyset-scan', timeout=3600 * 12, connection=connection)
 def process_keyset(account_info, bucket, key_set):
     session = get_session(account_info)
     s3 = session.client('s3', region_name=bucket['region'], config=s3config)
@@ -603,8 +602,7 @@ def process_keyset(account_info, bucket, key_set):
     remediation_count = 0
     denied_count = 0
     contents_key, _, _ = BUCKET_OBJ_DESC[bucket['versioned']]
-    processor = (bucket['versioned'] and processor.process_version
-                 or processor.process_key)
+    processor = (bucket['versioned'] and processor.process_version or processor.process_key)
     connection.hincrby(
         'keys-scanned', bucket_id(account_info, bucket['name']),
         len(key_set.get(contents_key, [])))

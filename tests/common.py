@@ -11,12 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import io
 import json
 import logging
 import os
-import StringIO
 import shutil
 import tempfile
+import unittest
+
+import six
 import yaml
 
 from c7n import policy
@@ -25,7 +30,7 @@ from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
 
-from zpill import PillTest
+from .zpill import PillTest
 
 
 logging.getLogger('placebo.pill').setLevel(logging.DEBUG)
@@ -34,8 +39,18 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 
 load_resources()
 
+ACCOUNT_ID = '644160558196'
+
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
+
+
+skip_if_not_validating = unittest.skipIf(
+    not C7N_VALIDATE, reason='We are not validating schemas.')
+
+# Set this so that if we run nose directly the tests will not fail
+if 'AWS_DEFAULT_REGION' not in os.environ:
+    os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
 
 
 class BaseTest(PillTest):
@@ -93,7 +108,9 @@ class BaseTest(PillTest):
             config['cache'] = os.path.join(temp_dir, 'c7n.cache')
             config['cache_period'] = 300
         conf = Config.empty(**config)
-        return policy.Policy(data, conf, session_factory)
+        p = policy.Policy(data, conf, session_factory)
+        p.validate()
+        return p
 
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data)
@@ -108,17 +125,18 @@ class BaseTest(PillTest):
         setattr(obj, attr, new)
         self.addCleanup(setattr, obj, attr, old)
 
-    def change_environment(self, **kw):
+    def change_environment(self, **kwargs):
         """Change the environment to the given set of variables.
 
+        To clear an environment variable set it to None.
         Existing environment restored after test.
         """
         # preserve key elements needed for testing
         for env in ["AWS_ACCESS_KEY_ID",
                     "AWS_SECRET_ACCESS_KEY",
                     "AWS_DEFAULT_REGION"]:
-            if env not in kw:
-                kw[env] = os.environ.get(env, "")
+            if env not in kwargs:
+                kwargs[env] = os.environ.get(env, "")
 
         original_environ = dict(os.environ)
 
@@ -128,13 +146,16 @@ class BaseTest(PillTest):
             os.environ.update(original_environ)
 
         os.environ.clear()
-        os.environ.update(kw)
+        for key, value in kwargs.items():
+            if value is None:
+                del(kwargs[key])
+        os.environ.update(kwargs)
 
     def capture_logging(
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = StringIO.StringIO()
+            log_file = TextTestIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)
@@ -149,6 +170,24 @@ class BaseTest(PillTest):
             logger.setLevel(old_logger_level)
 
         return log_file
+
+    @property
+    def account_id(self):
+        return ACCOUNT_ID
+
+
+class TextTestIO(io.StringIO):
+
+    def write(self, b):
+
+        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
+        # requires us to choose. We don't have control over all of the places
+        # we want to print from (think: traceback.print_exc) so we can't
+        # standardize the arg type up at the call sites. Hack it here.
+
+        if not isinstance(b, six.types.UnicodeType):
+            b = b.decode('utf8')
+        return super(TextTestIO, self).write(b)
 
 
 def placebo_dir(name):
@@ -192,13 +231,16 @@ class Config(Bag):
 
     @classmethod
     def empty(cls, **kw):
+        region = os.environ.get('AWS_DEFAULT_REGION', "us-east-1")
         d = {}
         d.update({
-            'region': os.environ.get('AWS_DEFAULT_REGION', "us-east-1"),
+            'region': region,
+            'regions': [region],
             'cache': '',
             'profile': None,
-            'account_id': '644160558196',
+            'account_id': ACCOUNT_ID,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': False,
             'output_dir': 's3://test-example/foo',

@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import datetime
-import time
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
+import time
+
+import six
 
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
@@ -39,7 +42,8 @@ class EMRCluster(QueryResourceManager):
     class resource_type(object):
         service = 'emr'
         type = 'emr'
-        enum_spec = ('list_clusters', 'Clusters', None)
+        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
@@ -48,7 +52,7 @@ class EMRCluster(QueryResourceManager):
 
     action_registry = actions
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
@@ -135,12 +139,13 @@ class TagDelayedAction(TagDelayedAction):
 
     permission = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('tag')
@@ -164,11 +169,12 @@ class TagTable(Tag):
 
     permissions = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('remove-tag')
@@ -279,7 +285,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.client import ClientError
 
 from collections import Counter
@@ -143,6 +145,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return subnet_ids
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes.
@@ -189,7 +194,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(ConfigValidFilter, self).initialize(asgs)
-        #pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
         self.subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
@@ -400,8 +405,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 asg['LaunchConfigurationName'])
             return False
         unencrypted = []
-        if (not self.data.get('exclude_image')
-                and cfg['ImageId'] in self.unencrypted_images):
+        if (not self.data.get('exclude_image') and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
         if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
             unencrypted.append('LaunchConfig')
@@ -424,7 +428,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     msg = e.response['Error']['Message']
                     e_ami_ids = [
                         e_ami_id.strip() for e_ami_id
-                        in msg[msg.find("'[")+2:msg.rfind("]'")].split(',')]
+                        in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
                     self.log.warning(
                         "asg:not-encrypted filter image not found %s",
                         e_ami_ids)
@@ -493,7 +497,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
                     msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     self.log.warning("Snapshot not found %s" % e_snap_id)
                     snap_ids.remove(e_snap_id)
                     continue
@@ -689,9 +693,9 @@ class Resize(Action):
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
-        if self.data['desired_size'] != 'current':
-            raise FilterValidationError(
-                "only resizing desired/min to current capacity is supported")
+        # if self.data['desired_size'] != 'current':
+        #    raise FilterValidationError(
+        #        "only resizing desired/min to current capacity is supported")
         return self
 
     def process(self, asgs):
@@ -700,13 +704,16 @@ class Resize(Action):
         for a in asgs:
             current_size = len(a['Instances'])
             min_size = a['MinSize']
-            desired = a['DesiredCapacity']
+            if self.data['desired_size'] is 'current':
+                desired = min((current_size, a['DesiredCapacity']))
+            else:
+                desired = int(self.data['desired_size'])
             log.debug('desired %d to %s, min %d to %d',
                       desired, current_size, min_size, current_size)
             self.manager.retry(
                 client.update_auto_scaling_group,
                 AutoScalingGroupName=a['AutoScalingGroupName'],
-                DesiredCapacity=min((current_size, desired)),
+                DesiredCapacity=desired,
                 MinSize=min((current_size, min_size)))
 
 
@@ -890,8 +897,7 @@ class PropagateTags(Action):
         client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
-                   if t['PropagateAtLaunch']
-                   and not t['Key'].startswith('aws:')}
+                   if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
 
         if self.data.get('tags'):
             tag_map = {
@@ -1041,16 +1047,16 @@ class RenameTag(Action):
              'Key': destination_tag,
              'Value': source['Value']}])
         if propagate:
-            self.propogate_instance_tag(source, destination_tag, asg)
+            self.propagate_instance_tag(source, destination_tag, asg)
 
-    def propogate_instance_tag(self, source, destination_tag, asg):
+    def propagate_instance_tag(self, source, destination_tag, asg):
         client = local_session(self.manager.session_factory).client('ec2')
         client.delete_tags(
             Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{"Key": source['Key']}])
         client.create_tags(
             Resources=[i['InstanceId'] for i in asg['Instances']],
-            Tags=[{'Key': source['Key'], 'Value': source['Value']}])
+            Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
 @actions.register('mark-for-op')
@@ -1148,10 +1154,6 @@ class Suspend(Action):
     ASG_PROCESSES = set(ASG_PROCESSES)
 
     def process(self, asgs):
-        original_count = len(asgs)
-        asgs = [a for a in asgs if a['Instances']]
-        self.log.debug("Filtered from %d to %d asgs with instances" % (
-            original_count, len(asgs)))
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 

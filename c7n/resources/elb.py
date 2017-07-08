@@ -14,8 +14,11 @@
 """
 Elastic Load Balancers
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from concurrent.futures import as_completed
 import logging
+import re
 
 from botocore.exceptions import ClientError
 
@@ -24,6 +27,8 @@ from c7n.actions import (
 from c7n.filters import (
     Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
 import c7n.filters.vpc as net_filters
+from datetime import datetime
+from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -272,12 +277,13 @@ class SetSslListenerPolicy(BaseAction):
 
         client = local_session(self.manager.session_factory).client('elb')
 
-        # Create a custom policy.
-        attrs = self.data.get('attributes')
-        # This name must be unique within the
+        # Create a custom policy with epoch timestamp.
+        # to make it unique within the
         # set of policies for this load balancer.
-        policy_name = self.data.get('name')
+        policy_name = self.data.get('name') + '-' + \
+            str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
         lb_name = elb['LoadBalancerName']
+        attrs = self.data.get('attributes')
         policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
             for attr in attrs]
 
@@ -296,15 +302,16 @@ class SetSslListenerPolicy(BaseAction):
         # Apply it to all SSL listeners.
         ssl_policies = ()
         if 'c7n.ssl-policies' in elb:
-            ssl_policies = set(elb['c7n.ssl-policies'])
+            ssl_policies = elb['c7n.ssl-policies']
 
         for ld in elb['ListenerDescriptions']:
             if ld['Listener']['Protocol'] in ('HTTPS', 'SSL'):
                 policy_names = [policy_name]
                 # Preserve extant non-ssl listener policies
+                policy_names.extend(ld.get('PolicyNames', ()))
+                # Remove extant ssl listener policy
                 if ssl_policies:
-                    policy_names.extend(
-                        ssl_policies.difference(ld.get('PolicyNames', ())))
+                    policy_names.remove(ssl_policies[0])
                 client.set_load_balancer_policies_of_listener(
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
@@ -346,6 +353,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     """ELB subnet filter"""
 
     RelatedIdsExpression = "Subnets[]"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @filters.register('instance')
@@ -425,6 +435,10 @@ class SSLPolicyFilter(Filter):
     Cannot specify both whitelist & blacklist in the same policy. These must
     be done seperately (seperate policy statements).
 
+    Likewise, if you want to reduce the consideration set such that we only
+    compare certain keys (e.g. you only want to compare the `Protocol-` keys),
+    you can use the `matching` option with a regular expression:
+
     :example:
 
         .. code-block: yaml
@@ -437,6 +451,14 @@ class SSLPolicyFilter(Filter):
                     blacklist:
                         - "Protocol-SSLv2"
                         - "Protocol-SSLv3"
+              - name: elb-modern-tls
+                resource: elb
+                filters:
+                  - type: ssl-policy
+                    matching: "^Protocol-"
+                    whitelist:
+                        - "Protocol-TLSv1.1"
+                        - "Protocol-TLSv1.2"
     """
 
     schema = {
@@ -445,13 +467,14 @@ class SSLPolicyFilter(Filter):
         'oneOf': [
             {'required': ['type', 'whitelist']},
             {'required': ['type', 'blacklist']}
-            ],
+        ],
         'properties': {
             'type': {'enum': ['ssl-policy']},
+            'matching': {'type': 'string'},
             'whitelist': {'type': 'array', 'items': {'type': 'string'}},
             'blacklist': {'type': 'array', 'items': {'type': 'string'}}
-            }
         }
+    }
     permissions = ("elasticloadbalancing:DescribeLoadBalancerPolicies",)
 
     def validate(self):
@@ -466,6 +489,14 @@ class SSLPolicyFilter(Filter):
                 not isinstance(self.data['blacklist'], list)):
             raise FilterValidationError("blacklist must be a list")
 
+        if 'matching' in self.data:
+                # Sanity check that we can compile
+                try:
+                    re.compile(self.data['matching'])
+                except re.error as e:
+                    raise FilterValidationError(
+                        "Invalid regex: %s %s" % (e, self.data))
+
         return self
 
     def process(self, balancers, event=None):
@@ -477,6 +508,16 @@ class SSLPolicyFilter(Filter):
         blacklist = set(self.data.get('blacklist', []))
 
         invalid_elbs = []
+
+        if 'matching' in self.data:
+            regex = self.data.get('matching')
+            filtered_pairs = []
+            for (elb, active_policies) in active_policy_attribute_tuples:
+                filtered_policies = [policy for policy in active_policies if
+                bool(re.match(regex, policy, flags=re.IGNORECASE))]
+                if filtered_policies:
+                    filtered_pairs.append((elb, filtered_policies))
+            active_policy_attribute_tuples = filtered_pairs
 
         if blacklist:
             for elb, active_policies in active_policy_attribute_tuples:

@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d25b06fb-2f66-11e7-8d49-adb1fbf0b38b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d25b06fb-2f66-11e7-8d49-adb1fbf0b38b", 
+                "date": "Tue, 02 May 2017 18:40:31 GMT", 
+                "content-length": "1160", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "hello",
+                        "Key": "world"
+                    }, 
+                    {
+                        "Value": "test",
+                        "Key": "demo"
+                    }, 
+                    {
+                        "Value": "xyz",
+                        "Key": "abc"
+                    }
+                ], 
+                "LoadBalancerName": "GitPrime-ELB"
+            }, 
+            {
+                "Tags": [
+                    {
+                        "Value": "test-tag-2", 
+                        "Key": "test-2"
+                    }, 
+                    {
+                        "Value": "test-tag-1", 
+                        "Key": "test-1"
+                    }
+                ], 
+                "LoadBalancerName": "test-elb"
+            }
+        ]
+    }
+}

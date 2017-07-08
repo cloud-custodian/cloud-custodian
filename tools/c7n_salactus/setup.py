@@ -19,8 +19,8 @@ setup(
     version='0.1.4',
     description="Cloud Custodian - Salactus S3",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +30,3 @@ setup(
             'c7n-salactus = c7n_salactus.cli:cli']},
     install_requires=["c7n", "click", "rq", "redis"],
 )
-

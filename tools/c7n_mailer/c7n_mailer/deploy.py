@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 
@@ -23,19 +25,23 @@ from c7n.mu import (
 
 entry_source = """\
 import logging
-logging.root.setLevel(logging.DEBUG)
 
 from c7n_mailer import handle
 
+logger = logging.getLogger('custodian.mailer')
+log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(level=logging.INFO, format=log_format)
+logging.getLogger('botocore').setLevel(logging.WARNING)
+
 def dispatch(event, context):
-    return handle.run(event, context)
+    return handle.start_c7n_mailer(logger)
 """
 
 
 def get_archive(config):
     archive = PythonPackageArchive(
         'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'yaml',
-        'memcache')
+        'redis')
 
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'msg-templates'))
@@ -69,7 +75,6 @@ def provision(config, session_factory):
                 session_factory,
                 prefix="")
         ])
-
 
     archive = get_archive(config)
     func = LambdaFunction(func_config, archive)

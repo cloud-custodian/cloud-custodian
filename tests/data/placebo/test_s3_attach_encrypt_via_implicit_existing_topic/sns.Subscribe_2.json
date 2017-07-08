@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "88fef41d-3e9e-5e4a-a402-a559737342c0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "88fef41d-3e9e-5e4a-a402-a559737342c0", 
+                "date": "Thu, 16 Mar 2017 08:24:13 GMT", 
+                "content-length": "392", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "SubscriptionArn": "arn:aws:sns:us-east-1:644160558196:existing-custodian-attach-encrypt-test-txt:8ca45a04-aeef-4b1d-bac0-696bec57d8b5"
+    }
+}

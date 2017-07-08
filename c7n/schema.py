@@ -25,6 +25,8 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import Counter
 import json
 import logging
@@ -57,7 +59,11 @@ def validate(data, schema=None):
         return []
     try:
         resp = specific_error(errors[0])
-        name = isinstance(errors[0].instance, dict) and errors[0].instance.get('name', 'unknown') or 'unknown'
+        name = isinstance(
+            errors[0].instance,
+            dict) and errors[0].instance.get(
+            'name',
+            'unknown') or 'unknown'
         return [resp, name]
     except Exception:
         logging.exception(
@@ -146,7 +152,7 @@ def generate(resource_types=()):
             'properties': {
                 'name': {
                     'type': 'string',
-                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
+                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
                 'region': {'type': 'string'},
                 'resource': {'type': 'string'},
                 'max-resources': {'type': 'integer'},
@@ -197,7 +203,7 @@ def generate(resource_types=()):
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
                              'event': {'type': 'string'}}}]
-                    }}
+                }}
             },
         },
     }
@@ -222,8 +228,8 @@ def generate(resource_types=()):
                 'type': 'array',
                 'additionalItems': False,
                 'items': {'anyOf': resource_refs}
-                }
             }
+        }
     }
 
     return schema
@@ -262,7 +268,7 @@ def process_resource(type_name, resource_type, resource_defs):
         {'$ref': '#/definitions/filters/valuekv'})
 
     filter_refs = []
-    filters_seen = set() # for aliases
+    filters_seen = set()  # for aliases
     for filter_name, f in sorted(resource_type.filter_registry.items()):
         if f in filters_seen:
             continue
@@ -302,7 +308,7 @@ def process_resource(type_name, resource_type, resource_defs):
                 'actions': {
                     'type': 'array',
                     'items': {'anyOf': action_refs}}}},
-            ]
+        ]
     }
 
     if type_name == 'ec2':
@@ -336,7 +342,7 @@ def resource_vocabulary():
 
 
 def summary(vocabulary):
-    print "resource count: %d" % len(vocabulary)
+    print("resource count: %d" % len(vocabulary))
     action_count = filter_count = 0
 
     common_actions = set(['notify', 'invoke-lambda'])
@@ -347,12 +353,16 @@ def summary(vocabulary):
             set(rv.get('actions', ())).difference(common_actions))
         filter_count += len(
             set(rv.get('filters', ())).difference(common_filters))
-    print "unique actions: %d" % action_count
-    print "common actions: %d" % len(common_actions)
-    print "unique filters: %d" % filter_count
-    print "common filters: %s" % len(common_filters)
+    print("unique actions: %d" % action_count)
+    print("common actions: %d" % len(common_actions))
+    print("unique filters: %d" % filter_count)
+    print("common filters: %s" % len(common_filters))
 
 
 def json_dump(resource=None):
     load_resources()
     print(json.dumps(generate(resource), indent=2))
+
+
+if __name__ == '__main__':
+    json_dump()
