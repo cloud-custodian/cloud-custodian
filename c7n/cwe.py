@@ -31,6 +31,10 @@ class CloudWatchEvents(object):
     trail_events = {
         # event source, resource type as keys, mapping to api call and
         # jmespath expression
+        'ConsoleLogin': {
+            'ids': 'userIdentity.arn',
+            'source': 'signin.amazonaws.com'},
+
         'CreateAutoScalingGroup': {
             'ids': 'requestParameters.autoScalingGroupName',
             'source': 'autoscaling.amazonaws.com'},
