@@ -698,6 +698,49 @@ class UserPolicy(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('group')
+class GroupPolicy(ValueFilter):
+    """Filter IAM users based on attached group values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-admin-access
+                resource: iam-user
+                filters:
+                  - type: group
+                    key: 'GroupName'
+                    value: 'AWSAdmin'
+    """
+
+    schema = type_schema('group', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListGroupsForUser',)
+
+    def user_groups(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            if 'c7n:Groups' not in u:
+                u['c7n:Groups'] = []
+            u['c7n:Groups'] = client.list_groups_for_user(
+                UserName=u['UserName'])['Groups']
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users' groups" % len(resources))
+            list(w.map(self.user_groups, user_set))
+
+        matched = []
+        for r in resources:
+            for p in r['c7n:Groups']:
+                if self.match(p) and r not in matched:
+                    matched.append(r)
+        return matched
+
+
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
     """Filter IAM users based on access-key values
