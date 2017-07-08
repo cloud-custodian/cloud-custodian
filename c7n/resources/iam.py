@@ -16,11 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import csv
 import datetime
 from datetime import timedelta
-from dateutil.parser import parse
-from dateutil.tz import tzutc
 import itertools
 import time
 
+from concurrent.futures import as_completed
+from dateutil.parser import parse
+from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
 
@@ -699,7 +700,7 @@ class UserPolicy(ValueFilter):
 
 
 @User.filter_registry.register('group')
-class GroupPolicy(ValueFilter):
+class GroupMembership(ValueFilter):
     """Filter IAM users based on attached group values
 
     :example:
@@ -718,20 +719,21 @@ class GroupPolicy(ValueFilter):
     schema = type_schema('group', rinherit=ValueFilter.schema)
     permissions = ('iam:ListGroupsForUser',)
 
-    def user_groups(self, user_set):
-        client = local_session(self.manager.session_factory).client('iam')
+    def get_user_groups(self, client, user_set):
         for u in user_set:
-            if 'c7n:Groups' not in u:
-                u['c7n:Groups'] = []
             u['c7n:Groups'] = client.list_groups_for_user(
                 UserName=u['UserName'])['Groups']
 
     def process(self, resources, event=None):
-        user_set = chunks(resources, size=50)
+        client = local_session(self.manager.session_factory).client('iam')
         with self.executor_factory(max_workers=2) as w:
-            self.log.debug(
-                "Querying %d users' groups" % len(resources))
-            list(w.map(self.user_groups, user_set))
+            futures = []
+            for user_set in chunks(
+                    [r for r in resources if 'c7n:Groups' not in r], size=50):
+                futures.append(
+                    w.submit(self.get_user_groups, client, user_set))
+            for f in as_completed(futures):
+                pass
 
         matched = []
         for r in resources:
