@@ -425,6 +425,7 @@ class LambdaMode(PolicyExecutionMode):
         TODO: better customization around execution context outputs
         TODO: support centralized lambda exec across accounts.
         """
+        region = event.get("region", "default")
         resources = self.resolve_resources(event)
         if not resources:
             return resources
@@ -439,6 +440,9 @@ class LambdaMode(PolicyExecutionMode):
                 "policy: %s resources: %s no resources matched" % (
                     self.policy.name, self.policy.resource_type))
             return
+        with self.policy.ctx:
+            self.policy._write_file(
+                region, 'resources.json', utils.dumps(resources, indent=2))
 
         self.policy.ctx.metrics.put_metric(
             'ResourceCount', len(resources), 'Count', Scope="Policy",
@@ -685,8 +689,8 @@ class Policy(object):
 
     run = __call__
 
-    def _write_file(self, rel_path, value):
-        with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
+    def _write_file(self, rel_path, value, prefix=''):
+        with open(os.path.join(self.ctx.log_dir, prefix, rel_path), 'w') as fh:
             fh.write(value)
 
     def get_resource_manager(self):
