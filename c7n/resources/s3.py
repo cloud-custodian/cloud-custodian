@@ -403,7 +403,7 @@ class HasStatementFilter(Filter):
     def process_bucket(self, b):
         p = b.get('Policy')
         if p is None:
-            return b
+            return None
         p = json.loads(p)
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])

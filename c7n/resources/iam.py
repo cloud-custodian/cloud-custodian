@@ -18,7 +18,6 @@ import datetime
 from datetime import timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
-import io
 import itertools
 import time
 
@@ -560,7 +559,7 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(io.StringIO(data))
+        reader = csv.reader(six.StringIO(data))
         headers = reader.next()
         for line in reader:
             info = dict(zip(headers, line))

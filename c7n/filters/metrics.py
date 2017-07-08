@@ -38,7 +38,7 @@ class MetricsFilter(Filter):
       - name: ec2-underutilized
         resource: ec2
         filters:
-          - type: metric
+          - type: metrics
             name: CPUUtilization
             days: 4
             period: 86400
