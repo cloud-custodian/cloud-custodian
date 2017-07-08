@@ -61,7 +61,7 @@ class MetricsFilter(Filter):
            'statistics': {'type': 'string', 'enum': [
                'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
            'days': {'type': 'number'},
-           'op': {'type': 'string', 'enum': OPERATORS.keys()},
+           'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
            'attr-multiplier': {'type': 'number'},

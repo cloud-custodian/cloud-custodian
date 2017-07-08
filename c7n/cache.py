@@ -73,7 +73,7 @@ class FileCacheManager(object):
             if (time.time() - os.stat(self.cache_path).st_mtime >
                     self.config.cache_period * 60):
                 return False
-            with open(self.cache_path) as fh:
+            with open(self.cache_path, 'rb') as fh:
                 try:
                     self.data = pickle.load(fh)
                 except EOFError:
@@ -83,7 +83,7 @@ class FileCacheManager(object):
 
     def save(self, key, data):
         try:
-            with open(self.cache_path, 'w') as fh:
+            with open(self.cache_path, 'wb') as fh:
                 self.data[pickle.dumps(key)] = data
                 pickle.dump(self.data, fh, protocol=2)
         except Exception as e:

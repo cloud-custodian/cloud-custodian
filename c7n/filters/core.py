@@ -110,11 +110,12 @@ class FilterRegistry(PluginRegistry):
 
         # Make the syntax a little nicer for common cases.
         if isinstance(data, dict) and len(data) == 1 and 'type' not in data:
-            if data.keys()[0] == 'or':
+            op = list(data.keys())[0]
+            if op == 'or':
                 return Or(data, self, manager)
-            elif data.keys()[0] == 'and':
+            elif op == 'and':
                 return And(data, self, manager)
-            elif data.keys()[0] == 'not':
+            elif op == 'not':
                 return Not(data, self, manager)
             return ValueFilter(data, manager).validate()
         if isinstance(data, six.string_types):
@@ -161,7 +162,7 @@ class Filter(object):
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
-        return filter(self, resources)
+        return list(filter(self, resources))
 
 
 class Or(Filter):
@@ -169,7 +170,7 @@ class Or(Filter):
     def __init__(self, data, registry, manager):
         super(Or, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):
@@ -199,7 +200,7 @@ class And(Filter):
     def __init__(self, data, registry, manager):
         super(And, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
 
     def process(self, resources, events=None):
         for f in self.filters:
@@ -212,7 +213,7 @@ class Not(Filter):
     def __init__(self, data, registry, manager):
         super(Not, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):

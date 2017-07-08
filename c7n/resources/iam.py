@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import datetime
+import io
 from datetime import timedelta
 import itertools
 import time
@@ -526,7 +527,7 @@ class CredentialReport(Filter):
             {'type': 'boolean'},
             {'type': 'number'},
             {'type': 'null'}]},
-        op={'enum': OPERATORS.keys()},
+        op={'enum': list(OPERATORS.keys())},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,
@@ -560,8 +561,8 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(six.StringIO(data))
-        headers = reader.next()
+        reader = csv.reader(io.StringIO(data))
+        headers = next(reader)
         for line in reader:
             info = dict(zip(headers, line))
             report[info['user']] = self.process_user_record(info)
@@ -571,7 +572,7 @@ class CredentialReport(Filter):
     @classmethod
     def process_user_record(cls, info):
         """Type convert the csv record, modifies in place."""
-        keys = info.keys()
+        keys = list(info.keys())
         # Value conversion
         for k in keys:
             v = info[k]
