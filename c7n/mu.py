@@ -817,6 +817,9 @@ class CloudWatchEventSource(object):
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
 
+        if event_type == 'cloudtrail':
+            if 'signin.amazonaws.com' in payload['detail']['eventSource']:
+                payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [
