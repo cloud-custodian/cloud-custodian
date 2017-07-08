@@ -30,7 +30,6 @@ import yaml
 
 from c7n import schema
 from c7n.credentials import assumed_session
-from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.reports import csvout as s3_resource_parser
 from c7n.resources import load_resources
@@ -87,8 +86,6 @@ CONFIG_SCHEMA = {
                     }
                 }
             ]
-            
-            
         },
         'accounts': {
             'type': 'array',
@@ -318,7 +315,6 @@ def index_account_resources(config, account, region, policy, date):
 
     for r in records:
         r['c7n:MatchedPolicy'] = policy['name']
-    
     indexer.index(records)
 
 
