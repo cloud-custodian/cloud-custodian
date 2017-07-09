@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import itertools
 import logging
 
 from botocore.exceptions import ClientError
@@ -22,12 +21,12 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import (type_schema, local_session)
+from c7n.utils import (type_schema, local_session, chunks)
 
 log = logging.getLogger('custodian.rds-param-group')
 
-pg_filters = FilterRegistry('rds-param-groups.filters')
-pg_actions = ActionRegistry('rds-param-groups.actions')
+pg_filters = FilterRegistry('rds-param-group.filters')
+pg_actions = ActionRegistry('rds-param-group.actions')
 
 
 @resources.register('rds-param-group')
@@ -50,8 +49,8 @@ class RDSParamGroup(QueryResourceManager):
     action_registry = pg_actions
 
 
-pg_cluster_filters = FilterRegistry('rds-cluster-param-groups.filters')
-pg_cluster_actions = ActionRegistry('rds-cluster-param-groups.actions')
+pg_cluster_filters = FilterRegistry('rds-cluster-param-group.filters')
+pg_cluster_actions = ActionRegistry('rds-cluster-param-group.actions')
 
 
 @resources.register('rds-cluster-param-group')
@@ -265,10 +264,7 @@ class Modify(BaseAction):
 
         # Can only do 20 elements at a time per docs, so if we have more than that we will
         # break it into multiple requests: https://goo.gl/Z6oGNv
-        params = [iter(params)] * 20
-        params = itertools.izip_longest(*params, fillvalue={})
-
-        for param_set in params:
+        for param_set in chunks(params, 20):
             for param_group in param_groups:
                 name = self.get_pg_name(param_group)
                 try:
