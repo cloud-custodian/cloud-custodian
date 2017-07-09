@@ -68,13 +68,13 @@ class ResolverTest(BaseTest):
         uri = 's3://%s/resource.json?RequestPayer=requestor' % bname
         data = resolver.resolve(uri)
         self.assertEqual(content, data)
-        self.assertEqual(cache.state.keys(), [('uri-resolver', uri)])
+        self.assertEqual(list(cache.state.keys()), [('uri-resolver', uri)])
 
     def test_resolve_file(self):
         content = json.dumps({'universe': {'galaxy': {'system': 'sun'}}})
         cache = FakeCache()
         resolver = URIResolver(None, cache)
-        with tempfile.NamedTemporaryFile(dir=os.getcwd()) as fh:
+        with tempfile.NamedTemporaryFile(mode='w+', dir=os.getcwd()) as fh:
             fh.write(content)
             fh.flush()
             self.assertEqual(

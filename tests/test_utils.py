@@ -21,6 +21,7 @@ import time
 
 from botocore.exceptions import ClientError
 import ipaddress
+import six
 
 from c7n import utils
 
@@ -262,11 +263,11 @@ class UtilTest(unittest.TestCase):
         # are returned instead of a dictionary.
         FakeResource.schema = {}
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, unicode)
+        self.assertIsInstance(ret, six.text_type)
 
         delattr(FakeResource, 'schema')
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, unicode)
+        self.assertIsInstance(ret, six.text_type)
 
     def test_load_file(self):
         # Basic load

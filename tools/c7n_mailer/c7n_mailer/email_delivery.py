@@ -13,10 +13,14 @@
 # limitations under the License.
 import smtplib
 
-from ldap_lookup import LdapLookup
 from email.mime.text import MIMEText
 from email.utils import parseaddr
-from utils import format_struct, get_message_subject, get_resource_tag_targets, get_rendered_jinja
+
+import six
+from .ldap_lookup import LdapLookup
+from .utils import (
+    format_struct, get_message_subject, get_resource_tag_targets,
+    get_rendered_jinja)
 
 
 class EmailDelivery(object):
@@ -133,7 +137,7 @@ class EmailDelivery(object):
     def get_to_addrs_email_messages_map(self, sqs_message):
         to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(sqs_message)
         to_addrs_to_mimetext_map = {}
-        for to_addrs, resources in to_addrs_to_resources_map.iteritems():
+        for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
             to_addrs_to_mimetext_map[to_addrs] = self.get_mimetext_message(
                 sqs_message,
                 resources,
@@ -172,7 +176,7 @@ class EmailDelivery(object):
                 'template', 'default').endswith('html') and 'html' or 'plain'
         subject            = get_message_subject(sqs_message)
         from_addr          = sqs_message['action'].get('from', self.config['from_address'])
-        message            = MIMEText(body.encode('utf-8'), email_format)
+        message            = MIMEText(body, email_format)
         message['From']    = from_addr
         message['To']      = ', '.join(to_addrs)
         message['Subject'] = subject
