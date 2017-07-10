@@ -516,7 +516,7 @@ class HealthFilter(HealthEventFilter):
                 resource_map[rid] = self.load_resource(rid)
             resource_map[rid].setdefault(
                 'c7n:HealthEvent', []).append(event_map[e['eventArn']])
-        return resource_map.values()
+        return list(resource_map.values())
 
     def load_resource(self, rid):
         config = local_session(self.manager.session_factory).client('config')

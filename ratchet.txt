@@ -1,6 +1,4 @@
 tests.test_actions.ActionTest.test_run_api
-tests.test_cli.ReportTest.test_report
-tests.test_ebs.HealthEventsFilterTest.test_ebs_health_events_filter
 tests.test_elb.SSLPolicyTest.test_set_ssl_listener_policy
 tests.test_mu.Constructor.test_class_constructor_only_accepts_py_modules_not_pyc
 tests.test_mu.PolicyLambdaProvision.test_config_coverage_for_lambda_creation
@@ -28,7 +26,6 @@ tests.test_revisions.SGDiffLibTest.test_sg_patch_pitr
 tests.test_s3.BucketScanLogTests.test_scan_log
 tests.test_schema.SchemaTest.test_semantic_error
 tests.test_schema.SchemaTest.test_semantic_error_on_value_derived
-tests.test_sqsexec.TestSQSExec.test_sqsexec
 tests.test_utils.UtilTest.testCamelCase
 tests.test_utils.UtilTest.test_chunks
 tests.test_utils.UtilTest.test_load_file
