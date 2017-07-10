@@ -270,8 +270,9 @@ class Modify(BaseAction):
             cur_params = self.get_current_params(client, name)
             changed_params = []
             for param in params:
-                if (param['ParameterName'] not in cur_params or
-                    cur_params[param['ParameterName']]['ParameterValue'] != param['ParameterValue']):
+                param_name = param['ParameterName']
+                if (param_name not in cur_params or
+                   cur_params[param_name]['ParameterValue'] != param['ParameterValue']):
                     changed_params.append(param)
 
             # Can only do 20 elements at a time per docs, so if we have more than that we will
@@ -313,7 +314,9 @@ class PGModify(PGMixin, Modify):
 
     def get_current_params(self, client, name):
         params = client.describe_db_parameters(DBParameterGroupName=name)
-        return {x['ParameterName']: {'ParameterValue': x.get('ParameterValue'), 'ApplyMethod': x['ApplyMethod']}
+        return {x['ParameterName']: {
+                'ParameterValue': x.get('ParameterValue'),
+                'ApplyMethod': x['ApplyMethod']}
                 for x in params.get('Parameters', [])}
 
     def do_modify(self, client, name, params):
@@ -346,7 +349,9 @@ class PGClusterModify(PGClusterMixin, Modify):
 
     def get_current_params(self, client, name):
         params = client.describe_db_cluster_parameters(DBClusterParameterGroupName=name)
-        return {x['ParameterName']: {'ParameterValue': x.get('ParameterValue'), 'ApplyMethod': x['ApplyMethod']}
+        return {x['ParameterName']: {
+                'ParameterValue': x.get('ParameterValue'),
+                'ApplyMethod': x['ApplyMethod']}
                 for x in params.get('Parameters', [])}
 
     def do_modify(self, client, name, params):
