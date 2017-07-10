@@ -211,7 +211,7 @@ class Formatter(object):
 
         uniq = self.uniq_by_id(records)
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
-        rows = map(self.extract_csv, uniq)
+        rows = list(map(self.extract_csv, uniq))
         return rows
 
 

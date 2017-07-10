@@ -53,7 +53,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_pipelines,
-                    pipelineIds=pipe_map.keys())
+                    pipelineIds=list(pipe_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'PipelineNotFound':

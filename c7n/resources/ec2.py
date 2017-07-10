@@ -196,7 +196,7 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
@@ -262,7 +262,7 @@ class AttachedVolume(ValueFilter):
         self.skip = self.data.get('skip-devices', [])
         self.operator = self.data.get(
             'operator', 'or') == 'or' and any or all
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def get_volume_mapping(self, resources):
         volume_map = {}
@@ -323,7 +323,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -466,7 +466,7 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 
@@ -492,7 +492,7 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'},
         hours={'type': 'number'},
         minutes={'type': 'number'})
@@ -1159,11 +1159,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EC2 Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):

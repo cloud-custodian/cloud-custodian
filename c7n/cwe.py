@@ -153,4 +153,4 @@ class CloudWatchEvents(object):
         if not isinstance(resource_ids, (tuple, list)):
             resource_ids = [resource_ids]
 
-        return filter(None, resource_ids)
+        return list(filter(None, resource_ids))

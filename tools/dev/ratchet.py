@@ -9,6 +9,9 @@ import sys
 import xml.etree.ElementTree as Etree
 
 
+INVALID_TYPE = 'E   botocore.exceptions.ParamValidationError: ' \
+    'Parameter validation failed:     Invalid type for parameter '
+
 
 class TestResults(object):
 
@@ -40,8 +43,10 @@ class TestResults(object):
         elif n == 1:
             result = nonsuccess.pop()
             self.failed.append(key)
-            self.failed_aggregates.setdefault(
-                result.get('message'), []).append(key)
+            message = result.get('message')
+            if message.startswith(INVALID_TYPE):
+                message = INVALID_TYPE
+            self.failed_aggregates.setdefault(message, []).append(key)
         else:
             self.passed.append(key)
 

@@ -102,7 +102,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         self.log.debug("fetching policy for %d glacier" % len(resources))
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(GlacierCrossAccountAccessFilter, self).process(
             resources, event)

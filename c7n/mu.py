@@ -628,7 +628,7 @@ class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python2.7"
+    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy

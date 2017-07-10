@@ -107,7 +107,7 @@ class S3(QueryResourceManager):
             results = w.map(
                 assemble_bucket,
                 zip(itertools.repeat(self.session_factory), buckets))
-            results = filter(None, results)
+            results = list(filter(None, results))
             return results
 
 
@@ -347,7 +347,7 @@ class GlobalGrantsFilter(Filter):
     def process(self, buckets, event=None):
         with self.executor_factory(max_workers=5) as w:
             results = w.map(self.process_bucket, buckets)
-            results = filter(None, list(results))
+            results = list(filter(None, list(results)))
             return results
 
     def process_bucket(self, b):
@@ -398,7 +398,7 @@ class HasStatementFilter(Filter):
         statement_ids={'type': 'array', 'items': {'type': 'string'}})
 
     def process(self, buckets, event=None):
-        return filter(None, map(self.process_bucket, buckets))
+        return list(filter(None, map(self.process_bucket, buckets)))
 
     def process_bucket(self, b):
         p = b.get('Policy')
@@ -446,7 +446,7 @@ class EncryptionEnabledFilter(Filter):
         return perms
 
     def process(self, buckets, event=None):
-        return filter(None, map(self.process_bucket, buckets))
+        return list(filter(None, map(self.process_bucket, buckets)))
 
     def process_bucket(self, b):
         p = b.get('Policy')
@@ -554,7 +554,7 @@ class RemovePolicyStatement(BucketActionBase):
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             results = w.map(self.process_bucket, buckets)
-            return filter(None, list(results))
+            return list(filter(None, list(results)))
 
     def process_bucket(self, bucket):
         p = bucket.get('Policy')
@@ -784,7 +784,7 @@ class AttachLambdaEncrypt(BucketActionBase):
                     log.exception(
                         "Error attaching lambda-encrypt %s" % (f.exception()))
                 results.append(f.result())
-            return filter(None, results)
+            return list(filter(None, results))
 
     def process_bucket(self, func, bucket, topic, account_id, session_factory):
         from c7n.mu import BucketSNSNotification, BucketLambdaNotification
@@ -826,7 +826,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             results = w.map(self.process_bucket, buckets)
-            results = filter(None, list(results))
+            results = list(filter(None, list(results)))
             return results
 
     def process_bucket(self, b):
@@ -1496,7 +1496,7 @@ class DeleteGlobalGrants(BucketActionBase):
 
     def process(self, buckets):
         with self.executor_factory(max_workers=5) as w:
-            return filter(None, list(w.map(self.process_bucket, buckets)))
+            return list(filter(None, list(w.map(self.process_bucket, buckets))))
 
     def process_bucket(self, b):
         grantees = self.data.get(

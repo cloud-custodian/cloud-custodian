@@ -110,7 +110,7 @@ class ActionRegistry(PluginRegistry):
         if action_class is None:
             raise ValueError(
                 "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
@@ -487,6 +487,12 @@ class Notify(EventAction):
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
 
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
     def send_sns(self, message):
         topic = self.data['transport']['topic']
         if topic.startswith('arn:aws:sns'):
@@ -498,9 +504,7 @@ class Notify(EventAction):
                 message['region'], message['account_id'], topic)
         client = self.manager.session_factory(
             region=region, assume=self.assume_role).client('sns')
-        client.publish(
-            TopicArn=topic_arn,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message))))
+        client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
@@ -533,7 +537,7 @@ class Notify(EventAction):
         }
         result = client.send_message(
             QueueUrl=queue_url,
-            MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
+            MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
 
@@ -650,7 +654,7 @@ class AutoTagUser(EventAction):
         principal_id_key = self.data.get('principal_id_tag', None)
         if principal_id_key and principal_id_value:
             new_tags[principal_id_key] = principal_id_value
-        for key, value in new_tags.iteritems():
+        for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
 
@@ -695,7 +699,7 @@ class PutMetric(BaseAction):
                     'type':'object'
                 },
             },
-            'op': {'enum': METRIC_OPS.keys()},
+            'op': {'enum': list(METRIC_OPS.keys())},
             'units': {'enum': METRIC_UNITS}
         }
     }
