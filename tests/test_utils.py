@@ -138,13 +138,16 @@ class UtilTest(unittest.TestCase):
     def test_chunks(self):
         self.assertEqual(
             list(utils.chunks(range(100), size=50)),
-            [range(50), range(50, 100, 1)])
+            [list(range(50)), list(range(50, 100, 1))],
+        )
         self.assertEqual(
             list(utils.chunks(range(1), size=50)),
-            [range(1)])
+            [[0]],
+        )
         self.assertEqual(
             list(utils.chunks(range(60), size=50)),
-            [range(50), range(50, 60, 1)])
+            [list(range(50)), list(range(50, 60, 1))],
+        )
 
     def test_type_schema(self):
         self.assertEqual(

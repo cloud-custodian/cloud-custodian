@@ -76,7 +76,7 @@ def load_file(path, format=None, vars=None):
                 msg = 'Failed to substitute variable by positional argument.'
                 raise VarsSubstitutionError(msg)
             except KeyError as e:
-                msg = 'Failed to substitute variables.  KeyError on "{}"'.format(e.message)
+                msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
@@ -187,13 +187,13 @@ def camelResource(obj):
     """
     if not isinstance(obj, dict):
         return obj
-    for k in list(obj.keys()):
+    for k in obj.keys():
         v = obj.pop(k)
         obj["%s%s" % (k[0].upper(), k[1:])] = v
         if isinstance(v, dict):
             camelResource(v)
         elif isinstance(v, list):
-            map(camelResource, v)
+            list(map(camelResource, v))
     return obj
 
 
