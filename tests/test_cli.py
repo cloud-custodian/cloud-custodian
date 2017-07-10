@@ -51,7 +51,7 @@ class CliTest(BaseTest):
         try:
             cli.main()
         except SystemExit as e:
-            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.message))
+            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.code))
         return out.getvalue(), err.getvalue()
 
     def run_and_expect_failure(self, argv, exit_code):
