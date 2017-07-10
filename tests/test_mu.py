@@ -537,7 +537,7 @@ class PythonArchiveTest(unittest.TestCase):
         archive.close()
         self.assertTrue('cheese.txt' in archive.get_filenames())
         with archive.get_reader() as reader:
-            self.assertEqual('So yummy!', reader.read('cheese.txt'))
+            self.assertEqual(b'So yummy!', reader.read('cheese.txt'))
 
     def test_custodian_archive_creates_a_custodian_archive(self):
         archive = custodian_archive()
