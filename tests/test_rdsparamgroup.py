@@ -54,6 +54,7 @@ class RDSParamGroupTest(BaseTest):
             pass
         else:
             self.fail('parameter group {} still exists'.format(name))
+            self.addCleanup(client.delete_db_parameter_group, DBParameterGroupName=name)
 
     @functional
     def test_rdsparamgroup_copy(self):
@@ -69,6 +70,7 @@ class RDSParamGroupTest(BaseTest):
             DBParameterGroupFamily='mysql5.5',
             Description='test'
         )
+        self.addCleanup(client.delete_db_parameter_group, DBParameterGroupName=name)
 
         # Copy it via custodian
         p = self.load_policy({
@@ -86,10 +88,7 @@ class RDSParamGroupTest(BaseTest):
         # Ensure it exists
         ret = client.describe_db_parameter_groups(DBParameterGroupName=copy_name)
         self.assertEqual(len(ret['DBParameterGroups']), 1)
-
-        # Delete both
-        client.delete_db_parameter_group(DBParameterGroupName=name)
-        client.delete_db_parameter_group(DBParameterGroupName=copy_name)
+        self.addCleanup(client.delete_db_parameter_group, DBParameterGroupName=copy_name)
 
     @functional
     def test_rdsparamgroup_modify(self):
@@ -104,6 +103,7 @@ class RDSParamGroupTest(BaseTest):
             DBParameterGroupFamily='mysql5.5',
             Description='test'
         )
+        self.addCleanup(client.delete_db_parameter_group, DBParameterGroupName=name)
 
         # Modify it via custodian
         p = self.load_policy({
@@ -134,9 +134,6 @@ class RDSParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
-
-        # Clean up
-        client.delete_db_parameter_group(DBParameterGroupName=name)
         
 
 class RDSClusterParamGroupTest(BaseTest):
@@ -176,7 +173,7 @@ class RDSClusterParamGroupTest(BaseTest):
             pass
         else:
             self.fail('parameter group cluster {} still exists'.format(name))
-
+            self.addCleanup(client.delete_db_cluster_parameter_group, DBClusterParameterGroupName=name)
 
     @functional
     def test_rdsclusterparamgroup_copy(self):
@@ -192,6 +189,7 @@ class RDSClusterParamGroupTest(BaseTest):
             DBParameterGroupFamily='aurora5.6',
             Description='test'
         )
+        self.addCleanup(client.delete_db_cluster_parameter_group, DBClusterParameterGroupName=name)
 
         # Copy it via custodian
         p = self.load_policy({
@@ -209,10 +207,8 @@ class RDSClusterParamGroupTest(BaseTest):
         # Ensure it exists
         ret = client.describe_db_cluster_parameter_groups(DBClusterParameterGroupName=copy_name)
         self.assertEqual(len(ret['DBClusterParameterGroups']), 1)
-
-        # Delete both
-        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
-        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=copy_name)
+        self.addCleanup(client.delete_db_cluster_parameter_group,
+                        DBClusterParameterGroupName=copy_name)
 
     @functional
     def test_rdsclusterparamgroup_modify(self):
@@ -227,6 +223,7 @@ class RDSClusterParamGroupTest(BaseTest):
             DBParameterGroupFamily='aurora5.6',
             Description='test'
         )
+        self.addCleanup(client.delete_db_cluster_parameter_group, DBClusterParameterGroupName=name)
 
         # Modify it via custodian
         p = self.load_policy({
@@ -257,6 +254,3 @@ class RDSClusterParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
-
-        # Clean up
-        client.delete_db_cluster_parameter_group(DBClusterParameterGroupName=name)
