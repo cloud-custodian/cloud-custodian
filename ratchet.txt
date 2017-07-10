@@ -16,11 +16,6 @@ tests.test_mu.PythonArchiveTest.test_unless_you_make_your_own_zipinfo
 tests.test_notify.NotifyTest.test_notify_address_from
 tests.test_offhours.ScheduleParserTest.test_schedule_parser
 tests.test_output.S3OutputTest.test_compress
-tests.test_resolver.ResolverTest.test_resolve_file
-tests.test_resolver.UrlValueTest.test_csv_column
-tests.test_resolver.UrlValueTest.test_csv_expr
-tests.test_resolver.UrlValueTest.test_csv_expr_using_dict
-tests.test_resolver.UrlValueTest.test_csv_raw
 tests.test_revisions.SGDiffLibTest.test_sg_diff_pitr
 tests.test_revisions.SGDiffLibTest.test_sg_patch_pitr
 tests.test_s3.BucketScanLogTests.test_scan_log

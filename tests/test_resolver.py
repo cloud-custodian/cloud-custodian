@@ -83,6 +83,13 @@ class ResolverTest(BaseTest):
 
 class UrlValueTest(BaseTest):
 
+    def setUp(self):
+        self.old_dir = os.getcwd()
+        os.chdir(tempfile.gettempdir())
+
+    def tearDown(self):
+        os.chdir(self.old_dir)
+
     def get_values_from(self, data, content):
         mgr = Bag({'session_factory': None, '_cache': None})
         values = ValuesFrom(data, mgr)
@@ -109,35 +116,49 @@ class UrlValueTest(BaseTest):
             ['a', 'b', 'c', 'd'])
 
     def test_csv_expr(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': '[*][2]'}, out.getvalue())
+        with open('test.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open('test.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': '[*][2]'},
+                out.read(),
+            )
+        os.remove('test.csv')
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
 
     def test_csv_expr_using_dict(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'}, out.getvalue())
+        with open('test.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open('test.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'},
+                out.read(),
+            )
+        os.remove('test.csv')
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': 1}, out.getvalue())
+        with open('test.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open('test.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': 1},
+                out.read(),
+            )
+        os.remove('test.csv')
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
 
     def test_csv_raw(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(3, 4) for r in range(5)])
-        values = self.get_values_from({'url': 'sun.csv'}, out.getvalue())
+        with open('test.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(3, 4) for r in range(5)])
+        with open('test.csv', 'r') as out:
+            values = self.get_values_from({'url': 'sun.csv'}, out.read())
+        os.remove('test.csv')
         self.assertEqual(
             values.get_values(),
             [['3'], ['3'], ['3'], ['3'], ['3']])
