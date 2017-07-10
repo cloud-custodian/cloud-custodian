@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c5a720ca-6521-11e7-b90e-e9f80d583977", 
+            "RequestId": "c5e2a339-6521-11e7-b90e-e9f80d583977", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c5a720ca-6521-11e7-b90e-e9f80d583977", 
+                "x-amzn-requestid": "c5e2a339-6521-11e7-b90e-e9f80d583977", 
                 "vary": "Accept-Encoding", 
-                "content-length": "39128", 
+                "content-length": "39184", 
                 "content-type": "text/xml", 
                 "date": "Mon, 10 Jul 2017 03:42:18 GMT"
             }
@@ -42,22 +42,24 @@
                 "ApplyType": "dynamic"
             }, 
             {
-                "ApplyMethod": "pending-reboot", 
+                "ApplyMethod": "immediate", 
                 "Description": "Intended for use with master-to-master replication, and can be used to control the operation of AUTO_INCREMENT columns", 
                 "DataType": "integer", 
-                "AllowedValues": "1-65535", 
-                "Source": "engine-default", 
                 "IsModifiable": true, 
+                "AllowedValues": "1-65535", 
+                "Source": "user", 
+                "ParameterValue": "1", 
                 "ParameterName": "auto_increment_increment", 
                 "ApplyType": "dynamic"
             }, 
             {
-                "ApplyMethod": "pending-reboot", 
+                "ApplyMethod": "immediate", 
                 "Description": "Determines the starting point for the AUTO_INCREMENT column value", 
                 "DataType": "integer", 
-                "AllowedValues": "1-65535", 
-                "Source": "engine-default", 
                 "IsModifiable": true, 
+                "AllowedValues": "1-65535", 
+                "Source": "user", 
+                "ParameterValue": "2", 
                 "ParameterName": "auto_increment_offset", 
                 "ApplyType": "dynamic"
             }, 

@@ -262,18 +262,29 @@ class Modify(BaseAction):
                 'ApplyMethod': param.get('apply-method', 'immediate'),
             })
 
-        # Can only do 20 elements at a time per docs, so if we have more than that we will
-        # break it into multiple requests: https://goo.gl/Z6oGNv
-        for param_set in chunks(params, 20):
-            for param_group in param_groups:
-                name = self.get_pg_name(param_group)
+        for param_group in param_groups:
+            name = self.get_pg_name(param_group)
+
+            # Fetch the existing parameters for this DB, so we only try to change the ones that are
+            # different.
+            cur_params = self.get_current_params(client, name)
+            changed_params = []
+            for param in params:
+                if (param['ParameterName'] not in cur_params or
+                    cur_params[param['ParameterName']]['ParameterValue'] != param['ParameterValue']):
+                    changed_params.append(param)
+
+            # Can only do 20 elements at a time per docs, so if we have more than that we will
+            # break it into multiple requests: https://goo.gl/Z6oGNv
+            for param_set in chunks(changed_params, 5):
                 try:
                     self.do_modify(client, name, param_set)
                 except ClientError:
                     # TODO - anything we need to catch?
                     raise
 
-                self.log.info('Modified RDS parameter group: %s', name)
+            self.log.info('Modified RDS parameter group %s (%i parameters changed, %i unchanged)',
+                          name, len(changed_params), len(params) - len(changed_params))
 
 
 @pg_actions.register('modify')
@@ -298,7 +309,12 @@ class PGModify(PGMixin, Modify):
                       value: "100"
     """
 
-    permissions = ('rds:ModifyDBParameterGroup',)
+    permissions = ('rds:DescribeDBParameters', 'rds:ModifyDBParameterGroup')
+
+    def get_current_params(self, client, name):
+        params = client.describe_db_parameters(DBParameterGroupName=name)
+        return {x['ParameterName']: {'ParameterValue': x.get('ParameterValue'), 'ApplyMethod': x['ApplyMethod']}
+                for x in params.get('Parameters', [])}
 
     def do_modify(self, client, name, params):
         client.modify_db_parameter_group(DBParameterGroupName=name, Parameters=params)
@@ -326,7 +342,12 @@ class PGClusterModify(PGClusterMixin, Modify):
                       value: "1"
     """
 
-    permissions = ('rds:ModifyDBClusterParameterGroup',)
+    permissions = ('rds:DescribeDBClusterParameters', 'rds:ModifyDBClusterParameterGroup')
+
+    def get_current_params(self, client, name):
+        params = client.describe_db_cluster_parameters(DBClusterParameterGroupName=name)
+        return {x['ParameterName']: {'ParameterValue': x.get('ParameterValue'), 'ApplyMethod': x['ApplyMethod']}
+                for x in params.get('Parameters', [])}
 
     def do_modify(self, client, name, params):
         client.modify_db_cluster_parameter_group(

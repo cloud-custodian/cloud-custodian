@@ -5,11 +5,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a9f76c51-6521-11e7-af76-fbe81bc5cf0d", 
+            "RequestId": "aa43688c-6521-11e7-8d3e-b587b18f1b27", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "a9f76c51-6521-11e7-af76-fbe81bc5cf0d", 
+                "x-amzn-requestid": "aa43688c-6521-11e7-8d3e-b587b18f1b27", 
                 "vary": "Accept-Encoding", 
-                "content-length": "55693", 
+                "content-length": "55749", 
                 "content-type": "text/xml", 
                 "date": "Mon, 10 Jul 2017 03:41:31 GMT"
             }
@@ -46,22 +46,24 @@
                 "ApplyType": "dynamic"
             }, 
             {
-                "ApplyMethod": "pending-reboot", 
+                "ApplyMethod": "immediate", 
                 "Description": "Sets the autocommit mode", 
                 "DataType": "boolean", 
-                "AllowedValues": "0,1", 
-                "Source": "engine-default", 
                 "IsModifiable": true, 
+                "AllowedValues": "0,1", 
+                "Source": "user", 
+                "ParameterValue": "0", 
                 "ParameterName": "autocommit", 
                 "ApplyType": "dynamic"
             }, 
             {
-                "ApplyMethod": "pending-reboot", 
+                "ApplyMethod": "immediate", 
                 "Description": "When this variable has a value of 1 (the default), the server automatically grants the EXECUTE and ALTER ROUTINE privileges to the creator of a stored routine, if the user cannot already execute and alter or drop the routine.", 
                 "DataType": "boolean", 
-                "AllowedValues": "0,1", 
-                "Source": "engine-default", 
                 "IsModifiable": true, 
+                "AllowedValues": "0,1", 
+                "Source": "user", 
+                "ParameterValue": "1", 
                 "ParameterName": "automatic_sp_privileges", 
                 "ApplyType": "dynamic"
             }, 
