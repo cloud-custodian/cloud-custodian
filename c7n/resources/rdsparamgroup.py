@@ -103,12 +103,7 @@ class Copy(BaseAction):
             name = self.get_pg_name(param_group)
             copy_name = self.data.get('name')
             copy_desc = self.data.get('description', 'Copy of {}'.format(name))
-            try:
-                self.do_copy(client, name, copy_name, copy_desc)
-            except ClientError:
-                # TODO - anything we need to catch?
-                raise
-
+            self.do_copy(client, name, copy_name, copy_desc)
             self.log.info('Copied RDS parameter group %s to %s', name, copy_name)
 
 
@@ -180,9 +175,10 @@ class Delete(BaseAction):
             try:
                 self.do_delete(client, name)
             except ClientError:
-                # TODO - anything we need to catch?
+                if e.response['Error']['Code'] == 'DBParameterGroupNotFoundFault':
+                    self.log.warning('RDS parameter group %s already deleted', name)
+                    continue
                 raise
-
             self.log.info('Deleted RDS parameter group: %s', name)
 
 
@@ -278,11 +274,7 @@ class Modify(BaseAction):
             # Can only do 20 elements at a time per docs, so if we have more than that we will
             # break it into multiple requests: https://goo.gl/Z6oGNv
             for param_set in chunks(changed_params, 5):
-                try:
-                    self.do_modify(client, name, param_set)
-                except ClientError:
-                    # TODO - anything we need to catch?
-                    raise
+                self.do_modify(client, name, param_set)
 
             self.log.info('Modified RDS parameter group %s (%i parameters changed, %i unchanged)',
                           name, len(changed_params), len(params) - len(changed_params))
