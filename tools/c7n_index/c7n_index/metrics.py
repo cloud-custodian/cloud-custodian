@@ -30,7 +30,6 @@ import yaml
 
 from c7n import schema
 from c7n.credentials import assumed_session, SessionFactory
-from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.reports import csvout as s3_resource_parser
 from c7n.resources import load_resources
@@ -325,7 +324,7 @@ def index_account_resources(config, account, region, policy, date):
         # Adding Custodian vars to each record
         r['c7n:MatchedPolicy'] = policy['name']
         r['c7n:AccountNumber'] = account['id']
-        
+
         # Reformat tags for ease of index/search
         # Tags are stored in the following format:
         # Tags: [ {'key': 'mykey', 'val': 'myval'}, {'key': 'mykey2', 'val': 'myval2'} ]
