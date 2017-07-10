@@ -174,7 +174,7 @@ class Delete(BaseAction):
             name = self.get_pg_name(param_group)
             try:
                 self.do_delete(client, name)
-            except ClientError:
+            except ClientError as e:
                 if e.response['Error']['Code'] == 'DBParameterGroupNotFoundFault':
                     self.log.warning('RDS parameter group %s already deleted', name)
                     continue
