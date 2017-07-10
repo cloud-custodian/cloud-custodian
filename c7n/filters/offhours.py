@@ -239,6 +239,8 @@ class Time(Filter):
         'cst': 'America/Chicago',
         'cdt': 'America/Chicago',
         'ct': 'America/Chicago',
+        'mst': 'America/Denver',
+        'mdt': 'America/Denver',
         'mt': 'America/Denver',
         'gmt': 'Etc/GMT',
         'gt': 'Etc/GMT',
@@ -380,8 +382,8 @@ class Time(Filter):
                 break
         if found is False:
             return False
-        # utf8, or do translate tables via unicode ord mapping
-        value = found.lower().encode('utf8')
+        # enforce utf8, or do translate tables via unicode ord mapping
+        value = found.lower().encode('utf8').decode('utf8')
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')

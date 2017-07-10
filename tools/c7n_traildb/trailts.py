@@ -211,6 +211,11 @@ def index_account(config, region, account, day, incremental):
                             name, region, key)
                 os.remove(fh.name)
                 return
+            if e.response['Error']['Code'] == '403':
+                msg = "account:%s region:%s forbidden key:%s" %(
+                    name, region, key)
+                log.warning(msg)
+                raise ValueError(msg)
             raise
         s3.download_file(bucket, key, fh.name)
         log.debug("downloaded %s in %0.2f", key, time.time() - st)

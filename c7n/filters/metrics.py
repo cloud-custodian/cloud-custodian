@@ -38,7 +38,7 @@ class MetricsFilter(Filter):
       - name: ec2-underutilized
         resource: ec2
         filters:
-          - type: metric
+          - type: metrics
             name: CPUUtilization
             days: 4
             period: 86400
@@ -61,7 +61,7 @@ class MetricsFilter(Filter):
            'statistics': {'type': 'string', 'enum': [
                'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
            'days': {'type': 'number'},
-           'op': {'type': 'string', 'enum': OPERATORS.keys()},
+           'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
            'attr-multiplier': {'type': 'number'},

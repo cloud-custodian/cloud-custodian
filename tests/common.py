@@ -65,16 +65,15 @@ class BaseTest(PillTest):
         Input a dictionary and a format. Valid formats are `yaml` and `json`
         Returns the file path.
         """
-        suffix = "." + format
-        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        fh = tempfile.NamedTemporaryFile(mode='w+b', suffix='.' + format)
         if format == 'json':
-            json.dump(policy, file)
+            fh.write(json.dumps(policy).encode('utf8'))
         else:
-            file.write(yaml.dump(policy, Dumper=yaml.SafeDumper))
+            fh.write(yaml.dump(policy, encoding='utf8', Dumper=yaml.SafeDumper))
 
-        file.flush()
-        self.addCleanup(file.close)
-        return file.name
+        fh.flush()
+        self.addCleanup(fh.close)
+        return fh.name
 
     def get_temp_dir(self):
         """ Return a temporary directory that will get cleaned up. """
@@ -185,7 +184,7 @@ class TextTestIO(io.StringIO):
         # we want to print from (think: traceback.print_exc) so we can't
         # standardize the arg type up at the call sites. Hack it here.
 
-        if not isinstance(b, six.types.UnicodeType):
+        if not isinstance(b, six.text_type):
             b = b.decode('utf8')
         return super(TextTestIO, self).write(b)
 

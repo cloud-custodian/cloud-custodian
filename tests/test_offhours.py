@@ -54,7 +54,8 @@ def mock_datetime_now(tgt, dt):
         # Python2 & Python3 compatible metaclass
 
     MockedDatetime = DatetimeSubclassMeta(
-        b'datetime', (BaseMockedDatetime,), {})
+        b'datetime' if str is bytes else 'datetime',  # hack Python2/3 port
+        (BaseMockedDatetime,), {})
     return mock.patch.object(dt, 'datetime', MockedDatetime)
 
 

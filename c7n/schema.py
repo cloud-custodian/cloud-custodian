@@ -69,10 +69,10 @@ def validate(data, schema=None):
         logging.exception(
             "specific_error failed, traceback, followed by fallback")
 
-    return filter(None, [
+    return list(filter(None, [
         errors[0],
         best_match(validator.iter_errors(data)),
-    ])
+    ]))
 
 
 def specific_error(error):
@@ -252,7 +252,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word action shortcuts
     action_refs.append(
-        {'enum': resource_type.action_registry.keys()})
+        {'enum': list(resource_type.action_registry.keys())})
 
     nested_filter_refs = []
     filters_seen = set()
@@ -295,7 +295,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word filter shortcuts
     filter_refs.append(
-        {'enum': resource_type.filter_registry.keys()})
+        {'enum': list(resource_type.filter_registry.keys())})
 
     resource_policy = {
         'allOf': [
