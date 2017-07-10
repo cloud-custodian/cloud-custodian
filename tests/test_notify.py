@@ -31,7 +31,7 @@ class NotifyTest(BaseTest):
         queue_url = client.create_queue(
             QueueName='c7n-notify-test')['QueueUrl']
         self.addCleanup(client.delete_queue, QueueUrl=queue_url)
-        temp_file = tempfile.NamedTemporaryFile()
+        temp_file = tempfile.NamedTemporaryFile(mode='w')
         json.dump({'emails': ['me@example.com']}, temp_file)
         temp_file.flush()
         self.addCleanup(temp_file.close)
