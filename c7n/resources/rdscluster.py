@@ -339,7 +339,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 

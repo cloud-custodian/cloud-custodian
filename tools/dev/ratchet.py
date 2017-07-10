@@ -9,6 +9,9 @@ import sys
 import xml.etree.ElementTree as Etree
 
 
+INVALID_TYPE = 'E   botocore.exceptions.ParamValidationError: ' \
+    'Parameter validation failed:     Invalid type for parameter '
+
 
 class TestResults(object):
 
@@ -40,8 +43,10 @@ class TestResults(object):
         elif n == 1:
             result = nonsuccess.pop()
             self.failed.append(key)
-            self.failed_aggregates.setdefault(
-                result.get('message'), []).append(key)
+            message = result.get('message')
+            if message.startswith(INVALID_TYPE):
+                message = INVALID_TYPE
+            self.failed_aggregates.setdefault(message, []).append(key)
         else:
             self.passed.append(key)
 
@@ -59,10 +64,10 @@ class TestResults(object):
                 print(" - %s" % t)
 
 
-def load_expected_successes(txt):
-    expected_successes = open(txt).read()
+def load_expected_failures(txt):
+    expected_failures = open(txt).read()
     parsed = set()
-    for line in expected_successes.splitlines():
+    for line in expected_failures.splitlines():
         if not line or line.startswith('#'):
             continue
         parsed.add(line)
@@ -74,11 +79,9 @@ def list_tests(tests):
         print(' ', test)
 
 
-def add_to_txt(txt_path, tests):
-    old = set(open(txt_path, 'r'))
+def update_expectation(txt_path, tests):
     new = set(t + '\n' for t in tests)
-    merged = sorted(old | new)
-    open(txt_path, 'w+').writelines(merged)
+    open(txt_path, 'w+').writelines(sorted(new))
 
 
 def main(xml_path, txt_path):
@@ -91,28 +94,28 @@ def main(xml_path, txt_path):
         results.report()
         return
 
-    previous = load_expected_successes(txt_path)
-    current = set(results.passed)
+    previous = load_expected_failures(txt_path)
+    current = set(results.failed)
 
     expected = previous - current
     if expected:
-        print("Some tests required to pass under Python 3.6 didn't:")
+        print("Some tests expected to fail under Python 3.6 didn't:")
         list_tests(expected)
+        update_expectation(txt_path, current)
+        print("Conveniently, they have been removed from {} for you. Perhaps "
+            "commit that?".format(txt_path))
 
     unexpected = current - previous
     if unexpected:
-        print("Some tests not required to pass under Python 3.6 did:")
+        print("Some tests not expected to fail under Python 3.6 did:")
         list_tests(unexpected)
-        add_to_txt(txt_path, unexpected)
-        print("Conveniently, they have been added to {} for you. Perhaps "
-            "commit that?".format(txt_path))
 
     if expected or unexpected:
-        print("Previously %d tests passed under Python 3.6, now %d did." %
+        print("Previously %d tests failed under Python 3.6, now %d did." %
             (len(previous), len(current)))
         return 1
 
-    print('All and only tests required to pass under Python 3.6 did.')
+    print('All and only tests expected to fail under Python 3.6 did.')
     return 0
 
 

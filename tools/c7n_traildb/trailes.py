@@ -27,7 +27,7 @@ import sqlite3
 
 import yaml
 
-from c7n.credentials import assumed_session
+from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session
 
@@ -54,6 +54,10 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {
                 'type': 'object',
+                'anyOf': [
+                    {"required": ['profile']},
+                    {"required": ['role']}
+                ],
                 'required': ['name', 'bucket', 'regions', 'title'],
                 'properties': {
                     'name': {'type': 'string'},
@@ -71,6 +75,7 @@ CONFIG_SCHEMA = {
 def get_es_client(config):
     host = [config['indexer'].get('host', 'localhost')]
     es_kwargs = {}
+    es_kwargs['connection_class'] = RequestsHttpConnection
     user = config['indexer'].get('user', False)
     password = config['indexer'].get('password', False)
     if user and password:
@@ -136,11 +141,12 @@ def index_account_trails(config, account, region, date, directory):
     es_client = get_es_client(config)
 
     s3 = local_session(
-        lambda : assumed_session(account['role'], 'TrailIndex')).client('s3')
+        lambda: SessionFactory(region, profile=account.get('profile'),
+        assume_role=account.get('role'))()).client('s3')
 
     bucket = account['bucket']
     key_prefix = "accounts/{}/{}/traildb".format(account['name'], region)
-    marker =  + "{}/{}/trail.db.bz2".format(key_prefix, date)
+    marker =  "{}/{}/trail.db.bz2".format(key_prefix, date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -159,7 +165,8 @@ def index_account_trails(config, account, region, date, directory):
 
             futures = map(lambda k: w.submit(
                 get_traildb, bucket, k,
-                lambda : assumed_session(account['role'], 'TrailIndex'), directory),
+                lambda: SessionFactory(region, profile=account.get('profile'),
+                assume_role=account.get('role'))(), directory),
                 keys)
 
             for f in as_completed(futures):

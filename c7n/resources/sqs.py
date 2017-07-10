@@ -68,7 +68,7 @@ class SQS(QueryResourceManager):
 
         self.log.debug('retrieving details for %d queues' % len(resources))
         with self.executor_factory(max_workers=4) as w:
-            return filter(None, w.map(_augment, resources))
+            return list(filter(None, w.map(_augment, resources)))
 
 
 @SQS.filter_registry.register('cross-account')

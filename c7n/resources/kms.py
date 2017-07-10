@@ -136,7 +136,7 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         self.log.debug("fetching policy for %d kms keys" % len(resources))
         with self.executor_factory(max_workers=1) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(KMSCrossAccountAccessFilter, self).process(
             resources, event)
@@ -166,7 +166,7 @@ class GrantCount(Filter):
 
     def process(self, keys, event=None):
         with self.executor_factory(max_workers=3) as w:
-            return filter(None, (w.map(self.process_key, keys)))
+            return list(filter(None, (w.map(self.process_key, keys))))
 
     def process_key(self, key):
         client = local_session(self.manager.session_factory).client('kms')
