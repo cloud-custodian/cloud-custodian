@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from dateutil import tz
 
 from datetime import datetime, timedelta
@@ -19,7 +21,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from common import instance, event_data, Bag
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -33,7 +35,7 @@ class BaseFilterTest(unittest.TestCase):
         try:
             self.assertEqual(filters.factory(f)(i), v)
         except AssertionError:
-            print f, i['LaunchTime'], i['Tags'], v
+            print(f, i['LaunchTime'], i['Tags'], v)
             raise
 
 
@@ -95,6 +97,39 @@ class TestAndFilter(unittest.TestCase):
             [])
 
 
+class TestNotFilter(unittest.TestCase):
+    
+    def test_not(self):
+
+        results = [
+            instance(Architecture='x86_64', Color='green'),
+            instance(Architecture='x86_64', Color='blue'),
+            instance(Architecture='x86_64', Color='yellow'),
+        ]
+
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86_64'},
+                {'Color': 'green'}]})
+        self.assertEqual(len(f.process(results)), 2)
+        
+        """
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86'}]})
+        self.assertEqual(len(f.process(results)), 3)
+
+        f = filters.factory({
+            'not': [
+                {'Architecture': 'x86_64'},
+                {'or': [
+                    {'Color': 'green'},
+                    {'Color': 'blue'},
+                    {'Color': 'yellow'},
+                ]}]})
+        self.assertEqual(len(f.process(results)), 0)
+        """
+
 class TestValueFilter(unittest.TestCase):
 
     # TODO test_manager needs a valid session_factory object
@@ -114,25 +149,38 @@ class TestValueFilter(unittest.TestCase):
     def test_value_type(self):
         sentinel = datetime.now()
         value = 5
+        resource = {'a': 1, 'Tags': [{'Key': 'xtra', 'Value': 'hello'}]}
         vf = filters.factory({'tag:ASV': 'absent'})
         vf.vtype = 'size'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
         vf.vtype = 'age'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (0, sentinel))
         vf.vtype = 'cidr'
         sentinel = '10.0.0.0/16'
         value = '10.10.10.10'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(
             (str(res[0]), str(res[1])),
             (sentinel, value),
         )
         vf.vtype = 'cidr_size'
         value = '10.10.10.300'
-        res = vf.process_value_type(sentinel, value)
+        res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
+
+        vf.vtype = 'expr'
+        value = 'tag:xtra'
+        sentinel = None
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 'hello'))
+
+        vf.vtype = 'expr'
+        value = 'a'
+        sentinel = None
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 1))
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -171,11 +219,11 @@ class TestRegexValue(unittest.TestCase):
     def test_regex_validate(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {'type': 'value',
-             'key': 'Color',
-             'value': '*green',
-             'op': 'regex'})
+            filters.factory({
+                'type': 'value',
+                'key': 'Color',
+                'value': '*green',
+                'op': 'regex'}).validate)
 
     def test_regex_match(self):
         f = filters.factory(
@@ -317,7 +365,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Bad `value`
         f = {
@@ -327,7 +375,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 'foo',
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Missing `op`
         f = {
@@ -336,7 +384,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -356,8 +404,22 @@ class TestInstanceAge(BaseFilterTest):
                 (i(two_months), True),
                 (i(one_month), False)
         ]:
-            self.assertFilter({'type': 'instance-uptime'}, ii, v)
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'days': 60}, ii, v)
 
+class TestInstanceAgeMinute(BaseFilterTest):
+
+    def test_filter_instance_age(self):
+        now = datetime.now(tz=tz.tzutc())
+        five_minute = now - timedelta(minutes=5)
+
+        def i(d):
+            return instance(LaunchTime=d)
+
+        for ii, v in [
+                (i(now), False),
+                (i(five_minute), True)
+        ]:
+            self.assertFilter({'type': 'instance-uptime', 'op': 'gte', 'minutes': 5}, ii, v)
 
 class TestMarkedForAction(BaseFilterTest):
 
@@ -426,8 +488,9 @@ class EventFilterTest(BaseFilterTest):
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
+        f = filters.factory(f, b)
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, b)
+            base_filters.FilterValidationError,  f.validate)
 
 
 class TestInstanceValue(BaseFilterTest):
@@ -482,21 +545,20 @@ class TestInstanceValue(BaseFilterTest):
     def test_complex_validator(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz", "type": "value"}).validate)
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"value": "xyz",
-             "type": "value"})
+            filters.factory({
+                "value": "xyz", "type": "value"}).validate)
+
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "value": "xyz",
-             "op": "oo",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz",
+                "value": "xyz",
+                "op": "oo",
+                "type": "value"}).validate)
 
     def test_complex_value_filter(self):
         self.assertFilter(

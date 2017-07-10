@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
-from common import BaseTest, Bag, Config
+from .common import BaseTest, Bag, Config
 
 
 class TestEMR(BaseTest):
@@ -55,7 +57,34 @@ class TestEMR(BaseTest):
             mgr.consolidate_query_filter(),
             [
                 {'Values': ['val1', 'val2'], 'Name': 'tag:foo'},
-                {'Values': ['val3'], 'Name': 'tag:bar'}
+                {'Values': ['val3'], 'Name': 'tag:bar'},
+                # default query
+                {
+                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
+                    'Name': 'ClusterStates',
+                },
+            ]
+        )
+
+        query = {
+            'query': [
+                {'tag:foo': 'val1'},
+                {'tag:foo': 'val2'},
+                {'tag:bar': 'val3'},
+                {'ClusterStates': 'terminated'},
+            ]
+        }
+        mgr = emr.EMRCluster(ctx, query)
+        self.assertEqual(
+            mgr.consolidate_query_filter(),
+            [
+                {'Values': ['val1', 'val2'], 'Name': 'tag:foo'},
+                {'Values': ['val3'], 'Name': 'tag:bar'},
+                # verify default is overridden
+                {
+                    'Values': ['terminated'],
+                    'Name': 'ClusterStates',
+                },
             ]
         )
 
@@ -97,6 +126,28 @@ class TestEMR(BaseTest):
         self.assertEqual(len(resources), 1)
         tag_map = {t['Key']: t['Value'] for t in new_tags}
         self.assertTrue('test_tag' in tag_map)
+
+    def test_emr_tag(self):
+        session_factory = self.replay_flight_data('test_emr_tag')
+        p = self.load_policy({
+                'name': 'emr-tag-table',
+                'resource': 'emr',
+                'filters': [{'tag:first_tag': 'first'}],
+                'actions': [{
+                    'type': 'tag',
+                    'tags': {'new_tag_key': 'new_tag_value'}
+                }]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        new_tags = resources[0]['Tags']
+        tag_map = {t['Key']: t['Value'] for t in new_tags}
+        self.assertEqual({
+                'first_tag': 'first',
+                'second_tag': 'second',
+                'new_tag_key': 'new_tag_value'
+            },
+            tag_map)
 
     def test_emr_unmark(self):
         session_factory = self.replay_flight_data(

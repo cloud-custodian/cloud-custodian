@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
 import logging
@@ -30,7 +31,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    local_session, get_account_id, generate_arn,
+    local_session, generate_arn,
     get_retry, chunks, snapshot_identifier, type_schema)
 
 log = logging.getLogger('custodian.elasticache')
@@ -38,7 +39,7 @@ log = logging.getLogger('custodian.elasticache')
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
-#registered marked-for-op filter
+# registered marked-for-op filter
 filters.register('marked-for-op', tags.TagActionFilter)
 
 TTYPE = re.compile('cache.t')
@@ -60,16 +61,9 @@ class ElastiCacheCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('elasticache:ListTagsForResource',)
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -130,6 +124,9 @@ class SubnetFilter(net_filters.SubnetFilter):
             self.manager.get_resource_manager(
                 'cache-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 # added mark-for-op
@@ -378,15 +375,8 @@ class ElastiCacheSnapshot(QueryResourceManager):
     filter_registry = FilterRegistry('elasticache-snapshot.filters')
     action_registry = ActionRegistry('elasticache-snapshot.actions')
     filter_registry.register('marked-for-op', tags.TagActionFilter)
-    _generate_arn = _account_id = None
+    _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def account_id(self):
-        if self._account_id is None:
-            session = local_session(self.session_factory)
-            self._account_id = get_account_id(session)
-        return self._account_id
 
     @property
     def generate_arn(self):
@@ -427,7 +417,7 @@ class ElastiCacheSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'dummy'
 
@@ -491,6 +481,8 @@ class DeleteElastiCacheSnapshot(BaseAction):
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
 # added mark-for-op
+
+
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an elasticache snapshot
@@ -583,6 +575,8 @@ class CopyClusterTags(BaseAction):
                 client.add_tags_to_resource, ResourceName=arn, Tags=copy_tags)
 
 # added unmark
+
+
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
 @ElastiCacheSnapshot.action_registry.register('unmark')
 class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
@@ -662,4 +656,4 @@ def _cluster_eligible_for_snapshot(cluster):
     return (
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
-        )
+    )

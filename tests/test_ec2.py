@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
+from datetime import datetime
+from dateutil import tz
 from jsonschema.exceptions import ValidationError
 
 from c7n.filters import FilterValidationError
@@ -20,7 +24,7 @@ from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class TestTagAugmentation(BaseTest):
@@ -84,7 +88,7 @@ class TestHealthEventsFilter(BaseTest):
             ]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
 
 class TestTagTrim(BaseTest):
@@ -242,6 +246,33 @@ class TestStateTransitionAgeFilter(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['StateTransitionReason'], 'User initiated (2015-11-25 10:11:55 GMT)')
 
+    def test_date_parsing(self):
+        instance = ec2.StateTransitionAge(None)
+
+        # Missing key
+        self.assertIsNone(instance.get_resource_date({}))
+
+        # Bad date format
+        self.assertRaises(
+            ValueError,
+            instance.get_resource_date,
+            {'StateTransitionReason': "User initiated (201-02-06 17:77:00 GMT)"}
+        )
+
+        # Won't match regex
+        self.assertIsNone(
+            instance.get_resource_date({
+                'StateTransitionReason': "Server.InternalError"
+        }))
+
+        # Test for success
+        self.assertEqual(
+            instance.get_resource_date({
+                'StateTransitionReason': "User initiated (2017-02-06 17:57:00 GMT)"
+            }),
+            datetime(2017, 2, 6, 17, 57, tzinfo=tz.tzutc())
+        )
+
 
 class TestImageAgeFilter(BaseTest):
 
@@ -337,7 +368,7 @@ class TestTag(BaseTest):
             }]
         }
         self.assertRaises(FilterValidationError, self.load_policy, policy)
-        
+
     def test_ec2_untag(self):
         session_factory = self.replay_flight_data(
             'test_ec2_untag')
@@ -526,6 +557,63 @@ class TestSnapshot(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+class TestSetInstanceProfile(BaseTest):
+
+    def test_ec2_set_instance_profile_assocation(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_association')
+        policy = self.load_policy({
+            'name': 'ec2-test-set-instance-profile-association',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'MissingInstanceProfile'},
+                {'IamInstanceProfile': 'absent'}],
+            'actions': [
+                {'type': 'set-instance-profile',
+                 'name': 'ec2-default'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertGreaterEqual(len(resources), 1)
+        ec2 = session_factory().client('ec2')
+        resources = ec2.describe_instances(
+            InstanceIds=[r['InstanceId'] for r in resources]
+        )
+
+        for r in resources['Reservations']:
+            for i in r['Instances']:
+                self.assertIn('IamInstanceProfile', i)
+                self.assertIn('Arn', i['IamInstanceProfile'])
+                self.assertIn(':instance-profile/ec2-default', i['IamInstanceProfile']['Arn'])
+
+    def test_ec2_set_instance_profile_disassocation(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_disassociation')
+        policy = self.load_policy({
+            'name': 'ec2-test-set-instance-profile-disassociation',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'MissingInstanceProfile'},
+                {'type': 'value',
+                 'key': 'IamInstanceProfile.Arn',
+                 'op': 'regex',
+                 'value': '.*/ec2-default'}],
+            'actions': [
+                {'type': 'set-instance-profile'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertGreaterEqual(len(resources), 1)
+        ec2 = session_factory().client('ec2')
+        associations = ec2.describe_iam_instance_profile_associations(
+            Filters=[
+                {
+                    'Name': 'instance-id',
+                    'Values': [r['InstanceId'] for r in resources]
+                }
+            ]
+        )
+
+        for a in associations['IamInstanceProfileAssociations']:
+            self.assertIn(a['State'], ('disassociating', 'disassociated'))
 
 class TestEC2QueryFilter(unittest.TestCase):
 
@@ -586,6 +674,23 @@ class TestDefaultVpc(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-0bfe468063b02d018')
 
+class TestSingletonFilter(BaseTest):
+
+    def test_ec2_singleton_filter(self):
+        session_factory = self.replay_flight_data('test_ec2_singleton')
+        p = self.load_policy(
+            {'name': 'ec2-singleton-filters',
+             'resource': 'ec2',
+             'filters': [
+                 {'tag:Name': 'Singleton'},
+                 {'type': 'singleton'}]},
+            config={'region': 'us-west-1'},
+            session_factory=session_factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-00fe7967fb7167c62')
 
 class TestActions(unittest.TestCase):
 
@@ -617,7 +722,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             ValidationError, self.load_policy, data=policy, validate=True)
 
     def test_invalid_remove_params(self):
-        # basestring invalid
+        # string invalid
         policy = {
             'name': 'remove-with-incorrect-param-string',
             'resource': 'ec2',
@@ -641,7 +746,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             ValidationError, self.load_policy, policy, validate=True)
 
     def test_invalid_add_params(self):
-        # basestring invalid
+        # string invalid
         policy = {
             'name': 'add-with-incorrect-param-string',
             'resource': 'ec2',
@@ -801,3 +906,66 @@ class TestModifySecurityGroupAction(BaseTest):
         self.assertEqual(len(
             second_resources[0]['NetworkInterfaces'][0]['Groups']), 2)
 
+class TestAutoRecoverAlarmAction(BaseTest):
+    def test_autorecover_alarm(self):
+        session_factory = self.replay_flight_data('test_ec2_autorecover_alarm')
+        p = self.load_policy(
+            {'name': 'ec2-autorecover-alarm',
+             'resource': 'ec2',
+             'filters': [
+                 {'tag:c7n-test': 'autorecover-alarm'}],
+             'actions': [
+                 {'type': 'autorecover-alarm'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['InstanceId'], 'i-0aaaaec4b77188b69')
+
+        try:
+            client = session_factory().client('cloudwatch')
+            result = client.describe_alarms(
+                AlarmNames=['recover-{}'.format(resources[0]['InstanceId'])])
+            self.assertTrue(result.get('MetricAlarms'))
+        except AssertionError:
+            self.fail('alarm not found')
+
+
+class TestFilter(BaseTest):
+
+    def test_not_filter(self):
+        # This test is to get coverage for the `not` filter's process_set method
+        session_factory = self.replay_flight_data(
+            'test_ec2_not_filter')
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [
+                    {'InstanceId': 'i-036ee05e8c2ca83b3'}
+                ]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        policy = self.load_policy({
+            'name': 'list-ec2-test-not',
+            'resource': 'ec2',
+            'filters': [{
+                'not': [{
+                    'or': [
+                        {'InstanceId': 'i-036ee05e8c2ca83b3'},
+                        {'InstanceId': 'i-03d8207d8285cbf53'}
+                    ]
+                }]
+            }]
+        },
+        session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)

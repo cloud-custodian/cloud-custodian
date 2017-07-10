@@ -15,6 +15,8 @@
 """
 S3 Key Encrypt on Bucket Changes
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 
 import boto3
@@ -65,13 +67,18 @@ def process_key_event(event, context):
         print("remediated %s:%s" % (bucket, key['Key']))
 
 
-def get_function(session_factory, role, buckets=None, account_id=None):
+def process_sns_event(event, context):
+    for record in event.get('Records', []):
+        process_key_event(json.loads(record['Sns']['Message']), context)
+
+
+def get_function(session_factory, role, via_sns, buckets=None, account_id=None):
     from c7n.mu import (
-        LambdaFunction, custodian_archive, BucketNotification)
+        LambdaFunction, custodian_archive, BucketLambdaNotification)
 
     config = dict(
         name='c7n-s3-encrypt',
-        handler='s3crypt.process_key_event',
+        handler='s3crypt.process_%s' % (via_sns and 'sns_event' or 'key_event'),
         memory_size=256,
         timeout=30,
         role=role,
@@ -80,17 +87,13 @@ def get_function(session_factory, role, buckets=None, account_id=None):
 
     if buckets:
         config['events'] = [
-            BucketNotification({'account_s3': account_id}, session_factory, b)
+            BucketLambdaNotification({'account_s3': account_id},
+                session_factory, b)
             for b in buckets]
 
     archive = custodian_archive()
-    archive.create()
 
-    src = __file__
-    if src.endswith('.pyc'):
-        src = src[:-1]
-
-    archive.add_file(src, 's3crypt.py')
+    archive.add_py_file(__file__)
     archive.add_contents('config.json', json.dumps({}))
     archive.close()
     return LambdaFunction(config, archive)

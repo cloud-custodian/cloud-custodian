@@ -19,6 +19,7 @@ Navigate below and get started with Cloud Custodian!
    overview/index
    quickstart/index
    quickstart/usage
+   quickstart/advanced
 
 .. toctree::
    :maxdepth: 2
@@ -47,7 +48,9 @@ Navigate below and get started with Cloud Custodian!
    :caption: Contributing
 
    contribute
-   developer   
+   developer/index.rst
+   developer/installing.rst
+   developer/tests.rst
 
 
 .. toctree::

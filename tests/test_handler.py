@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import logging
 import os
 import shutil
 import tempfile
 
-from common import BaseTest
+from .common import BaseTest
+from c7n.policy import Policy
 
 
 class HandleTest(BaseTest):
@@ -39,10 +42,22 @@ class HandleTest(BaseTest):
         self.addCleanup(cleanup)
         self.change_environment(C7N_OUTPUT_DIR=self.run_dir)
 
+        policy_execution = []
+
+        def push(self, event, context):
+            policy_execution.append((event, context))
+
+        self.patch(Policy, 'push', push)
+            
         from c7n import handler
 
         with open(os.path.join(self.run_dir, 'config.json'), 'w') as fh:
-            json.dump({'policies': []}, fh)
+            json.dump(
+                {'policies': [
+                    {'resource': 'asg',
+                     'name': 'autoscaling',
+                     'filters': [],
+                     'actions': []}]}, fh)
 
         self.assertEqual(
             handler.dispatch_event(
@@ -50,6 +65,9 @@ class HandleTest(BaseTest):
             None)
         self.assertEqual(
             handler.dispatch_event({'detail': {}}, None), True)
+        self.assertEqual(
+            policy_execution,
+            [({'detail': {}, 'debug': True}, None)])
 
         config = handler.Config.empty()
         self.assertEqual(config.assume_role, None)

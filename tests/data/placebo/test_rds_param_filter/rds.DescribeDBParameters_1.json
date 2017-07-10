@@ -1,0 +1,1027 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "bG9nX2RpcmVjdG9yeQ==", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b862a8a1-521a-11e7-ab28-6d89c50f6e01", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b862a8a1-521a-11e7-ab28-6d89c50f6e01", 
+                "vary": "Accept-Encoding", 
+                "content-length": "44953", 
+                "content-type": "text/xml", 
+                "date": "Thu, 15 Jun 2017 22:33:56 GMT"
+            }
+        }, 
+        "Parameters": [
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the application name to be reported in statistics and logs.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "application_name", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the shell command that will be called to archive a WAL file.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/etc/rds/dbbin/pgscripts/rds_wal_archive %p", 
+                "ParameterName": "archive_command", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(s) Forces a switch to the next xlog file if a new file has not been started within N seconds.", 
+                "DataType": "integer", 
+                "IsModifiable": false, 
+                "AllowedValues": "0-2147483647", 
+                "Source": "system", 
+                "ParameterValue": "300", 
+                "ParameterName": "archive_timeout", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enable input of NULL elements in arrays.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "array_nulls", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(s) Sets the maximum allowed time to complete client authentication.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-600", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "authentication_timeout", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Starts the autovacuum subprocess.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Number of tuple inserts, updates or deletes prior to analyze as a fraction of reltuples.", 
+                "DataType": "float", 
+                "IsModifiable": true, 
+                "AllowedValues": "0-100", 
+                "Source": "system", 
+                "ParameterValue": "0.05", 
+                "ParameterName": "autovacuum_analyze_scale_factor", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Minimum number of tuple inserts, updates or deletes prior to analyze.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_analyze_threshold", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Age at which to autovacuum a table to prevent transaction ID wraparound.", 
+                "DataType": "integer", 
+                "AllowedValues": "100000000-2000000000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_freeze_max_age", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the maximum number of simultaneously running autovacuum worker processes.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-8388607", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_max_workers", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Multixact age at which to autovacuum a table to prevent multixact wraparound.", 
+                "DataType": "integer", 
+                "AllowedValues": "10000000-2000000000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_multixact_freeze_max_age", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(s) Time to sleep between autovacuum runs.", 
+                "DataType": "integer", 
+                "IsModifiable": true, 
+                "AllowedValues": "1-2147483", 
+                "Source": "system", 
+                "ParameterValue": "30", 
+                "ParameterName": "autovacuum_naptime", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(ms) Vacuum cost delay in milliseconds, for autovacuum.", 
+                "DataType": "integer", 
+                "AllowedValues": "-1-100", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_vacuum_cost_delay", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Vacuum cost amount available before napping, for autovacuum.", 
+                "DataType": "integer", 
+                "AllowedValues": "-1-10000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_vacuum_cost_limit", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Number of tuple updates or deletes prior to vacuum as a fraction of reltuples.", 
+                "DataType": "float", 
+                "IsModifiable": true, 
+                "AllowedValues": "0-100", 
+                "Source": "system", 
+                "ParameterValue": "0.1", 
+                "ParameterName": "autovacuum_vacuum_scale_factor", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Minimum number of tuple updates or deletes prior to vacuum.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_vacuum_threshold", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(kB) Sets the maximum memory to be used by each autovacuum worker process.", 
+                "DataType": "integer", 
+                "AllowedValues": "-1-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autovacuum_work_mem", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(8Kb) Number of pages after which previously performed writes are flushed to disk.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-256", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "backend_flush_after", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets whether \\ is allowed in string literals.", 
+                "DataType": "string", 
+                "AllowedValues": "safe_encoding,on,off", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "backslash_quote", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(ms) Background writer sleep time between rounds.", 
+                "DataType": "integer", 
+                "AllowedValues": "10-10000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "bgwriter_delay", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(8Kb) Number of pages after which previously performed writes are flushed to disk.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-256", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "bgwriter_flush_after", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Background writer maximum number of LRU pages to flush per round.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-1000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "bgwriter_lru_maxpages", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Multiple of the average buffer usage to free per round.", 
+                "DataType": "float", 
+                "AllowedValues": "0-10", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "bgwriter_lru_multiplier", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the output format for bytea.", 
+                "DataType": "string", 
+                "AllowedValues": "escape,hex", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "bytea_output", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Check function bodies during CREATE FUNCTION.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "check_function_bodies", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Time spent flushing dirty buffers during checkpoint, as fraction of checkpoint interval.", 
+                "DataType": "float", 
+                "IsModifiable": true, 
+                "AllowedValues": "0-1", 
+                "Source": "system", 
+                "ParameterValue": "0.9", 
+                "ParameterName": "checkpoint_completion_target", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(8kB) Number of pages after which previously performed writes are flushed to disk.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-256", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "checkpoint_flush_after", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(s) Sets the maximum time between automatic WAL checkpoints.", 
+                "DataType": "integer", 
+                "AllowedValues": "30-3600", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "checkpoint_timeout", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(s) Enables warnings if checkpoint segments are filled more frequently than this.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "checkpoint_warning", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the clients character set encoding.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "Source": "system", 
+                "ParameterValue": "UTF8", 
+                "ParameterName": "client_encoding", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the message levels that are sent to the client.", 
+                "DataType": "string", 
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,log,notice,warning,error", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "client_min_messages", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the delay in microseconds between transaction commit and flushing WAL to disk.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-100000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "commit_delay", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the minimum concurrent open transactions before performing commit_delay.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-1000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "commit_siblings", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the servers main configuration file.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/rdsdbdata/config/postgresql.conf", 
+                "ParameterName": "config_file", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planner to use constraints to optimize queries.", 
+                "DataType": "string", 
+                "AllowedValues": "partition,on,off", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "constraint_exclusion", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the planners estimate of the cost of processing each index entry during an index scan.", 
+                "DataType": "float", 
+                "AllowedValues": "0-1.79769e+308", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "cpu_index_tuple_cost", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the planners estimate of the cost of processing each operator or function call.", 
+                "DataType": "float", 
+                "AllowedValues": "0-1.79769e+308", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "cpu_operator_cost", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the planners estimate of the cost of processing each tuple (row).", 
+                "DataType": "float", 
+                "AllowedValues": "0-1.79769e+308", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "cpu_tuple_cost", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the planners estimate of the fraction of a cursors rows that will be retrieved.", 
+                "DataType": "float", 
+                "AllowedValues": "0-1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "cursor_tuple_fraction", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the servers data directory.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/rdsdbdata/db", 
+                "ParameterName": "data_directory", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the display format for date and time values.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "datestyle", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables per-database user names.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": false, 
+                "ParameterName": "db_user_namespace", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(ms) Sets the time to wait on a lock before checking for deadlock.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "deadlock_timeout", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Indents parse and plan tree displays.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "debug_pretty_print", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Logs each querys parse tree.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "debug_print_parse", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Logs each querys execution plan.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "debug_print_plan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Logs each querys rewritten parse tree.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "debug_print_rewritten", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the default statistics target.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-10000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_statistics_target", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the default tablespace to create tables and indexes in.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_tablespace", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the default deferrable status of new transactions.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_transaction_deferrable", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the transaction isolation level of each new transaction.", 
+                "DataType": "string", 
+                "AllowedValues": "serializable,repeatable read,read committed,read uncommitted", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_transaction_isolation", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the default read-only status of new transactions.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_transaction_read_only", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Create new tables with OIDs by default.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "default_with_oids", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(8kB) Sets the planners assumption about the size of the disk cache.", 
+                "DataType": "integer", 
+                "IsModifiable": true, 
+                "AllowedValues": "1-2147483647", 
+                "Source": "system", 
+                "ParameterValue": "{DBInstanceClassMemory/16384}", 
+                "ParameterName": "effective_cache_size", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Number of simultaneous requests that can be handled efficiently by the disk subsystem.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-1000", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "effective_io_concurrency", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of bitmap-scan plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_bitmapscan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of hashed aggregation plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_hashagg", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of hash join plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_hashjoin", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planner's use of index-only-scan plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_indexonlyscan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of index-scan plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_indexscan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of materialization.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_material", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of merge join plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_mergejoin", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of nested-loop join plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_nestloop", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of sequential-scan plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_seqscan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of explicit sort steps.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_sort", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables the planners use of TID scan plans.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "enable_tidscan", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Warn about backslash escapes in ordinary string literals.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "escape_string_warning", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Terminate session on any error.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": false, 
+                "ParameterName": "exit_on_error", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the number of digits displayed for floating-point values.", 
+                "DataType": "integer", 
+                "AllowedValues": "-15-3", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "extra_float_digits", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Forces use of parallel query facilities.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "force_parallel_mode", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the FROM-list size beyond which subqueries are not collapsed.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "from_collapse_limit", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Forces synchronization of updates to disk.", 
+                "DataType": "boolean", 
+                "IsModifiable": false, 
+                "AllowedValues": "0,1", 
+                "Source": "system", 
+                "ParameterValue": "1", 
+                "ParameterName": "fsync", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Writes full pages to WAL when first modified after a checkpoint.", 
+                "DataType": "boolean", 
+                "IsModifiable": false, 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "ParameterValue": "1", 
+                "ParameterName": "full_page_writes", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables genetic query optimization.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "GEQO: effort is used to set the default for other GEQO parameters.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-10", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_effort", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "GEQO: number of iterations of the algorithm.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_generations", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "GEQO: number of individuals in the population.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_pool_size", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "GEQO: seed for random path selection.", 
+                "DataType": "float", 
+                "AllowedValues": "0-1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_seed", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "GEQO: selective pressure within the population.", 
+                "DataType": "float", 
+                "AllowedValues": "1.5-2", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_selection_bias", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the threshold of FROM items beyond which GEQO is used.", 
+                "DataType": "integer", 
+                "AllowedValues": "2-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "geqo_threshold", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the maximum allowed result for exact search by GIN.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "gin_fuzzy_search_limit", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(kB) Sets the maximum size of the pending list for GIN index.", 
+                "DataType": "integer", 
+                "AllowedValues": "64-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "gin_pending_list_limit", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the servers hba configuration file.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/rdsdbdata/config/pg_hba.conf", 
+                "ParameterName": "hba_file", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Allows feedback from a hot standby to the primary that will avoid query conflicts.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "hot_standby_feedback", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Use of huge pages on Linux.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "AllowedValues": "on,off", 
+                "Source": "system", 
+                "ParameterValue": "off", 
+                "ParameterName": "huge_pages", 
+                "MinimumEngineVersion": "9.6.2", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the servers ident configuration file.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/rdsdbdata/config/pg_ident.conf", 
+                "ParameterName": "ident_file", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(ms) Sets the maximum allowed duration of any idling transaction.", 
+                "DataType": "integer", 
+                "AllowedValues": "0-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "idle_in_transaction_session_timeout", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the display format for interval values.", 
+                "DataType": "string", 
+                "AllowedValues": "postgres,postgres_verbose,sql_standard,iso_8601", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "intervalstyle", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the FROM-list size beyond which JOIN constructs are not flattened.", 
+                "DataType": "integer", 
+                "AllowedValues": "1-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "join_collapse_limit", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the language in which messages are displayed.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "lc_messages", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the locale for formatting monetary amounts.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "lc_monetary", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the locale for formatting numbers.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "lc_numeric", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the locale for formatting date and time values.", 
+                "DataType": "string", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "lc_time", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the host name or IP address(es) to listen to.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "*", 
+                "ParameterName": "listen_addresses", 
+                "ApplyType": "static"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Enables backward compatibility mode for privilege checks on large objects.", 
+                "DataType": "boolean", 
+                "IsModifiable": false, 
+                "AllowedValues": "0,1", 
+                "Source": "system", 
+                "ParameterValue": "0", 
+                "ParameterName": "lo_compat_privileges", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "(ms) Sets the minimum execution time above which autovacuum actions will be logged.", 
+                "DataType": "integer", 
+                "AllowedValues": "-1-2147483647", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "log_autovacuum_min_duration", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Logs each checkpoint.", 
+                "DataType": "boolean", 
+                "IsModifiable": true, 
+                "AllowedValues": "0,1", 
+                "Source": "system", 
+                "ParameterValue": "1", 
+                "ParameterName": "log_checkpoints", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Logs each successful connection.", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "log_connections", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the destination for server log output.", 
+                "DataType": "string", 
+                "IsModifiable": true, 
+                "AllowedValues": "stderr,csvlog", 
+                "Source": "system", 
+                "ParameterValue": "stderr", 
+                "ParameterName": "log_destination", 
+                "MinimumEngineVersion": "9.6.2", 
+                "ApplyType": "dynamic"
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the destination directory for log files.", 
+                "DataType": "string", 
+                "IsModifiable": false, 
+                "Source": "system", 
+                "ParameterValue": "/rdsdbdata/log/error", 
+                "ParameterName": "log_directory", 
+                "ApplyType": "dynamic"
+            }
+        ]
+    }
+}

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import importlib
 
 import jmespath
@@ -33,7 +35,7 @@ class RelatedResourceFilter(ValueFilter):
         if self.RelatedIdsExpression is None:
             raise ValueError(
                 "%s Filter requires resource expression" % name)
-        #if self.AnnotationKey is None:
+        # if self.AnnotationKey is None:
         #    raise ValueError(
         #        "%s Filter requires annotation key" % name)
 
@@ -85,7 +87,7 @@ class RelatedResourceFilter(ValueFilter):
                 found.append(rid)
 
         if self.AnnotationKey is not None:
-            resource['c7n.%s' % self.AnnotationKey] = found
+            resource['c7n:%s' % self.AnnotationKey] = found
 
         if op == 'or' and found:
             return True

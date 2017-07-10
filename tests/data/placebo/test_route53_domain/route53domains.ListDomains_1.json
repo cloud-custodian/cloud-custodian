@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Domains": [
+        {
+            "TransferLock": true,
+            "AutoRenew": true,
+            "Expiry": 1503564799.0,
+            "DomainName": "github.com"
+        },
+        {
+            "TransferLock": false,
+            "AutoRenew": true,
+            "Expiry": 1503964000.0,
+            "DomainName": "cloud.custodian"
+        },
+        {
+            "TransferLock": true,
+            "AutoRenew": false,
+            "Expiry": 1503914799.0,
+            "DomainName": "example.com"
+        }
+    ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "xfc7tsVfULyWxVT+hVrXaY5S8BtrvHpYBD/GdkbwC/j15DdyJLLxIwTiv8SCIf0cI7XIQrpwd5A=", 
+            "RequestId": "8E7409360503B0C7"
+        }
+    }
+}

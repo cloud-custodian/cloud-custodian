@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import json
 import shutil
@@ -19,9 +21,8 @@ import tempfile
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from nose.tools import raises
 
-from common import BaseTest, Config, Bag
+from .common import BaseTest, Config, Bag
 
 
 class DummyResource(manager.ResourceManager):
@@ -112,7 +113,7 @@ class PolicyPermissions(BaseTest):
                         k, n))
 
             for n, f in v.filter_registry.items():
-                if n in ('and', 'or'):
+                if n in ('and', 'or', 'not'):
                     continue
                 p['filters'] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -139,6 +140,54 @@ class PolicyPermissions(BaseTest):
                 "\n\t".join(sorted(missing))))
 
 
+class TestPolicyCollection(BaseTest):
+
+    def test_expand_partitions(self):
+        cfg = Config.empty(
+            regions=['us-gov-west-1', 'cn-north-1', 'us-west-2'])
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'ec2'}]},
+            cfg)
+        collection = original.expand_regions(cfg.regions)
+        self.assertEqual(
+            sorted([p.options.region for p in collection]),
+            ['cn-north-1', 'us-gov-west-1', 'us-west-2'])
+
+    def test_policy_account_expand(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'account'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection), 1)
+
+    def test_policy_region_expand_global(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 's3'},
+                {'name': 'iam',
+                 'resource': 'iam-user'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection.resource_types), 2)
+        self.assertEqual(len(collection), 15)        
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'us-east-1')
+
+        collection = original.expand_regions(['eu-west-1', 'eu-west-2'])
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'eu-west-1')
+        self.assertEqual(len(collection), 3)
+
+
 class TestPolicy(BaseTest):
 
     def test_load_policy_validation_error(self):
@@ -153,7 +202,7 @@ class TestPolicy(BaseTest):
             }]
         }
         self.assertRaises(Exception, self.load_policy_set, invalid_policies)
-        
+
 
     def test_policy_validation(self):
         policy = self.load_policy({
@@ -169,9 +218,9 @@ class TestPolicy(BaseTest):
         policy.validate()
         self.assertEqual(policy.tags, ['abc'])
         self.assertFalse(policy.is_lambda)
-        self.assertEqual(
-            repr(policy),
-            "<Policy resource: ec2 name: ec2-utilization>")
+        self.assertTrue(
+            repr(policy).startswith(
+                "<Policy resource: ec2 name: ec2-utilization"))
 
     def test_policy_name_filtering(self):
 
@@ -191,14 +240,14 @@ class TestPolicy(BaseTest):
 
         self.assertIn('s3-remediate', collection)
         self.assertNotIn('s3-argle-bargle', collection)
-        
+
         # Make sure __iter__ works
         for p in collection:
             self.assertTrue(p.name is not None)
 
         self.assertEqual(collection.resource_types, set(('s3', 'ec2')))
         self.assertTrue('s3-remediate' in collection)
-        
+
         self.assertEqual(
             [p.name for p in collection.filter('s3*')],
             ['s3-remediate', 's3-global-grants'])
@@ -365,15 +414,13 @@ class TestPolicy(BaseTest):
 
 class PolicyExecutionModeTest(BaseTest):
 
-    @raises(NotImplementedError)
     def test_run_unimplemented(self):
-        action = policy.PolicyExecutionMode({}).run()
-        self.fail('Should have raised NotImplementedError')
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).run)
 
-    @raises(NotImplementedError)
     def test_get_logs_unimplemented(self):
-        action = policy.PolicyExecutionMode({}).get_logs(1, 2)
-        self.fail('Should have raised NotImplementedError')
+        self.assertRaises(NotImplementedError,
+            policy.PolicyExecutionMode({}).get_logs, 1, 2)
 
 
 class PullModeTest(BaseTest):

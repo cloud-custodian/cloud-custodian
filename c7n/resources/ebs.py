@@ -11,8 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import Counter
 import logging
+import itertools
+import json
+import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -22,12 +27,20 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
     ANNOTATION_KEY, FilterValidationError, OPERATORS)
+from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    local_session, set_annotation, chunks, type_schema, worker)
+    camelResource,
+    chunks,
+    get_retry,
+    local_session,
+    set_annotation,
+    type_schema,
+    worker,
+)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
@@ -87,15 +100,15 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
     date_attribute = 'StartTime'
 
 
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
         return snapshots
-    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    #This will populate the cache.
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    # This will populate the cache.
     amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
@@ -150,23 +163,39 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    """Filter to remove snapshots of AMIs from results
+    """
+    Filter to remove snapshots of AMIs from results
 
     This filter is 'true' by default.
 
     :example:
 
+        .. implicit with no parameters, 'true' by default
         .. code-block: yaml
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
                     op: ge
-                  - skip-ami-snapshots: true
+                  - skip-ami-snapshots
 
+    :example:
+
+        .. explicit with parameter
+        .. code-block: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: ebs-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                  - type: skip-ami-snapshots
+                    value: false
     """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
@@ -209,15 +238,15 @@ class SnapshotDelete(BaseAction):
     permissions = ('ec2.DeleteSnapshot',)
 
     def process(self, snapshots):
-        self.image_snapshots = snaps = set()
-         # Be careful re image snapshots, we do this by default
+        self.image_snapshots = set()
+        # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         pre = len(snapshots)
-        snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
+        snapshots = list(filter(None, _filter_ami_snapshots(self, snapshots)))
         post = len(snapshots)
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
-                 post, pre-post)
+                 post, pre - post)
 
         with self.executor_factory(max_workers=2) as w:
             futures = []
@@ -388,7 +417,7 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug('Filtered from %d volumes to %d attached volumes' % (
             original_count, len(resources)))
         self.instance_map = self.get_instance_mapping(resources)
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def __call__(self, r):
         instance = self.instance_map[r['Attachments'][0]['InstanceId']]
@@ -435,7 +464,7 @@ class FaultTolerantSnapshots(Filter):
     def pull_check_results(self):
         result = set()
         client = local_session(self.manager.session_factory).client('support')
-        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
+        client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
         for r in results['flaggedResources']:
@@ -447,6 +476,60 @@ class FaultTolerantSnapshots(Filter):
         if self.data.get('tolerant', True):
             return [r for r in resources if r['VolumeId'] not in flagged]
         return [r for r in resources if r['VolumeId'] in flagged]
+
+
+@filters.register('health-event')
+class HealthFilter(HealthEventFilter):
+
+    schema = type_schema(
+        'health-event',
+        types={'type': 'array', 'items': {
+            'type': 'string',
+            'enum': ['AWS_EBS_DEGRADED_EBS_VOLUME_PERFORMANCE',
+                     'AWS_EBS_VOLUME_LOST']}},
+        statuses={'type': 'array', 'items': {
+            'type': 'string',
+            'enum': ['open', 'upcoming', 'closed']
+        }})
+
+    permissions = HealthEventFilter.permissions + (
+        'config:GetResourceConfigHistory',)
+
+    def process(self, resources, event=None):
+        if 'AWS_EBS_VOLUME_LOST' not in self.data['types']:
+            return super(HealthFilter, self).process(resources, event)
+        if not resources:
+            return resources
+
+        client = local_session(self.manager.session_factory).client(
+            'health', region_name='us-east-1')
+        f = self.get_filter_parameters()
+        resource_map = {}
+
+        paginator = client.get_paginator('describe_events')
+        events = list(itertools.chain(
+            *[p['events']for p in paginator.paginate(filter=f)]))
+        entities = self.process_event(events)
+
+        event_map = {e['arn']: e for e in events}
+        for e in entities:
+            rid = e['entityValue']
+            if not resource_map.get(rid):
+                resource_map[rid] = self.load_resource(rid)
+            resource_map[rid].setdefault(
+                'c7n:HealthEvent', []).append(event_map[e['eventArn']])
+        return resource_map.values()
+
+    def load_resource(self, rid):
+        config = local_session(self.manager.session_factory).client('config')
+        resources_histories = config.get_resource_config_history(
+            resourceType='AWS::EC2::Volume',
+            resourceId=rid,
+            limit=2)['configurationItems']
+        for r in resources_histories:
+            if r['configurationItemStatus'] != u'ResourceDeleted':
+                return camelResource(json.loads(r['configuration']))
+        return {"VolumeId": rid}
 
 
 @actions.register('copy-instance-tags')
@@ -489,40 +572,52 @@ class CopyInstanceTags(BaseAction):
         return perms
 
     def process(self, volumes):
+        vol_count = len(volumes)
         volumes = [v for v in volumes if v['Attachments']]
+        if len(volumes) != vol_count:
+            self.log.warning(
+                "ebs copy tags action implicitly filtered from %d to %d",
+                vol_count, len(volumes))
+        self.initialize(volumes)
         with self.executor_factory(max_workers=10) as w:
             futures = []
-            for volume_set in chunks(reversed(volumes), size=100):
+            for instance_set in chunks(sorted(
+                    self.instance_map.keys(), reverse=True), size=100):
                 futures.append(
-                    w.submit(self.process_volume_set, volume_set))
-
+                    w.submit(self.process_instance_set, instance_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception copying instance tags \n %s" % (
                             f.exception()))
 
-    def process_volume_set(self, volume_set):
+    def initialize(self, volumes):
         instance_vol_map = {}
-        for v in volume_set:
+        for v in volumes:
             instance_vol_map.setdefault(
                 v['Attachments'][0]['InstanceId'], []).append(v)
-
         instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys())}
+                list(instance_vol_map.keys()))}
+        self.instance_vol_map = instance_vol_map
+        self.instance_map = instance_map
 
-        for i in instance_vol_map:
+    def process_instance_set(self, instance_ids):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in instance_ids:
             try:
                 self.process_instance_volumes(
-                    instance_map[i], instance_vol_map[i])
+                    client,
+                    self.instance_map[i],
+                    self.instance_vol_map[i])
             except Exception as e:
                 self.log.exception(
-                    "Error copying instance tags to volumes \n %s" % e)
+                    "Error copy instance:%s tags to volumes: %s \n %s",
+                    i, ",".join([v['VolumeId'] for v in self.instance_vol_map[i]]),
+                    e)
 
-    def process_instance_volumes(self, instance, volumes):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def process_instance_volumes(self, client, instance, volumes):
         for v in volumes:
             copy_tags = self.get_volume_tags(v, instance, v['Attachments'][0])
             if not copy_tags:
@@ -594,9 +689,12 @@ class EncryptInstanceVolumes(BaseAction):
        - Delete transient snapshots
        - Detach Unencrypted Volume
        - Attach Encrypted Volume
+       - Set DeleteOnTermination instance attribute equal to source volume
     - For each volume
        - Delete unencrypted volume
     - Start Instance (if originally running)
+    - For each newly encrypted volume
+       - Delete transient tags
 
     :example:
 
@@ -627,7 +725,9 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DescribeSnapshots',
         'ec2:DescribeVolumes',
         'ec2:StopInstances',
-        'ec2:StartInstances')
+        'ec2:StartInstances',
+        'ec2:ModifyInstanceAttribute',
+        'ec2:DeleteTags')
 
     def validate(self):
         key = self.data.get('key')
@@ -657,7 +757,7 @@ class EncryptInstanceVolumes(BaseAction):
         self.instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys(), cache=False)}
+                list(instance_vol_map.keys()), cache=False)}
 
         with self.executor_factory(max_workers=10) as w:
             futures = {}
@@ -700,10 +800,25 @@ class EncryptInstanceVolumes(BaseAction):
             client.detach_volume(
                 InstanceId=instance_id, VolumeId=v['VolumeId'])
             # 5/8/2016 The detach isn't immediately consistent
-            self.data.get('delay', 15)
+            time.sleep(self.data.get('delay', 15))
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
+
+            # Set DeleteOnTermination attribute the same as source volume
+            if v['Attachments'][0]['DeleteOnTermination']:
+                client.modify_instance_attribute(
+                    InstanceId=instance_id,
+                    BlockDeviceMappings=[
+                        {
+                            'DeviceName': v['Attachments'][0]['Device'],
+                            'Ebs': {
+                                'VolumeId': vol_id,
+                                'DeleteOnTermination': True
+                            }
+                        }
+                    ]
+                )
 
         if instance_running:
             client.start_instances(InstanceIds=[instance_id])
@@ -714,6 +829,17 @@ class EncryptInstanceVolumes(BaseAction):
 
         for v in vol_set:
             client.delete_volume(VolumeId=v['VolumeId'])
+
+        # Clean-up transient tags on newly created encrypted volume.
+        for v, vol_id in paired:
+            client.delete_tags(
+                Resources=[vol_id],
+                Tags=[
+                    {'Key': 'maid-crypt-remediation'},
+                    {'Key': 'maid-origin-volume'},
+                    {'Key': 'maid-instance-device'}
+                ]
+            )
 
     def stop_instance(self, instance_id):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -827,6 +953,34 @@ class EncryptInstanceVolumes(BaseAction):
             waiter.wait(InstanceIds=[instance_id])
             if self.verbose:
                 self.log.debug("Instance: %s stopped" % instance_id)
+
+
+@actions.register('snapshot')
+class CreateSnapshot(BaseAction):
+    """Snapshot an EBS volume
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: snapshot-volumes
+                resource: ebs
+                filters:
+                  - Attachments: []
+                  - State: available
+                actions:
+                  - snapshot
+    """
+    permissions = ('ec2:CreateSnapshot',)
+    schema = type_schema('snapshot')
+
+    def process(self, volumes):
+        client = local_session(self.manager.session_factory).client('ec2')
+        retry = get_retry(['Throttled'], max_attempts=5)
+        for vol in volumes:
+            vol_id = vol['VolumeId']
+            retry(client.create_snapshot, VolumeId=vol_id)
 
 
 @actions.register('delete')
@@ -1024,9 +1178,9 @@ class ModifyVolume(BaseAction):
             params = {'VolumeId': r['VolumeId']}
             if piops and ('io1' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
-                params['Iops'] = int(r['Iops'] + r.get('Iops', 10) * piops/100.0)
+                params['Iops'] = int(r['Iops'] + r.get('Iops', 10) * piops / 100.0)
             if psize:
-                params['Size'] = int(r['Size'] + r['Size'] * psize/100.0)
+                params['Size'] = int(r['Size'] + r['Size'] * psize / 100.0)
             if vtype:
                 params['VolumeType'] = vtype
             self.manager.retry(client.modify_volume, **params)

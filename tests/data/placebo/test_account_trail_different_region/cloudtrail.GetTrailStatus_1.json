@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "453fe62b-5cf4-11e6-93db-530701b43d09", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "453fe62b-5cf4-11e6-93db-530701b43d09", 
+                "date": "Sun, 07 Aug 2016 23:11:28 GMT", 
+                "content-length": "385", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "LatestNotificationAttemptSucceeded": "", 
+        "LatestDeliveryAttemptTime": "2016-08-07T23:07:56Z", 
+        "LatestDeliveryTime": {
+            "hour": 19, 
+            "__class__": "datetime", 
+            "month": 8, 
+            "second": 56, 
+            "microsecond": 58000, 
+            "year": 2016, 
+            "day": 7, 
+            "minute": 7
+        }, 
+        "LatestDeliveryAttemptSucceeded": "2016-08-07T23:07:56Z", 
+        "IsLogging": true, 
+        "TimeLoggingStarted": "2016-07-24T08:57:57Z", 
+        "StartLoggingTime": {
+            "hour": 4, 
+            "__class__": "datetime", 
+            "month": 7, 
+            "second": 57, 
+            "microsecond": 360000, 
+            "year": 2016, 
+            "day": 24, 
+            "minute": 57
+        }, 
+        "LatestDigestDeliveryTime": {
+            "hour": 19, 
+            "__class__": "datetime", 
+            "month": 8, 
+            "second": 32, 
+            "microsecond": 66000, 
+            "year": 2016, 
+            "day": 7, 
+            "minute": 2
+        }, 
+        "LatestNotificationAttemptTime": "", 
+        "TimeLoggingStopped": ""
+    }
+}

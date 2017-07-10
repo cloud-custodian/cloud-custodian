@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "trailList": [
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "skunk-trails", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": false, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41", 
+                "HomeRegion": "us-west-2"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "44c9cbc9-5cf4-11e6-93db-530701b43d09", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "44c9cbc9-5cf4-11e6-93db-530701b43d09", 
+                "date": "Sun, 07 Aug 2016 23:11:27 GMT", 
+                "content-length": "359", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

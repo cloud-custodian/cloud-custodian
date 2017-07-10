@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "k_vertigo", 
+            "ID": "904fc4c4790937100e9eb293a15e6a0a1f265a064888055b43d030034f8881ee"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2013, 
+                    "day": 21, 
+                    "minute": 12
+                }, 
+                "Name": "custodian-encryption-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "N4Ka3KSZO3Y3s5B83Kspi9VvuUEVx9p6UaiQkBxmyslMUZtOQB/75F61oq9wsE1fHn07nK0sMKo=", 
+            "RequestId": "80ED9683CA2CAB57"
+        }
+    }
+}

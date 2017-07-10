@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from botocore.exceptions import ClientError
 
-from common import BaseTest
+from .common import BaseTest
 from c7n.resources.ebs import (
     CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot, Delete)
 from c7n.executor import MainThreadExecutor
@@ -168,6 +170,31 @@ class CopyInstanceTagsTest(BaseTest):
         self.assertEqual(tags['Name'], 'CompileLambda')
 
 
+class VolumeSnapshotTest(BaseTest):
+
+    def test_volume_snapshot(self):
+        factory = self.replay_flight_data('test_ebs_snapshot')
+        policy = self.load_policy(
+            {
+                'name': 'test-ebs-snapshot',
+                'resource': 'ebs',
+                'filters': [{'VolumeId': 'vol-01adbb6a4f175941d'}],
+                'actions': ['snapshot'],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        snapshot_data = factory().client('ec2').describe_snapshots(
+            Filters=[
+                {
+                    'Name': 'volume-id',
+                    'Values': ['vol-01adbb6a4f175941d'],
+                },
+            ]
+        )
+        self.assertEqual(len(snapshot_data['Snapshots']), 1)
+
+
 class VolumeDeleteTest(BaseTest):
 
     def test_volume_delete_force(self):
@@ -197,26 +224,36 @@ class EncryptExtantVolumesTest(BaseTest):
     def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
-        output = self.capture_logging(level=logging.DEBUG)
-
         session_factory = self.replay_flight_data('test_encrypt_volumes')
-
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
             'filters': [
                 {'Encrypted': False},
-                {'VolumeId': 'vol-fdd1f844'}],
+                {'VolumeId': 'vol-0f53c81b92b4ecfce'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
-                 'delay': 0.1,
-                 'key': 'alias/ebs/crypto'}]},
+                 'delay': 0.001,
+                 'key': 'alias/encryptebs'}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['Encrypted'], False)
-
+        for r in resources:
+            volumes = session_factory().client('ec2').describe_volumes(
+                Filters=[{
+                    'Name':'attachment.instance-id',
+                    'Values': [
+                        r['Attachments'][0]['InstanceId']
+                    ]
+                }]
+            )
+            for v in volumes['Volumes']:
+                self.assertTrue(v['Attachments'][0]['DeleteOnTermination'])
+                self.assertTrue(v['Encrypted'])
+                if 'Tags' in v:
+                    self.assertNotIn('maid-crypt-remediation', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-origin-volume', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-instance-device', [i['Key'] for i in v['Tags']])
 
 class TestKmsAlias(BaseTest):
 
@@ -280,3 +317,21 @@ class PiopsMetricsFilterTest(BaseTest):
             }, session_factory=session)
         resources = policy.run()
         self.assertEqual(len(resources),1)
+
+
+class HealthEventsFilterTest(BaseTest):
+    def test_ebs_health_events_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ebs_health_events_filter')
+        policy = self.load_policy({
+            'name': 'ebs-health-events-filter',
+            'resource': 'ebs',
+            'filters': [{
+                'type': 'health-event',
+                'types': ['AWS_EBS_VOLUME_LOST']}]
+                }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue(('c7n:HealthEvent' in r) and
+                            ('Description' in e for e in r['c7n:HealthEvent']))

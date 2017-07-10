@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b7f08e83-27bc-11e7-97da-9d98532b8625", 
+            "HTTPHeaders": {
+                "date": "Sun, 23 Apr 2017 00:35:14 GMT", 
+                "x-amzn-requestid": "b7f08e83-27bc-11e7-97da-9d98532b8625", 
+                "content-length": "45", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": {
+            "xyz": "abcdef", 
+            "Language": "Python"
+        }
+    }
+}
