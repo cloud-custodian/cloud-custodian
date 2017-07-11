@@ -9,10 +9,11 @@ man/
 lib64
 .Python
 pip-selfcheck.json
-cover/
+coverage/
 .coverage
 tmp/
 .idea
 docs/source/generated/
 docs/build/
 cache/
+.tox/
