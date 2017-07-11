@@ -1106,7 +1106,7 @@ class ModifyableVolume(Filter):
         modifying = set()
         for vol_set in chunks(list(results), 200):
             vol_ids = [v['VolumeId'] for v in vol_set]
-            mutating = client.describe_volumes_modifications(                
+            mutating = client.describe_volumes_modifications(
                 Filters=[
                     {'Name': 'volume-id',
                      'Values': vol_ids},
@@ -1123,7 +1123,7 @@ class ModifyableVolume(Filter):
 
         return [r for r in results if r['VolumeId'] not in modifying]
 
-    
+
 @actions.register('modify')
 class ModifyVolume(BaseAction):
     """Modify an ebs volume online.
@@ -1191,7 +1191,6 @@ class ModifyVolume(BaseAction):
     and potentially additional preparation, else data-loss may occur.
     To prevent accidents, shrinking must be explicitly enabled by also
     setting `shrink: true` on the action.
-
     """
 
     schema = type_schema(

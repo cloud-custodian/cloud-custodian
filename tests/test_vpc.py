@@ -70,11 +70,10 @@ class VpcTest(BaseTest):
 
     @functional
     def test_flow_logs_absent(self):
-        """Test that ONLY vpcs with no flow logs are retained
-
-        'vpc-4a9ff72e' - has no flow logs
-        'vpc-d0e386b7' - has flow logs
-        """
+        # Test that ONLY vpcs with no flow logs are retained
+        #
+        # 'vpc-4a9ff72e' - has no flow logs
+        # 'vpc-d0e386b7' - has flow logs
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_absent')
 

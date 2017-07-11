@@ -466,17 +466,17 @@ class MetricsTest(CliTest):
             {'ec2-tag-compliance-v6':
              {u'Durations': [],
               u'Errors': [{u'Sum': 0.0,
-                           u'Timestamp': u'2016-05-30T10:50:00',
+                           u'Timestamp': u'2016-05-30T10:50:00+00:00',
                            u'Unit': u'Count'}],
               u'Invocations': [{u'Sum': 4.0,
-                                u'Timestamp': u'2016-05-30T10:50:00',
+                                u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                 u'Unit': u'Count'}],
               u'ResourceCount': [{u'Average': 1.0,
                                   u'Sum': 2.0,
-                                  u'Timestamp': u'2016-05-30T10:50:00',
+                                  u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                   u'Unit': u'Count'}],
               u'Throttles': [{u'Sum': 0.0,
-                              u'Timestamp': u'2016-05-30T10:50:00',
+                              u'Timestamp': u'2016-05-30T10:50:00+00:00',
                               u'Unit': u'Count'}]}})
 
     def test_metrics_get_endpoints(self):
