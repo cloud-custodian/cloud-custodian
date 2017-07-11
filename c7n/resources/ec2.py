@@ -1058,14 +1058,14 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction, StateTransitionFilter):
-    """Sets (or removes) the instance profile for an existing EC2 instance.
+    """Sets (or removes) the instance profile for a running EC2 instance.
 
     :Example:
 
     .. code-block: yaml
 
         policies:
-          - name:
+          - name: set-default-instance-profile
             resource: ec2
             query:
               - IamInstanceProfile: absent
