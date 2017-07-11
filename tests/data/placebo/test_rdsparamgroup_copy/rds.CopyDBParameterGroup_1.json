@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBParameterGroup": {
+            "DBParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:pg:pg-copy", 
+            "DBParameterGroupName": "pg-copy", 
+            "DBParameterGroupFamily": "mysql5.5", 
+            "Description": "Copy of pg-orig"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9185ed9a-606b-11e7-ba96-9fc607e5eb1c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9185ed9a-606b-11e7-ba96-9fc607e5eb1c", 
+                "date": "Tue, 04 Jul 2017 03:47:57 GMT", 
+                "content-length": "596", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
