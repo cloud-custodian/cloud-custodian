@@ -187,7 +187,7 @@ def camelResource(obj):
     """
     if not isinstance(obj, dict):
         return obj
-    for k in obj.keys():
+    for k in list(obj.keys()):
         v = obj.pop(k)
         obj["%s%s" % (k[0].upper(), k[1:])] = v
         if isinstance(v, dict):
