@@ -1162,11 +1162,42 @@ class ModifyVolume(BaseAction):
                - type: modify
                  volume-type: gp1
 
+    `iops-percent` and `size-percent` can be used to modify
+    respectively iops on io1 volumes and volume size.
+
+    When converting to io1, `iops-percent` is used to set the iops
+    allocation for the new volume against the extant value for the old
+    volume.
+
+    :example:
+
+      Double storage and quadruple iops for all io1 volumes.
+
+        .. code-block: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+                - VolumeType: io1
+                - modifyable
+              actions:
+                - type: modify
+                  size-percent: 200
+                  iops-percent: 400
+
+
+    **Note** resizing down aka shrinking requires OS and FS support
+    and potentially additional preparation, else data-loss may occur.
+    To prevent accidents, shrinking must be explicitly enabled by also
+    setting `shrink: true` on the action.
+
     """
 
     schema = type_schema(
         'modify',
         **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+           'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})
 
@@ -1177,7 +1208,10 @@ class ModifyVolume(BaseAction):
         if 'modifyable' not in self.manager.data.get('filters', ()):
             raise FilterValidationError(
                 "modify action requires modifyable filter in policy")
-
+        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+            raise FilterValidationError((
+                "shrinking volumes requires os/fs support "
+                "or data-loss may ensue, use `shrink: true` to override"))
         return self
 
     def process(self, resources):
@@ -1194,9 +1228,9 @@ class ModifyVolume(BaseAction):
             params = {'VolumeId': r['VolumeId']}
             if piops and ('io1' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
-                params['Iops'] = int(r['Iops'] + r.get('Iops', 10) * piops / 100.0)
+                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
             if psize:
-                params['Size'] = int(r['Size'] + r['Size'] * psize / 100.0)
+                params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
             if vtype:
                 params['VolumeType'] = vtype
             self.manager.retry(client.modify_volume, **params)

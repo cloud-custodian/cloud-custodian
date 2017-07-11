@@ -155,8 +155,8 @@ class ResizeTest(BaseTest):
             'actions': [{
                 'type': 'modify',
                 'volume-type': 'io1',
-                'size-percent': 100,
-                'iops-percent': 400
+                'size-percent': 200,
+                'iops-percent': 500
                 }]},
             session_factory=factory)
         resources = p.run()
