@@ -1065,6 +1065,7 @@ class ModifyableVolume(Filter):
         stats = Counter()
         marker_date = parse_date('2016-11-01T00:00:00+00:00')
 
+        # Filter volumes
         for r in resources:
             # unsupported type
             if r['VolumeType'] == 'standard':
@@ -1085,29 +1086,44 @@ class ModifyableVolume(Filter):
 
             attached.append(r)
 
-        # attached instance type check
+        # Filter volumes attached to unsupported instance types
         ec2 = self.manager.get_resource_manager('ec2')
-
         instance_map = {}
         for v in attached:
             instance_map.setdefault(
                 v['Attachments'][0]['InstanceId'], []).append(v)
 
-        instances = ec2.get_resources(instance_map.keys())
+        instances = ec2.get_resources(list(instance_map.keys()))
         for i in instances:
             if i['InstanceType'] in self.older_generation:
-                stats['instance-type'] += 1
-                filtered.extend(instance_map.pop(i['InstanceId']))
+                stats['instance-type'] += len(instance_map[i['InstanceId']])
+                filtered.extend([v['VolumeId'] for v in instance_map.pop(i['InstanceId'])])
             else:
                 results.extend(instance_map.pop(i['InstanceId']))
 
+        # Filter volumes that are currently under modification
+        client = local_session(self.manager.session_factory).client('ec2')
+        modifying = set()
+        for vol_set in chunks(list(results), 200):
+            vol_ids = [v['VolumeId'] for v in vol_set]
+            mutating = client.describe_volumes_modifications(                
+                Filters=[
+                    {'Name': 'volume-id',
+                     'Values': vol_ids},
+                    {'Name': 'modification-state',
+                     'Values': ['modifying', 'optimizing', 'failed']}])
+            for vm in mutating.get('VolumesModifications', ()):
+                stats['vol-mutation'] += 1
+                filtered.append(vm['VolumeId'])
+                modifying.add(vm['VolumeId'])
+
         self.log.debug(
-            "filtered %d volumes due to %s",
-            len(filtered), stats.items())
+            "filtered %d of %d volumes due to %s",
+            len(filtered), len(resources), sorted(stats.items()))
 
-        return results
+        return [r for r in results if r['VolumeId'] not in modifying]
 
-
+    
 @actions.register('modify')
 class ModifyVolume(BaseAction):
     """Modify an ebs volume online.

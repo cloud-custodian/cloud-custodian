@@ -53,6 +53,7 @@ if 'AWS_DEFAULT_REGION' not in os.environ:
     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
 
 
+
 class BaseTest(PillTest):
 
     def cleanUp(self):
