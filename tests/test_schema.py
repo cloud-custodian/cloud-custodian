@@ -94,9 +94,11 @@ class SchemaTest(BaseTest):
                 error.absolute_schema_path))
 
         self.assertTrue(
-            "u'skipped_devices': []" in error.message)
+            "'skipped_devices': []" in error.message)
         self.assertTrue(
-            "u'type': u'ebs'" in error.message)
+            "u'type': u'ebs'" in error.message or
+            "'type': 'ebs'" in error.message
+        )
 
     @mock.patch('c7n.schema.specific_error')
     def test_handle_specific_error_fail(self, mock_specific_error):
@@ -142,10 +144,12 @@ class SchemaTest(BaseTest):
         self.assertTrue(
             len(errors[0].absolute_schema_path) < len(
                 error.absolute_schema_path))
-        self.assertEqual(
-            error.message,
-            ("Additional properties are not allowed "
-             "(u'skipped_devices' was unexpected)"))
+        self.assertTrue(
+            "Additional properties are not allowed " in error.message
+        )
+        self.assertTrue(
+            "'skipped_devices' was unexpected" in error.message
+        )
 
     def test_invalid_resource_type(self):
         data = {
