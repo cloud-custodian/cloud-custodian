@@ -1057,15 +1057,15 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction):
-    """Sets (or removes) the instance profile for an existing EC2 instance.
+class SetInstanceProfile(BaseAction, StateTransitionFilter):
+    """Sets (or removes) the instance profile for a running EC2 instance.
 
     :Example:
 
     .. code-block: yaml
 
         policies:
-          - name:
+          - name: set-default-instance-profile
             resource: ec2
             query:
               - IamInstanceProfile: absent
@@ -1086,7 +1086,12 @@ class SetInstanceProfile(BaseAction):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
+    valid_origin_states = ('running', 'pending')
+
     def process(self, instances):
+        instances = self.filter_instance_state(instances)
+        if not len(instances):
+            return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         profile_name = self.data.get('name', '')
