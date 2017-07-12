@@ -558,10 +558,8 @@ class PythonArchiveTest(unittest.TestCase):
 
     def check_readable(self, archive):
         readable = 0o444 << 16
-        with open(archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            for i in reader.infolist():
-                self.assertGreaterEqual(i.external_attr, readable)
+        for i in zipfile.ZipFile(archive.path).filelist:
+            self.assertGreaterEqual(i.external_attr, readable)
 
     def test_files_are_all_readable(self):
         self.check_readable(self.make_archive('c7n'))
