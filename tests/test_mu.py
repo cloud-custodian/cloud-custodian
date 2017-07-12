@@ -556,13 +556,13 @@ class PythonArchiveTest(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(bench))
         return path
 
-    def check_readable(self, archive):
-        readable = 0o444 << 16
-        for i in zipfile.ZipFile(archive.path).filelist:
-            self.assertGreaterEqual(i.external_attr, readable)
+    def check_world_readable(self, archive):
+        world_readable = 0o004 << 16
+        for info in zipfile.ZipFile(archive.path).filelist:
+            self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_readable(self.make_archive('c7n'))
+        self.check_world_readable(self.make_archive('c7n'))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -570,14 +570,14 @@ class PythonArchiveTest(unittest.TestCase):
         archive = self.make_open_archive()
         archive.add_file(path)
         archive.close()
-        self.check_readable(archive)
+        self.check_world_readable(archive)
 
     def test_unless_you_make_your_own_zipinfo(self):
         info = zipfile.ZipInfo(self.make_file())
         archive = self.make_open_archive()
         archive.add_contents(info, 'foo.txt')
         archive.close()
-        self.assertRaises(AssertionError, self.check_readable, archive)
+        self.assertRaises(AssertionError, self.check_world_readable, archive)
 
 
 class PycCase(unittest.TestCase):
