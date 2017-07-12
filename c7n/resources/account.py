@@ -386,6 +386,8 @@ class ServiceLimit(Filter):
                   - type: service-limit
                     services:
                       - IAM
+                    limits:
+                      - Roles
                     threshold: 1.0
     """
 
