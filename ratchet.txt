@@ -26,6 +26,6 @@ tests.test_revisions.SGDiffLibTest.test_sg_patch_pitr
 tests.test_s3.BucketScanLogTests.test_scan_log
 tests.test_schema.SchemaTest.test_semantic_error
 tests.test_schema.SchemaTest.test_semantic_error_on_value_derived
-tests.test_utils.UtilTest.testCamelCase
+tests.test_utils.UtilTest.test_camel_case
 tests.test_utils.UtilTest.test_chunks
 tests.test_utils.UtilTest.test_load_file

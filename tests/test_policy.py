@@ -284,17 +284,17 @@ class TestPolicy(BaseTest):
             json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
             {u'Durations': [],
              u'Errors': [{u'Sum': 0.0,
-                          u'Timestamp': u'2016-05-30T10:50:00',
+                          u'Timestamp': u'2016-05-30T10:50:00+00:00',
                           u'Unit': u'Count'}],
              u'Invocations': [{u'Sum': 4.0,
-                               u'Timestamp': u'2016-05-30T10:50:00',
+                               u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                u'Unit': u'Count'}],
              u'ResourceCount': [{u'Average': 1.0,
                                  u'Sum': 2.0,
-                                 u'Timestamp': u'2016-05-30T10:50:00',
+                                 u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                  u'Unit': u'Count'}],
              u'Throttles': [{u'Sum': 0.0,
-                             u'Timestamp': u'2016-05-30T10:50:00',
+                             u'Timestamp': u'2016-05-30T10:50:00+00:00',
                              u'Unit': u'Count'}]})
 
     def test_policy_metrics(self):
@@ -315,7 +315,7 @@ class TestPolicy(BaseTest):
             {
                 "ActionTime": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 8541.752702140668,
                         "Sum": 128126.29053211001,
                         "Unit": "Seconds"
@@ -323,7 +323,7 @@ class TestPolicy(BaseTest):
                 ],
                 "Total Keys": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 1575708.7333333334,
                         "Sum": 23635631.0,
                         "Unit": "Count"
@@ -331,7 +331,7 @@ class TestPolicy(BaseTest):
                 ],
                 "ResourceTime": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 8.682969363532667,
                         "Sum": 130.24454045299,
                         "Unit": "Seconds"
@@ -339,7 +339,7 @@ class TestPolicy(BaseTest):
                 ],
                 "ResourceCount": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 23.6,
                         "Sum": 354.0,
                         "Unit": "Count"
@@ -347,7 +347,7 @@ class TestPolicy(BaseTest):
                 ],
                 "Unencrypted": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 10942.266666666666,
                         "Sum": 164134.0,
                         "Unit": "Count"
