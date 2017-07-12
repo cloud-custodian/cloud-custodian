@@ -615,9 +615,13 @@ class Constructor(PycCase):
             # ... and while *.pyc is importable ...
             self.assertTrue(get('bar'), 'bar.pyc')
         except ImportError:
-            # (except on PyPy)
-            # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
-            self.assertEqual(platform.python_implementation(), 'PyPy')
+            try:
+                # (except on PyPy)
+                # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
+                self.assertEqual(platform.python_implementation(), 'PyPy')
+            except AssertionError:
+                # (... aaaaaand Python 3)
+                self.assertEqual(platform.python_version_tuple()[0], '3')
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
@@ -631,7 +635,7 @@ class Constructor(PycCase):
         archive.close()
         self.assertEqual(archive.get_filenames(), ['foo.py'])
         with archive.get_reader() as reader:
-            self.assertEqual('42', reader.read('foo.py'))
+            self.assertEqual(b'42', reader.read('foo.py'))
 
 
 class AddPyFile(PycCase):
