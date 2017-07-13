@@ -113,12 +113,7 @@ class MessageIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.client.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.client.receive_message(
@@ -132,6 +127,13 @@ class MessageIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # back-compat
+
+    def ack(self, m):
+        self.client.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class SQSWorker(object):

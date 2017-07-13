@@ -49,13 +49,13 @@ class Table(QueryResourceManager):
 
     def augment(self, tables):
         resources = super(Table, self).augment(tables)
-        return filter(None, _dynamodb_table_tags(
+        return list(filter(None, _dynamodb_table_tags(
             self.get_model(),
             resources,
             self.session_factory,
             self.executor_factory,
             self.retry,
-            self.log))
+            self.log)))
 
 
 def _dynamodb_table_tags(

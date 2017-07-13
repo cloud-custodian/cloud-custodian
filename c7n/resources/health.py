@@ -77,7 +77,7 @@ class HealthEvents(QueryResourceManager):
         for resource_set in chunks(resources, 10):
             event_map = {r['arn']: r for r in resource_set}
             event_details = client.describe_event_details(
-                eventArns=event_map.keys())['successfulSet']
+                eventArns=list(event_map.keys()))['successfulSet']
             for d in event_details:
                 event_map[d['event']['arn']][
                     'Description'] = d['eventDescription']['latestDescription']
@@ -127,11 +127,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "Health Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in HEALTH_VALID_FILTERS:
             raise ValueError(

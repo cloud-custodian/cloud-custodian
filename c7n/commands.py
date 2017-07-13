@@ -24,6 +24,7 @@ import pprint
 import sys
 import time
 
+import six
 import yaml
 
 from c7n.policy import Policy, PolicyCollection, load as policy_load
@@ -97,7 +98,7 @@ def policy_command(f):
             policies_by_region[p.options.region].append(p)
         for region in policies_by_region.keys():
             counts = Counter([p.name for p in policies_by_region[region]])
-            for policy, count in counts.iteritems():
+            for policy, count in six.iteritems(counts):
                 if count > 1:
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
@@ -388,9 +389,8 @@ def schema_cmd(options):
 
         # Print schema
         print("\nSchema\n------\n")
-        pp = pprint.PrettyPrinter(indent=4)
         if hasattr(cls, 'schema'):
-            pp.pprint(cls.schema)
+            print(json.dumps(cls.schema, indent=4))
         else:
             # Shouldn't ever hit this, so exclude from cover
             print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover

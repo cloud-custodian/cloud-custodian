@@ -28,5 +28,5 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-indexer = c7n_index.metrics:cli']},
-    install_requires=["c7n", "click", "influxdb"],
+    install_requires=["c7n", "click", "influxdb", "elasticsearch"],
 )

@@ -78,7 +78,7 @@ def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
         client = local_session(session_factory).client('elbv2')
         alb_map = {alb['LoadBalancerArn']: alb for alb in alb_set}
 
-        results = retry(client.describe_tags, ResourceArns=alb_map.keys())
+        results = retry(client.describe_tags, ResourceArns=list(alb_map.keys()))
         for tag_desc in results['TagDescriptions']:
             if ('ResourceArn' in tag_desc and
                     tag_desc['ResourceArn'] in alb_map):
@@ -518,7 +518,7 @@ def _describe_target_group_tags(target_groups, session_factory,
 
         results = retry(
             client.describe_tags,
-            ResourceArns=target_group_map.keys())
+            ResourceArns=list(target_group_map.keys()))
         for tag_desc in results['TagDescriptions']:
             if ('ResourceArn' in tag_desc and
                     tag_desc['ResourceArn'] in target_group_map):

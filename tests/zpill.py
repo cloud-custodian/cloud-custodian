@@ -13,11 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import jmespath
-
-from placebo import pill
-import placebo
-
+from datetime import datetime, timedelta, tzinfo
 import fnmatch
 import json
 import unittest
@@ -26,6 +22,90 @@ import shutil
 import zipfile
 
 import boto3
+from botocore.response import StreamingBody
+import jmespath
+from placebo import pill
+import placebo
+from six import StringIO
+
+###########################################################################
+# BEGIN PLACEBO MONKEY PATCH
+#
+# Placebo is effectively abandoned upstream, since mitch went back to work at AWS, irony...
+# These monkeypatch patches represent fixes on trunk of that repo that have not been released
+# into an extant version, we carry them here. We can drop this when this issue is resolved
+#
+# https://github.com/garnaat/placebo/issues/63
+#
+# License - Apache 2.0
+# Copyright (c) 2015 Mitch Garnaat
+
+
+class UTC(tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return timedelta(0)
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return timedelta(0)
+
+
+utc = UTC()
+
+
+def deserialize(obj):
+    """Convert JSON dicts back into objects."""
+    # Be careful of shallow copy here
+    target = dict(obj)
+    class_name = None
+    if '__class__' in target:
+        class_name = target.pop('__class__')
+    if '__module__' in obj:
+        module_name = obj.pop('__module__')
+    # Use getattr(module, class_name) for custom types if needed
+    if class_name == 'datetime':
+        return datetime(tzinfo=utc, **target)
+    if class_name == 'StreamingBody':
+        return StringIO(target['body'])
+    # Return unrecognized structures as-is
+    return obj
+
+
+def serialize(obj):
+    """Convert objects into JSON structures."""
+    # Record class and module information for deserialization
+    result = {'__class__': obj.__class__.__name__}
+    try:
+        result['__module__'] = obj.__module__
+    except AttributeError:
+        pass
+    # Convert objects to dictionary representation based on type
+    if isinstance(obj, datetime):
+        result['year'] = obj.year
+        result['month'] = obj.month
+        result['day'] = obj.day
+        result['hour'] = obj.hour
+        result['minute'] = obj.minute
+        result['second'] = obj.second
+        result['microsecond'] = obj.microsecond
+        return result
+    if isinstance(obj, StreamingBody):
+        result['body'] = obj.read()
+        obj._raw_stream = StringIO(result['body'])
+        obj._amount_read = 0
+        return result
+    # Raise a TypeError if the object isn't recognized
+    raise TypeError("Type not serializable")
+
+
+placebo.pill.serialize = serialize
+placebo.pill.deserialize = deserialize
+## END PLACEBO MONKEY
+##########################################################################
 
 
 class ZippedPill(pill.Pill):

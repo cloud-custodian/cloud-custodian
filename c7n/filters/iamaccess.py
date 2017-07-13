@@ -167,19 +167,19 @@ def check_cross_account(policy_text, allowed_accounts):
         # accounts.
 
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition']['StringEquals'].keys()[0] in (
+            if list(s['Condition']['StringEquals'].keys())[0] in (
                     "aws:sourceVpce", "aws:sourceVpce"):
                 principal_ok = True
 
         if 'StringLike' in s['Condition']:
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition'][
-                    'StringLike'].keys()[0].lower() == "aws:sourcevpce":
+            if list(s['Condition'][
+                    'StringLike'].keys())[0].lower() == "aws:sourcevpce":
                 principal_ok = True
 
         if 'ForAnyValue:StringLike' in s['Condition']:
-            if s['Condition']['ForAnyValue:StringLike'].keys()[
-                    0].lower() == 'aws:sourcevpce':
+            if list(s['Condition']['ForAnyValue:StringLike'].keys()[
+                    0]).lower() == 'aws:sourcevpce':
                 principal_ok = True
 
         if 'IpAddress' in s['Condition']:

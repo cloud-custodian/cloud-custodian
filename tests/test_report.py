@@ -61,8 +61,8 @@ class TestEC2Report(unittest.TestCase):
             (['full', 'duplicate', 'minimal'], ['full', 'minimal']),
         ]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)
 
     def test_custom_fields(self):
@@ -108,8 +108,8 @@ class TestASGReport(unittest.TestCase):
             (['full', 'minimal'], ['full', 'minimal']),
             (['full', 'duplicate', 'minimal'], ['full', 'minimal'])]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)
 
 
@@ -128,8 +128,8 @@ class TestELBReport(unittest.TestCase):
             (['full', 'minimal'], ['full', 'minimal']),
             (['full', 'duplicate', 'minimal'], ['full', 'minimal'])]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)
 
 
@@ -148,6 +148,6 @@ class TestMultiReport(unittest.TestCase):
             (['minimal'], ['minimal_multipolicy']),
         ]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)

@@ -33,7 +33,7 @@ from c7n.resources.iam import (
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole, UnusedIamRole,
-    IamGroupUsers, UserPolicy,
+    IamGroupUsers, UserPolicy, GroupMembership,
     UserCredentialReport, UserAccessKey,
     IamRoleInlinePolicy, IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
@@ -219,6 +219,27 @@ class IamUserFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
+
+
+class IamUserGroupMembership(BaseTest):
+
+    def test_iam_user_group_membership(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_group_membership')
+        self.patch(
+            GroupMembership, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-admin-users',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'group',
+                'key': 'GroupName',
+                'value': 'QATester'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserName'], 'kapil')
+        self.assertTrue(resources[0]['c7n:Groups'])
 
 
 class IamInstanceProfileFilterUsage(BaseTest):

@@ -1,0 +1,264 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "61251370-df6e-4741-8335-8edfe8970c8d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 11 Jul 2017 10:14:57 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 8, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 37, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 27
+                        }, 
+                        "InstanceId": "i-0333e31f9a05612af", 
+                        "VolumeId": "vol-0614474fa940f42b6", 
+                        "State": "attached", 
+                        "DeleteOnTermination": false, 
+                        "Device": "/dev/sdc"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "NotResizable", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-0614474fa940f42b6", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 37, 
+                    "microsecond": 72000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 27
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 8, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 37, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 27
+                        }, 
+                        "InstanceId": "i-0333e31f9a05612af", 
+                        "VolumeId": "vol-03f0cd3521d73ce1b", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/sda1"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "NotResizable", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-03f0cd3521d73ce1b", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-039ffe051a6c30204", 
+                "CreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 36, 
+                    "microsecond": 910000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 27
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 8, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 0, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 29
+                        }, 
+                        "InstanceId": "i-0557d390667870549", 
+                        "VolumeId": "vol-0e4cba7adc4764f79", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/sda1"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "OnlineResizer", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "io1", 
+                "VolumeId": "vol-0e4cba7adc4764f79", 
+                "State": "in-use", 
+                "Iops": 400, 
+                "SnapshotId": "snap-039ffe051a6c30204", 
+                "CreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 998000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 28
+                }, 
+                "Size": 16
+            }, 
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 8, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 0, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 29
+                        }, 
+                        "InstanceId": "i-0557d390667870549", 
+                        "VolumeId": "vol-01c1876a915fa310e", 
+                        "State": "attached", 
+                        "DeleteOnTermination": false, 
+                        "Device": "/dev/sdd"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "OnlineResizer", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "standard", 
+                "VolumeId": "vol-01c1876a915fa310e", 
+                "State": "in-use", 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 0, 
+                    "microsecond": 285000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 29
+                }, 
+                "Size": 128
+            }, 
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 9, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 19, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 56
+                        }, 
+                        "InstanceId": "i-0557d390667870549", 
+                        "VolumeId": "vol-0073dcd216489ea1b", 
+                        "State": "attached", 
+                        "DeleteOnTermination": false, 
+                        "Device": "/dev/sdf"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "OnlineResizer", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-0073dcd216489ea1b", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 38, 
+                    "microsecond": 833000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 55
+                }, 
+                "Size": 32
+            }, 
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [], 
+                "Encrypted": false, 
+                "VolumeType": "io1", 
+                "VolumeId": "vol-091e2a63a6e4da54d", 
+                "State": "available", 
+                "Iops": 1000, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 51, 
+                    "microsecond": 299000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 0
+                }, 
+                "Size": 64
+            }
+        ]
+    }
+}

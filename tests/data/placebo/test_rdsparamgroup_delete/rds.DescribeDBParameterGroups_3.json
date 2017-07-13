@@ -1,0 +1,21 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "deeeba54-6065-11e7-ab40-39885776d054", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "deeeba54-6065-11e7-ab40-39885776d054", 
+                "date": "Tue, 04 Jul 2017 03:07:10 GMT", 
+                "content-length": "290", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "DBParameterGroup not found: pg-test", 
+            "Code": "DBParameterGroupNotFound", 
+            "Type": "Sender"
+        }
+    }
+}

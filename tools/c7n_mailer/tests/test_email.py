@@ -17,6 +17,7 @@ import copy
 import os
 import unittest
 
+import six
 from c7n_mailer.email_delivery import EmailDelivery
 from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
@@ -114,8 +115,9 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         to_emails = ('bill_lumberg@initech.com', 'milton@initech.com', 'peter@initech.com')
-        self.assertEqual(email_addrs_to_email_message_map.items()[0][0], to_emails)
-        self.assertEqual(email_addrs_to_email_message_map.items()[0][1]['to'], ', '.join(to_emails))
+        items = list(email_addrs_to_email_message_map.items())
+        self.assertEqual(items[0][0], to_emails)
+        self.assertEqual(items[0][1]['to'], ', '.join(to_emails))
 
     def test_smtp_called_once(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
@@ -123,7 +125,7 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
-            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.iteritems():
+            for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
                 self.assertEqual(mimetext_msg['X-Priority'], '1')
             # Get instance of mocked SMTP object
@@ -159,7 +161,7 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
-            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.iteritems():
+            for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
                 self.assertEqual(mimetext_msg.get('X-Priority'), None)
                 # self.assertEqual(mimetext_msg.get('X-Priority'), None)

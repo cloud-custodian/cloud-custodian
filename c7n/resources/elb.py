@@ -92,7 +92,7 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_tags,
-                    LoadBalancerNames=elb_map.keys())
+                    LoadBalancerNames=list(elb_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'LoadBalancerNotFound':

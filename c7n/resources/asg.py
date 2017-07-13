@@ -484,7 +484,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             return unencrypted_configs
 
         self.log.debug("querying %d snapshots", len(snaps))
-        for s in self.get_snapshots(ec2, snaps.keys()):
+        for s in self.get_snapshots(ec2, list(snaps.keys())):
             if not s.get('Encrypted'):
                 unencrypted_configs.update(snaps[s['SnapshotId']])
         return unencrypted_configs
@@ -529,7 +529,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -1359,7 +1359,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 

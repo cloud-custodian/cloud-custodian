@@ -71,7 +71,11 @@ class Config(dict):
             'dryrun': False})
         d.update(kw)
         if not os.path.exists(d['output_dir']):
-            os.mkdir(d['output_dir'])
+            try:
+                os.mkdir(d['output_dir'])
+            except OSError as error:
+                log.warning("Unable to make output directory: {}".format(error))
+
         return cls(d)
 
 

@@ -688,10 +688,11 @@ class HasVirtualMFA(Filter):
             client = local_session(self.manager.session_factory).client('iam')
             paginator = client.get_paginator('list_virtual_mfa_devices')
             raw_list = paginator.paginate().build_full_result()['VirtualMFADevices']
-            account['c7n:VirtualMFADevices'] = filter(self.mfa_belongs_to_root_account, raw_list)
+            account['c7n:VirtualMFADevices'] = list(filter(
+                self.mfa_belongs_to_root_account, raw_list))
         expect_virtual_mfa = self.data.get('value', True)
         has_virtual_mfa = any(account['c7n:VirtualMFADevices'])
         return expect_virtual_mfa == has_virtual_mfa
 
     def process(self, resources, event=None):
-        return filter(self.account_has_virtual_mfa, resources)
+        return list(filter(self.account_has_virtual_mfa, resources))

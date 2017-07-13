@@ -261,7 +261,7 @@ class TagCountFilter(Filter):
     schema = utils.type_schema(
         'tag-count',
         count={'type': 'integer', 'minimum': 0},
-        op={'enum': OPERATORS.keys()})
+        op={'enum': list(OPERATORS.keys())})
 
     def __call__(self, i):
         count = self.data.get('count', 10)
