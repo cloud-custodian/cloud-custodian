@@ -1015,7 +1015,7 @@ def _rds_snap_tags(
         return snap
 
     with executor_factory(max_workers=1) as w:
-        return filter(None, (w.map(process_tags, snaps)))
+        return list(filter(None, (w.map(process_tags, snaps))))
 
 
 @RDSSnapshot.filter_registry.register('onhour')
@@ -1063,7 +1063,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 
@@ -1568,7 +1568,7 @@ class ParameterFilter(ValueFilter):
 
         for pg in param_groups:
             cache_key = {
-                'region': self.manager.config.regions,
+                'region': self.manager.config.region,
                 'account_id': self.manager.config.account_id,
                 'rds-pg': pg}
             pg_values = self.manager._cache.get(cache_key)

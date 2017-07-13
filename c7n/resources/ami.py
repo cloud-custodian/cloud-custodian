@@ -139,7 +139,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number', 'minimum': 0})
 
 

@@ -1,0 +1,97 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "chadw", 
+                "PasswordLastUsed": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 18
+                }, 
+                "CreateDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 35
+                }, 
+                "UserId": "AIDAJJWTP3ZUOEPTN46O2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::114002464496:user/chadw"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 28
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 53
+                }, 
+                "UserId": "AIDAJMTVI4LNO3ZLAZZHU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::114002464496:user/kapil"
+            }, 
+            {
+                "UserName": "mandeep", 
+                "PasswordLastUsed": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 30
+                }, 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 29, 
+                    "minute": 31
+                }, 
+                "UserId": "AIDAJRL6Y6JSV7GUCJKQW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::114002464496:user/mandeep"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ee5367bd-63c5-11e7-8793-133e893c6607", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ee5367bd-63c5-11e7-8793-133e893c6607", 
+                "date": "Sat, 08 Jul 2017 10:12:20 GMT", 
+                "content-length": "1241", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

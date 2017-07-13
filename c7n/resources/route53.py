@@ -60,7 +60,7 @@ def _describe_route53_tags(
         results = retry(
             client.list_tags_for_resources,
             ResourceType=model.type,
-            ResourceIds=resource_map.keys())
+            ResourceIds=list(resource_map.keys()))
 
         for resource_tag_set in results['ResourceTagSets']:
             if ('ResourceId' in resource_tag_set and

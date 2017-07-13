@@ -330,15 +330,18 @@ def setup_parser():
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
-    parser.add_argument('--request-params',
-                    action='store_true',
-                    help="Append Request Params from CloudTrail Event Record")
-    parser.add_argument('--response-elements',
-                    action='store_true',
-                    help="Append Response Elements from CloudTrail Event Record")
-    parser.add_argument('--user-identity',
-                    action='store_true',
-                    help="Append  User Identity CloudTrail Events")
+    parser.add_argument(
+        '--request-params',
+        action='store_true',
+        help="Append Request Params from CloudTrail Event Record")
+    parser.add_argument(
+        '--response-elements',
+        action='store_true',
+        help="Append Response Elements from CloudTrail Event Record")
+    parser.add_argument(
+        '--user-identity',
+        action='store_true',
+        help="Append  User Identity CloudTrail Events")
     return parser
 
 

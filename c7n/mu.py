@@ -628,7 +628,7 @@ class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python2.7"
+    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy
@@ -817,6 +817,9 @@ class CloudWatchEventSource(object):
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
 
+        if event_type == 'cloudtrail':
+            if 'signin.amazonaws.com' in payload['detail']['eventSource']:
+                payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [

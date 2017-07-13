@@ -440,21 +440,28 @@ class LambdaMode(PolicyExecutionMode):
                     self.policy.name, self.policy.resource_type))
             return
 
-        self.policy.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
+        with self.policy.ctx:
+            self.policy.ctx.metrics.put_metric(
+                'ResourceCount', len(resources), 'Count', Scope="Policy",
+                buffer=False)
 
-        if 'debug' in event:
-            self.policy.log.info(
-                "Invoking actions %s", self.policy.resource_manager.actions)
-        for action in self.policy.resource_manager.actions:
-            self.policy.log.info(
-                "policy: %s invoking action: %s resources: %d",
-                self.policy.name, action.name, len(resources))
-            if isinstance(action, EventAction):
-                action.process(resources, event)
-            else:
-                action.process(resources)
+            if 'debug' in event:
+                self.policy.log.info(
+                    "Invoking actions %s", self.policy.resource_manager.actions)
+
+            self.policy._write_file(
+                'resources.json', utils.dumps(resources, indent=2))
+
+            for action in self.policy.resource_manager.actions:
+                self.policy.log.info(
+                    "policy: %s invoking action: %s resources: %d",
+                    self.policy.name, action.name, len(resources))
+                if isinstance(action, EventAction):
+                    results = action.process(resources, event)
+                else:
+                    results = action.process(resources)
+                self.policy._write_file(
+                    "action-%s" % action.name, utils.dumps(results))
         return resources
 
     def provision(self):

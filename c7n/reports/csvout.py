@@ -135,8 +135,8 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, six.string_types):
-                value = unicode(value)
+            if not isinstance(value, six.text_type):
+                value = six.text_type(value)
         vals.append(value)
     return vals
 
@@ -211,7 +211,7 @@ class Formatter(object):
 
         uniq = self.uniq_by_id(records)
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
-        rows = map(self.extract_csv, uniq)
+        rows = list(map(self.extract_csv, uniq))
         return rows
 
 
