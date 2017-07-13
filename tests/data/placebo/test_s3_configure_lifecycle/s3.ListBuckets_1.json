@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "larello732", 
+            "ID": "da1df7e8f5833d450286f71183943d61214484adf7c8f8a19cd81ec4b327d254"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 54
+                }, 
+                "Name": "laiello.com"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 1
+                }, 
+                "Name": "test-cloud-custodian-configure-lifecycle"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 54
+                }, 
+                "Name": "www.laiello.com"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "bY0PTUtkbH9UPiB5gGLcq6n3gkBcSMAKG6NuK4g70gH4D+vZybmRXZ0gi1evDJ3aNMfpLTewBzw=", 
+            "RequestId": "38CE2C4E61153C0D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "bY0PTUtkbH9UPiB5gGLcq6n3gkBcSMAKG6NuK4g70gH4D+vZybmRXZ0gi1evDJ3aNMfpLTewBzw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "38CE2C4E61153C0D", 
+                "date": "Thu, 13 Jul 2017 01:01:10 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
