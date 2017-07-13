@@ -74,6 +74,7 @@ actions.register('put-metric', PutMetric)
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 DEFAULT_WORKERS = 10
 
+
 @resources.register('s3')
 class S3(QueryResourceManager):
 
