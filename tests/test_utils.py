@@ -180,7 +180,7 @@ class UtilTest(unittest.TestCase):
                 separator=':'),
             'arn:aws:rds:us-east-1:123456789012:og:mysql-option-group1')
 
-    def testCamelCase(self):
+    def test_camel_case(self):
         d = {'zebraMoon': [{'instanceId': 123}, 'moon'],
              'color': {'yellow': 1, 'green': 2}}
         self.assertEqual(

@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import Counter
 import logging
 import itertools
 import json
@@ -20,6 +21,7 @@ import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
@@ -1023,3 +1025,211 @@ class Delete(BaseAction):
             if e.response['Error']['Code'] == "InvalidVolume.NotFound":
                 return
             raise
+
+
+@filters.register('modifyable')
+class ModifyableVolume(Filter):
+    """Check if an ebs volume is modifyable online.
+
+    Considerations - https://goo.gl/CBhfqV
+
+    Consideration Summary
+      - only current instance types are supported (one exception m3.medium)
+        Current Generation Instances (2017-2) https://goo.gl/iuNjPZ
+
+      - older magnetic volume types are not supported
+      - shrinking volumes is not supported
+      - must wait at least 6hrs between modifications to the same volume.
+      - volumes must have been attached after nov 1st, 2016.
+
+    See `custodian schema ebs.actions.modify` for examples.
+    """
+
+    schema = type_schema('modifyable')
+
+    older_generation = set((
+        'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge',
+        'c1.medium', 'c1.xlarge', 'cc2.8xlarge',
+        'm2.xlarge', 'm2.2xlarge', 'm2.4xlarge', 'cr1.8xlarge',
+        'hi1.4xlarge', 'hs1.8xlarge', 'cg1.4xlarge', 't1.micro',
+        # two legs good, not all current gen work either.
+        'm3.large', 'm3.xlarge', 'm3.2xlarge'
+    ))
+
+    permissions = ("ec2:DescribeInstances",)
+
+    def process(self, resources, event=None):
+        results = []
+        filtered = []
+        attached = []
+        stats = Counter()
+        marker_date = parse_date('2016-11-01T00:00:00+00:00')
+
+        # Filter volumes
+        for r in resources:
+            # unsupported type
+            if r['VolumeType'] == 'standard':
+                stats['vol-type'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            # unattached are easy
+            if not r.get('Attachments'):
+                results.append(r)
+                continue
+
+            # check for attachment date older then supported date
+            if r['Attachments'][0]['AttachTime'] < marker_date:
+                stats['attach-time'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            attached.append(r)
+
+        # Filter volumes attached to unsupported instance types
+        ec2 = self.manager.get_resource_manager('ec2')
+        instance_map = {}
+        for v in attached:
+            instance_map.setdefault(
+                v['Attachments'][0]['InstanceId'], []).append(v)
+
+        instances = ec2.get_resources(list(instance_map.keys()))
+        for i in instances:
+            if i['InstanceType'] in self.older_generation:
+                stats['instance-type'] += len(instance_map[i['InstanceId']])
+                filtered.extend([v['VolumeId'] for v in instance_map.pop(i['InstanceId'])])
+            else:
+                results.extend(instance_map.pop(i['InstanceId']))
+
+        # Filter volumes that are currently under modification
+        client = local_session(self.manager.session_factory).client('ec2')
+        modifying = set()
+        for vol_set in chunks(list(results), 200):
+            vol_ids = [v['VolumeId'] for v in vol_set]
+            mutating = client.describe_volumes_modifications(
+                Filters=[
+                    {'Name': 'volume-id',
+                     'Values': vol_ids},
+                    {'Name': 'modification-state',
+                     'Values': ['modifying', 'optimizing', 'failed']}])
+            for vm in mutating.get('VolumesModifications', ()):
+                stats['vol-mutation'] += 1
+                filtered.append(vm['VolumeId'])
+                modifying.add(vm['VolumeId'])
+
+        self.log.debug(
+            "filtered %d of %d volumes due to %s",
+            len(filtered), len(resources), sorted(stats.items()))
+
+        return [r for r in results if r['VolumeId'] not in modifying]
+
+
+@actions.register('modify')
+class ModifyVolume(BaseAction):
+    """Modify an ebs volume online.
+
+    **Note this action requires use of modifyable filter**
+
+    Intro Blog & Use Cases - https://goo.gl/E3u4Ue
+    Docs - https://goo.gl/DJM4T0
+    Considerations - https://goo.gl/CBhfqV
+
+    :example:
+
+      Find under utilized provisioned iops volumes older than a week
+      and change their type.
+
+        .. code-block: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+               - type: value
+                 key: CreateDate
+                 value_type: age
+                 value: 7
+                 op: greater-than
+               - VolumeType: io1
+               - type: metrics
+                 name: VolumeConsumedReadWriteOps
+                 statistics: Maximum
+                 value: 100
+                 op: less-than
+                 days: 7
+               - modifyable
+              actions:
+               - type: modify
+                 volume-type: gp1
+
+    `iops-percent` and `size-percent` can be used to modify
+    respectively iops on io1 volumes and volume size.
+
+    When converting to io1, `iops-percent` is used to set the iops
+    allocation for the new volume against the extant value for the old
+    volume.
+
+    :example:
+
+      Double storage and quadruple iops for all io1 volumes.
+
+        .. code-block: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+                - VolumeType: io1
+                - modifyable
+              actions:
+                - type: modify
+                  size-percent: 200
+                  iops-percent: 400
+
+
+    **Note** resizing down aka shrinking requires OS and FS support
+    and potentially additional preparation, else data-loss may occur.
+    To prevent accidents, shrinking must be explicitly enabled by also
+    setting `shrink: true` on the action.
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+           'shrink': False,
+           'size-percent': {'type': 'number'},
+           'iops-percent': {'type': 'number'}})
+
+    # assumptions as its the closest i can find.
+    permissions = ("ec2:ModifyVolumeAttribute",)
+
+    def validate(self):
+        if 'modifyable' not in self.manager.data.get('filters', ()):
+            raise FilterValidationError(
+                "modify action requires modifyable filter in policy")
+        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+            raise FilterValidationError((
+                "shrinking volumes requires os/fs support "
+                "or data-loss may ensue, use `shrink: true` to override"))
+        return self
+
+    def process(self, resources):
+        for resource_set in chunks(resources, 50):
+            self.process_resource_set(resource_set)
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('ec2')
+        vtype = self.data.get('volume-type')
+        psize = self.data.get('size-percent')
+        piops = self.data.get('iops-percent')
+
+        for r in resource_set:
+            params = {'VolumeId': r['VolumeId']}
+            if piops and ('io1' in (vtype, r['VolumeType'])):
+                # default here if we're changing to io1
+                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
+            if psize:
+                params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
+            if vtype:
+                params['VolumeType'] = vtype
+            self.manager.retry(client.modify_volume, **params)
