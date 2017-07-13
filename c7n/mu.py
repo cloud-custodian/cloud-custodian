@@ -43,10 +43,6 @@ from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
-RUNTIME = 'python{}.{}'.format(
-    sys.version_info.major,
-    sys.version_info.minor,
-)
 
 
 class PythonPackageArchive(object):
