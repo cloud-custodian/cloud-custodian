@@ -352,7 +352,6 @@ def main():
     if options.tmpdir and not os.path.exists(options.tmpdir):
         os.makedirs(options.tmpdir)
     prefix = get_bucket_path(options)
-    prefix = 'AWSLogs/AWSLogs/685250009713/CloudTrail/us-east-1/2017/07/13/'
 
     process_bucket(
         options.bucket,
