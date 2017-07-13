@@ -1571,7 +1571,7 @@ class S3Test(BaseTest):
 
     def test_configure_lifecycle(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_lifecycle', 'Lifecycle', None, None),
+            ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
             ('get_bucket_location', 'Location', None, None)])
         session_factory = self.replay_flight_data('test_s3_configure_lifecycle')
         session = session_factory()
@@ -1582,7 +1582,7 @@ class S3Test(BaseTest):
 
         # Configure the policy
         p = self.load_policy({
-            'name': 's3-has-lifecycle',
+            'name': 's3-configure-lifecycle',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [{'type': 'configure-lifecycle',
@@ -1612,8 +1612,7 @@ class S3Test(BaseTest):
                          'ia_days': 30,
                          'glacier_days': 90,
                          'previous_version_ia_days': 30,
-                         'previous_version_glacier_days': 90,
-                         'max_workers': 15}]},
+                         'previous_version_glacier_days': 90}]},
             session_factory=session_factory)
 
         resources = p.run()

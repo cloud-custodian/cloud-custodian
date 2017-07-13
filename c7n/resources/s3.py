@@ -73,8 +73,6 @@ actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 DEFAULT_WORKERS = 10
-CACHE_NAME = 's3-lifecycles'
-
 
 @resources.register('s3')
 class S3(QueryResourceManager):
@@ -123,7 +121,7 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_website', 'Website', None, None),
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None),
-    ('get_bucket_lifecycle', 'Lifecycle', None, None),
+    ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
     #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -379,42 +377,8 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
-class LifecycleApiMixin(object):
-    """Mixin class for calling the s3 lifecycle API in a multuthreaded fashion."""
-
-    def call_lifecycle_api(self, bucket):
-        bname = bucket['Name']
-        session = local_session(self.manager.session_factory)
-        s3 = bucket_client(session, bucket)
-
-        try:
-            shared_buckets = self.manager._cache.get(CACHE_NAME)
-            if shared_buckets:
-                if (bname in shared_buckets) and ('LifecyclePolicy' in shared_buckets[bname]):
-                    return bucket
-                else:
-                    lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                    shared_buckets[bname] = bucket
-                    shared_buckets[bname]['LifecyclePolicy'] = lifecycle
-                    self.cache_update = True
-                    return shared_buckets[bname]
-            else:
-                lifecycle = s3.get_bucket_lifecycle_configuration(Bucket=bname)
-                bucket['LifecyclePolicy'] = lifecycle
-                self.cache_update = True
-                return bucket
-        except ClientError as e:
-            # Do nothing
-            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
-                return
-            if e.response['Error']['Code'] == 'NoSuchBucket':
-                self.log.warn("Bucket `%s` no longer exists", bname)
-                return
-            raise
-
-
 @filters.register('has-lifecycle')
-class HasLifecycle(Filter, LifecycleApiMixin):
+class HasLifecycle(Filter):
     """Filter out S3 buckets that have lifecycle rules for
     transitioning objects to different storage types."""
 
@@ -430,16 +394,9 @@ class HasLifecycle(Filter, LifecycleApiMixin):
                          ia_days={'type': 'number'},
                          previous_version_ia_days={'type': 'number'},
                          glacier_days={'type': 'number'},
-                         previous_version_glacier_days={'type': 'number'},
-                         max_workers={'type': 'number'})
-
-    cache_update = False
+                         previous_version_glacier_days={'type': 'number'})
 
     def process(self, buckets, event=None):
-        max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
-        with self.executor_factory(max_workers=max_workers) as w:
-            shared_buckets = w.map(self.call_lifecycle_api, buckets)
-            shared_buckets = filter(None, list(shared_buckets))
 
         # Make sure lifecycle is within configured policy limits
         ia_days_in_policy = self.data.get('ia_days', None)
@@ -455,15 +412,15 @@ class HasLifecycle(Filter, LifecycleApiMixin):
 
         prefix = self.data.get('prefix', '')
         results = []
-        for b in shared_buckets:
+        for b in buckets:
             bucket_region = get_bucket_region(b)
             if bucket_region in glacier_supported_regions:
                 glacier_days_in_policy = self.data.get('glacier_days', None)
             else:
                 glacier_days_in_policy = None
 
-            if 'LifecyclePolicy' in b:
-                for rule in b['LifecyclePolicy']['Rules']:
+            if b['Lifecycle']:
+                for rule in b['Lifecycle']['Rules']:
                     if rule['ID'] == self.data.get('id'):
 
                         if rule['Status'] == 'Disabled':
@@ -511,27 +468,19 @@ class HasLifecycle(Filter, LifecycleApiMixin):
 
                         # Current version deletions
                         if 'Expiration' in rule and 'Days' in rule['Expiration']:
-                            # if isinstance(deletes_objects, bool) and (deletes_objects is False):
-                            #     continue
                             if delete_days_in_policy and\
                                     rule['Expiration']['Days'] != delete_days_in_policy:
                                 continue
-                        # elif (deletes_objects is True) or delete_days_in_policy:
-                        #     continue
                         elif delete_days_in_policy:
                             continue
 
                         # Previous version deletions
                         if 'NoncurrentVersionExpiration' in rule and\
                                 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
-                            # if isinstance(deletes_objects, bool) and (deletes_objects is False):
-                            #     continue
                             if prv_delete_days_in_policy and\
                                     rule['NoncurrentVersionExpiration']['NoncurrentDays'] !=\
                                     prv_delete_days_in_policy:
                                 continue
-                        # elif (deletes_objects is True) or prv_delete_days_in_policy:
-                        #     continue
                         elif prv_delete_days_in_policy:
                             continue
 
@@ -547,10 +496,6 @@ class HasLifecycle(Filter, LifecycleApiMixin):
 
                         results.append(b)
                         break
-
-        if self.cache_update is True:
-            shared_buckets = {b['Name']: b for b in shared_buckets}
-            self.manager._cache.save(CACHE_NAME, shared_buckets)
 
         self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets",
                       len(results),
@@ -1108,7 +1053,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 
 @actions.register('configure-lifecycle')
-class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
+class ConfigureLifecycle(BucketActionBase):
     """Action that aggregates all rules with whole bucket prefix and
     changes them to the configured policy values."""
 
@@ -1133,18 +1078,8 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
         'required': ['id']
     }
 
-    cache_update = False
-
     def process(self, buckets):
             max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
-
-            with self.executor_factory(max_workers=max_workers) as w:
-                saved_buckets = w.map(self.call_lifecycle_api, buckets)
-                saved_buckets = filter(None, list(saved_buckets))
-
-            if self.cache_update:
-                saved_buckets = {b['Name']: b for b in saved_buckets}
-                self.manager._cache.save(CACHE_NAME, saved_buckets)
 
             with self.executor_factory(max_workers=max_workers) as w:
                 w.map(self.put_lifecycle, buckets)
@@ -1187,8 +1122,8 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
 
         changed_bucket_lifecycle = True
         rules = {'Rules': []}
-        if 'LifecyclePolicy' in bucket:
-            lifecycle = bucket['LifecyclePolicy']
+        if bucket['Lifecycle']:
+            lifecycle = bucket['Lifecycle']
             for rule in lifecycle['Rules']:
                 if rule['ID'] == self.data.get('id'):
                     changed_bucket_lifecycle = False
@@ -1327,10 +1262,6 @@ class ConfigureLifecycle(BucketActionBase, LifecycleApiMixin):
             try:
                 s3.put_bucket_lifecycle_configuration(Bucket=bname,
                                                       LifecycleConfiguration=rules)
-                shared_buckets = self.manager._cache.get(CACHE_NAME)
-                shared_buckets[bucket['Name']]['LifecyclePolicy'] = rules
-                self.manager._cache.save(CACHE_NAME, shared_buckets)
-
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchBucket':
                     return

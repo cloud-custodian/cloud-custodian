@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "Z/RSzlaLBZAg5PbplMmrznXa625W9C5PNf6ojzDdOdO0k4/0AEW9Ajov8bnUEEd81h0w5LaKUBo=", 
-            "RequestId": "BF0CF95FAEF71887", 
+            "HostId": "czAmGNjalBm9EGJbML4sXR1q1u8xiAnZ49bfnS/CZGfiJTCveBRiqPE5v/PvQxa78hduCj9pVUM=", 
+            "RequestId": "7E1BF30E9562F6A7", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "Z/RSzlaLBZAg5PbplMmrznXa625W9C5PNf6ojzDdOdO0k4/0AEW9Ajov8bnUEEd81h0w5LaKUBo=", 
+                "x-amz-id-2": "czAmGNjalBm9EGJbML4sXR1q1u8xiAnZ49bfnS/CZGfiJTCveBRiqPE5v/PvQxa78hduCj9pVUM=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "BF0CF95FAEF71887", 
+                "x-amz-request-id": "7E1BF30E9562F6A7", 
                 "location": "/test-cloud-custodian-configure-lifecycle", 
-                "date": "Thu, 13 Jul 2017 01:01:09 GMT"
+                "date": "Thu, 13 Jul 2017 02:03:53 GMT"
             }
         }
     }
