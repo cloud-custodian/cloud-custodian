@@ -172,7 +172,7 @@ class PythonPackageArchive(object):
     def get_checksum(self):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
-        with open(self._temp_archive_file.name) as fh:
+        with open(self._temp_archive_file.name, 'rb') as fh:
             return base64.b64encode(checksum(fh, hashlib.sha256()))
 
     def get_bytes(self):
