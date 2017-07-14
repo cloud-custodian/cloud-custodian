@@ -1657,3 +1657,33 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        # Configure the policy again, for code coverage
+        p = self.load_policy({
+            'name': 's3-configure-lifecycle',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'configure-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400,
+                         'delete_previous_version_days': 400,
+                         'multipart_days': 7,
+                         'ia_days': 30,
+                         'glacier_days': 90,
+                         'previous_version_ia_days': 30,
+                         'previous_version_glacier_days': 90,
+                         'max_workers': 15}]},
+            session_factory=session_factory)
+        p.run()
+
+        # Only look for one attribute
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
