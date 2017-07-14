@@ -45,30 +45,32 @@ class PluginRegistry(object):
 
     """
 
-    events = ('register', 'final')
+    EVENT_REGISTER = 0
+    EVENT_FINAL = 1
+    EVENTS = (EVENT_REGISTER, EVENT_FINAL)
 
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
-        self._subscribers = {x: [] for x in self.events}
+        self._subscribers = {x: [] for x in self.EVENTS}
 
     def subscribe(self, event, func):
-        if event not in self.events:
-            raise ValueError('Available events are: {}'.format(', '.join(self.events)))
+        if event not in self.EVENTS:
+            raise ValueError('Invalid event')
 
         self._subscribers[event].append(func)
 
     def register(self, name, klass=None):
         # invoked as function
         if klass:
-            self.notify('register', name)
+            self.notify(self.EVENT_REGISTER, name)
             klass.type = name
             self._factories[name] = klass
             return klass
 
         # invoked as class decorator
         def _register_class(klass):
-            self.notify('register', name)
+            self.notify(self.EVENT_REGISTER, name)
             self._factories[name] = klass
             klass.type = name
             return klass
@@ -78,12 +80,9 @@ class PluginRegistry(object):
         if name in self._factories:
             del self._factories[name]
 
-    def notify(self, category, key):
-        for subscriber in self._subscribers[category]:
-            subscriber(self, key, self._factories.keys())
-
-    def notify_loading_done(self):
-        self.notify('final', None)
+    def notify(self, event, key=None):
+        for subscriber in self._subscribers[event]:
+            subscriber(self, key)
 
     def get(self, name):
         return self._factories.get(name)

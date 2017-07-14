@@ -22,15 +22,15 @@ from c7n.registry import PluginRegistry
 from c7n.utils import dumps
 
 
-def add_auto_tag_user(registry, _, resources):
-    for resource in resources:
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
         klass = registry.get(resource)
         if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
             klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
 resources = PluginRegistry('resources')
-resources.subscribe('final', add_auto_tag_user)
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
 class ResourceManager(object):
