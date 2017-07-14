@@ -45,46 +45,45 @@ class PluginRegistry(object):
 
     """
 
-    event_times = ('register', 'unregister', 'final')
+    events = ('register', 'final')
 
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
-        self._events = {x: [] for x in self.event_times}
+        self._subscribers = {x: [] for x in self.events}
 
-    def add_event(self, time, func):
-        if time not in self.event_times:
-            raise ValueError('Available hook times are: {}'.format(', '.join(self.event_times)))
+    def subscribe(self, event, func):
+        if event not in self.events:
+            raise ValueError('Available events are: {}'.format(', '.join(self.events)))
 
-        self._events[time].append(func)
+        self._subscribers[event].append(func)
 
     def register(self, name, klass=None):
         # invoked as function
         if klass:
-            self.run_events('register', name)
+            self.notify('register', name)
             klass.type = name
             self._factories[name] = klass
             return klass
 
         # invoked as class decorator
         def _register_class(klass):
-            self.run_events('register', name)
+            self.notify('register', name)
             self._factories[name] = klass
             klass.type = name
             return klass
         return _register_class
 
     def unregister(self, name):
-        self.run_events('unregister', name)
         if name in self._factories:
             del self._factories[name]
 
-    def run_final_events(self):
-        self.run_events('final', None)
+    def notify(self, category, key):
+        for subscriber in self._subscribers[category]:
+            subscriber(self, key, self._factories.keys())
 
-    def run_events(self, category, key):
-        for event in self._events[category]:
-            event(self, key, self._factories.keys())
+    def notify_loading_done(self):
+        self.notify('final', None)
 
     def get(self, name):
         return self._factories.get(name)

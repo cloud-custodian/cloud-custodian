@@ -89,7 +89,6 @@ class ActionRegistry(PluginRegistry):
         self.register('notify', Notify)
         self.register('invoke-lambda', LambdaInvoke)
         self.register('put-metric', PutMetric)
-        self.add_event('final', add_auto_tag_user)
 
     def parse(self, data, manager):
         results = []
@@ -658,11 +657,6 @@ class AutoTagUser(EventAction):
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
-
-
-def add_auto_tag_user(registry, key, all_keys):
-    if 'tag' in all_keys and 'auto-tag-user' not in all_keys:
-        registry.register('auto-tag-user', AutoTagUser)
 
 
 class PutMetric(BaseAction):
