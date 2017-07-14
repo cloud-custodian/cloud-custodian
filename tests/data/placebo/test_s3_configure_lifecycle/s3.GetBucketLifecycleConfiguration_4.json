@@ -1,56 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Rules": [
-            {
-                "Status": "Enabled", 
-                "NoncurrentVersionExpiration": {
-                    "NoncurrentDays": 400
-                }, 
-                "NoncurrentVersionTransitions": [
-                    {
-                        "NoncurrentDays": 30, 
-                        "StorageClass": "STANDARD_IA"
-                    }, 
-                    {
-                        "NoncurrentDays": 90, 
-                        "StorageClass": "GLACIER"
-                    }
-                ], 
-                "Filter": {
-                    "Prefix": ""
-                }, 
-                "Expiration": {
-                    "Days": 400
-                }, 
-                "AbortIncompleteMultipartUpload": {
-                    "DaysAfterInitiation": 7
-                }, 
-                "Transitions": [
-                    {
-                        "Days": 30, 
-                        "StorageClass": "STANDARD_IA"
-                    }, 
-                    {
-                        "Days": 90, 
-                        "StorageClass": "GLACIER"
-                    }
-                ], 
-                "ID": "test-cc-lifecycle"
-            }
-        ], 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
+            "HTTPStatusCode": 404, 
             "RetryAttempts": 0, 
-            "HostId": "I5I7jCT1u3C1TfWNKQnk5CHkpzzlzwOjfSBkRYjuxMM1JAzaPVLlJK0Pn0yea5LA8T9aBK7KZE0=", 
-            "RequestId": "C54CF28DBDEA8152", 
+            "HostId": "CZFdzZmemknUt+SVEeaOSZrcUbPMpxwuKNR+GKs3IUha449z1G51kmnjnONGzOIdV6ElxUv9tTg=", 
+            "RequestId": "7B21816A27E12D41", 
             "HTTPHeaders": {
-                "x-amz-id-2": "I5I7jCT1u3C1TfWNKQnk5CHkpzzlzwOjfSBkRYjuxMM1JAzaPVLlJK0Pn0yea5LA8T9aBK7KZE0=", 
-                "date": "Fri, 14 Jul 2017 04:57:58 GMT", 
+                "x-amz-id-2": "CZFdzZmemknUt+SVEeaOSZrcUbPMpxwuKNR+GKs3IUha449z1G51kmnjnONGzOIdV6ElxUv9tTg=", 
+                "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "C54CF28DBDEA8152", 
-                "server": "AmazonS3"
+                "x-amz-request-id": "7B21816A27E12D41", 
+                "date": "Fri, 14 Jul 2017 05:11:29 GMT", 
+                "content-type": "application/xml"
             }
+        }, 
+        "Error": {
+            "Message": "The lifecycle configuration does not exist", 
+            "Code": "NoSuchLifecycleConfiguration", 
+            "BucketName": "laiello.com"
         }
     }
 }

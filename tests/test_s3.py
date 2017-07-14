@@ -1660,7 +1660,7 @@ class S3Test(BaseTest):
 
         # Configure the policy again, for code coverage
         p = self.load_policy({
-            'name': 's3-configure-lifecycle',
+            'name': 's3-configure-lifecycle-again',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [{'type': 'configure-lifecycle',
@@ -1678,7 +1678,7 @@ class S3Test(BaseTest):
 
         # Only look for one attribute
         p = self.load_policy({
-            'name': 's3-has-lifecycle',
+            'name': 's3-has-lifecycle-one-element',
             'resource': 's3',
             'filters': [{'type': 'has-lifecycle',
                          'id': 'test-cc-lifecycle',
