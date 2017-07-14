@@ -425,6 +425,13 @@ class LambdaMode(PolicyExecutionMode):
         TODO: better customization around execution context outputs
         TODO: support centralized lambda exec across accounts.
         """
+
+        mode = self.policy.data.get('mode', {})
+        if not bool(mode.get("log", True)):
+            root = logging.getLogger()
+            map(root.removeHandler, root.handlers[:])
+            root.handlers = [logging.NullHandler()]
+
         resources = self.resolve_resources(event)
         if not resources:
             return resources
