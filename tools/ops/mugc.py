@@ -126,6 +126,7 @@ def main():
     options = parser.parse_args()
     options.policy_filter = None
     options.log_group = None
+    options.external_id = None
     options.cache_period = 0
     options.cache = None
     log_level = logging.INFO
