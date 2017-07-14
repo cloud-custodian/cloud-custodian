@@ -21,14 +21,14 @@
             }, 
             {
                 "CreationDate": {
-                    "hour": 2, 
+                    "hour": 4, 
                     "__class__": "datetime", 
                     "month": 7, 
-                    "second": 53, 
+                    "second": 22, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 13, 
-                    "minute": 3
+                    "day": 14, 
+                    "minute": 36
                 }, 
                 "Name": "test-cloud-custodian-configure-lifecycle"
             }, 
@@ -49,14 +49,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "V7vdG27/hlZTy/L0ZL4YXaZp11Uws+IgtYTahHt1Ba7nJhZGZViU4eu4kTLzlRJEAF+XnnppW2g=", 
-            "RequestId": "E7DA891079DE3E28", 
+            "HostId": "GAtWXKM3NaClyc7mvGZ3tjCDVc0tl70gbDlH930GzWFBj2injfVsWYRFFj1qzlY5wNwocjoNe8E=", 
+            "RequestId": "9A7E459E334C9BC5", 
             "HTTPHeaders": {
-                "x-amz-id-2": "V7vdG27/hlZTy/L0ZL4YXaZp11Uws+IgtYTahHt1Ba7nJhZGZViU4eu4kTLzlRJEAF+XnnppW2g=", 
+                "x-amz-id-2": "GAtWXKM3NaClyc7mvGZ3tjCDVc0tl70gbDlH930GzWFBj2injfVsWYRFFj1qzlY5wNwocjoNe8E=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "E7DA891079DE3E28", 
-                "date": "Thu, 13 Jul 2017 02:03:55 GMT", 
+                "x-amz-request-id": "9A7E459E334C9BC5", 
+                "date": "Fri, 14 Jul 2017 04:36:24 GMT", 
                 "content-type": "application/xml"
             }
         }

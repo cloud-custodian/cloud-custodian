@@ -1,24 +1,54 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "FoiWSZRu5zsXWjrLn0jH6fZyo1zxHFh0HacMOj0kjMAq5JNwz6sf9uQXCcXlCz5VrW8FJkXsCbU=", 
-            "RequestId": "5DF8BAD486813184", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "FoiWSZRu5zsXWjrLn0jH6fZyo1zxHFh0HacMOj0kjMAq5JNwz6sf9uQXCcXlCz5VrW8FJkXsCbU=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "5DF8BAD486813184", 
-                "date": "Thu, 13 Jul 2017 02:03:52 GMT", 
-                "content-type": "application/xml"
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "NoncurrentVersionExpiration": {
+                    "NoncurrentDays": 500
+                }, 
+                "NoncurrentVersionTransitions": [
+                    {
+                        "NoncurrentDays": 40, 
+                        "StorageClass": "STANDARD_IA"
+                    }, 
+                    {
+                        "NoncurrentDays": 110, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "Prefix": "", 
+                "Expiration": {
+                    "Days": 500
+                }, 
+                "AbortIncompleteMultipartUpload": {
+                    "DaysAfterInitiation": 4
+                }, 
+                "Transitions": [
+                    {
+                        "Days": 40, 
+                        "StorageClass": "STANDARD_IA"
+                    }, 
+                    {
+                        "Days": 110, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "test-cc-lifecycle"
             }
-        }, 
-        "Error": {
-            "Message": "The lifecycle configuration does not exist", 
-            "Code": "NoSuchLifecycleConfiguration", 
-            "BucketName": "test-cloud-custodian-configure-lifecycle"
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "EyeSa3qCTFEESgMmKtoUJsHsLYScPwhnx1j1JXMzr0b6TdSm9MsgOQcwFzABHwVfyxovuxZSK00=", 
+            "RequestId": "FAF60AFCEEA3C748", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "EyeSa3qCTFEESgMmKtoUJsHsLYScPwhnx1j1JXMzr0b6TdSm9MsgOQcwFzABHwVfyxovuxZSK00=", 
+                "date": "Fri, 14 Jul 2017 04:36:23 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "FAF60AFCEEA3C748", 
+                "server": "AmazonS3"
+            }
         }
     }
 }

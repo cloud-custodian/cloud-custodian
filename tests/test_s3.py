@@ -1578,6 +1578,48 @@ class S3Test(BaseTest):
         client = session.client('s3')
         bname = 'test-cloud-custodian-configure-lifecycle'
         client.create_bucket(Bucket=bname)
+        client.put_bucket_lifecycle_configuration(
+          Bucket=bname,
+          LifecycleConfiguration={
+            'Rules': [
+              {
+                'Expiration': {
+                  'Days': 500
+                },
+                'NoncurrentVersionExpiration': {
+                  'NoncurrentDays': 500
+                },
+                'AbortIncompleteMultipartUpload': {
+                  'DaysAfterInitiation': 4
+                },
+                'Transitions': [
+                  {
+                    'Days': 40,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'Days': 110,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'NoncurrentVersionTransitions': [
+                  {
+                    'NoncurrentDays': 40,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'NoncurrentDays': 110,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'ID': 'test-cc-lifecycle',
+                'Status': 'Enabled',
+                'Prefix': ''
+              }
+            ]
+          }
+        )
+
         self.addCleanup(client.delete_bucket, Bucket=bname)
 
         # Configure the policy
@@ -1587,7 +1629,6 @@ class S3Test(BaseTest):
             'filters': [{'Name': bname}],
             'actions': [{'type': 'configure-lifecycle',
                          'id': 'test-cc-lifecycle',
-                         'prefix': 'test',
                          'delete_days': 400,
                          'delete_previous_version_days': 400,
                          'multipart_days': 7,
@@ -1605,7 +1646,6 @@ class S3Test(BaseTest):
             'resource': 's3',
             'filters': [{'type': 'has-lifecycle',
                          'id': 'test-cc-lifecycle',
-                         'prefix': 'test',
                          'delete_days': 400,
                          'delete_previous_version_days': 400,
                          'multipart_days': 7,
