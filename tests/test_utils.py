@@ -25,7 +25,7 @@ import six
 
 from c7n import utils
 
-from .common import BaseTest
+from .common import BaseTest, Config
 
 
 class Backoff(BaseTest):
@@ -270,20 +270,22 @@ class UtilTest(unittest.TestCase):
         self.assertIsInstance(ret, six.text_type)
 
     def test_load_file(self):
+        config = Config.empty()
+
         # Basic load
         yml_file = os.path.join(os.path.dirname(__file__), 'data', 'vars-test.yml')
-        data = utils.load_file(yml_file)
+        data = utils.load_file(yml_file, config)
         self.assertTrue(len(data['policies']) == 1)
 
         # Load with vars
         resource = 'ec2'
-        data = utils.load_file(yml_file, vars={'resource': resource})
+        data = utils.load_file(yml_file, config, vars={'resource': resource})
         self.assertTrue(data['policies'][0]['resource'] == resource)
 
         # Fail to substitute
-        self.assertRaises(utils.VarsSubstitutionError, utils.load_file, yml_file, vars={'foo': 'bar'})
+        self.assertRaises(utils.VarsSubstitutionError, utils.load_file, yml_file, config, vars={'foo': 'bar'})
 
         # JSON load
         json_file = os.path.join(os.path.dirname(__file__), 'data', 'ec2-instance.json')
-        data = utils.load_file(json_file)
+        data = utils.load_file(json_file, config)
         self.assertTrue(data['InstanceId'] == 'i-1aebf7c0')

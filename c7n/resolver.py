@@ -18,7 +18,8 @@ import io
 import json
 import os.path
 from six.moves.urllib.request import urlopen
-from six.moves.urllib.parse import parse_qsl, urlparse
+
+from c7n import utils
 
 import jmespath
 
@@ -31,7 +32,7 @@ class URIResolver(object):
 
     def resolve(self, uri):
         if uri.startswith('s3://'):
-            contents = self.get_s3_uri(uri)
+            contents = utils.load_file_from_s3(uri, self.session_factory())
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
@@ -40,17 +41,6 @@ class URIResolver(object):
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
-
-    def get_s3_uri(self, uri):
-        parsed = urlparse(uri)
-        client = self.session_factory().client('s3')
-        params = dict(
-            Bucket=parsed.netloc,
-            Key=parsed.path[1:])
-        if parsed.query:
-            params.update(dict(parse_qsl(parsed.query)))
-        result = client.get_object(**params)
-        return result['Body'].read()
 
 
 class ValuesFrom(object):

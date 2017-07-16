@@ -47,12 +47,8 @@ log = logging.getLogger('c7n.policy')
 
 
 def load(options, path, format='yaml', validate=True, vars=None):
-    # should we do os.path.expanduser here?
-    if not os.path.exists(path):
-        raise IOError("Invalid path for config %r" % path)
-
     load_resources()
-    data = utils.load_file(path, format=format, vars=vars)
+    data = utils.load_file(path, options, format=format, vars=vars)
 
     if format == 'json':
         validate = False

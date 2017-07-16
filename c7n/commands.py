@@ -112,7 +112,7 @@ def _load_vars(options):
     vars = None
     if options.vars:
         try:
-            vars = load_file(options.vars)
+            vars = load_file(options.vars, options)
         except IOError as e:
             log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
             sys.exit(1)
