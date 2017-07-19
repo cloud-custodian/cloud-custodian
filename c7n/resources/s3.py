@@ -51,6 +51,9 @@ import ssl
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
+from botocore.vendored import requests
+from botocore.vendored.requests.packages import urllib3
+
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric
@@ -336,13 +339,20 @@ class GlobalGrantsFilter(Filter):
                   - delete-global-grants
     """
 
-    schema = type_schema('global-grants', permissions={
-        'type': 'array', 'items': {
-            'type': 'string', 'enum': [
-                'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
+    schema = type_schema(
+        'global-grants',
+        allow_website={'type': 'boolean'},
+        operator={'type': 'string', 'enum': ['or', 'and']},
+        permissions={
+            'type': 'array', 'items': {
+                'type': 'string', 'enum': [
+                    'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
+
+    from c7n.executor import MainThreadExecutor
+    executor_factory = MainThreadExecutor
 
     def process(self, buckets, event=None):
         with self.executor_factory(max_workers=5) as w:
@@ -354,14 +364,17 @@ class GlobalGrantsFilter(Filter):
         acl = b.get('Acl', {'Grants': []})
         if not acl or not acl['Grants']:
             return
+
         results = []
+        allow_website = self.data.get('allow_website', True)
         perms = self.data.get('permissions', [])
+
         for grant in acl['Grants']:
             if 'URI' not in grant.get("Grantee", {}):
                 continue
             if grant['Grantee']['URI'] not in [self.AUTH_ALL, self.GLOBAL_ALL]:
                 continue
-            if grant['Permission'] == 'READ' and b['Website']:
+            if allow_website and grant['Permission'] == 'READ' and b['Website']:
                 continue
             if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])

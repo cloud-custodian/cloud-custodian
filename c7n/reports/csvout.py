@@ -69,7 +69,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     regions = set([p.options.region for p in policies])
     policy_names = set([p.name for p in policies])
     formatter = Formatter(
-        policies[0].resource_manager,
+        policies[0].resource_manager.resource_type,
         extra_fields=options.field,
         include_default_fields=not options.no_default_fields,
         include_region=len(regions) > 1,
@@ -143,12 +143,9 @@ def _get_values(record, field_list, tag_map):
 
 class Formatter(object):
 
-    def __init__(self, resource_manager, extra_fields=(), include_default_fields=True,
-                 include_region=False, include_policy=False):
-
-        self.resource_manager = resource_manager
+    def __init__(self, model, extra_fields=(), include_default_fields=True,
+                 include_region=False, include_policy=False, fields=None):
         # Lookup default fields for resource type.
-        model = resource_manager.resource_type
         self._id_field = model.id
         self._date_field = getattr(model, 'date', None)
 
@@ -160,7 +157,10 @@ class Formatter(object):
             if model.date:
                 mfields.append(model.date)
 
-        if include_default_fields:
+        if fields is not None:
+            for m in mfields:
+                fields[m] = m
+        elif include_default_fields:
             fields = OrderedDict(zip(mfields, mfields))
         else:
             fields = OrderedDict()

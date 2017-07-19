@@ -27,7 +27,7 @@ import six
 from botocore.client import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, IndexMetrics
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.tags import register_tags
 from c7n.utils import (
@@ -111,6 +111,7 @@ class QueryMeta(type):
             # Generic cloud watch metrics support
             if m.dimension and 'metrics':
                 attrs['filter_registry'].register('metrics', MetricsFilter)
+                attrs['action_registry'].register('index-metrics', IndexMetrics)
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
                 # Generic ec2 retry

@@ -11,19 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .core import (
-    ANNOTATION_KEY,
-    FilterValidationError,
-    OPERATORS,
-    FilterRegistry,
-    Filter,
-    Or,
-    And,
-    ValueFilter,
-    AgeFilter,
-    EventFilter)
-from .iamaccess import CrossAccountAccessFilter
-from .metrics import MetricsFilter, ShieldMetrics
-from .vpc import DefaultVpcBase
+from setuptools import setup, find_packages
+
+setup(
+    name="c7n_org",
+    version='0.0.1',
+    description="Cloud Custodian - Multi Account",
+    classifiers=[
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
+    ],
+    url="https://github.com/capitalone/cloud-custodian",
+    license="Apache-2.0",
+    packages=find_packages(),
+    entry_points={
+        'console_scripts': [
+            'c7n-org = c7n_org.cli:cli']},
+    install_requires=["c7n", "click"]
+)

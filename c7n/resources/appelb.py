@@ -28,6 +28,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, chunks, type_schema, get_retry
 
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+
 log = logging.getLogger('custodian.app-elb')
 
 filters = FilterRegistry('app-elb.filters')
@@ -72,6 +74,9 @@ class AppELB(QueryResourceManager):
 
         return albs
 
+    def get_arn(self, r):
+        return r[self.resource_type.id]
+
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
     def _process_tags(alb_set):
@@ -115,6 +120,10 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+filters.register('shield-enabled', IsShieldProtected)
+actions.register('set-shield', SetShieldProtection)
 
 
 @actions.register('mark-for-op')
@@ -639,3 +648,95 @@ class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
     def __call__(self, target_group):
         return (target_group.get('VpcId') and
                 self.match(target_group.get('VpcId')) or False)
+
+
+@AppELB.filter_registry.register('waf-enabled')
+class WafEnabled(Filter):
+
+    schema = type_schema(
+        'waf-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('waf-regional:ListResourcesForWebACL', 'waf-regional:ListWebACLs')
+
+    # TODO verify name uniqueness within region/account
+    # TODO consider associated resource fetch in augment
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            'waf-regional')
+
+        target_acl = self.data.get('web-acl')
+        state = self.data.get('state', False)
+
+        name_id_map = {}
+        resource_map = {}
+
+        wafs = self.get_resource_manager('waf-regional').resources()
+
+        for w in wafs:
+            if not 'c7n:AssociatedResources' in w:
+                arns = client.list_resources_for_web_acl(
+                    WebAclId=r['WebACLId']).get('ResourceArns', [])
+                w['c7n:AssociatedResources'] = arns
+            name_id_map[w['Name']] = w['WebACLId']
+            for r in w['c7n:AssociatedResources']:
+                resource_map[r] = w['WebACLId']
+
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+
+        # generally frown on runtime validation errors, but also frown on
+        # api calls during validation.
+        if target_acl_id not in name_id_map.values():
+            raise ValueError("Invalid target acl:%s, acl not found" % target_acl)
+
+        results = []
+        for r in resources:
+            arn = self.manager.get_arn(r)
+            if arn in resource_map:
+                if not target_acl:
+                    continue
+                r_acl = resource_map[arn]
+                if r_acl == target_acl_id:
+                    continue
+                results.append(r)
+            else:
+                results.append(r)
+        return results
+
+
+
+@AppELB.action_registry.register('set-waf')
+class SetWaf(BaseAction):
+    """Enable/Disable waf protection on applicable resource.
+
+    TODO: check if already protected by another web acl and skip
+    """
+    permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
+
+    schema = type_schema(
+        'set-waf', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+#            'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = name_id_map.get(target_waf, target_waf)
+
+        if target_acl_id not in waf_name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = local_session(self.manager.session_factory).client(
+            'waf-regional')
+
+        for r in resources:
+            arn = self.manager.get_arn(r)
+            if arn in protected_arns:
+                continue
+            client.associate_web_acl(
+                WebACLId=target_acl_id, ResourceArn=arn)
+            # TODO implement force to reassociate.
+            # TODO investigate limits on waf association.

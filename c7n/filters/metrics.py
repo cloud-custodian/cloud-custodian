@@ -66,7 +66,7 @@ class MetricsFilter(Filter):
            'period': {'type': 'number'},
            'attr-multiplier': {'type': 'number'},
            'percent-attr': {'type': 'string'},
-           'required': ('value', 'name')})
+           'required': ('name',)})
 
     permissions = ("cloudwatch:GetMetricStatistics",)
 
@@ -113,7 +113,7 @@ class MetricsFilter(Filter):
         self.statistics = self.data.get('statistics', 'Average')
         self.model = self.manager.get_model()
         self.op = OPERATORS[self.data.get('op', 'less-than')]
-        self.value = self.data['value']
+        self.value = self.data.get('value')
 
         ns = self.data.get('namespace')
         if not ns:
@@ -151,7 +151,7 @@ class MetricsFilter(Filter):
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
             dimensions = self.get_dimensions(r)
-            collected_metrics = r.setdefault('c7n.metrics', {})
+            met = collected_metrics = r.setdefault('c7n.metrics', {})
             # Note this annotation cache is policy scoped, not across
             # policies, still the lack of full qualification on the key
             # means multiple filters within a policy using the same metric
@@ -176,6 +176,51 @@ class MetricsFilter(Filter):
                            rvalue * 100)
                 if self.op(percent, self.value):
                     matched.append(r)
-            elif self.op(collected_metrics[key][0][self.statistics], self.value):
+
+            elif self.value is None or self.op(collected_metrics[key][0][self.statistics], self.value):
                 matched.append(r)
         return matched
+
+
+class ShieldMetrics(MetricsFilter):
+    """Specialized metrics filter for shield
+    """
+    namespace = "AWS/DDoSProtection"
+    metrics = (
+        'DDoSAttackBitsPerSecond',
+        'DDoSAttackRequestsPerSecond',
+        'DDoSDetected')
+
+    attack_vectors = (
+        'ACKFlood',
+        'ChargenReflection',
+        'DNSReflection',
+        'GenericUDPReflection',
+        'MSSQLReflection',
+        'NetBIOSReflection',
+        'NTPReflection',
+        'PortMapper',
+        'RequestFlood',
+        'RIPReflection',
+        'SNMPReflection',
+        'SYNFlood',
+        'SSDPReflection',
+        'UDPTraffic',
+        'UDPFragment',
+        )
+
+    def validate(self):
+        if self.data.get('name') not in metrics:
+            raise FilterValidationError(
+                "invalid shield metric %s valid:%s" % (
+                    self.data['name'],
+                    ", ".join(self.metrics)))
+
+    def get_dimensions(self, resource):
+        return [{
+            'Name': 'ResourceArn',
+            'Value': self.manager.get_arn(resource)}]
+
+    def process(self, resources, event=None):
+        self.data['namespace'] = self.namespace
+        return super(ShieldMetrics, self).process(resources, event)
