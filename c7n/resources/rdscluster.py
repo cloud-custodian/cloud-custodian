@@ -23,6 +23,7 @@ from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n import tags
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks, get_retry)
 
@@ -30,6 +31,9 @@ log = logging.getLogger('custodian.rds-cluster')
 
 filters = FilterRegistry('rds-cluster.filters')
 actions = ActionRegistry('rds-cluster.actions')
+
+filters.register('tag-count', tags.TagCountFilter)
+filters.register('marked-for-op', tags.TagActionFilter)
 
 
 @resources.register('rds-cluster')
@@ -79,6 +83,104 @@ def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, 
     # Rds maintains a low api call limit, so this can take some time :-(
     with executor_factory(max_workers=1) as w:
         return list(w.map(process_tags, dbs))
+
+
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+    """Mark a RDS cluster for specific custodian action
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: mark-for-delete
+                resource: rds-cluster
+                filters:
+                  - type: default-vpc
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
+    schema = type_schema(
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
+    permissions = ('rds:AddTagsToResource',)
+
+    batch_size = 5
+
+    def process(self, dbs):
+        return super(TagDelayedAction, self).process(dbs)
+
+    def process_resource_set(self, dbs, tags):
+        client = local_session(self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('tag')
+@actions.register('mark')
+class Tag(tags.Tag):
+    """Mark/tag a RDS cluster with a key/value
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-owner-tag
+                resource: rds-cluster
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('rds:AddTagsToResource',)
+
+    def process_resource_set(self, dbs, ts):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+
+
+@actions.register('remove-tag')
+@actions.register('unmark')
+class RemoveTag(tags.RemoveTag):
+    """Removes a tag or set of tags from RDS clusters
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-unmark-cluster
+                resource: rds-cluster
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: unmark
+                    tags: ["ExpiredTag"]
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('rds:RemoveTagsFromResource',)
+
+    def process_resource_set(self, dbs, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
 
 
 @filters.register('security-group')
