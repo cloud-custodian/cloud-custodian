@@ -386,6 +386,8 @@ class ServiceLimit(Filter):
                   - type: service-limit
                     services:
                       - IAM
+                    limits:
+                      - Roles
                     threshold: 1.0
     """
 
@@ -453,12 +455,14 @@ class RequestLimitIncrease(BaseAction):
              - type: service-limit
                services:
                  - EBS
+               limits:
+                 - Provisioned IOPS (SSD) storage (GiB)
                threshold: 60.5
              actions:
                - type: request-limit-increase
                  notify: [email, email2]
                  percent-increase: 50
-                 message: "Raise {service} by {percent}%"
+                 message: "Raise {service} - {limits} by {percent}%"
     """
 
     schema = type_schema(
@@ -473,8 +477,8 @@ class RequestLimitIncrease(BaseAction):
 
     permissions = ('support:CreateCase',)
 
-    default_subject = 'Raise the account limit of {service}'
-    default_template = 'Please raise the account limit of {service} by {percent}%'
+    default_subject = 'Raise the account limit of {service} - {limits} in {region}'
+    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -493,18 +497,24 @@ class RequestLimitIncrease(BaseAction):
         services_done = set()
         for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
             service = resource['service']
+            limits = resource['check']
+            region = resource['region']
+
             if service in services_done:
                 continue
 
             services_done.add(service)
+            services_done.add(limits)
+            services_done.add(region)
             service_code = self.service_code_mapping.get(service)
 
             subject = self.data.get('subject', self.default_subject)
-            subject = subject.format(service=service)
 
+            subject = subject.format(service=service,limits=limits,region=region)
             body = self.data.get('message', self.default_template)
             body = body.format(**{
                 'service': service,
+                'limits': limits,
                 'percent': self.data.get('percent-increase')
             })
 
