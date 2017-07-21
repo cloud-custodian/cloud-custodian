@@ -25,6 +25,7 @@ import boto3
 from botocore.client import ClientError
 import jmespath
 import six
+import re
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
@@ -470,6 +471,15 @@ class LambdaMode(PolicyExecutionMode):
                 self.policy._write_file(
                     "action-%s" % action.name, utils.dumps(results))
         return resources
+    def expand_variables(self, policy):
+        """expand any variables in the action to_from/cc_from fields.
+        """
+        p = self.policy.data.copy()
+        if 'mode' in self.policy.data:
+            mode = self.policy.data['mode'].copy()
+            mode['role'] = re.sub(r'{{account_id}}',policy['account_id'],mode['role'])
+            p['mode'] = mode
+        return p
 
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
@@ -478,6 +488,14 @@ class LambdaMode(PolicyExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
+
+            policy = {
+                'account_id': self.policy.options.account_id,
+                'region': self.policy.options.region,
+                'policy': self.policy.data
+            }
+            self.policy.data = self.expand_variables(policy)
+
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
