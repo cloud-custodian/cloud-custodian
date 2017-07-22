@@ -23,7 +23,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters import Filter, FilterRegistry, ValueFilter, FilterValidationError
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -385,10 +385,17 @@ class ServiceLimit(Filter):
                 filters:
                   - type: service-limit
                     services:
+                      - EC2
+                    threshold: 1.0
+              - name: specify-region-for-global-service
+                region: us-east-1
+                resource: account
+                filters:
+                  - type: service-limit
+                    services:
                       - IAM
                     limits:
                       - Roles
-                    threshold: 1.0
     """
 
     schema = type_schema(
@@ -403,13 +410,28 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+    global_services = set(['IAM'])
+
+    def validate(self):
+        region = self.manager.data.get('region', '')
+        if len(self.global_services.intersection(self.data.get('services', []))):
+            if region != 'us-east-1':
+                raise FilterValidationError(
+                    "Global services: %s must be targeted in us-east-1 on the policy"
+                    % ', '.join(self.global_services))
+        return self
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('support')
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name='us-east-1')
         checks = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
 
+        region = self.manager.config.region
+        checks['flaggedResources'] = [r for r in checks['flaggedResources']
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')]
         resources[0]['c7n:ServiceLimits'] = checks
+
         delta = timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(checks['timestamp'])
         if datetime.now(tz=tzutc()) - delta > check_date:
@@ -492,7 +514,7 @@ class RequestLimitIncrease(BaseAction):
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
-        client = session.client('support')
+        client = session.client('support', region_name='us-east-1')
 
         services_done = set()
         for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
