@@ -886,10 +886,8 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-            filters:
-              - type: ebs
           actions:
-            - snapshot
+            - type: snapshot
               copy-tags:
                 - Name
     """
