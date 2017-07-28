@@ -13,7 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.executor import MainThreadExecutor
 from c7n.resources.rdscluster import RDSCluster
+from c7n import tags
 
 from .common import BaseTest
 
@@ -155,6 +157,110 @@ class RDSClusterTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rdscluster_tag_and_remove(self):
+        self.patch(RDSCluster, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_tag_and_remove'
+        )
+        client = session_factory().client('rds')
+
+        p = self.load_policy({
+            'name': 'rds-cluster-tag',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'DBClusterIdentifier': 'c7ntest'}
+            ],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBClusterIdentifier'])
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('xyz' in tag_map)
+
+        policy = self.load_policy({
+            'name': 'rds-cluster-remove-tag',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'tag:xyz': 'not-null'}
+            ],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['xyz']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('xyz' in tag_map)
+
+    def test_rdscluster_mark_match_unmark(self):
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_mark_and_match'
+        )
+        client = session_factory().client('rds')
+
+        # mark
+        p = self.load_policy({
+            'name': 'rds-mark',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'DBClusterIdentifier': 'c7ntest'}],
+            'actions': [
+                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': 1,
+                 'op': 'delete'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # assert marked
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBClusterIdentifier']
+        )
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('custodian_next' in tag_map)
+
+        # match marked
+        policy = self.load_policy({
+            'name': 'rds-mark-filter',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete', 'skew': 1}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        # unmark
+        policy = self.load_policy({
+            'name': 'rds-mark-filter',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete', 'skew': 1}
+            ],
+            'actions': [
+                {'type': 'unmark', 'tags': ['custodian_next']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        # assert unmarked
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('custodian_next' in tag_map)
 
 
 class RDSClusterSnapshotTest(BaseTest):
