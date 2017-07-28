@@ -1564,7 +1564,67 @@ class S3Test(BaseTest):
             'resource': 's3',
             'filters': [{'type': 'has-lifecycle',
                          'id': 'test-cc-lifecycle',
-                         'multipart_days': 5}]},
+                         'multipart_days': 5 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 450 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_previous_version_days': 450}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)

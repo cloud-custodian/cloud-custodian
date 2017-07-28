@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LocationConstraint": "us-east-1",
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "zdXRgS/2pcPZGXsoRc8dnqgpNlH8A+XiD/s0s5jWVIbKw2LjdbHrIi18jZst1Kk5w8Ctr/n5jlQ=", 
+            "RequestId": "67C0217DA0E45DC1", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "zdXRgS/2pcPZGXsoRc8dnqgpNlH8A+XiD/s0s5jWVIbKw2LjdbHrIi18jZst1Kk5w8Ctr/n5jlQ=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "67C0217DA0E45DC1", 
+                "date": "Fri, 28 Jul 2017 13:49:04 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

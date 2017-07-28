@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "NoncurrentVersionExpiration": {
+                    "NoncurrentDays": 400
+                }, 
+                "Transition": {
+                    "Days": 30, 
+                    "StorageClass": "STANDARD_IA"
+                }, 
+                "Prefix": "", 
+                "Expiration": {
+                    "Days": 400
+                }, 
+                "AbortIncompleteMultipartUpload": {
+                    "DaysAfterInitiation": 7
+                }, 
+                "NoncurrentVersionTransition": {
+                    "NoncurrentDays": 30, 
+                    "StorageClass": "STANDARD_IA"
+                }, 
+                "ID": "test-cc-lifecycle"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "e04sdlTBiLcoe9HQtoqr0HT+nxGVgBoQy0mXtt0vlBMZRo8TelUPCwO04nS9vS809qsu9G+GWUk=", 
+            "RequestId": "765F08F7E5DA3109", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "e04sdlTBiLcoe9HQtoqr0HT+nxGVgBoQy0mXtt0vlBMZRo8TelUPCwO04nS9vS809qsu9G+GWUk=", 
+                "date": "Fri, 28 Jul 2017 13:49:08 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "765F08F7E5DA3109", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
