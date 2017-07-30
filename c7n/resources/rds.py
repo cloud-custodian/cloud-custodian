@@ -900,7 +900,7 @@ class RetentionWindow(BaseAction):
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
-        retention_type = self.data['enforce', 'min'].lower()
+        retention_type = self.data.get('enforce', 'min').lower()
 
         if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
