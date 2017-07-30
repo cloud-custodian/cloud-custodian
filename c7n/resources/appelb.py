@@ -14,6 +14,8 @@
 """
 Application Load Balancers
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from collections import defaultdict
@@ -76,7 +78,7 @@ def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
         client = local_session(session_factory).client('elbv2')
         alb_map = {alb['LoadBalancerArn']: alb for alb in alb_set}
 
-        results = retry(client.describe_tags, ResourceArns=alb_map.keys())
+        results = retry(client.describe_tags, ResourceArns=list(alb_map.keys()))
         for tag_desc in results['TagDescriptions']:
             if ('ResourceArn' in tag_desc and
                     tag_desc['ResourceArn'] in alb_map):
@@ -110,6 +112,9 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @actions.register('mark-for-op')
@@ -341,7 +346,8 @@ class AppELBModifyListenerPolicy(BaseAction):
                   - type: modify-listener
                     protocol: HTTPS
                     sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
-                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+                    certificate: "arn:aws:acm:region:123456789012:certificate/12345678-\
+                    1234-1234-1234-123456789012"
     """
 
     schema = type_schema(
@@ -512,7 +518,7 @@ def _describe_target_group_tags(target_groups, session_factory,
 
         results = retry(
             client.describe_tags,
-            ResourceArns=target_group_map.keys())
+            ResourceArns=list(target_group_map.keys()))
         for tag_desc in results['TagDescriptions']:
             if ('ResourceArn' in tag_desc and
                     tag_desc['ResourceArn'] in target_group_map):

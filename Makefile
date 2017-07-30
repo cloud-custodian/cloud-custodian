@@ -1,25 +1,21 @@
 
 install:
 	python -m virtualenv --python python2.7 .
-	source bin/activate && pip install -r requirements.txt
-	source bin/activate && python setup.py develop
-
-develop:
-	python -m virtualenv --python python2.7 .
-	source bin/activate && pip install -r requirements-dev.txt
-	source bin/activate && python setup.py develop
+	. bin/activate && pip install -r requirements-dev.txt
+	. bin/activate && python setup.py develop
 
 coverage:
 	rm -Rf .coverage
-	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=cover --processes=-1 --cover-inclusive tests
-
-ttest:
-	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer tests
-lint:
-	flake8 c7n --ignore=W293,W291,W503,W391,E123
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=coverage --processes=-1 --cover-inclusive tests  --process-timeout=64
 
 test:
-	AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar AWS_DEFAULT_REGION=us-east-1 nosetests  --processes=-1 tests
+	./bin/tox -e py27
+
+nose-tests:
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 tests
+
+ttest:
+	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer --process-timeout=300 tests
 
 depcache:
 	mkdir -p deps
@@ -43,4 +39,5 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 clean:
-	rm -rf .Python bin include lib pip-selfcheck.json 
+	rm -rf .tox .Python bin include lib pip-selfcheck.json
+

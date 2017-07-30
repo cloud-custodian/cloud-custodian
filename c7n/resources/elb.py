@@ -14,6 +14,8 @@
 """
 Elastic Load Balancers
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from concurrent.futures import as_completed
 import logging
 import re
@@ -90,7 +92,7 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_tags,
-                    LoadBalancerNames=elb_map.keys())
+                    LoadBalancerNames=list(elb_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'LoadBalancerNotFound':
@@ -279,7 +281,7 @@ class SetSslListenerPolicy(BaseAction):
         # to make it unique within the
         # set of policies for this load balancer.
         policy_name = self.data.get('name') + '-' + \
-                      str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
+            str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
         policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
@@ -351,6 +353,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     """ELB subnet filter"""
 
     RelatedIdsExpression = "Subnets[]"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @filters.register('instance')
@@ -462,14 +467,14 @@ class SSLPolicyFilter(Filter):
         'oneOf': [
             {'required': ['type', 'whitelist']},
             {'required': ['type', 'blacklist']}
-            ],
+        ],
         'properties': {
             'type': {'enum': ['ssl-policy']},
             'matching': {'type': 'string'},
             'whitelist': {'type': 'array', 'items': {'type': 'string'}},
             'blacklist': {'type': 'array', 'items': {'type': 'string'}}
-            }
         }
+    }
     permissions = ("elasticloadbalancing:DescribeLoadBalancerPolicies",)
 
     def validate(self):
@@ -508,7 +513,8 @@ class SSLPolicyFilter(Filter):
             regex = self.data.get('matching')
             filtered_pairs = []
             for (elb, active_policies) in active_policy_attribute_tuples:
-                filtered_policies =  [policy for policy in active_policies if bool(re.match(regex, policy, flags=re.IGNORECASE))]
+                filtered_policies = [policy for policy in active_policies if
+                bool(re.match(regex, policy, flags=re.IGNORECASE))]
                 if filtered_policies:
                     filtered_pairs.append((elb, filtered_policies))
             active_policy_attribute_tuples = filtered_pairs

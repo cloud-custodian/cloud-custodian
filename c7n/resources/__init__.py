@@ -14,6 +14,7 @@
 #
 # AWS resources to manage
 #
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 def load_resources():
@@ -42,6 +43,7 @@ def load_resources():
     import c7n.resources.ecs
     import c7n.resources.efs
     import c7n.resources.elasticache
+    import c7n.resources.elasticbeanstalk
     import c7n.resources.elasticsearch
     import c7n.resources.elb
     import c7n.resources.emr
@@ -50,11 +52,13 @@ def load_resources():
     import c7n.resources.health
     import c7n.resources.hsm
     import c7n.resources.iam
+    import c7n.resources.iot
     import c7n.resources.kinesis
     import c7n.resources.kms
     import c7n.resources.ml
     import c7n.resources.opsworks
     import c7n.resources.rds
+    import c7n.resources.rdsparamgroup
     import c7n.resources.rdscluster
     import c7n.resources.redshift
     import c7n.resources.route53

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.client import ClientError
 
 from collections import Counter
@@ -143,6 +145,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return subnet_ids
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('launch-config')
 class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
     """Filter asg by launch config attributes.
@@ -189,7 +194,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def initialize(self, asgs):
         super(ConfigValidFilter, self).initialize(asgs)
-        #pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
         self.subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
@@ -400,8 +405,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 asg['LaunchConfigurationName'])
             return False
         unencrypted = []
-        if (not self.data.get('exclude_image')
-                and cfg['ImageId'] in self.unencrypted_images):
+        if (not self.data.get('exclude_image') and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
         if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
             unencrypted.append('LaunchConfig')
@@ -424,7 +428,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     msg = e.response['Error']['Message']
                     e_ami_ids = [
                         e_ami_id.strip() for e_ami_id
-                        in msg[msg.find("'[")+2:msg.rfind("]'")].split(',')]
+                        in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
                     self.log.warning(
                         "asg:not-encrypted filter image not found %s",
                         e_ami_ids)
@@ -480,7 +484,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             return unencrypted_configs
 
         self.log.debug("querying %d snapshots", len(snaps))
-        for s in self.get_snapshots(ec2, snaps.keys()):
+        for s in self.get_snapshots(ec2, list(snaps.keys())):
             if not s.get('Encrypted'):
                 unencrypted_configs.update(snaps[s['SnapshotId']])
         return unencrypted_configs
@@ -493,7 +497,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
                     msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     self.log.warning("Snapshot not found %s" % e_snap_id)
                     snap_ids.remove(e_snap_id)
                     continue
@@ -525,7 +529,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -689,7 +693,7 @@ class Resize(Action):
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
-        #if self.data['desired_size'] != 'current':
+        # if self.data['desired_size'] != 'current':
         #    raise FilterValidationError(
         #        "only resizing desired/min to current capacity is supported")
         return self
@@ -893,8 +897,7 @@ class PropagateTags(Action):
         client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
-                   if t['PropagateAtLaunch']
-                   and not t['Key'].startswith('aws:')}
+                   if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
 
         if self.data.get('tags'):
             tag_map = {
@@ -1151,10 +1154,6 @@ class Suspend(Action):
     ASG_PROCESSES = set(ASG_PROCESSES)
 
     def process(self, asgs):
-        original_count = len(asgs)
-        asgs = [a for a in asgs if a['Instances']]
-        self.log.debug("Filtered from %d to %d asgs with instances" % (
-            original_count, len(asgs)))
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_asg, asgs))
 
@@ -1360,7 +1359,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 

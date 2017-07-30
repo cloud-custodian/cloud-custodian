@@ -10,13 +10,13 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ make test
+   $ tox
 
 Coverage reports can be generated and viewed with the following:
 
 .. code-block:: bash
 
-   $ make coverage
+   (py27) $ make coverage
 
    # Open the reports in a browser
 
@@ -25,6 +25,19 @@ Coverage reports can be generated and viewed with the following:
 
    # on gnomeish linux
    $ gnome-open coverage/index.html
+
+
+Ratcheting up Python 3.6 Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We are in the process of porting Custodian to run on both Python 3.6 in
+addition to 2.7. As part of this process, we record tests that are known to
+pass under Python 3.6 in a file called ``ratchet.txt``, and we require these
+and only these tests to pass under the ``py36`` environment. If you make
+changes that introduce new passing tests under Python 3.6, then the ``py36``
+test environment will add the new tests to the ``ratchet.txt`` file and will
+fail with a message prompting you to commit the changes to ``ratchet.txt``.
+
 
 Decorating tests
 ~~~~~~~~~~~~~~~~

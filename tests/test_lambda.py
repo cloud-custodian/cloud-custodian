@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda
 
@@ -45,7 +47,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
-            {r['c7n.EventSources'][0] for r in resources},
+            {r['c7n:EventSources'][0] for r in resources},
             set(['iot.amazonaws.com']))
 
     def test_sg_filter(self):
@@ -63,7 +65,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]['FunctionName'], 'mys3')
         self.assertEqual(
-            resources[0]['c7n.matched-security-groups'],
+            resources[0]['c7n:matched-security-groups'],
             ['sg-f9cc4d9f'])
 
 

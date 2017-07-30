@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
 import itertools
@@ -23,6 +24,7 @@ from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -135,7 +137,10 @@ class FlowLogFilter(Filter):
                 fl_matches = []
                 for fl in flogs:
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
-                    traffic_type_match = (traffic_type is None) or op(fl['TrafficType'], traffic_type.upper())
+                    traffic_type_match = (
+                        traffic_type is None) or op(
+                        fl['TrafficType'],
+                        traffic_type.upper())
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
@@ -150,6 +155,40 @@ class FlowLogFilter(Filter):
                         results.append(r)
 
         return results
+
+
+@Vpc.filter_registry.register('security-group')
+class SecurityGroupFilter(RelatedResourceFilter):
+    """Filter VPCs based on Security Group attributes
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: security-group
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'security-group', rinherit=ValueFilter.schema,
+        **{'match-resource':{'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+    RelatedIdsExpression = '[SecurityGroups][].GroupId'
+    AnnotationKey = "matched-vpcs"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_group_ids = {
+            g['GroupId'] for g in
+            self.manager.get_resource_manager('security-group').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_group_ids
 
 
 @resources.register('subnet')
@@ -167,7 +206,9 @@ class Subnet(QueryResourceManager):
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
+
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
@@ -275,7 +316,7 @@ class SecurityGroupDiff(object):
             rule.get('FromPort', 0) or 0,
             rule.get('ToPort', 0) or 0,
             rule.get('IpProtocol', '-1') or '-1'
-            )
+        )
         for a, ke in self.RULE_ATTRS:
             if a not in rule:
                 continue
@@ -283,7 +324,7 @@ class SecurityGroupDiff(object):
             ev.sort()
             for e in ev:
                 buf += "%s-" % e
-        return abs(zlib.crc32(buf))
+        return abs(zlib.crc32(buf.encode('ascii')))
 
 
 @SecurityGroup.action_registry.register('patch')
@@ -482,8 +523,7 @@ class UnusedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         return unused and self.filter_peered_refs(unused) or []
 
 
@@ -510,8 +550,7 @@ class UsedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
         return [r for r in resources if r['GroupId'] not in unused]
 
@@ -651,10 +690,10 @@ class SGPermission(Filter):
         OnlyPorts: [22, 443, 80]
 
       - type: egress
-        IpRanges:
-          - value_type: cidr
-          - op: in
-          - value: x.y.z
+        Cidr:
+          value_type: cidr
+          op: in
+          value: x.y.z
 
     """
 
@@ -807,12 +846,12 @@ class IPPermission(SGPermission):
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
@@ -838,11 +877,11 @@ class IPPermissionEgress(SGPermission):
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['egress']},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
@@ -944,7 +983,15 @@ class NetworkInterface(QueryResourceManager):
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
 
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagSet', [])
+        return resources
+
+
 NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register(
+    'network-location', net_filters.NetworkLocation)
 
 
 @NetworkInterface.filter_registry.register('subnet')
@@ -1248,4 +1295,3 @@ class KeyPair(QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
-

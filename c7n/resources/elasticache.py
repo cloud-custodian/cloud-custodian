@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
 import logging
@@ -38,7 +39,7 @@ log = logging.getLogger('custodian.elasticache')
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
-#registered marked-for-op filter
+# registered marked-for-op filter
 filters.register('marked-for-op', tags.TagActionFilter)
 
 TTYPE = re.compile('cache.t')
@@ -123,6 +124,9 @@ class SubnetFilter(net_filters.SubnetFilter):
             self.manager.get_resource_manager(
                 'cache-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 # added mark-for-op
@@ -413,7 +417,7 @@ class ElastiCacheSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'dummy'
 
@@ -477,6 +481,8 @@ class DeleteElastiCacheSnapshot(BaseAction):
             c.delete_snapshot(SnapshotName=s['SnapshotName'])
 
 # added mark-for-op
+
+
 @ElastiCacheSnapshot.action_registry.register('mark-for-op')
 class ElastiCacheSnapshotTagDelayedAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an elasticache snapshot
@@ -569,6 +575,8 @@ class CopyClusterTags(BaseAction):
                 client.add_tags_to_resource, ResourceName=arn, Tags=copy_tags)
 
 # added unmark
+
+
 @ElastiCacheSnapshot.action_registry.register('remove-tag')
 @ElastiCacheSnapshot.action_registry.register('unmark')
 class ElastiCacheSnapshotRemoveTag(tags.RemoveTag):
@@ -648,4 +656,4 @@ def _cluster_eligible_for_snapshot(cluster):
     return (
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
-        )
+    )

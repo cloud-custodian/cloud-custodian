@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import time
 
 from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
+from c7n.utils import reset_session_cache
 
 
 class ExecutionContext(object):
@@ -56,6 +59,8 @@ class ExecutionContext(object):
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         self.metrics.flush()
+        # clear policy execution thread local session cache
+        reset_session_cache()
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__exit__(exc_type, exc_value, exc_traceback)
             self.cloudwatch_logs = None

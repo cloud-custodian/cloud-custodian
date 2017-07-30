@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import six
+
+from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import AppELB, AppELBTargetGroup
 
@@ -251,7 +255,7 @@ class AppELBTest(BaseTest):
         arn = resources[0]['LoadBalancerArn']
         attributes = client.describe_load_balancer_attributes(LoadBalancerArn=arn)['Attributes']
         for attribute in attributes:
-            for key,value in attribute.iteritems():
+            for key,value in six.iteritems(attribute):
                 if 'deletion_protection.enabled' in key:
                     self.assertTrue(value)
         self.assertEqual(len(resources), 1)

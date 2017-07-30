@@ -13,6 +13,8 @@
 # limitations under the License.
 """Data Pipeline
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.exceptions import ClientError
 
 from c7n.manager import resources
@@ -51,7 +53,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_pipelines,
-                    pipelineIds=pipe_map.keys())
+                    pipelineIds=list(pipe_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'PipelineNotFound':

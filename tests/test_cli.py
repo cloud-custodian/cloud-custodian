@@ -11,19 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 import sys
 
 from argparse import ArgumentTypeError
-from common import BaseTest
-from cStringIO import StringIO
-from c7n import cli, version, commands
+from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
+
+from .common import BaseTest, TextTestIO
 
 
 class CliTest(BaseTest):
     """ A subclass of BaseTest with some handy functions for CLI related tests. """
+
+    def patch_account_id(self):
+        test_account_id = lambda x: self.account_id
+        self.patch(cli, '_default_account_id', test_account_id)
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
@@ -31,14 +37,15 @@ class CliTest(BaseTest):
         return out
 
     def capture_output(self):
-        out = StringIO()
-        err = StringIO()
+        out = TextTestIO()
+        err = TextTestIO()
         self.patch(sys, 'stdout', out)
         self.patch(sys, 'stderr', err)
         return out, err
 
-    def run_and_expect_success(self, argv, capture=True):
+    def run_and_expect_success(self, argv):
         """ Run cli.main() with supplied argv and expect normal execution. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
         try:
@@ -49,6 +56,7 @@ class CliTest(BaseTest):
 
     def run_and_expect_failure(self, argv, exit_code):
         """ Run cli.main() with supplied argv and expect exit_code. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         out, err = self.capture_output()
         #clear_resources()
@@ -59,6 +67,7 @@ class CliTest(BaseTest):
 
     def run_and_expect_exception(self, argv, exception):
         """ Run cli.main() with supplied argv and expect supplied exception. """
+        self.patch_account_id()
         self.patch(sys, 'argv', argv)
         #clear_resources()
         try:
@@ -229,14 +238,6 @@ class ReportTest(CliTest):
         self.assertIn('InstanceId', output)
         self.assertIn('i-014296505597bf519', output)
 
-        # Test for when output dir contains metric name, ensure that the
-        # output_dir gets auto-corrected
-        new_output_dir = os.path.join(self.output_dir, policy_name)
-        output = self.get_output(
-            ['custodian', 'report', '-s', new_output_dir, yaml_file])
-        self.assertIn('InstanceId', output)
-        self.assertIn('i-014296505597bf519', output)
-
         # empty file
         temp_dir = self.get_temp_dir()
         empty_policies = {'policies': []}
@@ -249,7 +250,7 @@ class ReportTest(CliTest):
         policies = {
             'policies': [
                 {'name': 'foo', 'resource': 's3'},
-                { 'name': 'bar', 'resource': 'ec2'},
+                {'name': 'bar', 'resource': 'ec2'},
             ]
         }
         yaml_file = self.write_policy_file(policies)
@@ -258,11 +259,9 @@ class ReportTest(CliTest):
             1)
 
     def test_warning_on_empty_policy_filter(self):
-        """
-        This test is to examine the warning output supplied when -p is used and
-        the resulting policy set is empty.  It is not specific to the `report`
-        subcommand - it is also used by `run` and a few other subcommands.
-        """
+        # This test is to examine the warning output supplied when -p is used and
+        # the resulting policy set is empty.  It is not specific to the `report`
+        # subcommand - it is also used by `run` and a few other subcommands.
         policy_name = 'test-policy'
         valid_policies = {
             'policies':
@@ -276,19 +275,16 @@ class ReportTest(CliTest):
         temp_dir = self.get_temp_dir()
 
         bad_policy_name = policy_name + '-nonexistent'
-        _, err = self.run_and_expect_failure(
-            ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file], 
+        log_output = self.capture_logging('custodian.commands')
+        self.run_and_expect_failure(
+            ['custodian', 'report', '-s', temp_dir, '-p', bad_policy_name, yaml_file],
             1)
-        
-        self.assertIn('Warning', err)
-        self.assertIn(policy_name, err)
+        self.assertIn(policy_name, log_output.getvalue())
 
         bad_resource_name = 'foo'
-        _, err = self.run_and_expect_failure(
+        self.run_and_expect_failure(
             ['custodian', 'report', '-s', temp_dir, '-t', bad_resource_name, yaml_file],
             1)
-        
-        self.assertIn('Warning', err)
 
 
 class LogsTest(CliTest):
@@ -357,20 +353,21 @@ class TabCompletionTest(CliTest):
 
         args = MockArgs()
         self.assertIn('rds', cli._schema_tab_completer('rd', args))
-        
+
         args.summary = True
         self.assertListEqual([], cli._schema_tab_completer('rd', args))
 
-        
+
 class RunTest(CliTest):
-    
+
     def test_ec2(self):
         session_factory = self.replay_flight_data(
             'test_ec2_state_transition_age_filter'
         )
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({
@@ -433,12 +430,13 @@ class RunTest(CliTest):
 
 
 class MetricsTest(CliTest):
-    
+
     def test_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory', lambda x: session_factory)
+        self.patch(PolicyCollection, 'test_session_factory',
+                   staticmethod(lambda x=None: session_factory))
 
         yaml_file = self.write_policy_file({
             'policies': [{
@@ -454,7 +452,7 @@ class MetricsTest(CliTest):
                         {"tag:Env": 'absent'},
                         {"tag:Owner": 'absent'}]}]
             }]
-        }) 
+        })
 
         end = datetime.utcnow()
         start = end - timedelta(14)
@@ -462,27 +460,25 @@ class MetricsTest(CliTest):
 
         out = self.get_output(
             ['custodian', 'metrics', '--start', str(start), '--end', str(end), '--period', str(period), yaml_file])
-        
+
         self.assertEqual(
             json.loads(out),
             {'ec2-tag-compliance-v6':
-                 {u'Durations': [],
-                 u'Errors': [{u'Sum': 0.0,
-                              u'Timestamp': u'2016-05-30T10:50:00',
-                              u'Unit': u'Count'}],
-                 u'Invocations': [{u'Sum': 4.0,
-                                   u'Timestamp': u'2016-05-30T10:50:00',
-                                   u'Unit': u'Count'}],
-                 u'ResourceCount': [{u'Average': 1.0,
-                                     u'Sum': 2.0,
-                                     u'Timestamp': u'2016-05-30T10:50:00',
-                                     u'Unit': u'Count'}],
-                 u'Throttles': [{u'Sum': 0.0,
-                                 u'Timestamp': u'2016-05-30T10:50:00',
-                                 u'Unit': u'Count'}]}
-             }
-        )
-        
+             {u'Durations': [],
+              u'Errors': [{u'Sum': 0.0,
+                           u'Timestamp': u'2016-05-30T10:50:00+00:00',
+                           u'Unit': u'Count'}],
+              u'Invocations': [{u'Sum': 4.0,
+                                u'Timestamp': u'2016-05-30T10:50:00+00:00',
+                                u'Unit': u'Count'}],
+              u'ResourceCount': [{u'Average': 1.0,
+                                  u'Sum': 2.0,
+                                  u'Timestamp': u'2016-05-30T10:50:00+00:00',
+                                  u'Unit': u'Count'}],
+              u'Throttles': [{u'Sum': 0.0,
+                              u'Timestamp': u'2016-05-30T10:50:00+00:00',
+                              u'Unit': u'Count'}]}})
+
     def test_metrics_get_endpoints(self):
 
         #
@@ -515,14 +511,14 @@ class MetricsTest(CliTest):
 
 
 class MiscTest(CliTest):
-    
+
     def test_empty_policy_file(self):
         # Doesn't do anything, but should exit 0
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
         self.run_and_expect_success(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
-        0)
+            ['custodian', 'run', '-s', temp_dir, yaml_file]
+        )
 
     def test_nonexistent_policy_file(self):
         temp_dir = self.get_temp_dir()
@@ -545,4 +541,19 @@ class MiscTest(CliTest):
         yaml_file = self.write_policy_file(policy)
         self.run_and_expect_failure(
             ['custodian', 'run', '-s', temp_dir, yaml_file, yaml_file],
+            1)
+
+    def test_failure_with_no_default_region(self):
+        policy = {
+            'policies':
+            [{
+                'name': 'will-never-run',
+                'resource': 'ec2',
+            }]
+        }
+        temp_dir = self.get_temp_dir()
+        yaml_file = self.write_policy_file(policy)
+        self.patch(utils, 'get_profile_session', lambda x: None)
+        self.run_and_expect_failure(
+            ['custodian', 'run', '-s', temp_dir, yaml_file],
             1)

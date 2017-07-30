@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
 
 from c7n.utils import local_session, chunks, type_schema
@@ -62,7 +64,7 @@ class HealthEventFilter(Filter):
                     'c7n:HealthEvent', []).append(event_map[e['eventArn']])
                 found.add(rid)
             seen.update(event_map.keys())
-        return [resource_map[rid] for rid in found]
+        return [resource_map[resource_id] for resource_id in found]
 
     def get_filter_parameters(self):
         m = self.manager
@@ -71,6 +73,7 @@ class HealthEventFilter(Filter):
         else:
             service = m.get_model().service.upper()
         f = {'services': [service],
+             'regions': [self.manager.config.region],
              'eventStatusCodes': self.data.get(
                  'statuses', ['open', 'upcoming'])}
         if self.data.get('types'):
@@ -83,12 +86,13 @@ class HealthEventFilter(Filter):
             'health', region_name='us-east-1')
         for event_set in chunks(health_events, 10):
             event_map = {e['arn']: e for e in event_set}
+            event_arns = list(event_map.keys())
             for d in client.describe_event_details(
-                    eventArns=event_map.keys()).get('successfulSet', ()):
+                    eventArns=event_arns).get('successfulSet', ()):
                 event_map[d['event']['arn']]['Description'] = d[
                     'eventDescription']['latestDescription']
             paginator = client.get_paginator('describe_affected_entities')
             entities.extend(list(itertools.chain(
-                            *[p['entities']for p in paginator.paginate(
-                                filter={'eventArns': event_map.keys()})])))
+                            *[p['entities'] for p in paginator.paginate(
+                                filter={'eventArns': event_arns})])))
         return entities

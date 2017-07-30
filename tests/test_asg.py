@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import boto3
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class LaunchConfigTest(BaseTest):
@@ -54,7 +56,6 @@ class AutoScalingTest(BaseTest):
                 {'Name': 'resource-type',
                  'Values': ['instance']}])['Tags']
         return {t['Key']: t['Value'] for t in results}
-        
 
     def test_asg_delete(self):
         factory = self.replay_flight_data('test_asg_delete')
@@ -247,7 +248,6 @@ class AutoScalingTest(BaseTest):
         self.assertFalse('Platform' in tag_map)
         self.assertTrue('Linux' in tag_map)
 
-
     def test_asg_suspend(self):
         factory = self.replay_flight_data('test_asg_suspend')
         p = self.load_policy({
@@ -263,6 +263,31 @@ class AutoScalingTest(BaseTest):
         result = client.describe_auto_scaling_groups(
             AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
                 'AutoScalingGroups'].pop()
+        self.assertTrue(result['SuspendedProcesses'])
+
+    def test_asg_suspend_when_no_instances(self):
+        factory = self.replay_flight_data('test_asg_suspend_when_no_instances')
+        client = factory().client('autoscaling')
+
+        # Ensure we have a non-suspended ASG with no instances
+        name = 'zero-instances'
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[name])['AutoScalingGroups'].pop()
+        self.assertEqual(len(result['SuspendedProcesses']), 0)
+        self.assertEqual(len(result['Instances']), 0)
+
+        # Run policy and verify suspend occurs
+        p = self.load_policy({
+            'name': 'asg-suspend',
+            'resource': 'asg',
+            'filters': [
+                {'AutoScalingGroupName': name}],
+            'actions': ['suspend'],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[name])['AutoScalingGroups'].pop()
         self.assertTrue(result['SuspendedProcesses'])
 
     def test_asg_resume(self):
@@ -321,7 +346,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            sorted(resources[0]['c7n.matched-subnets']),
+            sorted(resources[0]['c7n:matched-subnets']),
             sorted(['subnet-65dbce1d', 'subnet-b77a4ffd', 'subnet-db9f62b2']))
 
     def test_asg_security_group_not_matched(self):
@@ -339,7 +364,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n.matched-security-groups'], ['sg-aa6c90c3'])
+            resources[0]['c7n:matched-security-groups'], ['sg-aa6c90c3'])
 
     def test_asg_security_group(self):
         factory = self.replay_flight_data('test_asg_security_group')

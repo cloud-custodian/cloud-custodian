@@ -14,24 +14,31 @@
 """
 Actions to take on resources
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import base64
 from datetime import datetime
 import jmespath
 import logging
 import zlib
 
+import six
 from botocore.exceptions import ClientError
 
-from c7n.registry import PluginRegistry
 from c7n.executor import ThreadPoolExecutor
+from c7n.registry import PluginRegistry
+from c7n.resolver import ValuesFrom
 from c7n import utils
 from c7n.version import version as VERSION
+
 
 def average(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
+
 def distinct_count(values):
-    return float( len( set(values)))
+    return float(len(set(values)))
+
 
 METRIC_OPS = {
     'count': len,
@@ -74,6 +81,7 @@ METRIC_UNITS = [
     'None'
 ]
 
+
 class ActionRegistry(PluginRegistry):
 
     def __init__(self, *args, **kw):
@@ -102,7 +110,7 @@ class ActionRegistry(PluginRegistry):
         if action_class is None:
             raise ValueError(
                 "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
@@ -140,10 +148,10 @@ class Action(object):
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
-        except ClientError, e:
-            if (e.response['Error']['Code'] == 'DryRunOperation'
-                    and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
-                    and 'would have succeeded' in e.message):
+        except ClientError as e:
+            if (e.response['Error']['Code'] == 'DryRunOperation' and
+            e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
+            'would have succeeded' in e.message):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))
@@ -193,7 +201,7 @@ class ModifyVpcSecurityGroupsAction(Action):
             {'required': ['isolation-group', 'remove']},
             {'required': ['add', 'remove']},
             {'required': ['add']}]
-        }
+    }
 
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
@@ -259,13 +267,13 @@ class ModifyVpcSecurityGroupsAction(Action):
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
                 remove_groups = remove_target_group_ids
-            elif isinstance(remove_target_group_ids, basestring):
+            elif isinstance(remove_target_group_ids, six.string_types):
                 remove_groups = [remove_target_group_ids]
 
             # Parse add_groups
             if isinstance(add_target_group_ids, list):
                 add_groups = add_target_group_ids
-            elif isinstance(add_target_group_ids, basestring):
+            elif isinstance(add_target_group_ids, six.string_types):
                 add_groups = [add_target_group_ids]
 
             # seems extraneous with list?
@@ -392,11 +400,15 @@ class Notify(EventAction):
 
     schema = {
         'type': 'object',
-        'required': ['type', 'transport', 'to'],
+        'oneOf': [
+            {'required': ['type', 'transport', 'to']},
+            {'required': ['type', 'transport', 'to_from']}],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_from': ValuesFrom.schema,
             'cc_manager': {'type': 'boolean'},
             'from': {'type': 'string'},
             'subject': {'type': 'string'},
@@ -413,12 +425,17 @@ class Notify(EventAction):
                      'properties': {
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
-                         }}]
-            }
+                     }}]
+            },
+            'assume_role': {'type': 'boolean'}
         }
     }
 
     batch_size = 250
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Notify, self).__init__(data, manager, log_dir)
+        self.assume_role = data.get('assume_role', True)
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -427,17 +444,38 @@ class Notify(EventAction):
             return ('sqs:SendMessage',)
         return ()
 
+    def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
+        p = self.data.copy()
+        if 'to_from' in self.data:
+            to_from = self.data['to_from'].copy()
+            to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
+            p['to'] = ValuesFrom(to_from, self.manager).get_values()
+        if 'cc_from' in self.data:
+            cc_from = self.data['cc_from'].copy()
+            cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
+            p['cc'] = ValuesFrom(cc_from, self.manager).get_values()
+        return p
+
     def process(self, resources, event=None):
         aliases = self.manager.session_factory().client(
             'iam').list_account_aliases().get('AccountAliases', ())
         account_name = aliases and aliases[0] or ''
+        message = {
+            'event': event,
+            'account_id': self.manager.config.account_id,
+            'account': account_name,
+            'region': self.manager.config.region,
+            'policy': self.manager.data}
+        message['action'] = self.expand_variables(message)
+
         for batch in utils.chunks(resources, self.batch_size):
-            message = {'resources': batch,
-                       'event': event,
-                       'account': account_name,
-                       'action': self.data,
-                       'region': self.manager.config.region,
-                       'policy': self.manager.data}
+            message['resources'] = batch
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
@@ -449,28 +487,57 @@ class Notify(EventAction):
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
 
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
     def send_sns(self, message):
         topic = self.data['transport']['topic']
-        region = topic.split(':', 5)[3]
-        client = self.manager.session_factory(region=region).client('sns')
-        client.publish(
-            TopicArn=topic,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
-            )
+        if topic.startswith('arn:aws:sns'):
+            region = region = topic.split(':', 5)[3]
+            topic_arn = topic
+        else:
+            region = message['region']
+            topic_arn = "arn:aws:sns:%s:%s:%s" % (
+                message['region'], message['account_id'], topic)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sns')
+        client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = queue.split('.', 2)[1]
-        client = self.manager.session_factory(region=region).client('sqs')
+        if queue.startswith('https://queue.amazonaws.com'):
+            region = 'us-east-1'
+            queue_url = queue
+        elif queue.startswith('https://sqs.'):
+            region = queue.split('.', 2)[1]
+            queue_url = queue
+        elif queue.startswith('arn:sqs'):
+            queue_arn_split = queue.split(':', 5)
+            region = queue_arn_split[3]
+            owner_id = queue_arn_split[4]
+            queue_name = queue_arn_split[5]
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
+        else:
+            region = self.manager.config.region
+            owner_id = self.manager.config.account_id
+            queue_name = queue
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
                 'DataType': 'String',
                 'StringValue': self.C7N_DATA_MESSAGE,
-                },
-            }
+            },
+        }
         result = client.send_message(
-            QueueUrl=queue,
-            MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
+            QueueUrl=queue_url,
+            MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
 
@@ -483,14 +550,19 @@ class AutoTagUser(EventAction):
       policies:
         - name: ec2-auto-tag-owner
           resource: ec2
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
           filters:
            - tag:Owner: absent
           actions:
-           - type: auto-tag-creator
+           - type: auto-tag-user
              tag: OwnerContact
 
-    There's a number of caveats to usage, resources which don't
-    include tagging as part of their api, may have some delay before
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
     automation kicks in to create a tag. Real world delay may be several
     minutes, with worst case into hours[0]. This creates a race condition
     between auto tagging and automation.
@@ -501,7 +573,7 @@ class AutoTagUser(EventAction):
 
     References
      - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
-     - CloudTrail User - http://goo.gl/XQhIG6 q
+     - CloudTrail User - http://goo.gl/XQhIG6
     """
 
     schema = utils.type_schema(
@@ -517,6 +589,7 @@ class AutoTagUser(EventAction):
                       ]}},
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
+           'principal_id_tag': {'type': 'string'}
            }
     )
 
@@ -542,44 +615,57 @@ class AutoTagUser(EventAction):
         user = None
         if utype == "IAMUser":
             user = event['userIdentity']['userName']
+            principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
             user = event['userIdentity']['arn']
             prefix, user = user.rsplit('/', 1)
+            principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):
                 return
-            # lambda function
+            # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
         if user is None:
             return
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
-            untagged = []
-            for r in resources:
-                found = False
-                for t in r.get('Tags', ()):
-                    if t['Key'] == self.data['tag']:
-                        found = True
+            untagged_resources = []
+            # iterating over all the resources the user spun up in this event
+            for resource in resources:
+                tag_already_set = False
+                for tag in resource.get('Tags', ()):
+                    if tag['Key'] == self.data['tag']:
+                        tag_already_set = True
                         break
-                if not found:
-                    untagged.append(r)
+                if not tag_already_set:
+                    untagged_resources.append(resource)
+        # if update is set to True, we will overwrite the userName tag even if
+        # the user already set a value
         else:
-            untagged = resources
+            untagged_resources = resources
 
         tag_action = self.manager.action_registry.get('tag')
-        tag_action(
-            {'key': self.data['tag'], 'value': user},
-            self.manager).process(untagged)
-        return untagged
+        new_tags = {
+            self.data['tag']: user
+        }
+        # if principal_id_key is set (and value), we'll set the principalId tag.
+        principal_id_key = self.data.get('principal_id_tag', None)
+        if principal_id_key and principal_id_value:
+            new_tags[principal_id_key] = principal_id_value
+        for key, value in six.iteritems(new_tags):
+            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        return new_tags
 
 
 class PutMetric(BaseAction):
     """Action to put metrics based on an expression into CloudWatch metrics
-    
+
     :example:
-    
+
         .. code-block: yaml
-        
+
             policies:
               - name: track-attached-ebs
                 resource: ec2
@@ -607,12 +693,13 @@ class PutMetric(BaseAction):
             'key': {'type': 'string'},  # jmes path
             'namespace': {'type': 'string'},
             'metric_name': {'type': 'string'},
-            'dimensions': {'type':'array',
-                           'items': {
-                               'type':'object'
-                            },
+            'dimensions':
+                {'type':'array',
+                'items': {
+                    'type':'object'
+                },
             },
-            'op': {'enum': METRIC_OPS.keys()},
+            'op': {'enum': list(METRIC_OPS.keys())},
             'units': {'enum': METRIC_UNITS}
         }
     }
@@ -634,22 +721,21 @@ class PutMetric(BaseAction):
         try:
             values = jmespath.search("Resources[]." + key_expression,
                                      {'Resources': resources})
-            # I had to wrap resourses in a dict like this in order to not have jmespath expressions start with []
-            # in the yaml files.  It fails to parse otherwise.
-        except TypeError, oops:
+            # I had to wrap resourses in a dict like this in order to not have jmespath expressions
+            # start with [] in the yaml files.  It fails to parse otherwise.
+        except TypeError as oops:
             self.log.error(oops.message)
 
         value = 0
         try:
             f = METRIC_OPS[operation]
             value = f(values)
-        except KeyError, bad_op:
+        except KeyError:
             self.log.error("Bad op for put-metric action: %s", operation)
 
         # for demo purposes
         # from math import sin, pi
         # value = sin((now.minute * 6 * 4 * pi) / 180) * ((now.hour + 1) * 4.0)
-
 
         metrics_data = [
             {
@@ -673,6 +759,6 @@ class PutMetric(BaseAction):
         ]
 
         client = self.manager.session_factory().client('cloudwatch')
-        res = client.put_metric_data(Namespace=ns, MetricData=metrics_data)
+        client.put_metric_data(Namespace=ns, MetricData=metrics_data)
 
         return resources

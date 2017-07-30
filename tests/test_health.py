@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class HealthResource(BaseTest):
@@ -48,11 +49,3 @@ class HealthResource(BaseTest):
             self.assertTrue(
                 (r['eventTypeCategory'] == 'accountNotification'
              ) ^ ('AffectedEntities' in r))
-
-    def test_health_region(self):
-        self.change_environment(AWS_DEFAULT_REGION='us-west-2')
-        self.assertRaises(
-            ValueError,
-            self.load_policy,
-            {'name': 'account-health-query',
-             'resource': 'health-event'})
