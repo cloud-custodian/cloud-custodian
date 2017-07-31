@@ -30,7 +30,11 @@ Actions:
 
    Check bucket acls for global grants
 
- encryption-policy
+ restrict-s3
+
+   Creates a bucket policy on S3 to restrict the access to the bucket.
+
+encryption-policy
 
    Attach an encryption required policy to a bucket, this will break
    applications that are not using encryption, including aws log
@@ -796,6 +800,84 @@ class AttachLambdaEncrypt(BucketActionBase):
                 {'account_s3': account_id}, session_factory, bucket)
         return source.add(func)
 
+       
+@actions.register('restrict-s3')
+class RestrictS3Policy(BucketActionBase):
+    """Action to apply an restrict policy to S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-lockdown
+                resource: s3
+                filters:
+                  - type: missing-policy-statement
+                actions:
+                  - restrict-s3
+    """
+
+    permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
+    schema = type_schema('restrict-s3')
+
+    def __init__(self, data=None, manager=None):
+        self.data = data or {}
+        self.manager = manager
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            results = w.map(self.process_bucket, buckets)
+            results = filter(None, list(results))
+            return results
+
+    def process_bucket(self, b):
+        p = b['Policy']
+        if p is None:
+            log.info("No policy found, creating new")
+            p = {'Version': "2012-10-17", "Statement": []}
+        else:
+            p = json.loads(p)
+
+        restrict_sid = "restrict_s3"
+        restrict_statement = {
+            'Sid': restrict_sid,
+            'Effect': 'Deny',
+            'Principal': '*',
+            'Action': ["s3:GetObject","s3:DeleteObject","s3:PutObject"],
+            "Resource": "arn:aws:s3:::%s/*" % b['Name']}
+
+        statements = p.get('Statement', [])
+        for s in list(statements):
+            if s.get('Sid', '') == restrict_sid:
+                log.debug("Bucket:%s Found extant restrict policy", b['Name'])
+                if s != restrict_statement:
+                    log.info(
+                        "Bucket:%s updating extant restrict policy", b['Name'])
+                    statements.remove(s)
+                else:
+                    return
+
+        session = self.manager.session_factory()
+        s3 = bucket_client(session, b)
+        statements.append(restrict_statement)
+        p['Statement'] = statements
+        log.info('Bucket:%s attached restrict policy' % b['Name'])
+
+        try:
+            s3.put_bucket_policy(
+                Bucket=b['Name'],
+                Policy=json.dumps(p))
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
+            self.log.exception(
+                "Error on bucket:%s putting policy\n%s error:%s",
+                b['Name'],
+                json.dumps(statements, indent=2), e)
+            raise
+        return {'Name': b['Name'], 'State': 'PolicyAttached'}
+         
 
 @actions.register('encryption-policy')
 class EncryptionRequiredPolicy(BucketActionBase):
