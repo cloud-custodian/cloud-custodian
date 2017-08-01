@@ -97,28 +97,23 @@ class TrailDB(object):
               error_code   varchar(256),
               error        text'''
 
-        if options.request_params:
+        if options.field and 'user_identity' in options.field:
+            command += ',\nuser         text'
+
+        if options.field and 'request_params' in options.field:
             command += ',\nrequest    text'
 
-        if options.response_elements:
+        if options.field and 'response_elements' in options.field:
             command += ',\nresponse   text'
-
-        if options.user_identity:
-            command += ',\nuser         text'
 
         command += ')'
         self.cursor.execute(command)
 
     def insert(self, records):
         command = "insert into events values (?, ?, ?, ?, ?, ?, ?, ?, ?"
-        if options.request_params:
-            command += ', ?'
 
-        if options.response_elements:
-            command += ', ?'
-
-        if options.user_identity:
-            command += ', ?'
+        if options.field:
+            command += ', ?' * len(options.field)
 
         command += ")"
         self.cursor.executemany(command, records)
@@ -202,14 +197,14 @@ def process_records(records,
         )
 
         # Optional data can be added to each record
-        if options.request_params:
+        if options.field and 'user_identity' in options.field:
+            user_record += (json.dumps(r['userIdentity']), )
+
+        if options.field and 'request_params' in options.field:
             user_record += (json.dumps(r['requestParameters']), )
 
-        if options.response_elements:
+        if options.field and 'response_elements' in options.field:
             user_record += (json.dumps(r['responseElements']), )
-
-        if options.user_identity:
-            user_record += (json.dumps(r['userIdentity']), )
 
         user_records.append(user_record)
 
@@ -330,18 +325,9 @@ def setup_parser():
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
-    parser.add_argument(
-        '--request-params',
-        action='store_true',
-        help="Append Request Params from CloudTrail Event Record")
-    parser.add_argument(
-        '--response-elements',
-        action='store_true',
-        help="Append Response Elements from CloudTrail Event Record")
-    parser.add_argument(
-        '--user-identity',
-        action='store_true',
-        help="Append  User Identity CloudTrail Events")
+    parser.add_argument('--field', action='append',
+        help='additonal fields that can be added to each record',
+        choices=['user_identity', 'request_params', 'response_elements'])
     return parser
 
 
