@@ -73,6 +73,7 @@ class HealthEventFilter(Filter):
         else:
             service = m.get_model().service.upper()
         f = {'services': [service],
+             'regions': [self.manager.config.region],
              'eventStatusCodes': self.data.get(
                  'statuses', ['open', 'upcoming'])}
         if self.data.get('types'):
