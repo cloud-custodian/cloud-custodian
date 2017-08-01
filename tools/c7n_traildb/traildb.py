@@ -97,14 +97,9 @@ class TrailDB(object):
               error_code   varchar(256),
               error        text'''
 
-        if options.field and 'user_identity' in options.field:
-            command += ',\nuser         text'
-
-        if options.field and 'request_params' in options.field:
-            command += ',\nrequest    text'
-
-        if options.field and 'response_elements' in options.field:
-            command += ',\nresponse   text'
+        if options.field:
+            for field in options.field:
+                command += ",\n{}    text".format(field)
 
         command += ')'
         self.cursor.execute(command)
