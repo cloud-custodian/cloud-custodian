@@ -913,7 +913,7 @@ class S3Test(BaseTest):
 
         self.addCleanup(
             LambdaManager(functools.partial(session_factory, region='us-west-2')).remove,
-            s3crypt.get_function(None, role, False))
+            s3crypt.get_function(None, role))
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -962,7 +962,7 @@ class S3Test(BaseTest):
         self.addCleanup(
             LambdaManager(
                 functools.partial(session_factory, region='us-east-1')).remove,
-            s3crypt.get_function(None, role, True))
+            s3crypt.get_function(None, role))
         arn = 'arn:aws:sns:us-east-1:644160558196:custodian-attach-encrypt-test'
         self.addCleanup(session.client('sns').delete_topic, TopicArn=arn)
         self.addCleanup(session.client('logs').delete_log_group,
@@ -1040,7 +1040,7 @@ class S3Test(BaseTest):
         self.addCleanup(
             LambdaManager(
                 functools.partial(session_factory, region='us-east-1')).remove,
-            s3crypt.get_function(None, role, True))
+            s3crypt.get_function(None, role))
         self.addCleanup(session.client('logs').delete_log_group,
             logGroupName='/aws/lambda/c7n-s3-encrypt')
 
@@ -1112,7 +1112,7 @@ class S3Test(BaseTest):
         self.addCleanup(
             LambdaManager(
                 functools.partial(session_factory, region='us-east-1')).remove,
-            s3crypt.get_function(None, role, True))
+            s3crypt.get_function(None, role))
         self.addCleanup(session.client('logs').delete_log_group,
             logGroupName='/aws/lambda/c7n-s3-encrypt')
 

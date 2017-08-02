@@ -742,7 +742,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
         func = get_function(
             None, self.data.get('role', self.manager.config.assume_role),
-            bool(topic_arn), account_id=account_id)
+            account_id=account_id)
 
         regions = set([
             b.get('Location', {
