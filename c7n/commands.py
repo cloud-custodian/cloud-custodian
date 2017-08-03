@@ -156,11 +156,11 @@ def validate(options):
             raise ValueError("Invalid path for config %r" % config_file)
 
         options.dryrun = True
-        format = config_file.rsplit('.', 1)[-1]
+        fmt = config_file.rsplit('.', 1)[-1]
         with open(config_file) as fh:
-            if format in ('yml', 'yaml'):
+            if fmt in ('yml', 'yaml'):
                 data = yaml.safe_load(fh.read())
-            if format in ('json',):
+            if fmt in ('json',):
                 data = json.load(fh)
 
         errors += schema.validate(data, schm)
