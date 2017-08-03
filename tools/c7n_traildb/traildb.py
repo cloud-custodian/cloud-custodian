@@ -191,15 +191,11 @@ def process_records(records,
             r.get('errorMessage', None)
         )
 
-        # Optional data can be added to each record
-        if options.field and 'user_identity' in options.field:
-            user_record += (json.dumps(r['userIdentity']), )
-
-        if options.field and 'request_params' in options.field:
-            user_record += (json.dumps(r['requestParameters']), )
-
-        if options.field and 'response_elements' in options.field:
-            user_record += (json.dumps(r['responseElements']), )
+        # Optional data can be added to each record.
+        # Field names are Case Sensitive.
+        if options.field:
+            for field in options.field:
+                user_record += (json.dumps(r[field]), )
 
         user_records.append(user_record)
 
@@ -322,7 +318,7 @@ def setup_parser():
         help="Role to assume")
     parser.add_argument('--field', action='append',
         help='additonal fields that can be added to each record',
-        choices=['user_identity', 'request_params', 'response_elements'])
+        choices=['userIdentity', 'requestParameters', 'responseElements'])
     return parser
 
 
