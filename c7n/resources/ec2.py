@@ -644,7 +644,8 @@ class Start(BaseAction, StateTransitionFilter):
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
+            if e.response['Error']['Code'] in ('InsufficientInstanceCapacity',
+                'InstanceLimitExceeded'):
                 self.log.exception(
                     ("Could not start instances:%d type:%s"
                      " zone:%s instances:%s error:%s"),
