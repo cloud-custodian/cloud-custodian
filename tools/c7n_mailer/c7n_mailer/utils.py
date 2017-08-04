@@ -196,9 +196,11 @@ def resource_format(resource, resource_type):
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
     elif resource_type == 'log-group':
-        return "name: %s last_write: %s" % (
-            resource['logGroupName'],
-            resource['lastWrite'])
+        if 'lastWrite' in resource:
+            return "name: %s last_write: %s" % (
+                resource['logGroupName'],
+                resource['lastWrite'])
+        return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
