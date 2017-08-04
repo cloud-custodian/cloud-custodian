@@ -523,8 +523,12 @@ class MissingPolicyStatementFilter(Filter):
 @filters.register('no-access')
 class AccessDeniedFilter(Filter):
     """Find buckets that Custodian can not access.
+
+
     :example:
+
         .. code-block: yaml
+
             policies:
               - name: s3-bucket-not-accessible
                 resource: s3
