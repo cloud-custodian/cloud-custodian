@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
 import operator
 import random
 import re
 
+import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -27,6 +30,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -40,6 +44,7 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 actions.register('auto-tag-user', AutoTagUser)
+filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -166,6 +171,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
@@ -188,14 +196,17 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
         v = i.get('StateTransitionReason')
         if not v:
             return None
-        return parse(self.RE_PARSE_AGE.findall(v)[0][1:-1])
+        dates = self.RE_PARSE_AGE.findall(v)
+        if dates:
+            return parse(dates[0][1:-1])
+        return None
 
 
 class StateTransitionFilter(object):
@@ -251,7 +262,7 @@ class AttachedVolume(ValueFilter):
         self.skip = self.data.get('skip-devices', [])
         self.operator = self.data.get(
             'operator', 'or') == 'or' and any or all
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def get_volume_mapping(self, resources):
         volume_map = {}
@@ -264,6 +275,8 @@ class AttachedVolume(ValueFilter):
                         continue
                     volume_ids.append(bd['Ebs']['VolumeId'])
             for v in manager.get_resources(volume_ids):
+                if not v['Attachments']:
+                    continue
                 volume_map.setdefault(
                     v['Attachments'][0]['InstanceId'], []).append(v)
         return volume_map
@@ -310,7 +323,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -453,7 +466,7 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 
@@ -479,13 +492,14 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
-        days={'type': 'number'})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
 
     def get_resource_date(self, i):
         # LaunchTime is basically how long has the instance
         # been on, use the oldest ebs vol attach time
-        found = False
         ebs_vols = [
             block['Ebs'] for block in i['BlockDeviceMappings']
             if 'Ebs' in block]
@@ -506,6 +520,74 @@ class DefaultVpc(DefaultVpcBase):
 
     def __call__(self, ec2):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
+
+
+@filters.register('singleton')
+class SingletonFilter(Filter, StateTransitionFilter):
+    """EC2 instances without autoscaling or a recover alarm
+
+    Filters EC2 instances that are not members of an autoscaling group
+    and do not have Cloudwatch recover alarms.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - singleton
+            actions:
+              - type: tag
+                key: problem
+                value: instance is not resilient
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """
+
+    schema = type_schema('singleton')
+
+    permissions = ('cloudwatch:DescribeAlarmsForMetric',)
+
+    valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
+
+    in_asg = ValueFilter({
+        'key': 'tag:aws:autoscaling:groupName',
+        'value': 'not-null'}).validate()
+
+    def process(self, instances, event=None):
+        return super(SingletonFilter, self).process(
+            self.filter_instance_state(instances))
+
+    def __call__(self, i):
+        if self.in_asg(i):
+            return False
+        else:
+            return not self.has_recover_alarm(i)
+
+    def has_recover_alarm(self, i):
+        client = utils.local_session(self.manager.session_factory).client('cloudwatch')
+        alarms = client.describe_alarms_for_metric(
+            MetricName='StatusCheckFailed_System',
+            Namespace='AWS/EC2',
+            Dimensions=[
+                {
+                    'Name': 'InstanceId',
+                    'Value': i['InstanceId']
+                }
+            ]
+        )
+
+        for i in alarms['MetricAlarms']:
+            for a in i['AlarmActions']:
+                if (
+                    a.startswith('arn:aws:automate:') and
+                    a.endswith(':ec2:recover')
+                ):
+                    return True
+
+        return False
 
 
 @actions.register('start')
@@ -672,8 +754,7 @@ class Stop(BaseAction, StateTransitionFilter):
     """
     valid_origin_states = ('running',)
 
-    schema =  type_schema(
-        'stop', **{'terminate-ephemeral': {'type': 'boolean'}})
+    schema = type_schema('stop', **{'terminate-ephemeral': {'type': 'boolean'}})
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -716,7 +797,7 @@ class Stop(BaseAction, StateTransitionFilter):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     msg = e.response['Error']['Message']
-                    e_instance_id = msg[msg.find("'")+1:msg.rfind("'")]
+                    e_instance_id = msg[msg.find("'") + 1:msg.rfind("'")]
                     instance_ids.remove(e_instance_id)
                     if not instance_ids:
                         return
@@ -805,10 +886,8 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-            filters:
-              - type: ebs
           actions:
-            - snapshot
+            - type: snapshot
               copy-tags:
                 - Name
     """
@@ -820,7 +899,7 @@ class Snapshot(BaseAction):
 
     def process(self, resources):
         for resource in resources:
-            with self.executor_factory(max_workers=3) as w:
+            with self.executor_factory(max_workers=2) as w:
                 futures = []
                 futures.append(w.submit(self.process_volume_set, resource))
                 for f in as_completed(futures):
@@ -911,6 +990,136 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
+@actions.register('autorecover-alarm')
+class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+    """Adds a cloudwatch metric alarm to recover an EC2 instance.
+
+    This action takes effect on instances that are NOT part
+    of an ASG.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-autorecover-alarm
+            resource: ec2
+            filters:
+              - singleton
+          actions:
+            - autorecover-alarm
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
+    """
+
+    schema = type_schema('autorecover-alarm')
+    permissions = ('ec2:DescribeInstanceStatus',
+                   'ec2:RecoverInstances',
+                   'ec2:DescribeInstanceRecoveryAttribute')
+
+    valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
+    filter_asg_membership = ValueFilter({
+        'key': 'tag:aws:autoscaling:groupName',
+        'value': 'empty'}).validate()
+
+    def process(self, instances):
+        instances = self.filter_asg_membership.process(
+            self.filter_instance_state(instances))
+        if not len(instances):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('cloudwatch')
+        for i in instances:
+            client.put_metric_alarm(
+                AlarmName='recover-{}'.format(i['InstanceId']),
+                AlarmDescription='Auto Recover {}'.format(i['InstanceId']),
+                ActionsEnabled=True,
+                AlarmActions=[
+                    'arn:aws:automate:{}:ec2:recover'.format(
+                        i['Placement']['AvailabilityZone'][:-1])
+                ],
+                MetricName='StatusCheckFailed_System',
+                Namespace='AWS/EC2',
+                Statistic='Minimum',
+                Dimensions=[
+                    {
+                        'Name': 'InstanceId',
+                        'Value': i['InstanceId']
+                    }
+                ],
+                Period=60,
+                EvaluationPeriods=2,
+                Threshold=0,
+                ComparisonOperator='GreaterThanThreshold'
+            )
+
+
+@actions.register('set-instance-profile')
+class SetInstanceProfile(BaseAction, StateTransitionFilter):
+    """Sets (or removes) the instance profile for a running EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: set-default-instance-profile
+            resource: ec2
+            query:
+              - IamInstanceProfile: absent
+            actions:
+              - type: set-instance-profile
+                name: default
+
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/associate-iam-instance-profile.html
+    https://docs.aws.amazon.com/cli/latest/reference/ec2/disassociate-iam-instance-profile.html
+    """
+
+    schema = type_schema(
+        'set-instance-profile',
+        **{'name': {'type': 'string'}})
+
+    permissions = (
+        'ec2:AssociateIamInstanceProfile',
+        'ec2:DisassociateIamInstanceProfile',
+        'iam:PassRole')
+
+    valid_origin_states = ('running', 'pending')
+
+    def process(self, instances):
+        instances = self.filter_instance_state(instances)
+        if not len(instances):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name', '')
+
+        for i in instances:
+            if profile_name:
+                client.associate_iam_instance_profile(
+                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    InstanceId=i['InstanceId'])
+            else:
+                response = client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {
+                            'Name': 'instance-id',
+                            'Values': [i['InstanceId']],
+                        },
+                        {
+                            'Name': 'state',
+                            'Values': ['associating', 'associated']
+                        }
+                    ]
+                )
+                for a in response['IamInstanceProfileAssociations']:
+                    client.disassociate_iam_instance_profile(
+                        AssociationId=a['AssociationId']
+                    )
+
+        return instances
+
+
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {
@@ -953,11 +1162,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EC2 Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
@@ -973,7 +1182,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

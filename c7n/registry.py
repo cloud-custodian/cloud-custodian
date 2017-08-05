@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 class PluginRegistry(object):
@@ -43,6 +44,7 @@ class PluginRegistry(object):
       PluginRegistry('ec2.filters').load_plugins()
 
     """
+
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
@@ -87,5 +89,3 @@ class PluginRegistry(object):
         for ep in iter_entry_points(group="custodian.%s" % self.plugin_type):
             f = ep.load()
             f()
-
-

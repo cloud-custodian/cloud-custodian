@@ -1,5 +1,3 @@
-
-
 # Copyright 2016 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager

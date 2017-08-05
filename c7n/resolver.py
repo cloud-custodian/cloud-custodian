@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
+import io
 import json
 import os.path
-from StringIO import StringIO
-import urllib2
-import urlparse
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import parse_qsl, urlparse
 
 import jmespath
 
@@ -33,20 +35,20 @@ class URIResolver(object):
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
-            fh = urllib2.urlopen(uri)
+            fh = urlopen(uri)
             contents = fh.read()
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def get_s3_uri(self, uri):
-        parsed = urlparse.urlparse(uri)
+        parsed = urlparse(uri)
         client = self.session_factory().client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
         if parsed.query:
-            params.update(dict(urlparse.parse_qsl(parsed.query)))
+            params.update(dict(parse_qsl(parsed.query)))
         result = client.get_object(**params)
         return result['Body'].read()
 
@@ -58,8 +60,10 @@ class ValuesFrom(object):
     to retrieve a subset of values.
 
     Expression syntax
-    - on json, a jmespath expr is valuated
+    - on json, a jmespath expr is evaluated
     - on csv, an integer column or jmespath expr can be specified
+    - on csv2dict, a jmespath expr (the csv is parsed into a dictionary where
+    the keys are the headers and the values are the remaining columns)
 
     Text files are expected to be line delimited values.
 
@@ -74,10 +78,15 @@ class ValuesFrom(object):
          format: json
          expr: Region."us-east-1"[].ImageId
 
+      value_from:
+         url: s3://bucket/abc/foo.csv
+         format: csv2dict
+         expr: key[1]
+
        # inferred from extension
-       format: [json, csv, txt]
+       format: [json, csv, csv2dict, txt]
     """
-    supported_formats = ('json', 'txt', 'csv')
+    supported_formats = ('json', 'txt', 'csv', 'csv2dict')
 
     # intent is that callers embed this schema
     schema = {
@@ -86,8 +95,10 @@ class ValuesFrom(object):
         'required': ['url'],
         'properties': {
             'url': {'type': 'string'},
-            'format': {'enum': ['csv', 'json', 'txt']},
-            'expr': {'type': 'string'}
+            'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
+            'expr': {'oneOf': [
+                {'type': 'integer'},
+                {'type': 'string'}]}
         }
     }
 
@@ -118,12 +129,17 @@ class ValuesFrom(object):
             data = json.loads(contents)
             if 'expr' in self.data:
                 return jmespath.search(self.data['expr'], data)
-        elif format == 'csv':
-            data = csv.reader(StringIO(contents))
-            if 'expr' in self.data and isinstance(self.data['expr'], int):
-                return [d[self.data['expr']] for d in data]
+        elif format == 'csv' or format == 'csv2dict':
+            data = csv.reader(io.BytesIO(contents))
+            if format == 'csv2dict':
+                data = {x[0]: list(x[1:]) for x in zip(*data)}
+            else:
+                if isinstance(self.data.get('expr'), int):
+                    return [d[self.data['expr']] for d in data]
+                data = list(data)
             if 'expr' in self.data:
-                return jmespath.search(self.data['expr'], list(data))
-            return list(data)
+                return jmespath.search(self.data['expr'], data)
+            return data
         elif format == 'txt':
-            return [s.strip() for s in StringIO(contents).readlines()]
+            return [s.strip().decode('utf8')
+                    for s in io.BytesIO(contents).readlines()]

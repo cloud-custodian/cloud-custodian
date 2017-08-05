@@ -34,7 +34,7 @@ log exceptions to Sentry as they occur.
 
 ```
 (cloud-custodian) $ export SENTRY_DSN=foo
-(cloud-custodian) $ c7n-sentry deploy -c config.json --sentry-org=yours
+(cloud-custodian) $ c7n-sentry deploy -c config.json
 ```
 
 Either way, `config.json` looks something like this:

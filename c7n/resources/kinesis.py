@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -27,8 +29,8 @@ class KinesisStream(QueryResourceManager):
         detail_spec = (
             'describe_stream', 'StreamName', None, 'StreamDescription')
         name = id = 'StreamName'
-        filter_name = None
-        filter_type = None
+        filter_name = 'StreamNames'
+        filter_type = 'list'
         date = None
         dimension = 'StreamName'
 

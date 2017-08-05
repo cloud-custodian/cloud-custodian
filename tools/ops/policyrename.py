@@ -80,7 +80,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
 
         if page.get('Contents') is None:
             raise ArgumentError('Key {} does not exist in bucket {}'.format(
-                    old, bucket))
+                old, bucket))
 
         # Loop through the old objects copying and deleting
         for obj in page.get('Contents'):

@@ -1,0 +1,418 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-060de0f1d0c57ecb7", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-52-206-167-168.compute-1.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 3, 
+                            "__class__": "datetime", 
+                            "month": 2, 
+                            "second": 48, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 24, 
+                            "minute": 55
+                        }, 
+                        "PublicIpAddress": "52.206.167.168", 
+                        "PrivateIpAddress": "172.31.17.185", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-036ee05e8c2ca83b3", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-0b33d91d", 
+                        "PrivateDnsName": "ip-172-31-17-185.ec2.internal", 
+                        "KeyName": "calvin-east-1", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "scot-test", 
+                                "GroupId": "sg-c67c7dba"
+                            }
+                        ], 
+                        "ClientToken": "cADxJ1487908547252", 
+                        "SubnetId": "subnet-efbcccb7", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0e:da:0f:b2:ae:4c", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "Association": {
+                                    "PublicIp": "52.206.167.168", 
+                                    "PublicDnsName": "ec2-52-206-167-168.compute-1.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }, 
+                                "NetworkInterfaceId": "eni-621ef8a5", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-17-185.ec2.internal", 
+                                        "Association": {
+                                            "PublicIp": "52.206.167.168", 
+                                            "PublicDnsName": "ec2-52-206-167-168.compute-1.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }, 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.17.185"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-17-185.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-6d28a93c", 
+                                    "AttachTime": {
+                                        "hour": 3, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 48, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 55
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "scot-test", 
+                                        "GroupId": "sg-c67c7dba"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "SubnetId": "subnet-efbcccb7", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.17.185"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1b"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-027869a1c272ed94a", 
+                                    "AttachTime": {
+                                        "hour": 3, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 49, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 55
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }, 
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-0f41530069955541e", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-54-159-69-245.compute-1.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 4, 
+                            "__class__": "datetime", 
+                            "month": 2, 
+                            "second": 5, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 24, 
+                            "minute": 10
+                        }, 
+                        "PublicIpAddress": "54.159.69.245", 
+                        "PrivateIpAddress": "172.31.24.158", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-012d153789199a2ea", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-0b33d91d", 
+                        "PrivateDnsName": "ip-172-31-24-158.ec2.internal", 
+                        "KeyName": "calvin-east-1", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-5", 
+                                "GroupId": "sg-45131239"
+                            }
+                        ], 
+                        "ClientToken": "bqAbV1487909404715", 
+                        "SubnetId": "subnet-efbcccb7", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0e:74:d8:ef:71:3c", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "Association": {
+                                    "PublicIp": "54.159.69.245", 
+                                    "PublicDnsName": "ec2-54-159-69-245.compute-1.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }, 
+                                "NetworkInterfaceId": "eni-557e9892", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-24-158.ec2.internal", 
+                                        "Association": {
+                                            "PublicIp": "54.159.69.245", 
+                                            "PublicDnsName": "ec2-54-159-69-245.compute-1.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }, 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.24.158"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-24-158.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-74cb4b25", 
+                                    "AttachTime": {
+                                        "hour": 4, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 5, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 10
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-5", 
+                                        "GroupId": "sg-45131239"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "SubnetId": "subnet-efbcccb7", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.24.158"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1b"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-0191e7011b209868f", 
+                                    "AttachTime": {
+                                        "hour": 4, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 6, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 10
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }, 
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-04165fe1b985c1fa9", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-54-210-221-39.compute-1.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 4, 
+                            "__class__": "datetime", 
+                            "month": 2, 
+                            "second": 23, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 24, 
+                            "minute": 10
+                        }, 
+                        "PublicIpAddress": "54.210.221.39", 
+                        "PrivateIpAddress": "172.31.28.123", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-03d8207d8285cbf53", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-0b33d91d", 
+                        "PrivateDnsName": "ip-172-31-28-123.ec2.internal", 
+                        "KeyName": "calvin-east-1", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-6", 
+                                "GroupId": "sg-dc1312a0"
+                            }
+                        ], 
+                        "ClientToken": "jRBlU1487909422108", 
+                        "SubnetId": "subnet-efbcccb7", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0e:3d:a6:3c:22:ce", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "Association": {
+                                    "PublicIp": "54.210.221.39", 
+                                    "PublicDnsName": "ec2-54-210-221-39.compute-1.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }, 
+                                "NetworkInterfaceId": "eni-d97d9b1e", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-28-123.ec2.internal", 
+                                        "Association": {
+                                            "PublicIp": "54.210.221.39", 
+                                            "PublicDnsName": "ec2-54-210-221-39.compute-1.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }, 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.28.123"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-28-123.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-43ca4a12", 
+                                    "AttachTime": {
+                                        "hour": 4, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 23, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 10
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-6", 
+                                        "GroupId": "sg-dc1312a0"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "SubnetId": "subnet-efbcccb7", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.28.123"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1b"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-06a06b913ff0257f0", 
+                                    "AttachTime": {
+                                        "hour": 4, 
+                                        "__class__": "datetime", 
+                                        "month": 2, 
+                                        "second": 23, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 24, 
+                                        "minute": 10
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "299cb0be-ef26-4e88-8ae3-b5f6a7f13536", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 24 Feb 2017 04:17:24 GMT"
+            }
+        }
+    }
+}

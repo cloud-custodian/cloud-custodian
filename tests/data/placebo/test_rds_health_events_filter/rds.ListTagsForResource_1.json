@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8e6366a4-ef06-11e6-bdd9-817998a983c9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8e6366a4-ef06-11e6-bdd9-817998a983c9", 
+                "date": "Thu, 09 Feb 2017 20:30:11 GMT", 
+                "content-length": "468", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "human", 
+                "Key": "species"
+            }, 
+            {
+                "Value": "earth", 
+                "Key": "planet"
+            }
+        ]
+    }
+}

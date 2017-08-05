@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "b8049ab5-ec5a-11e6-a3e5-878059839077", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b8049ab5-ec5a-11e6-a3e5-878059839077", 
+                "content-length": "110", 
+                "connection": "keep-alive", 
+                "date": "Mon, 06 Feb 2017 10:55:05 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:644160558196:function:c7n-hello-world", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

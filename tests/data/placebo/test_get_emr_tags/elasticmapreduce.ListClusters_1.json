@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "Status": {
+                    "Timeline": {
+                        "EndDateTime": {
+                            "hour": 13, 
+                            "__class__": "datetime", 
+                            "month": 1, 
+                            "second": 51, 
+                            "microsecond": 940000, 
+                            "year": 2017, 
+                            "day": 30, 
+                            "minute": 33
+                        }, 
+                        "CreationDateTime": {
+                            "hour": 13, 
+                            "__class__": "datetime", 
+                            "month": 1, 
+                            "second": 40, 
+                            "microsecond": 847000, 
+                            "year": 2017, 
+                            "day": 30, 
+                            "minute": 31
+                        }
+                    }, 
+                    "State": "TERMINATED_WITH_ERRORS", 
+                    "StateChangeReason": {
+                        "Message": "Failed to provision ec2 instances because 'The requested instance profile EMR_AutoScaling_DefaultRole is invalid'", 
+                        "Code": "VALIDATION_ERROR"
+                    }
+                }, 
+                "NormalizedInstanceHours": 0, 
+                "Id": "j-1U3KBYP5TY79M", 
+                "Name": "test-cluster-tags"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "75f7dc9e-e71b-11e6-a561-9b2e948d1e8c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "75f7dc9e-e71b-11e6-a561-9b2e948d1e8c", 
+                "date": "Mon, 30 Jan 2017 18:39:40 GMT", 
+                "content-length": "391", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.exceptions import ClientError
 
 from c7n.filters import CrossAccountAccessFilter
@@ -64,6 +66,6 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         self.log.debug("fetching policy for %d repos" % len(resources))
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(ECRCrossAccountAccessFilter, self).process(resources, event)

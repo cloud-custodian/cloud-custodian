@@ -18,7 +18,7 @@ Actions
 -------
 
 ``delete``
-  Delete CloudFormation Stack
+  Delete volume
 
   .. c7n-schema:: Delete
       :module: c7n.resources.ebs

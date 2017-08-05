@@ -11,17 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import datetime
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import logging
 import time
 
-from botocore.exceptions import ClientError
+import six
 
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import (
+    local_session, type_schema, get_retry)
+from c7n.tags import (
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
+filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
+log = logging.getLogger('custodian.emr')
+
+filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('emr')
@@ -32,7 +42,8 @@ class EMRCluster(QueryResourceManager):
     class resource_type(object):
         service = 'emr'
         type = 'emr'
-        enum_spec = ('list_clusters', 'Clusters', None)
+        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
         dimension = 'ClusterId'
@@ -40,6 +51,8 @@ class EMRCluster(QueryResourceManager):
         filter_name = None
 
     action_registry = actions
+    filter_registry = filters
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
@@ -84,13 +97,117 @@ class EMRCluster(QueryResourceManager):
             else:
                 names.add(query_filter['Name'])
                 result.append(query_filter)
+        if 'ClusterStates' not in names:
+            # include default query
+            result.append(
+                {
+                    'Name': 'ClusterStates',
+                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
+                }
+            )
         return result
 
     def augment(self, resources):
+        client = local_session(
+            self.get_resource_manager('emr').session_factory).client('emr')
+        result = []
         # remap for cwmetrics
         for r in resources:
-            r['ClusterId'] = r['Id']
-        return resources
+            cluster = self.retry(
+                client.describe_cluster, ClusterId=r['Id'])['Cluster']
+            result.append(cluster)
+        return result
+
+
+@actions.register('mark-for-op')
+class TagDelayedAction(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-mark-for-op
+                resource: emr
+                filters:
+                  - "tag:Name": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    op: terminate
+                    days: 4
+                    msg: "Cluster does not have required tags"
+    """
+
+    permission = ('elasticmapreduce:AddTags',)
+    batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('emr')
+        for r in resources:
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+
+
+@actions.register('tag')
+class TagTable(Tag):
+    """Action to create tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-tag-table
+                resource: emr
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('elasticmapreduce:AddTags',)
+    batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('emr')
+        for r in resources:
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+
+
+@actions.register('remove-tag')
+class UntagTable(RemoveTag):
+    """Action to remove tag(s) on a resource
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: emr-remove-tag
+                resource: emr
+                filters:
+                  - "tag:target-tag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["target-tag"]
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('elasticmapreduce:RemoveTags',)
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('emr')
+        for r in resources:
+            client.remove_tags(
+                ResourceId=r['Id'], TagKeys=tag_keys)
 
 
 @actions.register('terminate')
@@ -130,17 +247,7 @@ class Terminate(BaseAction):
 
 
 # Valid EMR Query Filters
-EMR_VALID_FILTERS = {
-    'CreatedAfter': datetime,
-    'CreatedBefore': datetime,
-    'ClusterStates': (
-        'terminated',
-        'bootstrapping',
-        'running',
-        'waiting',
-        'terminating',
-        'terminated',
-        'terminated_with_errors')}
+EMR_VALID_FILTERS = set(('CreatedAfter', 'CreatedBefore', 'ClusterStates'))
 
 
 class QueryFilter(object):
@@ -161,11 +268,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EMR Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
@@ -181,8 +288,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
-

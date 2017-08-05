@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f3822792-4c74-11e7-a1d2-f3beada5f152", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f3822792-4c74-11e7-a1d2-f3beada5f152", 
+                "date": "Thu, 08 Jun 2017 18:04:44 GMT", 
+                "content-length": "1581", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MetricAlarms": [
+            {
+                "EvaluationPeriods": 2, 
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:185106417252:alarm:recover-i-0aaaaec4b77188b69", 
+                "StateUpdatedTimestamp": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 43, 
+                    "microsecond": 873000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 4
+                }, 
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 43, 
+                    "microsecond": 873000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 4
+                }, 
+                "ComparisonOperator": "GreaterThanThreshold", 
+                "AlarmActions": [
+                    "arn:aws:automate:us-east-1:ec2:recover"
+                ], 
+                "AlarmDescription": "Auto Recover i-0aaaaec4b77188b69", 
+                "Namespace": "AWS/EC2", 
+                "Period": 60, 
+                "StateValue": "INSUFFICIENT_DATA", 
+                "Threshold": 0.0, 
+                "AlarmName": "recover-i-0aaaaec4b77188b69", 
+                "Dimensions": [
+                    {
+                        "Name": "InstanceId", 
+                        "Value": "i-0aaaaec4b77188b69"
+                    }
+                ], 
+                "Statistic": "Minimum", 
+                "StateReason": "Unchecked: Initial alarm creation", 
+                "InsufficientDataActions": [], 
+                "OKActions": [], 
+                "ActionsEnabled": true, 
+                "MetricName": "StatusCheckFailed_System"
+            }
+        ]
+    }
+}

@@ -1,0 +1,281 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DistributionList": {
+            "Marker": "", 
+            "Items": [
+                {
+                    "Status": "InProgress", 
+                    "CacheBehaviors": {
+                        "Items": [
+                            {
+                                "TrustedSigners": {
+                                    "Enabled": false, 
+                                    "Quantity": 0
+                                }, 
+                                "LambdaFunctionAssociations": {
+                                    "Quantity": 0
+                                }, 
+                                "TargetOriginId": "S3-test", 
+                                "ViewerProtocolPolicy": "allow-all", 
+                                "ForwardedValues": {
+                                    "Headers": {
+                                        "Quantity": 0
+                                    }, 
+                                    "Cookies": {
+                                        "Forward": "none"
+                                    }, 
+                                    "QueryStringCacheKeys": {
+                                        "Quantity": 0
+                                    }, 
+                                    "QueryString": false
+                                }, 
+                                "MaxTTL": 31536000, 
+                                "PathPattern": "allowpath", 
+                                "SmoothStreaming": false, 
+                                "DefaultTTL": 86400, 
+                                "AllowedMethods": {
+                                    "Items": [
+                                        "HEAD", 
+                                        "GET"
+                                    ], 
+                                    "CachedMethods": {
+                                        "Items": [
+                                            "HEAD", 
+                                            "GET"
+                                        ], 
+                                        "Quantity": 2
+                                    }, 
+                                    "Quantity": 2
+                                }, 
+                                "MinTTL": 0, 
+                                "Compress": false
+                            }
+                        ], 
+                        "Quantity": 1
+                    }, 
+                    "Restrictions": {
+                        "GeoRestriction": {
+                            "RestrictionType": "none", 
+                            "Quantity": 0
+                        }
+                    }, 
+                    "Origins": {
+                        "Items": [
+                            {
+                                "S3OriginConfig": {
+                                    "OriginAccessIdentity": ""
+                                }, 
+                                "OriginPath": "", 
+                                "CustomHeaders": {
+                                    "Quantity": 0
+                                }, 
+                                "Id": "S3-test", 
+                                "DomainName": "test.s3.amazonaws.com"
+                            }
+                        ], 
+                        "Quantity": 1
+                    }, 
+                    "DomainName": "d2p1t52f7m9vp1.cloudfront.net", 
+                    "WebACLId": "", 
+                    "PriceClass": "PriceClass_All", 
+                    "Enabled": true, 
+                    "DefaultCacheBehavior": {
+                        "TrustedSigners": {
+                            "Enabled": false, 
+                            "Quantity": 0
+                        }, 
+                        "LambdaFunctionAssociations": {
+                            "Quantity": 0
+                        }, 
+                        "TargetOriginId": "S3-test", 
+                        "ViewerProtocolPolicy": "allow-all", 
+                        "ForwardedValues": {
+                            "Headers": {
+                                "Quantity": 0
+                            }, 
+                            "Cookies": {
+                                "Forward": "none"
+                            }, 
+                            "QueryStringCacheKeys": {
+                                "Quantity": 0
+                            }, 
+                            "QueryString": false
+                        }, 
+                        "MaxTTL": 31536000, 
+                        "SmoothStreaming": false, 
+                        "DefaultTTL": 86400, 
+                        "AllowedMethods": {
+                            "Items": [
+                                "HEAD", 
+                                "GET"
+                            ], 
+                            "CachedMethods": {
+                                "Items": [
+                                    "HEAD", 
+                                    "GET"
+                                ], 
+                                "Quantity": 2
+                            }, 
+                            "Quantity": 2
+                        }, 
+                        "MinTTL": 0, 
+                        "Compress": false
+                    }, 
+                    "IsIPV6Enabled": true, 
+                    "Comment": "", 
+                    "ViewerCertificate": {
+                        "CloudFrontDefaultCertificate": true, 
+                        "MinimumProtocolVersion": "SSLv3", 
+                        "CertificateSource": "cloudfront"
+                    }, 
+                    "CustomErrorResponses": {
+                        "Quantity": 0
+                    }, 
+                    "LastModifiedTime": {
+                        "hour": 21, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 14, 
+                        "microsecond": 633000, 
+                        "year": 2017, 
+                        "day": 19, 
+                        "minute": 12
+                    }, 
+                    "HttpVersion": "HTTP2", 
+                    "Id": "ECKBFYF275ZPH", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/ECKBFYF275ZPH", 
+                    "Aliases": {
+                        "Quantity": 0
+                    }
+                }, 
+                {
+                    "Status": "Deployed", 
+                    "CacheBehaviors": {
+                        "Quantity": 0
+                    }, 
+                    "Restrictions": {
+                        "GeoRestriction": {
+                            "RestrictionType": "none", 
+                            "Quantity": 0
+                        }
+                    }, 
+                    "Origins": {
+                        "Items": [
+                            {
+                                "OriginPath": "", 
+                                "CustomOriginConfig": {
+                                    "OriginSslProtocols": {
+                                        "Items": [
+                                            "TLSv1.1", 
+                                            "TLSv1.2"
+                                        ], 
+                                        "Quantity": 2
+                                    }, 
+                                    "OriginProtocolPolicy": "match-viewer", 
+                                    "OriginReadTimeout": 30, 
+                                    "HTTPPort": 80, 
+                                    "HTTPSPort": 443, 
+                                    "OriginKeepaliveTimeout": 5
+                                }, 
+                                "CustomHeaders": {
+                                    "Quantity": 0
+                                }, 
+                                "Id": "Custom-custom_origin.com", 
+                                "DomainName": "custom_origin.com"
+                            }
+                        ], 
+                        "Quantity": 1
+                    }, 
+                    "DomainName": "d3samj04x9xf5a.cloudfront.net", 
+                    "WebACLId": "", 
+                    "PriceClass": "PriceClass_All", 
+                    "Enabled": true, 
+                    "DefaultCacheBehavior": {
+                        "TrustedSigners": {
+                            "Enabled": false, 
+                            "Quantity": 0
+                        }, 
+                        "LambdaFunctionAssociations": {
+                            "Quantity": 0
+                        }, 
+                        "TargetOriginId": "Custom-custom_origin.com", 
+                        "ViewerProtocolPolicy": "allow-all", 
+                        "ForwardedValues": {
+                            "Headers": {
+                                "Quantity": 0
+                            }, 
+                            "Cookies": {
+                                "Forward": "none"
+                            }, 
+                            "QueryStringCacheKeys": {
+                                "Quantity": 0
+                            }, 
+                            "QueryString": false
+                        }, 
+                        "MaxTTL": 31536000, 
+                        "SmoothStreaming": false, 
+                        "DefaultTTL": 86400, 
+                        "AllowedMethods": {
+                            "Items": [
+                                "HEAD", 
+                                "GET"
+                            ], 
+                            "CachedMethods": {
+                                "Items": [
+                                    "HEAD", 
+                                    "GET"
+                                ], 
+                                "Quantity": 2
+                            }, 
+                            "Quantity": 2
+                        }, 
+                        "MinTTL": 0, 
+                        "Compress": false
+                    }, 
+                    "IsIPV6Enabled": true, 
+                    "Comment": "", 
+                    "ViewerCertificate": {
+                        "CloudFrontDefaultCertificate": true, 
+                        "MinimumProtocolVersion": "SSLv3", 
+                        "CertificateSource": "cloudfront"
+                    }, 
+                    "CustomErrorResponses": {
+                        "Quantity": 0
+                    }, 
+                    "LastModifiedTime": {
+                        "hour": 17, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 58, 
+                        "microsecond": 824000, 
+                        "year": 2017, 
+                        "day": 19, 
+                        "minute": 48
+                    }, 
+                    "HttpVersion": "HTTP2", 
+                    "Id": "E2CO7J9ZT67Q34", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E2CO7J9ZT67Q34", 
+                    "Aliases": {
+                        "Quantity": 0
+                    }
+                }
+            ], 
+            "IsTruncated": false, 
+            "MaxItems": 100, 
+            "Quantity": 2
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9d3ea44b-3cd8-11e7-9140-79c1ff79fbdd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9d3ea44b-3cd8-11e7-9140-79c1ff79fbdd", 
+                "vary": "Accept-Encoding", 
+                "content-length": "5677", 
+                "content-type": "text/xml", 
+                "date": "Fri, 19 May 2017 21:17:50 GMT"
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "f0f7a72a-3048-11e7-bad1-05f4cefca7c6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f0f7a72a-3048-11e7-bad1-05f4cefca7c6", 
+                "date": "Wed, 03 May 2017 21:39:09 GMT", 
+                "content-length": "436", 
+                "content-type": "text/xml", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Load balancer 'arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/test-alb/28710532987600ac' cannot be deleted because deletion protection is enabled", 
+            "Code": "OperationNotPermitted", 
+            "Type": "Sender"
+        }
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "status_code": 200, 
+    "data": {
+        "configurationItems": [
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 1, 
+                    "microsecond": 401000, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 37
+                }, 
+                "relationships": [], 
+                "awsRegion": "us-east-1", 
+                "tags": {}, 
+                "resourceType": "AWS::EC2::Volume", 
+                "resourceId": "vol-12345", 
+                "relatedEvents": [], 
+                "version": "1.2", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "null", 
+                "configurationItemStatus": "ResourceDeleted"
+            }, 
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 3, 
+                    "microsecond": 382000, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 17
+                }, 
+                "resourceCreationTime": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 33, 
+                    "microsecond": 122000, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 20
+                }, 
+                "availabilityZone": "us-east-1a", 
+                "awsRegion": "us-east-1", 
+                "tags": {
+                    "K": "V"
+                }, 
+                "resourceType": "AWS::EC2::Volume", 
+                "resourceId": "vol-12345", 
+                "relatedEvents": [], 
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::Instance", 
+                        "resourceId": "i-12345", 
+                        "relationshipName": "Is attached to Instance"
+                    }
+                ], 
+                "version": "1.2", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "{\"volumeId\":\"vol-12345\",\"size\":100,\"snapshotId\":\"snap-12345\",\"availabilityZone\":\"us-east-1a\",\"state\":\"in-use\",\"createTime\":\"2017-01-18T02:20:33.122Z\",\"attachments\":[{\"volumeId\":\"vol-12345\",\"instanceId\":\"i-12345\",\"device\":\"/dev/sda1\",\"state\":\"attached\",\"attachTime\":\"2017-01-18T02:20:33.000Z\",\"deleteOnTermination\":true}],\"tags\":[{\"key\":\"K\",\"value\":\"V\"}],\"volumeType\":\"gp2\",\"iops\":300,\"encrypted\":true}", 
+                "configurationItemStatus": "OK"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "83a1af11-ff65-11e6-ac75-1d46fe3085c7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "83a1af11-ff65-11e6-ac75-1d46fe3085c7", 
+                "date": "Thu, 02 Mar 2017 16:30:14 GMT", 
+                "content-length": "3394", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -14,49 +14,7 @@
             }
         }, 
         "successfulSet": [
-            {
-                "event": {
-                    "lastUpdatedTime": {
-                        "hour": 9, 
-                        "__class__": "datetime", 
-                        "month": 12, 
-                        "second": 8, 
-                        "microsecond": 0, 
-                        "year": 2016, 
-                        "day": 6, 
-                        "minute": 6
-                    }, 
-                    "service": "IAM", 
-                    "eventTypeCode": "AWS_IAM_OPERATIONAL_ISSUE", 
-                    "startTime": {
-                        "hour": 9, 
-                        "__class__": "datetime", 
-                        "month": 12, 
-                        "second": 6, 
-                        "microsecond": 0, 
-                        "year": 2016, 
-                        "day": 6, 
-                        "minute": 6
-                    }, 
-                    "eventTypeCategory": "issue", 
-                    "endTime": {
-                        "hour": 9, 
-                        "__class__": "datetime", 
-                        "month": 12, 
-                        "second": 6, 
-                        "microsecond": 0, 
-                        "year": 2016, 
-                        "day": 6, 
-                        "minute": 6
-                    }, 
-                    "region": "us-east-1", 
-                    "arn": "arn:aws:health:us-east-1::event/AWS_IAM_OPERATIONAL_ISSUE_1481033166", 
-                    "statusCode": "closed"
-                }, 
-                "eventDescription": {
-                    "latestDescription": "[RESOLVED] Delays for User and Policy Updates\n2016-12-06T14:06:08Z Between 4:25 AM to 5:25 AM PST we experienced increased propagation delays in delivering changes made to IAM. Previously created credentials were not impacted during this period. The issue has been resolved and the service is operating normally.\n"
-                }
-            }
+
         ]
     }
 }

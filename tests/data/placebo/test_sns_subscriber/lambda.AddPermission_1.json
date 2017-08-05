@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Sid\":\"sns-topic-custodian-test-sns-sub\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:c7n-hello-world\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sns.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:sns:us-west-2:644160558196:custodian-test-sns-sub\"}}}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "b899af4a-ec5a-11e6-8d20-bb44296dcfb9", 
+            "HTTPHeaders": {
+                "date": "Mon, 06 Feb 2017 10:55:06 GMT", 
+                "x-amzn-requestid": "b899af4a-ec5a-11e6-8d20-bb44296dcfb9", 
+                "content-length": "362", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}
