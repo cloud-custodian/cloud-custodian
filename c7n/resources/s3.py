@@ -51,8 +51,6 @@ import ssl
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
-from botocore.vendored import requests
-from botocore.vendored.requests.packages import urllib3
 
 from concurrent.futures import as_completed
 

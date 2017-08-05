@@ -173,7 +173,6 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
             violations.append(s)
             continue
 
-
         whitelist_conditions = conditions
 
         if 'StringEquals' in s['Condition']:
@@ -209,8 +208,9 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 principal_ok = True
 
         if 'ForAnyValue:StringLike' in s['Condition']:
-            if list(s['Condition']['ForAnyValue:StringLike'].keys()
-                            )[0].lower() in whitelist_conditions:
+            if list(
+                s['Condition'][
+                    'ForAnyValue:StringLike'].keys())[0].lower() in whitelist_conditions:
                 principal_ok = True
 
         if 'IpAddress' in s['Condition']:
