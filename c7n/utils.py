@@ -209,6 +209,22 @@ def get_account_id_from_sts(session):
     return response.get('Account')
 
 
+def get_instance_key(instance):
+    """Given AWS instance metadata, return the key used to identify the
+    associated resource.
+    """
+    if 'InstanceId' in instance:
+        return 'InstanceId'  # ec2
+    elif 'AutoScalingGroupName' in instance:
+        return 'AutoScalingGroupName'  # asg
+    elif 'DBInstanceIdentifier' in instance:
+        return 'DBInstanceIdentifier'  # rds instance
+    elif 'DBClusterIdentifier' in instance:
+        return 'DBClusterIdentifier'  # rds cluster
+    else:
+        raise ValueError
+
+
 def query_instances(session, client=None, **query):
     """Return a list of ec2 instances for the query.
     """

@@ -212,7 +212,7 @@ from os.path import join
 from dateutil import zoneinfo
 
 from c7n.filters import Filter, FilterValidationError
-from c7n.utils import type_schema, dumps
+from c7n.utils import type_schema, dumps, get_instance_key
 
 log = logging.getLogger('custodian.offhours')
 
@@ -318,7 +318,7 @@ class Time(Filter):
         # but unit testing is calling this direct.
         if self.id_key is None:
             self.id_key = (
-                self.manager is None and 'InstanceId' or self.manager.get_model().id)
+                self.manager is None and get_instance_key(i) or self.manager.get_model().id)
 
         # The resource tag is not present, if we're not running in an opt-out
         # mode, we're done.
