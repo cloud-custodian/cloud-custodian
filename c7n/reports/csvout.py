@@ -157,7 +157,7 @@ class Formatter(object):
             mfields = [model.id]
             if model.name != model.id:
                 mfields.append(model.name)
-            if model.date:
+            if getattr(model, 'date', None):
                 mfields.append(model.date)
 
         if include_default_fields:

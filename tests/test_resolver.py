@@ -100,9 +100,9 @@ class UrlValueTest(BaseTest):
         self.assertRaises(ValueError, values.get_values)
 
     def test_txt(self):
-        out = io.StringIO()
+        out = io.BytesIO()
         for i in ['a', 'b', 'c', 'd']:
-            out.write('%s\n' % i)
+            out.write(('%s\n' % i).encode('utf8'))
         values = self.get_values_from({'url': 'letters.txt'}, out.getvalue())
         self.assertEqual(
             values.get_values(),

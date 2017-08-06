@@ -621,6 +621,7 @@ class EnableTrail(BaseAction):
         **{
             'trail': {'type': 'string'},
             'bucket': {'type': 'string'},
+            'bucket-region': {'type': 'string'},
             'multi-region': {'type': 'boolean'},
             'global-events': {'type': 'boolean'},
             'notify': {'type': 'string'},
@@ -636,6 +637,7 @@ class EnableTrail(BaseAction):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         bucket_name = self.data['bucket']
+        bucket_region = self.data.get('bucket-region', 'us-east-1')
         trail_name = self.data.get('trail', 'default-trail')
         multi_region = self.data.get('multi-region', True)
         global_events = self.data.get('global-events', True)
@@ -645,7 +647,16 @@ class EnableTrail(BaseAction):
         kms_key = self.data.get('kms-key', '')
 
         s3client = session.client('s3')
-        s3client.create_bucket(Bucket=bucket_name)
+        try:
+            s3client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={'LocationConstraint': bucket_region}
+            )
+        except ClientError as ce:
+            if not ('Error' in ce.response and
+            ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
+                raise ce
+
         try:
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
         except ClientError:
