@@ -131,9 +131,8 @@ class BucketInventory(BaseTest):
         client = session_factory().client('s3')
         client.create_bucket(Bucket=bname)
         client.create_bucket(Bucket=inv_bname)
-        
         self.addCleanup(client.delete_bucket, Bucket=bname)
-        self.addCleanup(client.delete_bucket, Bucket=inv_bname)        
+        self.addCleanup(client.delete_bucket, Bucket=inv_bname)
 
         inv = {
             'Destination': {
@@ -149,12 +148,12 @@ class BucketInventory(BaseTest):
             'Schedule': {
                 'Frequency': 'Daily'}
             }
-            
+
         client.put_bucket_inventory_configuration(
             Bucket=bname,
             Id=inv_name,
             InventoryConfiguration=inv)
-        
+
         p = self.load_policy({
             'name': 's3-inv',
             'resource': 's3',
@@ -170,7 +169,6 @@ class BucketInventory(BaseTest):
             Bucket=bname).get('InventoryConfigurationList')
         self.assertTrue(invs)
         self.assertEqual(sorted(invs[0]['OptionalFields']), ['LastModifiedDate', 'Size'])
-            
 
         p = self.load_policy({
             'name': 's3-inv',
@@ -186,10 +184,10 @@ class BucketInventory(BaseTest):
 
         self.assertEqual(len(p.run()), 1)
         self.assertFalse(
-            client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList'))
-        
-        
-        
+            client.list_bucket_inventory_configurations(
+                Bucket=bname).get('InventoryConfigurationList'))
+
+
 class BucketDelete(BaseTest):
 
     def test_delete_replicated_bucket(self):
@@ -817,6 +815,54 @@ class S3Test(BaseTest):
             'actions': [
                 {'type': 'remove-statements', 'statement_ids': [
                     'Zebra', 'Moon']}],
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_bucket_policy, Bucket=bname)
+
+    def test_remove_policy_matched(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.RemovePolicyStatement, 'executor_factory', MainThreadExecutor)
+        self.patch(MainThreadExecutor, 'async', False)
+
+        bname = "custodian-policy-test"
+        statement = {
+            'Sid': 'Zebra',
+            'Effect': 'Deny',
+            'Principal': '*',
+            'Action': 's3:PutObject',
+            'Resource': 'arn:aws:s3:::%s/*' % bname,
+            'Condition': {
+                'StringNotEquals': {
+                    's3:x-amz-server-side-encryption': [
+                        'AES256', 'aws:kms']}}}
+
+        process_buckets = s3.RemovePolicyStatement.process
+        def enrich(self, buckets):
+            buckets[0]['CrossAccountViolations'] = [statement]
+            process_buckets(self, buckets)
+
+        self.patch(s3.RemovePolicyStatement, 'process', enrich)
+
+        session_factory = self.replay_flight_data('test_s3_remove_policy')
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17', 'Statement': [statement]}))
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy({
+            'name': 'remove-policy',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [
+                {'type': 'remove-statements', 'statement_ids': 'matched'}],
             }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

@@ -33,7 +33,7 @@ class CommandsValidateTest(BaseTest):
             subparser='validate',
             verbose=False
         )
-        with self.assertRaises(SystemExit) as exit:
+        with self.assertRaises((SystemExit, ValueError)) as exit:
             validate_yaml_policies(yaml_validate_options)
         # if there is a bad policy in the batch being validated, there should be an exit 1
         self.assertEqual(exit.exception.code, 1)
