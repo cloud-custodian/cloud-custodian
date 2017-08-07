@@ -248,6 +248,8 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',
