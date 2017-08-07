@@ -637,8 +637,8 @@ class Start(BaseAction, StateTransitionFilter):
 
         # Raise an exception after all batches process
         if self.exception:
-            if self.exception.response['Error']['Code']  not in ('InsufficientInstanceCapacity'):
-                self.log.exception("Error while starting instances error %s", e)
+            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
+                self.log.exception("Error while starting instances error %s", self.exception)
                 raise self.exception
 
     def process_instance_set(self, client, instances, itype, izone):
@@ -659,6 +659,7 @@ class Start(BaseAction, StateTransitionFilter):
                 len(instances), itype, izone,
                 ", ".join(instance_ids), e)
             return
+
 
 @actions.register('resize')
 class Resize(BaseAction, StateTransitionFilter):
