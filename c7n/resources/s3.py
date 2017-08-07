@@ -162,7 +162,7 @@ def assemble_bucket(item):
                 continue
             else:
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    if 'DeniedActions' in b:
+                    if 'c7n:DeniedActions' in b:
                         b['c7n:DeniedActions'].append(m)
                     else:
                         b['c7n:DeniedActions'] = [m]
