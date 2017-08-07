@@ -29,7 +29,7 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda, PythonPackageArchive,
-    CloudWatchLogSubscription, SNSSubscription, RUNTIME)
+    CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from .common import BaseTest, Config, event_data
@@ -233,7 +233,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-s3-bucket-policy',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
     def test_mu_metrics(self):
@@ -276,7 +276,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-ec2-encrypted-vol',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -311,7 +311,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'custodian-asg-spin-detector',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -347,7 +347,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'custodian-periodic-ec2-checker',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -412,7 +412,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bar'}},
@@ -437,7 +437,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bloo'}},
@@ -461,7 +461,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'baz'}},
@@ -537,7 +537,7 @@ class PythonArchiveTest(unittest.TestCase):
         archive.close()
         self.assertTrue('cheese.txt' in archive.get_filenames())
         with archive.get_reader() as reader:
-            self.assertEqual('So yummy!', reader.read('cheese.txt'))
+            self.assertEqual(b'So yummy!', reader.read('cheese.txt'))
 
     def test_custodian_archive_creates_a_custodian_archive(self):
         archive = custodian_archive()
@@ -556,15 +556,13 @@ class PythonArchiveTest(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(bench))
         return path
 
-    def check_readable(self, archive):
-        readable = 0o444 << 16
-        with open(archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            for i in reader.infolist():
-                self.assertGreaterEqual(i.external_attr, readable)
+    def check_world_readable(self, archive):
+        world_readable = 0o004 << 16
+        for info in zipfile.ZipFile(archive.path).filelist:
+            self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_readable(self.make_archive('c7n'))
+        self.check_world_readable(self.make_archive('c7n'))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -572,14 +570,14 @@ class PythonArchiveTest(unittest.TestCase):
         archive = self.make_open_archive()
         archive.add_file(path)
         archive.close()
-        self.check_readable(archive)
+        self.check_world_readable(archive)
 
     def test_unless_you_make_your_own_zipinfo(self):
         info = zipfile.ZipInfo(self.make_file())
         archive = self.make_open_archive()
         archive.add_contents(info, 'foo.txt')
         archive.close()
-        self.assertRaises(AssertionError, self.check_readable, archive)
+        self.assertRaises(AssertionError, self.check_world_readable, archive)
 
 
 class PycCase(unittest.TestCase):
@@ -617,9 +615,13 @@ class Constructor(PycCase):
             # ... and while *.pyc is importable ...
             self.assertTrue(get('bar'), 'bar.pyc')
         except ImportError:
-            # (except on PyPy)
-            # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
-            self.assertEqual(platform.python_implementation(), 'PyPy')
+            try:
+                # (except on PyPy)
+                # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
+                self.assertEqual(platform.python_implementation(), 'PyPy')
+            except AssertionError:
+                # (... aaaaaand Python 3)
+                self.assertEqual(platform.python_version_tuple()[0], '3')
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
@@ -633,7 +635,7 @@ class Constructor(PycCase):
         archive.close()
         self.assertEqual(archive.get_filenames(), ['foo.py'])
         with archive.get_reader() as reader:
-            self.assertEqual('42', reader.read('foo.py'))
+            self.assertEqual(b'42', reader.read('foo.py'))
 
 
 class AddPyFile(PycCase):
