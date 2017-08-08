@@ -128,7 +128,7 @@ class PolicyPermissions(BaseTest):
                          'capacity-delta', 'is-ssl', 'global-grants',
                          'missing-policy-statement', 'missing-statement',
                          'healthcheck-protocol-mismatch', 'image-age',
-                         'has-statement',
+                         'has-statement', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
                 if not perms:
