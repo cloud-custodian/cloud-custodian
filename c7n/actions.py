@@ -400,7 +400,7 @@ class Notify(EventAction):
 
     schema = {
         'type': 'object',
-        'oneOf': [
+        'anyOf': [
             {'required': ['type', 'transport', 'to']},
             {'required': ['type', 'transport', 'to_from']}],
         'properties': {
@@ -453,13 +453,13 @@ class Notify(EventAction):
             to_from['url'] = to_from['url'].format(**message)
             if 'expr' in to_from:
                 to_from['expr'] = to_from['expr'].format(**message)
-            p['to'] = ValuesFrom(to_from, self.manager).get_values()
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
         if 'cc_from' in self.data:
             cc_from = self.data['cc_from'].copy()
             cc_from['url'] = cc_from['url'].format(**message)
             if 'expr' in cc_from:
                 cc_from['expr'] = cc_from['expr'].format(**message)
-            p['cc'] = ValuesFrom(cc_from, self.manager).get_values()
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
         return p
 
     def process(self, resources, event=None):
