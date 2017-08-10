@@ -696,7 +696,7 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(local_session(self.manager.session_factory), r)
-            target_prefix = self.data.get('target_prefix', r['Name'])
+            target_prefix = self.data.get('target_prefix', r['Name'] + '/')
             if 'TargetBucket' in r['Logging']:
                 r['Logging'] = {'Status': 'Enabled'}
             else:
