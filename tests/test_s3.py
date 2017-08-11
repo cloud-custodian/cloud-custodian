@@ -19,6 +19,7 @@ import os
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
+import uuid
 
 from unittest import TestCase
 
@@ -28,8 +29,9 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
+from c7n.sqsexec import MessageIterator
 
-from .common import BaseTest, event_data, skip_if_not_validating
+from .common import BaseTest, event_data, skip_if_not_validating, functional
 
 
 class RestoreCompletionTest(TestCase):
@@ -116,6 +118,7 @@ class BucketMetrics(BaseTest):
             'AWS/S3.NumberOfObjects.Average' in resources[0]['c7n.metrics'])
 
 
+
 class BucketInventory(BaseTest):
 
     def test_inventory(self):
@@ -131,9 +134,9 @@ class BucketInventory(BaseTest):
         client = session_factory().client('s3')
         client.create_bucket(Bucket=bname)
         client.create_bucket(Bucket=inv_bname)
-        
+
         self.addCleanup(client.delete_bucket, Bucket=bname)
-        self.addCleanup(client.delete_bucket, Bucket=inv_bname)        
+        self.addCleanup(client.delete_bucket, Bucket=inv_bname)
 
         inv = {
             'Destination': {
@@ -149,12 +152,12 @@ class BucketInventory(BaseTest):
             'Schedule': {
                 'Frequency': 'Daily'}
             }
-            
+
         client.put_bucket_inventory_configuration(
             Bucket=bname,
             Id=inv_name,
             InventoryConfiguration=inv)
-        
+
         p = self.load_policy({
             'name': 's3-inv',
             'resource': 's3',
@@ -170,7 +173,6 @@ class BucketInventory(BaseTest):
             Bucket=bname).get('InventoryConfigurationList')
         self.assertTrue(invs)
         self.assertEqual(sorted(invs[0]['OptionalFields']), ['LastModifiedDate', 'Size'])
-            
 
         p = self.load_policy({
             'name': 's3-inv',
@@ -187,9 +189,8 @@ class BucketInventory(BaseTest):
         self.assertEqual(len(p.run()), 1)
         self.assertFalse(
             client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList'))
-        
-        
-        
+
+
 class BucketDelete(BaseTest):
 
     def test_delete_replicated_bucket(self):
@@ -321,7 +322,6 @@ class BucketDelete(BaseTest):
         # Make sure file got written
         denied_file = os.path.join(p.resource_manager.log_dir, 'denied.json')
         self.assertIn(bname, open(denied_file).read())
-        
         #
         # Now delete it for real
         #
@@ -374,6 +374,193 @@ class BucketTag(BaseTest):
 
 
 class S3ConfigSource(BaseTest):
+
+    @functional
+    def test_normalize(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        augments = list(s3.S3_AUGMENT_TABLE)
+        augments.remove(('get_bucket_location', 'Location', None, None))
+        self.patch(s3, 'S3_AUGMENT_TABLE', augments)
+
+        bname = 'custodian-test-data-23'
+        session_factory = self.replay_flight_data('test_s3_normalize')
+        session = session_factory()
+
+        queue_url = self.initialize_config_subscriber(session)
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        sns = session.client('sns')
+        notify_topic = sns.create_topic(Name=bname).get('TopicArn')
+        sns.set_topic_attributes(
+            TopicArn=notify_topic,
+            AttributeName='Policy',
+            AttributeValue=json.dumps({
+                'Statement': [{
+                    'Action': 'SNS:Publish',
+                    'Effect': 'Allow',
+                    'Resource': notify_topic,
+                    'Principal': {'Service': 's3.amazonaws.com'}}]}))
+        self.addCleanup(sns.delete_topic, TopicArn=notify_topic)
+
+        public = 'http://acs.amazonaws.com/groups/global/AuthenticatedUsers'
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "mandeep.bal",
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': public},
+                     'Permission': 'READ'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'WRITE'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'READ_ACP'},
+                    ]})
+        client.put_bucket_tagging(
+            Bucket=bname,
+            Tagging={'TagSet': [
+                {'Key': 'rudolph', 'Value': 'rabbit'},
+                {'Key': 'platform', 'Value': 'tyre'}]})
+        client.put_bucket_logging(
+            Bucket=bname,
+            BucketLoggingStatus={
+                'LoggingEnabled': {
+                    'TargetBucket': bname,
+                    'TargetPrefix': 's3-logs/'}})
+        client.put_bucket_versioning(
+            Bucket=bname,
+            VersioningConfiguration={'Status': 'Enabled'})
+        client.put_bucket_accelerate_configuration(
+            Bucket=bname,
+            AccelerateConfiguration={'Status': 'Enabled'})
+        client.put_bucket_website(
+            Bucket=bname,
+            WebsiteConfiguration={
+                'IndexDocument': {
+                    'Suffix': 'index.html'}})
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'Zebra',
+                    'Effect': 'Deny',
+                    'Principal': '*',
+                    'Action': 's3:PutObject',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname,
+                    'Condition': {
+                        'StringNotEquals': {
+                            's3:x-amz-server-side-encryption': [
+                                'AES256', 'aws:kms']}}}]}))
+        client.put_bucket_notification_configuration(
+            Bucket=bname,
+            NotificationConfiguration={
+                'TopicConfigurations': [{
+                    'Id': bname,
+                    'TopicArn': notify_topic,
+                    'Events': ['s3:ObjectCreated:*'],
+                    'Filter': {
+                        'Key': {
+                            'FilterRules': [
+                                {'Name': 'prefix',
+                                 'Value': 's3-logs/'}
+                                ]
+                            }
+                        }
+                    }]
+                })
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [{'Name': bname}]}, session_factory=session_factory)
+
+        manager = p.get_resource_manager()
+        resource_a = manager.get_resources([bname])[0]
+        results = self.wait_for_config(session, queue_url, bname)
+        import pprint
+        pprint.pprint(resource_a)
+        resource_b = s3.ConfigS3(manager).load_resource(results[0])
+        self.maxDiff = None
+
+        for k in ('Logging', 'Policy', 'Versioning', 'Name', 'Website'):
+            self.assertEqual(resource_a[k], resource_b[k])
+
+    def wait_for_config(self, session, queue_url, resource_id):
+        client = session.client('sqs')
+        messages = MessageIterator(client, queue_url, timeout=20)
+        results = []
+        while True:
+            for m in messages:
+                msg = json.loads(m['Body'])
+                change = json.loads(msg['Message'])
+                messages.ack(m)
+                if change['configurationItem']['resourceId'] != resource_id:
+                    continue
+                results.append(change['configurationItem'])
+                break
+            if results:
+                break
+        return results
+
+    def initialize_config_subscriber(self, session):
+        config = session.client('config')
+        sqs = session.client('sqs')
+        sns = session.client('sns')
+
+        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
+        assert channels, "config not enabled"
+
+        topic = channels[0]['snsTopicARN']
+        queue = "custodian-waiter-%s" % str(uuid.uuid4())
+        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
+        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
+
+        attrs = sqs.get_queue_attributes(QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
+        queue_arn = attrs['Attributes']['QueueArn']
+        policy = json.loads(attrs['Attributes'].get(
+            'Policy',
+            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
+        policy['Statement'].append({
+            "Sid": "ConfigTopicSubscribe",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": topic}}})
+        sqs.set_queue_attributes(QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
+        subscription = sns.subscribe(
+            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get('SubscriptionArn')
+        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
+        return queue_url
+
+    def test_website(self):
+        event = event_data('s3-website.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {u'IndexDocument': {u'Suffix': 'index.html'},
+             u'RoutingRules': [
+                 {u'Redirect': {u'ReplaceKeyWith': 'error.html'},
+                  u'Condition': {u'HttpErrorCodeReturnedEquals': '404',
+                                 u'KeyPrefixEquals': 'docs/'}}]})
 
     def test_load_item_resource(self):
         event = event_data('s3.json', 'config')

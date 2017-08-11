@@ -48,10 +48,13 @@ import os
 import time
 import ssl
 
+import six
+
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
+from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric
 from c7n.filters import (
@@ -61,6 +64,7 @@ from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps)
+
 
 
 log = logging.getLogger('custodian.s3')
@@ -136,18 +140,28 @@ class ConfigS3(query.ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigS3, self).load_resource(item)
         cfg = item['supplementaryConfiguration']
-
         if item['awsRegion'] != 'us-east-1': # aka standard
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
 
         # owner is under acl per describe
         resource.pop('Owner', None)
+        resource['CreationDate'] = parse_date(resource['CreationDate'])
 
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
-            if cfg[k] == null_value:
+            if cfg.get(k) == null_value:
                 continue
             method = getattr(self, "handle_%s" % k, None)
-            method(resource, json.loads(cfg[k]))
+            if method is None:
+                raise ValueError("unhandled supplementary config %s", k)
+                continue
+            v = cfg[k]
+            if isinstance(cfg[k], six.string_types):
+                v = json.loads(cfg[k])
+            method(resource, v)
+
+        for el in S3_AUGMENT_TABLE:
+            if el[1] not in resource:
+                resource[el[1]] = el[2]
         return resource
 
     PERMISSION_MAP = {
@@ -157,33 +171,45 @@ class ConfigS3(query.ConfigSource):
         'Read': 'READ',
         'ReadAcp': 'READ_ACP'}
 
+    GRANTEE_MAP = {
+        'AllUsers':  "http://acs.amazonaws.com/groups/global/AllUsers",
+        'AuthenticatedUsers': "http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
+        'LogDelivery': 'http://acs.amazonaws.com/groups/s3/LogDelivery'}
+
     def handle_AccessControlList(self, resource, item_value):
         # double serialized in config for some reason
-        item_value = json.loads(item_value)
+        if isinstance(item_value, six.string_types):
+            item_value = json.loads(item_value)
+
         resource['Acl'] = {}
         resource['Acl']['Owner'] = {'ID': item_value['owner']['id']}
         if item_value['owner']['displayName']:
             resource['Acl']['Owner']['DisplayName'] = item_value[
                 'owner']['displayName']
         resource['Acl']['Grants'] = grants = []
+
         for g in item_value['grantList']:
-            rg = {'ID': g['grantee']['id']}
-            if not g['grantee'].get('type'):
-                rg['Type'] = 'CanonicalUser'
+            if 'id' not in g['grantee']:
+                assert g['grantee'] in self.GRANTEE_MAP, "unknown grantee %s" % g
+                rg = {'Type': 'Group', 'URI': self.GRANTEE_MAP[g['grantee']]}
             else:
-                # value mapping..
-                rg['Type'] = g['grantee']['type']
-            if g['grantee']['displayName']:
+                rg = {'ID': g['grantee']['id'], 'Type': 'CanonicalUser'}
+
+            if 'displayName' in g:
                 rg['DisplayName'] = g['displayName']
+
             grants.append({
                 'Permission': self.PERMISSION_MAP[g['permission']],
                 'Grantee': rg,
                 })
 
-    def handle_AccelerateConfiguration(self, resource, item_value):
-        pass
+    def handle_BucketAccelerateConfiguration(self, resource, item_value):
+        # not currently auto-augmented by custodian
+        return
 
     def handle_BucketLoggingConfiguration(self, resource, item_value):
+        if item_value['destinationBucketName'] is None:
+            return {}
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
@@ -200,10 +226,45 @@ class ConfigS3(query.ConfigSource):
 
     def handle_BucketVersioningConfiguration(self, resource, item_value):
         assert item_value['status'] in ('Enabled', 'Suspended')
-        assert item_value['isMfaDeletedEnabled'] in ('Enabled', 'Disabled')
-        resource['Versioning'] = {
-            'Status': item_value['status'],
-            'MFADelete': item_value['isMfaDeletedEnabled']}
+        resource['Versioning'] = {'Status': item_value['status']}
+        if item_value['isMfaDeleteEnabled']:
+            resource['Versioning']['MFADelete'] = item_value[
+                'isMfaDeleteEnabled'].title()
+
+    def handle_BucketWebsiteConfiguration(self, resource, item_value):
+        website = {}
+        if item_value['indexDocumentSuffix']:
+            website['IndexDocument'] = {
+                'Suffix': item_value['indexDocumentSuffix']}
+        if item_value['errorDocument']:
+            website['ErrorDocument'] = {
+                'Key': item_value['errorDocument']}
+        if item_value['redirectAllRequestsTo']:
+            website['RedirectAllRequestsTo'] = {
+                'HostName': item_value['redirectsAllRequestsTo']['hostName'],
+                'Protocol': item_value['redirectsAllRequestsTo']['protocol']}
+        for r in item_value['routingRules']:
+            redirect = {}
+            rule = {'Redirect': redirect}
+            website.setdefault('RoutingRules', []).append(rule)
+            if 'condition' in r:
+                cond = {}
+                for ck, rk in (
+                    ('keyPrefixEquals', 'KeyPrefixEquals'),
+                    ('httpErrorCodeReturnedEquals',
+                     'HttpErrorCodeReturnedEquals')):
+                    if r['condition'][ck]:
+                        cond[rk] = r['condition'][ck]
+                rule['Condition'] = cond
+            for ck, rk in (
+                    ('protocol', 'Protocol'),
+                    ('hostName', 'HostName'),
+                    ('replaceKeyPrefixWith', 'ReplaceKeyPrefixWith'),
+                    ('replaceKeyWith', 'ReplaceKeyWith'),
+                    ('httpRedirectCode', 'HttpRedirectCode')):
+                if r['redirect'][ck]:
+                    redirect[rk] = r['redirect'][ck]
+        resource['Website'] = website
 
 
 S3_CONFIG_SUPPLEMENT_NULL_MAP = {
@@ -212,9 +273,9 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
     'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}',
     'BucketAccelerateConfiguration': u'{"status":null}',
     'BucketNotificationConfiguration': u'{"configurations":{}}',
-    # Always load
     'AccessControlList': None,
-    'BucketTaggingConfiguration': u'',
+    'BucketTaggingConfiguration': None,
+    'BucketWebsiteConfiguration': None
     }
 
 S3_AUGMENT_TABLE = (
