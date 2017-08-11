@@ -341,7 +341,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 
     def __call__(self, alb):
         listeners = self.listener_map[alb['LoadBalancerArn']]
-        if 'matched' in self.data:
+        if self.data.get('matched', False):
             listeners = alb.pop('c7n:MatchedListeners', [])
 
         found_listeners = False
