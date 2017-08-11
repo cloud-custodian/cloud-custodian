@@ -308,13 +308,13 @@ class AppELBTargetGroupFilterBase(object):
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
     """Filter ALB based on matching listener attributes
-    
+
     Adding the `matched` flag will filter on previously matched listeners
 
     :example:
 
         .. code-block: yaml
-        
+
             policies:
               - name: app-elb-invalid-ciphers
                 resource: app-elb
