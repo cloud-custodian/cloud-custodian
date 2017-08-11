@@ -375,6 +375,8 @@ class BucketTag(BaseTest):
 
 class S3ConfigSource(BaseTest):
 
+    maxDiff = None
+
     @functional
     def test_normalize(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
@@ -488,13 +490,19 @@ class S3ConfigSource(BaseTest):
         manager = p.get_resource_manager()
         resource_a = manager.get_resources([bname])[0]
         results = self.wait_for_config(session, queue_url, bname)
-        import pprint
-        pprint.pprint(resource_a)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
         self.maxDiff = None
 
-        for k in ('Logging', 'Policy', 'Versioning', 'Name', 'Website'):
+        for k in ('Logging',
+                  'Policy',
+                  'Versioning',
+                  'Name',
+                  'Website'):
             self.assertEqual(resource_a[k], resource_b[k])
+
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resource_a.get('Tags')},
+            {t['Key']: t['Value'] for t in resource_b.get('Tags')})
 
     def wait_for_config(self, session, queue_url, resource_id):
         client = session.client('sqs')
@@ -546,11 +554,60 @@ class S3ConfigSource(BaseTest):
         self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
         return queue_url
 
-    def test_website(self):
+    def test_config_normalize_notification(self):
+        event = event_data('s3-rep-and-notify.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Notification'],
+            {u'TopicConfigurations': [
+                {u'Filter': {
+                    u'Key': {
+                        u'FilterRules': [
+                            {u'Name': 'Prefix', u'Value': 'oids/'}]}},
+                 u'Id': 'rabbit',
+                 u'TopicArn': 'arn:aws:sns:us-east-1:644160558196:custodian-test-data-22',
+                 u'Events': ['s3:ReducedRedundancyLostObject',
+                             's3:ObjectCreated:CompleteMultipartUpload']}],
+             u'LambdaFunctionConfigurations': [
+                 {u'Filter': {
+                     u'Key': {
+                         u'FilterRules': [
+                             {u'Name': 'Prefix', u'Value': 'void/'}]}},
+                  u'LambdaFunctionArn': 'arn:aws:lambda:us-east-1:644160558196:function:lambdaenv',
+                  u'Id': 'ZDAzZDViMTUtNGU3MS00ZWIwLWI0MzgtOTZiMWQ3ZWNkZDY1',
+                  u'Events': ['s3:ObjectRemoved:Delete']}],
+             u'QueueConfigurations': [
+                 {u'Filter': {
+                     u'Key': {
+                         u'FilterRules': [
+                             {u'Name': 'Prefix', u'Value': 'images/'}]}},
+                  u'Id': 'OGQ5OTAyNjYtYjBmNy00ZTkwLWFiMjUtZjE4ODBmYTgwNTE0',
+                  u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
+                  u'Events': ['s3:ObjectCreated:*']}]})
+
+    def test_config_normalize_replication(self):
+        event = event_data('s3-rep-and-notify.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Replication'], {
+                u'ReplicationConfiguration': {
+                    u'Rules': [{u'Status': 'Enabled',
+                                u'Prefix': '',
+                                u'Destination': {
+                                    u'Bucket': 'arn:aws:s3:::testing-west'},
+                                u'ID': 'testing-99'}],
+                    u'Role': (
+                        'arn:aws:iam::644160558196:role'
+                        '/custodian-replicated-custodian-replicated'
+                        '-west-s3-repl-role')}})
+
+    def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
-        p = self.load_policy({
-            'name': 's3cfg',
-            'resource': 's3'})
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
         source = p.resource_manager.get_source('config')
         self.maxDiff = None
         resource = source.load_resource(event)
