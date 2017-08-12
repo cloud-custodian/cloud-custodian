@@ -25,6 +25,7 @@ from c7n.utils import get_retry, local_session
 class Glacier(QueryResourceManager):
 
     permissions = ('glacier:ListTagsForVault',)
+    retry = staticmethod(get_retry(('Throttled',)))
 
     class resource_type(object):
         service = 'glacier'
