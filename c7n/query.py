@@ -208,7 +208,7 @@ class ConfigSource(object):
         return results
 
     def load_resource(self, item):
-        if isinstance(item['configuration'], (basestring,)):
+        if isinstance(item['configuration'], six.string_types):
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
