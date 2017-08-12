@@ -47,8 +47,8 @@ as a simple cron job on a server to execute against large existing fleets.
 Features
 ########
 
-- Comprehensive support for AWS services and resources (~60), along with
-  ~160 actions and ~180 filters to build policies with.
+- Comprehensive support for AWS services and resources (> 100), along with
+  400+ actions and 300+ filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
 - Automatically provisions lambda functions, config rules, and cloud watch event targets for
@@ -59,6 +59,7 @@ Features
 - Battle-tested - in production on some very large AWS accounts.
 - Supports cross-account usage via STS role assumption.
 - Supports integration with custom/user supplied lambdas as actions.
+
 
 Links
 #####
@@ -152,6 +153,32 @@ Get Involved
 Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 
 Gitter - https://gitter.im/capitalone/cloud-custodian
+
+Additional Tools
+################
+
+The Custodian project also develops and maintains a suite of additional tools
+here https://github.com/capitalone/cloud-custodian/tree/master/tools:
+
+
+Salactus
+   Scale out s3 scanning.
+
+Mailer
+   A reference implementation of sending emails to users to notify them.
+
+TrailDB
+   Cloudtrail indexing and timeseries generation for dashboarding
+
+LogExporter
+   Cloud watch log exporting to s3
+
+Index
+   Indexing of custodian metrics and outputs for dashboarding
+
+Sentry
+   Log parsing for python tracebacks to integrate with
+   https://sentry.io/welcome/
 
 
 Contributors

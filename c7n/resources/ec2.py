@@ -195,7 +195,7 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
@@ -261,7 +261,7 @@ class AttachedVolume(ValueFilter):
         self.skip = self.data.get('skip-devices', [])
         self.operator = self.data.get(
             'operator', 'or') == 'or' and any or all
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def get_volume_mapping(self, resources):
         volume_map = {}
@@ -322,7 +322,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -465,7 +465,7 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 
@@ -491,7 +491,7 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'},
         hours={'type': 'number'},
         minutes={'type': 'number'})
@@ -612,6 +612,7 @@ class Start(BaseAction, StateTransitionFilter):
     schema = type_schema('start')
     permissions = ('ec2:StartInstances',)
     batch_size = 10
+    exception = None
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -633,6 +634,12 @@ class Start(BaseAction, StateTransitionFilter):
                 for batch in utils.chunks(z_instances, self.batch_size):
                     self.process_instance_set(client, batch, itype, izone)
 
+        # Raise an exception after all batches process
+        if self.exception:
+            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
+                self.log.exception("Error while starting instances error %s", self.exception)
+                raise self.exception
+
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retry = utils.get_retry((
@@ -643,15 +650,14 @@ class Start(BaseAction, StateTransitionFilter):
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
-                return
-            self.log.exception("Error while starting instances error %s", e)
-            raise
+            # Saving exception
+            self.exception = e
+            self.log.exception(
+                ("Could not start instances:%d type:%s"
+                 " zone:%s instances:%s error:%s"),
+                len(instances), itype, izone,
+                ", ".join(instance_ids), e)
+            return
 
 
 @actions.register('resize')
@@ -885,10 +891,8 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-            filters:
-              - type: ebs
           actions:
-            - snapshot
+            - type: snapshot
               copy-tags:
                 - Name
     """
@@ -1056,15 +1060,15 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction):
-    """Sets (or removes) the instance profile for an existing EC2 instance.
+class SetInstanceProfile(BaseAction, StateTransitionFilter):
+    """Sets (or removes) the instance profile for a running EC2 instance.
 
     :Example:
 
     .. code-block: yaml
 
         policies:
-          - name:
+          - name: set-default-instance-profile
             resource: ec2
             query:
               - IamInstanceProfile: absent
@@ -1085,7 +1089,12 @@ class SetInstanceProfile(BaseAction):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
+    valid_origin_states = ('running', 'pending')
+
     def process(self, instances):
+        instances = self.filter_instance_state(instances)
+        if not len(instances):
+            return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         profile_name = self.data.get('name', '')
@@ -1158,11 +1167,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EC2 Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):

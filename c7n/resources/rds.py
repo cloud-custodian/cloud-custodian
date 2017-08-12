@@ -270,6 +270,11 @@ class RDSOffHour(OffHour):
     """
 
 
+@filters.register('onhour')
+class RDSOnHour(OnHour):
+    """Scheduled action on rds instance."""
+
+
 @filters.register('default-vpc')
 class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
@@ -568,12 +573,12 @@ class TagTrim(tags.TagTrim):
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
-def _elgibile_start_stop(db, state="available"):
+def _eligible_start_stop(db, state="available"):
 
     if db.get('DBInstanceStatus') != state:
         return False
 
-    if db.get('MultiAZ') is False:
+    if db.get('MultiAZ'):
         return False
 
     if db.get('ReadReplicaDBInstanceIdentifiers'):
@@ -600,14 +605,14 @@ class Stop(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        for r in filter(_elgibile_start_stop, resources):
+        for r in filter(_eligible_start_stop, resources):
             try:
                 client.stop_db_instance(
                     DBInstanceIdentifier=r['DBInstanceIdentifier'])
             except ClientError as e:
                 log.exception(
                     "Error stopping db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('start')
@@ -624,7 +629,7 @@ class Start(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        start_filter = functools.partial(_elgibile_start_stop, state='stopped')
+        start_filter = functools.partial(_eligible_start_stop, state='stopped')
         for r in filter(start_filter, resources):
             try:
                 client.start_db_instance(
@@ -632,7 +637,7 @@ class Start(BaseAction):
             except ClientError as e:
                 log.exception(
                     "Error starting db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('delete')
@@ -895,7 +900,7 @@ class RetentionWindow(BaseAction):
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
-        retention_type = self.data['enforce', 'min'].lower()
+        retention_type = self.data.get('enforce', 'min').lower()
 
         if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
@@ -1010,11 +1015,11 @@ def _rds_snap_tags(
         return snap
 
     with executor_factory(max_workers=1) as w:
-        return filter(None, (w.map(process_tags, snaps)))
+        return list(filter(None, (w.map(process_tags, snaps))))
 
 
 @RDSSnapshot.filter_registry.register('onhour')
-class RDSOnHour(OnHour):
+class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
 
 
@@ -1058,7 +1063,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 
@@ -1563,7 +1568,7 @@ class ParameterFilter(ValueFilter):
 
         for pg in param_groups:
             cache_key = {
-                'region': self.manager.config.regions,
+                'region': self.manager.config.region,
                 'account_id': self.manager.config.account_id,
                 'rds-pg': pg}
             pg_values = self.manager._cache.get(cache_key)

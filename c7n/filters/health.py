@@ -73,6 +73,7 @@ class HealthEventFilter(Filter):
         else:
             service = m.get_model().service.upper()
         f = {'services': [service],
+             'regions': [self.manager.config.region],
              'eventStatusCodes': self.data.get(
                  'statuses', ['open', 'upcoming'])}
         if self.data.get('types'):
@@ -85,12 +86,13 @@ class HealthEventFilter(Filter):
             'health', region_name='us-east-1')
         for event_set in chunks(health_events, 10):
             event_map = {e['arn']: e for e in event_set}
+            event_arns = list(event_map.keys())
             for d in client.describe_event_details(
-                    eventArns=event_map.keys()).get('successfulSet', ()):
+                    eventArns=event_arns).get('successfulSet', ()):
                 event_map[d['event']['arn']]['Description'] = d[
                     'eventDescription']['latestDescription']
             paginator = client.get_paginator('describe_affected_entities')
             entities.extend(list(itertools.chain(
-                            *[p['entities']for p in paginator.paginate(
-                                filter={'eventArns': event_map.keys()})])))
+                            *[p['entities'] for p in paginator.paginate(
+                                filter={'eventArns': event_arns})])))
         return entities

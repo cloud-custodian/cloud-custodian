@@ -17,7 +17,7 @@ import json
 import os
 import yaml
 
-from cStringIO import StringIO
+from io import StringIO
 from dateutil import parser
 from dateutil.tz import gettz
 
@@ -110,9 +110,9 @@ def get_date_time_delta(delta):
 
 
 def format_struct(evt):
-    io = StringIO()
-    json.dump(evt, io, indent=2)
-    return io.getvalue()
+    buf = StringIO()
+    json.dump(evt, buf, indent=2)
+    return buf.getvalue()
 
 
 def resource_tag(resource, k):
@@ -196,9 +196,11 @@ def resource_format(resource, resource_type):
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
     elif resource_type == 'log-group':
-        return "name: %s last_write: %s" % (
-            resource['logGroupName'],
-            resource['lastWrite'])
+        if 'lastWrite' in resource:
+            return "name: %s last_write: %s" % (
+                resource['logGroupName'],
+                resource['lastWrite'])
+        return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
@@ -226,5 +228,5 @@ def resource_format(resource, resource_type):
             resource['CidrBlock'],
             resource['AvailableIpAddressCount'])
     else:
-        print "Unknown resource type", resource_type
+        print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)

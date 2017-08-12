@@ -20,7 +20,6 @@ import copy
 from datetime import datetime
 import functools
 import json
-import io
 import itertools
 import logging
 import os
@@ -28,6 +27,7 @@ import random
 import threading
 import time
 import ipaddress
+import six
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
@@ -44,6 +44,8 @@ else:
             from yaml import SafeLoader
         except ImportError:
             SafeLoader = None
+
+log = logging.getLogger('custodian.utils')
 
 
 class VarsSubstitutionError(Exception):
@@ -80,7 +82,12 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            return yaml_load(contents)
+            try:
+                return yaml_load(contents)
+            except yaml.YAMLError as e:
+                log.error('Error while loading yaml file %s', path)
+                log.error('Skipping this file.  Error message below:\n%s', e)
+                return None
         elif format == 'json':
             return loads(contents)
 
@@ -103,9 +110,7 @@ def dumps(data, fh=None, indent=0):
 
 
 def format_event(evt):
-    buf = io.BytesIO()
-    json.dump(evt, buf, indent=2)
-    return buf.getvalue().decode('utf8')
+    return json.dumps(evt, indent=2)
 
 
 def type_schema(
@@ -356,7 +361,7 @@ def parse_cidr(value):
     if '/' not in value:
         klass = ipaddress.ip_address
     try:
-        v = klass(unicode(value))
+        v = klass(six.text_type(value))
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v

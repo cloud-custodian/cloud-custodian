@@ -23,7 +23,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters import Filter, FilterRegistry, ValueFilter, FilterValidationError
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -385,8 +385,17 @@ class ServiceLimit(Filter):
                 filters:
                   - type: service-limit
                     services:
-                      - IAM
+                      - EC2
                     threshold: 1.0
+              - name: specify-region-for-global-service
+                region: us-east-1
+                resource: account
+                filters:
+                  - type: service-limit
+                    services:
+                      - IAM
+                    limits:
+                      - Roles
     """
 
     schema = type_schema(
@@ -401,13 +410,28 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+    global_services = set(['IAM'])
+
+    def validate(self):
+        region = self.manager.data.get('region', '')
+        if len(self.global_services.intersection(self.data.get('services', []))):
+            if region != 'us-east-1':
+                raise FilterValidationError(
+                    "Global services: %s must be targeted in us-east-1 on the policy"
+                    % ', '.join(self.global_services))
+        return self
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('support')
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name='us-east-1')
         checks = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
 
+        region = self.manager.config.region
+        checks['flaggedResources'] = [r for r in checks['flaggedResources']
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')]
         resources[0]['c7n:ServiceLimits'] = checks
+
         delta = timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(checks['timestamp'])
         if datetime.now(tz=tzutc()) - delta > check_date:
@@ -453,12 +477,14 @@ class RequestLimitIncrease(BaseAction):
              - type: service-limit
                services:
                  - EBS
+               limits:
+                 - Provisioned IOPS (SSD) storage (GiB)
                threshold: 60.5
              actions:
                - type: request-limit-increase
                  notify: [email, email2]
                  percent-increase: 50
-                 message: "Raise {service} by {percent}%"
+                 message: "Raise {service} - {limits} by {percent}%"
     """
 
     schema = type_schema(
@@ -473,8 +499,8 @@ class RequestLimitIncrease(BaseAction):
 
     permissions = ('support:CreateCase',)
 
-    default_subject = 'Raise the account limit of {service}'
-    default_template = 'Please raise the account limit of {service} by {percent}%'
+    default_subject = 'Raise the account limit of {service} - {limits} in {region}'
+    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -488,23 +514,29 @@ class RequestLimitIncrease(BaseAction):
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
-        client = session.client('support')
+        client = session.client('support', region_name='us-east-1')
 
         services_done = set()
         for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
             service = resource['service']
+            limits = resource['check']
+            region = resource['region']
+
             if service in services_done:
                 continue
 
             services_done.add(service)
+            services_done.add(limits)
+            services_done.add(region)
             service_code = self.service_code_mapping.get(service)
 
             subject = self.data.get('subject', self.default_subject)
-            subject = subject.format(service=service)
 
+            subject = subject.format(service=service,limits=limits,region=region)
             body = self.data.get('message', self.default_template)
             body = body.format(**{
                 'service': service,
+                'limits': limits,
                 'percent': self.data.get('percent-increase')
             })
 
@@ -589,6 +621,7 @@ class EnableTrail(BaseAction):
         **{
             'trail': {'type': 'string'},
             'bucket': {'type': 'string'},
+            'bucket-region': {'type': 'string'},
             'multi-region': {'type': 'boolean'},
             'global-events': {'type': 'boolean'},
             'notify': {'type': 'string'},
@@ -604,6 +637,7 @@ class EnableTrail(BaseAction):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         bucket_name = self.data['bucket']
+        bucket_region = self.data.get('bucket-region', 'us-east-1')
         trail_name = self.data.get('trail', 'default-trail')
         multi_region = self.data.get('multi-region', True)
         global_events = self.data.get('global-events', True)
@@ -613,7 +647,16 @@ class EnableTrail(BaseAction):
         kms_key = self.data.get('kms-key', '')
 
         s3client = session.client('s3')
-        s3client.create_bucket(Bucket=bucket_name)
+        try:
+            s3client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={'LocationConstraint': bucket_region}
+            )
+        except ClientError as ce:
+            if not ('Error' in ce.response and
+            ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
+                raise ce
+
         try:
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
         except ClientError:
@@ -688,10 +731,11 @@ class HasVirtualMFA(Filter):
             client = local_session(self.manager.session_factory).client('iam')
             paginator = client.get_paginator('list_virtual_mfa_devices')
             raw_list = paginator.paginate().build_full_result()['VirtualMFADevices']
-            account['c7n:VirtualMFADevices'] = filter(self.mfa_belongs_to_root_account, raw_list)
+            account['c7n:VirtualMFADevices'] = list(filter(
+                self.mfa_belongs_to_root_account, raw_list))
         expect_virtual_mfa = self.data.get('value', True)
         has_virtual_mfa = any(account['c7n:VirtualMFADevices'])
         return expect_virtual_mfa == has_virtual_mfa
 
     def process(self, resources, event=None):
-        return filter(self.account_has_virtual_mfa, resources)
+        return list(filter(self.account_has_virtual_mfa, resources))

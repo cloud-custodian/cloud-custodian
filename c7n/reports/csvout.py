@@ -135,8 +135,8 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, six.string_types):
-                value = unicode(value)
+            if not isinstance(value, six.text_type):
+                value = six.text_type(value)
         vals.append(value)
     return vals
 
@@ -157,7 +157,7 @@ class Formatter(object):
             mfields = [model.id]
             if model.name != model.id:
                 mfields.append(model.name)
-            if model.date:
+            if getattr(model, 'date', None):
                 mfields.append(model.date)
 
         if include_default_fields:
@@ -211,7 +211,7 @@ class Formatter(object):
 
         uniq = self.uniq_by_id(records)
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
-        rows = map(self.extract_csv, uniq)
+        rows = list(map(self.extract_csv, uniq))
         return rows
 
 
@@ -230,7 +230,7 @@ def fs_record_set(output_path, policy_name):
         return records
 
 
-def record_set(session_factory, bucket, key_prefix, start_date):
+def record_set(session_factory, bucket, key_prefix, start_date, specify_hour=False):
     """Retrieve all s3 records for the given policy output url
 
     From the given start date.
@@ -241,8 +241,13 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     records = []
     key_count = 0
 
-    marker = key_prefix.strip("/") + "/" + start_date.strftime(
-        '%Y/%m/%d/00') + "/resources.json.gz"
+    date = start_date.strftime('%Y/%m/%d')
+    if specify_hour:
+        date += "/{}".format(start_date.hour)
+    else:
+        date += "/00"
+
+    marker = "{}/{}/resources.json.gz".format(key_prefix.strip("/"), date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -279,7 +284,7 @@ def get_records(bucket, key, session_factory):
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
-    blob = io.StringIO(result['Body'].read())
+    blob = io.BytesIO(result['Body'].read())
 
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",

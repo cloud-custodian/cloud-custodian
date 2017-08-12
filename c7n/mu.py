@@ -43,10 +43,6 @@ from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
-RUNTIME = 'python{}.{}'.format(
-    sys.version_info.major,
-    sys.version_info.minor,
-)
 
 
 class PythonPackageArchive(object):
@@ -172,7 +168,7 @@ class PythonPackageArchive(object):
     def get_checksum(self):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
-        with open(self._temp_archive_file.name) as fh:
+        with open(self._temp_archive_file.name, 'rb') as fh:
             return base64.b64encode(checksum(fh, hashlib.sha256()))
 
     def get_bytes(self):
@@ -628,7 +624,7 @@ class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python2.7"
+    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy
@@ -817,6 +813,9 @@ class CloudWatchEventSource(object):
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
 
+        if event_type == 'cloudtrail':
+            if 'signin.amazonaws.com' in payload['detail']['eventSource']:
+                payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [
@@ -1237,7 +1236,14 @@ class ConfigRule(object):
 
         if isinstance(func, PolicyLambda):
             manager = func.policy.get_resource_manager()
-            config_type = manager.get_model().config_type
+            if hasattr(manager.get_model(), 'config_type'):
+                config_type = manager.get_model().config_type
+            else:
+                raise Exception("You may have attempted to deploy a config "
+                        "based lambda function with an unsupported config type. "
+                        "The most recent AWS config types are here: http://docs.aws"
+                        ".amazon.com/config/latest/developerguide/resource"
+                        "-config-reference.html.")
             params['Scope'] = {
                 'ComplianceResourceTypes': [config_type]}
         else:

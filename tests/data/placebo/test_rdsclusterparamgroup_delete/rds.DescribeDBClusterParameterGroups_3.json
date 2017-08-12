@@ -1,0 +1,21 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "3b8c916b-6069-11e7-80ed-a161999cffc8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3b8c916b-6069-11e7-80ed-a161999cffc8", 
+                "date": "Tue, 04 Jul 2017 03:31:14 GMT", 
+                "content-length": "305", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "DBClusterParameterGroup not found: pg-cluster-test", 
+            "Code": "DBParameterGroupNotFound", 
+            "Type": "Sender"
+        }
+    }
+}

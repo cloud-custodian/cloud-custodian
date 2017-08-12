@@ -58,6 +58,7 @@ def load_resources():
     import c7n.resources.ml
     import c7n.resources.opsworks
     import c7n.resources.rds
+    import c7n.resources.rdsparamgroup
     import c7n.resources.rdscluster
     import c7n.resources.redshift
     import c7n.resources.route53

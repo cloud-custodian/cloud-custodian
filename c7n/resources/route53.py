@@ -17,7 +17,7 @@ import functools
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import chunks, generate_arn, local_session
+from c7n.utils import chunks, get_retry, generate_arn, local_session
 
 
 class Route53Base(object):
@@ -55,7 +55,7 @@ def _describe_route53_tags(
         results = retry(
             client.list_tags_for_resources,
             ResourceType=model.type,
-            ResourceIds=resource_map.keys())
+            ResourceIds=list(resource_map.keys()))
 
         for resource_tag_set in results['ResourceTagSets']:
             if ('ResourceId' in resource_tag_set and

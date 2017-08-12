@@ -91,7 +91,12 @@ class ResourceQuery(object):
 
         resources = self.filter(resource_type, **params)
         if client_filter:
-            resources = [r for r in resources if r[m.id] in identities]
+            # This logic was added to prevent the issue from:
+            # https://github.com/capitalone/cloud-custodian/issues/1398
+            if all(map(lambda r: isinstance(r, six.string_types), resources)):
+                resources = [r for r in resources if r in identities]
+            else:
+                resources = [r for r in resources if r[m.id] in identities]
 
         return resources
 
@@ -123,11 +128,7 @@ class QueryMeta(type):
             if getattr(m, 'universal_taggable', False):
                 register_universal_tags(
                     attrs['filter_registry'], attrs['action_registry'])
-                attrs['retry'] = staticmethod(get_retry((
-                    'Throttled',
-                    'RequestLimitExceeded',
-                    'Client.RequestLimitExceeded'
-                )))
+
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
