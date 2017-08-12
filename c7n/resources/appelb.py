@@ -332,8 +332,24 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
                     sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
     """
 
-    schema = type_schema('listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
+    schema = type_schema(
+        'listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+
+    def validate(self):
+        if not self.data.get('matched'):
+            return
+        listeners = [f for f in self.manager.filters
+                     if isinstance(f, self.__class__)]
+        found = False
+        for f in listeners[:listeners.index(self)]:
+            if not f.data.get('matched', False):
+                found = True
+                break
+        if not found:
+            raise FilterValidationError(
+                "matched listener filter, requires preceding listener filter")
+        return self
 
     def process(self, albs, event=None):
         self.initialize(albs)

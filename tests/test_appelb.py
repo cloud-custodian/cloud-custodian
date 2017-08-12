@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import six
 
 from .common import BaseTest
+from c7n.filters import FilterValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import AppELB, AppELBTargetGroup
 
@@ -31,6 +32,35 @@ class AppELBTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_appelb_validate(self):
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'appelb-simple-filter',
+             'resource': 'app-elb',
+             'filters': [
+                 {'type': 'listener',
+                  'key': 'LoadBalancerName',
+                  'matched': True,
+                  'value': 'alb-1'}]})
+
+        try:
+            self.load_policy(
+                {'name': 'appelb-simple-filter',
+                 'resource': 'app-elb',
+                 'filters': [
+                     {'type': 'listener',
+                      'key': 'LoadBalancerName',
+                      'value': 'alb-1'},
+                     {'type': 'listener',
+                      'key': 'LoadBalancerName',
+                      'matched': True,
+                      'value': 'alb-1'}
+                 ]})
+        except FilterValidationError:
+            raise
+            self.fail("filter validation should not have failed")
 
     def test_appelb_simple_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
@@ -114,7 +144,6 @@ class AppELBTest(BaseTest):
         arn = resources[0]['LoadBalancerArn']
         listeners = client.describe_listeners(LoadBalancerArn=arn)['Listeners']
         self.assertEqual(listeners[0]['Port'],80)
-
 
     def test_appelb_target_group_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
