@@ -44,6 +44,8 @@ class TestResults(object):
             result = nonsuccess.pop()
             self.failed.append(key)
             message = result.get('message')
+            if message is None:
+                return
             if message.startswith(INVALID_TYPE):
                 message = INVALID_TYPE
             self.failed_aggregates.setdefault(message, []).append(key)

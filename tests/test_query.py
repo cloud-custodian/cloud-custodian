@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,12 +63,12 @@ class QueryResourceManagerTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         output = self.capture_logging(
             name=p.resource_manager.log.name, level=logging.DEBUG)
         p.run()
         self.assertTrue("Using cached internet-gateway: 3", output.getvalue())
-        
+
     def test_get_resources(self):
         session_factory = self.replay_flight_data('test_query_manager_get')
         p = self.load_policy(
@@ -79,6 +79,3 @@ class QueryResourceManagerTest(BaseTest):
         self.assertEqual(len(resources), 1)
         resources = p.resource_manager.get_resources(['igw-5bce113f'])
         self.assertEqual(resources, [])
-    
-             
-            
