@@ -26,6 +26,7 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
+
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
 from c7n.utils import local_session, chunks, type_schema, get_retry
 
@@ -330,24 +331,65 @@ class AppELBTargetGroupFilterBase(object):
 
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
-    """Filter ALB based on matching listener attributes"""
+    """Filter ALB based on matching listener attributes
 
-    schema = type_schema('listener', rinherit=ValueFilter.schema)
+    Adding the `matched` flag will filter on previously matched listeners
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: app-elb-invalid-ciphers
+                resource: app-elb
+                filters:
+                  - type: listener
+                    key: Protocol
+                    value: HTTPS
+                  - type: listener
+                    key: SslPolicy
+                    value: ['ELBSecurityPolicy-TLS-1-1-2017-01','ELBSecurityPolicy-TLS-1-2-2017-01']
+                    op: ni
+                    matched: true
+                actions:
+                  - type: modify-listener
+                    sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+    """
+
+    schema = type_schema(
+        'listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+
+    def validate(self):
+        if not self.data.get('matched'):
+            return
+        listeners = [f for f in self.manager.filters
+                     if isinstance(f, self.__class__)]
+        found = False
+        for f in listeners[:listeners.index(self)]:
+            if not f.data.get('matched', False):
+                found = True
+                break
+        if not found:
+            raise FilterValidationError(
+                "matched listener filter, requires preceding listener filter")
+        return self
 
     def process(self, albs, event=None):
         self.initialize(albs)
         return super(AppELBListenerFilter, self).process(albs, event)
 
     def __call__(self, alb):
-        matched = []
-        for listener in self.listener_map[alb['LoadBalancerArn']]:
+        listeners = self.listener_map[alb['LoadBalancerArn']]
+        if self.data.get('matched', False):
+            listeners = alb.pop('c7n:MatchedListeners', [])
+
+        found_listeners = False
+        for listener in listeners:
             if self.match(listener):
-                matched.append(listener)
-        if not matched:
-            return False
-        alb['c7n:MatchedListeners'] = matched
-        return True
+                set_annotation(alb, 'c7n:MatchedListeners', listener)
+                found_listeners = True
+        return found_listeners
 
 
 @actions.register('modify-listener')

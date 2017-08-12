@@ -13,11 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import functools
+
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.tags import universal_augment
+from c7n.utils import generate_arn, local_session, type_schema
 
 
 @resources.register('distribution')
@@ -25,11 +28,28 @@ class Distribution(QueryResourceManager):
 
     class resource_type(object):
         service = 'cloudfront'
+        type = 'distribution'
         enum_spec = ('list_distributions', 'DistributionList.Items', None)
         id = 'Id'
         name = 'DomainName'
         date = 'LastModifiedTime'
         dimension = "DistributionId"
+        universal_taggable = True
+
+    augment = universal_augment
+
+    @property
+    def generate_arn(self):
+        """ Generates generic arn if ID is not already arn format.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.get_model().service,
+                account_id=self.account_id,
+                resource_type=self.get_model().type,
+                separator='/')
+        return self._generate_arn
 
 
 @resources.register('streaming-distribution')
@@ -37,6 +57,7 @@ class StreamingDistribution(QueryResourceManager):
 
     class resource_type(object):
         service = 'cloudfront'
+        type = 'streaming-distribution'
         enum_spec = ('list_streaming_distributions',
                      'StreamingDistributionList.Items',
                      None)
@@ -44,6 +65,22 @@ class StreamingDistribution(QueryResourceManager):
         name = 'DomainName'
         date = 'LastModifiedTime'
         dimension = "DistributionId"
+        universal_taggable = True
+
+    augment = universal_augment
+
+    @property
+    def generate_arn(self):
+        """ Generates generic arn if ID is not already arn format.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.get_model().service,
+                account_id=self.account_id,
+                resource_type=self.get_model().type,
+                separator='/')
+        return self._generate_arn
 
 
 @Distribution.filter_registry.register('metrics')

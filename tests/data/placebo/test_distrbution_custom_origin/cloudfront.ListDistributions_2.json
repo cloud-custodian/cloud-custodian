@@ -5,7 +5,7 @@
             "Marker": "", 
             "Items": [
                 {
-                    "Status": "Deployed", 
+                    "Status": "InProgress", 
                     "CacheBehaviors": {
                         "Quantity": 0
                     }, 
@@ -18,17 +18,16 @@
                     "Origins": {
                         "Items": [
                             {
-                                "OriginPath": "", 
+                                "OriginPath": "/customer", 
                                 "CustomOriginConfig": {
                                     "OriginSslProtocols": {
                                         "Items": [
-                                            "TLSv1", 
                                             "TLSv1.1", 
                                             "TLSv1.2"
                                         ], 
-                                        "Quantity": 3
+                                        "Quantity": 2
                                     }, 
-                                    "OriginProtocolPolicy": "match-viewer", 
+                                    "OriginProtocolPolicy": "https-only", 
                                     "OriginReadTimeout": 30, 
                                     "HTTPPort": 80, 
                                     "HTTPSPort": 443, 
@@ -37,16 +36,27 @@
                                 "CustomHeaders": {
                                     "Quantity": 0
                                 }, 
-                                "Id": "Custom-custom_origin.com", 
-                                "DomainName": "custom_origin.com"
+                                "Id": "Custom-custom.com/customer", 
+                                "DomainName": "custom.com"
+                            }, 
+                            {
+                                "S3OriginConfig": {
+                                    "OriginAccessIdentity": ""
+                                }, 
+                                "OriginPath": "/distribution", 
+                                "CustomHeaders": {
+                                    "Quantity": 0
+                                }, 
+                                "Id": "S3-c7n-cloudfront-test/distribution", 
+                                "DomainName": "c7n-cloudfront-test.s3.amazonaws.com"
                             }
                         ], 
-                        "Quantity": 1
+                        "Quantity": 2
                     }, 
-                    "DomainName": "d3samj04x9xf5a.cloudfront.net", 
+                    "DomainName": "d32plmcrnvwzrd.cloudfront.net", 
                     "WebACLId": "", 
                     "PriceClass": "PriceClass_All", 
-                    "Enabled": true, 
+                    "Enabled": false, 
                     "DefaultCacheBehavior": {
                         "TrustedSigners": {
                             "Enabled": false, 
@@ -55,7 +65,7 @@
                         "LambdaFunctionAssociations": {
                             "Quantity": 0
                         }, 
-                        "TargetOriginId": "Custom-custom_origin.com", 
+                        "TargetOriginId": "S3-c7n-cloudfront-test/distribution", 
                         "ViewerProtocolPolicy": "allow-all", 
                         "ForwardedValues": {
                             "Headers": {
@@ -100,18 +110,18 @@
                         "Quantity": 0
                     }, 
                     "LastModifiedTime": {
-                        "hour": 21, 
+                        "hour": 1, 
                         "__class__": "datetime", 
-                        "month": 5, 
-                        "second": 12, 
-                        "microsecond": 154000, 
+                        "month": 6, 
+                        "second": 54, 
+                        "microsecond": 941000, 
                         "year": 2017, 
-                        "day": 19, 
-                        "minute": 37
+                        "day": 24, 
+                        "minute": 23
                     }, 
                     "HttpVersion": "HTTP2", 
-                    "Id": "E2CO7J9ZT67Q34", 
-                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E2CO7J9ZT67Q34", 
+                    "Id": "E2VHZ76UVAJYSC", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E2VHZ76UVAJYSC", 
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -124,13 +134,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b7596f76-3cdd-11e7-9e1f-97d93876721a", 
+            "RequestId": "ca21e568-587b-11e7-923e-79b1f273df27", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "b7596f76-3cdd-11e7-9e1f-97d93876721a", 
+                "x-amzn-requestid": "ca21e568-587b-11e7-923e-79b1f273df27", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2696", 
+                "content-length": "2971", 
                 "content-type": "text/xml", 
-                "date": "Fri, 19 May 2017 21:54:21 GMT"
+                "date": "Sat, 24 Jun 2017 01:23:54 GMT"
             }
         }
     }

@@ -29,8 +29,8 @@ class KinesisStream(QueryResourceManager):
         detail_spec = (
             'describe_stream', 'StreamName', None, 'StreamDescription')
         name = id = 'StreamName'
-        filter_name = 'StreamNames'
-        filter_type = 'list'
+        filter_name = None
+        filter_type = None
         date = None
         dimension = 'StreamName'
 
