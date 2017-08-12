@@ -215,7 +215,7 @@ class PolicyCollection(object):
     @classmethod
     def session_factory(cls):
         return None
-    
+
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""

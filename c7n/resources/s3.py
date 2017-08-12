@@ -214,8 +214,45 @@ class ConfigS3(query.ConfigSource):
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
 
+    NotifyTypeMap = {
+        'QueueConfiguration': 'QueueConfigurations',
+        'LambdaConfiguration': 'LambdaFunctionConfigurations',
+        'TopicConfiguration': 'TopicConfigurations'}
+
     def handle_BucketNotificationConfiguration(self, resource, item_value):
-        resource['Notification'] = item_value['configurations']
+        d = {}
+        for nid, n in item_value['configurations'].items():
+            ninfo = {}
+            d.setdefault(self.NotifyTypeMap[n['type']], []).append(ninfo)
+            if n['type'] == 'QueueConfiguration':
+                ninfo['QueueArn'] = n['queueARN']
+            elif n['type'] == 'TopicConfiguration':
+                ninfo['TopicArn'] = n['topicARN']
+            elif n['type'] == 'LambdaConfiguration':
+                ninfo['LambdaFunctionArn'] = n['functionARN']
+            ninfo['Id'] = nid
+            ninfo['Events'] = n['events']
+            rules = []
+            for r in n['filter'].get('s3KeyFilter', {}).get('filterRules', []):
+                rules.append({'Name': r['name'], 'Value': r['value']})
+            if rules:
+                ninfo['Filter'] = {'Key': {'FilterRules': rules}}
+        resource['Notification'] = d
+
+    def handle_BucketReplicationConfiguration(self, resource, item_value):
+        d = {'Role': item_value['roleARN'], 'Rules': []}
+        for rid, r in item_value['rules'].items():
+            rule = {
+                'ID': rid,
+                'Status': r['status'],
+                'Prefix': r['prefix'],
+                'Destination': {
+                    'Bucket': r['destinationConfig']['bucketARN']}
+            }
+            if r['destinationConfig']['storageClass']:
+                rule['Destination']['StorageClass'] = r['destinationConfig']['storageClass']
+            d['Rules'].append(rule)
+        resource['Replication'] = {'ReplicationConfiguration': d}
 
     def handle_BucketPolicy(self, resource, item_value):
         resource['Policy'] = item_value['policyText']
@@ -275,7 +312,8 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
     'BucketNotificationConfiguration': u'{"configurations":{}}',
     'AccessControlList': None,
     'BucketTaggingConfiguration': None,
-    'BucketWebsiteConfiguration': None
+    'BucketWebsiteConfiguration': None,
+    'BucketReplicationConfiguration': None
 }
 
 S3_AUGMENT_TABLE = (

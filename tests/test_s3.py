@@ -627,14 +627,22 @@ class S3ConfigSource(BaseTest):
         source = p.resource_manager.get_source('config')
         self.maxDiff = None
         resource = source.load_resource(event)
+        resource.pop('CreationDate')
+        self.assertEqual(
+            {'Planet': 'Earth', 'Verbose': 'Game'},
+            {t['Key']: t['Value'] for t in resource.pop('Tags')}
+        )        
         self.assertEqual(
             resource,
             {'Location': {'LocationConstraint': u'us-east-2'},
-             u'Name': u'config-rule-sanity',
-             u'CreationDate': u'2017-02-04T11:06:27.000Z',
-             'Tags': [
-                 {"Key": u"Planet", "Value": u"Earth"},
-                 {"Key": u"Verbose", "Value": u"Game"}],
+             'Name': u'config-rule-sanity',
+             'Lifecycle': None,
+             'Website': None,
+             'Policy': None,
+             'Replication': None,
+             'Versioning': None,
+             'Logging': None,
+             'Notification': None,
              "Acl": {
                  "Owner": {
                      "ID": u"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
