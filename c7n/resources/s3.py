@@ -163,10 +163,7 @@ def assemble_bucket(item):
                 continue
             else:
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    if 'c7n:DeniedActions' in b:
-                        b['c7n:DeniedActions'].append(m)
-                    else:
-                        b['c7n:DeniedActions'] = [m]
+                    b.setdefault('c7n:DeniedMethods', []).append(m)
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
@@ -1467,39 +1464,6 @@ class LogTarget(Filter):
                     continue
                 for tgt in f.result():
                     yield tgt
-
-
-@filters.register('no-access')
-class AccessDeniedFilter(Filter):
-    """Find buckets that Custodian can not access.
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: s3-bucket-not-accessible
-                resource: s3
-                filters:
-                  - type: no-access
-                    actions:
-                        - get_bucket_tagging
-                        - get_bucket_location
-    """
-    schema = type_schema(
-        'no-access',
-        actions={'type': 'array', 'items': {'type': 'string'}})
-
-    def process(self, buckets, event=None):
-        return list(filter(None, map(self.process_bucket, buckets)))
-
-    def process_bucket(self, b):
-        if b.get('c7n:DeniedActions'):
-            denied_actions = list(b.get('c7n:DeniedActions'))
-            actions = list(self.data.get('actions', []))
-            matched_actions = [a for a in actions if a in denied_actions]
-            if set(matched_actions) == set(actions):
-                return b
-        return None
 
 
 def _query_elb_attrs(session_factory, elb_set):
