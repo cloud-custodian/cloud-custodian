@@ -29,7 +29,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
-from c7n.tags import register_tags
+from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
 from c7n.registry import PluginRegistry
@@ -114,7 +114,7 @@ class QueryMeta(type):
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])
             # Generic cloud watch metrics support
-            if m.dimension and 'metrics':
+            if m.dimension:
                 attrs['filter_registry'].register('metrics', MetricsFilter)
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
@@ -123,8 +123,12 @@ class QueryMeta(type):
                     'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
-                    register_tags(
+                    register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
+            if getattr(m, 'universal_taggable', False):
+                register_universal_tags(
+                    attrs['filter_registry'], attrs['action_registry'])
+
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
@@ -337,11 +341,12 @@ class QueryResourceManager(ResourceManager):
     def get_arns(self, resources):
         arns = []
         for r in resources:
-            _id = r[self.manager.get_model().id]
+            _id = r[self.get_model().id]
             if 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))
+        return arns
 
     @property
     def generate_arn(self):
@@ -354,7 +359,7 @@ class QueryResourceManager(ResourceManager):
                 region=self.config.region,
                 account_id=self.account_id,
                 resource_type=self.get_model().type,
-                separator=':')
+                separator='/')
         return self._generate_arn
 
 

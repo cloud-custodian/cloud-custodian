@@ -15,29 +15,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, AutoTagUser
-from c7n.filters import FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.tags import (
-    TagActionFilter, UniversalTag, UniversalUntag, UniversalTagDelayedAction)
 from c7n.utils import get_retry, local_session
 
 
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
-
-    filter_registry = FilterRegistry('glacier.filters')
-    filter_registry.register('marked-for-op', TagActionFilter)
-
-    action_registry = ActionRegistry('glacier.actions')
-    action_registry.register('auto-tag-user', AutoTagUser)
-    action_registry.register('mark', UniversalTag)
-    action_registry.register('tag', UniversalTag)
-    action_registry.register('mark-for-op', UniversalTagDelayedAction)
-    action_registry.register('remove-tag', UniversalUntag)
-    action_registry.register('unmark', UniversalUntag)
-    action_registry.register('untag', UniversalUntag)
 
     permissions = ('glacier:ListTagsForVault',)
     retry = staticmethod(get_retry(('Throttled',)))
@@ -48,6 +33,7 @@ class Glacier(QueryResourceManager):
         name = "VaultName"
         id = "VaultARN"
         dimension = None
+        universal_taggable = True
 
     def augment(self, resources):
         def process_tags(resource):
