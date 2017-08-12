@@ -613,6 +613,7 @@ class Start(BaseAction, StateTransitionFilter):
     schema = type_schema('start')
     permissions = ('ec2:StartInstances',)
     batch_size = 10
+    exception = None
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -634,6 +635,12 @@ class Start(BaseAction, StateTransitionFilter):
                 for batch in utils.chunks(z_instances, self.batch_size):
                     self.process_instance_set(client, batch, itype, izone)
 
+        # Raise an exception after all batches process
+        if self.exception:
+            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
+                self.log.exception("Error while starting instances error %s", self.exception)
+                raise self.exception
+
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retry = utils.get_retry((
@@ -644,15 +651,14 @@ class Start(BaseAction, StateTransitionFilter):
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
-                return
-            self.log.exception("Error while starting instances error %s", e)
-            raise
+            # Saving exception
+            self.exception = e
+            self.log.exception(
+                ("Could not start instances:%d type:%s"
+                 " zone:%s instances:%s error:%s"),
+                len(instances), itype, izone,
+                ", ".join(instance_ids), e)
+            return
 
 
 @actions.register('resize')
