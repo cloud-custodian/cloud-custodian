@@ -118,7 +118,6 @@ class BucketMetrics(BaseTest):
             'AWS/S3.NumberOfObjects.Average' in resources[0]['c7n.metrics'])
 
 
-
 class BucketInventory(BaseTest):
 
     def test_inventory(self):

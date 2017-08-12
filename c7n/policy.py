@@ -111,9 +111,6 @@ def get_service_region_map(regions, resource_types):
 
 class PolicyCollection(object):
 
-    # cli/collection tests patch this
-    session_factory = None
-
     log = logging.getLogger('c7n.policies')
 
     def __init__(self, policies, options):
@@ -123,7 +120,7 @@ class PolicyCollection(object):
     @classmethod
     def from_data(cls, data, options):
         policies = [Policy(p, options,
-                           session_factory=cls.test_session_factory())
+                           session_factory=cls.session_factory())
                     for p in data.get('policies', ())]
         return PolicyCollection(policies, options)
 
@@ -179,7 +176,7 @@ class PolicyCollection(object):
 
                 policies.append(
                     Policy(p.data, options_copy,
-                           session_factory=self.test_session_factory()))
+                           session_factory=self.session_factory()))
         return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
@@ -214,6 +211,11 @@ class PolicyCollection(object):
             rtypes.add(p.resource_type)
         return rtypes
 
+    # cli/collection tests patch this
+    @classmethod
+    def session_factory(cls):
+        return None
+    
 
 class PolicyExecutionMode(object):
     """Policy execution semantics"""
