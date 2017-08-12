@@ -264,8 +264,8 @@ class QueryResourceManager(ResourceManager):
         return self.data.get('source', 'describe')
 
     def get_source(self, source_type):
-        return sources.get(source_type)(self)        
-    
+        return sources.get(source_type)(self)
+
     @classmethod
     def get_model(cls):
         return ResourceQuery.resolve(cls.resource_type)

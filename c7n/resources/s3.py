@@ -66,7 +66,6 @@ from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, dumps)
 
 
-
 log = logging.getLogger('custodian.s3')
 
 filters = FilterRegistry('s3.filters')
@@ -140,7 +139,7 @@ class ConfigS3(query.ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigS3, self).load_resource(item)
         cfg = item['supplementaryConfiguration']
-        if item['awsRegion'] != 'us-east-1': # aka standard
+        if item['awsRegion'] != 'us-east-1':  # aka standard
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
 
         # owner is under acl per describe
@@ -172,7 +171,7 @@ class ConfigS3(query.ConfigSource):
         'ReadAcp': 'READ_ACP'}
 
     GRANTEE_MAP = {
-        'AllUsers':  "http://acs.amazonaws.com/groups/global/AllUsers",
+        'AllUsers': "http://acs.amazonaws.com/groups/global/AllUsers",
         'AuthenticatedUsers': "http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
         'LogDelivery': 'http://acs.amazonaws.com/groups/s3/LogDelivery'}
 
@@ -201,7 +200,7 @@ class ConfigS3(query.ConfigSource):
             grants.append({
                 'Permission': self.PERMISSION_MAP[g['permission']],
                 'Grantee': rg,
-                })
+            })
 
     def handle_BucketAccelerateConfiguration(self, resource, item_value):
         # not currently auto-augmented by custodian
@@ -276,7 +275,7 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
     'AccessControlList': None,
     'BucketTaggingConfiguration': None,
     'BucketWebsiteConfiguration': None
-    }
+}
 
 S3_AUGMENT_TABLE = (
     ('get_bucket_location', 'Location', None, None),

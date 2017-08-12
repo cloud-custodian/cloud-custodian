@@ -1031,6 +1031,7 @@ class DescribeRDSSnapshot(DescribeSource):
             self.manager.retry))
         return snaps
 
+
 class ConfigRDSSnapshot(ConfigSource):
 
     def load_resource(self, item):
