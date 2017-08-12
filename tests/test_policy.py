@@ -87,6 +87,28 @@ class PolicyPermissions(BaseTest):
                  'ec2:DescribeTags',
                  'cloudwatch:GetMetricStatistics')))
 
+    def xtest_resource_filter_name(self):
+        # resources without a filter name won't play nice in
+        # lambda policies
+        missing = []
+        marker = object
+        for k, v in manager.resources.items():
+            if getattr(v.resource_type, 'filter_name', marker) is marker:
+                missing.append(k)
+        if missing:
+            self.fail("Missing filter name %s" % (', '.join(missing)))
+
+    def test_resource_augment_universal_mask(self):
+        # universal tag had a potential bad patterm of masking
+        # resource augmentation, scan resources to ensure
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'universal_taggable', None):
+                continue
+            if v.augment.__name__ == 'universal_augment' and getattr(
+                    v.resource_type, 'detail_spec', None):
+                self.fail(
+                    "%s resource has universal augment masking resource augment" % k)
+
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')
         missing = []

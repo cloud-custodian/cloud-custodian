@@ -32,6 +32,7 @@ class Glacier(QueryResourceManager):
         enum_spec = ('list_vaults', 'VaultList', None)
         name = "VaultName"
         id = "VaultARN"
+        filter_name = None
         dimension = None
         universal_taggable = True
 
