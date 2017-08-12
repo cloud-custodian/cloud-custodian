@@ -22,9 +22,9 @@ class CognitoIdentityPool(QueryResourceManager):
 
     class resource_type(object):
         service = 'cognito-identity'
-        enum_spec = ('list_identity_pools', 'IdentityPools', None)
+        enum_spec = ('list_identity_pools', 'IdentityPools', {'MaxResults': 60})
         detail_spec = (
-            'describe_identity_pool', 'IdentityPoolId', 'IdentityPoolId')
+            'describe_identity_pool', 'IdentityPoolId', 'IdentityPoolId', None)
         id = 'IdentityPoolId'
         name = 'IdentityPoolName'
         filter_name = None
@@ -36,7 +36,7 @@ class CognitoUserPool(QueryResourceManager):
 
     class resource_type(object):
         service = "cognito-idp"
-        enum_spec = ('list_user_pools', 'UserPools', None)
+        enum_spec = ('list_user_pools', 'UserPools', {'MaxResults': 60})
         detail_spec = (
             'describe_user_pool', 'UserPoolId', 'Id', 'UserPool')
         id = 'Id'
