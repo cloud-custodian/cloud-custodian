@@ -294,9 +294,28 @@ class AttachedVolume(ValueFilter):
 
 class InstanceImageBase(object):
 
-    def get_image_mapping(self, resources):
+    def prefetch_instance_images(self, instances):
+        image_ids = [i['ImageId'] for i in instances if 'c7n:instance-image' not in i]
+        self.image_map = self.get_local_image_mapping(image_ids)
+
+    def get_base_image_mapping(self):
         return {i['ImageId']: i for i in
                 self.manager.get_resource_manager('ami').resources()}
+
+    def get_instance_image(self, instance):
+        image = instance.get('c7n:instance-image', None)
+        if not image:
+            image = instance['c7n:instance-image'] = self.image_map.get(instance['ImageId'], None)
+        return image
+
+    def get_local_image_mapping(self, image_ids):
+        base_image_map = self.get_base_image_mapping()
+        resources = {i: base_image_map[i] for i in image_ids if i in base_image_map}
+        missing = list(set(image_ids) - set(resources.keys()))
+        if missing:
+            loaded = self.manager.get_resource_manager('ami').get_resources(missing, False)
+            resources.update({image['ImageId']: image for image in loaded})
+        return resources
 
 
 @filters.register('image-age')
@@ -329,15 +348,15 @@ class ImageAge(AgeFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(ImageAge, self).process(resources, event)
 
     def get_resource_date(self, i):
-        if i['ImageId'] not in self.image_map:
-            # our image is no longer available
+        image = self.get_instance_image(i)
+        if image:
+            return parse(image['CreationDate'])
+        else:
             return parse("2000-01-01T01:01:01.000Z")
-        image = self.image_map[i['ImageId']]
-        return parse(image['CreationDate'])
 
 
 @filters.register('image')
@@ -349,11 +368,12 @@ class InstanceImage(ValueFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(InstanceImage, self).process(resources, event)
 
     def __call__(self, i):
-        image = self.image_map.get(i['ImageId'])
+        image = self.get_instance_image(i)
+        # Finally, if we have no image...
         if not image:
             self.log.warning(
                 "Could not locate image for instance:%s ami:%s" % (

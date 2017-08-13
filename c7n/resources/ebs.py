@@ -56,7 +56,7 @@ class Snapshot(QueryResourceManager):
         service = 'ec2'
         type = 'snapshot'
         enum_spec = (
-            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+            'describe_snapshots', 'Snapshots', None)
         detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
@@ -76,6 +76,12 @@ class Snapshot(QueryResourceManager):
 
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
+
+    def resources(self, query=None):
+        query = query or {}
+        if query.get('OwnerIds') is None:
+            query['OwnerIds'] = ['self']
+        return super(Snapshot, self).resources(query=query)
 
 
 @Snapshot.filter_registry.register('age')
