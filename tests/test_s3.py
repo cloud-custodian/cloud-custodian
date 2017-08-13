@@ -587,6 +587,56 @@ class S3ConfigSource(BaseTest):
                   u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
                   u'Events': ['s3:ObjectCreated:*']}]})
 
+    def test_config_normalize_lifecycle_and_predicate(self):
+        event = event_data('s3-lifecycle-and-predicate.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        rfilter = resource['Lifecycle']['Rules'][0]['Filter']
+
+        self.assertEqual(
+            rfilter['And']['Prefix'],
+            'docs/')
+        self.assertEqual(
+            rfilter['And']['Tags'],
+            [{"Value": "Archive", "Key": "Workflow"},
+             {"Value": "Complete", "Key": "State"}])
+
+    def test_config_normalize_lifecycle(self):
+        event = event_data('s3-lifecycle.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Lifecycle'], {
+                "Rules": [
+                    {
+                        "Status": "Enabled",
+                        "NoncurrentVersionExpiration": {
+                            "NoncurrentDays": 545
+                        },
+                        "Filter": {
+                            "Prefix": "docs/"
+                        },
+                        "Transitions": [{
+                            "Days": 30,
+                            "StorageClass": "STANDARD_IA"
+                        }],
+                        "Expiration": {
+                            "ExpiredObjectDeleteMarker": True
+                        },
+                        "AbortIncompleteMultipartUpload": {
+                            "DaysAfterInitiation": 7
+                        },
+                        "NoncurrentVersionTransitions": [{
+                            "NoncurrentDays": 180,
+                            "StorageClass": "GLACIER"
+                        }],
+                        "ID": "Docs"
+                    }
+                ]
+            })
+
     def test_config_normalize_replication(self):
         event = event_data('s3-rep-and-notify.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})

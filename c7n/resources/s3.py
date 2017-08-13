@@ -64,7 +64,7 @@ from c7n.manager import resources
 from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
-    chunks, local_session, set_annotation, type_schema, dumps)
+    chunks, local_session, set_annotation, type_schema, dumps, camelResource)
 
 
 log = logging.getLogger('custodian.s3')
@@ -214,6 +214,74 @@ class ConfigS3(query.ConfigSource):
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
 
+    def handle_BucketLifecycleConfiguration(self, resource, item_value):
+        rules = []
+        for r in item_value.get('rules'):
+            rr = {}
+            rules.append(rr)
+            expiry = {}
+            for ek, ck in (
+                    ('Date', 'expirationDate'),
+                    ('ExpiredObjectDeleteMarker', 'expiredObjectDeleteMarker'),
+                    ('Days', 'expirationInDays')):
+                if r[ck] and r[ck] != -1:
+                    expiry[ek] = r[ck]
+            if expiry:
+                rr['Expiration'] = expiry
+
+            transitions = []
+            for t in (r.get('transitions') or ()):
+                tr = {}
+                for k in ('date', 'days', 'storageClass'):
+                    if t[k]:
+                        tr["%s%s" % (k[0].upper(), k[1:])] = t[k]
+                transitions.append(tr)
+            if transitions:
+                rr['Transitions'] = transitions
+
+            if r.get('abortIncompleteMultipartUpload'):
+                rr['AbortIncompleteMultipartUpload'] = {
+                    'DaysAfterInitiation': r['abortIncompleteMultipartUpload']['daysAfterInitiation']}
+            if r.get('noncurrentVersionExpirationInDays'):
+                rr['NoncurrentVersionExpiration'] = {
+                    'NoncurrentDays': r['noncurrentVersionExpirationInDays']}
+
+            nonc_transitions = []
+            for t in (r.get('noncurrentVersionTransitions') or ()):
+                nonc_transitions.append({
+                    'NoncurrentDays': t['days'],
+                    'StorageClass': t['storageClass']})
+            if nonc_transitions:
+                rr['NoncurrentVersionTransitions'] = nonc_transitions
+
+            rr['Status'] = r['status']
+            rr['ID'] = r['id']
+            if r.get('prefix'):
+                rr['Prefix'] = r['prefix']
+            if 'filter' not in r:
+                continue
+
+            rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
+
+        resource['Lifecycle'] = {'Rules': rules}
+
+    def convertLifePredicate(self, p):
+        if p['type'] == 'LifecyclePrefixPredicate':
+            return {'Prefix': p['prefix']}
+        if p['type'] == 'LifecycleTagPredicate':
+            return {'Tags': [{'Key': p['tag']['key'], 'Value': p['tag']['value']}]}
+        if p['type'] == 'LifecycleAndOperator':
+            n = {}
+            for o in p['operands']:
+                ot = self.convertLifePredicate(o)
+                if 'Tags' in n and 'Tags' in ot:
+                    n['Tags'].extend(ot['Tags'])
+                else:
+                    n.update(ot)
+            return {'And': n}
+
+        raise ValueError("unknown predicate: %s" % p)
+
     NotifyTypeMap = {
         'QueueConfiguration': 'QueueConfigurations',
         'LambdaConfiguration': 'LambdaFunctionConfigurations',
@@ -310,6 +378,7 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
     'BucketVersioningConfiguration': u'{"status":"Off","isMfaDeleteEnabled":null}',
     'BucketAccelerateConfiguration': u'{"status":null}',
     'BucketNotificationConfiguration': u'{"configurations":{}}',
+    'BucketLifecycleConfiguration': None,
     'AccessControlList': None,
     'BucketTaggingConfiguration': None,
     'BucketWebsiteConfiguration': None,
