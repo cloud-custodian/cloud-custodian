@@ -34,29 +34,12 @@ class CloudFront(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(
-            resources[0]['DomainName'], 'd1k7b41j4nj6pa.cloudfront.net')
-
+            resources[0]['DomainName'], 'd32plmcrnvwzrd.cloudfront.net')
 
     def test_distribution_set_ssl(self):
         factory = self.replay_flight_data('test_distrbution_set_ssl')
 
-        k = 'CacheBehaviors.Items[].ViewerProtocolPolicy'
-
-        p = self.load_policy({
-            'name': 'distribution-set-ssl',
-            'resource': 'distribution',
-            'filters': [{
-                'type': 'value',
-                'key': k,
-                'value': 'allow-all',
-                'op': 'contains'
-            }]
-        }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        expr = jmespath.compile(k)
-        r = expr.search(resources[0])
-        self.assertTrue('allow-all' in r)
+        k = 'DefaultCacheBehavior.ViewerProtocolPolicy'
 
         p = self.load_policy({
             'name': 'distribution-set-ssl',
@@ -74,34 +57,20 @@ class CloudFront(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        expr = jmespath.compile(k)
+        r = expr.search(resources[0])
+        self.assertTrue('allow-all' in r)
 
         client = local_session(factory).client('cloudfront')
         resp = client.list_distributions()
         self.assertEqual(
-            resp['DistributionList']['Items'][0]['CacheBehaviors']['Items'][0]['ViewerProtocolPolicy'],
+            resp['DistributionList']['Items'][0]['DefaultCacheBehavior']['ViewerProtocolPolicy'],
             'https-only')
-
 
     def test_distribution_custom_origin(self):
         factory = self.replay_flight_data('test_distrbution_custom_origin')
 
         k = 'Origins.Items[].CustomOriginConfig.OriginSslProtocols.Items[]'
-
-        p = self.load_policy({
-            'name': 'distribution-set-ssl',
-            'resource': 'distribution',
-            'filters': [{
-                'type': 'value',
-                'key': k,
-                'value': 'TLSv1',
-                'op': 'contains'
-            }]
-        }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        expr = jmespath.compile(k)
-        r = expr.search(resources[0])
-        self.assertTrue('TLSv1.1' in r)
 
         p = self.load_policy({
             'name': 'distribution-set-ssl',
@@ -120,6 +89,9 @@ class CloudFront(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        expr = jmespath.compile(k)
+        r = expr.search(resources[0])
+        self.assertTrue('TLSv1' in r)
 
         client = local_session(factory).client('cloudfront')
         resp = client.list_distributions()
@@ -128,7 +100,8 @@ class CloudFront(BaseTest):
             'https-only')
         self.assertTrue('TLSv1.2' in
             resp['DistributionList']['Items'][0]['Origins']['Items'][0]['CustomOriginConfig']['OriginSslProtocols']['Items'])
-
+        self.assertFalse('TLSv1' in
+            resp['DistributionList']['Items'][0]['Origins']['Items'][0]['CustomOriginConfig']['OriginSslProtocols']['Items'])
 
     def test_distribution_disable(self):
         factory = self.replay_flight_data('test_distrbution_disable')
@@ -138,13 +111,15 @@ class CloudFront(BaseTest):
             'resource': 'distribution',
             'filters': [{
                 'type': 'value',
-                'key': 'CacheBehaviors.Items[].ViewerProtocolPolicy',
+                'key': 'DefaultCacheBehavior.ViewerProtocolPolicy',
                 'value': 'allow-all',
                 'op': 'contains'
             }],
-            'actions': [{
-                'type': 'disable'
-            }]
+            'actions': [
+                {
+                    'type': 'disable'
+                }
+            ]
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -153,6 +128,32 @@ class CloudFront(BaseTest):
         client = local_session(factory).client('cloudfront')
         resp = client.list_distributions()
         self.assertEqual(resp['DistributionList']['Items'][0]['Enabled'], False)
+
+
+    def test_distribution_tag(self):
+        factory = self.replay_flight_data('test_distrbution_tag')
+
+        p = self.load_policy({
+            'name': 'distribution-tag',
+            'resource': 'distribution',
+            'filters': [{
+                'tag:abc': 'present'
+            }],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'key': '123',
+                    'value': '456'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_tags_for_resource(
+            Resource=resources[0]['ARN'])
+        self.assertEqual(len(resp['Tags']['Items']), 2)
 
 
     def test_streaming_distribution_disable(self):
@@ -177,3 +178,28 @@ class CloudFront(BaseTest):
         client = local_session(factory).client('cloudfront')
         resp = client.list_streaming_distributions()
         self.assertEqual(resp['StreamingDistributionList']['Items'][0]['Enabled'], False)
+
+    def test_streaming_distribution_tag(self):
+        factory = self.replay_flight_data('test_streaming_distrbution_tag')
+
+        p = self.load_policy({
+            'name': 'streaming-distribution-tag',
+            'resource': 'streaming-distribution',
+            'filters': [{
+                'tag:123': 'present'
+            }],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'key': 'abc',
+                    'value': '123'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client('cloudfront')
+        resp = client.list_tags_for_resource(
+            Resource=resources[0]['ARN'])
+        self.assertEqual(len(resp['Tags']['Items']), 2)

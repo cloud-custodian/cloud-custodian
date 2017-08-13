@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ class HealthEventFilter(Filter):
         else:
             service = m.get_model().service.upper()
         f = {'services': [service],
+             'regions': [self.manager.config.region],
              'eventStatusCodes': self.data.get(
                  'statuses', ['open', 'upcoming'])}
         if self.data.get('types'):

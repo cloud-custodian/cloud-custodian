@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import ssl
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
+
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric
@@ -161,6 +162,8 @@ def assemble_bucket(item):
                 methods.append((m, k, default, select))
                 continue
             else:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    b.setdefault('c7n:DeniedMethods', []).append(m)
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
@@ -336,10 +339,14 @@ class GlobalGrantsFilter(Filter):
                   - delete-global-grants
     """
 
-    schema = type_schema('global-grants', permissions={
-        'type': 'array', 'items': {
-            'type': 'string', 'enum': [
-                'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
+    schema = type_schema(
+        'global-grants',
+        allow_website={'type': 'boolean'},
+        operator={'type': 'string', 'enum': ['or', 'and']},
+        permissions={
+            'type': 'array', 'items': {
+                'type': 'string', 'enum': [
+                    'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
@@ -354,14 +361,17 @@ class GlobalGrantsFilter(Filter):
         acl = b.get('Acl', {'Grants': []})
         if not acl or not acl['Grants']:
             return
+
         results = []
+        allow_website = self.data.get('allow_website', True)
         perms = self.data.get('permissions', [])
+
         for grant in acl['Grants']:
             if 'URI' not in grant.get("Grantee", {}):
                 continue
             if grant['Grantee']['URI'] not in [self.AUTH_ALL, self.GLOBAL_ALL]:
                 continue
-            if grant['Permission'] == 'READ' and b['Website']:
+            if allow_website and grant['Permission'] == 'READ' and b['Website']:
                 continue
             if not perms or (perms and grant['Permission'] in perms):
                 results.append(grant['Permission'])
@@ -548,13 +558,25 @@ class RemovePolicyStatement(BucketActionBase):
 
     schema = type_schema(
         'remove-statements',
-        statement_ids={'type': 'array', 'items': {'type': 'string'}})
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
     permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
-            results = w.map(self.process_bucket, buckets)
-            return list(filter(None, list(results)))
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                elif f.result():
+                    results.append(b)
+            return results
 
     def process_bucket(self, bucket):
         p = bucket.get('Policy')
@@ -563,10 +585,18 @@ class RemovePolicyStatement(BucketActionBase):
         else:
             p = json.loads(p)
 
-        statements = p.get('Statement', [])
         found = []
+        statement_ids = self.data.get('statement_ids')
+        statements = p.get('Statement', [])
+        resource_statements = bucket.get(
+            CrossAccountAccessFilter.annotation_key, ())
+
         for s in list(statements):
-            if s['Sid'] in self.data['statement_ids']:
+            if statement_ids == 'matched':
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['statement_ids']:
                 found.append(s)
                 statements.remove(s)
         if not found:
@@ -668,7 +698,7 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(local_session(self.manager.session_factory), r)
-            target_prefix = self.data.get('target_prefix', r['Name'])
+            target_prefix = self.data.get('target_prefix', r['Name'] + '/')
             if 'TargetBucket' in r['Logging']:
                 r['Logging'] = {'Status': 'Enabled'}
             else:
@@ -742,7 +772,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
         func = get_function(
             None, self.data.get('role', self.manager.config.assume_role),
-            bool(topic_arn), account_id=account_id)
+            account_id=account_id)
 
         regions = set([
             b.get('Location', {

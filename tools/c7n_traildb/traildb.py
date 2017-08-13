@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import json
 import logging
 import math
 from multiprocessing import cpu_count, Pool
+from c7n.credentials import assumed_session, SessionFactory
 import os
 import tempfile
 import time
@@ -33,6 +34,7 @@ from botocore.client import Config
 
 log = logging.getLogger('c7n_traildb')
 
+options = None
 
 def dump(o):
     return json.dumps(o)
@@ -56,7 +58,13 @@ def chunks(iterable, size=50):
 
 def process_trail_set(
         object_set, map_records, reduce_results=None, trail_bucket=None):
-    s3 = boto3.Session().client('s3', config=Config(signature_version='s3v4'))
+
+    session_factory = SessionFactory(
+        options.region, options.profile, options.assume_role)
+
+    s3 = session_factory().client(
+        's3', config=Config(signature_version='s3v4'))
+
     previous = None
     for o in object_set:
         body = s3.get_object(Key=o['Key'], Bucket=trail_bucket)['Body']
@@ -77,7 +85,7 @@ class TrailDB(object):
         self._init()
 
     def _init(self):
-        self.cursor.execute('''
+        command = '''
            create table if not exists events (
               event_date   datetime,
               event_name   varchar(128),
@@ -87,17 +95,23 @@ class TrailDB(object):
               client_ip    varchar(32),
               user_id      varchar(128),
               error_code   varchar(256),
-              error        text
-        )''')
-# omit due to size
-#              response     text,
-#              request      text,
-#              user         text,
+              error        text'''
+
+        if options.field:
+            for field in options.field:
+                command += ",\n{}    text".format(field)
+
+        command += ')'
+        self.cursor.execute(command)
 
     def insert(self, records):
-        self.cursor.executemany(
-            "insert into events values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            records)
+        command = "insert into events values (?, ?, ?, ?, ?, ?, ?, ?, ?"
+
+        if options.field:
+            command += ', ?' * len(options.field)
+
+        command += ")"
+        self.cursor.executemany(command, records)
 
     def flush(self):
         self.conn.commit()
@@ -164,7 +178,8 @@ def process_records(records,
             continue
         elif service_filter and not r['eventSource'] == service_filter:
             continue
-        user_records.append((
+
+        user_record = (
             r['eventTime'],
             r['eventName'],
             r['eventSource'],
@@ -172,13 +187,18 @@ def process_records(records,
             r.get('requestID', ''),
             r.get('sourceIPAddress', ''),
             uid,
-            # TODO make this optional, for now omit for size
-            #            json.dumps(r['requestParameters']),
-            #            json.dumps(r['responseElements']),
-            #            json.dumps(r['userIdentity']),
             r.get('errorCode', None),
             r.get('errorMessage', None)
-        ))
+        )
+
+        # Optional data can be added to each record.
+        # Field names are Case Sensitive.
+        if options.field:
+            for field in options.field:
+                user_record += (json.dumps(r[field]), )
+
+        user_records.append(user_record)
+
     if data_dir:
         if not user_records:
             return
@@ -196,7 +216,10 @@ def process_bucket(
         output=None, uid_filter=None, event_filter=None,
         service_filter=None, not_service_filter=None, data_dir=None):
 
-    s3 = boto3.Session().client(
+    session_factory = SessionFactory(
+        options.region, options.profile, options.assume_role)
+
+    s3 = session_factory().client(
         's3', config=Config(signature_version='s3v4'))
 
     paginator = s3.get_paginator('list_objects')
@@ -287,12 +310,22 @@ def setup_parser():
     parser.add_argument("--tmpdir", default="/tmp/traildb")
     parser.add_argument("--region", default="us-east-1")
     parser.add_argument("--output", default="results.db")
+    parser.add_argument(
+        "--profile", default=os.environ.get('AWS_PROFILE'),
+        help="AWS Account Config File Profile to utilize")
+    parser.add_argument(
+        "--assume", default=None, dest="assume_role",
+        help="Role to assume")
+    parser.add_argument('--field', action='append',
+        help='additonal fields that can be added to each record',
+        choices=['userIdentity', 'requestParameters', 'responseElements'])
     return parser
 
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('botocore').setLevel(logging.WARNING)
+    global options
     parser = setup_parser()
     options = parser.parse_args()
 

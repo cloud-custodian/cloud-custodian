@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
-from c7n.filters import CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager
@@ -69,6 +69,15 @@ class SQS(QueryResourceManager):
         self.log.debug('retrieving details for %d queues' % len(resources))
         with self.executor_factory(max_workers=4) as w:
             return list(filter(None, w.map(_augment, resources)))
+
+
+@SQS.filter_registry.register('metrics')
+class MetricsFilter(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [
+            {'Name': 'QueueName',
+             'Value': resource['QueueUrl'].rsplit('/', 1)[-1]}]
 
 
 @SQS.filter_registry.register('cross-account')

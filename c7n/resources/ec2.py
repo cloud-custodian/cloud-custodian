@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from concurrent.futures import as_completed
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
@@ -43,7 +43,6 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('health-event', HealthEventFilter)
 
 
@@ -613,6 +612,7 @@ class Start(BaseAction, StateTransitionFilter):
     schema = type_schema('start')
     permissions = ('ec2:StartInstances',)
     batch_size = 10
+    exception = None
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -634,6 +634,12 @@ class Start(BaseAction, StateTransitionFilter):
                 for batch in utils.chunks(z_instances, self.batch_size):
                     self.process_instance_set(client, batch, itype, izone)
 
+        # Raise an exception after all batches process
+        if self.exception:
+            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
+                self.log.exception("Error while starting instances error %s", self.exception)
+                raise self.exception
+
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retry = utils.get_retry((
@@ -644,15 +650,14 @@ class Start(BaseAction, StateTransitionFilter):
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
-                return
-            self.log.exception("Error while starting instances error %s", e)
-            raise
+            # Saving exception
+            self.exception = e
+            self.log.exception(
+                ("Could not start instances:%d type:%s"
+                 " zone:%s instances:%s error:%s"),
+                len(instances), itype, izone,
+                ", ".join(instance_ids), e)
+            return
 
 
 @actions.register('resize')
@@ -886,10 +891,8 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-            filters:
-              - type: ebs
           actions:
-            - snapshot
+            - type: snapshot
               copy-tags:
                 - Name
     """
@@ -1057,15 +1060,15 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction):
-    """Sets (or removes) the instance profile for an existing EC2 instance.
+class SetInstanceProfile(BaseAction, StateTransitionFilter):
+    """Sets (or removes) the instance profile for a running EC2 instance.
 
     :Example:
 
     .. code-block: yaml
 
         policies:
-          - name:
+          - name: set-default-instance-profile
             resource: ec2
             query:
               - IamInstanceProfile: absent
@@ -1086,7 +1089,12 @@ class SetInstanceProfile(BaseAction):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
+    valid_origin_states = ('running', 'pending')
+
     def process(self, instances):
+        instances = self.filter_instance_state(instances)
+        if not len(instances):
+            return
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         profile_name = self.data.get('name', '')

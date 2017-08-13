@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ else:
         except ImportError:
             SafeLoader = None
 
+log = logging.getLogger('custodian.utils')
+
 
 class VarsSubstitutionError(Exception):
     pass
@@ -80,7 +82,12 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            return yaml_load(contents)
+            try:
+                return yaml_load(contents)
+            except yaml.YAMLError as e:
+                log.error('Error while loading yaml file %s', path)
+                log.error('Skipping this file.  Error message below:\n%s', e)
+                return None
         elif format == 'json':
             return loads(contents)
 

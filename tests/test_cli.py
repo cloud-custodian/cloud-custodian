@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ class ValidateTest(CliTest):
         json_file = self.write_policy_file(invalid_policies, format='json')
 
         # YAML validation
-        self.run_and_expect_failure(['custodian', 'validate', yaml_file], 1)
+        self.run_and_expect_exception(['custodian', 'validate', yaml_file], SystemExit)
 
         # JSON validation
         self.run_and_expect_failure(['custodian', 'validate', json_file], 1)

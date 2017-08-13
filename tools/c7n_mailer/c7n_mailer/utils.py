@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -196,9 +196,11 @@ def resource_format(resource, resource_type):
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
     elif resource_type == 'log-group':
-        return "name: %s last_write: %s" % (
-            resource['logGroupName'],
-            resource['lastWrite'])
+        if 'lastWrite' in resource:
+            return "name: %s last_write: %s" % (
+                resource['logGroupName'],
+                resource['lastWrite'])
+        return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
