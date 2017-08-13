@@ -64,7 +64,7 @@ from c7n.manager import resources
 from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
-    chunks, local_session, set_annotation, type_schema, dumps, camelResource)
+    chunks, local_session, set_annotation, type_schema, dumps)
 
 
 log = logging.getLogger('custodian.s3')
@@ -241,7 +241,8 @@ class ConfigS3(query.ConfigSource):
 
             if r.get('abortIncompleteMultipartUpload'):
                 rr['AbortIncompleteMultipartUpload'] = {
-                    'DaysAfterInitiation': r['abortIncompleteMultipartUpload']['daysAfterInitiation']}
+                    'DaysAfterInitiation': r[
+                        'abortIncompleteMultipartUpload']['daysAfterInitiation']}
             if r.get('noncurrentVersionExpirationInDays'):
                 rr['NoncurrentVersionExpiration'] = {
                     'NoncurrentDays': r['noncurrentVersionExpirationInDays']}
