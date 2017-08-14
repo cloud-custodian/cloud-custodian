@@ -68,6 +68,7 @@ def provision(config, session_factory):
         role=config['role'],
         subnets=config['subnets'],
         security_groups=config['security_groups'],
+        dead_letter_config=config.get('dead_letter_config', {}),
         events=[
             CloudWatchEventSource(
                 {'type': 'periodic',
