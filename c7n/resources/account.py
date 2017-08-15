@@ -537,7 +537,8 @@ class RequestLimitIncrease(BaseAction):
             body = body.format(**{
                 'service': service,
                 'limits': limits,
-                'percent': self.data.get('percent-increase')
+                'percent': self.data.get('percent-increase'),
+                'region': region
             })
 
             client.create_case(
