@@ -500,7 +500,7 @@ class RequestLimitIncrease(BaseAction):
     permissions = ('support:CreateCase',)
 
     default_subject = 'Raise the account limit of {service} - {limits} in {region}'
-    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
+    default_template = 'Please raise the account limit of {service} - {limits} by {percent}% in {region}'
     default_severity = 'normal'
 
     service_code_mapping = {
