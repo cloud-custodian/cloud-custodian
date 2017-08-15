@@ -3,24 +3,6 @@
     "data": {
         "FlowLogs": [
             {
-                "ResourceId": "vpc-c57780bc", 
-                "CreationTime": {
-                    "hour": 15, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 19, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 12, 
-                    "minute": 54
-                }, 
-                "LogGroupName": "scot-test", 
-                "TrafficType": "ALL", 
-                "FlowLogStatus": "ACTIVE", 
-                "FlowLogId": "fl-6dc93d04", 
-                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/CloudCustodianRole"
-            }, 
-            {
                 "ResourceId": "vpc-d2d616b5", 
                 "CreationTime": {
                     "hour": 8, 

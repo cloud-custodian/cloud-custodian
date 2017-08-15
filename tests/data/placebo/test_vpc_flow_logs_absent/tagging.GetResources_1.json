@@ -11,19 +11,6 @@
                         "Key": "Name"
                     }
                 ]
-            }, 
-            {
-                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-f1516b97", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestVPC", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "tagfanncyvalue", 
-                        "Key": "tagfancykey"
-                    }
-                ]
             }
         ], 
         "ResponseMetadata": {

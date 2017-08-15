@@ -2,56 +2,7 @@
     "status_code": 200, 
     "data": {
         "PaginationToken": "", 
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-05cf9b60", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestSubnetC", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "tagfanncyvalue", 
-                        "Key": "tagfancykey"
-                    }
-                ]
-            }, 
-            {
-                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-6f273034", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestSubnetPrivate", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "Private", 
-                        "Key": "NetworkLocation"
-                    }
-                ]
-            }, 
-            {
-                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-71bda45c", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestSubnetD", 
-                        "Key": "Name"
-                    }
-                ]
-            }, 
-            {
-                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-ecfb30a4", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestSubnetPublic", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "Public", 
-                        "Key": "NetworkLocation"
-                    }
-                ]
-            }
-        ], 
+        "ResourceTagMappingList": [], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 

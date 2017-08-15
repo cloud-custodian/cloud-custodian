@@ -3,24 +3,6 @@
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-f1516b97", 
-                "InstanceTenancy": "default", 
-                "Tags": [
-                    {
-                        "Value": "FancyTestVPC", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "tagfanncyvalue", 
-                        "Key": "tagfancykey"
-                    }
-                ], 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-24ff1940", 
-                "CidrBlock": "10.0.42.0/24", 
-                "IsDefault": false
-            }, 
-            {
                 "VpcId": "vpc-28a71f51", 
                 "InstanceTenancy": "default", 
                 "State": "available", 
