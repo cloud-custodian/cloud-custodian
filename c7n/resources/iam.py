@@ -854,6 +854,7 @@ class UserRemoveAccessKey(BaseAction):
 
         if age:
             threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
+
         for r in resources:
             if 'AccessKeys' not in r:
                 r['AccessKeys'] = client.list_access_keys(
