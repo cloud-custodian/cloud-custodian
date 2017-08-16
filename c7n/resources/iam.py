@@ -21,7 +21,6 @@ import itertools
 import time
 
 from concurrent.futures import as_completed
-from dateutil.parser import parse
 from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
