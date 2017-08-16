@@ -854,7 +854,6 @@ class UserRemoveAccessKey(BaseAction):
 
         if age:
             threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
-
         for r in resources:
             if 'AccessKeys' not in r:
                 r['AccessKeys'] = client.list_access_keys(
@@ -862,7 +861,7 @@ class UserRemoveAccessKey(BaseAction):
             keys = r['AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(
