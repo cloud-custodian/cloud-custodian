@@ -21,7 +21,6 @@ import itertools
 import time
 
 from concurrent.futures import as_completed
-from dateutil.parser import parse
 from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
@@ -862,7 +861,7 @@ class UserRemoveAccessKey(BaseAction):
             keys = r['AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(
