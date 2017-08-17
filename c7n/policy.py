@@ -120,7 +120,7 @@ class PolicyCollection(object):
     @classmethod
     def from_data(cls, data, options):
         policies = [Policy(p, options,
-                           session_factory=cls.test_session_factory())
+                           session_factory=cls.session_factory())
                     for p in data.get('policies', ())]
         return PolicyCollection(policies, options)
 
@@ -176,7 +176,7 @@ class PolicyCollection(object):
 
                 policies.append(
                     Policy(p.data, options_copy,
-                           session_factory=self.test_session_factory()))
+                           session_factory=self.session_factory()))
         return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
@@ -211,9 +211,9 @@ class PolicyCollection(object):
             rtypes.add(p.resource_type)
         return rtypes
 
+    # cli/collection tests patch this
     @classmethod
-    def test_session_factory(self):
-        """ For testing: patched by tests to use a custom session_factory """
+    def session_factory(cls):
         return None
 
 
@@ -537,8 +537,8 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
 
     def resolve_resources(self, event):
-        return [utils.camelResource(
-            self.cfg_event['configurationItem']['configuration'])]
+        source = self.policy.resource_manager.get_source('config')
+        return [source.load_resource(self.cfg_event['configurationItem'])]
 
     def run(self, event, lambda_context):
         self.cfg_event = json.loads(event['invokingEvent'])
@@ -557,6 +557,8 @@ class ConfigRuleMode(LambdaMode):
         if evaluation is None:
             resources = super(ConfigRuleMode, self).run(event, lambda_context)
             match = self.policy.data['mode'].get('match-compliant', False)
+            self.policy.log.info(
+                "found resources:%d match-compliant:%s", len(resources or ()), match)
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',

@@ -16,6 +16,7 @@ Application Load Balancers
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import json
 import logging
 
 from collections import defaultdict
@@ -25,7 +26,8 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
 from c7n.utils import local_session, chunks, type_schema, get_retry, set_annotation
 
 log = logging.getLogger('custodian.app-elb')
@@ -65,12 +67,34 @@ class AppELB(QueryResourceManager):
         return ("elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTags")
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeAppElb(self)
+        elif source_type == 'config':
+            return ConfigAppElb(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeAppElb(DescribeSource):
+
     def augment(self, albs):
         _describe_appelb_tags(
-            albs, self.session_factory,
-            self.executor_factory, self.retry)
+            albs,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry)
 
         return albs
+
+
+class ConfigAppElb(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigAppElb, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        return resource
 
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):

@@ -139,14 +139,8 @@ def _napi(op_name):
 sources = PluginRegistry('sources')
 
 
-class Source(object):
-
-    def __init__(self, manager):
-        self.manager = manager
-
-
 @sources.register('describe')
-class DescribeSource(Source):
+class DescribeSource(object):
 
     def __init__(self, manager):
         self.manager = manager
@@ -190,7 +184,10 @@ class DescribeSource(Source):
 
 
 @sources.register('config')
-class ConfigSource(Source):
+class ConfigSource(object):
+
+    def __init__(self, manager):
+        self.manager = manager
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -202,14 +199,20 @@ class ConfigSource(Source):
         m = self.manager.get_model()
         for i in ids:
             results.append(
-                camelResource(
-                    json.loads(
-                        client.get_resource_config_history(
-                            resourceId=i,
-                            resourceType=m.config_type,
-                            limit=1)[
-                                'configurationItems'][0]['configuration'])))
+                self.load_resource(
+                    client.get_resource_config_history(
+                        resourceId=i,
+                        resourceType=m.config_type,
+                        limit=1)[
+                            'configurationItems'][0]))
         return results
+
+    def load_resource(self, item):
+        if isinstance(item['configuration'], six.string_types):
+            item_config = json.loads(item['configuration'])
+        else:
+            item_config = item['configuration']
+        return camelResource(item_config)
 
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
@@ -258,11 +261,14 @@ class QueryResourceManager(ResourceManager):
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
-        self.source = sources.get(self.source_type)(self)
+        self.source = self.get_source(self.source_type)
 
     @property
     def source_type(self):
         return self.data.get('source', 'describe')
+
+    def get_source(self, source_type):
+        return sources.get(source_type)(self)
 
     @classmethod
     def get_model(cls):

@@ -45,6 +45,7 @@ Find rds instances that are not encrypted
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
+import json
 import itertools
 import logging
 import operator
@@ -65,7 +66,7 @@ from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
 from c7n import tags
 from c7n.utils import (
     local_session, type_schema,
@@ -129,12 +130,35 @@ class RDS(QueryResourceManager):
                 account_id=self.account_id, resource_type='db', separator=':')
         return self._generate_arn
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRDS(self)
+        elif source_type == 'config':
+            return ConfigRDS(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeRDS(DescribeSource):
+
     def augment(self, dbs):
         filter(None, _rds_tags(
-            self.get_model(),
-            dbs, self.session_factory, self.executor_factory,
-            self.generate_arn, self.retry))
+            self.manager.get_model(),
+            dbs,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.generate_arn,
+            self.manager.retry))
         return dbs
+
+
+class ConfigRDS(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDS, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        return resource
 
 
 def _rds_tags(
@@ -986,12 +1010,36 @@ class RDSSnapshot(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRDSSnapshot(self)
+        elif source_type == 'config':
+            return ConfigRDSSnapshot(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeRDSSnapshot(DescribeSource):
+
     def augment(self, snaps):
         filter(None, _rds_snap_tags(
-            self.get_model(),
-            snaps, self.session_factory, self.executor_factory,
-            self.generate_arn, self.retry))
+            self.manager.get_model(),
+            snaps,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.generate_arn,
+            self.manager.retry))
         return snaps
+
+
+class ConfigRDSSnapshot(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDSSnapshot, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        # TODO: Load DBSnapshotAttributes into annotation
+        return resource
 
 
 def _rds_snap_tags(
