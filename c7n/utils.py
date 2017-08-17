@@ -200,7 +200,7 @@ def camelResource(obj):
         if isinstance(v, dict):
             camelResource(v)
         elif isinstance(v, list):
-            map(camelResource, v)
+            list(map(camelResource, v))
     return obj
 
 

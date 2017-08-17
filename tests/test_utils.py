@@ -180,6 +180,37 @@ class UtilTest(unittest.TestCase):
                 separator=':'),
             'arn:aws:rds:us-east-1:123456789012:og:mysql-option-group1')
 
+    def test_camel_nested(self):
+        nest ={'description': 'default VPC security group',
+               'groupId': 'sg-6c7fa917',
+               'groupName': 'default',
+               'ipPermissions': [{'ipProtocol': '-1',
+                                  'ipRanges': ['108.56.181.242/32'],
+                                  'ipv4Ranges': [{'cidrIp': '108.56.181.242/32'}],
+                                  'ipv6Ranges': [],
+                                  'prefixListIds': [],
+                                  'userIdGroupPairs': [{'groupId': 'sg-6c7fa917',
+                                                        'userId': '644160558196'}]}],
+               'ipPermissionsEgress': [{'ipProtocol': '-1',
+                                        'ipRanges': ['0.0.0.0/0'],
+                                        'ipv4Ranges': [{'cidrIp': '0.0.0.0/0'}],
+                                        'ipv6Ranges': [],
+                                        'prefixListIds': [],
+                                        'userIdGroupPairs': []}],
+               'ownerId': '644160558196',
+               'tags': [{'key': 'Name', 'value': ''},
+                        {'key': 'c7n-test-tag', 'value': 'c7n-test-val'}],
+               'vpcId': 'vpc-d2d616b5'}
+        self.assertEqual(
+            utils.camelResource(nest)['IpPermissions'],
+            [{u'IpProtocol': u'-1',
+              u'IpRanges': [u'108.56.181.242/32'],
+              u'Ipv4Ranges': [{u'CidrIp': u'108.56.181.242/32'}],
+              u'Ipv6Ranges': [],
+              u'PrefixListIds': [],
+              u'UserIdGroupPairs': [{u'GroupId': u'sg-6c7fa917',
+                                     u'UserId': u'644160558196'}]}])
+                         
     def test_camel_case(self):
         d = {'zebraMoon': [{'instanceId': 123}, 'moon'],
              'color': {'yellow': 1, 'green': 2}}

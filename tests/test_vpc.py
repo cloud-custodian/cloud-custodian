@@ -328,7 +328,6 @@ class NetworkLocationTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
-
 class NetworkAclTest(BaseTest):
 
     @functional
@@ -798,15 +797,26 @@ class SecurityGroupTest(BaseTest):
             'test_security_group_config_source')
         p = self.load_policy({
             'name': 'sg-test',
+            'resource': 'security-group',
+            'filters': [{'GroupId': 'sg-6c7fa917'}]},
+            session_factory=factory)
+        d_resources = p.run()
+        self.assertEqual(len(d_resources), 1)
+
+        p = self.load_policy({
+            'name': 'sg-test',
             'source': 'config',
             'resource': 'security-group',
             'filters': [
                 {'type': 'default-vpc'},
-                {'GroupName': 'default'}]},
+                {'GroupId': 'sg-6c7fa917'}]},
             session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
+        c_resources = p.run()
+
+        self.assertEqual(len(c_resources), 1)
+        self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
+        self.maxDiff = None
+        self.assertEqual(c_resources, d_resources)
 
     def test_only_ports_ingress(self):
         p = self.load_policy({

@@ -2,15 +2,29 @@
     "status_code": 200, 
     "data": {
         "PaginationToken": "", 
-        "ResourceTagMappingList": [], 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-6c7fa917", 
+                "Tags": [
+                    {
+                        "Value": "", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "c7n-test-val", 
+                        "Key": "c7n-test-tag"
+                    }
+                ]
+            }
+        ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "02273fa4-5b4f-11e7-b54b-cf03244b62a5", 
+            "RequestId": "2f45def0-8350-11e7-9be3-817126018688", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "02273fa4-5b4f-11e7-b54b-cf03244b62a5", 
-                "date": "Tue, 27 Jun 2017 15:40:55 GMT", 
-                "content-length": "1444", 
+                "x-amzn-requestid": "2f45def0-8350-11e7-9be3-817126018688", 
+                "date": "Thu, 17 Aug 2017 13:30:06 GMT", 
+                "content-length": "210", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

@@ -26,7 +26,7 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ConfigSource, DescribeSource
 from c7n.manager import resources
 from c7n.tags import universal_augment
 from c7n.utils import (
@@ -231,7 +231,29 @@ class SecurityGroup(QueryResourceManager):
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
-    augment = universal_augment
+    def get_source(self, source_type):
+        if source_type == 'config':
+            return ConfigSG(self)
+        elif source_type == 'describe':
+            return DescribeSG(self)
+        return super(SecurityGroup, self).get_source(source_type)
+
+
+class DescribeSG(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+class ConfigSG(ConfigSource):
+
+    def augment(self, resources):
+        for r in resources:
+            for p in r.get('IpPermissions', ()):
+                p['IpRanges'] = p.pop('Ipv4Ranges')
+            for p in r.get('IpPermissionsEgress', ()):
+                p['IpRanges'] = p.pop('Ipv4Ranges')
+        return resources
 
 
 @SecurityGroup.filter_registry.register('diff')
