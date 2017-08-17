@@ -111,12 +111,12 @@ class AutoScalingTest(BaseTest):
             'resource': 'asg',
             'filters': [
                 {'type': 'vpc-id',
-                 'value': 'vpc-399e3d52'}]
+                 'value': 'vpc-d2d616b5'}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['LaunchConfigurationName'], 'CustodianASGTest')
+            resources[0]['LaunchConfigurationName'], 'foo-bar')
 
     def test_asg_tag_and_propagate(self):
         factory = self.replay_flight_data('test_asg_tag')
@@ -364,7 +364,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n:matched-security-groups'], ['sg-aa6c90c3'])
+            resources[0]['c7n:matched-security-groups'], ['sg-0b3d3377'])
 
     def test_asg_security_group(self):
         factory = self.replay_flight_data('test_asg_security_group')

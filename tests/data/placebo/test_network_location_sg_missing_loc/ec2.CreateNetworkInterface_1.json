@@ -4,46 +4,46 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "38d91893-ca35-4eeb-bb27-b42caf23199b", 
+            "RequestId": "da6e8c41-0caf-4395-8df1-dd9eb14098f1", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 29 May 2017 11:15:25 GMT"
+                "date": "Mon, 26 Jun 2017 18:37:29 GMT"
             }
         }, 
         "NetworkInterface": {
             "Status": "pending", 
-            "MacAddress": "02:b0:08:96:9c:eb", 
+            "MacAddress": "0a:0f:3d:b6:b0:ce", 
             "SourceDestCheck": true, 
-            "VpcId": "vpc-09563360", 
+            "AvailabilityZone": "us-east-1a", 
             "Description": "", 
-            "NetworkInterfaceId": "eni-ec134484", 
+            "NetworkInterfaceId": "eni-4ccdab9c", 
             "PrivateIpAddresses": [
                 {
                     "Primary": true, 
-                    "PrivateIpAddress": "10.4.9.232"
+                    "PrivateIpAddress": "10.4.9.240"
                 }
             ], 
             "RequesterManaged": false, 
+            "SubnetId": "subnet-07bbcc4f", 
+            "VpcId": "vpc-7365db0a", 
+            "RequesterId": "AIDAIYEUEZZQWE5TZHHAE", 
             "Groups": [
                 {
-                    "GroupName": "some-tier", 
-                    "GroupId": "sg-cb371ba2"
+                    "GroupName": "web-tier", 
+                    "GroupId": "sg-5256f823"
                 }, 
                 {
-                    "GroupName": "web-tier", 
-                    "GroupId": "sg-80371be9"
+                    "GroupName": "some-tier", 
+                    "GroupId": "sg-4c5af43d"
                 }
             ], 
             "Ipv6Addresses": [], 
-            "AvailabilityZone": "us-east-2a", 
-            "RequesterId": "AIDAJEZOTH6YPO3DY45QW", 
-            "SubnetId": "subnet-bc264dd5", 
             "OwnerId": "644160558196", 
             "TagSet": [], 
-            "PrivateIpAddress": "10.4.9.232"
+            "PrivateIpAddress": "10.4.9.240"
         }
     }
 }

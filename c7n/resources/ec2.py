@@ -1002,9 +1002,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         interfaces = []
         for i in instances:
             for eni in i['NetworkInterfaces']:
-                if i.get('c7n.matched-security-groups'):
-                    eni['c7n.matched-security-groups'] = i[
-                        'c7n.matched-security-groups']
+                if i.get('c7n:matched-security-groups'):
+                    eni['c7n:matched-security-groups'] = i[
+                        'c7n:matched-security-groups']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)

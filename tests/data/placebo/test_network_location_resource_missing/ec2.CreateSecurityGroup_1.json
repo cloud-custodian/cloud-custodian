@@ -1,17 +1,17 @@
 {
     "status_code": 200, 
     "data": {
-        "GroupId": "sg-88361ae1", 
+        "GroupId": "sg-8b2f81fa", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "e8541de8-20c4-4b10-a825-30e84b432b2f", 
+            "RequestId": "65a09de3-25e5-4018-92fa-98f89f6495f5", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 29 May 2017 11:26:26 GMT"
+                "date": "Mon, 26 Jun 2017 18:46:52 GMT"
             }
         }
     }

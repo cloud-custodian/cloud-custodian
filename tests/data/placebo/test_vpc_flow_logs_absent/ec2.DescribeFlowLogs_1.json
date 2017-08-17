@@ -3,52 +3,53 @@
     "data": {
         "FlowLogs": [
             {
-                "ResourceId": "vpc-d0e386b7",
+                "ResourceId": "vpc-d2d616b5", 
                 "CreationTime": {
-                    "hour": 23,
-                    "__class__": "datetime",
-                    "month": 2,
-                    "second": 52,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 18,
-                    "minute": 17
-                },
-                "LogGroupName": "/this/is/the/wrong/group",
-                "TrafficType": "REJECT",
-                "FlowLogStatus": "SOMETHINGBAD",
-                "FlowLogId": "fl-84d63aed",
-                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole"
-            },
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 52
+                }, 
+                "LogGroupName": "flow-logs", 
+                "TrafficType": "ALL", 
+                "FlowLogStatus": "ACTIVE", 
+                "FlowLogId": "fl-a41befcd", 
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/CloudCustodianRole", 
+                "DeliverLogsErrorMessage": "Access error"
+            }, 
             {
-                "ResourceId": "vpc-d0e386b7",
+                "ResourceId": "vpc-3065db49", 
                 "CreationTime": {
-                    "hour": 23,
-                    "__class__": "datetime",
-                    "month": 2,
-                    "second": 52,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 18,
-                    "minute": 17
-                },
-                "LogGroupName": "/aws/lambda/myIOTFunction",
-                "TrafficType": "ALL",
-                "FlowLogStatus": "ACTIVE",
-                "FlowLogId": "fl-84d63aed",
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 27
+                }, 
+                "LogGroupName": "vpc-logs", 
+                "TrafficType": "ALL", 
+                "FlowLogStatus": "ACTIVE", 
+                "FlowLogId": "fl-e1bb4a88", 
                 "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole"
             }
-        ],
+        ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2bb11182-8edf-4f73-a61c-84598d337e63", 
+            "RequestId": "a16f4303-9480-4592-947a-f85faef11fb1", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 18 Feb 2017 23:37:34 GMT"
+                "date": "Tue, 27 Jun 2017 17:03:12 GMT"
             }
         }
     }
