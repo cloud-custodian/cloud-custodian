@@ -1,0 +1,246 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 23
+                }, 
+                "Name": "aws-codestar-us-east-1-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 24
+                }, 
+                "Name": "aws-codestar-us-east-1-644160558196-supernally-pipeline"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 18
+                }, 
+                "Name": "c7n-output-west-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 6
+                }, 
+                "Name": "config-rule-sanity"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 4
+                }, 
+                "Name": "custodian-lifecycle-test2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 14
+                }, 
+                "Name": "custodian-log-archive"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 57
+                }, 
+                "Name": "custodian-replicated-west"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 18
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 38
+                }, 
+                "Name": "foobar2456"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 32
+                }, 
+                "Name": "scot-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 16
+                }, 
+                "Name": "scot-test2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 46
+                }, 
+                "Name": "sphere11-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 15
+                }, 
+                "Name": "sphere11-dev-us-west-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 14
+                }, 
+                "Name": "sphere11-us-west-2-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 35
+                }, 
+                "Name": "test-kqf870"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "qX6AMqDQwxa47HWuSaWCLnsr4aU6oFJYjXleMkkfzrhw9Dx95UvIJkjouNgEMb8YDSmKBNkr8Yw=", 
+            "RequestId": "5502314A8C6221BE", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "qX6AMqDQwxa47HWuSaWCLnsr4aU6oFJYjXleMkkfzrhw9Dx95UvIJkjouNgEMb8YDSmKBNkr8Yw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "5502314A8C6221BE", 
+                "date": "Fri, 19 May 2017 01:04:00 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

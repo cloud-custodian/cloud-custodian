@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-lifecycle-test2", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "R/lMGyQihZ/Tkaq+/Ydc6dWR/MMggXu/54etu/v6vTmZu3gByBs+ElpwsPKiCpoTGouAsP2QDOM=", 
+            "RequestId": "3A350959073D800F", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "R/lMGyQihZ/Tkaq+/Ydc6dWR/MMggXu/54etu/v6vTmZu3gByBs+ElpwsPKiCpoTGouAsP2QDOM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3A350959073D800F", 
+                "date": "Fri, 19 May 2017 01:04:08 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

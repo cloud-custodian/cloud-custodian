@@ -53,6 +53,7 @@ from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
 
 from concurrent.futures import as_completed
+from dateutil.parser import parse
 
 from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric
 from c7n.filters import (
@@ -1864,3 +1865,110 @@ class DeleteBucket(ScanBucket):
             Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
         if self.get_bucket_style(bucket) != 'versioned':
             return results
+
+
+@actions.register('lifecycle')
+class Lifecycle(BucketActionBase):
+    """Action applies a lifecycle policy to versioned S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-apply-lifecycle
+                resource: s3
+                actions:
+                  - type: lifecycle
+                    id: default-retention-policy
+                    expire-days: 60
+                    expire-obj-del-marker: false
+                    noncur-expire-days: 60
+    """
+
+    schema = type_schema(
+        'lifecycle',
+        **{
+            'id': {'type': 'string'},
+            'prefix': {'type': 'string'},
+            'expire-days': {'type': 'number'},
+            'expire-date': {'type': 'string'},
+            'expire-obj-del-marker': {'type': 'boolean'},
+            'noncur-expire-days': {'type': 'number'},
+            'abort-multipart-days': {'type': 'number'},
+            'trans-days': {'type': 'number'},
+            'trans-date': {'type': 'string'},
+            'trans-type': {'enum': ['GLACIER', 'STANDARD_IA']},
+            'noncur-trans-days': {'type': 'number'},
+            'noncur-trans-type': {'enum': ['GLACIER', 'STANDARD_IA']},
+        }
+    )
+
+    permissions = ('s3:PutLifecycleConfiguration',)
+
+    def process(self, buckets):
+
+        rule = {
+            'ID': self.data['id'],
+            'Status': 'Enabled',
+        }
+
+        if self.data.get('prefix'):
+            rule['Filter'] = {'Prefix': self.data['prefix']}
+
+        if self.data.get('expire-days'):
+            rule['Expiration'] = {}
+            rule['Expiration']['Days'] = self.data['expire-days']
+
+        if self.data.get('expire-obj-del-marker'):
+            if 'Expiration' not in rule:
+                rule['Expiration'] = {}
+            rule['Expiration']['ExpiredObjectDeleteMarker'] = self.data['expire-obj-del-marker']
+
+        if self.data.get('expire-date'):
+            if 'Expiration' not in rule:
+                rule['Expiration'] = {}
+            rule['Expiration']['Date'] = parse(self.data['expire-date'])
+
+        if self.data.get('noncur-expire-days'):
+            rule['NoncurrentVersionExpiration'] = {
+                'NoncurrentDays': self.data['noncur-expire-days'],
+            }
+
+        if self.data.get('abort-multipart-days'):
+            rule['AbortIncompleteMultipartUpload'] = {
+                'DaysAfterInitiation': self.data['abort-multipart-days']
+            }
+
+        if self.data.get('trans-days'):
+            rule['Transitions'] = [{
+                'Days': self.data['trans-days'],
+            }]
+
+        if self.data.get('trans-type'):
+            if 'Transitions' not in rule:
+                rule['Transitions'] = [{}]
+            rule['Transitions'][0]['StorageClass'] = self.data['trans-type']
+
+        if self.data.get('trans-date'):
+            if 'Transitions' not in rule:
+                rule['Transitions'] = [{}]
+            rule['Transitions'][0]['Date'] = parse(self.data['trans-date'])
+
+        if self.data.get('noncur-trans-days'):
+            rule['NoncurrentVersionTransitions'] = [{
+                'NoncurrentDays': self.data['noncur-trans-days'],
+            }]
+
+        if self.data.get('noncur-trans-type'):
+            key = 'NoncurrentVersionTransitions'
+            if key not in rule:
+                rule[key] = [{}]
+            rule[key][0]['StorageClass'] = self.data['noncur-trans-type']
+
+        config = {'Rules': [rule]}
+
+        for bucket in buckets:
+            s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+            s3.put_bucket_lifecycle_configuration(
+                Bucket=bucket['Name'], LifecycleConfiguration=config)
