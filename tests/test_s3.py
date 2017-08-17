@@ -19,7 +19,6 @@ import os
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
-import uuid
 
 from unittest import TestCase
 
@@ -29,9 +28,9 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
-from c7n.sqsexec import MessageIterator
 
-from .common import BaseTest, event_data, skip_if_not_validating, functional
+from .common import (
+    BaseTest, ConfigTest, event_data, skip_if_not_validating, functional)
 
 
 class RestoreCompletionTest(TestCase):
@@ -373,7 +372,7 @@ class BucketTag(BaseTest):
             tags)
 
 
-class S3ConfigSource(BaseTest):
+class S3ConfigSource(ConfigTest):
 
     maxDiff = None
 
@@ -504,56 +503,6 @@ class S3ConfigSource(BaseTest):
             {t['Key']: t['Value'] for t in resource_a.get('Tags')},
             {t['Key']: t['Value'] for t in resource_b.get('Tags')})
 
-    def wait_for_config(self, session, queue_url, resource_id):
-        client = session.client('sqs')
-        messages = MessageIterator(client, queue_url, timeout=20)
-        results = []
-        while True:
-            for m in messages:
-                msg = json.loads(m['Body'])
-                change = json.loads(msg['Message'])
-                messages.ack(m)
-                if change['configurationItem']['resourceId'] != resource_id:
-                    continue
-                results.append(change['configurationItem'])
-                break
-            if results:
-                break
-        return results
-
-    def initialize_config_subscriber(self, session):
-        config = session.client('config')
-        sqs = session.client('sqs')
-        sns = session.client('sns')
-
-        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
-        assert channels, "config not enabled"
-
-        topic = channels[0]['snsTopicARN']
-        queue = "custodian-waiter-%s" % str(uuid.uuid4())
-        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
-        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
-
-        attrs = sqs.get_queue_attributes(QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
-        queue_arn = attrs['Attributes']['QueueArn']
-        policy = json.loads(attrs['Attributes'].get(
-            'Policy',
-            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
-        policy['Statement'].append({
-            "Sid": "ConfigTopicSubscribe",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "sqs:SendMessage",
-            "Resource": queue_arn,
-            "Condition": {
-                "ArnEquals": {
-                    "aws:SourceArn": topic}}})
-        sqs.set_queue_attributes(QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
-        subscription = sns.subscribe(
-            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get('SubscriptionArn')
-        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
-        return queue_url
-
     def test_config_normalize_notification(self):
         event = event_data('s3-rep-and-notify.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -681,7 +630,7 @@ class S3ConfigSource(BaseTest):
         self.assertEqual(
             {'Planet': 'Earth', 'Verbose': 'Game'},
             {t['Key']: t['Value'] for t in resource.pop('Tags')}
-        )        
+        )
         self.assertEqual(
             resource,
             {'Location': {'LocationConstraint': u'us-east-2'},

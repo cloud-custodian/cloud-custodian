@@ -20,6 +20,7 @@ import os
 import shutil
 import tempfile
 import unittest
+import uuid
 
 import six
 import yaml
@@ -173,6 +174,75 @@ class BaseTest(PillTest):
     @property
     def account_id(self):
         return ACCOUNT_ID
+
+
+class ConfigTest(BaseTest):
+    """Test base class for integration tests with aws config.
+
+    To allow for integration testing with config.
+
+     - before creating and modifying use the
+       initialize_config_subscriber method to setup an sqs queue on
+       the config recorder's sns topic. returns the sqs queue url.
+
+     - after creating/modifying a resource, use the wait_for_config
+       with the queue url and the resource id.
+    """
+
+    def wait_for_config(self, session, queue_url, resource_id):
+        # lazy import to avoid circular
+        from c7n.sqsexec import MessageIterator
+        client = session.client('sqs')
+        messages = MessageIterator(client, queue_url, timeout=20)
+        results = []
+        while True:
+            for m in messages:
+                msg = json.loads(m['Body'])
+                change = json.loads(msg['Message'])
+                messages.ack(m)
+                if change['configurationItem']['resourceId'] != resource_id:
+                    continue
+                results.append(change['configurationItem'])
+                break
+            if results:
+                break
+        return results
+
+    def initialize_config_subscriber(self, session):
+        config = session.client('config')
+        sqs = session.client('sqs')
+        sns = session.client('sns')
+
+        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
+        assert channels, "config not enabled"
+
+        topic = channels[0]['snsTopicARN']
+        queue = "custodian-waiter-%s" % str(uuid.uuid4())
+        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
+        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
+
+        attrs = sqs.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
+        queue_arn = attrs['Attributes']['QueueArn']
+        policy = json.loads(attrs['Attributes'].get(
+            'Policy',
+            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
+        policy['Statement'].append({
+            "Sid": "ConfigTopicSubscribe",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": topic}}})
+        sqs.set_queue_attributes(
+            QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
+        subscription = sns.subscribe(
+            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get(
+                'SubscriptionArn')
+        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
+        return queue_url
 
 
 class TextTestIO(io.StringIO):
