@@ -6,177 +6,14 @@
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
                         "IpRanges": [
                             {
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
                         "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-042d227f"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-264cdf41", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-042d227f"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-682d2213"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-7a4cdf1d", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-682d2213"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "108.56.181.242/32"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-6c7fa917"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-6c7fa917"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-74beb70f"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-5d62f03a", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-74beb70f"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-fda0a986"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-4078ea27", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-fda0a986"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "Description": "for apps", 
@@ -191,24 +28,26 @@
                         ], 
                         "ToPort": 62000, 
                         "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": []
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "GroupName": "web-tier", 
-                "VpcId": "vpc-5d62f03a", 
+                "VpcId": "vpc-7cc27a05", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-6bbeb710"
+                "GroupId": "sg-e6853097"
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2b4f62fe-ae66-419a-96e8-1d79beed7eb2", 
+            "RequestId": "99feca40-77c1-4e6f-be19-44a192d57682", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 23 Jul 2016 11:52:00 GMT"
+                "date": "Tue, 27 Jun 2017 15:45:48 GMT"
             }
         }
     }

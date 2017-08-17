@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-07bbcc4f", 
+                "Tags": [
+                    {
+                        "Value": "web", 
+                        "Key": "Location"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8483c500-5a9e-11e7-9476-cd20aa54f40e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8483c500-5a9e-11e7-9476-cd20aa54f40e", 
+                "date": "Mon, 26 Jun 2017 18:37:32 GMT", 
+                "content-length": "820", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

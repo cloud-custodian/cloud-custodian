@@ -76,20 +76,22 @@ class VpcTest(BaseTest):
         # 'vpc-d0e386b7' - has flow logs
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_absent')
-
-        vpc_id1 = 'vpc-4a9ff72e'
+        session = factory()
+        ec2 = session.client('ec2')
+        vpc_id = ec2.create_vpc(CidrBlock="10.4.0.0/24")['Vpc']['VpcId']
+        self.addCleanup(ec2.delete_vpc, VpcId=vpc_id)
 
         p = self.load_policy({
             'name': 'net-find',
             'resource': 'vpc',
             'filters': [
-                {'VpcId': vpc_id1},
+                {'VpcId': vpc_id},
                 'flow-logs']},
             session_factory=factory)
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['VpcId'], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id)
 
     @functional
     def test_flow_logs_misconfiguration(self):
@@ -138,7 +140,6 @@ class VpcTest(BaseTest):
 
 class NetworkLocationTest(BaseTest):
 
-    @functional
     def test_network_location_sg_missing(self):
         self.factory = self.replay_flight_data(
             'test_network_location_sg_missing_loc')

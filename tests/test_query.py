@@ -59,7 +59,7 @@ class QueryResourceManagerTest(BaseTest):
             {'name': 'igw-check',
              'resource': 'internet-gateway',
              'filters': [{
-                 'InternetGatewayId': 'igw-5bce113e'}]},
+                 'InternetGatewayId': 'igw-2e65104a'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -75,7 +75,7 @@ class QueryResourceManagerTest(BaseTest):
             {'name': 'igw-check',
              'resource': 'internet-gateway'},
             session_factory=session_factory)
-        resources = p.resource_manager.get_resources(['igw-5bce113e'])
+        resources = p.resource_manager.get_resources(['igw-2e65104a'])
         self.assertEqual(len(resources), 1)
         resources = p.resource_manager.get_resources(['igw-5bce113f'])
         self.assertEqual(resources, [])

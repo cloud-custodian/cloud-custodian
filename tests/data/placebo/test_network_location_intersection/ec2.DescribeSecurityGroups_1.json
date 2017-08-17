@@ -25,21 +25,21 @@
                 ], 
                 "IpPermissions": [], 
                 "GroupName": "web-tier", 
-                "VpcId": "vpc-3b5c3952", 
+                "VpcId": "vpc-cf62dcb6", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-a03519c9"
+                "GroupId": "sg-2a228c5b"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "25e38857-590e-4076-9d43-2511788b1222", 
+            "RequestId": "e4329f02-602a-4422-8fb5-bb0057d6308b", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 29 May 2017 11:28:21 GMT"
+                "date": "Mon, 26 Jun 2017 18:48:08 GMT"
             }
         }
     }

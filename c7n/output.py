@@ -43,7 +43,7 @@ class MetricsOutput(object):
 
     permissions = ("cloudWatch:PutMetricData",)
 
-    retry = get_retry(('Throttling',))
+    retry = staticmethod(get_retry(('Throttling',)))
 
     @staticmethod
     def select(metrics_enabled):
