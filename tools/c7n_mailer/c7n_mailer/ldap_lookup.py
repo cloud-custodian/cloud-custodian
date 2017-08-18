@@ -140,7 +140,8 @@ class LdapLookup(object):
                 self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
                 self.caching.set(uid, ldap_user_metadata)
         else:
-            self.caching.set(uid, {})
+            if self.cache_engine:
+                self.caching.set(uid, {})
             return {}
         return ldap_user_metadata
 
