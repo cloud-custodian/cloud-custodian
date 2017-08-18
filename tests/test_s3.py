@@ -1768,3 +1768,17 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_s3_cross_account_object_filter(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_acl', 'Acl', None, None)])
+        session_factory = self.replay_flight_data(
+            'test_s3_cross_account_object_filter')
+        p = self.load_policy({
+            'name': 's3-cross-account-objects',
+            'resource': 's3',
+            'region': 'us-east-1',
+            'filters': ['cross-account-objects']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'cross-account-test-sw')
