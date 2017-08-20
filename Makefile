@@ -25,6 +25,9 @@ depcache:
 	rm -Rf dep-download
 	rm -Rf deps
 
+ftest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
+
 sphinx:
 	make -f docs/Makefile.sphinx clean && \
 	make -f docs/Makefile.sphinx html
