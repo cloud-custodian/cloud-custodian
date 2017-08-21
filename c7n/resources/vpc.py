@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
 import itertools
 import operator
 import zlib
@@ -26,10 +25,11 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
+from c7n.filters.locked import Locked
 from c7n.query import QueryResourceManager, ConfigSource
 from c7n.manager import resources
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, camelResource, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 
 @resources.register('vpc')
@@ -236,11 +236,34 @@ class ConfigSG(ConfigSource):
 
     def augment(self, resources):
         for r in resources:
-            for p in r.get('IpPermissions', ()):
-                p['IpRanges'] = p.pop('Ipv4Ranges')
-            for p in r.get('IpPermissionsEgress', ()):
-                p['IpRanges'] = p.pop('Ipv4Ranges')
+            for rset in ('IpPermissions', 'IpPermissionsEgress'):
+                for p in r.get(rset, ()):
+                    if p.get('FromPort', '') is None:
+                        p.pop('FromPort')
+                    if p.get('ToPort', '') is None:
+                        p.pop('ToPort')
+                    if 'Ipv6Ranges' not in p:
+                        p[u'Ipv6Ranges'] = []
+                    for i in p.get('UserIdGroupPairs', ()):
+                        for k, v in list(i.items()):
+                            if v is None:
+                                i.pop(k)
+
+                    # legacy config form, still version 1.2
+                    for attribute, element_key in (('IpRanges', u'CidrIp'),):
+                        if attribute not in p:
+                            continue
+                        p[attribute] = [{element_key: v} for v in p[attribute]]
+                    if 'Ipv4Ranges' in p:
+                        p['IpRanges'] = p.pop('Ipv4Ranges')
         return resources
+
+
+@SecurityGroup.filter_registry.register('locked')
+class SecurityGroupLockedFilter(Locked):
+
+    def get_parent_id(self, resource, account_id):
+        return resource.get('VpcId', account_id)
 
 
 @SecurityGroup.filter_registry.register('diff')
@@ -249,24 +272,6 @@ class SecurityGroupDiffFilter(Diff):
     def diff(self, source, target):
         differ = SecurityGroupDiff()
         return differ.diff(source, target)
-
-    def transform_revision(self, revision):
-        # config does some odd transforms, walk them back
-        resource = camelResource(json.loads(revision['configuration']))
-        for rset in ('IpPermissions', 'IpPermissionsEgress'):
-            for p in resource.get(rset, ()):
-                if p.get('FromPort', '') is None:
-                    p.pop('FromPort')
-                if p.get('ToPort', '') is None:
-                    p.pop('ToPort')
-                if 'Ipv6Ranges' not in p:
-                    p[u'Ipv6Ranges'] = []
-                for attribute, element_key in (
-                        ('IpRanges', u'CidrIp'),):
-                    if attribute not in p:
-                        continue
-                    p[attribute] = [{element_key: v} for v in p[attribute]]
-        return resource
 
 
 class SecurityGroupDiff(object):
@@ -292,8 +297,8 @@ class SecurityGroupDiff(object):
             return delta
 
     def get_tag_delta(self, source, target):
-        source_tags = {t['Key']: t['Value'] for t in source['Tags']}
-        target_tags = {t['Key']: t['Value'] for t in target['Tags']}
+        source_tags = {t['Key']: t['Value'] for t in source.get('Tags', ())}
+        target_tags = {t['Key']: t['Value'] for t in target.get('Tags', ())}
         target_keys = set(target_tags.keys())
         source_keys = set(source_tags.keys())
         removed = source_keys.difference(target_keys)

@@ -464,10 +464,6 @@ class RouteTableTest(BaseTest):
               u'Origin': 'CreateRoute',
               u'State': 'active'}])
 
-    def test_bad_peer(self):
-        pass
-
-
 
 class PeeringConnectionTest(BaseTest):
 
