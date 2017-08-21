@@ -12,7 +12,7 @@ nose-timer==0.7.0
 twine
 fakeredis
 pytest>=2.7.0
-pytest-xdist
+pytest-xdist>=1.20.0
 pytest-cov
 tox
 

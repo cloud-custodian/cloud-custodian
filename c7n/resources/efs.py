@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry
 
 
@@ -29,7 +30,19 @@ class ElasticFileSystem(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         dimension = None
+        type = 'file-system'
+        # resource type for resource tagging api
+        resource_type = 'elasticfilesystem:file-system'
         detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(ElasticFileSystem, self).augment(resources))
+
+
+register_universal_tags(
+    ElasticFileSystem.filter_registry,
+    ElasticFileSystem.action_registry)
 
 
 @ElasticFileSystem.action_registry.register('delete')
