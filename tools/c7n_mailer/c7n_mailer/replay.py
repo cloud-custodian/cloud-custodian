@@ -22,48 +22,10 @@ import yaml
 
 from c7n import utils
 from c7n_mailer.utils import setup_defaults
+from c7n_mailer.cli import CONFIG_SCHEMA
 from .sqs_message_processor import SqsMessageProcessor
 
 logger = logging.getLogger(__name__)
-
-
-CONFIG_SCHEMA = {
-    'type': 'object',
-    'additionalProperties': False,
-    'required': ['queue_url', 'role', 'from_address'],
-    'properties': {
-        'queue_url': {'type': 'string'},
-        'from_address': {'type': 'string'},
-        'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
-
-        # Standard Lambda Function Config
-        'region': {'type': 'string'},
-        'role': {'type': 'string'},
-        'memory': {'type': 'integer'},
-        'timeout': {'type': 'integer'},
-        'subnets': {'type': 'array', 'items': {'type': 'string'}},
-        'security_groups': {'type': 'array', 'items': {'type': 'string'}},
-
-        # Mailer Infrastructure Config
-        'cache': {'type': 'string'},
-        'smtp_server': {'type': 'string'},
-        'smtp_port': {'type': 'integer'},
-        'smtp_ssl': {'type': 'boolean'},
-        'smtp_username': {'type': 'string'},
-        'smtp_password': {'type': 'string'},
-        'ldap_uri': {'type': 'string'},
-        'ldap_bind_dn': {'type': 'string'},
-        'ldap_bind_user': {'type': 'string'},
-        'ldap_bind_password': {'type': 'string'},
-        'cross_accounts': {'type': 'object'},
-        'ses_region': {'type': 'string'},
-
-        # SDK Config
-        'profile': {'type': 'string'},
-        'http_proxy': {'type': 'string'},
-        'https_proxy': {'type': 'string'},
-    }
-}
 
 
 class MailerTester(object):
