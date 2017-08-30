@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+import functools
 
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment, register_universal_tags
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
 
 @resources.register('efs')
@@ -34,10 +35,24 @@ class ElasticFileSystem(QueryResourceManager):
         # resource type for resource tagging api
         resource_type = 'elasticfilesystem:file-system'
         detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
+        filter_name = 'FileSystemId'
+        filter_type = 'scalar'
 
     def augment(self, resources):
         return universal_augment(
             self, super(ElasticFileSystem, self).augment(resources))
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                'elasticfilesystem',
+                region=self.config.region,
+                account_id=self.account_id,
+                resource_type='file-system',
+                separator='/')
+        return self._generate_arn
 
 
 register_universal_tags(
