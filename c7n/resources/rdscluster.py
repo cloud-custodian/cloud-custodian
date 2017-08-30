@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -333,7 +333,7 @@ class RetentionWindow(BaseAction):
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
-        retention_type = self.data['enforce', 'min'].lower()
+        retention_type = self.data.get('enforce', 'min').lower()
 
         if retention_type == 'min':
             self.set_retention_window(

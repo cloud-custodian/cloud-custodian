@@ -3,38 +3,33 @@
     "data": {
         "CacheSubnetGroups": [
             {
-                "VpcId": "vpc-4a9ff72e", 
-                "CacheSubnetGroupDescription": "An ElastiCache subnet group", 
+                "VpcId": "vpc-f1516b97", 
+                "CacheSubnetGroupDescription": " ", 
                 "Subnets": [
                     {
-                        "SubnetIdentifier": "subnet-5fb47507", 
+                        "SubnetIdentifier": "subnet-ecfb30a4", 
                         "SubnetAvailabilityZone": {
-                            "Name": "us-west-2c"
+                            "Name": "us-east-1a"
                         }
                     }, 
                     {
-                        "SubnetIdentifier": "subnet-15452171", 
+                        "SubnetIdentifier": "subnet-71bda45c", 
                         "SubnetAvailabilityZone": {
-                            "Name": "us-west-2a"
-                        }
-                    }, 
-                    {
-                        "SubnetIdentifier": "subnet-63c97615", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-west-2b"
+                            "Name": "us-east-1d"
                         }
                     }
                 ], 
-                "CacheSubnetGroupName": "elasticache-subnet-group-1"
+                "CacheSubnetGroupName": "msg"
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "bcd53202-750a-11e6-bcfa-055709a7c18d", 
+            "RequestId": "3056b751-588a-11e7-a2c8-af369a23b0d0", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "bcd53202-750a-11e6-bcfa-055709a7c18d", 
-                "date": "Wed, 07 Sep 2016 14:52:45 GMT", 
-                "content-length": "1309", 
+                "x-amzn-requestid": "3056b751-588a-11e7-a2c8-af369a23b0d0", 
+                "date": "Sat, 24 Jun 2017 03:06:58 GMT", 
+                "content-length": "1043", 
                 "content-type": "text/xml"
             }
         }

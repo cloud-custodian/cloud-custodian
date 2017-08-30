@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "dea04a2d-b4ac-11e6-aa7f-051ab4a3ccd7", 
+            "RequestId": "07eff52a-84db-11e7-9c27-67d0bf52c278", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "dea04a2d-b4ac-11e6-aa7f-051ab4a3ccd7", 
-                "date": "Sun, 27 Nov 2016 14:22:04 GMT", 
-                "content-length": "348", 
+                "x-amzn-requestid": "07eff52a-84db-11e7-9c27-67d0bf52c278", 
+                "date": "Sat, 19 Aug 2017 12:36:32 GMT", 
+                "content-length": "449", 
                 "content-type": "application/json"
             }
         }, 
@@ -17,22 +17,24 @@
                 "SizeInBytes": {
                     "Value": 6144
                 }, 
-                "Name": "MyDocs", 
-                "CreationToken": "console-43c2e0a4-487f-4a6c-b699-a8523911dbf2", 
+                "Name": "Somewhere", 
+                "CreationToken": "e6986d0c-4720-4a08-881d-d694695c6d51", 
+                "Encrypted": true, 
                 "CreationTime": {
-                    "hour": 8, 
+                    "hour": 7, 
                     "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 34, 
+                    "month": 8, 
+                    "second": 26, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 46
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 36
                 }, 
                 "PerformanceMode": "generalPurpose", 
-                "FileSystemId": "fs-5e7fac17", 
-                "NumberOfMountTargets": 4, 
+                "FileSystemId": "fs-1ac6a253", 
+                "NumberOfMountTargets": 0, 
                 "LifeCycleState": "available", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5", 
                 "OwnerId": "644160558196"
             }
         ]

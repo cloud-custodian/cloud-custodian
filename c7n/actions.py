@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -262,7 +262,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
-                remove_groups = r.get('c7n.matched-security-groups', ())
+                remove_groups = r.get('c7n:matched-security-groups', ())
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
@@ -400,7 +400,7 @@ class Notify(EventAction):
 
     schema = {
         'type': 'object',
-        'oneOf': [
+        'anyOf': [
             {'required': ['type', 'transport', 'to']},
             {'required': ['type', 'transport', 'to_from']}],
         'properties': {
@@ -453,13 +453,13 @@ class Notify(EventAction):
             to_from['url'] = to_from['url'].format(**message)
             if 'expr' in to_from:
                 to_from['expr'] = to_from['expr'].format(**message)
-            p['to'] = ValuesFrom(to_from, self.manager).get_values()
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
         if 'cc_from' in self.data:
             cc_from = self.data['cc_from'].copy()
             cc_from['url'] = cc_from['url'].format(**message)
             if 'expr' in cc_from:
                 cc_from['expr'] = cc_from['expr'].format(**message)
-            p['cc'] = ValuesFrom(cc_from, self.manager).get_values()
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
         return p
 
     def process(self, resources, event=None):

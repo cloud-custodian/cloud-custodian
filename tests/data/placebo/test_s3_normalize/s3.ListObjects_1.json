@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-test-data-23", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "OkAMFiQmc7RXVfd+urwgFrsR9sp7cWXLlgJpu0HQev7BFcK5AMuparj2Gd3N5S8sUK7EaYtVniU=", 
+            "RequestId": "643F974F6D2FF9BE", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "OkAMFiQmc7RXVfd+urwgFrsR9sp7cWXLlgJpu0HQev7BFcK5AMuparj2Gd3N5S8sUK7EaYtVniU=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "643F974F6D2FF9BE", 
+                "date": "Thu, 10 Aug 2017 14:19:27 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

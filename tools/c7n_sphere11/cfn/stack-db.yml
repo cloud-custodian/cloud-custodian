@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  LockTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "Sphere11.ResourceLocks"
+      AttributeDefinitions:
+
+        - AttributeName: "ResourceId"
+          AttributeType: "S"
+        - AttributeName: "AccountId"
+          AttributeType: "S"
+#        - AttributeName: "Region"
+#          AttributeType: "S"
+#        - AttributeName: "ParentId"
+#          AttributeType: "S"
+#        - AttributeName: "LockStatus"
+#          AttributeType: "N"
+#        - AttributeName: "LockDate"
+#          AttributeType: "N"
+#        - AttributeName: "RevisionDate"
+#          AttributeType: "N"
+      KeySchema:
+#        - AttributeName: "AccountId"
+#          KeyType: "HASH"
+#        - AttributeName: "ResourceId"
+#          KeyType: "RANGE"
+        - AttributeName: "ResourceId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      GlobalSecondaryIndexes:
+        - IndexName: "Sphere11.AccountLocks"
+          KeySchema:
+            - AttributeName: "AccountId"
+              KeyType: "HASH"
+            - AttributeName: "ResourceId"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"

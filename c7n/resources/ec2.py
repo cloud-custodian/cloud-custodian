@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from concurrent.futures import as_completed
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
@@ -43,7 +43,6 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('health-event', HealthEventFilter)
 
 
@@ -295,9 +294,28 @@ class AttachedVolume(ValueFilter):
 
 class InstanceImageBase(object):
 
-    def get_image_mapping(self, resources):
+    def prefetch_instance_images(self, instances):
+        image_ids = [i['ImageId'] for i in instances if 'c7n:instance-image' not in i]
+        self.image_map = self.get_local_image_mapping(image_ids)
+
+    def get_base_image_mapping(self):
         return {i['ImageId']: i for i in
                 self.manager.get_resource_manager('ami').resources()}
+
+    def get_instance_image(self, instance):
+        image = instance.get('c7n:instance-image', None)
+        if not image:
+            image = instance['c7n:instance-image'] = self.image_map.get(instance['ImageId'], None)
+        return image
+
+    def get_local_image_mapping(self, image_ids):
+        base_image_map = self.get_base_image_mapping()
+        resources = {i: base_image_map[i] for i in image_ids if i in base_image_map}
+        missing = list(set(image_ids) - set(resources.keys()))
+        if missing:
+            loaded = self.manager.get_resource_manager('ami').get_resources(missing, False)
+            resources.update({image['ImageId']: image for image in loaded})
+        return resources
 
 
 @filters.register('image-age')
@@ -330,15 +348,15 @@ class ImageAge(AgeFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(ImageAge, self).process(resources, event)
 
     def get_resource_date(self, i):
-        if i['ImageId'] not in self.image_map:
-            # our image is no longer available
+        image = self.get_instance_image(i)
+        if image:
+            return parse(image['CreationDate'])
+        else:
             return parse("2000-01-01T01:01:01.000Z")
-        image = self.image_map[i['ImageId']]
-        return parse(image['CreationDate'])
 
 
 @filters.register('image')
@@ -350,11 +368,12 @@ class InstanceImage(ValueFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(InstanceImage, self).process(resources, event)
 
     def __call__(self, i):
-        image = self.image_map.get(i['ImageId'])
+        image = self.get_instance_image(i)
+        # Finally, if we have no image...
         if not image:
             self.log.warning(
                 "Could not locate image for instance:%s ami:%s" % (
@@ -613,6 +632,7 @@ class Start(BaseAction, StateTransitionFilter):
     schema = type_schema('start')
     permissions = ('ec2:StartInstances',)
     batch_size = 10
+    exception = None
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -634,6 +654,12 @@ class Start(BaseAction, StateTransitionFilter):
                 for batch in utils.chunks(z_instances, self.batch_size):
                     self.process_instance_set(client, batch, itype, izone)
 
+        # Raise an exception after all batches process
+        if self.exception:
+            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
+                self.log.exception("Error while starting instances error %s", self.exception)
+                raise self.exception
+
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retry = utils.get_retry((
@@ -644,15 +670,14 @@ class Start(BaseAction, StateTransitionFilter):
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
-                return
-            self.log.exception("Error while starting instances error %s", e)
-            raise
+            # Saving exception
+            self.exception = e
+            self.log.exception(
+                ("Could not start instances:%d type:%s"
+                 " zone:%s instances:%s error:%s"),
+                len(instances), itype, izone,
+                ", ".join(instance_ids), e)
+            return
 
 
 @actions.register('resize')
@@ -886,10 +911,8 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-            filters:
-              - type: ebs
           actions:
-            - snapshot
+            - type: snapshot
               copy-tags:
                 - Name
     """
@@ -979,9 +1002,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         interfaces = []
         for i in instances:
             for eni in i['NetworkInterfaces']:
-                if i.get('c7n.matched-security-groups'):
-                    eni['c7n.matched-security-groups'] = i[
-                        'c7n.matched-security-groups']
+                if i.get('c7n:matched-security-groups'):
+                    eni['c7n:matched-security-groups'] = i[
+                        'c7n:matched-security-groups']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -500,7 +500,7 @@ class RequestLimitIncrease(BaseAction):
     permissions = ('support:CreateCase',)
 
     default_subject = 'Raise the account limit of {service} - {limits} in {region}'
-    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
+    default_template = 'Please raise the limit of {service} - {limits} by {percent}% in {region}'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -537,7 +537,8 @@ class RequestLimitIncrease(BaseAction):
             body = body.format(**{
                 'service': service,
                 'limits': limits,
-                'percent': self.data.get('percent-increase')
+                'percent': self.data.get('percent-increase'),
+                'region': region
             })
 
             client.create_case(
@@ -621,6 +622,7 @@ class EnableTrail(BaseAction):
         **{
             'trail': {'type': 'string'},
             'bucket': {'type': 'string'},
+            'bucket-region': {'type': 'string'},
             'multi-region': {'type': 'boolean'},
             'global-events': {'type': 'boolean'},
             'notify': {'type': 'string'},
@@ -636,6 +638,7 @@ class EnableTrail(BaseAction):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         bucket_name = self.data['bucket']
+        bucket_region = self.data.get('bucket-region', 'us-east-1')
         trail_name = self.data.get('trail', 'default-trail')
         multi_region = self.data.get('multi-region', True)
         global_events = self.data.get('global-events', True)
@@ -645,7 +648,16 @@ class EnableTrail(BaseAction):
         kms_key = self.data.get('kms-key', '')
 
         s3client = session.client('s3')
-        s3client.create_bucket(Bucket=bucket_name)
+        try:
+            s3client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={'LocationConstraint': bucket_region}
+            )
+        except ClientError as ce:
+            if not ('Error' in ce.response and
+            ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
+                raise ce
+
         try:
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
         except ClientError:

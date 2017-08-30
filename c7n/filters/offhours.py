@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -248,6 +248,8 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',

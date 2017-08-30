@@ -4,26 +4,18 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d6e6f4a2-13e8-11e7-a10d-03dc08f89c32", 
+            "RequestId": "0861f09c-84db-11e7-a8e3-e1c9ebb5a9f5", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "d6e6f4a2-13e8-11e7-a10d-03dc08f89c32", 
-                "date": "Tue, 28 Mar 2017 19:00:41 GMT", 
-                "content-length": "142", 
+                "x-amzn-requestid": "0861f09c-84db-11e7-a8e3-e1c9ebb5a9f5", 
+                "date": "Sat, 19 Aug 2017 12:36:33 GMT", 
+                "content-length": "77", 
                 "content-type": "application/json"
             }
         }, 
         "Tags": [
             {
-                "Value": "MyDocs", 
+                "Value": "Somewhere", 
                 "Key": "Name"
-            }, 
-            {
-                "Value": "Test User", 
-                "Key": "POC"
-            }, 
-            {
-                "Value": "skunk", 
-                "Key": "Service"
             }
         ]
     }

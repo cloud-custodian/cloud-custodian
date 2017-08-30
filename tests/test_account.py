@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ TRAIL = 'nosetest'
 import datetime
 from dateutil import parser
 from .test_offhours import mock_datetime_now
+from .common import Config
 
 
 class AccountTests(BaseTest):
@@ -290,6 +291,34 @@ class AccountTests(BaseTest):
                 ],
             },
             session_factory=factory,
+        )
+        p.run()
+        client = local_session(factory).client('cloudtrail')
+        resp = client.describe_trails(trailNameList=[TRAIL])
+        trails = resp['trailList']
+        arn = trails[0]['TrailARN']
+        status = client.get_trail_status(Name=arn)
+        self.assertTrue(status['IsLogging'])
+
+    def test_create_trail_bucket_exists_in_west(self):
+        config = Config.empty(account_id='644160558196', region='us-west-1')
+        factory = self.replay_flight_data('test_cloudtrail_create_bucket_exists_in_west')
+        p = self.load_policy(
+            {
+                'name': 'trail-test',
+                'resource': 'account',
+                'region': 'us-west-1',
+                'actions': [
+                    {
+                        'type': 'enable-cloudtrail',
+                        'trail': TRAIL,
+                        'bucket': '%s-bucket' % TRAIL,
+                        'bucket-region': 'us-west-1'
+                    },
+                ],
+            },
+            session_factory=factory,
+            config=config
         )
         p.run()
         client = local_session(factory).client('cloudtrail')

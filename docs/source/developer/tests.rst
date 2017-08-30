@@ -82,7 +82,13 @@ example:
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-Now run this test.  This may take a little while as the test is contacting AWS.
+Now run this test using the following command to generate the placebo data:
+
+  .. code-block:: shell
+
+    $ nosetests -s -v tests/path/to/test.py
+
+This may take a little while as the test is contacting AWS.
 All responses are stored in the placebo dir, and can be viewed when the test is
 finished.  It is not necessary to inspect these files, but they can be helpful
 if the test is not behaving how you expect.

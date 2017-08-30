@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InternetGateways": [
+            {
+                "Tags": [], 
+                "Attachments": [
+                    {
+                        "State": "available", 
+                        "VpcId": "vpc-d2d616b5"
+                    }
+                ], 
+                "InternetGatewayId": "igw-2e65104a"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "13d3a960-d306-47a8-976e-6aba9f322032", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 27 Jun 2017 18:55:22 GMT"
+            }
+        }
+    }
+}

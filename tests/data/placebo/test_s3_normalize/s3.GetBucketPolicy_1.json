@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-test-data-23/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "t8mnQ2mHxDvmo8GUpEqnfuIjy5f6v4OYbRVlMJ9hGZLLJFdeew/Ui0krVwVfe8Lb4MUbO4BN/fg=", 
+            "RequestId": "821131EB3FF1E3FA", 
+            "HTTPHeaders": {
+                "content-length": "250", 
+                "x-amz-id-2": "t8mnQ2mHxDvmo8GUpEqnfuIjy5f6v4OYbRVlMJ9hGZLLJFdeew/Ui0krVwVfe8Lb4MUbO4BN/fg=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "821131EB3FF1E3FA", 
+                "date": "Thu, 10 Aug 2017 14:12:42 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

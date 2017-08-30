@@ -1,40 +1,17 @@
 {
     "status_code": 200, 
     "data": {
-        "StaleSecurityGroupSet": [
-            {
-                "VpcId": "vpc-595ea73f", 
-                "StaleIpPermissionsEgress": [], 
-                "GroupName": "web-tier", 
-                "StaleIpPermissions": [
-                    {
-                        "ToPort": 62000, 
-                        "FromPort": 60000, 
-                        "UserIdGroupPairs": [
-                            {
-                                "VpcId": "vpc-265ea740", 
-                                "GroupId": "sg-3066f84d", 
-                                "VpcPeeringConnectionId": "pcx-7fc05116", 
-                                "PeeringStatus": "active"
-                            }
-                        ], 
-                        "IpProtocol": "tcp"
-                    }
-                ], 
-                "GroupId": "sg-3166f84c", 
-                "Description": "for apps"
-            }
-        ], 
+        "StaleSecurityGroupSet": [], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2cfe7ad5-7702-4ba3-a13a-66b3b9946004", 
+            "RequestId": "dbfbe1e6-82f4-4464-ac51-25b6b95b718c", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 26 Nov 2016 15:11:02 GMT"
+                "date": "Tue, 27 Jun 2017 15:40:55 GMT"
             }
         }
     }

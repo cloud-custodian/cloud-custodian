@@ -4,46 +4,46 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5682d714-20c4-47f4-bd69-9d7007387bb7", 
+            "RequestId": "27a203a0-8dba-4b39-8f77-dac41ca2da72", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 30 May 2017 01:17:31 GMT"
+                "date": "Mon, 26 Jun 2017 18:46:19 GMT"
             }
         }, 
         "NetworkInterface": {
             "Status": "pending", 
-            "MacAddress": "06:e2:4d:5d:aa:aa", 
+            "MacAddress": "02:db:1c:8d:30:f0", 
             "SourceDestCheck": true, 
-            "VpcId": "vpc-fcaa6085", 
+            "AvailabilityZone": "us-east-1c", 
             "Description": "", 
-            "NetworkInterfaceId": "eni-d3b3abdd", 
+            "NetworkInterfaceId": "eni-fe20dfe9", 
             "PrivateIpAddresses": [
                 {
                     "Primary": true, 
-                    "PrivateIpAddress": "10.4.9.112"
+                    "PrivateIpAddress": "10.4.9.159"
                 }
             ], 
             "RequesterManaged": false, 
+            "SubnetId": "subnet-5a24303f", 
+            "VpcId": "vpc-6c63dd15", 
+            "RequesterId": "AIDAIYEUEZZQWE5TZHHAE", 
             "Groups": [
                 {
                     "GroupName": "db-tier", 
-                    "GroupId": "sg-09053177"
+                    "GroupId": "sg-37278946"
                 }, 
                 {
                     "GroupName": "web-tier", 
-                    "GroupId": "sg-a81a2ed6"
+                    "GroupId": "sg-c253fdb3"
                 }
             ], 
             "Ipv6Addresses": [], 
-            "AvailabilityZone": "us-east-1e", 
-            "RequesterId": "AIDAJEZOTH6YPO3DY45QW", 
-            "SubnetId": "subnet-ff7f5bc3", 
             "OwnerId": "644160558196", 
             "TagSet": [], 
-            "PrivateIpAddress": "10.4.9.112"
+            "PrivateIpAddress": "10.4.9.159"
         }
     }
 }

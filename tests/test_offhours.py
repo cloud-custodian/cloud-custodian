@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -388,6 +388,18 @@ class OffHoursFilterTest(BaseTest):
                                 'Value': 'off=(m-f,20);on=(m-f,9);tz=et'}])]:
                 results.append(OnHour({})(i))
             self.assertEqual(results, [True, False])
+
+    def test_arizona_tz(self):
+        t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
+        t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'off=(m-f,19);on=(m-f,7);tz=at'}])
+            self.assertEqual(OnHour({})(i), True)
+
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'off=(m-f,20);on=(m-f,6);tz=ast'}])
+            self.assertEqual(OnHour({})(i), False)
 
     def test_custom_bad_tz(self):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
