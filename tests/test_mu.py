@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import imp
 import json
@@ -27,16 +29,16 @@ import zipfile
 
 from c7n.mu import (
     custodian_archive, LambdaManager, PolicyLambda, PythonPackageArchive,
-    CloudWatchLogSubscription, SNSSubscription, RUNTIME)
+    CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from common import BaseTest, Config, event_data
-from data import helloworld
+from .common import BaseTest, Config, event_data
+from .data import helloworld
 
 
 class PolicyLambdaProvision(BaseTest):
 
-    role = "arn:aws:iam::619193117841:role/lambda_basic_execution"
+    role = "arn:aws:iam::644160558196:role/custodian-mu"
 
     def assert_items(self, result, expected):
         for k, v in expected.items():
@@ -193,8 +195,8 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        start = 0L
-        end = long(time.time() * 1000)
+        start = 0
+        end = time.time() * 1000
         self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
@@ -213,6 +215,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
         result = mgr.publish(pl, 'Dev', role=self.role)
 
         events = pl.get_events(session_factory)
@@ -230,9 +233,8 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-s3-bucket-policy',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
-        mgr.remove(pl)
 
     def test_mu_metrics(self):
         session_factory = self.replay_flight_data('test_mu_metrics')
@@ -266,22 +268,23 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
             {'Description': 'cloud-custodian lambda policy',
-             'FunctionName': 'c7n-ec2-encrypted-vol',
-             'Handler': 'c7n_policy.run',
+             'FunctionName': 'custodian-ec2-encrypted-vol',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-ec2-encrypted-vol")
+        result = events.list_rules(NamePrefix="custodian-ec2-encrypted-vol")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "c7n-ec2-encrypted-vol"})
+             "Name": "custodian-ec2-encrypted-vol"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
@@ -289,7 +292,6 @@ class PolicyLambdaProvision(BaseTest):
              "detail": {
                  "state": ["pending"]},
              "detail-type": ["EC2 Instance State-change Notification"]})
-        mgr.remove(pl)
 
     def test_cwe_asg_instance(self):
         session_factory = self.replay_flight_data('test_cwe_asg', zdata=True)
@@ -302,27 +304,27 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'c7n-asg-spin-detector',
-             'Handler': 'c7n_policy.run',
+            {'FunctionName': 'custodian-asg-spin-detector',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-asg-spin-detector")
+        result = events.list_rules(NamePrefix="custodian-asg-spin-detector")
         self.assert_items(
             result['Rules'][0],
             {"State": "ENABLED",
-             "Name": "c7n-asg-spin-detector"})
+             "Name": "custodian-asg-spin-detector"})
 
         self.assertEqual(
             json.loads(result['Rules'][0]['EventPattern']),
             {"source": ["aws.autoscaling"],
              "detail-type": ["EC2 Instance Launch Unsuccessful"]})
-        mgr.remove(pl)
 
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data(
@@ -338,24 +340,134 @@ class PolicyLambdaProvision(BaseTest):
 
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
         result = mgr.publish(pl, 'Dev', role=self.role)
         self.assert_items(
             result,
-            {'FunctionName': 'c7n-periodic-ec2-checker',
-             'Handler': 'c7n_policy.run',
+            {'FunctionName': 'custodian-periodic-ec2-checker',
+             'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
-        result = events.list_rules(NamePrefix="c7n-periodic-ec2-checker")
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
         self.assert_items(
             result['Rules'][0],
             {
                 "State": "ENABLED",
                 "ScheduleExpression": "rate(1 day)",
-                "Name": "c7n-periodic-ec2-checker"})
-        mgr.remove(pl)
+                "Name": "custodian-periodic-ec2-checker"})
+
+    key_arn = 'arn:aws:kms:us-west-2:644160558196:key/'\
+        '44d25a5c-7efa-44ed-8436-b9511ea921b3'
+    sns_arn = 'arn:aws:sns:us-west-2:644160558196:config-topic'
+
+    def create_a_lambda(self, flight, **extra):
+        session_factory = self.replay_flight_data(flight, zdata=True)
+        mode = {
+            'type': 'config-rule',
+            'role':'arn:aws:iam::644160558196:role/custodian-mu'}
+        mode.update(extra)
+        p = Policy({
+            'resource': 's3',
+            'name': 'hello-world',
+            'actions': ['no-op'],
+            'mode': mode,
+        }, Config.empty())
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        return mgr, mgr.publish(pl)
+
+    def create_a_lambda_with_lots_of_config(self, flight):
+        extra = {
+            'environment': {'Variables': {'FOO': 'bar'}},
+            'kms_key_arn': self.key_arn,
+            'dead_letter_config': {'TargetArn': self.sns_arn},
+            'tracing_config': {'Mode': 'Active'},
+            'tags': {'Foo': 'Bar'}}
+        return self.create_a_lambda(flight, **extra)
+
+    def update_a_lambda(self, mgr, **config):
+        mode = {
+            'type': 'config-rule',
+            'role':'arn:aws:iam::644160558196:role/custodian-mu'}
+        mode.update(config)
+        p = Policy({
+            'resource': 's3',
+            'name': 'hello-world',
+            'actions': ['no-op'],
+            'mode': mode
+        }, Config.empty())
+        pl = PolicyLambda(p)
+        return mgr.publish(pl)
+
+    def test_config_coverage_for_lambda_creation(self):
+        mgr, result = self.create_a_lambda_with_lots_of_config(
+            'test_config_coverage_for_lambda_creation')
+        self.assert_items(
+            result,
+            {'Description': 'cloud-custodian lambda policy',
+             'FunctionName': 'custodian-hello-world',
+             'Handler': 'custodian_policy.run',
+             'MemorySize': 512,
+             'Runtime': 'python2.7',
+             'Timeout': 60,
+             'DeadLetterConfig': {'TargetArn': self.sns_arn},
+             'Environment': {'Variables': {'FOO': 'bar'}},
+             'KMSKeyArn': self.key_arn,
+             'TracingConfig': {'Mode': 'Active'}})
+        tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
+        self.assert_items(tags, {'Foo': 'Bar'})
+
+    def test_config_coverage_for_lambda_update_from_plain(self):
+        mgr, result = self.create_a_lambda(
+            'test_config_coverage_for_lambda_update_from_plain')
+        result = self.update_a_lambda(mgr, **{
+            'environment': {'Variables': {'FOO': 'bloo'}},
+            'kms_key_arn': self.key_arn,
+            'dead_letter_config': {'TargetArn': self.sns_arn},
+            'tracing_config': {'Mode': 'Active'},
+            'tags': {'Foo': 'Bloo'}})
+
+        self.assert_items(
+            result,
+            {'Description': 'cloud-custodian lambda policy',
+             'FunctionName': 'custodian-hello-world',
+             'Handler': 'custodian_policy.run',
+             'MemorySize': 512,
+             'Runtime': 'python2.7',
+             'Timeout': 60,
+             'DeadLetterConfig': {'TargetArn': self.sns_arn},
+             'Environment': {'Variables': {'FOO': 'bloo'}},
+             'TracingConfig': {'Mode': 'Active'}})
+        tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
+        self.assert_items(tags, {'Foo': 'Bloo'})
+
+    def test_config_coverage_for_lambda_update_from_complex(self):
+        mgr, result = self.create_a_lambda_with_lots_of_config(
+            'test_config_coverage_for_lambda_update_from_complex')
+        result = self.update_a_lambda(mgr, **{
+            'environment': {'Variables': {'FOO': 'baz'}},
+            'kms_key_arn': '',
+            'dead_letter_config': {},
+            'tracing_config': {},
+            'tags': {'Foo': 'Baz', 'Bah': 'Bug'}})
+
+        self.assert_items(
+            result,
+            {'Description': 'cloud-custodian lambda policy',
+             'FunctionName': 'custodian-hello-world',
+             'Handler': 'custodian_policy.run',
+             'MemorySize': 512,
+             'Runtime': 'python2.7',
+             'Timeout': 60,
+             'DeadLetterConfig': {'TargetArn': self.sns_arn},
+             'Environment': {'Variables': {'FOO': 'baz'}},
+             'TracingConfig': {'Mode': 'Active'}})
+        tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
+        self.assert_items(tags, {'Foo': 'Baz', 'Bah': 'Bug'})
 
 
 class PythonArchiveTest(unittest.TestCase):
@@ -390,8 +502,6 @@ class PythonArchiveTest(unittest.TestCase):
 
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')
-        self.assertTrue('ctypes/__init__.py' in filenames)
-        self.assertTrue('ctypes/macholib/__init__.py' in filenames)
         self.assertTrue('README.ctypes' not in filenames)
 
     def test_cant_get_bytes_when_open(self):
@@ -427,7 +537,7 @@ class PythonArchiveTest(unittest.TestCase):
         archive.close()
         self.assertTrue('cheese.txt' in archive.get_filenames())
         with archive.get_reader() as reader:
-            self.assertEqual('So yummy!', reader.read('cheese.txt'))
+            self.assertEqual(b'So yummy!', reader.read('cheese.txt'))
 
     def test_custodian_archive_creates_a_custodian_archive(self):
         archive = custodian_archive()
@@ -446,15 +556,13 @@ class PythonArchiveTest(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(bench))
         return path
 
-    def check_readable(self, archive):
-        readable = 0o444 << 16L
-        with open(archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            for i in reader.infolist():
-                self.assertGreaterEqual(i.external_attr, readable)
+    def check_world_readable(self, archive):
+        world_readable = 0o004 << 16
+        for info in zipfile.ZipFile(archive.path).filelist:
+            self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_readable(self.make_archive('c7n'))
+        self.check_world_readable(self.make_archive('c7n'))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -462,14 +570,14 @@ class PythonArchiveTest(unittest.TestCase):
         archive = self.make_open_archive()
         archive.add_file(path)
         archive.close()
-        self.check_readable(archive)
+        self.check_world_readable(archive)
 
     def test_unless_you_make_your_own_zipinfo(self):
         info = zipfile.ZipInfo(self.make_file())
         archive = self.make_open_archive()
         archive.add_contents(info, 'foo.txt')
         archive.close()
-        self.assertRaises(AssertionError, self.check_readable, archive)
+        self.assertRaises(AssertionError, self.check_world_readable, archive)
 
 
 class PycCase(unittest.TestCase):
@@ -507,9 +615,13 @@ class Constructor(PycCase):
             # ... and while *.pyc is importable ...
             self.assertTrue(get('bar'), 'bar.pyc')
         except ImportError:
-            # (except on PyPy)
-            # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
-            self.assertEqual(platform.python_implementation(), 'PyPy')
+            try:
+                # (except on PyPy)
+                # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
+                self.assertEqual(platform.python_implementation(), 'PyPy')
+            except AssertionError:
+                # (... aaaaaand Python 3)
+                self.assertEqual(platform.python_version_tuple()[0], '3')
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
@@ -523,7 +635,7 @@ class Constructor(PycCase):
         archive.close()
         self.assertEqual(archive.get_filenames(), ['foo.py'])
         with archive.get_reader() as reader:
-            self.assertEqual('42', reader.read('foo.py'))
+            self.assertEqual(b'42', reader.read('foo.py'))
 
 
 class AddPyFile(PycCase):
@@ -546,3 +658,20 @@ class AddPyFile(PycCase):
         py = self.py_with_pyc('foo.py')
         os.unlink(py)
         self.assertRaises(IOError, archive.add_py_file, py+'c')
+
+
+class DiffTags(unittest.TestCase):
+
+    def test_empty(self):
+        assert LambdaManager.diff_tags({}, {}) == ({}, [])
+
+    def test_removal(self):
+        assert LambdaManager.diff_tags({'Foo': 'Bar'}, {}) == ({}, ['Foo'])
+
+    def test_addition(self):
+        assert LambdaManager.diff_tags(
+            {}, {'Foo': 'Bar'}) == ({'Foo': 'Bar'}, [])
+
+    def test_update(self):
+        assert LambdaManager.diff_tags(
+            {'Foo': 'Bar'}, {'Foo': 'Baz'}) == ({'Foo': 'Baz'}, [])

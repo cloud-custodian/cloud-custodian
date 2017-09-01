@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """A cloudwatch log subscriber that records error messages into getsentry.com
 
 Features
@@ -52,6 +51,7 @@ OrgMode
    to sentry projects
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
 import base64
@@ -61,7 +61,6 @@ import json
 import logging
 import os
 import time
-import urlparse
 import uuid
 import zlib
 
@@ -71,6 +70,7 @@ from botocore.exceptions import ClientError
 from botocore.vendored import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
+from six.moves.urllib.parse import urlparse
 
 sqs = logs = config = None
 
@@ -169,7 +169,7 @@ def process_log_group(config):
 
 def send_sentry_message(sentry_dsn, msg):
     # reversed from raven.base along with raven docs
-    parsed = urlparse.urlparse(sentry_dsn)
+    parsed = urlparse(sentry_dsn)
     key, secret = parsed.netloc.split('@')[0].split(':')
     project_id = parsed.path.strip('/')
     msg['project'] = project_id
@@ -283,7 +283,7 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
     """
 
     data = {}
-    lines = filter(None, msg.split('\n'))
+    lines = list(filter(None, msg.split('\n')))
     data['frames'] = []
     err_ctx = None
 
@@ -360,7 +360,7 @@ def get_function(session_factory, name, handler, role,
 
 
 def orgreplay(options):
-    from common import Bag, get_accounts
+    from .common import Bag, get_accounts
     accounts = get_accounts(options)
 
     auth_headers = {'Authorization': 'Bearer %s' % options.sentry_token}
@@ -368,7 +368,7 @@ def orgreplay(options):
     sget = partial(requests.get, headers=auth_headers)
     spost = partial(requests.post, headers=auth_headers)
 
-    dsn = urlparse.urlparse(options.sentry_dsn)
+    dsn = urlparse(options.sentry_dsn)
     endpoint = "%s://%s/api/0/" % (
         dsn.scheme,
         "@" in dsn.netloc and dsn.netloc.rsplit('@', 1)[1] or dsn.netloc)
@@ -440,7 +440,7 @@ def orgreplay(options):
 
 
 def deploy(options):
-    from common import get_accounts
+    from .common import get_accounts
     for account in get_accounts(options):
         for region_name in options.regions:
             for fname, config in account['config_files'].items():
@@ -475,7 +475,7 @@ def deploy_one(region_name, account, policy, sentry_dsn):
 
 
 def setup_parser():
-    from common import setup_parser as common_parser
+    from .common import setup_parser as common_parser
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', default=False, action="store_true")
@@ -521,7 +521,7 @@ if __name__ == '__main__':
 
     try:
         main()
-    except SystemExit, KeyboardInterrupt:
+    except (SystemExit, KeyboardInterrupt):
         raise
     except:
         import traceback, sys, pdb

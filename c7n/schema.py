@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import Counter
 import json
 import logging
@@ -67,10 +69,10 @@ def validate(data, schema=None):
         logging.exception(
             "specific_error failed, traceback, followed by fallback")
 
-    return filter(None, [
+    return list(filter(None, [
         errors[0],
         best_match(validator.iter_errors(data)),
-    ])
+    ]))
 
 
 def specific_error(error):
@@ -150,7 +152,7 @@ def generate(resource_types=()):
             'properties': {
                 'name': {
                     'type': 'string',
-                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]*[A-z][A-z0-9]*)*$"},
+                    'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
                 'region': {'type': 'string'},
                 'resource': {'type': 'string'},
                 'max-resources': {'type': 'integer'},
@@ -250,7 +252,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word action shortcuts
     action_refs.append(
-        {'enum': resource_type.action_registry.keys()})
+        {'enum': list(resource_type.action_registry.keys())})
 
     nested_filter_refs = []
     filters_seen = set()
@@ -293,7 +295,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word filter shortcuts
     filter_refs.append(
-        {'enum': resource_type.filter_registry.keys()})
+        {'enum': list(resource_type.filter_registry.keys())})
 
     resource_policy = {
         'allOf': [
@@ -340,7 +342,7 @@ def resource_vocabulary():
 
 
 def summary(vocabulary):
-    print "resource count: %d" % len(vocabulary)
+    print("resource count: %d" % len(vocabulary))
     action_count = filter_count = 0
 
     common_actions = set(['notify', 'invoke-lambda'])
@@ -351,12 +353,16 @@ def summary(vocabulary):
             set(rv.get('actions', ())).difference(common_actions))
         filter_count += len(
             set(rv.get('filters', ())).difference(common_filters))
-    print "unique actions: %d" % action_count
-    print "common actions: %d" % len(common_actions)
-    print "unique filters: %d" % filter_count
-    print "common filters: %s" % len(common_filters)
+    print("unique actions: %d" % action_count)
+    print("common actions: %d" % len(common_actions))
+    print("unique filters: %d" % filter_count)
+    print("common filters: %s" % len(common_filters))
 
 
 def json_dump(resource=None):
     load_resources()
     print(json.dumps(generate(resource), indent=2))
+
+
+if __name__ == '__main__':
+    json_dump()

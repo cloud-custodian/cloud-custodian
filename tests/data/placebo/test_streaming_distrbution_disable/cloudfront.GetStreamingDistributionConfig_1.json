@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "E38AUG67ZAJC5T", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7c3b59c5-587d-11e7-a2d0-c7d9d46d8e4d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7c3b59c5-587d-11e7-a2d0-c7d9d46d8e4d", 
+                "date": "Sat, 24 Jun 2017 01:36:03 GMT", 
+                "content-length": "584", 
+                "etag": "E38AUG67ZAJC5T", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "StreamingDistributionConfig": {
+            "S3Origin": {
+                "OriginAccessIdentity": "", 
+                "DomainName": "rando20170506.s3.amazonaws.com"
+            }, 
+            "Comment": "", 
+            "Logging": {
+                "Bucket": "", 
+                "Prefix": "", 
+                "Enabled": false
+            }, 
+            "PriceClass": "PriceClass_All", 
+            "Enabled": true, 
+            "TrustedSigners": {
+                "Enabled": false, 
+                "Quantity": 0
+            }, 
+            "CallerReference": "1498268099518", 
+            "Aliases": {
+                "Quantity": 0
+            }
+        }
+    }
+}

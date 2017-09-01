@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "py7c/m4BfDxoVWz9H8r2wcA3nhWnb834KCslpMUAneVAXtVTPA9UcwNp98YApq2Y0m0yGEj8+PA=", 
-            "RequestId": "B953F07BB1AADBDE", 
+            "HostId": "o+0AVG4SpqMzuRhV9cmRTVISInPbgIXjqx4YM98VLvF77K6tawVOpjhzBdzD78D7f2WBYq580qI=", 
+            "RequestId": "B0699AD16599D852", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "py7c/m4BfDxoVWz9H8r2wcA3nhWnb834KCslpMUAneVAXtVTPA9UcwNp98YApq2Y0m0yGEj8+PA=", 
+                "x-amz-id-2": "o+0AVG4SpqMzuRhV9cmRTVISInPbgIXjqx4YM98VLvF77K6tawVOpjhzBdzD78D7f2WBYq580qI=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "B953F07BB1AADBDE", 
+                "x-amz-request-id": "B0699AD16599D852", 
                 "location": "/custodian-encrypt-test", 
-                "date": "Sun, 19 Feb 2017 02:16:37 GMT"
+                "date": "Mon, 29 May 2017 00:35:02 GMT"
             }
         }
     }

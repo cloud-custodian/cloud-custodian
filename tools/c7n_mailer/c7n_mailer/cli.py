@@ -1,12 +1,14 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import argparse
 import boto3
 import functools
-
 import jsonschema
+import logging
 import yaml
 
 from c7n_mailer import deploy, utils
-
+from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 
 CONFIG_SCHEMA = {
     'type': 'object',
@@ -24,62 +26,116 @@ CONFIG_SCHEMA = {
         'timeout': {'type': 'integer'},
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
         'security_groups': {'type': 'array', 'items': {'type': 'string'}},
+        'dead_letter_config': {'type': 'object'},
 
         # Mailer Infrastructure Config
-        'cache': {'type': 'string'},
+        'cache_engine': {'type': 'string'},
         'smtp_server': {'type': 'string'},
         'smtp_port': {'type': 'integer'},
         'smtp_ssl': {'type': 'boolean'},
         'smtp_username': {'type': 'string'},
         'smtp_password': {'type': 'string'},
+        'ldap_email_key': {'type': 'string'},
+        'ldap_uid_tags': {'type': 'array', 'items': {'type': 'string'}},
+        'debug': {'type': 'boolean'},
+        'ldap_uid_regex': {'type': 'string'},
         'ldap_uri': {'type': 'string'},
         'ldap_bind_dn': {'type': 'string'},
         'ldap_bind_user': {'type': 'string'},
+        'ldap_uid_attribute': {'type': 'string'},
+        'ldap_manager_attribute': {'type': 'string'},
+        'ldap_email_attribute': {'type': 'string'},
+        'ldap_bind_password_in_kms': {'type': 'boolean'},
         'ldap_bind_password': {'type': 'string'},
         'cross_accounts': {'type': 'object'},
         'ses_region': {'type': 'string'},
+        'redis_host': {'type': 'string'},
+        'redis_port': {'type': 'integer'},
 
         # SDK Config
         'profile': {'type': 'string'},
         'http_proxy': {'type': 'string'},
-        'https_proxy': {'type': 'string'},
+        'https_proxy': {'type': 'string'}
     }
 }
 
 
-def setup_parser():
+def session_factory(mailer_config):
+    return boto3.Session(
+        region_name=mailer_config['region'],
+        profile_name=mailer_config.get('profile', None))
+
+
+def get_logger(debug=False):
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_format)
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    if debug:
+        logging.getLogger('botocore').setLevel(logging.DEBUG)
+        debug_logger = logging.getLogger('custodian-mailer')
+        debug_logger.setLevel(logging.DEBUG)
+        return debug_logger
+    else:
+        return logging.getLogger('custodian-mailer')
+
+
+def get_and_validate_mailer_config(args):
+    with open(args.config) as fh:
+        config = yaml.load(fh.read(), Loader=yaml.SafeLoader)
+    jsonschema.validate(config, CONFIG_SCHEMA)
+    utils.setup_defaults(config)
+    return config
+
+
+def get_c7n_mailer_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', required=True)
+    parser.add_argument('-c', '--config', required=True, help='mailer.yml config file')
+    debug_help_msg = 'sets c7n_mailer logger to debug, for maximum output (the default is INFO)'
+    parser.add_argument('--debug', action='store_true', help=debug_help_msg)
+    max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
+    parser.add_argument('--max-num-processes', help=max_num_processes_help_msg)
+    group = parser.add_mutually_exclusive_group(required=True)
+    update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
+    group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
+    run_help_msg = 'run c7n-mailer locally, process sqs messages and send emails or sns messages'
+    group.add_argument('--run', action='store_true', help=run_help_msg)
     return parser
 
 
-def session_factory(config):
-    return boto3.Session(
-        region_name=config['region'],
-        profile_name=config.get('profile'))
+def run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes):
+    try:
+        max_num_processes = int(max_num_processes)
+        if max_num_processes < 1:
+            raise Exception
+    except:
+        print('--max-num-processes must be an integer')
+        return
+    sqs_queue_processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+    sqs_queue_processor.max_num_processes = max_num_processes
+    sqs_queue_processor.run(parallel=True)
 
 
 def main():
-    parser = setup_parser()
-    options = parser.parse_args()
-
-    import logging
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.DEBUG, format=log_format)
-    logging.getLogger('botocore').setLevel(logging.WARNING)
-
-    with open(options.config) as fh:
-        config = yaml.load(fh.read(), Loader=yaml.SafeLoader)
-
-    jsonschema.validate(config, CONFIG_SCHEMA)
-    utils.setup_defaults(config)
-
-    try:
-        deploy.provision(config, functools.partial(session_factory, config))
-    except Exception:
-        import traceback, pdb, sys
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
+    parser = get_c7n_mailer_parser()
+    args = parser.parse_args()
+    mailer_config = get_and_validate_mailer_config(args)
+    aws_session = session_factory(mailer_config)
+    args_dict = vars(args)
+    logger = get_logger(debug=args_dict.get('debug', False))
+    if args_dict.get('update_lambda'):
+        if args_dict.get('debug'):
+            print('\n** --debug is only supported with --run, not --update-lambda **\n')
+            return
+        if args_dict.get('max_num_processes'):
+            print('\n** --max-num-processes is only supported with --run, not --update-lambda **\n')
+            return
+        deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+    if args_dict.get('run'):
+        max_num_processes = args_dict.get('max_num_processes')
+        if max_num_processes:
+            run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes)
+        else:
+            MailerSqsQueueProcessor(mailer_config, aws_session, logger).run()
 
 
 if __name__ == '__main__':

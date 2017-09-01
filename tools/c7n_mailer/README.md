@@ -24,10 +24,11 @@ and run a policy that triggers an email to your inbox.
 1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 1. Make sure your email address is verified in SES, and set it as
-   `from_address` in `mailer.yml`. By default SES is in sandbox mode where
-   you must verify every individual receipient of emails. If need be, make
-   an AWS support ticket to be taken out of SES sandbox mode.
-   AWS SES Docs: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html
+   `from_address` in `mailer.yml`. By default SES is in sandbox mode where you
+must
+[verify](http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html)
+every individual recipient of emails. If need be, make an AWS support ticket to
+be taken out of SES sandbox mode.
 
 Your `mailer.yml` should now look something like this:
 
@@ -40,7 +41,8 @@ from_address: you@example.com
 (Also set `region` if you are in a region other than `us-east-1`.)
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
-`test-policy.yml` file with this content:
+`test-policy.yml` file with this content (update `to` and `queue` to match your
+environment):
 
 ```yaml
 policies:
@@ -51,7 +53,7 @@ policies:
     actions:
       - type: notify
         template: default
-        priority_header: 2
+        priority_header: '2'
         subject: testing the c7n mailer
         to:
           - you@example.com
@@ -63,7 +65,7 @@ policies:
 Now run:
 
 ```
-c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 ```
 
 You should see output similar to the following:
@@ -129,15 +131,20 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Mailer Infrastructure Config
 
-| Required? | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `cache`              | string           | memcached for caching ldap lookups  |
-|           | `cross_accounts`     | object           | account to assume back into for sending to SNS topics |
-|           | `ldap_bind_dn`       | string           | ldap server for resolving users     |
-|           | `ldap_bind_user`     | string           | ldap server for resolving users     |
-|           | `ldap_bind_password` | string           | ldap server for resolving users     |
-|           | `ldap_uri`           | string           | ldap server for resolving users     |
-|           | `ses_region`         | string           | AWS region that handles SES API calls |
+| Required? | Key                        | Type             | Notes                               |
+|:---------:|:---------------------------|:-----------------|:------------------------------------|
+|           | `cache`                    | string           | memcached for caching ldap lookups  |
+|           | `cross_accounts`           | object           | account to assume back into for sending to SNS topics |
+|           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
+|           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
+|           | `ldap_bind_password`       | string           | ldap bind password     |
+|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
+|           | `ldap_email_key`     | string           | eg 'mail'     |
+|           | `ldap_manager_attribute`   | string           | eg 'manager'    |
+|           | `ldap_username_attribute`  | string           | eg 'sAMAccountName'     |
+|           | `ldap_bind_password_in_kms`| boolean           | defaults to true, most people (except capone want to se this to false)     |
+|           | `ses_region`               | string           | AWS region that handles SES API calls |
+
 
 #### SDK Config
 
@@ -162,7 +169,8 @@ policies:
     actions:
       - type: notify
         template: default
-        priority_header: 1
+        template_format: 'html'
+        priority_header: '1'
         subject: fix your tags
         to:
           - resource-owner
@@ -183,7 +191,7 @@ are either
   `OwnerContact` tag on the resource that matched the policy, or
 - `event-owner` for push-based/realtime policies that will send to the user
   that was responsible for the underlying event.
-- `priority_header` indicate the importannce of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an integer from 1 to 5.
+- `priority_header` to indicate the importance of an email with [headers](https://www.chilkatsoft.com/p/p_471.asp). Different emails clients will display stars, exclamation points or flags depending on the value. Should be an string from 1 to 5.
 
 Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
@@ -199,7 +207,7 @@ For reference purposes, the JSON Schema of the `notify` action:
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
-    "priority_header": {"type": "integer"},
+    "priority_header": {"type": "string"},
     "template": {"type": "string"},
     "transport": {
       "type": "object",
@@ -248,7 +256,8 @@ The following extra jinja filters are available:
 
 | filter | behavior |
 |:----------|:-----------|
-| `{{ utc_string|date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z') }}` | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+| <code>utc_string&#124;date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')</code> | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
+| <code>30&#124;get_date_time_delta</code> | Convert a time [delta](https://docs.python.org/2/library/datetime.html#datetime.timedelta) like '30' days in the future, to a datetime string. You can also use negative values for the past. |
 
 
 ## Developer Install (OS X El Capitan)
@@ -268,3 +277,21 @@ Install the extensions:
 ```
 python setup.py develop
 ```
+
+## Testing Templates and Recipients
+
+A ``c7n-mailer-replay`` entrypoint is provided to assist in testing email notifications
+and templates. This script operates on an actual SQS message from cloud-custodian itself,
+which you can either retrieve from the SQS queue or replicate locally. By default it expects
+the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS. With the
+``-p`` | ``--plain`` argument, it will expect the message file to contain plain JSON.
+
+``c7n-mailer-replay`` has three main modes of operation:
+
+* With no additional arguments, it will render the template specified by the policy the
+  message is for, and actually send mail from the local machine as ``c7n-mailer`` would.
+  This only works with SES, not SMTP.
+* With the ``-t`` | ``--template-print`` argument, it will log the email addresses that would
+  receive mail, and print the rendered message body template to STDOUT.
+* With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
+  that would be sent, for each message that would be sent, to STDOUT.

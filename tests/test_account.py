@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,15 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 from c7n.utils import local_session
+from c7n.filters import FilterValidationError
 
 
 TRAIL = 'nosetest'
 
 import datetime
 from dateutil import parser
-from test_offhours import mock_datetime_now
+from .test_offhours import mock_datetime_now
+from .common import Config
 
 
 class AccountTests(BaseTest):
@@ -161,7 +165,7 @@ class AccountTests(BaseTest):
                 'threshold': 0}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 50)
+        self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 10)
 
     def test_service_limit_specific_check(self):
         session_factory = self.replay_flight_data('test_account_service_limit')
@@ -183,18 +187,19 @@ class AccountTests(BaseTest):
         self.assertEqual(
             set([l['region'] for l
                  in resources[0]['c7n:ServiceLimitsExceeded']]),
-            set(['us-east-1', 'us-west-2', 'us-west-1']))
+            set(['us-east-1']))
         self.assertEqual(
             set([l['check'] for l
                  in resources[0]['c7n:ServiceLimitsExceeded']]),
             set(['DB security groups']))
-        self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 3)
+        self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 1)
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data('test_account_service_limit')
         p = self.load_policy({
             'name': 'service-limit',
             'resource': 'account',
+            'region': 'us-east-1',
             'filters': [{
                 'type': 'service-limit', 'services': ['IAM'], 'threshold': 1.0
             }]},
@@ -206,6 +211,15 @@ class AccountTests(BaseTest):
                  in resources[0]['c7n:ServiceLimitsExceeded']]),
             set(['IAM']))
         self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 2)
+
+    def test_service_limit_global_service(self):
+        policy = {
+            'name': 'service-limit',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit', 'services': ['IAM']
+            }]}
+        self.assertRaises(FilterValidationError, self.load_policy, policy)
 
     def test_service_limit_no_threshold(self):
         # only warns when the default threshold goes to warning or above
@@ -219,6 +233,38 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_account_virtual_mfa(self):
+        # only warns when the default threshold goes to warning or above
+        session_factory = self.replay_flight_data('test_account_virtual_mfa')
+        p1 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa'}]},
+            session_factory=session_factory)
+        resources = p1.run()
+        self.assertEqual(len(resources), 1)
+
+        p2 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa',
+                'value': True}]},
+            session_factory=session_factory)
+        resources = p2.run()
+        self.assertEqual(len(resources), 1)
+
+        p3 = self.load_policy({
+            'name': 'account-virtual-mfa',
+            'resource': 'account',
+            'filters': [{
+                'type': 'has-virtual-mfa',
+                'value': False}]},
+            session_factory=session_factory)
+        resources = p3.run()
+        self.assertEqual(len(resources), 0)
+
     def test_missing_password_policy(self):
         session_factory = self.replay_flight_data('test_account_missing_password_policy')
         p = self.load_policy({
@@ -229,7 +275,7 @@ class AccountTests(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_create_trail(self):
         factory = self.replay_flight_data('test_cloudtrail_create')
         p = self.load_policy(
@@ -245,6 +291,34 @@ class AccountTests(BaseTest):
                 ],
             },
             session_factory=factory,
+        )
+        p.run()
+        client = local_session(factory).client('cloudtrail')
+        resp = client.describe_trails(trailNameList=[TRAIL])
+        trails = resp['trailList']
+        arn = trails[0]['TrailARN']
+        status = client.get_trail_status(Name=arn)
+        self.assertTrue(status['IsLogging'])
+
+    def test_create_trail_bucket_exists_in_west(self):
+        config = Config.empty(account_id='644160558196', region='us-west-1')
+        factory = self.replay_flight_data('test_cloudtrail_create_bucket_exists_in_west')
+        p = self.load_policy(
+            {
+                'name': 'trail-test',
+                'resource': 'account',
+                'region': 'us-west-1',
+                'actions': [
+                    {
+                        'type': 'enable-cloudtrail',
+                        'trail': TRAIL,
+                        'bucket': '%s-bucket' % TRAIL,
+                        'bucket-region': 'us-west-1'
+                    },
+                ],
+            },
+            session_factory=factory,
+            config=config
         )
         p.run()
         client = local_session(factory).client('cloudtrail')
@@ -275,7 +349,7 @@ class AccountTests(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         # Validate that a case was created
         support = session_factory().client('support')
         cases = support.describe_cases()

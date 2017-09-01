@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
+import io
 import json
 import os.path
-from StringIO import StringIO
-import urllib2
-import urlparse
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import parse_qsl, urlparse
 
 import jmespath
 
@@ -33,20 +35,20 @@ class URIResolver(object):
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
-            fh = urllib2.urlopen(uri)
+            fh = urlopen(uri)
             contents = fh.read()
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def get_s3_uri(self, uri):
-        parsed = urlparse.urlparse(uri)
+        parsed = urlparse(uri)
         client = self.session_factory().client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
         if parsed.query:
-            params.update(dict(urlparse.parse_qsl(parsed.query)))
+            params.update(dict(parse_qsl(parsed.query)))
         result = client.get_object(**params)
         return result['Body'].read()
 
@@ -128,7 +130,7 @@ class ValuesFrom(object):
             if 'expr' in self.data:
                 return jmespath.search(self.data['expr'], data)
         elif format == 'csv' or format == 'csv2dict':
-            data = csv.reader(StringIO(contents))
+            data = csv.reader(io.BytesIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
             else:
@@ -139,4 +141,5 @@ class ValuesFrom(object):
                 return jmespath.search(self.data['expr'], data)
             return data
         elif format == 'txt':
-            return [s.strip() for s in StringIO(contents).readlines()]
+            return [s.strip().decode('utf8')
+                    for s in io.BytesIO(contents).readlines()]

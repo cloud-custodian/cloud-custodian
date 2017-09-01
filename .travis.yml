@@ -1,19 +1,16 @@
 language: python
+dist: trusty
 sudo: false
-cache: pip
-env:
-  # Region required, and Bypass credential lookup
-  - AWS_DEFAULT_REGION="us-east-1" AWS_ACCESS_KEY_ID="some" AWS_SECRET_ACCESS_KEY="thing" C7N_VALIDATE=yes
+cache:
+  directories:
+   - .tox
+
 python:
   - "2.7"
+  - "3.6"
 install:
-  - pip install -r requirements-dev.txt
-  - pip install --upgrade pytest pytest-xdist pytest-cov
-  - pip install --upgrade coveralls
-  - python setup.py develop
+  - pip install coveralls tox
 script:
-  - flake8
-  - make sphinx
-  - py.test -v -n auto --cov=c7n tests tools/c7n_*
+  - TOXENV=`tools/dev/citoxenv.py` tox
 after_success:
-  coveralls
+  - if [ "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then coveralls; fi

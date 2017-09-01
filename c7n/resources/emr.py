@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import time
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
+import time
+
+import six
 
 from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
@@ -48,11 +52,14 @@ class EMRCluster(QueryResourceManager):
 
     action_registry = actions
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'ClusterStates': [
+                    'running', 'bootstrapping', 'waiting']}]))
 
     @classmethod
     def get_permissions(cls):
@@ -135,12 +142,13 @@ class TagDelayedAction(TagDelayedAction):
 
     permission = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('tag')
@@ -164,11 +172,12 @@ class TagTable(Tag):
 
     permissions = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
 
 
 @actions.register('remove-tag')
@@ -259,11 +268,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EMR Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
@@ -279,7 +288,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

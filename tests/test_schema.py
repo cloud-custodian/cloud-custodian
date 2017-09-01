@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import mock
 from json import dumps
 from jsonschema.exceptions import best_match
 
 from c7n.manager import resources
 from c7n.schema import Validator, validate, generate, specific_error
-from common import BaseTest
+from .common import BaseTest
 
 
 class SchemaTest(BaseTest):
@@ -92,9 +94,9 @@ class SchemaTest(BaseTest):
                 error.absolute_schema_path))
 
         self.assertTrue(
-            "'skipped_devices': []" in error.message)
+            "u'skipped_devices': []" in error.message)
         self.assertTrue(
-            "'type': 'ebs'" in error.message)
+            "u'type': u'ebs'" in error.message)
 
     @mock.patch('c7n.schema.specific_error')
     def test_handle_specific_error_fail(self, mock_specific_error):
@@ -143,7 +145,7 @@ class SchemaTest(BaseTest):
         self.assertEqual(
             error.message,
             ("Additional properties are not allowed "
-             "('skipped_devices' was unexpected)"))
+             "(u'skipped_devices' was unexpected)"))
 
     def test_invalid_resource_type(self):
         data = {

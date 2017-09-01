@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,12 @@ References
 - IAM Policy Reference - http://goo.gl/U0a06y
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import fnmatch
 import json
+
+import six
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
@@ -44,12 +49,25 @@ class CrossAccountAccessFilter(Filter):
 
     schema = type_schema(
         'cross-account',
+        # only consider policies that grant one of the given actions.
+        actions={'type': 'array', 'items': {'type': 'string'}},
+        # only consider policies which grant to *
+        everyone_only={'type': 'boolean'},
+        # disregard statements using these conditions.
+        whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
+        # white list accounts
         whitelist_from=ValuesFrom.schema,
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
+    annotation_key = 'CrossAccountViolations'
 
     def process(self, resources, event=None):
+        self.everyone_only = self.data.get('everyone_only', False)
+        self.conditions = set(self.data.get(
+            'whitelist_conditions',
+            ("aws:sourcevpce", "aws:sourcevpc", "aws:userid", "aws:username")))
+        self.actions = self.data.get('actions', ())
         self.accounts = self.get_accounts()
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
@@ -69,9 +87,10 @@ class CrossAccountAccessFilter(Filter):
         p = self.get_resource_policy(r)
         if p is None:
             return False
-        violations = check_cross_account(p, self.accounts)
+        violations = check_cross_account(
+            p, self.accounts, self.everyone_only, self.conditions, self.actions)
         if violations:
-            r['CrossAccountViolations'] = violations
+            r[self.annotation_key] = violations
             return True
 
 
@@ -83,10 +102,11 @@ def _account(arn):
     return arn.split(':', 5)[4]
 
 
-def check_cross_account(policy_text, allowed_accounts):
+def check_cross_account(policy_text, allowed_accounts, everyone_only,
+                        conditions, check_actions):
     """Find cross account access policy grant not explicitly allowed
     """
-    if isinstance(policy_text, basestring):
+    if isinstance(policy_text, six.string_types):
         policy = json.loads(policy_text)
     else:
         policy = policy_text
@@ -98,6 +118,17 @@ def check_cross_account(policy_text, allowed_accounts):
 
         if s['Effect'] != 'Allow':
             continue
+
+        if check_actions:
+            actions = s.get('Action')
+            actions = isinstance(actions, six.string_types) and (actions,) or actions
+            found = False
+            for a in actions:
+                if fnmatch.filter(check_actions, a):
+                    found = True
+                    break
+            if not found:
+                continue
 
         # Highly suspect in an allow
         if 'NotPrincipal' in s:
@@ -117,12 +148,17 @@ def check_cross_account(policy_text, allowed_accounts):
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         # At this point principal is required?
-        p = (isinstance(s['Principal'], basestring) and s['Principal'] or s['Principal']['AWS'])
+        if isinstance(s['Principal'], six.string_types):
+            p = s['Principal']
+        else:
+            p = s['Principal']['AWS']
 
-        p = isinstance(p, basestring) and (p,) or p
+        p = isinstance(p, six.string_types) and (p,) or p
         for pid in p:
             if pid == '*':
                 principal_ok = False
+            elif everyone_only:
+                continue
             elif pid.startswith('arn:aws:iam::cloudfront:user'):
                 continue
             else:
@@ -136,6 +172,8 @@ def check_cross_account(policy_text, allowed_accounts):
         if 'Condition' not in s:
             violations.append(s)
             continue
+
+        whitelist_conditions = conditions
 
         if 'StringEquals' in s['Condition']:
             # Default SNS Policy does this
@@ -160,19 +198,19 @@ def check_cross_account(policy_text, allowed_accounts):
         # accounts.
 
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition']['StringEquals'].keys()[0] in (
-                    "aws:sourceVpce", "aws:sourceVpce"):
+            if list(s['Condition']['StringEquals'].keys())[0].lower() in whitelist_conditions:
                 principal_ok = True
 
         if 'StringLike' in s['Condition']:
             # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition'][
-                    'StringLike'].keys()[0].lower() == "aws:sourcevpce":
+            if list(s['Condition'][
+                    'StringLike'].keys())[0].lower() in whitelist_conditions:
                 principal_ok = True
 
         if 'ForAnyValue:StringLike' in s['Condition']:
-            if s['Condition']['ForAnyValue:StringLike'].keys()[
-                    0].lower() == 'aws:sourcevpce':
+            if list(
+                s['Condition'][
+                    'ForAnyValue:StringLike'].keys())[0].lower() in whitelist_conditions:
                 principal_ok = True
 
         if 'IpAddress' in s['Condition']:
@@ -193,7 +231,7 @@ def check_cross_account(policy_text, allowed_accounts):
             if v is None:
                 violations.append(s)
             else:
-                v = isinstance(v, basestring) and (v,) or v
+                v = isinstance(v, six.string_types) and (v,) or v
                 for arn in v:
                     aid = _account(arn)
                     if aid not in allowed_accounts:
@@ -204,7 +242,7 @@ def check_cross_account(policy_text, allowed_accounts):
                 v = s['Condition']['ArnLike'].get(k)
                 if v:
                     break
-            v = isinstance(v, basestring) and (v,) or v
+            v = isinstance(v, six.string_types) and (v,) or v
             principal_ok = True
             for arn in v:
                 aid = _account(arn)

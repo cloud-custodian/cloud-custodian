@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import logging
 from c7n.credentials import SessionFactory
 from c7n.policy import load as policy_load
 from c7n import mu, resources
+
+from botocore.exceptions import ClientError
 
 log = logging.getLogger('resources')
 
@@ -54,7 +56,19 @@ def resources_gc_prefix(options, policy_collection):
 
     for n in remove:
         events = []
-        result = client.get_policy(FunctionName=n['FunctionName'])
+        try:
+            result = client.get_policy(FunctionName=n['FunctionName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                log.warn("Lambda Function or Access Policy Statement missing: {}".
+                    format(n['FunctionName']))
+            else:
+                log.warn("Unexpected error: {} for function {}".
+                    format(e, n['FunctionName']))
+
+            # Continue on with next function instead of raising an exception
+            continue
+
         if 'Policy' not in result:
             pass
         else:
@@ -112,6 +126,7 @@ def main():
     options = parser.parse_args()
     options.policy_filter = None
     options.log_group = None
+    options.external_id = None
     options.cache_period = 0
     options.cache = None
     log_level = logging.INFO

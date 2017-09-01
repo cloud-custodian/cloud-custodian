@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 import json
 import shutil
@@ -20,7 +22,7 @@ from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 
-from common import BaseTest, Config, Bag
+from .common import BaseTest, Config, Bag
 
 
 class DummyResource(manager.ResourceManager):
@@ -85,6 +87,28 @@ class PolicyPermissions(BaseTest):
                  'ec2:DescribeTags',
                  'cloudwatch:GetMetricStatistics')))
 
+    def xtest_resource_filter_name(self):
+        # resources without a filter name won't play nice in
+        # lambda policies
+        missing = []
+        marker = object
+        for k, v in manager.resources.items():
+            if getattr(v.resource_type, 'filter_name', marker) is marker:
+                missing.append(k)
+        if missing:
+            self.fail("Missing filter name %s" % (', '.join(missing)))
+
+    def test_resource_augment_universal_mask(self):
+        # universal tag had a potential bad patterm of masking
+        # resource augmentation, scan resources to ensure
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'universal_taggable', None):
+                continue
+            if v.augment.__name__ == 'universal_augment' and getattr(
+                    v.resource_type, 'detail_spec', None):
+                self.fail(
+                    "%s resource has universal augment masking resource augment" % k)
+
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')
         missing = []
@@ -126,16 +150,67 @@ class PolicyPermissions(BaseTest):
                          'capacity-delta', 'is-ssl', 'global-grants',
                          'missing-policy-statement', 'missing-statement',
                          'healthcheck-protocol-mismatch', 'image-age',
-                         'has-statement',
+                         'has-statement', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
+                qk = "%s.filters.%s" % (k, n)
+                if qk in ('route-table.filters.route',):
+                    continue
                 if not perms:
-                    missing.append("%s.filters.%s" % (
-                        k, n))
+                    missing.append(qk)
+
         if missing:
             self.fail("Missing permissions %d on \n\t%s" % (
                 len(missing),
                 "\n\t".join(sorted(missing))))
+
+
+class TestPolicyCollection(BaseTest):
+
+    def test_expand_partitions(self):
+        cfg = Config.empty(
+            regions=['us-gov-west-1', 'cn-north-1', 'us-west-2'])
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'ec2'}]},
+            cfg)
+        collection = original.expand_regions(cfg.regions)
+        self.assertEqual(
+            sorted([p.options.region for p in collection]),
+            ['cn-north-1', 'us-gov-west-1', 'us-west-2'])
+
+    def test_policy_account_expand(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 'account'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection), 1)
+
+    def test_policy_region_expand_global(self):
+        original = policy.PolicyCollection.from_data(
+            {'policies': [
+                {'name': 'foo',
+                 'resource': 's3'},
+                {'name': 'iam',
+                 'resource': 'iam-user'}]},
+            Config.empty(regions=['us-east-1', 'us-west-2']))
+
+        collection = original.expand_regions(['all'])
+        self.assertEqual(len(collection.resource_types), 2)
+        self.assertEqual(len(collection), 15)        
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'us-east-1')
+
+        collection = original.expand_regions(['eu-west-1', 'eu-west-2'])
+        iam = [p for p in collection if p.resource_type == 'iam-user']
+        self.assertEqual(len(iam), 1)
+        self.assertEqual(iam[0].options.region, 'eu-west-1')
+        self.assertEqual(len(collection), 3)
 
 
 class TestPolicy(BaseTest):
@@ -168,9 +243,9 @@ class TestPolicy(BaseTest):
         policy.validate()
         self.assertEqual(policy.tags, ['abc'])
         self.assertFalse(policy.is_lambda)
-        self.assertEqual(
-            repr(policy),
-            "<Policy resource: ec2 name: ec2-utilization>")
+        self.assertTrue(
+            repr(policy).startswith(
+                "<Policy resource: ec2 name: ec2-utilization"))
 
     def test_policy_name_filtering(self):
 
@@ -234,17 +309,17 @@ class TestPolicy(BaseTest):
             json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
             {u'Durations': [],
              u'Errors': [{u'Sum': 0.0,
-                          u'Timestamp': u'2016-05-30T10:50:00',
+                          u'Timestamp': u'2016-05-30T10:50:00+00:00',
                           u'Unit': u'Count'}],
              u'Invocations': [{u'Sum': 4.0,
-                               u'Timestamp': u'2016-05-30T10:50:00',
+                               u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                u'Unit': u'Count'}],
              u'ResourceCount': [{u'Average': 1.0,
                                  u'Sum': 2.0,
-                                 u'Timestamp': u'2016-05-30T10:50:00',
+                                 u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                  u'Unit': u'Count'}],
              u'Throttles': [{u'Sum': 0.0,
-                             u'Timestamp': u'2016-05-30T10:50:00',
+                             u'Timestamp': u'2016-05-30T10:50:00+00:00',
                              u'Unit': u'Count'}]})
 
     def test_policy_metrics(self):
@@ -265,7 +340,7 @@ class TestPolicy(BaseTest):
             {
                 "ActionTime": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 8541.752702140668,
                         "Sum": 128126.29053211001,
                         "Unit": "Seconds"
@@ -273,7 +348,7 @@ class TestPolicy(BaseTest):
                 ],
                 "Total Keys": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 1575708.7333333334,
                         "Sum": 23635631.0,
                         "Unit": "Count"
@@ -281,7 +356,7 @@ class TestPolicy(BaseTest):
                 ],
                 "ResourceTime": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 8.682969363532667,
                         "Sum": 130.24454045299,
                         "Unit": "Seconds"
@@ -289,7 +364,7 @@ class TestPolicy(BaseTest):
                 ],
                 "ResourceCount": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 23.6,
                         "Sum": 354.0,
                         "Unit": "Count"
@@ -297,7 +372,7 @@ class TestPolicy(BaseTest):
                 ],
                 "Unencrypted": [
                     {
-                        "Timestamp": "2016-05-30T00:00:00",
+                        "Timestamp": "2016-05-30T00:00:00+00:00",
                         "Average": 10942.266666666666,
                         "Sum": 164134.0,
                         "Unit": "Count"

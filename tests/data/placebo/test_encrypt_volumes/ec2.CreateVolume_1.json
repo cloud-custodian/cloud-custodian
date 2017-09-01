@@ -1,26 +1,34 @@
 {
     "status_code": 200, 
     "data": {
-        "AvailabilityZone": "us-west-2c", 
+        "AvailabilityZone": "us-east-1a", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3d0a2da9-13dd-4d41-b833-cda44e920090"
+            "RequestId": "e3e139eb-1804-41af-9cd8-4dbc36e1512d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 08 Jun 2017 18:23:18 GMT"
+            }
         }, 
         "Encrypted": true, 
         "VolumeType": "gp2", 
-        "VolumeId": "vol-add3fa14", 
+        "VolumeId": "vol-072dfa20eef03dd38", 
         "State": "creating", 
-        "Iops": 24, 
-        "SnapshotId": "snap-ee6f74be", 
+        "Iops": 100, 
+        "SnapshotId": "snap-0bd2772f3c7cafa62", 
         "CreateTime": {
-            "hour": 11, 
+            "hour": 18, 
             "__class__": "datetime", 
-            "month": 5, 
-            "second": 26, 
-            "microsecond": 851000, 
-            "year": 2016, 
+            "month": 6, 
+            "second": 18, 
+            "microsecond": 581000, 
+            "year": 2017, 
             "day": 8, 
-            "minute": 13
+            "minute": 23
         }, 
         "Size": 8
     }

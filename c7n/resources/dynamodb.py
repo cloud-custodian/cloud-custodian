@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -47,13 +49,13 @@ class Table(QueryResourceManager):
 
     def augment(self, tables):
         resources = super(Table, self).augment(tables)
-        return filter(None, _dynamodb_table_tags(
+        return list(filter(None, _dynamodb_table_tags(
             self.get_model(),
             resources,
             self.session_factory,
             self.executor_factory,
             self.retry,
-            self.log))
+            self.log)))
 
 
 def _dynamodb_table_tags(

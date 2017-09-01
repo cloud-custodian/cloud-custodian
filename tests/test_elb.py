@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
@@ -226,35 +228,37 @@ class SSLPolicyTest(BaseTest):
             'test-elb-invalid-policy')
 
     def test_filter_validation_no_blacklist(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy'}
+             ]},
+            session_factory=None, validate=False)
 
     def test_filter_validation_blacklist_not_iterable(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy', 'blacklist': 'single-value'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy', 'blacklist': 'single-value'}
+             ]},
+            session_factory=None, validate=False)
 
 
 class TestDefaultVpc(BaseTest):
 
     def test_elb_default_vpc(self):
         session_factory = self.replay_flight_data('test_elb_default_vpc')
-        p = self.load_policy(
-            {'name': 'elb-default-filters',
-             'resource': 'elb',
-             'filters': [
-                 {'type': 'default-vpc'}]},
+        p = self.load_policy({
+            'name': 'elb-default-filters',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'default-vpc'}]},
             config={'region': 'us-west-2'},
             session_factory=session_factory)
 

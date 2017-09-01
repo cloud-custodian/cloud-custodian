@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,25 +11,45 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from botocore.exceptions import ClientError
 
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import local_session
+from c7n.utils import get_retry, local_session
 
 
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
 
-    class Meta(object):
+    permissions = ('glacier:ListTagsForVault',)
+    retry = staticmethod(get_retry(('Throttled',)))
+
+    class resource_type(object):
         service = 'glacier'
         enum_spec = ('list_vaults', 'VaultList', None)
         name = "VaultName"
         id = "VaultARN"
+        filter_name = None
         dimension = None
+        universal_taggable = True
 
-    resource_type = Meta
+    def augment(self, resources):
+        def process_tags(resource):
+            client = local_session(self.session_factory).client('glacier')
+            tag_dict = self.retry(
+                client.list_tags_for_vault,
+                vaultName=resource[self.get_model().name])['Tags']
+            tag_list = []
+            for k, v in tag_dict.items():
+                tag_list.append({'Key': k, 'Value': v})
+            resource['Tags'] = tag_list
+            return resource
+
+        with self.executor_factory(max_workers=2) as w:
+            return list(w.map(process_tags, resources))
 
 
 @Glacier.filter_registry.register('cross-account')
@@ -69,7 +89,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         self.log.debug("fetching policy for %d glacier" % len(resources))
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(GlacierCrossAccountAccessFilter, self).process(
             resources, event)

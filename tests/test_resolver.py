@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
+import io
 import json
 import os
-from StringIO import StringIO
 import tempfile
 
-from common import Bag, BaseTest
-from test_s3 import destroyBucket
+from .common import Bag, BaseTest
+from .test_s3 import destroyBucket
 
 from c7n.resolver import ValuesFrom, URIResolver
 
@@ -66,13 +68,13 @@ class ResolverTest(BaseTest):
         uri = 's3://%s/resource.json?RequestPayer=requestor' % bname
         data = resolver.resolve(uri)
         self.assertEqual(content, data)
-        self.assertEqual(cache.state.keys(), [('uri-resolver', uri)])
+        self.assertEqual(list(cache.state.keys()), [('uri-resolver', uri)])
 
     def test_resolve_file(self):
         content = json.dumps({'universe': {'galaxy': {'system': 'sun'}}})
         cache = FakeCache()
         resolver = URIResolver(None, cache)
-        with tempfile.NamedTemporaryFile(dir=os.getcwd()) as fh:
+        with tempfile.NamedTemporaryFile(mode='w+', dir=os.getcwd()) as fh:
             fh.write(content)
             fh.flush()
             self.assertEqual(
@@ -98,16 +100,16 @@ class UrlValueTest(BaseTest):
         self.assertRaises(ValueError, values.get_values)
 
     def test_txt(self):
-        out = StringIO()
+        out = io.BytesIO()
         for i in ['a', 'b', 'c', 'd']:
-            out.write('%s\n' % i)
+            out.write(('%s\n' % i).encode('utf8'))
         values = self.get_values_from({'url': 'letters.txt'}, out.getvalue())
         self.assertEqual(
             values.get_values(),
             ['a', 'b', 'c', 'd'])
 
     def test_csv_expr(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
@@ -115,7 +117,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
 
     def test_csv_expr_using_dict(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
         writer.writerows([range(5) for r in range(5)])
@@ -124,7 +126,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(5) for r in range(5)])
         values = self.get_values_from(
@@ -132,7 +134,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
 
     def test_csv_raw(self):
-        out = StringIO()
+        out = io.BytesIO()
         writer = csv.writer(out)
         writer.writerows([range(3, 4) for r in range(5)])
         values = self.get_values_from({'url': 'sun.csv'}, out.getvalue())

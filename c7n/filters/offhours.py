@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ Resource Scheduling Offhours
 
 Custodian provides for time based filters, that allow for taking periodic
 action on a resource, with resource schedule customization based on tag values.
-A common use is offhours scheduling for asgs, and instances.
+A common use is offhours scheduling for asgs and instances.
 
 Features
 ========
@@ -33,48 +33,98 @@ Policy Configuration
 ====================
 
 We provide an `onhour` and `offhour` time filter, each should be used in a
-different policy, they support the same configuration options
+different policy, they support the same configuration options:
 
  - **weekends**: default true, whether to leave resources off for the weekend
  - **weekend-only**: default false, whether to turn the resource off only on
    the weekend
- - **default_tz**: which timezone to utilize when evaluating time
- - **tag**: default maid_offhours, which resource tag key to look for the
-   resource's schedule.
- - **opt-out**: applies the default schedule to resource which do not specify
-   any value.  a value of `off` to disable/exclude the resource.
+ - **default_tz**: which timezone to utilize when evaluating time **(REQUIRED)**
+ - **tag**: which resource tag name to use for per-resource configuration
+   (schedule and timezone overrides and opt-in/opt-out); default is
+   ``maid_offhours``.
+ - **opt-out**: Determines the behavior for resources which do not have a tag
+   matching the one specified for **tag**. Values can be either ``false`` (the
+   default) where the policy operates on an opt-in basis and resources must have
+   the tag in order to be acted on by the policy, or ``true`` where the policy
+   operates on an opt-out basis, and resources without the tag are acted on by
+   the policy.
+ - **onhour**: the default time to start/run resources, specified as 0-23
+ - **offhour**: the default time to stop/suspend resources, specified as 0-23
 
-The default off hours and on hours are specified per the policy configuration
-along with the opt-in/opt-out behavior. Resources can specify the timezone
-that they wish to have this scheduled utilized with.
+This example policy overrides most of the defaults for an offhour policy:
+
+.. code-block:: yaml
+
+   policies:
+     - name: offhours-stop
+       resource: ec2
+       filters:
+         - type: offhour
+           weekends: false
+           default_tz: pt
+           tag: downtime
+           opt-out: true
+           onhour: 8
+           offhour: 20
 
 Tag Based Configuration
 =======================
 
-Note the tag name is configurable per policy configuration, examples below use
-default tag name, ie. custodian_downtime.
+Resources can use a special tag to override the default configuration on a
+per-resource basis. Note that the name of the tag is configurable via the
+``tag`` option in the policy; the examples below use the default tag name,
+``maid_offhours``.
 
-- custodian_downtime:
+The value of the tag must be one of the following:
 
-An empty tag value implies night and weekend offhours using the default
-time zone configured in the policy (tz=est if unspecified).
+- **(empty)** or **on** - An empty tag value or a value of "on" implies night
+  and weekend offhours using the default time zone configured in the policy
+  (tz=est if unspecified) and the default onhour and offhour values configured
+  in the policy.
+- **off** - If offhours is configured to run in opt-out mode, this tag can be
+  specified to disable offhours on a given instance. If offhours is configured
+  to run in opt-in mode, this tag will have no effect (the resource will still
+  be opted out).
+- a semicolon-separated string composed of one or more of the following
+  components, which override the defaults specified in the policy:
 
-- custodian_downtime: tz=pt
+  * ``tz=<timezone>`` to evaluate with a resource-specific timezone, where
+    ``<timezone>`` is either one of the supported timezone aliases defined in
+    :py:attr:`c7n.filters.offhours.Time.TZ_ALIASES` (such as ``pt``) or the name
+    of a geographic timezone identifier in
+    [IANA's tzinfo database](https://www.iana.org/time-zones), such as
+    ``Americas/Los_Angeles``. *(Note all timezone aliases are
+    referenced to a locality to ensure taking into account local daylight
+    savings time, if applicable.)*
+  * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
+    supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
+    in the next section.
 
-Note all timezone aliases are referenced to a locality to ensure taking into
-account local daylight savings time (if any).
+ScheduleParser Time Specifications
+----------------------------------
 
-- custodian_downtime: tz=Americas/Los_Angeles
+Each time specification follows the format ``(days,hours)``. Multiple time
+specifications can be combined in square-bracketed lists, i.e.
+``[(days,hours),(days,hours),(days,hours)]``.
 
-A geography can be specified but must be in the time zone database.
+**Examples**::
 
-Per http://www.iana.org/time-zones
+    # up mon-fri from 7am-7pm; eastern time
+    off=(M-F,19);on=(M-F,7)
+    # up mon-fri from 6am-9pm; up sun from 10am-6pm; pacific time
+    off=[(M-F,21),(U,18)];on=[(M-F,6),(U,10)];tz=pt
 
-- custodian_downtime: off
+**Possible values**:
 
-If offhours is configured to run in opt-out mode, this tag can be specified
-to disable offhours on a given instance.
+    +------------+----------------------+
+    | field      | values               |
+    +============+======================+
+    | days       | M, T, W, H, F, S, U  |
+    +------------+----------------------+
+    | hours      | 0, 1, 2, ..., 22, 23 |
+    +------------+----------------------+
 
+    Days can be specified in a range (ex. M-F).
 
 Policy examples
 ===============
@@ -104,42 +154,55 @@ Here's doing the same with auto scale groups
 
     policies:
       - name: asg-offhours-stop
-        resource: ec2
+        resource: asg
         filters:
            - offhour
         actions:
            - suspend
       - name: asg-onhours-start
-        resource: ec2
+        resource: asg
         filters:
            - onhour
         actions:
            - resume
 
+Additional policy examples and resource-type-specific information can be seen in
+the :ref:`EC2 Offhours <ec2offhours>` and :ref:`ASG Offhours <asgoffhours>`
+use cases.
 
-Options
-=======
+Resume During Offhours
+======================
 
-- tag: the tag name to use when configuring
-- default_tz: the default timezone to use when interpreting offhours
-- offhour: the time to turn instances off, specified in 0-24
-- onhour: the time to turn instances on, specified in 0-24
-- opt-out: default behavior is opt in, as in ``tag`` must be present,
-  with opt-out: true, the tag doesn't need to be present.
+These policies are evaluated hourly; during each run (once an hour),
+cloud-custodian will act on **only** the resources tagged for that **exact**
+hour. In other words, if a resource has an offhours policy of
+stopping/suspending at 23:00 Eastern daily and starting/resuming at 06:00
+Eastern daily, and you run cloud-custodian once an hour via Lambda, that
+resource will only be stopped once a day sometime between 23:00 and 23:59, and
+will only be started once a day sometime between 06:00 and 06:59. If the current
+hour does not *exactly* match the hour specified in the policy, nothing will be
+done at all.
 
+As a result of this, if custodian stops an instance or suspends an ASG and you
+need to start/resume it, you can safely do so manually and custodian won't touch
+it again until the next day.
 
-.. code-block:: yaml
+ElasticBeanstalk, EFS and Other Services with Tag Value Restrictions
+====================================================================
 
-   policies:
-     - name: offhours-stop
-       resource: ec2
-       filters:
-         - type: offhour
-           tag: downtime
-           onhour: 8
-           offhour: 20
+A number of AWS services have restrictions on the characters that can be used
+in tag values, such as `ElasticBeanstalk <http://docs.aws.amazon.com/elasticbean
+stalk/latest/dg/using-features.tagging.html>`_ and `EFS <http://docs.aws.amazon.
+com/efs/latest/ug/API_Tag.html>`_. In particular, these services do not allow
+parenthesis, square brackets, commas, or semicolons, or empty tag values. This
+proves to be problematic with the tag-based schedule configuration described
+above. The best current workaround is to define a separate policy with a unique
+``tag`` name for each unique schedule that you want to use, and then tag
+resources with that tag name and a value of ``on``. Note that this can only be
+used in opt-in mode, not opt-out.
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # note we have to module import for our testing mocks
 import datetime
@@ -154,6 +217,14 @@ from c7n.utils import type_schema, dumps
 log = logging.getLogger('custodian.offhours')
 
 
+def brackets_removed(u):
+    return u.translate({ord('['): None, ord(']'): None})
+
+
+def parens_removed(u):
+    return u.translate({ord('('): None, ord(')'): None})
+
+
 class Time(Filter):
 
     schema = {
@@ -164,7 +235,6 @@ class Time(Filter):
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
-            'debug': {'type': 'boolean'},
         }
     }
 
@@ -178,15 +248,19 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',
         'cst': 'America/Chicago',
         'cdt': 'America/Chicago',
         'ct': 'America/Chicago',
+        'mst': 'America/Denver',
+        'mdt': 'America/Denver',
         'mt': 'America/Denver',
-        'gmt': 'Europe/London',
-        'gt': 'Europe/London',
+        'gmt': 'Etc/GMT',
+        'gt': 'Etc/GMT',
         'bst': 'Europe/London',
         'ist': 'Europe/Dublin',
         'cet': 'Europe/Berlin',
@@ -263,17 +337,21 @@ class Time(Filter):
             self.enabled_count += 1
 
         try:
-            return self.process_resource_schedule(i, value)
+            return self.process_resource_schedule(i, value, self.time_type)
         except:
             log.exception(
                 "%s failed to process resource:%s value:%s",
                 self.__class__.__name__, i[self.id_key], value)
             return False
 
-    def process_resource_schedule(self, i, value):
+    def process_resource_schedule(self, i, value, time_type):
         """Does the resource tag schedule and policy match the current time."""
         rid = i[self.id_key]
-        if self.parser.has_resource_schedule(value):
+        # this is to normalize trailing semicolons which when done allows
+        # dateutil.parser.parse to process: value='off=(m-f,1);' properly.
+        # before this normalization, some cases would silently fail.
+        value = ';'.join(filter(None, value.split(';')))
+        if self.parser.has_resource_schedule(value, time_type):
             schedule = self.parser.parse(value)
         elif self.parser.keys_are_valid(value):
             # respect timezone from tag
@@ -285,20 +363,17 @@ class Time(Filter):
                 schedule = self.default_schedule
         else:
             schedule = None
-
         if schedule is None:
             log.warning(
                 "Invalid schedule on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
-
         tz = self.get_tz(schedule['tz'])
         if not tz:
             log.warning(
                 "Could not resolve tz on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
-
         now = datetime.datetime.now(tz).replace(
             minute=0, second=0, microsecond=0)
         return self.match(now, schedule)
@@ -321,8 +396,8 @@ class Time(Filter):
                 break
         if found is False:
             return False
-        # utf8, or do translate tables via unicode ord mapping
-        value = found.lower().encode('utf8')
+        # enforce utf8, or do translate tables via unicode ord mapping
+        value = found.lower().encode('utf8').decode('utf8')
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')
@@ -340,7 +415,7 @@ class OffHour(Time):
 
     schema = type_schema(
         'offhour', rinherit=Time.schema, required=['offhour', 'default_tz'],
-        offhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        offhour={'type': 'integer', 'minimum': 0, 'maximum': 23})
     time_type = "off"
 
     DEFAULT_HR = 19
@@ -362,7 +437,7 @@ class OnHour(Time):
 
     schema = type_schema(
         'onhour', rinherit=Time.schema, required=['onhour', 'default_tz'],
-        onhour={'type': 'integer', 'minimum': 0, 'maximum': 24})
+        onhour={'type': 'integer', 'minimum': 0, 'maximum': 23})
     time_type = "on"
 
     DEFAULT_HR = 7
@@ -495,15 +570,16 @@ class ScheduleParser(object):
         return schedule
 
     @staticmethod
-    def has_resource_schedule(tag_value):
+    def has_resource_schedule(tag_value, time_type):
         raw_data = ScheduleParser.raw_data(tag_value)
-        return 'on' in raw_data and 'off' in raw_data
+        # note time_type is set to 'on' or 'off' and raw_data is a dict
+        return time_type in raw_data
 
     def parse_resource_schedule(self, lexeme):
         parsed = []
-        exprs = lexeme.translate(None, '[]').split(',(')
+        exprs = brackets_removed(lexeme).split(',(')
         for e in exprs:
-            tokens = e.translate(None, '()').split(',')
+            tokens = parens_removed(e).split(',')
             # custom hours must have two parts: (<days>, <hour>)
             if not len(tokens) == 2:
                 return None

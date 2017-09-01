@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ Cloud-Custodian Lambda Entry Point
 Mostly this serves to load up the policy and dispatch
 an event.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 import os
 import uuid
+import json
 
-from c7n.policy import load
+from c7n.policy import PolicyCollection
+from c7n.resources import load_resources
 from c7n.utils import format_event, get_account_id_from_sts
 
 
@@ -42,12 +45,14 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
-        try:
-            import boto3
-            session = boto3.Session()
-            account_id = get_account_id_from_sts(session)
-        except:
-            account_id = None
+        account_id = None
+        if 'AWS_LAMBDA_FUNCTION_NAME' in os.environ:
+            try:
+                import boto3
+                session = boto3.Session()
+                account_id = get_account_id_from_sts(session)
+            except:
+                pass
 
         d = {}
         d.update({
@@ -56,6 +61,7 @@ class Config(dict):
             'profile': None,
             'account_id': account_id,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': True,
             'output_dir': os.environ.get(
@@ -65,7 +71,11 @@ class Config(dict):
             'dryrun': False})
         d.update(kw)
         if not os.path.exists(d['output_dir']):
-            os.mkdir(d['output_dir'])
+            try:
+                os.mkdir(d['output_dir'])
+            except OSError as error:
+                log.warning("Unable to make output directory: {}".format(error))
+
         return cls(d)
 
 
@@ -80,7 +90,20 @@ def dispatch_event(event, context):
     if event['debug']:
         log.info("Processing event\n %s", format_event(event))
 
-    policies = load(Config.empty(), 'config.json', format='json')
+    # policies file should always be valid in lambda so do loading naively
+    with open('config.json') as f:
+        policy_config = json.load(f)
+
+    if not policy_config or not policy_config.get('policies'):
+        return False
+
+    # TODO. This enshrines an assumption of a single policy per lambda.
+    options_overrides = policy_config[
+        'policies'][0].get('mode', {}).get('execution-options', {})
+    options = Config.empty(**options_overrides)
+
+    load_resources()
+    policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
             p.push(event, context)

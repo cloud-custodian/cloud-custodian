@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest
+from .common import BaseTest
 
 
 class Kinesis(BaseTest):
@@ -23,11 +24,16 @@ class Kinesis(BaseTest):
             'name': 'kstream',
             'resource': 'kinesis',
             'filters': [
-                {'type': 'value', 'value_type': 'size',
-                 'value': 2, 'key': 'Shards'}]
+                {'type': 'value',
+                 'value_type': 'size',
+                 'value': 3,
+                 'key': 'Shards'}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'Origin', 'Value': 'home'}])
         self.assertEqual(resources[0]['StreamStatus'], 'ACTIVE')
 
     def test_stream_delete(self):

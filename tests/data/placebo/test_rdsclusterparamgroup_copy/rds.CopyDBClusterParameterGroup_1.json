@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusterParameterGroup": {
+            "DBClusterParameterGroupName": "pgc-copy", 
+            "DBParameterGroupFamily": "aurora5.6", 
+            "Description": "Copy of pgc-orig", 
+            "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:pgc-copy"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "21935e7f-606c-11e7-ba96-9fc607e5eb1c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "21935e7f-606c-11e7-ba96-9fc607e5eb1c", 
+                "date": "Tue, 04 Jul 2017 03:51:59 GMT", 
+                "content-length": "678", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

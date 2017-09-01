@@ -2,19 +2,22 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3025e16e-a1bf-471d-b00f-095f3f121e4f", 
+            "RequestId": "5c37f2a3-2e93-4d67-a013-e0a64650dde2", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 23 Jul 2016 11:52:00 GMT"
+                "date": "Tue, 27 Jun 2017 15:45:47 GMT"
             }
         }, 
         "Vpc": {
-            "VpcId": "vpc-5d62f03a", 
+            "VpcId": "vpc-7cc27a05", 
             "InstanceTenancy": "default", 
+            "Tags": [], 
+            "Ipv6CidrBlockAssociationSet": [], 
             "State": "pending", 
             "DhcpOptionsId": "dopt-24ff1940", 
             "CidrBlock": "10.4.0.0/16", 

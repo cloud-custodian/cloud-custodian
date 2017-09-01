@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name="c7n",
-    version='0.8.23.2',
+    version='0.8.25.1',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             'custodian = c7n.cli:main']},
     install_requires=[
-        "boto3>=1.4.4",
+        "boto3>=1.4.6",
+        "botocore>=1.6.1",
         "pyyaml",
         "jsonschema",
         "ipaddress",

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,19 +39,21 @@ CLI Usage
 
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from concurrent.futures import as_completed
 
-from cStringIO import StringIO
 import csv
 from datetime import datetime
 import gzip
+import io
 import json
 import jmespath
 import logging
 import os
 from tabulate import tabulate
 
+import six
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
@@ -62,24 +64,36 @@ from c7n.utils import local_session, dumps
 log = logging.getLogger('custodian.reports')
 
 
-def report(policy, start_date, options, output_fh, raw_output_fh=None):
+def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
+    regions = set([p.options.region for p in policies])
+    policy_names = set([p.name for p in policies])
     formatter = Formatter(
-        policy.resource_manager,
+        policies[0].resource_manager,
         extra_fields=options.field,
-        no_default_fields=options.no_default_fields,
+        include_default_fields=not options.no_default_fields,
+        include_region=len(regions) > 1,
+        include_policy=len(policy_names) > 1
     )
 
-    if policy.ctx.output.use_s3():
-        records = record_set(
-            policy.session_factory,
-            policy.ctx.output.bucket,
-            policy.ctx.output.key_prefix,
-            start_date)
-    else:
-        records = fs_record_set(policy.ctx.output_path, policy.name)
+    records = []
+    for policy in policies:
+        if policy.ctx.output.use_s3():
+            policy_records = record_set(
+                policy.session_factory,
+                policy.ctx.output.bucket,
+                policy.ctx.output.key_prefix,
+                start_date)
+        else:
+            policy_records = fs_record_set(policy.ctx.output_path, policy.name)
 
-    log.debug("Found %d records", len(records))
+        log.debug("Found %d records for region %s", len(policy_records), policy.options.region)
+
+        for record in policy_records:
+            record['policy'] = policy.name
+            record['region'] = policy.options.region
+
+        records += policy_records
 
     rows = formatter.to_csv(records)
     if options.format == 'csv':
@@ -121,16 +135,16 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, basestring):
-                value = unicode(value)
+            if not isinstance(value, six.text_type):
+                value = six.text_type(value)
         vals.append(value)
     return vals
 
 
 class Formatter(object):
 
-    def __init__(
-            self, resource_manager, extra_fields=(), no_default_fields=None):
+    def __init__(self, resource_manager, extra_fields=(), include_default_fields=True,
+                 include_region=False, include_policy=False):
 
         self.resource_manager = resource_manager
         # Lookup default fields for resource type.
@@ -143,10 +157,10 @@ class Formatter(object):
             mfields = [model.id]
             if model.name != model.id:
                 mfields.append(model.name)
-            if model.date:
+            if getattr(model, 'date', None):
                 mfields.append(model.date)
 
-        if not no_default_fields:
+        if include_default_fields:
             fields = OrderedDict(zip(mfields, mfields))
         else:
             fields = OrderedDict()
@@ -155,6 +169,15 @@ class Formatter(object):
             # TODO this type coercion should be done at cli input, not here
             h, cexpr = field.split('=', 1)
             fields[h] = cexpr
+
+        # Add these at the end so that they are the last fields
+        if include_default_fields:
+            if include_region:
+                fields['Region'] = 'region'
+
+            if include_policy:
+                fields['Policy'] = 'policy'
+
         self.fields = fields
 
     def headers(self):
@@ -188,7 +211,7 @@ class Formatter(object):
 
         uniq = self.uniq_by_id(records)
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
-        rows = map(self.extract_csv, uniq)
+        rows = list(map(self.extract_csv, uniq))
         return rows
 
 
@@ -207,7 +230,7 @@ def fs_record_set(output_path, policy_name):
         return records
 
 
-def record_set(session_factory, bucket, key_prefix, start_date):
+def record_set(session_factory, bucket, key_prefix, start_date, specify_hour=False):
     """Retrieve all s3 records for the given policy output url
 
     From the given start date.
@@ -218,8 +241,13 @@ def record_set(session_factory, bucket, key_prefix, start_date):
     records = []
     key_count = 0
 
-    marker = key_prefix.strip("/") + "/" + start_date.strftime(
-        '%Y/%m/%d/00') + "/resources.json.gz"
+    date = start_date.strftime('%Y/%m/%d')
+    if specify_hour:
+        date += "/{}".format(start_date.hour)
+    else:
+        date += "/00"
+
+    marker = "{}/{}/resources.json.gz".format(key_prefix.strip("/"), date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -256,7 +284,7 @@ def get_records(bucket, key, session_factory):
     custodian_date = date_parse(date_str)
     s3 = local_session(session_factory).client('s3')
     result = s3.get_object(Bucket=bucket, Key=key['Key'])
-    blob = StringIO(result['Body'].read())
+    blob = io.BytesIO(result['Body'].read())
 
     records = json.load(gzip.GzipFile(fileobj=blob))
     log.debug("bucket: %s key: %s records: %d",

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import functools
 import json
 import logging
+import itertools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -119,6 +122,9 @@ class SubnetFilter(net_filters.SubnetFilter):
         return super(SubnetFilter, self).process(resources, event)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @filters.register('param')
 class Parameter(ValueFilter):
     """Filter redshift clusters based on parameter values
@@ -151,8 +157,9 @@ class Parameter(ValueFilter):
 
         def get_params(group_name):
             c = local_session(self.manager.session_factory).client('redshift')
-            param_group = c.describe_cluster_parameters(
-                ParameterGroupName=group_name)['Parameters']
+            paginator = c.get_paginator('describe_cluster_parameters')
+            param_group = list(itertools.chain(*[p['Parameters']
+                for p in paginator.paginate(ParameterGroupName=group_name)]))
             params = {}
             for p in param_group:
                 v = p['ParameterValue']
@@ -607,7 +614,7 @@ class RedshiftSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 

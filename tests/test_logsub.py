@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
-import os
-import tempfile
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
 from c7n.logs_support import _timestamp_from_string
@@ -23,21 +21,9 @@ from c7n.ufuncs import logsub
 class TestLogsub(TestCase):
 
     def setUp(self):
-        self.old_dir = os.getcwd()
-        os.chdir(tempfile.gettempdir())
-        self.config_data = {
+        logsub.config = {
             'test': 'data',
         }
-        with open('config.json', 'w') as conf:
-            json.dump(self.config_data, conf)
-
-    def tearDown(self):
-        os.remove('config.json')
-        os.chdir(self.old_dir)
-
-    def test_init(self):
-        logsub.init()
-        self.assertEqual(logsub.config, self.config_data)
 
     def test_message_event(self):
         event = {

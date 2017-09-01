@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 """
 CloudWatch Metrics suppport for resources
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -36,7 +38,7 @@ class MetricsFilter(Filter):
       - name: ec2-underutilized
         resource: ec2
         filters:
-          - type: metric
+          - type: metrics
             name: CPUUtilization
             days: 4
             period: 86400
@@ -59,7 +61,7 @@ class MetricsFilter(Filter):
            'statistics': {'type': 'string', 'enum': [
                'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
            'days': {'type': 'number'},
-           'op': {'type': 'string', 'enum': OPERATORS.keys()},
+           'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
            'period': {'type': 'number'},
            'attr-multiplier': {'type': 'number'},

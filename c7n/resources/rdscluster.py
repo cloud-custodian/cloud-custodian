@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from botocore.exceptions import ClientError
@@ -21,13 +23,17 @@ from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks)
+    type_schema, local_session, snapshot_identifier, chunks, get_retry)
 
 log = logging.getLogger('custodian.rds-cluster')
 
 filters = FilterRegistry('rds-cluster.filters')
 actions = ActionRegistry('rds-cluster.actions')
+
+filters.register('tag-count', tags.TagCountFilter)
+filters.register('marked-for-op', tags.TagActionFilter)
 
 
 @resources.register('rds-cluster')
@@ -38,7 +44,7 @@ class RDSCluster(QueryResourceManager):
     class resource_type(object):
 
         service = 'rds'
-        type = 'rds-cluster'
+        type = 'cluster'
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
         filter_name = None
@@ -48,6 +54,133 @@ class RDSCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(get_retry(('Throttled',)))
+
+    def augment(self, dbs):
+        filter(None, _rds_cluster_tags(
+            self.get_model(),
+            dbs, self.session_factory, self.executor_factory,
+            self.generate_arn, self.retry))
+        return dbs
+
+
+def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, retry):
+    """Augment rds clusters with their respective tags."""
+
+    def process_tags(db):
+        client = local_session(session_factory).client('rds')
+        arn = generator(db[model.id])
+        tag_list = None
+        try:
+            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'DBClusterNotFoundFault':
+                log.warning("Exception getting rdscluster tags\n %s", e)
+            return None
+        db['Tags'] = tag_list or []
+        return db
+
+    # Rds maintains a low api call limit, so this can take some time :-(
+    with executor_factory(max_workers=1) as w:
+        return list(w.map(process_tags, dbs))
+
+
+@actions.register('mark-for-op')
+class TagDelayedAction(tags.TagDelayedAction):
+    """Mark a RDS cluster for specific custodian action
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: mark-for-delete
+                resource: rds-cluster
+                filters:
+                  - type: default-vpc
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
+    schema = type_schema(
+        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
+    permissions = ('rds:AddTagsToResource',)
+
+    batch_size = 5
+
+    def process(self, dbs):
+        return super(TagDelayedAction, self).process(dbs)
+
+    def process_resource_set(self, dbs, tags):
+        client = local_session(self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
+
+
+@actions.register('tag')
+@actions.register('mark')
+class Tag(tags.Tag):
+    """Mark/tag a RDS cluster with a key/value
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-cluster-owner-tag
+                resource: rds-cluster
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('rds:AddTagsToResource',)
+
+    def process_resource_set(self, dbs, ts):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
+
+
+@actions.register('remove-tag')
+@actions.register('unmark')
+class RemoveTag(tags.RemoveTag):
+    """Removes a tag or set of tags from RDS clusters
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-unmark-cluster
+                resource: rds-cluster
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: unmark
+                    tags: ["ExpiredTag"]
+    """
+
+    concurrency = 2
+    batch_size = 5
+    permissions = ('rds:RemoveTagsFromResource',)
+
+    def process_resource_set(self, dbs, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('rds')
+        for db in dbs:
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            client.remove_tags_from_resource(
+                ResourceName=arn, TagKeys=tag_keys)
 
 
 @filters.register('security-group')
@@ -78,6 +211,9 @@ class SubnetFilter(net_filters.SubnetFilter):
             r['DBSubnetGroupName']: r for r in
             self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @actions.register('delete')
@@ -150,7 +286,9 @@ class Delete(BaseAction):
 
 @actions.register('retention')
 class RetentionWindow(BaseAction):
-    """Action to set the retention period on rds cluster snapshots
+    """
+    Action to set the retention period on rds cluster snapshots,
+    enforce (min, max, exact) sets retention days occordingly.
 
     :example:
 
@@ -167,14 +305,16 @@ class RetentionWindow(BaseAction):
                 actions:
                   - type: retention
                     days: 21
+                    enforce: min
     """
 
     date_attribute = "BackupRetentionPeriod"
     # Tag copy not yet available for Aurora:
     #   https://forums.aws.amazon.com/thread.jspa?threadID=225812
     schema = type_schema(
-        'retention',
-        **{'days': {'type': 'number'}})
+        'retention', **{'days': {'type': 'number'},
+                        'enforce': {'type': 'string', 'enum': [
+                            'min', 'max', 'exact']}})
     permissions = ('rds:ModifyDBCluster',)
 
     def process(self, clusters):
@@ -193,11 +333,22 @@ class RetentionWindow(BaseAction):
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
+        retention_type = self.data.get('enforce', 'min').lower()
 
-        if current_retention < new_retention:
+        if retention_type == 'min':
             self.set_retention_window(
                 cluster,
                 max(current_retention, new_retention))
+            return cluster
+
+        if retention_type == 'max':
+            self.set_retention_window(
+                cluster,
+                min(current_retention, new_retention))
+            return cluster
+
+        if retention_type == 'exact':
+            self.set_retention_window(cluster, new_retention)
             return cluster
 
     def set_retention_window(self, cluster, retention):
@@ -290,7 +441,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 

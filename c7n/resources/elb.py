@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 """
 Elastic Load Balancers
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from concurrent.futures import as_completed
 import logging
 import re
@@ -90,7 +92,7 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_tags,
-                    LoadBalancerNames=elb_map.keys())
+                    LoadBalancerNames=list(elb_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'LoadBalancerNotFound':
@@ -351,6 +353,9 @@ class SubnetFilter(net_filters.SubnetFilter):
     """ELB subnet filter"""
 
     RelatedIdsExpression = "Subnets[]"
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @filters.register('instance')
