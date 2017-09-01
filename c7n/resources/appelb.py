@@ -28,7 +28,8 @@ from c7n import tags
 from c7n.manager import resources
 
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
-from c7n.utils import local_session, chunks, type_schema, get_retry, set_annotation
+from c7n.utils import (
+    local_session, chunks, type_schema, get_retry, set_annotation)
 
 log = logging.getLogger('custodian.app-elb')
 

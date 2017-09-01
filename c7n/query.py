@@ -432,7 +432,7 @@ class ChildResourceManager(QueryResourceManager):
 
     @property
     def source_type(self):
-        source =  self.data.get('source', 'describe-child')
+        source = self.data.get('source', 'describe-child')
         if source == 'describe':
             source = 'describe-child'
         return source
