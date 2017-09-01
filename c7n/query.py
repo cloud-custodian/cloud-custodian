@@ -69,43 +69,10 @@ class ResourceQuery(object):
         m = self.resolve(resource_type)
         client = local_session(self.session_factory).client(
             m.service)
-
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
-
-        if getattr(m, 'parent_enum_spec', None):
-            parent_resource_type, id_path, param_key, parent_batchable = getattr(m, 'parent_enum_spec', None)
-
-            parent_id_path = jmespath.compile(id_path)
-            parent_resources = self.filter(parent_resource_type.resource_type)
-            parent_ids = parent_id_path.search(parent_resources)
-            # Bail out with no parent ids...
-
-            existing_param = param_key in params
-
-            if not existing_param and len(parent_ids) == 0:
-                return []
-            # Handle the param contextual scoping...
-            if existing_param:
-                data = self._invoke_client_enum(client, enum_op, params, path)
-            elif parent_batchable:
-                params[param_key] = parent_ids
-                data = self._invoke_client_enum(client, enum_op, params, path)
-            else:
-                # Since they're a single call-per-id, we need to invoke it for each id here.
-                results = []
-                for parent_id in parent_ids:
-                    merged_params = dict(params, **{param_key: parent_id})
-                    subset = self._invoke_client_enum(client, enum_op, merged_params, path)
-                    results.extend(subset)
-                data = results
-        else:
-            data = self._invoke_client_enum(client, enum_op, params, path)
-
-        if data is None:
-            data = []
-        return data
+        return self._invoke_client_enum(client, enum_op, params, path) or []
 
     def get(self, resource_type, identities):
         """Get resources by identities
@@ -136,9 +103,56 @@ class ResourceQuery(object):
         return resources
 
 
+class ChildResourceQuery(ResourceQuery):
+    """A resource query for resources that must be queried with parent information.
+
+    Several resource types can only be queried in the context of their
+    parents identifiers. ie. efs mount targets (parent efs), route53 resource
+    records (parent hosted zone), ecs services (ecs cluster).
+    """
+    def __init__(self, session_factory, manager):
+        self.session_factory = session_factory
+        self.manager = manager
+
+    def filter(self, resource_type, **params):
+        """Query a set of resources."""
+        m = self.resolve(resource_type)
+        client = local_session(self.session_factory).client(m.service)
+
+        enum_op, path, extra_args = m.enum_spec
+        if extra_args:
+            params.update(extra_args)
+
+        parent_type, parent_key = m.parent_spec
+        parents = self.manager.get_resource_manager(parent_type)
+        parent_ids = [p[parents.resource_type.id] for p in parents.resources()]
+
+        # Bail out with no parent ids...
+        existing_param = parent_key in params
+        if not existing_param and len(parent_ids) == 0:
+            return []
+
+        # Handle a query with parent id
+        if existing_param:
+            return self._invoke_client_enum(client, enum_op, params, path)
+
+        # Have to query separately for each parent's children.
+        results = []
+        for parent_id in parent_ids:
+            merged_params = dict(params, **{parent_key: parent_id})
+            subset = self._invoke_client_enum(
+                client, enum_op, merged_params, path)
+            results.extend(subset)
+
+        return results
+
+
 class QueryMeta(type):
 
     def __new__(cls, name, parents, attrs):
+        if 'resource_type' not in attrs:
+            return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
+
         if 'filter_registry' not in attrs:
             attrs['filter_registry'] = FilterRegistry(
                 '%s.filters' % name.lower())
@@ -216,6 +230,15 @@ class DescribeSource(object):
             results = list(w.map(
                 _augment, chunks(resources, self.manager.chunk_size)))
             return list(itertools.chain(*results))
+
+
+@sources.register('describe-child')
+class ChildDescribeSource(DescribeSource):
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = ChildResourceQuery(
+            self.manager.session_factory, self.manager)
 
 
 @sources.register('config')
@@ -332,7 +355,8 @@ class QueryResourceManager(ResourceManager):
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
                     len(resources)))
                 return self.filter_resources(resources)
 
@@ -402,6 +426,16 @@ class QueryResourceManager(ResourceManager):
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+
+class ChildResourceManager(QueryResourceManager):
+
+    @property
+    def source_type(self):
+        source =  self.data.get('source', 'describe-child')
+        if source == 'describe':
+            source = 'describe-child'
+        return source
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):
