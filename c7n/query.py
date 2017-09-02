@@ -142,7 +142,8 @@ class ChildResourceQuery(ResourceQuery):
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path)
-            results.extend(subset)
+            if subset:
+                results.extend(subset)
 
         return results
 
