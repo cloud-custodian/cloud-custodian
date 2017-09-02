@@ -59,6 +59,17 @@ register_universal_tags(
     ElasticFileSystem.filter_registry,
     ElasticFileSystem.action_registry)
 
+@resources.register('efs-mount-target')
+class ElasticFileSystemMountTarget(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'efs'
+        parent_enum_spec = (ElasticFileSystem, '[].FileSystemId', 'FileSystemId', False)
+        enum_spec = ('describe_mount_targets', 'MountTargets', None)
+        name = id = 'MountTargetId'
+        date = None
+        dimension = None
+
 
 @ElasticFileSystem.action_registry.register('delete')
 class Delete(Action):
