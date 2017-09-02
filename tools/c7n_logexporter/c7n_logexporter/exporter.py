@@ -640,7 +640,6 @@ def get_exports(client, bucket, prefix, latest=True):
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end')
 @click.option('--role', help="sts role to assume for log group access")
-@click.option('--role', help="sts role to assume for log group access")
 @click.option('--poll-period', type=float, default=300)
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
@@ -657,12 +656,17 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         session = get_session(role)
 
     client = session.client('logs')
+    for _group in client.describe_log_groups()['logGroups']:
+        if _group['logGroupName'] == group:
+            break
+    else:
+        raise ValueError('Log group not found.')
+    group = _group
 
     if prefix:
-        prefix = "%s/%s" % (prefix.rstrip('/'),
-            group['logGroupName'].strip('/'))
+        prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
     else:
-        prefix = group
+        prefix = group['logGroupName']
 
     named_group = "%s:%s" % (name, group['logGroupName'])
     log.info(
@@ -675,14 +679,16 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         group['storedBytes'])
 
     t = time.time()
-    days = [(start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+    days = [(start + timedelta(i)).replace(
+                minute=0, hour=0, second=0, microsecond=0)
             for i in range((end - start).days)]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)
 
     log.info("Group:%s filtering s3 extant keys from %d to %d start:%s end:%s",
-             named_group, day_count, len(days), days[0], days[-1])
+             named_group, day_count, len(days),
+             days[0] if days else '', days[-1] if days else '')
     t = time.time()
 
     retry = get_retry(('SlowDown',))
@@ -709,7 +715,7 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         try:
             s3.head_object(Bucket=bucket, Key=prefix)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'NotFound':
+            if e.response['Error']['Code'] != '404':  # Not Found
                 raise
             s3.put_object(
                 Bucket=bucket,

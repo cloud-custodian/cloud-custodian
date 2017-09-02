@@ -22,7 +22,7 @@ archiving.
 ## Assumptions
 
  - The archive bucket has already has appropriate bucket policy permissions.
-   See http://goo.gl/ for details.
+   See https://goo.gl/DYLRmK for details.
  - Default periodicity for log group archival into s3 is daily.
  - Exporter is run with account credentials that have access to the archive s3 bucket.
  - Catch up archiving is not run in lambda (do a cli run first)
@@ -37,7 +37,7 @@ make install
 
 You can run on a single account / log group via the export subcommand
 ```
-c7n-log-export export --help
+c7n-log-exporter export --help
 ```
 
 ## Config format
@@ -64,7 +64,7 @@ To run on the cli across multiple accounts, edit the config.yml to specify multi
 accounts and log groups.
 
 ```
-c7n-log-export run --config config.yml
+c7n-log-exporter run --config config.yml
 ```
 
 # Serverless Usage
