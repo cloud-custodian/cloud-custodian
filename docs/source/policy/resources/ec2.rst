@@ -30,6 +30,7 @@ Query
        'tag-key': str,
        'tag-value': str,
        'tag:': str,
+       'tenancy': ('dedicated', 'default', 'host'),
        'vpc-id': str}
 
 Filters

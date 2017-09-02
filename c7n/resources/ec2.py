@@ -1166,6 +1166,7 @@ EC2_VALID_FILTERS = {
     'tag-key': str,
     'tag-value': str,
     'tag:': str,
+    'tenancy': ('dedicated', 'default', 'host'),
     'vpc-id': str}
 
 
