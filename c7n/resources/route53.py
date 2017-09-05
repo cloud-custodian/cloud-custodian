@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session
 
@@ -105,11 +105,12 @@ class HealthCheck(Route53Base, QueryResourceManager):
 
 
 @resources.register('rrset')
-class ResourceRecordSet(QueryResourceManager):
+class ResourceRecordSet(ChildResourceManager):
 
     class resource_type(object):
         service = 'route53'
         type = 'rrset'
+        parent_spec = ('hostedzone', 'HostedZoneId')
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         filter_name = None

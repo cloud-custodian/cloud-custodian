@@ -16,7 +16,7 @@ import functools
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
@@ -34,7 +34,7 @@ class ElasticFileSystem(QueryResourceManager):
         type = 'file-system'
         # resource type for resource tagging api
         resource_type = 'elasticfilesystem:file-system'
-        detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
+        detail_spec = None
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
 
@@ -58,6 +58,18 @@ class ElasticFileSystem(QueryResourceManager):
 register_universal_tags(
     ElasticFileSystem.filter_registry,
     ElasticFileSystem.action_registry)
+
+
+@resources.register('efs-mount-target')
+class ElasticFileSystemMountTarget(ChildResourceManager):
+
+    class resource_type(object):
+        service = 'efs'
+        parent_spec = ('efs', 'FileSystemId')
+        enum_spec = ('describe_mount_targets', 'MountTargets', None)
+        name = id = 'MountTargetId'
+        date = None
+        dimension = None
 
 
 @ElasticFileSystem.action_registry.register('delete')
