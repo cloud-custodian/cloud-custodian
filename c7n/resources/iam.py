@@ -828,10 +828,11 @@ class UserDelete(BaseAction):
     For example if you want to have a whitelist of valid (machine-)users
     and want to ensure that no users have been clicked without documentation.
 
-    You can use both the 'credential' or the 'username' filter. 'credential' will have an SLA of 4h,
-    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html), but the
-    added benefit of performing less API calls, whereas 'username' will make more API calls, but
-    have a SLA of your cache.
+    You can use both the 'credential' or the 'username'
+    filter. 'credential' will have an SLA of 4h,
+    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html),
+    but the added benefit of performing less API calls, whereas
+    'username' will make more API calls, but have a SLA of your cache.
 
     ... code-block: yaml
 
@@ -875,56 +876,14 @@ class UserDelete(BaseAction):
          - delete
 
     """
-
     schema = type_schema('delete')
-    permissions = ('iam:DeleteLoginProfile',
-                   'iam:ListAccessKeys', 'iam:DeleteAccessKey',
-                   'iam:ListAttachedUserPolicies', 'iam:DetachUserPolicy',
-                   'iam:DeleteUser')
+    permissions = ('iam:DeleteUser',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-
         for r in resources:
-            self.log.debug('Deleting LoginProfile for user "%s"' % (r['UserName']))
-            try:
-                client.delete_login_profile(UserName=r['UserName'])
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchEntity':
-                    self.log.debug('No LoginProfile found to delete for user "%s"' %
-                            r['UserName'])
-                else:
-                    raise
-
-            self.log.debug('Deleting AccessKeys for user "%s"' % r['UserName'])
-            response = client.list_access_keys(UserName=r['UserName'])
-            for access_key in response['AccessKeyMetadata']:
-                client.delete_access_key(UserName=r['UserName'],
-                        AccessKeyId=access_key['AccessKeyId'])
-
-            response = client.list_attached_user_policies(UserName=r['UserName'])
-            for user_policy in response['AttachedPolicies']:
-                client.detach_user_policy(UserName=r['UserName'],
-                        PolicyArn=user_policy['PolicyArn'])
-                self.log.debug('Detached UserPolicy "%s" from user "%s"' %
-                        (user_policy['PolicyArn'], r['UserName']))
-
-            response = client.list_mfa_devices(UserName=r['UserName'])
-            for mfa_device in response['MFADevices']:
-                client.deactivate_mfa_device(UserName=r['UserName'],
-                        SerialNumber=mfa_device['SerialNumber'])
-                self.log.debug('Deactivated MFA Device "%s" for user "%s"' %
-                        (mfa_device['SerialNumber'], r['UserName']))
-
-            response = client.list_groups_for_user(UserName=r['UserName'])
-            for user_group in response['Groups']:
-                client.remove_user_from_group(UserName=r['UserName'],
-                    GroupName=user_group['GroupName'])
-                self.log.debug('Removed user "%s" from group "%s"' %
-                    (r['UserName'], user_group['GroupName']))
-
             client.delete_user(UserName=r['UserName'])
-            self.log.debug('Deleted user "%s"' % (r['UserName']))
+        self.log.debug('Deleted user "%s"' % (r['UserName']))
 
 
 @User.action_registry.register('remove-keys')
