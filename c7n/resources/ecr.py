@@ -87,7 +87,7 @@ class RemovePolicyStatement(BaseAction):
 
             policies:
               - name: ecr-remove-cross-accounts
-                resource: s3
+                resource: ecr
                 filters:
                   - type: cross-account
                 actions:
