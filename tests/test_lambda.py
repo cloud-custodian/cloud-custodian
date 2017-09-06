@@ -17,6 +17,7 @@ from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda
 
+
 class LambdaTest(BaseTest):
 
     def test_delete(self):
