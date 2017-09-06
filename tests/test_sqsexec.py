@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ class TestSQSExec(BaseTest):
         client = session_factory().client('sqs')
         map_queue = client.create_queue(
             QueueName = "%s-map-%s" % (
-                TEST_SQS_PREFIX, "".join(random.sample(string.letters, 3))))[
-                    'QueueUrl']
+                TEST_SQS_PREFIX, "".join(
+                    random.sample(string.ascii_letters, 3))))['QueueUrl']
         self.addCleanup(client.delete_queue, QueueUrl=map_queue)
         reduce_queue = client.create_queue(
             QueueName = "%s-map-%s" % (
-                TEST_SQS_PREFIX, "".join(random.sample(string.letters, 3))))[
-                    'QueueUrl']
+                TEST_SQS_PREFIX, "".join(
+                    random.sample(string.ascii_letters, 3))))['QueueUrl']
         self.addCleanup(client.delete_queue, QueueUrl=reduce_queue)
 
         with SQSExecutor(

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import datetime
-from datetime import timedelta
-from dateutil.parser import parse
-from dateutil.tz import tzutc
 import io
+from datetime import timedelta
 import itertools
 import time
 
+from concurrent.futures import as_completed
+from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
 
@@ -526,7 +526,7 @@ class CredentialReport(Filter):
             {'type': 'boolean'},
             {'type': 'number'},
             {'type': 'null'}]},
-        op={'enum': OPERATORS.keys()},
+        op={'enum': list(OPERATORS.keys())},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,
@@ -560,8 +560,11 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(io.StringIO(data))
-        headers = reader.next()
+        if isinstance(data, six.binary_type):
+            reader = csv.reader(io.BytesIO(data))
+        else:
+            reader = csv.reader(io.StringIO(data))
+        headers = next(reader)
         for line in reader:
             info = dict(zip(headers, line))
             report[info['user']] = self.process_user_record(info)
@@ -571,7 +574,7 @@ class CredentialReport(Filter):
     @classmethod
     def process_user_record(cls, info):
         """Type convert the csv record, modifies in place."""
-        keys = info.keys()
+        keys = list(info.keys())
         # Value conversion
         for k in keys:
             v = info[k]
@@ -694,6 +697,50 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
+                if self.match(p) and r not in matched:
+                    matched.append(r)
+        return matched
+
+
+@User.filter_registry.register('group')
+class GroupMembership(ValueFilter):
+    """Filter IAM users based on attached group values
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: iam-users-with-admin-access
+                resource: iam-user
+                filters:
+                  - type: group
+                    key: 'GroupName'
+                    value: 'AWSAdmin'
+    """
+
+    schema = type_schema('group', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListGroupsForUser',)
+
+    def get_user_groups(self, client, user_set):
+        for u in user_set:
+            u['c7n:Groups'] = client.list_groups_for_user(
+                UserName=u['UserName'])['Groups']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for user_set in chunks(
+                    [r for r in resources if 'c7n:Groups' not in r], size=50):
+                futures.append(
+                    w.submit(self.get_user_groups, client, user_set))
+            for f in as_completed(futures):
+                pass
+
+        matched = []
+        for r in resources:
+            for p in r['c7n:Groups']:
                 if self.match(p) and r not in matched:
                     matched.append(r)
         return matched
@@ -920,7 +967,7 @@ class UserRemoveAccessKey(BaseAction):
             keys = r['AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(

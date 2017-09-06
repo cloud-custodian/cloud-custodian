@@ -24,11 +24,16 @@ class Kinesis(BaseTest):
             'name': 'kstream',
             'resource': 'kinesis',
             'filters': [
-                {'type': 'value', 'value_type': 'size',
-                 'value': 2, 'key': 'Shards'}]
+                {'type': 'value',
+                 'value_type': 'size',
+                 'value': 3,
+                 'key': 'Shards'}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'Origin', 'Value': 'home'}])
         self.assertEqual(resources[0]['StreamStatus'], 'ACTIVE')
 
     def test_stream_delete(self):

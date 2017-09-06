@@ -10,7 +10,7 @@ man/
 lib64
 .Python
 pip-selfcheck.json
-cover/
+coverage/
 .coverage*
 tmp/
 docs/source/generated/

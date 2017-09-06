@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,7 +71,11 @@ class Config(dict):
             'dryrun': False})
         d.update(kw)
         if not os.path.exists(d['output_dir']):
-            os.mkdir(d['output_dir'])
+            try:
+                os.mkdir(d['output_dir'])
+            except OSError as error:
+                log.warning("Unable to make output directory: {}".format(error))
+
         return cls(d)
 
 

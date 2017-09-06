@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
             try:
                 results = retry(
                     client.describe_tags,
-                    LoadBalancerNames=elb_map.keys())
+                    LoadBalancerNames=list(elb_map.keys()))
                 break
             except ClientError as e:
                 if e.response['Error']['Code'] != 'LoadBalancerNotFound':

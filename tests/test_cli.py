@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import codecs
-import io
 import json
 import os
 import sys
 
-import six
 from argparse import ArgumentTypeError
 from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
-from .common import BaseTest
-
-
-class AmbiguousIO(io.BytesIO):
-
-    def write(self, x):
-
-        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
-        # requires us to choose. We don't have control over all of the places
-        # we want to print from (think: traceback.print_exc) so we can't
-        # standardize the arg type up at the call sites. Hack it here.
-
-        if type(x) is six.text_type:
-            x = codecs.encode(x, 'utf8')
-        io.BytesIO.write(self, x)
+from .common import BaseTest, TextTestIO
 
 
 class CliTest(BaseTest):
@@ -54,8 +37,8 @@ class CliTest(BaseTest):
         return out
 
     def capture_output(self):
-        out = AmbiguousIO()
-        err = AmbiguousIO()
+        out = TextTestIO()
+        err = TextTestIO()
         self.patch(sys, 'stdout', out)
         self.patch(sys, 'stderr', err)
         return out, err
@@ -136,7 +119,7 @@ class ValidateTest(CliTest):
         json_file = self.write_policy_file(invalid_policies, format='json')
 
         # YAML validation
-        self.run_and_expect_failure(['custodian', 'validate', yaml_file], 1)
+        self.run_and_expect_exception(['custodian', 'validate', yaml_file], SystemExit)
 
         # JSON validation
         self.run_and_expect_failure(['custodian', 'validate', json_file], 1)
@@ -279,6 +262,7 @@ class ReportTest(CliTest):
         # This test is to examine the warning output supplied when -p is used and
         # the resulting policy set is empty.  It is not specific to the `report`
         # subcommand - it is also used by `run` and a few other subcommands.
+
         policy_name = 'test-policy'
         valid_policies = {
             'policies':
@@ -383,8 +367,9 @@ class RunTest(CliTest):
         )
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory',
-                   staticmethod(lambda x=None: session_factory))
+        self.patch(
+            PolicyCollection, 'session_factory',
+            staticmethod(lambda x=None: session_factory))
 
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({
@@ -450,10 +435,11 @@ class MetricsTest(CliTest):
 
     def test_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
-
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory',
-                   staticmethod(lambda x=None: session_factory))
+
+        self.patch(
+            PolicyCollection, 'session_factory',
+            staticmethod(lambda x=None: session_factory))
 
         yaml_file = self.write_policy_file({
             'policies': [{
@@ -483,17 +469,17 @@ class MetricsTest(CliTest):
             {'ec2-tag-compliance-v6':
              {u'Durations': [],
               u'Errors': [{u'Sum': 0.0,
-                           u'Timestamp': u'2016-05-30T10:50:00',
+                           u'Timestamp': u'2016-05-30T10:50:00+00:00',
                            u'Unit': u'Count'}],
               u'Invocations': [{u'Sum': 4.0,
-                                u'Timestamp': u'2016-05-30T10:50:00',
+                                u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                 u'Unit': u'Count'}],
               u'ResourceCount': [{u'Average': 1.0,
                                   u'Sum': 2.0,
-                                  u'Timestamp': u'2016-05-30T10:50:00',
+                                  u'Timestamp': u'2016-05-30T10:50:00+00:00',
                                   u'Unit': u'Count'}],
               u'Throttles': [{u'Sum': 0.0,
-                              u'Timestamp': u'2016-05-30T10:50:00',
+                              u'Timestamp': u'2016-05-30T10:50:00+00:00',
                               u'Unit': u'Count'}]}})
 
     def test_metrics_get_endpoints(self):

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,13 +49,13 @@ class Table(QueryResourceManager):
 
     def augment(self, tables):
         resources = super(Table, self).augment(tables)
-        return filter(None, _dynamodb_table_tags(
+        return list(filter(None, _dynamodb_table_tags(
             self.get_model(),
             resources,
             self.session_factory,
             self.executor_factory,
             self.retry,
-            self.log))
+            self.log)))
 
 
 def _dynamodb_table_tags(

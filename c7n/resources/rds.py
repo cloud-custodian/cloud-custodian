@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ Find rds instances that are not encrypted
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
+import json
 import itertools
 import logging
 import operator
@@ -65,7 +66,7 @@ from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
 from c7n import tags
 from c7n.utils import (
     local_session, type_schema,
@@ -129,12 +130,35 @@ class RDS(QueryResourceManager):
                 account_id=self.account_id, resource_type='db', separator=':')
         return self._generate_arn
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRDS(self)
+        elif source_type == 'config':
+            return ConfigRDS(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeRDS(DescribeSource):
+
     def augment(self, dbs):
         filter(None, _rds_tags(
-            self.get_model(),
-            dbs, self.session_factory, self.executor_factory,
-            self.generate_arn, self.retry))
+            self.manager.get_model(),
+            dbs,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.generate_arn,
+            self.manager.retry))
         return dbs
+
+
+class ConfigRDS(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDS, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        return resource
 
 
 def _rds_tags(
@@ -268,6 +292,11 @@ def _get_available_engine_upgrades(client, major=False):
 class RDSOffHour(OffHour):
     """Scheduled action on rds instance.
     """
+
+
+@filters.register('onhour')
+class RDSOnHour(OnHour):
+    """Scheduled action on rds instance."""
 
 
 @filters.register('default-vpc')
@@ -568,12 +597,12 @@ class TagTrim(tags.TagTrim):
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
-def _elgibile_start_stop(db, state="available"):
+def _eligible_start_stop(db, state="available"):
 
     if db.get('DBInstanceStatus') != state:
         return False
 
-    if db.get('MultiAZ') is False:
+    if db.get('MultiAZ'):
         return False
 
     if db.get('ReadReplicaDBInstanceIdentifiers'):
@@ -600,14 +629,14 @@ class Stop(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        for r in filter(_elgibile_start_stop, resources):
+        for r in filter(_eligible_start_stop, resources):
             try:
                 client.stop_db_instance(
                     DBInstanceIdentifier=r['DBInstanceIdentifier'])
             except ClientError as e:
                 log.exception(
                     "Error stopping db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('start')
@@ -624,7 +653,7 @@ class Start(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        start_filter = functools.partial(_elgibile_start_stop, state='stopped')
+        start_filter = functools.partial(_eligible_start_stop, state='stopped')
         for r in filter(start_filter, resources):
             try:
                 client.start_db_instance(
@@ -632,7 +661,7 @@ class Start(BaseAction):
             except ClientError as e:
                 log.exception(
                     "Error starting db instance:%s err:%s",
-                    r['DBInstanceIdentier'], e)
+                    r['DBInstanceIdentifier'], e)
 
 
 @actions.register('delete')
@@ -895,7 +924,7 @@ class RetentionWindow(BaseAction):
         current_copy_tags = resource['CopyTagsToSnapshot']
         new_retention = self.data['days']
         new_copy_tags = self.data.get('copy-tags', True)
-        retention_type = self.data['enforce', 'min'].lower()
+        retention_type = self.data.get('enforce', 'min').lower()
 
         if ((retention_type == 'min' or
              current_copy_tags != new_copy_tags) and
@@ -981,12 +1010,36 @@ class RDSSnapshot(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRDSSnapshot(self)
+        elif source_type == 'config':
+            return ConfigRDSSnapshot(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeRDSSnapshot(DescribeSource):
+
     def augment(self, snaps):
         filter(None, _rds_snap_tags(
-            self.get_model(),
-            snaps, self.session_factory, self.executor_factory,
-            self.generate_arn, self.retry))
+            self.manager.get_model(),
+            snaps,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.generate_arn,
+            self.manager.retry))
         return snaps
+
+
+class ConfigRDSSnapshot(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDSSnapshot, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        # TODO: Load DBSnapshotAttributes into annotation
+        return resource
 
 
 def _rds_snap_tags(
@@ -1010,11 +1063,11 @@ def _rds_snap_tags(
         return snap
 
     with executor_factory(max_workers=1) as w:
-        return filter(None, (w.map(process_tags, snaps)))
+        return list(filter(None, (w.map(process_tags, snaps))))
 
 
 @RDSSnapshot.filter_registry.register('onhour')
-class RDSOnHour(OnHour):
+class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
 
 
@@ -1058,7 +1111,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
 
     date_attribute = 'SnapshotCreateTime'
 
@@ -1563,7 +1616,7 @@ class ParameterFilter(ValueFilter):
 
         for pg in param_groups:
             cache_key = {
-                'region': self.manager.config.regions,
+                'region': self.manager.config.region,
                 'account_id': self.manager.config.account_id,
                 'rds-pg': pg}
             pg_values = self.manager._cache.get(cache_key)

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, AutoTagUser, BaseAction
+from c7n.actions import ActionRegistry, AutoTagUser, BaseAction, RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -48,13 +48,13 @@ class AWSLambda(QueryResourceManager):
 
     def augment(self, functions):
         resources = super(AWSLambda, self).augment(functions)
-        return filter(None, _lambda_function_tags(
+        return list(filter(None, _lambda_function_tags(
             self.get_model(),
             resources,
             self.session_factory,
             self.executor_factory,
             self.retry,
-            self.log))
+            self.log)))
 
 
 def _lambda_function_tags(
@@ -140,7 +140,7 @@ class LambdaEventSource(ValueFilter):
         self.data['key'] = self.annotation_key
 
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
             return super(LambdaEventSource, self).process(resources, event)
 
     def __call__(self, r):
@@ -156,6 +156,9 @@ class LambdaEventSource(ValueFilter):
             if sources:
                 r[self.annotation_key] = list(sources)
         return self.match(r)
+
+
+ErrAccessDenied = "AccessDeniedException"
 
 
 @filters.register('cross-account')
@@ -193,17 +196,82 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
                     FunctionName=r['FunctionName'])['Policy']
                 return r
             except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDeniedException':
+                if e.response['Error']['Code'] == ErrAccessDenied:
                     self.log.warning(
                         "Access denied getting policy lambda:%s",
                         r['FunctionName'])
 
         self.log.debug("fetching policy for %d lambdas" % len(resources))
         with self.executor_factory(max_workers=3) as w:
-            resources = filter(None, w.map(_augment, resources))
+            resources = list(filter(None, w.map(_augment, resources)))
 
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
+
+
+@actions.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy/permission statements from lambda functions.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: lambda-remove-cross-accounts
+                resource: lambda
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+
+    schema = type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = ("lambda:GetPolicy", "lambda:RemovePermission")
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('lambda')
+        for r in resources:
+            try:
+                if self.process_resource(client, r):
+                    results.append(r)
+            except:
+                self.log.exception(
+                    "Error processing lambda %s", r['FunctionArn'])
+        return results
+
+    def process_resource(self, client, resource):
+        if 'Policy' not in resource:
+            try:
+                resource['Policy'] = client.get_policy(
+                    FunctionName=resource['FunctionName']).get('Policy')
+            except ClientError as e:
+                if e.response['Error']['Code'] != ErrAccessDenied:
+                    raise
+                resource['Policy'] = None
+
+        if not resource['Policy']:
+            return
+
+        p = json.loads(resource['Policy'])
+
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+        if not found:
+            return
+
+        for f in found:
+            client.remove_permission(
+                FunctionName=resource['FunctionName'],
+                StatementId=f['Sid'])
 
 
 @actions.register('mark-for-op')

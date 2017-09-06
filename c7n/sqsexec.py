@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,12 +113,7 @@ class MessageIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.client.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.client.receive_message(
@@ -132,6 +127,13 @@ class MessageIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # back-compat
+
+    def ack(self, m):
+        self.client.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class SQSWorker(object):

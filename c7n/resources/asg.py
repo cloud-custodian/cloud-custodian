@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -484,7 +484,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             return unencrypted_configs
 
         self.log.debug("querying %d snapshots", len(snaps))
-        for s in self.get_snapshots(ec2, snaps.keys()):
+        for s in self.get_snapshots(ec2, list(snaps.keys())):
             if not s.get('Encrypted'):
                 unencrypted_configs.update(snaps[s['SnapshotId']])
         return unencrypted_configs
@@ -529,7 +529,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -1257,7 +1257,10 @@ class Resume(Action):
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        ec2_client.start_instances(InstanceIds=instance_ids)
+
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.
@@ -1359,7 +1362,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number'})
 
 

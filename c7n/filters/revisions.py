@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,17 +15,23 @@
 Custodian support for diffing and patching across multiple versions
 of a resource.
 """
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import json
 import six
+
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
+from dateutil.tz import tzlocal, tzutc
 
 from c7n.filters import Filter, FilterValidationError
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, camelResource
 
 
 ErrNotFound = "ResourceNotDiscoveredException"
+
+UTC = tzutc()
 
 
 class Diff(Filter):
@@ -65,9 +71,9 @@ class Diff(Filter):
             idx = self.manager.data['filters'].index(self.data)
             found = False
             for n in self.manager.data['filters'][:idx]:
-                if isinstance(n, dict) and n.get('type', '') == 'is-locked':
+                if isinstance(n, dict) and n.get('type', '') == 'locked':
                     found = True
-                if isinstance(n, six.string_types) and n == 'is-locked':
+                if isinstance(n, six.string_types) and n == 'locked':
                     found = True
             if not found:
                 raise FilterValidationError(
@@ -100,6 +106,8 @@ class Diff(Filter):
             revisions = config.get_resource_config_history(
                 **params)['configurationItems']
         except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotDiscoveredException':
+                return []
             if e.response['Error']['Code'] != ErrNotFound:
                 self.log.debug(
                     "config - resource %s:%s not found" % (
@@ -126,6 +134,11 @@ class Diff(Filter):
 
     def select_revision(self, revisions):
         for rev in revisions:
+            # convert unix timestamp to utc to be normalized with other dates
+            if rev['configurationItemCaptureTime'].tzinfo and \
+               isinstance(rev['configurationItemCaptureTime'].tzinfo, tzlocal):
+                rev['configurationItemCaptureTime'] = rev[
+                    'configurationItemCaptureTime'].astimezone(UTC)
             return {
                 'date': rev['configurationItemCaptureTime'],
                 'version_id': rev['configurationStateId'],
@@ -134,7 +147,8 @@ class Diff(Filter):
 
     def transform_revision(self, revision):
         """make config revision look like describe output."""
-        raise NotImplementedError("subclass responsibility")
+        config = self.manager.get_source('config')
+        return config.augment([camelResource(json.loads(revision['configuration']))])[0]
 
     def diff(self, source, target):
         raise NotImplementedError("Subclass responsibility")

@@ -1,0 +1,37 @@
+{
+    "status_code": 201, 
+    "data": {
+        "SizeInBytes": {
+            "Value": 0
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "044defa8-84db-11e7-9018-150d1b08e163", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "044defa8-84db-11e7-9018-150d1b08e163", 
+                "date": "Sat, 19 Aug 2017 12:36:26 GMT", 
+                "content-length": "388", 
+                "content-type": "application/json"
+            }
+        }, 
+        "CreationToken": "e6986d0c-4720-4a08-881d-d694695c6d51", 
+        "Encrypted": true, 
+        "CreationTime": {
+            "hour": 7, 
+            "__class__": "datetime", 
+            "month": 8, 
+            "second": 26, 
+            "microsecond": 0, 
+            "year": 2017, 
+            "day": 19, 
+            "minute": 36
+        }, 
+        "PerformanceMode": "generalPurpose", 
+        "FileSystemId": "fs-1ac6a253", 
+        "NumberOfMountTargets": 0, 
+        "LifeCycleState": "creating", 
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5", 
+        "OwnerId": "644160558196"
+    }
+}

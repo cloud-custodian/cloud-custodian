@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ def factory(config):
     if not config.cache or not config.cache_period:
         log.debug("Disabling cache")
         return NullCache(config)
+    elif config.cache == 'memory':
+        log.debug("Using in-memory cache")
+        return InMemoryCache()
 
     return FileCacheManager(config)
 
@@ -49,6 +52,24 @@ class NullCache(object):
 
     def save(self, key, data):
         pass
+
+
+class InMemoryCache(object):
+    # Running in a temporary environment, so keep as a cache.
+
+    __shared_state = {}
+
+    def __init__(self):
+        self.data = self.__shared_state
+
+    def load(self):
+        return True
+
+    def get(self, key):
+        return self.data.get(pickle.dumps(key))
+
+    def save(self, key, data):
+        self.data[pickle.dumps(key)] = data
 
 
 class FileCacheManager(object):
@@ -73,7 +94,7 @@ class FileCacheManager(object):
             if (time.time() - os.stat(self.cache_path).st_mtime >
                     self.config.cache_period * 60):
                 return False
-            with open(self.cache_path) as fh:
+            with open(self.cache_path, 'rb') as fh:
                 try:
                     self.data = pickle.load(fh)
                 except EOFError:
@@ -83,7 +104,7 @@ class FileCacheManager(object):
 
     def save(self, key, data):
         try:
-            with open(self.cache_path, 'w') as fh:
+            with open(self.cache_path, 'wb') as fh:
                 self.data[pickle.dumps(key)] = data
                 pickle.dump(self.data, fh, protocol=2)
         except Exception as e:

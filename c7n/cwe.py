@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,10 @@ class CloudWatchEvents(object):
     trail_events = {
         # event source, resource type as keys, mapping to api call and
         # jmespath expression
+        'ConsoleLogin': {
+            'ids': 'userIdentity.arn',
+            'source': 'signin.amazonaws.com'},
+
         'CreateAutoScalingGroup': {
             'ids': 'requestParameters.autoScalingGroupName',
             'source': 'autoscaling.amazonaws.com'},
@@ -66,6 +70,14 @@ class CloudWatchEvents(object):
         'SetLoadBalancerPoliciesOfListener': {
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
+
+        'CreateElasticsearchDomain': {
+            'ids': 'requestParameters.domainName',
+            'source': 'es.amazonaws.com'},
+
+        'CreateTable': {
+            'ids': 'requestParameters.tableName',
+            'source': 'dynamodb.amazonaws.com"'},
 
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
@@ -141,4 +153,4 @@ class CloudWatchEvents(object):
         if not isinstance(resource_ids, (tuple, list)):
             resource_ids = [resource_ids]
 
-        return filter(None, resource_ids)
+        return list(filter(None, resource_ids))

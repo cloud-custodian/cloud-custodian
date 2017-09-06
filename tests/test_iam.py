@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ from c7n.resources.iam import (
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole, UnusedIamRole,
-    IamGroupUsers, UserPolicy,
+    IamGroupUsers, UserPolicy, GroupMembership,
     UserCredentialReport, UserAccessKey,
     IamRoleInlinePolicy, IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
@@ -219,6 +219,27 @@ class IamUserFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
+
+
+class IamUserGroupMembership(BaseTest):
+
+    def test_iam_user_group_membership(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_group_membership')
+        self.patch(
+            GroupMembership, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-admin-users',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'group',
+                'key': 'GroupName',
+                'value': 'QATester'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserName'], 'kapil')
+        self.assertTrue(resources[0]['c7n:Groups'])
 
 
 class IamInstanceProfileFilterUsage(BaseTest):
@@ -694,12 +715,14 @@ class CrossAccountChecker(TestCase):
                  'Effect': 'Allow',
                  'NotPrincipal': '90120'}]}
         self.assertTrue(
-            bool(check_cross_account(policy, set(['221800032964']))))
+            bool(check_cross_account(
+                policy, set(['221800032964']), False, (), None)))
 
     def test_sqs_policies(self):
         policies = load_data('iam/sqs-policies.json')
         for p, expected in zip(
                 policies, [False, True, True, False,
                            False, False, False, False]):
-            violations = check_cross_account(p, set(['221800032964']))
+            violations = check_cross_account(
+                p, set(['221800032964']), False, (), None)
             self.assertEqual(bool(violations), expected)

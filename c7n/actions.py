@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ class ActionRegistry(PluginRegistry):
         if action_class is None:
             raise ValueError(
                 "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
@@ -262,7 +262,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
-                remove_groups = r.get('c7n.matched-security-groups', ())
+                remove_groups = r.get('c7n:matched-security-groups', ())
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
@@ -400,7 +400,9 @@ class Notify(EventAction):
 
     schema = {
         'type': 'object',
-        'required': ['type', 'transport', 'to'],
+        'anyOf': [
+            {'required': ['type', 'transport', 'to']},
+            {'required': ['type', 'transport', 'to_from']}],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
@@ -451,13 +453,13 @@ class Notify(EventAction):
             to_from['url'] = to_from['url'].format(**message)
             if 'expr' in to_from:
                 to_from['expr'] = to_from['expr'].format(**message)
-            p['to'] = ValuesFrom(to_from).get_values()
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
         if 'cc_from' in self.data:
             cc_from = self.data['cc_from'].copy()
             cc_from['url'] = cc_from['url'].format(**message)
             if 'expr' in cc_from:
                 cc_from['expr'] = cc_from['expr'].format(**message)
-            p['cc'] = ValuesFrom(cc_from).get_values()
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
         return p
 
     def process(self, resources, event=None):
@@ -485,6 +487,12 @@ class Notify(EventAction):
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
 
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
     def send_sns(self, message):
         topic = self.data['transport']['topic']
         if topic.startswith('arn:aws:sns'):
@@ -496,13 +504,14 @@ class Notify(EventAction):
                 message['region'], message['account_id'], topic)
         client = self.manager.session_factory(
             region=region, assume=self.assume_role).client('sns')
-        client.publish(
-            TopicArn=topic_arn,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message))))
+        client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        if queue.startswith('https://sqs.'):
+        if queue.startswith('https://queue.amazonaws.com'):
+            region = 'us-east-1'
+            queue_url = queue
+        elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
         elif queue.startswith('arn:sqs'):
@@ -528,7 +537,7 @@ class Notify(EventAction):
         }
         result = client.send_message(
             QueueUrl=queue_url,
-            MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
+            MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
 
@@ -541,14 +550,19 @@ class AutoTagUser(EventAction):
       policies:
         - name: ec2-auto-tag-owner
           resource: ec2
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
           filters:
            - tag:Owner: absent
           actions:
-           - type: auto-tag-creator
+           - type: auto-tag-user
              tag: OwnerContact
 
-    There's a number of caveats to usage, resources which don't
-    include tagging as part of their api, may have some delay before
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
     automation kicks in to create a tag. Real world delay may be several
     minutes, with worst case into hours[0]. This creates a race condition
     between auto tagging and automation.
@@ -559,7 +573,7 @@ class AutoTagUser(EventAction):
 
     References
      - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
-     - CloudTrail User - http://goo.gl/XQhIG6 q
+     - CloudTrail User - http://goo.gl/XQhIG6
     """
 
     schema = utils.type_schema(
@@ -640,7 +654,7 @@ class AutoTagUser(EventAction):
         principal_id_key = self.data.get('principal_id_tag', None)
         if principal_id_key and principal_id_value:
             new_tags[principal_id_key] = principal_id_value
-        for key, value in new_tags.iteritems():
+        for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
 
@@ -685,7 +699,7 @@ class PutMetric(BaseAction):
                     'type':'object'
                 },
             },
-            'op': {'enum': METRIC_OPS.keys()},
+            'op': {'enum': list(METRIC_OPS.keys())},
             'units': {'enum': METRIC_UNITS}
         }
     }
@@ -748,3 +762,33 @@ class PutMetric(BaseAction):
         client.put_metric_data(Namespace=ns, MetricData=metrics_data)
 
         return resources
+
+
+class RemovePolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    def process_policy(self, policy, resource, matched_key):
+        statement_ids = self.data.get('statement_ids')
+
+        found = []
+        statements = policy.get('Statement', [])
+        resource_statements = resource.get(
+            matched_key, ())
+
+        for s in list(statements):
+            if statement_ids == ['matched']:
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['statement_ids']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return None, found
+        return statements, found

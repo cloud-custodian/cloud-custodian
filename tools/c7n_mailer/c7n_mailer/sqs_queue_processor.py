@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import base64
 import json
 import logging
 import zlib
+
+import six
 
 from email_delivery import EmailDelivery
 from sns_delivery import SnsDelivery
@@ -144,7 +146,7 @@ class MailerSqsQueueProcessor(object):
         # and send any emails (to SES or SMTP) if there are email addresses found
         email_delivery = EmailDelivery(self.config, self.session, self.logger)
         to_addrs_to_email_messages_map = email_delivery.get_to_addrs_email_messages_map(sqs_message)
-        for email_to_addrs, mimetext_msg in to_addrs_to_email_messages_map.iteritems():
+        for email_to_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
             email_delivery.send_c7n_email(sqs_message, list(email_to_addrs), mimetext_msg)
 
         # this sections gets the map of sns_to_addresses to rendered_jinja messages

@@ -11,13 +11,14 @@ sphinx-rtd-theme==0.2.4
 nose-timer==0.7.0
 twine
 fakeredis
-pytest>=2.7.0
-pytest-xdist
+pytest>=3.2.1
+pytest-xdist>=1.2.0
 pytest-cov
+tox
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext
-# Local package required for new c7n_mailer tests
+# Local package required for c7n_mailer tests
 -e tools/c7n_mailer
 
 # requires pandoc, fails on ci server, only used for pypi metadata

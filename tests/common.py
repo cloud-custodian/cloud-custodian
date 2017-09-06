@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ import logging
 import os
 import shutil
 import tempfile
-import yaml
 import unittest
+import uuid
+
+import six
+import yaml
 
 from c7n import policy
 from c7n.schema import generate, validate as schema_validate
@@ -63,16 +66,15 @@ class BaseTest(PillTest):
         Input a dictionary and a format. Valid formats are `yaml` and `json`
         Returns the file path.
         """
-        suffix = "." + format
-        file = tempfile.NamedTemporaryFile(suffix=suffix)
+        fh = tempfile.NamedTemporaryFile(mode='w+b', suffix='.' + format)
         if format == 'json':
-            json.dump(policy, file)
+            fh.write(json.dumps(policy).encode('utf8'))
         else:
-            file.write(yaml.dump(policy, Dumper=yaml.SafeDumper))
+            fh.write(yaml.dump(policy, encoding='utf8', Dumper=yaml.SafeDumper))
 
-        file.flush()
-        self.addCleanup(file.close)
-        return file.name
+        fh.flush()
+        self.addCleanup(fh.close)
+        return fh.name
 
     def get_temp_dir(self):
         """ Return a temporary directory that will get cleaned up. """
@@ -153,7 +155,7 @@ class BaseTest(PillTest):
             self, name=None, level=logging.INFO,
             formatter=None, log_file=None):
         if log_file is None:
-            log_file = io.StringIO()
+            log_file = TextTestIO()
         log_handler = logging.StreamHandler(log_file)
         if formatter:
             log_handler.setFormatter(formatter)
@@ -174,15 +176,98 @@ class BaseTest(PillTest):
         return ACCOUNT_ID
 
 
+class ConfigTest(BaseTest):
+    """Test base class for integration tests with aws config.
+
+    To allow for integration testing with config.
+
+     - before creating and modifying use the
+       initialize_config_subscriber method to setup an sqs queue on
+       the config recorder's sns topic. returns the sqs queue url.
+
+     - after creating/modifying a resource, use the wait_for_config
+       with the queue url and the resource id.
+    """
+
+    def wait_for_config(self, session, queue_url, resource_id):
+        # lazy import to avoid circular
+        from c7n.sqsexec import MessageIterator
+        client = session.client('sqs')
+        messages = MessageIterator(client, queue_url, timeout=20)
+        results = []
+        while True:
+            for m in messages:
+                msg = json.loads(m['Body'])
+                change = json.loads(msg['Message'])
+                messages.ack(m)
+                if change['configurationItem']['resourceId'] != resource_id:
+                    continue
+                results.append(change['configurationItem'])
+                break
+            if results:
+                break
+        return results
+
+    def initialize_config_subscriber(self, session):
+        config = session.client('config')
+        sqs = session.client('sqs')
+        sns = session.client('sns')
+
+        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
+        assert channels, "config not enabled"
+
+        topic = channels[0]['snsTopicARN']
+        queue = "custodian-waiter-%s" % str(uuid.uuid4())
+        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
+        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
+
+        attrs = sqs.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
+        queue_arn = attrs['Attributes']['QueueArn']
+        policy = json.loads(attrs['Attributes'].get(
+            'Policy',
+            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
+        policy['Statement'].append({
+            "Sid": "ConfigTopicSubscribe",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": topic}}})
+        sqs.set_queue_attributes(
+            QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
+        subscription = sns.subscribe(
+            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get(
+                'SubscriptionArn')
+        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
+        return queue_url
+
+
+class TextTestIO(io.StringIO):
+
+    def write(self, b):
+
+        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
+        # requires us to choose. We don't have control over all of the places
+        # we want to print from (think: traceback.print_exc) so we can't
+        # standardize the arg type up at the call sites. Hack it here.
+
+        if not isinstance(b, six.text_type):
+            b = b.decode('utf8')
+        return super(TextTestIO, self).write(b)
+
+
 def placebo_dir(name):
     return os.path.join(
         os.path.dirname(__file__), 'data', 'placebo', name)
 
 
-def event_data(name):
+def event_data(name, event_type='cwe'):
     with open(
             os.path.join(
-                os.path.dirname(__file__), 'data', 'cwe', name)) as fh:
+                os.path.dirname(__file__), 'data', event_type, name)) as fh:
         return json.load(fh)
 
 

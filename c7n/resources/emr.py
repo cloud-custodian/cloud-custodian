@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,7 +56,10 @@ class EMRCluster(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'ClusterStates': [
+                    'running', 'bootstrapping', 'waiting']}]))
 
     @classmethod
     def get_permissions(cls):
@@ -265,11 +268,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "EMR Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
