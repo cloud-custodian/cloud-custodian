@@ -762,3 +762,33 @@ class PutMetric(BaseAction):
         client.put_metric_data(Namespace=ns, MetricData=metrics_data)
 
         return resources
+
+
+class RemovePolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    def process_policy(self, policy, resource, matched_key):
+        statement_ids = self.data.get('statement_ids')
+
+        found = []
+        statements = policy.get('Statement', [])
+        resource_statements = resource.get(
+            matched_key, ())
+
+        for s in list(statements):
+            if statement_ids == ['matched']:
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['statement_ids']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return None, found
+        return statements, found

@@ -19,7 +19,7 @@ import json
 from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.actions import BaseAction
+from c7n.actions import RemovePolicyBase
 from c7n.utils import local_session, type_schema
 
 
@@ -78,7 +78,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 
 
 @ECR.action_registry.register('remove-statements')
-class RemovePolicyStatement(BaseAction):
+class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from ECR
 
     :example:
@@ -101,7 +101,8 @@ class RemovePolicyStatement(BaseAction):
         statement_ids={'oneOf': [
             {'enum': ['matched']},
             {'type': 'array', 'items': {'type': 'string'}}]})
-    permissions = ("ecr:SetRepositoryPolicy",)
+
+    permissions = ("ecr:SetRepositoryPolicy", "ecr:GetRepositoryPolicy")
 
     def process(self, resources):
         results = []
@@ -129,10 +130,12 @@ class RemovePolicyStatement(BaseAction):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(p, resource)
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
 
         if statements is None:
             return
+
         if not statements:
             client.delete_repository_policy(
                 repositoryName=resource['repositoryName'])
@@ -143,23 +146,3 @@ class RemovePolicyStatement(BaseAction):
         return {'Name': resource['repositoryName'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
-
-    def process_policy(self, policy, resource):
-        statement_ids = self.data.get('statement_ids')
-
-        found = []
-        statements = policy.get('Statement', [])
-        resource_statements = resource.get(
-            CrossAccountAccessFilter.annotation_key, ())
-
-        for s in list(statements):
-            if statement_ids == ['matched']:
-                if s in resource_statements:
-                    found.append(s)
-                    statements.remove(s)
-            elif s['Sid'] in self.data['statement_ids']:
-                found.append(s)
-                statements.remove(s)
-        if not found:
-            return None, found
-        return statements, found
