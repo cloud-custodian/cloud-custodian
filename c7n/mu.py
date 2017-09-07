@@ -337,6 +337,15 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
+            new_config = func.get_config()
+
+            old_runtime = old_config['Runtime']
+            new_runtime = new_config['Runtime']
+
+            if old_runtime != new_runtime:
+                raise RuntimeError(
+                    'Lambda already installed with {}.'.format(old_runtime))
+
             if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
@@ -346,9 +355,7 @@ class LambdaManager(object):
             # TODO/Consider also set publish above to false, and publish
             # after configuration change?
 
-            new_config = func.get_config()
             new_config['Role'] = role
-            del new_config['Runtime']
             new_tags = new_config.pop('Tags', {})
 
             if self.delta_function(old_config, new_config):
