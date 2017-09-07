@@ -190,7 +190,7 @@ class IamUserTest(BaseTest):
 
     @functional
     def test_iam_user_delete(self):
-        factory = self.record_flight_data('test_iam_user_delete')
+        factory = self.replay_flight_data('test_iam_user_delete')
         name = 'alice'
         client = factory().client('iam')
         client.create_user(UserName=name, Path="/test/")
