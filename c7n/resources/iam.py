@@ -836,44 +836,44 @@ class UserDelete(BaseAction):
 
     ... code-block: yaml
 
-     # using a 'credential' filter':
-     - name: iam-only-whitelisted-users
-       resource: iam-user
-       filters:
-         - type: credential
-           key: user
-           op: not-in
-           value:
-             - valid-user-1
-             - valid-user-2
-       actions:
-         - delete
+      # using a 'credential' filter':
+      - name: iam-only-whitelisted-users
+        resource: iam-user
+        filters:
+          - type: credential
+            key: user
+            op: not-in
+            value:
+              - valid-user-1
+              - valid-user-2
+        actions:
+          - delete
 
-     # using a 'username' filter with 'UserName':
-     - name: iam-only-whitelisted-users
-       resource: iam-user
-       filters:
-         - type: username
-           key: UserName
-           op: not-in
-           value:
-             - valid-user-1
-             - valid-user-2
-       actions:
-         - delete
+      # using a 'username' filter with 'UserName':
+      - name: iam-only-whitelisted-users
+        resource: iam-user
+        filters:
+          - type: username
+            key: UserName
+            op: not-in
+            value:
+              - valid-user-1
+              - valid-user-2
+        actions:
+          - delete
 
-     # using a 'username' filter with 'Arn':
-     - name: iam-only-whitelisted-users
-       resource: iam-user
-       filters:
-         - type: username
-           key: Arn
-           op: not-in
-           value:
-             - arn:aws:iam:123456789012:user/valid-user-1
-             - arn:aws:iam:123456789012:user/valid-user-2
-       actions:
-         - delete
+      # using a 'username' filter with 'Arn':
+      - name: iam-only-whitelisted-users
+        resource: iam-user
+        filters:
+          - type: username
+            key: Arn
+            op: not-in
+            value:
+              - arn:aws:iam:123456789012:user/valid-user-1
+              - arn:aws:iam:123456789012:user/valid-user-2
+        actions:
+          - delete
 
     """
     schema = type_schema('delete')
