@@ -42,6 +42,7 @@ load_resources()
 
 ACCOUNT_ID = '644160558196'
 
+C7N_RECORD = bool(os.environ.get('C7N_RECORD', ''))
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
@@ -56,9 +57,18 @@ if 'AWS_DEFAULT_REGION' not in os.environ:
 
 class BaseTest(PillTest):
 
+    recording = C7N_RECORD
+
     def cleanUp(self):
         # Clear out thread local session cache
         CONN_CACHE.session = None
+
+    def get_session_factory(self, flight_name, zdata=False):
+        if self.recording:
+            func = self.record_flight_data
+        else:
+            func = self.replay_flight_data
+        return func(flight_name, zdata)
 
     def write_policy_file(self, policy, format='yaml'):
         """ Write a policy file to disk in the specified format.
