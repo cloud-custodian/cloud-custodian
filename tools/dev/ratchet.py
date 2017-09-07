@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""Ratchet up successes under Python 3.6.
+"""Ratchet down failures under Python 3.6.
 """
 from __future__ import (
     absolute_import, division, print_function, unicode_literals)
@@ -88,7 +88,7 @@ def update_expectation(txt_path, tests):
 
 def main(xml_path, txt_path):
     """Takes two paths, one to XML output from pytest, the other to a text file
-    listing expected successes. Walks the former looking for the latter.
+    listing expected failures. Walks the former looking for the latter.
     """
     results = TestResults(xml_path).parse()
 
