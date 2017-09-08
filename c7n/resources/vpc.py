@@ -1337,6 +1337,33 @@ class InternetGateway(QueryResourceManager):
         id_prefix = "igw-"
 
 
+@resources.register('nat-gateway')
+class NATGateway(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'nat-gateway'
+        enum_spec = ('describe_nat_gateways', 'NatGateways', None)
+        name = id = 'NatGatewayId'
+        filter_name = 'NatGatewayIds'
+        filter_type = 'list'
+        dimension = None
+        date = 'CreateTime'
+        id_prefix = "nat-"
+
+
+@NATGateway.action_registry.register('delete')
+class DeleteNATGateway(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteNatGateway',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_nat_gateway(NatGatewayId=r['NatGatewayId'])
+
+
 @resources.register('vpn-connection')
 class VPNConnection(QueryResourceManager):
 
