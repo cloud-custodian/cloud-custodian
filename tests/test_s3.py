@@ -940,8 +940,8 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], bname)
 
-        # eventual consistency fun for recording
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         versioning = client.get_bucket_versioning(Bucket=bname)['Status']
         self.assertEqual('Enabled', versioning)
 
@@ -961,8 +961,8 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # eventual consistency fun for recording
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         versioning = client.get_bucket_versioning(Bucket=bname)['Status']
         self.assertEqual('Suspended', versioning)
 
@@ -989,8 +989,8 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], bname)
 
-        # eventual consistency fun for recording
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         logging = client.get_bucket_logging(Bucket=bname)['Status']
         self.assertEqual('Enabled', logging)
 
@@ -1010,8 +1010,8 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # eventual consistency fun for recording
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         logging = client.get_bucket_logging(Bucket=bname)['Status']
         self.assertEqual('Disabled', logging)
 
@@ -1250,7 +1250,8 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         notifications = client.get_bucket_notification_configuration(
             Bucket=bname)
         notifications.pop('ResponseMetadata')
@@ -1263,7 +1264,8 @@ class S3Test(BaseTest):
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
-        #time.sleep(30)
+        if self.recording:
+            time.sleep(30)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
@@ -1304,7 +1306,8 @@ class S3Test(BaseTest):
         # Check that the policy sets stuff up properly.
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         topic_notifications = client.get_bucket_notification_configuration(
             Bucket=bname).get('TopicConfigurations', [])
         us = [t for t in topic_notifications if t.get('TopicArn') == arn]
@@ -1314,7 +1317,8 @@ class S3Test(BaseTest):
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
-        #time.sleep(30)
+        if self.recording:
+            time.sleep(30)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
@@ -1380,7 +1384,8 @@ class S3Test(BaseTest):
         # Check that the policy sets stuff up properly.
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         notifies = client.get_bucket_notification_configuration(
             Bucket=bname).get('TopicConfigurations', [])
         existing = [t for t in notifies if 'existing' in t['TopicArn']]
@@ -1390,7 +1395,8 @@ class S3Test(BaseTest):
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
-        #time.sleep(30)
+        if self.recording:
+            time.sleep(30)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
@@ -1452,7 +1458,8 @@ class S3Test(BaseTest):
         # Check that the policy sets stuff up properly.
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        #time.sleep(10)
+        if self.recording:
+            time.sleep(10)
         notifies = client.get_bucket_notification_configuration(
             Bucket=bname).get('TopicConfigurations', [])
         existing = [t for t in notifies if 'existing' in t['TopicArn']]
@@ -1462,7 +1469,8 @@ class S3Test(BaseTest):
         client.put_object(
             Bucket=bname, Key='hello-world.txt',
             Body='hello world', ContentType='text/plain')
-        #time.sleep(30)
+        if self.recording:
+            time.sleep(30)
         info = client.head_object(Bucket=bname, Key='hello-world.txt')
         self.assertTrue('ServerSideEncryption' in info)
 
