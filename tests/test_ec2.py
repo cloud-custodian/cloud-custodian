@@ -30,7 +30,7 @@ from .common import BaseTest
 class TestTagAugmentation(BaseTest):
 
     def test_tag_augment_empty(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_augment_tag_empty')
         # recording was modified to be sans tags
         ec2 = session_factory().client('ec2')
@@ -42,7 +42,7 @@ class TestTagAugmentation(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_tag_augment(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_augment_tags')
         # recording was modified to be sans tags
         ec2 = session_factory().client('ec2')
@@ -59,7 +59,7 @@ class TestTagAugmentation(BaseTest):
 class TestMetricFilter(BaseTest):
 
     def test_metric_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_metric')
         ec2 = session_factory().client('ec2')
         policy = self.load_policy({
@@ -78,7 +78,7 @@ class TestMetricFilter(BaseTest):
 
 class TestHealthEventsFilter(BaseTest):
     def test_ec2_health_events_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_health_events_filter')
         policy = self.load_policy({
             'name': 'ec2-health-events-filter',
@@ -95,7 +95,7 @@ class TestTagTrim(BaseTest):
 
     def test_ec2_tag_trim(self):
         self.patch(tags.TagTrim, 'max_tag_count', 10)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_tag_trim')
         ec2 = session_factory().client('ec2')
         start_tags = {
@@ -137,7 +137,7 @@ class TestTagTrim(BaseTest):
 class TestVolumeFilter(BaseTest):
 
     def test_ec2_attached_ebs_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_attached_ebs_filter')
         policy = self.load_policy({
             'name': 'ec2-unencrypted-vol',
@@ -152,7 +152,7 @@ class TestVolumeFilter(BaseTest):
 
     # DISABLED / Re-record flight data on public account
     def test_ec2_attached_volume_skip_block(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_attached_ebs_filter')
         policy = self.load_policy({
             'name': 'ec2-unencrypted-vol',
@@ -172,7 +172,7 @@ class TestResizeInstance(BaseTest):
     def test_ec2_resize(self):
         # preconditions - three instances (2 m4.4xlarge, 1 m4.1xlarge)
         # one of the instances stopped
-        session_factory = self.replay_flight_data('test_ec2_resize')
+        session_factory = self.get_session_factory('test_ec2_resize')
         policy = self.load_policy({
             'name': 'ec2-resize',
             'resource': 'ec2',
@@ -230,7 +230,7 @@ class TestResizeInstance(BaseTest):
 class TestStateTransitionAgeFilter(BaseTest):
 
     def test_ec2_state_transition_age(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_state_transition_age_filter'
         )
         policy = self.load_policy({
@@ -277,7 +277,7 @@ class TestStateTransitionAgeFilter(BaseTest):
 class TestImageAgeFilter(BaseTest):
 
     def test_ec2_image_age(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_image_age_filter')
         policy = self.load_policy({
             'name': 'ec2-image-age',
@@ -294,7 +294,7 @@ class TestImageAgeFilter(BaseTest):
 class TestImageFilter(BaseTest):
 
     def test_ec2_image(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_image_filter')
         policy = self.load_policy({
             'name': 'ec2-image',
@@ -312,7 +312,7 @@ class TestInstanceAge(BaseTest):
 
     # placebo doesn't record tz information
     def test_ec2_instance_age(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_instance_age_filter')
         policy = self.load_policy({
             'name': 'ec2-instance-age',
@@ -329,7 +329,7 @@ class TestInstanceAge(BaseTest):
 class TestTag(BaseTest):
 
     def test_ec2_tag(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_mark')
         policy = self.load_policy({
             'name': 'ec2-test-mark',
@@ -370,7 +370,7 @@ class TestTag(BaseTest):
         self.assertRaises(FilterValidationError, self.load_policy, policy)
 
     def test_ec2_untag(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_untag')
         policy = self.load_policy({
             'name': 'ec2-test-unmark',
@@ -385,7 +385,7 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_ec2_normalize_tag(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_normalize_tag')
 
         policy = self.load_policy({
@@ -442,7 +442,7 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_ec2_rename_tag(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_rename_tag')
 
         policy = self.load_policy({
@@ -477,7 +477,7 @@ class TestTag(BaseTest):
 class TestStop(BaseTest):
 
     def test_ec2_stop(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_stop')
         policy = self.load_policy({
             'name': 'ec2-test-stop',
@@ -494,7 +494,7 @@ class TestStop(BaseTest):
 class TestStart(BaseTest):
 
     def test_ec2_start(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_start')
         policy = self.load_policy({
             'name': 'ec2-test-start',
@@ -510,7 +510,7 @@ class TestStart(BaseTest):
 class TestOr(BaseTest):
 
     def test_ec2_or_condition(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_stop')
         policy = self.load_policy({
             'name': 'ec2-test-snapshot',
@@ -530,7 +530,7 @@ class TestOr(BaseTest):
 class TestSnapshot(BaseTest):
 
     def test_ec2_snapshot_no_copy_tags(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_snapshot')
         policy = self.load_policy({
             'name': 'ec2-test-snapshot',
@@ -544,7 +544,7 @@ class TestSnapshot(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_ec2_snapshot_copy_tags(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_snapshot')
         policy = self.load_policy({
             'name': 'ec2-test-snapshot',
@@ -560,7 +560,7 @@ class TestSnapshot(BaseTest):
 class TestSetInstanceProfile(BaseTest):
 
     def test_ec2_set_instance_profile_assocation(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_set_instance_profile_association')
         policy = self.load_policy({
             'name': 'ec2-test-set-instance-profile-association',
@@ -586,7 +586,7 @@ class TestSetInstanceProfile(BaseTest):
                 self.assertIn(':instance-profile/ec2-default', i['IamInstanceProfile']['Arn'])
 
     def test_ec2_set_instance_profile_disassocation(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_set_instance_profile_disassociation')
         policy = self.load_policy({
             'name': 'ec2-test-set-instance-profile-disassociation',
@@ -641,7 +641,7 @@ class TestTerminate(BaseTest):
 
     def test_ec2_terminate(self):
         # Test conditions: single running instance, with delete protection
-        session_factory = self.replay_flight_data('test_ec2_terminate')
+        session_factory = self.get_session_factory('test_ec2_terminate')
         p = self.load_policy({
             'name': 'ec2-term',
             'resource': 'ec2',
@@ -660,7 +660,7 @@ class TestTerminate(BaseTest):
 class TestDefaultVpc(BaseTest):
 
     def test_ec2_default_vpc(self):
-        session_factory = self.replay_flight_data('test_ec2_default_vpc')
+        session_factory = self.get_session_factory('test_ec2_default_vpc')
         p = self.load_policy(
             {'name': 'ec2-default-filters',
              'resource': 'ec2',
@@ -677,7 +677,7 @@ class TestDefaultVpc(BaseTest):
 class TestSingletonFilter(BaseTest):
 
     def test_ec2_singleton_filter(self):
-        session_factory = self.replay_flight_data('test_ec2_singleton')
+        session_factory = self.get_session_factory('test_ec2_singleton')
         p = self.load_policy(
             {'name': 'ec2-singleton-filters',
              'resource': 'ec2',
@@ -790,7 +790,7 @@ class TestModifySecurityGroupAction(BaseTest):
         #     and one with none
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is
         #     attached to both test instances
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_security_group_filter')
 
         # Catch on anything that uses the *PROD-ONLY* security groups but isn't in a prod role
@@ -824,7 +824,7 @@ class TestModifySecurityGroupAction(BaseTest):
         #     and one with none
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is
         #     attached to both test instances
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_modify_groups_action')
         client = session_factory().client('ec2')
 
@@ -884,7 +884,7 @@ class TestModifySecurityGroupAction(BaseTest):
         #     is attached to test instance
         #   - security group with id sg-8a4b64f7 exists in VPC and is selected
         #     in a policy to be attached
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_add_security_groups')
         policy = self.load_policy({
             'name': 'add-sg-to-prod-instances',
@@ -908,7 +908,7 @@ class TestModifySecurityGroupAction(BaseTest):
 
 class TestAutoRecoverAlarmAction(BaseTest):
     def test_autorecover_alarm(self):
-        session_factory = self.replay_flight_data('test_ec2_autorecover_alarm')
+        session_factory = self.get_session_factory('test_ec2_autorecover_alarm')
         p = self.load_policy(
             {'name': 'ec2-autorecover-alarm',
              'resource': 'ec2',
@@ -936,7 +936,7 @@ class TestFilter(BaseTest):
 
     def test_not_filter(self):
         # This test is to get coverage for the `not` filter's process_set method
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_not_filter')
 
         policy = self.load_policy({

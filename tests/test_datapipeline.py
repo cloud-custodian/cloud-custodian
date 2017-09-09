@@ -19,7 +19,7 @@ from .common import BaseTest
 class DataPipelineTest(BaseTest):
 
     def test_reporting(self):
-        factory = self.replay_flight_data('test_datapipeline_reporting')
+        factory = self.get_session_factory('test_datapipeline_reporting')
 
         session = factory()
         client = session.client('datapipeline')

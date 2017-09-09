@@ -63,7 +63,7 @@ class OffHoursFilterTest(BaseTest):
     """[off|on] hours testing"""
 
     def test_offhours_records(self):
-        session_factory = self.replay_flight_data('test_offhours_records')
+        session_factory = self.get_session_factory('test_offhours_records')
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2016, month=8, day=14, hour=19, minute=00)
 

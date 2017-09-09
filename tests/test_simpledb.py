@@ -19,7 +19,7 @@ from .common import BaseTest
 class SimpleDB(BaseTest):
 
     def test_delete(self):
-        session_factory = self.replay_flight_data('test_simpledb_delete')
+        session_factory = self.get_session_factory('test_simpledb_delete')
         p = self.load_policy({
             'name': 'sdb-del',
             'resource': 'simpledb',
@@ -37,7 +37,7 @@ class SimpleDB(BaseTest):
             resources[0]['DomainName'] not in extant_domains)
 
     def test_simpledb(self):
-        session_factory = self.replay_flight_data('test_simpledb_query')
+        session_factory = self.get_session_factory('test_simpledb_query')
         p = self.load_policy({
             'name': 'sdbtest',
             'resource': 'simpledb'},

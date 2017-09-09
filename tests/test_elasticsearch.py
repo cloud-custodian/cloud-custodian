@@ -20,7 +20,7 @@ class ElasticSearch(BaseTest):
 
     def test_resource_manager(self):
         config = Config.empty(account_id='644160558196')
-        factory = self.replay_flight_data('test_elasticsearch_query')
+        factory = self.get_session_factory('test_elasticsearch_query')
         p = self.load_policy({
             'name': 'es-query',
             'resource': 'elasticsearch',
@@ -37,7 +37,7 @@ class ElasticSearch(BaseTest):
 
     def test_delete_search(self):
         config = Config.empty(account_id='644160558196')        
-        factory = self.replay_flight_data('test_elasticsearch_delete')
+        factory = self.get_session_factory('test_elasticsearch_delete')
         p = self.load_policy({
             'name': 'es-query',
             'resource': 'elasticsearch',

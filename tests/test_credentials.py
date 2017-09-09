@@ -33,7 +33,7 @@ class Credential(BaseTest):
     def xtest_assumed_session(self):
         # placebo's datetime bug bites again
         # https://github.com/garnaat/placebo/pull/50
-        factory = self.replay_flight_data('test_credential_sts')    
+        factory = self.get_session_factory('test_credential_sts')    
         user = factory().client('iam').get_user()
         session = assumed_session(
             "arn:aws:iam::644160558196:role/CloudCustodianRole",

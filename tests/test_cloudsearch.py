@@ -20,7 +20,7 @@ from .common import BaseTest
 class CloudSearch(BaseTest):
 
     def test_resource_manager(self):
-        factory = self.replay_flight_data('test_cloudsearch_query')
+        factory = self.get_session_factory('test_cloudsearch_query')
         p = self.load_policy({
             'name': 'cs-query',
             'resource': 'cloudsearch',
@@ -31,7 +31,7 @@ class CloudSearch(BaseTest):
         self.assertEqual(resources[0]['DomainName'], 'sock-index')
 
     def test_delete_search(self):
-        factory = self.replay_flight_data('test_cloudsearch_delete')
+        factory = self.get_session_factory('test_cloudsearch_delete')
         p = self.load_policy({
             'name': 'csdel',
             'resource': 'cloudsearch',

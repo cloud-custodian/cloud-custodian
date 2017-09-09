@@ -19,7 +19,7 @@ from .common import BaseTest
 class KMSTest(BaseTest):
 
     def test_kms_grant(self):
-        session_factory = self.replay_flight_data('test_kms_grants')
+        session_factory = self.get_session_factory('test_kms_grants')
         p = self.load_policy(
             {'name': 'kms-grant-count',
              'resource': 'kms',
@@ -31,7 +31,7 @@ class KMSTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_key_rotation(self):
-        session_factory = self.replay_flight_data('test_key_rotation')
+        session_factory = self.get_session_factory('test_key_rotation')
         p = self.load_policy(
             {'name': 'kms-key-rotation',
              'resource': 'kms-key',

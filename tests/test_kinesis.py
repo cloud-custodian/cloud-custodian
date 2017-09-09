@@ -19,7 +19,7 @@ from .common import BaseTest
 class Kinesis(BaseTest):
 
     def test_stream_query(self):
-        factory = self.replay_flight_data('test_kinesis_stream_query')
+        factory = self.get_session_factory('test_kinesis_stream_query')
         p = self.load_policy({
             'name': 'kstream',
             'resource': 'kinesis',
@@ -37,7 +37,7 @@ class Kinesis(BaseTest):
         self.assertEqual(resources[0]['StreamStatus'], 'ACTIVE')
 
     def test_stream_delete(self):
-        factory = self.replay_flight_data('test_kinesis_stream_delete')
+        factory = self.get_session_factory('test_kinesis_stream_delete')
         p = self.load_policy({
             'name': 'kstream',
             'resource': 'kinesis',
@@ -52,7 +52,7 @@ class Kinesis(BaseTest):
         self.assertEqual(stream['StreamStatus'], 'DELETING')
 
     def test_hose_query(self):
-        factory = self.replay_flight_data('test_kinesis_hose_query')
+        factory = self.get_session_factory('test_kinesis_hose_query')
         p = self.load_policy({
             'name': 'khole',
             'resource': 'firehose',
@@ -64,7 +64,7 @@ class Kinesis(BaseTest):
         self.assertEqual(resources[0]['DeliveryStreamStatus'], 'ACTIVE')
 
     def test_hose_delete(self):
-        factory = self.replay_flight_data('test_kinesis_hose_delete')
+        factory = self.get_session_factory('test_kinesis_hose_delete')
         p = self.load_policy({
             'name': 'khole',
             'resource': 'firehose',
@@ -81,7 +81,7 @@ class Kinesis(BaseTest):
             'DELETING')
 
     def test_app_query(self):
-        factory = self.replay_flight_data('test_kinesis_analytics_query')
+        factory = self.get_session_factory('test_kinesis_analytics_query')
         p = self.load_policy({
             'name': 'kapp',
             'resource': 'kinesis-analytics',
@@ -92,7 +92,7 @@ class Kinesis(BaseTest):
         self.assertEqual(resources[0]['ApplicationName'], 'sock-app')
 
     def test_app_delete(self):
-        factory = self.replay_flight_data('test_kinesis_analytics_delete')
+        factory = self.get_session_factory('test_kinesis_analytics_delete')
         p = self.load_policy({
             'name': 'kapp',
             'resource': 'kinesis-analytics',

@@ -34,7 +34,7 @@ class SnapshotAccessTest(BaseTest):
         # shared publicly. 2 non matching volumes, one not shared, one shared
         # explicitly to its own account.
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
-        factory = self.replay_flight_data('test_ebs_cross_account')
+        factory = self.get_session_factory('test_ebs_cross_account')
         p = self.load_policy({
             'name': 'snap-copy',
             'resource': 'ebs-snapshot',
@@ -55,7 +55,7 @@ class SnapshotCopyTest(BaseTest):
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
         self.change_environment(AWS_DEFAULT_REGION='us-west-2')
 
-        factory = self.replay_flight_data('test_ebs_snapshot_copy')
+        factory = self.get_session_factory('test_ebs_snapshot_copy')
         p = self.load_policy({
             'name': 'snap-copy',
             'resource': 'ebs-snapshot',
@@ -83,7 +83,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
     def test_snapshot_ami_snapshot_filter(self):
         self.patch(CopySnapshot, 'executor_factory', MainThreadExecutor)
         # DEFAULT_REGION needs to be set to west for recording
-        factory = self.replay_flight_data('test_ebs_ami_snapshot_filter')
+        factory = self.get_session_factory('test_ebs_ami_snapshot_filter')
 
         #first case should return only resources that are ami snapshots
         p = self.load_policy({
@@ -111,7 +111,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
 class SnapshotTrimTest(BaseTest):
 
     def test_snapshot_trim(self):
-        factory = self.replay_flight_data('test_ebs_snapshot_delete')
+        factory = self.get_session_factory('test_ebs_snapshot_delete')
         p = self.load_policy({
             'name': 'snapshot-trim',
             'resource': 'ebs-snapshot',
@@ -126,7 +126,7 @@ class SnapshotTrimTest(BaseTest):
 class AttachedInstanceTest(BaseTest):
 
     def test_ebs_instance_filter(self):
-        factory = self.replay_flight_data('test_ebs_instance_filter')
+        factory = self.get_session_factory('test_ebs_instance_filter')
         p = self.load_policy({
             'name': 'attached-instance-test',
             'resource': 'ebs',
@@ -142,7 +142,7 @@ class AttachedInstanceTest(BaseTest):
 class ResizeTest(BaseTest):
 
     def test_resize_action(self):
-        factory = self.replay_flight_data('test_ebs_modifyable_action')
+        factory = self.get_session_factory('test_ebs_modifyable_action')
         client = factory().client('ec2')
         # Change a volume from 32 gb gp2 and 100 iops (sized based) to
         # 64gb and 500 iops.
@@ -168,7 +168,7 @@ class ResizeTest(BaseTest):
         
     def test_resize_filter(self):
         # precondition, 6 volumes, 4 not modifyable.
-        factory = self.replay_flight_data('test_ebs_modifyable_filter')
+        factory = self.get_session_factory('test_ebs_modifyable_filter')
         output = self.capture_logging('custodian.filters', level=logging.DEBUG)
         p = self.load_policy({
             'name': 'resizable',
@@ -197,7 +197,7 @@ class CopyInstanceTagsTest(BaseTest):
         # More a functional/coverage test then a unit test.
         self.patch(
             CopyInstanceTags, 'executor_factory', MainThreadExecutor)
-        factory = self.replay_flight_data('test_ebs_copy_instance_tags')
+        factory = self.get_session_factory('test_ebs_copy_instance_tags')
 
         volume_id = 'vol-2b047792'
 
@@ -226,7 +226,7 @@ class CopyInstanceTagsTest(BaseTest):
 class VolumeSnapshotTest(BaseTest):
 
     def test_volume_snapshot(self):
-        factory = self.replay_flight_data('test_ebs_snapshot')
+        factory = self.get_session_factory('test_ebs_snapshot')
         policy = self.load_policy(
             {
                 'name': 'test-ebs-snapshot',
@@ -252,7 +252,7 @@ class VolumeDeleteTest(BaseTest):
 
     def test_volume_delete_force(self):
         self.patch(Delete, 'executor_factory', MainThreadExecutor)
-        factory = self.replay_flight_data('test_ebs_force_delete')
+        factory = self.get_session_factory('test_ebs_force_delete')
         policy = self.load_policy({
             'name': 'test-ebs',
             'resource': 'ebs',
@@ -277,7 +277,7 @@ class EncryptExtantVolumesTest(BaseTest):
     def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_encrypt_volumes')
+        session_factory = self.get_session_factory('test_encrypt_volumes')
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
@@ -311,7 +311,7 @@ class EncryptExtantVolumesTest(BaseTest):
 class TestKmsAlias(BaseTest):
 
     def test_ebs_kms_alias(self):
-        session_factory = self.replay_flight_data('test_ebs_aws_managed_kms_keys')
+        session_factory = self.get_session_factory('test_ebs_aws_managed_kms_keys')
         p = self.load_policy(
             {'name': 'ebs-aws-managed-kms-keys-filters',
              'resource': 'ebs',
@@ -329,7 +329,7 @@ class TestKmsAlias(BaseTest):
 class EbsFaultToleranceTest(BaseTest):
 
     def test_ebs_fault_tolerant(self):
-        session = self.replay_flight_data('test_ebs_fault_tolerant')
+        session = self.get_session_factory('test_ebs_fault_tolerant')
         policy = self.load_policy({
             'name': 'ebs-fault-tolerant',
             'resource': 'ebs',
@@ -340,7 +340,7 @@ class EbsFaultToleranceTest(BaseTest):
         self.assertEqual(resources[0]['VolumeId'], 'vol-c5eaa459')
 
     def test_ebs_non_fault_tolerant(self):
-        session = self.replay_flight_data('test_ebs_non_fault_tolerant')
+        session = self.get_session_factory('test_ebs_non_fault_tolerant')
         policy = self.load_policy({
             'name': 'ebs-non-fault-tolerant',
             'resource': 'ebs',
@@ -355,7 +355,7 @@ class EbsFaultToleranceTest(BaseTest):
 class PiopsMetricsFilterTest(BaseTest):
 
     def test_ebs_metrics_percent_filter(self):
-        session = self.replay_flight_data('test_ebs_metrics_percent_filter')
+        session = self.get_session_factory('test_ebs_metrics_percent_filter')
         policy = self.load_policy({
             'name': 'ebs-unused-piops',
             'resource': 'ebs',
@@ -374,7 +374,7 @@ class PiopsMetricsFilterTest(BaseTest):
 
 class HealthEventsFilterTest(BaseTest):
     def test_ebs_health_events_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ebs_health_events_filter')
         policy = self.load_policy({
             'name': 'ebs-health-events-filter',

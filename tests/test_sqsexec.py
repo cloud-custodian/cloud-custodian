@@ -37,7 +37,7 @@ def int_processor(*args):
 class TestSQSExec(BaseTest):
 
     def test_sqsexec(self):
-        session_factory = self.replay_flight_data('test_sqs_exec')
+        session_factory = self.get_session_factory('test_sqs_exec')
         client = session_factory().client('sqs')
         map_queue = client.create_queue(
             QueueName = "%s-map-%s" % (

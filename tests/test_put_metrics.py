@@ -65,7 +65,7 @@ class PutMetricsTest(BaseTest):
             session_factory = self.record_flight_data('test_cw_put_metrics_'+name)
         else:
             logger.debug("TestPutMetrics is replaying")
-            session_factory = self.replay_flight_data('test_cw_put_metrics_'+name)
+            session_factory = self.get_session_factory('test_cw_put_metrics_'+name)
 
         policy = self.load_policy(yaml_load(yaml_doc)['policies'][0], session_factory=session_factory)
 

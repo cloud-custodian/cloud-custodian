@@ -24,7 +24,7 @@ from .common import BaseTest
 class LogTest(BaseTest):
 
     def test_existing_stream(self):
-        session_factory = self.replay_flight_data('test_log_existing_stream')
+        session_factory = self.get_session_factory('test_log_existing_stream')
         client =  session_factory().client('logs')
         group_name = "/custodian-dev"
         client.create_log_group(logGroupName=group_name)
@@ -42,7 +42,7 @@ class LogTest(BaseTest):
         handler.close()
 
     def test_time_flush(self):
-        session_factory = self.replay_flight_data('test_log_time_flush')
+        session_factory = self.get_session_factory('test_log_time_flush')
         log = logging.getLogger("test-c7n")
         handler = CloudWatchLogHandler(
             "test-c7n-4", "alpha", session_factory=session_factory)
@@ -61,7 +61,7 @@ class LogTest(BaseTest):
         handler.close()
 
     def test_transport_buffer_flush(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_transport_buffer_flush')
         log = logging.getLogger("test-c7n")
         handler = CloudWatchLogHandler(

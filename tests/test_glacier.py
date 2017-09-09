@@ -20,7 +20,7 @@ class GlacierTagTest(BaseTest):
 
     @functional
     def test_glacier_tag(self):
-        session_factory = self.replay_flight_data('test_glacier_tag')
+        session_factory = self.get_session_factory('test_glacier_tag')
         client = session_factory().client('glacier')
         name = 'c7n-glacier-test'
 
@@ -54,7 +54,7 @@ class GlacierTagTest(BaseTest):
         self.assertTrue('abc' in tags['Tags'])
 
     def test_glacier_untag(self):
-        session_factory = self.replay_flight_data('test_glacier_untag')
+        session_factory = self.get_session_factory('test_glacier_untag')
         client = session_factory().client('glacier')
 
         p = self.load_policy({
@@ -79,7 +79,7 @@ class GlacierTagTest(BaseTest):
         self.assertEqual(len(tags['Tags']), 0)
 
     def test_glacier_markop(self):
-        session_factory = self.replay_flight_data('test_glacier_markop')
+        session_factory = self.get_session_factory('test_glacier_markop')
         client = session_factory().client('glacier')
         name = 'c7n-glacier-test'
 

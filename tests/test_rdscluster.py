@@ -31,7 +31,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_security_group(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_sg_filter')
+        session_factory = self.get_session_factory('test_rdscluster_sg_filter')
         p = self.load_policy({
             'name': 'rdscluster-sg',
             'resource': 'rds-cluster',
@@ -46,7 +46,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_subnet(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_subnet')
+        session_factory = self.get_session_factory('test_rdscluster_subnet')
         p = self.load_policy({
             'name': 'rdscluster-sub',
             'resource': 'rds-cluster',
@@ -61,7 +61,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_simple(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_simple')
+        session_factory = self.get_session_factory('test_rdscluster_simple')
         p = self.load_policy({
             'name': 'rdscluster-simple',
             'resource': 'rds-cluster'},
@@ -71,7 +71,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_simple_filter(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_simple')
+        session_factory = self.get_session_factory('test_rdscluster_simple')
         p = self.load_policy({
             'name': 'rdscluster-simple-filter',
             'resource': 'rds-cluster',
@@ -85,7 +85,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_delete(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_delete')
+        session_factory = self.get_session_factory('test_rdscluster_delete')
         p = self.load_policy({
             'name': 'rdscluster-delete',
             'resource': 'rds-cluster',
@@ -102,7 +102,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_delete_with_instances(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_delete_with_instances')
+        session_factory = self.get_session_factory('test_rdscluster_delete_with_instances')
         p = self.load_policy({
             'name': 'rdscluster-delete',
             'resource': 'rds-cluster',
@@ -119,7 +119,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_retention(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_retention')
+        session_factory = self.get_session_factory('test_rdscluster_retention')
         p = self.load_policy({
             'name': 'rdscluster-delete',
             'resource': 'rds-cluster',
@@ -134,7 +134,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_snapshot(self):
         self.remove_augments()
-        session_factory = self.replay_flight_data('test_rdscluster_snapshot')
+        session_factory = self.get_session_factory('test_rdscluster_snapshot')
         p = self.load_policy({
             'name': 'rdscluster-snapshot',
             'resource': 'rds-cluster',
@@ -148,7 +148,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_tag_augment(self):
-        session_factory = self.replay_flight_data('test_rdscluster_tag_augment')
+        session_factory = self.get_session_factory('test_rdscluster_tag_augment')
         p = self.load_policy({
             'name': 'rdscluster-tag-augment',
             'resource': 'rds-cluster',
@@ -160,7 +160,7 @@ class RDSClusterTest(BaseTest):
 
     def test_rdscluster_tag_and_remove(self):
         self.patch(RDSCluster, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rdscluster_tag_and_remove'
         )
         client = session_factory().client('rds')
@@ -203,7 +203,7 @@ class RDSClusterTest(BaseTest):
         self.assertFalse('xyz' in tag_map)
 
     def test_rdscluster_mark_match_unmark(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rdscluster_mark_and_match'
         )
         client = session_factory().client('rds')
@@ -266,7 +266,7 @@ class RDSClusterTest(BaseTest):
 class RDSClusterSnapshotTest(BaseTest):
 
     def test_rdscluster_snapshot_simple(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-simple',
@@ -276,7 +276,7 @@ class RDSClusterSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_rdscluster_snapshot_simple_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-simple-filter',
@@ -290,7 +290,7 @@ class RDSClusterSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_snapshot_age_filter(self):
-        factory = self.replay_flight_data('test_rdscluster_snapshot_simple')
+        factory = self.get_session_factory('test_rdscluster_snapshot_simple')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-age-filter',
             'resource': 'rds-cluster-snapshot',
@@ -300,7 +300,7 @@ class RDSClusterSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_rdscluster_snapshot_trim(self):
-        factory = self.replay_flight_data('test_rdscluster_snapshot_delete')
+        factory = self.get_session_factory('test_rdscluster_snapshot_delete')
         p = self.load_policy({
             'name': 'rdscluster-snapshot-trim',
             'resource': 'rds-cluster-snapshot',

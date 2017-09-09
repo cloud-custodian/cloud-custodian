@@ -98,7 +98,7 @@ class BucketMetrics(BaseTest):
     def test_metrics(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_metrics')
+        session_factory = self.get_session_factory('test_s3_metrics')
         p = self.load_policy({
             'name': 's3-obj-count',
             'resource': 's3',
@@ -127,7 +127,7 @@ class BucketInventory(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
 
-        session_factory = self.replay_flight_data('test_s3_inventory')
+        session_factory = self.get_session_factory('test_s3_inventory')
 
         client = session_factory().client('s3')
         client.create_bucket(Bucket=bname)
@@ -203,7 +203,7 @@ class BucketDelete(BaseTest):
             s3, 'S3_AUGMENT_TABLE',
             [('get_bucket_replication', 'Replication', None, None),
              ('get_bucket_versioning', 'Versioning', None, None)])
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_delete_replicated_bucket')
         p = self.load_policy({
             'name': 's3-delete-bucket',
@@ -223,7 +223,7 @@ class BucketDelete(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
                    [('get_bucket_versioning', 'Versioning', None, None)])
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_delete_versioned_bucket')
         session = session_factory()
         client = session.client('s3')
@@ -263,7 +263,7 @@ class BucketDelete(BaseTest):
         self.patch(
             s3.DeleteBucket, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_delete_bucket')
+        session_factory = self.get_session_factory('test_s3_delete_bucket')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-byebye'
@@ -286,7 +286,7 @@ class BucketDelete(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3.DeleteBucket, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_delete_bucket_with_failure')
+        session_factory = self.get_session_factory('test_s3_delete_bucket_with_failure')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-perm-denied'
@@ -339,7 +339,7 @@ class BucketTag(BaseTest):
             s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_tagging', 'Tags', [], 'TagSet')])
-        session_factory = self.replay_flight_data('test_s3_tag')
+        session_factory = self.get_session_factory('test_s3_tag')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-tagger'
@@ -384,7 +384,7 @@ class S3ConfigSource(ConfigTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', augments)
 
         bname = 'custodian-test-data-23'
-        session_factory = self.replay_flight_data('test_s3_normalize')
+        session_factory = self.get_session_factory('test_s3_normalize')
         session = session_factory()
 
         queue_url = self.initialize_config_subscriber(session)
@@ -666,7 +666,7 @@ class S3Test(BaseTest):
             s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         self.patch(s3, 'MAX_COPY_SIZE', (1024 * 1024 * 6.1))
-        session_factory = self.replay_flight_data('test_s3_multipart_file')
+        session_factory = self.get_session_factory('test_s3_multipart_file')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-largef-test'
@@ -721,7 +721,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')])
-        session_factory = self.replay_flight_data('test_s3_self_log_target')
+        session_factory = self.get_session_factory('test_s3_self_log_target')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-log-test'
@@ -767,7 +767,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_logging', 'Logging', None, 'LoggingEnabled')])
-        session_factory = self.replay_flight_data('test_s3_log_target')
+        session_factory = self.get_session_factory('test_s3_log_target')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-log-test'
@@ -812,7 +812,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
-        session_factory = self.replay_flight_data('test_s3_has_statement')
+        session_factory = self.get_session_factory('test_s3_has_statement')
         bname = "custodian-policy-test"
         session = session_factory()
         client = session.client('s3')
@@ -851,7 +851,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
-        session_factory = self.replay_flight_data('test_s3_no_encryption_statement')
+        session_factory = self.get_session_factory('test_s3_no_encryption_statement')
         bname = "custodian-encryption-test"
         session = session_factory()
         client = session.client('s3')
@@ -889,7 +889,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
-        session_factory = self.replay_flight_data('test_s3_missing_policy')
+        session_factory = self.get_session_factory('test_s3_missing_policy')
         bname = "custodian-encrypt-test"
         session = session_factory()
         client = session.client('s3')
@@ -924,7 +924,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_versioning', 'Versioning', None, None)])
-        session_factory = self.replay_flight_data('test_s3_enable_versioning')
+        session_factory = self.get_session_factory('test_s3_enable_versioning')
         bname = 'superduper-and-magic'
         session = session_factory()
         client = session.client('s3')
@@ -970,7 +970,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_logging', 'Logging', None, None)])
-        session_factory = self.replay_flight_data('test_s3_enable_logging')
+        session_factory = self.get_session_factory('test_s3_enable_logging')
         bname = 'superduper-and-magic'
 
         session = session_factory()
@@ -1019,7 +1019,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
-        session_factory = self.replay_flight_data('test_s3_encrypt_policy')
+        session_factory = self.get_session_factory('test_s3_encrypt_policy')
         bname = "custodian-encrypt-test"
 
         session = session_factory()
@@ -1048,7 +1048,7 @@ class S3Test(BaseTest):
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_remove_empty_policy')
         bname = "custodian-policy-test"
         session = session_factory()
@@ -1075,7 +1075,7 @@ class S3Test(BaseTest):
         self.patch(
             s3.RemovePolicyStatement, 'executor_factory', MainThreadExecutor)
 
-        session_factory = self.replay_flight_data('test_s3_remove_policy')
+        session_factory = self.get_session_factory('test_s3_remove_policy')
         bname = "custodian-policy-test"
         session = session_factory()
         client = session.client('s3')
@@ -1135,7 +1135,7 @@ class S3Test(BaseTest):
 
         self.patch(s3.RemovePolicyStatement, 'process', enrich)
 
-        session_factory = self.replay_flight_data('test_s3_remove_policy')
+        session_factory = self.get_session_factory('test_s3_remove_policy')
         session = session_factory()
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
@@ -1176,7 +1176,7 @@ class S3Test(BaseTest):
             ('get_bucket_policy',  'Policy', None, 'Policy'),
         ])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_s3_create')
+        session_factory = self.get_session_factory('test_s3_create')
         bname = 'custodian-create-bucket-v4'
         session = session_factory()
         client = session.client('s3')
@@ -1222,7 +1222,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE',
                    [('get_bucket_location', 'Location', None, None)])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_attach_encrypt_via_bucket_notification')
         bname = "custodian-attach-encrypt-test"
         role = "arn:aws:iam::644160558196:role/custodian-mu"
@@ -1274,7 +1274,7 @@ class S3Test(BaseTest):
             'get_bucket_notification_configuration', 'Notification', None,
             None)])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_attach_encrypt_via_new_topic')
         bname = "custodian-attach-encrypt-test"
         role = "arn:aws:iam::644160558196:role/custodian-mu"
@@ -1327,7 +1327,7 @@ class S3Test(BaseTest):
             'get_bucket_notification_configuration', 'Notification', None,
             None)])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_attach_encrypt_via_implicit_existing_topic')
         bname = "custodian-attach-encrypt-test"
         role = "arn:aws:iam::644160558196:role/custodian-mu"
@@ -1405,7 +1405,7 @@ class S3Test(BaseTest):
             'get_bucket_notification_configuration', 'Notification', None,
             None)])
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_attach_encrypt_via_explicit_existing_topic')
         bname = "custodian-attach-encrypt-test"
         role = "arn:aws:iam::644160558196:role/custodian-mu"
@@ -1481,7 +1481,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
             s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_s3_encrypt_versioned')
+        session_factory = self.get_session_factory('test_s3_encrypt_versioned')
         bname = "custodian-encrypt-test"
 
         session = session_factory()
@@ -1510,7 +1510,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         self.patch(
             s3.EncryptExtantKeys, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_s3_encrypt_empty')
+        session_factory = self.get_session_factory('test_s3_encrypt_empty')
         bname = "custodian-encrypt-test"
 
         session = session_factory()
@@ -1528,7 +1528,7 @@ class S3Test(BaseTest):
 
     def test_encrypt_keys(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_encrypt')
+        session_factory = self.get_session_factory('test_s3_encrypt')
         bname = "custodian-encrypt-test"
 
         session = session_factory()
@@ -1567,7 +1567,7 @@ class S3Test(BaseTest):
 
     def test_encrypt_keys_key_id_option(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_encrypt_key_id_option')
         bname = "custodian-encrypt-test"
 
@@ -1611,7 +1611,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
             ])
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_s3_global_grants_filter')
         bname = 'custodian-testing-grants'
         session = session_factory()
@@ -1660,7 +1660,7 @@ class S3Test(BaseTest):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_acl', 'Acl', None, None)
             ])
-        session_factory = self.replay_flight_data('test_s3_grants')
+        session_factory = self.get_session_factory('test_s3_grants')
 
         bname = 'custodian-testing-grants'
         session = session_factory()
@@ -1700,7 +1700,7 @@ class S3Test(BaseTest):
     def test_s3_mark_for_op(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_tagging', 'Tags', [], 'TagSet')])
-        session_factory = self.replay_flight_data('test_s3_mark_for_op')
+        session_factory = self.get_session_factory('test_s3_mark_for_op')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-mark-test'
@@ -1723,7 +1723,7 @@ class S3Test(BaseTest):
     def test_s3_remove_tag(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_tagging', 'Tags', [], 'TagSet')])
-        session_factory = self.replay_flight_data('test_s3_remove_tag')
+        session_factory = self.get_session_factory('test_s3_remove_tag')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-mark-test'
@@ -1742,7 +1742,7 @@ class S3Test(BaseTest):
     def test_hosts_website(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_website', 'Website', None, None)])
-        session_factory = self.replay_flight_data('test_s3_hosts_website')
+        session_factory = self.get_session_factory('test_s3_hosts_website')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-static-website-test'

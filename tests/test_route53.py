@@ -22,7 +22,7 @@ from c7n.resources.route53 import HostedZone
 class Route53HostedZoneTest(BaseTest):
 
     def test_route53_hostedzone_tag(self):
-        session_factory = self.replay_flight_data('test_route53_hostedzone_tag')
+        session_factory = self.get_session_factory('test_route53_hostedzone_tag')
 
         p = self.load_policy({
             'name': 'hostedzone-tag-records',
@@ -62,7 +62,7 @@ class Route53HostedZoneTest(BaseTest):
             return 'arn:aws:route53:::hostedzone/Z148QEXAMPLE8V'
         self.patch(HostedZone, 'generate_arn', generate_arn)
 
-        session_factory = self.replay_flight_data('test_route53_hostedzone_tag_exception')
+        session_factory = self.get_session_factory('test_route53_hostedzone_tag_exception')
         p = self.load_policy({
             'name': 'hostedzone-tag-records',
             'resource': 'hostedzone',
@@ -91,7 +91,7 @@ class Route53HostedZoneTest(BaseTest):
                          "found with ID: Z148QEXAMPLE8V") in output.getvalue())
 
     def test_route53_hostedzone_untag(self):
-        session_factory = self.replay_flight_data('test_route53_hostedzone_untag')
+        session_factory = self.get_session_factory('test_route53_hostedzone_untag')
 
         p = self.load_policy({
             'name': 'hostedzone-untag-records',
@@ -120,7 +120,7 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags['ResourceTagSet']['Tags']), 0)
 
     def test_route53_hostedzone_markop(self):
-        session_factory = self.replay_flight_data('test_route53_hostedzone_markop')
+        session_factory = self.get_session_factory('test_route53_hostedzone_markop')
 
         p = self.load_policy({
             'name': 'hostedzone-markop-records',
@@ -154,7 +154,7 @@ class Route53HostedZoneTest(BaseTest):
 class Route53HealthCheckTest(BaseTest):
 
     def test_route53_healthcheck_tag(self):
-        session_factory = self.replay_flight_data('test_route53_healthcheck_tag')
+        session_factory = self.get_session_factory('test_route53_healthcheck_tag')
 
         p = self.load_policy({
             'name': 'healthcheck-tag-records',
@@ -187,7 +187,7 @@ class Route53HealthCheckTest(BaseTest):
         self.assertTrue('abc' in tags['ResourceTagSet']['Tags'][0].values())
 
     def test_route53_healthcheck_untag(self):
-        session_factory = self.replay_flight_data('test_route53_healthcheck_untag')
+        session_factory = self.get_session_factory('test_route53_healthcheck_untag')
 
         p = self.load_policy({
             'name': 'healthcheck-untag-records',
@@ -216,7 +216,7 @@ class Route53HealthCheckTest(BaseTest):
         self.assertTrue('Name' in tags['ResourceTagSet']['Tags'][0].values())
 
     def test_route53_healthcheck_markop(self):
-        session_factory = self.replay_flight_data('test_route53_healthcheck_markop')
+        session_factory = self.get_session_factory('test_route53_healthcheck_markop')
 
         p = self.load_policy({
             'name': 'healthcheck-markop-records',
@@ -250,7 +250,7 @@ class Route53HealthCheckTest(BaseTest):
 class Route53DomainTest(BaseTest):
 
     def test_route53_domain_auto_renew(self):
-        session_factory = self.replay_flight_data('test_route53_domain')
+        session_factory = self.get_session_factory('test_route53_domain')
         p = self.load_policy({
              'name': 'r53domain-auto-renew',
              'resource': 'r53domain',
@@ -266,7 +266,7 @@ class Route53DomainTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_route53_domain_transfer_lock(self):
-        session_factory = self.replay_flight_data('test_route53_domain')
+        session_factory = self.get_session_factory('test_route53_domain')
         p = self.load_policy({
              'name': 'r53domain-transfer-lock',
              'resource': 'r53domain',

@@ -45,7 +45,7 @@ class PolicyLambdaProvision(BaseTest):
             self.assertEqual(v, result[k])
 
     def test_config_rule_provision(self):
-        session_factory = self.replay_flight_data('test_config_rule')
+        session_factory = self.get_session_factory('test_config_rule')
         p = Policy({
             'resource': 'security-group',
             'name': 'sg-modified',
@@ -58,7 +58,7 @@ class PolicyLambdaProvision(BaseTest):
         self.addCleanup(mgr.remove, pl)
 
     def test_config_rule_evaluation(self):
-        session_factory = self.replay_flight_data('test_config_rule_evaluate')
+        session_factory = self.get_session_factory('test_config_rule_evaluate')
         p = self.load_policy({
             'resource': 'ec2',
             'name': 'ec2-modified',
@@ -72,7 +72,7 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, 'iam_delay', 0.01)
-        session_factory = self.replay_flight_data('test_cwl_subscriber')
+        session_factory = self.get_session_factory('test_cwl_subscriber')
         session = session_factory()
         client = session.client('logs')
 
@@ -104,7 +104,7 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_sns_subscriber(self):
         self.patch(SNSSubscription, 'iam_delay', 0.01)
-        session_factory = self.replay_flight_data('test_sns_subscriber')
+        session_factory = self.get_session_factory('test_sns_subscriber')
         session = session_factory()
         client = session.client('sns')
 
@@ -146,7 +146,7 @@ class PolicyLambdaProvision(BaseTest):
         # the function code / which invalidate the recorded data and
         # the focus of the test.
 
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_cwe_update', zdata=True)
         p = Policy({
             'resource': 's3',
@@ -201,7 +201,7 @@ class PolicyLambdaProvision(BaseTest):
         self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
-        session_factory = self.replay_flight_data('test_cwe_trail', zdata=True)
+        session_factory = self.get_session_factory('test_cwe_trail', zdata=True)
         p = Policy({
             'resource': 's3',
             'name': 's3-bucket-policy',
@@ -238,7 +238,7 @@ class PolicyLambdaProvision(BaseTest):
              'Timeout': 60})
 
     def test_mu_metrics(self):
-        session_factory = self.replay_flight_data('test_mu_metrics')
+        session_factory = self.get_session_factory('test_mu_metrics')
         p = Policy({
             'resources': 's3',
             'name': 's3-bucket-policy',
@@ -258,7 +258,7 @@ class PolicyLambdaProvision(BaseTest):
                        'Throttles': [], 'Invocations': []}])
 
     def test_cwe_instance(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_cwe_instance', zdata=True)
         p = Policy({
             'resource': 's3',
@@ -295,7 +295,7 @@ class PolicyLambdaProvision(BaseTest):
              "detail-type": ["EC2 Instance State-change Notification"]})
 
     def test_cwe_asg_instance(self):
-        session_factory = self.replay_flight_data('test_cwe_asg', zdata=True)
+        session_factory = self.get_session_factory('test_cwe_asg', zdata=True)
         p = Policy({
             'resource': 'asg',
             'name': 'asg-spin-detector',
@@ -328,7 +328,7 @@ class PolicyLambdaProvision(BaseTest):
              "detail-type": ["EC2 Instance Launch Unsuccessful"]})
 
     def test_cwe_schedule(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_cwe_schedule', zdata=True)
         p = Policy({
             'resource': 'ec2',
@@ -365,7 +365,7 @@ class PolicyLambdaProvision(BaseTest):
     sns_arn = 'arn:aws:sns:us-west-2:644160558196:config-topic'
 
     def create_a_lambda(self, flight, **extra):
-        session_factory = self.replay_flight_data(flight, zdata=True)
+        session_factory = self.get_session_factory(flight, zdata=True)
         mode = {
             'type': 'config-rule',
             'role':'arn:aws:iam::644160558196:role/custodian-mu'}

@@ -25,7 +25,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_simple(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_simple')
+        session_factory = self.get_session_factory('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-simple',
             'resource': 'app-elb'},
@@ -64,7 +64,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_simple_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_simple')
+        session_factory = self.get_session_factory('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-simple-filter',
             'resource': 'app-elb',
@@ -78,7 +78,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_default_vpc_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_default_vpc')
+        session_factory = self.get_session_factory('test_appelb_default_vpc')
         p = self.load_policy({
             'name': 'appelb-default-vpc',
             'resource': 'app-elb',
@@ -89,7 +89,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_tags_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_simple')
+        session_factory = self.get_session_factory('test_appelb_simple')
         p = self.load_policy({
             'name': 'appelb-tags-filter',
             'resource': 'app-elb',
@@ -108,7 +108,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_is_https_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_is_https')
+        session_factory = self.get_session_factory('test_appelb_is_https')
         p = self.load_policy({
             'name': 'appelb-is-https-filter',
             'resource': 'app-elb',
@@ -123,7 +123,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_modify_listener(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_modify_listener')
+        session_factory = self.get_session_factory('test_appelb_modify_listener')
         client = session_factory().client('elbv2')
         p = self.load_policy({
             'name': 'appelb-modify-listener-policy',
@@ -147,7 +147,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_target_group_filter(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_instance_count_non_zero')
         p = self.load_policy({
             'name': 'appelb-target-group-filter',
@@ -163,7 +163,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_instance_count_filter_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_instance_count_zero')
         p = self.load_policy({
             'name': 'appelb-instance-count-filter-zero',
@@ -180,7 +180,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_instance_count_filter_non_zero(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_instance_count_non_zero')
         p = self.load_policy({
             'name': 'appelb-instance-count-filter-non-zero',
@@ -197,7 +197,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_add_tag(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_add_tag')
+        session_factory = self.get_session_factory('test_appelb_add_tag')
         p = self.load_policy({
             'name': 'appelb-add-tag',
             'resource': 'app-elb',
@@ -214,7 +214,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_remove_tag(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_remove_tag')
+        session_factory = self.get_session_factory('test_appelb_remove_tag')
         p = self.load_policy({
             'name': 'appelb-remove-tag',
             'resource': 'app-elb',
@@ -231,7 +231,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_mark_for_delete(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_mark_for_delete')
         p = self.load_policy({
             'name': 'appelb-mark-for-delete',
@@ -250,7 +250,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_delete(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_delete')
+        session_factory = self.get_session_factory('test_appelb_delete')
         p = self.load_policy({
             'name': 'appelb-delete',
             'resource': 'app-elb',
@@ -266,7 +266,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_delete_force(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_appelb_delete_force')
+        session_factory = self.get_session_factory('test_appelb_delete_force')
         client = session_factory().client('elbv2')
         p = self.load_policy({
             'name': 'appelb-modify-listener-policy',
@@ -309,7 +309,7 @@ class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
     def test_appelb_healthcheck_protocol_mismatch_filter_good(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_healthcheck_protocol_mismatch_good')
         p = self.load_policy({
             'name': 'appelb-healthcheck-protocol-mismatch-good',
@@ -321,7 +321,7 @@ class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
     def test_appelb_healthcheck_protocol_mismatch_filter_bad(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_healthcheck_protocol_mismatch_bad')
         p = self.load_policy({
             'name': 'appelb-healthcheck-protocol-mismatch-bad',
@@ -336,7 +336,7 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_simple(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_target_group_simple')
         p = self.load_policy({
             'name': 'appelb-target-group-simple',
@@ -347,7 +347,7 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_simple_filter(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_target_group_simple')
         p = self.load_policy({
             'name': 'appelb-target-group-simple-filter',
@@ -362,7 +362,7 @@ class AppELBTargetGroupTest(BaseTest):
 
     def test_appelb_target_group_default_vpc(self):
         self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_target_group_default_vpc')
         p = self.load_policy({
             'name': 'appelb-target-group-default-vpc',
@@ -376,7 +376,7 @@ class AppELBTargetGroupTest(BaseTest):
 class TestAppElbLogging(BaseTest):
 
     def test_enable_s3_logging(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_enable_s3_logging')
         policy = self.load_policy({
             'name': 'test-enable-s3-logging',
@@ -404,7 +404,7 @@ class TestAppElbLogging(BaseTest):
              'access_logs.s3.prefix': 'gah5/alb1'})
 
     def test_disable_s3_logging(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_appelb_disable_s3_logging')
         policy = self.load_policy({
             'name': 'test-disable-s3-logging',
@@ -441,7 +441,7 @@ class TestAppElbIsLoggingFilter(BaseTest):
     """
 
     def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data('test_appelb_is_logging_filter')
+        session_factory = self.get_session_factory('test_appelb_is_logging_filter')
         policy = self.load_policy({
             'name': 'appelb-is-logging-to-bucket-test',
             'resource': 'app-elb',
@@ -466,7 +466,7 @@ class TestAppElbIsNOtLoggingFilter(BaseTest):
     """
 
     def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data('test_appelb_is_logging_filter')
+        session_factory = self.get_session_factory('test_appelb_is_logging_filter')
         policy = self.load_policy({
             'name': 'appelb-is-logging-to-bucket-test',
             'resource': 'app-elb',

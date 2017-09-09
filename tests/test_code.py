@@ -19,7 +19,7 @@ from .common import BaseTest
 class CodeCommit(BaseTest):
 
     def test_query_repos(self):
-        factory = self.replay_flight_data('test_codecommit')
+        factory = self.get_session_factory('test_codecommit')
         p = self.load_policy({
             'name': 'get-repos',
             'resource': 'codecommit',
@@ -34,7 +34,7 @@ class CodeCommit(BaseTest):
 class CodeBuild(BaseTest):
 
     def test_query_builds(self):
-        factory = self.replay_flight_data('test_codebuild')
+        factory = self.get_session_factory('test_codebuild')
         p = self.load_policy({
             'name': 'get-builders',
             'resource': 'codebuild',
@@ -53,7 +53,7 @@ class CodeBuild(BaseTest):
 class CodePipeline(BaseTest):
 
     def test_query_pipeline(self):
-        factory = self.replay_flight_data('test_codepipeline')
+        factory = self.get_session_factory('test_codepipeline')
         p = self.load_policy({
             'name': 'get-pipes',
             'resource': 'codepipeline',

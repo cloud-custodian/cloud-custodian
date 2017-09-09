@@ -362,7 +362,7 @@ class TabCompletionTest(CliTest):
 class RunTest(CliTest):
 
     def test_ec2(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ec2_state_transition_age_filter'
         )
 
@@ -434,7 +434,7 @@ class RunTest(CliTest):
 class MetricsTest(CliTest):
 
     def test_metrics(self):
-        session_factory = self.replay_flight_data('test_lambda_policy_metrics')
+        session_factory = self.get_session_factory('test_lambda_policy_metrics')
         from c7n.policy import PolicyCollection
 
         self.patch(

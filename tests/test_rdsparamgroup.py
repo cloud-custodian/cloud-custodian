@@ -21,7 +21,7 @@ class RDSParamGroupTest(BaseTest):
 
     @functional
     def test_rdsparamgroup_delete(self):
-        session_factory = self.replay_flight_data('test_rdsparamgroup_delete')
+        session_factory = self.get_session_factory('test_rdsparamgroup_delete')
         client = session_factory().client('rds')
 
         name = 'pg-test'
@@ -58,7 +58,7 @@ class RDSParamGroupTest(BaseTest):
 
     @functional
     def test_rdsparamgroup_copy(self):
-        session_factory = self.replay_flight_data('test_rdsparamgroup_copy')
+        session_factory = self.get_session_factory('test_rdsparamgroup_copy')
         client = session_factory().client('rds')
 
         name = 'pg-orig'
@@ -92,7 +92,7 @@ class RDSParamGroupTest(BaseTest):
 
     @functional
     def test_rdsparamgroup_modify(self):
-        session_factory = self.replay_flight_data('test_rdsparamgroup_modify')
+        session_factory = self.get_session_factory('test_rdsparamgroup_modify')
         client = session_factory().client('rds')
 
         name = 'pg-test'
@@ -140,7 +140,7 @@ class RDSClusterParamGroupTest(BaseTest):
 
     @functional
     def test_rdsclusterparamgroup_delete(self):
-        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_delete')
+        session_factory = self.get_session_factory('test_rdsclusterparamgroup_delete')
         client = session_factory().client('rds')
 
         name = 'pg-cluster-test'
@@ -177,7 +177,7 @@ class RDSClusterParamGroupTest(BaseTest):
 
     @functional
     def test_rdsclusterparamgroup_copy(self):
-        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_copy')
+        session_factory = self.get_session_factory('test_rdsclusterparamgroup_copy')
         client = session_factory().client('rds')
 
         name = 'pgc-orig'
@@ -212,7 +212,7 @@ class RDSClusterParamGroupTest(BaseTest):
 
     @functional
     def test_rdsclusterparamgroup_modify(self):
-        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_modify')
+        session_factory = self.get_session_factory('test_rdsclusterparamgroup_modify')
         client = session_factory().client('rds')
 
         name = 'pgc-test'

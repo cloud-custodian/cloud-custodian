@@ -23,7 +23,7 @@ class TestSqsAction(BaseTest):
 
     @functional
     def test_sqs_delete(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_sqs_delete')
         client = session_factory().client('sqs')
         client.create_queue(QueueName='test-sqs')
@@ -45,7 +45,7 @@ class TestSqsAction(BaseTest):
 
     @functional
     def test_sqs_set_encryption(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_sqs_set_encryption')
 
         client_sqs = session_factory().client('sqs')

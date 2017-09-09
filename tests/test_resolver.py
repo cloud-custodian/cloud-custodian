@@ -49,7 +49,7 @@ class FakeResolver(object):
 class ResolverTest(BaseTest):
 
     def test_resolve_s3(self):
-        session_factory = self.replay_flight_data('test_s3_resolver')
+        session_factory = self.get_session_factory('test_s3_resolver')
         session = session_factory()
         client = session.client('s3')
         resource = session.resource('s3')

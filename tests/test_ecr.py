@@ -24,7 +24,7 @@ class TestECR(BaseTest):
     @functional
     def test_ecr_no_policy(self):
         # running against a registry with no policy causes no issues.
-        session_factory = self.replay_flight_data('test_ecr_no_policy')
+        session_factory = self.get_session_factory('test_ecr_no_policy')
         client = session_factory().client('ecr')
         name = 'test-ecr-no-policy'
         client.create_repository(repositoryName=name)
@@ -43,7 +43,7 @@ class TestECR(BaseTest):
 
     @functional
     def test_ecr_remove_matched(self):
-        session_factory = self.replay_flight_data('test_ecr_remove_matched')
+        session_factory = self.get_session_factory('test_ecr_remove_matched')
         client = session_factory().client('ecr')
         name = 'test-ecr-remove-matched'
         client.create_repository(repositoryName=name)
@@ -105,7 +105,7 @@ class TestECR(BaseTest):
     def test_ecr_remove_named(self):
         # pre-requisites empty repo - no policy
         # pre-requisites abc repo - policy w/ matched statement id
-        session_factory = self.replay_flight_data('test_ecr_remove_named')
+        session_factory = self.get_session_factory('test_ecr_remove_named')
         client = session_factory().client('ecr')
         name = 'test-xyz'
 

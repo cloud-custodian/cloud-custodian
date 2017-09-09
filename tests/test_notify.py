@@ -25,7 +25,7 @@ class NotifyTest(BaseTest):
 
     @functional
     def test_notify_address_from(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_notify_address_from')
         client = session_factory().client('sqs')
         queue_url = client.create_queue(
@@ -69,7 +69,7 @@ class NotifyTest(BaseTest):
                 'resources')))
         
     def test_sns_notify(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_sns_notify_action')
         client = session_factory().client('sns')
         topic = client.create_topic(Name='c7n-notify-test')['TopicArn']
@@ -91,7 +91,7 @@ class NotifyTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_notify(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             "test_notify_action", zdata=True)
         policy = self.load_policy({
             'name': 'instance-check',

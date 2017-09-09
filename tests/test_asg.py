@@ -21,7 +21,7 @@ from .common import BaseTest
 class LaunchConfigTest(BaseTest):
 
     def test_config_unused(self):
-        factory = self.replay_flight_data('test_launch_config_unused')
+        factory = self.get_session_factory('test_launch_config_unused')
         p = self.load_policy({
             'name': 'unused-cfg',
             'resource': 'launch-config',
@@ -32,7 +32,7 @@ class LaunchConfigTest(BaseTest):
                          'CloudClusterCopy')
 
     def test_config_delete(self):
-        factory = self.replay_flight_data('test_launch_config_delete')
+        factory = self.get_session_factory('test_launch_config_delete')
         p = self.load_policy({
             'name': 'delete-cfg',
             'resource': 'launch-config',
@@ -58,7 +58,7 @@ class AutoScalingTest(BaseTest):
         return {t['Key']: t['Value'] for t in results}
 
     def test_asg_delete(self):
-        factory = self.replay_flight_data('test_asg_delete')
+        factory = self.get_session_factory('test_asg_delete')
         p = self.load_policy({
             'name': 'asg-delete',
             'resource': 'asg',
@@ -71,7 +71,7 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')
 
     def test_asg_non_encrypted_filter(self):
-        factory = self.replay_flight_data('test_asg_non_encrypted_filter')
+        factory = self.get_session_factory('test_asg_non_encrypted_filter')
         p = self.load_policy({
             'name': 'asg-encrypted-filter',
             'resource': 'asg',
@@ -82,7 +82,7 @@ class AutoScalingTest(BaseTest):
             resources[0]['Unencrypted'], ['Image', 'LaunchConfig'])
 
     def test_asg_image_age_filter(self):
-        factory = self.replay_flight_data('test_asg_image_age_filter')
+        factory = self.get_session_factory('test_asg_image_age_filter')
         p = self.load_policy({
             'name': 'asg-cfg-filter',
             'resource': 'asg',
@@ -93,7 +93,7 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_asg_config_filter(self):
-        factory = self.replay_flight_data('test_asg_config_filter')
+        factory = self.get_session_factory('test_asg_config_filter')
         p = self.load_policy({
             'name': 'asg-cfg-filter',
             'resource': 'asg',
@@ -105,7 +105,7 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_asg_vpc_filter(self):
-        factory = self.replay_flight_data('test_asg_vpc_filter')
+        factory = self.get_session_factory('test_asg_vpc_filter')
         p = self.load_policy({
             'name': 'asg-vpc-filter',
             'resource': 'asg',
@@ -119,7 +119,7 @@ class AutoScalingTest(BaseTest):
             resources[0]['LaunchConfigurationName'], 'foo-bar')
 
     def test_asg_tag_and_propagate(self):
-        factory = self.replay_flight_data('test_asg_tag')
+        factory = self.get_session_factory('test_asg_tag')
         p = self.load_policy({
             'name': 'asg-tag',
             'resource': 'asg',
@@ -164,7 +164,7 @@ class AutoScalingTest(BaseTest):
         self.assertFalse('Home' in tag_map)
 
     def test_asg_remove_tag(self):
-        factory = self.replay_flight_data('test_asg_remove_tag')
+        factory = self.get_session_factory('test_asg_remove_tag')
         p = self.load_policy({
             'name': 'asg-remove-tag',
             'resource': 'asg',
@@ -185,7 +185,7 @@ class AutoScalingTest(BaseTest):
         self.assertFalse('CustomerId' in tag_map)
 
     def test_asg_mark_for_op(self):
-        factory = self.replay_flight_data('test_asg_mark_for_op')
+        factory = self.get_session_factory('test_asg_mark_for_op')
         p = self.load_policy({
             'name': 'asg-mark-for-op',
             'resource': 'asg',
@@ -207,7 +207,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue('suspend@' in tag_map['custodian_action'])
 
     def test_asg_rename_tag(self):
-        factory = self.replay_flight_data('test_asg_rename')
+        factory = self.get_session_factory('test_asg_rename')
         p = self.load_policy({
             'name': 'asg-rename-tag',
             'resource': 'asg',
@@ -249,7 +249,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue('Linux' in tag_map)
 
     def test_asg_suspend(self):
-        factory = self.replay_flight_data('test_asg_suspend')
+        factory = self.get_session_factory('test_asg_suspend')
         p = self.load_policy({
             'name': 'asg-suspend',
             'resource': 'asg',
@@ -266,7 +266,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue(result['SuspendedProcesses'])
 
     def test_asg_suspend_when_no_instances(self):
-        factory = self.replay_flight_data('test_asg_suspend_when_no_instances')
+        factory = self.get_session_factory('test_asg_suspend_when_no_instances')
         client = factory().client('autoscaling')
 
         # Ensure we have a non-suspended ASG with no instances
@@ -291,7 +291,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue(result['SuspendedProcesses'])
 
     def test_asg_resume(self):
-        factory = self.replay_flight_data('test_asg_resume')
+        factory = self.get_session_factory('test_asg_resume')
         p = self.load_policy({
             'name': 'asg-suspend',
             'resource': 'asg',
@@ -309,7 +309,7 @@ class AutoScalingTest(BaseTest):
         self.assertFalse(result['SuspendedProcesses'])
 
     def test_asg_invalid_filter_good(self):
-        factory = self.replay_flight_data('test_asg_invalid_filter_good')
+        factory = self.get_session_factory('test_asg_invalid_filter_good')
         p = self.load_policy({
             'name': 'asg-invalid-filter',
             'resource': 'asg',
@@ -319,7 +319,7 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_asg_invalid_filter_bad(self):
-        factory = self.replay_flight_data('test_asg_invalid_filter_bad')
+        factory = self.get_session_factory('test_asg_invalid_filter_bad')
         p = self.load_policy({
             'name': 'asg-invalid-filter',
             'resource': 'asg',
@@ -333,7 +333,7 @@ class AutoScalingTest(BaseTest):
         self.assertTrue('invalid-security-group' in s)
 
     def test_asg_subnet(self):
-        factory = self.replay_flight_data('test_asg_subnet')
+        factory = self.get_session_factory('test_asg_subnet')
         p = self.load_policy({
             'name': 'asg-sub',
             'resource': 'asg',
@@ -350,7 +350,7 @@ class AutoScalingTest(BaseTest):
             sorted(['subnet-65dbce1d', 'subnet-b77a4ffd', 'subnet-db9f62b2']))
 
     def test_asg_security_group_not_matched(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_asg_security_group_not_matched')
         p = self.load_policy({
             'name': 'asg-sg',
@@ -367,7 +367,7 @@ class AutoScalingTest(BaseTest):
             resources[0]['c7n:matched-security-groups'], ['sg-0b3d3377'])
 
     def test_asg_security_group(self):
-        factory = self.replay_flight_data('test_asg_security_group')
+        factory = self.get_session_factory('test_asg_security_group')
         p = self.load_policy({
             'name': 'asg-sg',
             'resource': 'asg',
