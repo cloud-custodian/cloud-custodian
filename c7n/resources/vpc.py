@@ -82,7 +82,7 @@ class FlowLogFilter(Filter):
                       op: equal
                       # equality operator applies to following keys
                       traffic-type: all
-                      status: success
+                      status: active
                       log-group: vpc-logs
 
     """
