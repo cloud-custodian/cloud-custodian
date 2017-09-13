@@ -18,6 +18,7 @@ import io
 import json
 import os
 import tempfile
+from six import binary_type
 
 from .common import Bag, BaseTest
 from .test_s3 import destroyBucket
@@ -40,6 +41,8 @@ class FakeCache(object):
 class FakeResolver(object):
 
     def __init__(self, contents):
+        if isinstance(contents, binary_type):
+            contents = contents.decode('utf8')
         self.contents = contents
 
     def resolve(self, uri):
