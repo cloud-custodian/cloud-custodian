@@ -386,7 +386,12 @@ class RunTest(CliTest):
         #self.assertIn('metric:ResourceCount Count:1 policy:ec2-state-transition-age', logs)
 
         self.run_and_expect_success(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
         )
 
     def test_error(self):
@@ -410,7 +415,12 @@ class RunTest(CliTest):
         })
 
         self.run_and_expect_failure(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
             2
         )
 
