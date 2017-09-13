@@ -142,5 +142,6 @@ class ValuesFrom(object):
                 return jmespath.search(self.data['expr'], data)
             return data
         elif format == 'txt':
+            contents = contents.encode('utf8')
             return [s.strip().decode('utf8')
                     for s in io.BytesIO(contents).readlines()]
