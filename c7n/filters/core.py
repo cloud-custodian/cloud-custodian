@@ -63,6 +63,9 @@ def operator_in(x, y):
 def operator_ni(x, y):
     return x not in y
 
+## intersect function will allow the comparison of 2 lists
+def intersect(x, y):
+    return bool(set(x).intersection(y))
 
 OPERATORS = {
     'eq': operator.eq,
@@ -82,7 +85,8 @@ OPERATORS = {
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
-    'contains': operator.contains}
+    'contains': operator.contains,
+    'intersect': intersect}
 
 
 class FilterRegistry(PluginRegistry):
