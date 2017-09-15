@@ -63,9 +63,11 @@ def operator_in(x, y):
 def operator_ni(x, y):
     return x not in y
 
-## intersect function will allow the comparison of 2 lists
+
+# intersect function will allow the comparison of 2 lists
 def intersect(x, y):
     return bool(set(x).intersection(y))
+
 
 OPERATORS = {
     'eq': operator.eq,
