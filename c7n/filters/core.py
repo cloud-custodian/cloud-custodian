@@ -69,7 +69,8 @@ def intersect(x, y):
     return bool(set(x).intersection(y))
 
 
-    """Filter RDS based on subnet group.  Uses op: intersect option to compare the databases Subnet-Group list against a user provided list.
+    """Filter RDS based on subnet group.  Uses op: intersect option to compare
+    the databases Subnet-Group list against a user provided list.
     
     :example:
         .. code-block: yaml
