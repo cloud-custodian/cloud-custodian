@@ -76,12 +76,12 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 log = logging.getLogger('custodian.rds')
 
 filters = FilterRegistry('rds.filters')
-actions = ActionRegistry('rds.actions')
+rds_actions = ActionRegistry('rds.actions')
 
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
 filters.register('health-event', HealthEventFilter)
-actions.register('auto-tag-user', AutoTagUser)
+rds_actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('rds')
@@ -114,7 +114,7 @@ class RDS(QueryResourceManager):
         )
 
     filter_registry = filters
-    action_registry = actions
+    action_registry = rds_actions
     _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('rds:ListTagsForResource',)
@@ -341,7 +341,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(dbs)
 
 
-@actions.register('mark-for-op')
+@rds_actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Mark a RDS instance for specific custodian action
 
@@ -375,7 +375,7 @@ class TagDelayedAction(tags.TagDelayedAction):
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
-@actions.register('auto-patch')
+@rds_actions.register('auto-patch')
 class AutoPatch(BaseAction):
     """Toggle AutoMinorUpgrade flag on RDS instance
 
@@ -466,7 +466,7 @@ class UpgradeAvailable(Filter):
         return results
 
 
-@actions.register('upgrade')
+@rds_actions.register('upgrade')
 class UpgradeMinor(BaseAction):
     """Upgrades a RDS instance to the latest major/minor version available
 
@@ -521,8 +521,8 @@ class UpgradeMinor(BaseAction):
                 ApplyImmediately=self.data.get('immediate', False))
 
 
-@actions.register('tag')
-@actions.register('mark')
+@rds_actions.register('tag')
+@rds_actions.register('mark')
 class Tag(tags.Tag):
     """Mark/tag a RDS instance with a key/value
 
@@ -553,8 +553,8 @@ class Tag(tags.Tag):
             client.add_tags_to_resource(ResourceName=arn, Tags=ts)
 
 
-@actions.register('remove-tag')
-@actions.register('unmark')
+@rds_actions.register('remove-tag')
+@rds_actions.register('unmark')
 class RemoveTag(tags.RemoveTag):
     """Removes a tag or set of tags from RDS instances
 
@@ -585,7 +585,7 @@ class RemoveTag(tags.RemoveTag):
                 ResourceName=arn, TagKeys=tag_keys)
 
 
-@actions.register('tag-trim')
+@rds_actions.register('tag-trim')
 class TagTrim(tags.TagTrim):
 
     permissions = ('rds:RemoveTagsFromResource',)
@@ -615,7 +615,7 @@ def _eligible_start_stop(db, state="available"):
     return True
 
 
-@actions.register('stop')
+@rds_actions.register('stop')
 class Stop(BaseAction):
     """Stop an rds instance.
 
@@ -639,7 +639,7 @@ class Stop(BaseAction):
                     r['DBInstanceIdentifier'], e)
 
 
-@actions.register('start')
+@rds_actions.register('start')
 class Start(BaseAction):
     """Stop an rds instance.
 
@@ -664,7 +664,7 @@ class Start(BaseAction):
                     r['DBInstanceIdentifier'], e)
 
 
-@actions.register('delete')
+@rds_actions.register('delete')
 class Delete(BaseAction):
     """Deletes selected RDS instances
 
@@ -763,7 +763,7 @@ class Delete(BaseAction):
             Tags=tags)
 
 
-@actions.register('snapshot')
+@rds_actions.register('snapshot')
 class Snapshot(BaseAction):
     """Creates a manual snapshot of a RDS instance
 
@@ -807,7 +807,7 @@ class Snapshot(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'])
 
 
-@actions.register('resize')
+@rds_actions.register('resize')
 class ResizeInstance(BaseAction):
     """Change the allocated storage of an rds instance.
 
@@ -873,7 +873,7 @@ class ResizeInstance(BaseAction):
                 ApplyImmediately=self.data.get('immediate', False))
 
 
-@actions.register('retention')
+@rds_actions.register('retention')
 class RetentionWindow(BaseAction):
     """
     Sets the 'BackupRetentionPeriod' value for automated snapshots,
@@ -996,6 +996,7 @@ class RDSSnapshot(QueryResourceManager):
 
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')
+    action_registry.register('auto-tag-user', AutoTagUser)
     filter_registry.register('marked-for-op', tags.TagActionFilter)
 
     _generate_arn = None
@@ -1512,7 +1513,7 @@ class RDSSnapshotDelete(BaseAction):
                 DBSnapshotIdentifier=s['DBSnapshotIdentifier'])
 
 
-@actions.register('modify-security-groups')
+@rds_actions.register('modify-security-groups')
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     permissions = ('rds:ModifyDBInstance', 'rds:ModifyDBCluster')

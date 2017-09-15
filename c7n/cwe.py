@@ -59,10 +59,6 @@ class CloudWatchEvents(object):
             'ids': 'requestParameters.loadBalancerName',
             'source': 'elasticloadbalancing.amazonaws.com'},
 
-        'CreateDBInstance': {
-            'ids': 'requestParameters.dBInstanceIdentifier',
-            'source': 'rds.amazonaws.com'},
-
         'CreateVolume': {
             'ids': 'responseElements.volumeId',
             'source': 'ec2.amazonaws.com'},
@@ -81,7 +77,16 @@ class CloudWatchEvents(object):
 
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
-            'source': 'ec2.amazonaws.com'}}
+            'source': 'ec2.amazonaws.com'},
+        # rds
+        'CreateDBInstance': {
+            'ids': 'requestParameters.dBInstanceIdentifier',
+            'source': 'rds.amazonaws.com'},
+        # rds-snapshot
+        'CreateDBSnapshot': {
+            'ids': 'responseElements.dBSnapshotArn',
+            'source': 'rds.amazonaws.com'}
+    }
 
     @classmethod
     def get(cls, event_name):
