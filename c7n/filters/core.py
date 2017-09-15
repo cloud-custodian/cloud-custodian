@@ -69,18 +69,19 @@ def intersect(x, y):
     return bool(set(x).intersection(y))
 
 
-    """Filter RDS based on subnet group.  Uses op: intersect option to compare
+    """Filter RDS based on subnet group. Uses op: intersect option to compare
     the databases Subnet-Group list against a user provided list.
-    
+
     :example:
         .. code-block: yaml
+
             policies:
               - name: find-rds-on-public-subnets-using-s3-list
                 description: |
                    This policy will compare rds instances subnet group list
                    against a user provided list of public subnets from a s3 txt file.
                 comment:  |
-                   The txt file needs to be in utf-8 no BOM format and contain one 
+                   The txt file needs to be in utf-8 no BOM format and contain one
                    subnet per line in the file no quotes around the subnets either.
                 resource: rds
                 filters:
@@ -100,13 +101,13 @@ def intersect(x, y):
                    - type: value
                      key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
                      op: intersect
-                     value: 
+                     value:
                          - subnet-2a8374658
                          - subnet-1b8474522
                          - subnet-2d2736444
     """
 
-    
+
 OPERATORS = {
     'eq': operator.eq,
     'equal': operator.eq,
