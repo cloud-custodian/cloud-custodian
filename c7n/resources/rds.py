@@ -1634,6 +1634,8 @@ class ParameterFilter(ValueFilter):
             for pg in resource['DBParameterGroups']:
                 pg_values = paramcache[pg['DBParameterGroupName']]
                 if self.match(pg_values):
+                    resource.setdefault('c7n:MatchedDBParameter', []).append(
+                        self.data.get('key'))
                     results.append(resource)
                     break
         return results
