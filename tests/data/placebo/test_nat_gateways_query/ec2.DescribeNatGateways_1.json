@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "20eb721b-845d-40ce-8d67-2a1f72e780e8",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Fri, 08 Sep 2017 19:31:28 GMT"
+            }
+        },
+        "NatGateways": [
+            {
+                "NatGatewayAddresses": [
+                    {
+                        "PublicIp": "1.1.1.1",
+                        "NetworkInterfaceId": "eni-0000000",
+                        "AllocationId": "eipalloc-0000000",
+                        "PrivateIp": "1.1.1.1"
+                    }
+                ],
+                "VpcId": "vpc-0000000",
+                "State": "available",
+                "NatGatewayId": "nat-0000000000000000",
+                "SubnetId": "subnet-0000000",
+                "CreateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 16,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 8,
+                    "minute": 21
+                }
+            }
+        ]
+    }
+}

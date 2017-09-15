@@ -56,7 +56,10 @@ class EMRCluster(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'ClusterStates': [
+                    'running', 'bootstrapping', 'waiting']}]))
 
     @classmethod
     def get_permissions(cls):

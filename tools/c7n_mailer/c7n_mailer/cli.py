@@ -26,6 +26,7 @@ CONFIG_SCHEMA = {
         'timeout': {'type': 'integer'},
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
         'security_groups': {'type': 'array', 'items': {'type': 'string'}},
+        'dead_letter_config': {'type': 'object'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},

@@ -371,3 +371,114 @@ class AppELBTargetGroupTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestAppElbLogging(BaseTest):
+
+    def test_enable_s3_logging(self):
+        session_factory = self.replay_flight_data(
+            'test_appelb_enable_s3_logging')
+        policy = self.load_policy({
+            'name': 'test-enable-s3-logging',
+            'resource': 'app-elb',
+            'filters': [{'LoadBalancerName': 'alb1'}],
+            'actions': [
+                {'type': 'set-s3-logging',
+                 'state': 'enabled',
+                 'bucket': 'elbv2logtest',
+                 'prefix': 'elblogs/{LoadBalancerName}'},
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('elbv2')
+        attrs = {t['Key']: t['Value'] for t in
+                 client.describe_load_balancer_attributes(
+                     LoadBalancerArn=resources[0][
+                         'LoadBalancerArn']).get('Attributes')}
+        self.assertEqual(
+            attrs,
+            {'access_logs.s3.enabled': 'true',
+             'access_logs.s3.bucket': 'elbv2logtest',
+             'access_logs.s3.prefix': 'gah5/alb1'})
+
+    def test_disable_s3_logging(self):
+        session_factory = self.replay_flight_data(
+            'test_appelb_disable_s3_logging')
+        policy = self.load_policy({
+            'name': 'test-disable-s3-logging',
+            'resource': 'app-elb',
+            'filters': [
+                {'LoadBalancerName': 'alb1'}],
+            'actions': [{
+                'type': 'set-s3-logging',
+                'state': 'disabled'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('elbv2')
+        attrs = {t['Key']: t['Value'] for t in
+                 client.describe_load_balancer_attributes(
+                     LoadBalancerArn=resources[0][
+                         'LoadBalancerArn']).get('Attributes')}
+        self.assertEqual(
+            attrs,
+            {'access_logs.s3.enabled': 'false',
+             'access_logs.s3.bucket': 'elbv2logtest',
+             'access_logs.s3.prefix': 'gah5'})
+
+
+class TestAppElbIsLoggingFilter(BaseTest):
+    """ replicate
+        - name: appelb-is-logging-to-bucket-test
+          resource: app-elb
+          filters:
+            - type: is-logging
+            bucket: elbv2logtest
+    """
+
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data('test_appelb_is_logging_filter')
+        policy = self.load_policy({
+            'name': 'appelb-is-logging-to-bucket-test',
+            'resource': 'app-elb',
+            'filters': [
+                {'type': 'is-logging',
+                 'bucket': 'elbv2logtest',
+                 },
+            ]
+        }, session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should find appelbs logging "
+                                              "to elbv2logtest")
+class TestAppElbIsNOtLoggingFilter(BaseTest):
+    """ replicate
+        - name: appelb-is-not-logging-to-bucket-test
+          resource: app-elb
+          filters:
+            - type: is-not-logging
+            bucket: elbv2logtest
+    """
+
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data('test_appelb_is_logging_filter')
+        policy = self.load_policy({
+            'name': 'appelb-is-logging-to-bucket-test',
+            'resource': 'app-elb',
+            'filters': [
+                {'type': 'is-not-logging',
+                 'bucket': 'otherbucket',
+                 },
+            ]
+        }, session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should find appelbs not"
+                                              "logging to otherbucket")
+

@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VpcPeeringConnections": [
+            {
+                "Status": {
+                    "Message": "Active", 
+                    "Code": "active"
+                }, 
+                "Tags": [
+                    {
+                        "Value": "notable", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AccepterVpcInfo": {
+                    "PeeringOptions": {
+                        "AllowEgressFromLocalVpcToRemoteClassicLink": false, 
+                        "AllowDnsResolutionFromRemoteVpc": false, 
+                        "AllowEgressFromLocalClassicLinkToRemoteVpc": false
+                    }, 
+                    "OwnerId": "619193117841", 
+                    "VpcId": "vpc-1cc8e779", 
+                    "CidrBlock": "10.0.0.0/16"
+                }, 
+                "VpcPeeringConnectionId": "pcx-36096b5f", 
+                "RequesterVpcInfo": {
+                    "PeeringOptions": {
+                        "AllowEgressFromLocalVpcToRemoteClassicLink": false, 
+                        "AllowDnsResolutionFromRemoteVpc": false, 
+                        "AllowEgressFromLocalClassicLinkToRemoteVpc": false
+                    }, 
+                    "OwnerId": "619193117841", 
+                    "VpcId": "vpc-cb3e8cae", 
+                    "CidrBlock": "172.20.0.0/16"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c10d7cc0-5a93-49fe-8e11-7ade0b72be57", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 19 Aug 2017 03:24:58 GMT"
+            }
+        }
+    }
+}

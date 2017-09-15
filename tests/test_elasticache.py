@@ -221,7 +221,7 @@ class TestElastiCacheSnapshot(BaseTest):
         p = self.load_policy({
             'name': 'elasticache-snapshot-age-filter',
             'resource': 'cache-snapshot',
-            'filters': [{'type': 'age', 'days': 2}]},
+            'filters': [{'type': 'age', 'days': 2, 'op': 'gt'}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 4)

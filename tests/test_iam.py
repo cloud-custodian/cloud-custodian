@@ -19,7 +19,7 @@ import os
 import tempfile
 
 from unittest import TestCase
-from .common import load_data, BaseTest
+from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 from dateutil import parser
@@ -186,8 +186,25 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 6)
 
 
-class IamUserFilterUsage(BaseTest):
+class IamUserTest(BaseTest):
 
+    @functional
+    def test_iam_user_delete(self):
+        factory = self.replay_flight_data('test_iam_user_delete')
+        name = 'alice'
+        client = factory().client('iam')
+        client.create_user(UserName=name, Path="/test/")
+        p = self.load_policy({
+            'name': 'iam-user-delete',
+            'resource': 'iam-user',
+            'filters': [{'UserName': name}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.list_users(PathPrefix="/test/").get('Users', [])
+        self.assertEqual(users, [])
+        
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
             'test_iam_user_admin_policy')
@@ -352,6 +369,7 @@ class IamGroupFilterUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 
 class IamManagedPolicyUsage(BaseTest):
 

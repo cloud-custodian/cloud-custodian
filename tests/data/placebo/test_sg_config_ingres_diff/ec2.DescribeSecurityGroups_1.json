@@ -1,0 +1,86 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "Tags": [
+                    {
+                        "Value": "Private", 
+                        "Key": "NetworkLocation"
+                    }
+                ], 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-aa6c90c3"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-5f6c9936", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-aa6c90c3"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Test", 
+                "Tags": [
+                    {
+                        "Value": "Test", 
+                        "Key": "Name"
+                    }
+                ], 
+                "IpPermissions": [], 
+                "GroupName": "Test", 
+                "VpcId": "vpc-5f6c9936", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-65229a0c"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7ed1af97-b7b2-4e2f-a8e6-49fdbdd28cc1", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 27 Jan 2017 00:50:55 GMT"
+            }
+        }
+    }
+}

@@ -3,7 +3,7 @@
     "data": {
         "Subnets": [
             {
-                "VpcId": "vpc-3b5c3952", 
+                "AvailabilityZone": "us-east-1b", 
                 "Tags": [
                     {
                         "Value": "web", 
@@ -11,12 +11,12 @@
                     }
                 ], 
                 "AvailableIpAddressCount": 250, 
-                "MapPublicIpOnLaunch": false, 
                 "DefaultForAz": false, 
                 "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-cf62dcb6", 
                 "State": "available", 
-                "AvailabilityZone": "us-east-2b", 
-                "SubnetId": "subnet-f404b58f", 
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-b5a610ef", 
                 "CidrBlock": "10.4.9.0/24", 
                 "AssignIpv6AddressOnCreation": false
             }
@@ -24,13 +24,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3cb58ea0-d493-40c3-9ea7-a0d776aee892", 
+            "RequestId": "7b9721c8-0c1f-400f-84a0-d437806fca55", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 29 May 2017 11:28:22 GMT"
+                "date": "Mon, 26 Jun 2017 18:48:09 GMT"
             }
         }
     }

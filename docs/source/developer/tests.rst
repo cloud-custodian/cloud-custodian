@@ -27,16 +27,17 @@ Coverage reports can be generated and viewed with the following:
    $ gnome-open coverage/index.html
 
 
-Ratcheting up Python 3.6 Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ratcheting down Python 3.6 Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We are in the process of porting Custodian to run on both Python 3.6 in
 addition to 2.7. As part of this process, we record tests that are known to
-pass under Python 3.6 in a file called ``ratchet.txt``, and we require these
-and only these tests to pass under the ``py36`` environment. If you make
-changes that introduce new passing tests under Python 3.6, then the ``py36``
-test environment will add the new tests to the ``ratchet.txt`` file and will
-fail with a message prompting you to commit the changes to ``ratchet.txt``.
+fail under Python 3.6 in a file called ``ratchet.txt``, and we require these
+and only these tests to fail under the ``py36`` environment during continuous
+integration. If you make changes that fix some failing tests under Python 3.6,
+then the ``py36`` test environment will remove the newly pasing tests from the
+``ratchet.txt`` file and will fail with a message prompting you to commit the
+changes to ``ratchet.txt``.
 
 
 Decorating tests

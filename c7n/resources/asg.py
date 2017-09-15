@@ -1257,7 +1257,10 @@ class Resume(Action):
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        ec2_client.start_instances(InstanceIds=instance_ids)
+
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.

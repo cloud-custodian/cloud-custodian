@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"SharedInvoke\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-1:644160558196:function:func-b\"}]}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "000da3bb-932b-11e7-9ded-53eb932c6bae", 
+            "HTTPHeaders": {
+                "date": "Wed, 06 Sep 2017 17:44:14 GMT", 
+                "x-amzn-requestid": "000da3bb-932b-11e7-9ded-53eb932c6bae", 
+                "content-length": "291", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

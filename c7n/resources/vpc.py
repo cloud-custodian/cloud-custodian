@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
 import itertools
 import operator
 import zlib
@@ -26,10 +25,11 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.query import QueryResourceManager
+from c7n.filters.locked import Locked
+from c7n.query import QueryResourceManager, ConfigSource
 from c7n.manager import resources
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, camelResource, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 
 @resources.register('vpc')
@@ -82,7 +82,7 @@ class FlowLogFilter(Filter):
                       op: equal
                       # equality operator applies to following keys
                       traffic-type: all
-                      status: success
+                      status: active
                       log-group: vpc-logs
 
     """
@@ -226,6 +226,45 @@ class SecurityGroup(QueryResourceManager):
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
+    def get_source(self, source_type):
+        if source_type == 'config':
+            return ConfigSG(self)
+        return super(SecurityGroup, self).get_source(source_type)
+
+
+class ConfigSG(ConfigSource):
+
+    def augment(self, resources):
+        for r in resources:
+            for rset in ('IpPermissions', 'IpPermissionsEgress'):
+                for p in r.get(rset, ()):
+                    if p.get('FromPort', '') is None:
+                        p.pop('FromPort')
+                    if p.get('ToPort', '') is None:
+                        p.pop('ToPort')
+                    if 'Ipv6Ranges' not in p:
+                        p[u'Ipv6Ranges'] = []
+                    for i in p.get('UserIdGroupPairs', ()):
+                        for k, v in list(i.items()):
+                            if v is None:
+                                i.pop(k)
+
+                    # legacy config form, still version 1.2
+                    for attribute, element_key in (('IpRanges', u'CidrIp'),):
+                        if attribute not in p:
+                            continue
+                        p[attribute] = [{element_key: v} for v in p[attribute]]
+                    if 'Ipv4Ranges' in p:
+                        p['IpRanges'] = p.pop('Ipv4Ranges')
+        return resources
+
+
+@SecurityGroup.filter_registry.register('locked')
+class SecurityGroupLockedFilter(Locked):
+
+    def get_parent_id(self, resource, account_id):
+        return resource.get('VpcId', account_id)
+
 
 @SecurityGroup.filter_registry.register('diff')
 class SecurityGroupDiffFilter(Diff):
@@ -233,24 +272,6 @@ class SecurityGroupDiffFilter(Diff):
     def diff(self, source, target):
         differ = SecurityGroupDiff()
         return differ.diff(source, target)
-
-    def transform_revision(self, revision):
-        # config does some odd transforms, walk them back
-        resource = camelResource(json.loads(revision['configuration']))
-        for rset in ('IpPermissions', 'IpPermissionsEgress'):
-            for p in resource.get(rset, ()):
-                if p.get('FromPort', '') is None:
-                    p.pop('FromPort')
-                if p.get('ToPort', '') is None:
-                    p.pop('ToPort')
-                if 'Ipv6Ranges' not in p:
-                    p[u'Ipv6Ranges'] = []
-                for attribute, element_key in (
-                        ('IpRanges', u'CidrIp'),):
-                    if attribute not in p:
-                        continue
-                    p[attribute] = [{element_key: v} for v in p[attribute]]
-        return resource
 
 
 class SecurityGroupDiff(object):
@@ -276,8 +297,8 @@ class SecurityGroupDiff(object):
             return delta
 
     def get_tag_delta(self, source, target):
-        source_tags = {t['Key']: t['Value'] for t in source['Tags']}
-        target_tags = {t['Key']: t['Value'] for t in target['Tags']}
+        source_tags = {t['Key']: t['Value'] for t in source.get('Tags', ())}
+        target_tags = {t['Key']: t['Value'] for t in target.get('Tags', ())}
         target_keys = set(target_tags.keys())
         source_keys = set(source_tags.keys())
         removed = source_keys.difference(target_keys)
@@ -830,19 +851,6 @@ class SGPermission(Filter):
 
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
-    """Filter security groups by ingress (inbound) port(s)
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: security-groups-ingress-https
-                resource: security-group
-                filters:
-                  - type: ingress
-                    OnlyPorts: [443]
-    """
 
     ip_permissions_key = "IpPermissions"
     schema = {
@@ -858,22 +866,6 @@ class IPPermission(SGPermission):
 
 @SecurityGroup.filter_registry.register('egress')
 class IPPermissionEgress(SGPermission):
-    """Filter security groups by egress (outbound) port(s)
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: security-groups-egress-https
-                resource: security-group
-                filters:
-                  - type: egress
-                    Cidr:
-                      value: 24
-                      op: lt
-                      value_type: cidr_size
-    """
 
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
@@ -1093,6 +1085,63 @@ class RouteTable(QueryResourceManager):
         id_prefix = "rtb-"
 
 
+@RouteTable.filter_registry.register('subnet')
+class SubnetRoute(net_filters.SubnetFilter):
+    """Filter a route table by its associated subnet attributes."""
+
+    RelatedIdsExpression = "Associations[].SubnetId"
+
+    RelatedMapping = None
+
+    def get_related_ids(self, resources):
+        if self.RelatedIdMapping is None:
+            return super(SubnetRoute, self).get_related_ids(resources)
+        return list(itertools.chain(*[self.RelatedIdMapping[r['RouteTableId']] for r in resources]))
+
+    def get_related(self, resources):
+        rt_subnet_map = {}
+        main_tables = {}
+
+        manager = self.get_resource_manager()
+        for r in resources:
+            rt_subnet_map[r['RouteTableId']] = []
+            for a in r.get('Associations', ()):
+                if 'SubnetId' in a:
+                    rt_subnet_map[r['RouteTableId']].append(a['SubnetId'])
+                elif a.get('Main'):
+                    main_tables[r['VpcId']] = r['RouteTableId']
+        explicit_subnet_ids = set(itertools.chain(*rt_subnet_map.values()))
+        subnets = manager.resources()
+        for s in subnets:
+            if s['SubnetId'] in explicit_subnet_ids:
+                continue
+            if s['VpcId'] not in main_tables:
+                continue
+            rt_subnet_map.setdefault(main_tables[s['VpcId']], []).append(s['SubnetId'])
+        related_subnets = set(itertools.chain(*rt_subnet_map.values()))
+        self.RelatedIdMapping = rt_subnet_map
+        return {s['SubnetId']: s for s in subnets if s['SubnetId'] in related_subnets}
+
+
+@RouteTable.filter_registry.register('route')
+class Route(ValueFilter):
+    """Filter a route table by its routes' attributes."""
+
+    schema = type_schema('route', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            matched = []
+            for route in r['Routes']:
+                if self.match(route):
+                    matched.append(route)
+            if matched:
+                r.setdefault('c7n:matched-routes', []).extend(matched)
+                results.append(r)
+        return results
+
+
 @resources.register('peering-connection')
 class PeeringConnection(QueryResourceManager):
 
@@ -1107,6 +1156,44 @@ class PeeringConnection(QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
+
+
+@PeeringConnection.filter_registry.register('missing-route')
+class MissingRoute(Filter):
+    """Return peers which are missing a route in route tables.
+
+    If the peering connection is between two vpcs in the same account,
+    the connection is returned unless it is in present route tables in
+    each vpc.
+
+    If the peering connection is between accounts, then the local vpc's
+    route table is checked.
+    """
+
+    schema = type_schema('missing-route')
+    permissions = ('DescribeRouteTables',)
+
+    def process(self, resources, event=None):
+        tables = self.manager.get_resource_manager(
+            'route-table').resources()
+        routed_vpcs = {}
+        mid = 'VpcPeeringConnectionId'
+        for t in tables:
+            for r in t.get('Routes', ()):
+                if mid in r:
+                    routed_vpcs.setdefault(r[mid], []).append(t['VpcId'])
+        results = []
+        for r in resources:
+            if r[mid] not in routed_vpcs:
+                results.append(r)
+                continue
+            for k in ('AccepterVpcInfo', 'RequesterVpcInfo'):
+                if r[k]['OwnerId'] != self.manager.config.account_id:
+                    continue
+                if r[k]['VpcId'] not in routed_vpcs[r['VpcPeeringConnectionId']]:
+                    results.append(r)
+                    break
+        return results
 
 
 @resources.register('network-acl')
@@ -1251,6 +1338,33 @@ class InternetGateway(QueryResourceManager):
         id_prefix = "igw-"
 
 
+@resources.register('nat-gateway')
+class NATGateway(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'nat-gateway'
+        enum_spec = ('describe_nat_gateways', 'NatGateways', None)
+        name = id = 'NatGatewayId'
+        filter_name = 'NatGatewayIds'
+        filter_type = 'list'
+        dimension = None
+        date = 'CreateTime'
+        id_prefix = "nat-"
+
+
+@NATGateway.action_registry.register('delete')
+class DeleteNATGateway(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteNatGateway',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_nat_gateway(NatGatewayId=r['NatGatewayId'])
+
+
 @resources.register('vpn-connection')
 class VPNConnection(QueryResourceManager):
 
@@ -1281,6 +1395,21 @@ class VPNGateway(QueryResourceManager):
         date = None
         config_type = 'AWS::EC2::VPNGateway'
         id_prefix = "vgw-"
+
+
+@resources.register('vpc-endpoint')
+class VpcEndpoint(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc-endpoint'
+        enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
+        id = 'VpcEndpointId'
+        date = 'CreationTimestamp'
+        filter_name = 'VpcEndpointIds'
+        filter_type = 'list'
+        dimension = None
+        id_prefix = "vpce-"
 
 
 @resources.register('key-pair')

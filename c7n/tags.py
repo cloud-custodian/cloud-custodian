@@ -76,13 +76,20 @@ def register_universal_tags(filters, actions):
 
 
 def universal_augment(self, resources):
+    # Resource Tagging API Support
+    # https://goo.gl/uccKc9
+
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi')
 
     paginator = client.get_paginator('get_resources')
-    resource_type = self.get_model().service
-    if self.get_model().type:
-        resource_type += ":" + self.get_model().type
+
+    resource_type = getattr(self.get_model(), 'resource_type', None)
+    if not resource_type:
+        resource_type = self.get_model().service
+        if self.get_model().type:
+            resource_type += ":" + self.get_model().type
+
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
             ResourceTypeFilters=[resource_type])]))

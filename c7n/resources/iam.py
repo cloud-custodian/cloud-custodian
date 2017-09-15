@@ -21,7 +21,6 @@ import itertools
 import time
 
 from concurrent.futures import as_completed
-from dateutil.parser import parse
 from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
@@ -822,6 +821,73 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.action_registry.register('delete')
+class UserDelete(BaseAction):
+    """Delete a user.
+
+    For example if you want to have a whitelist of valid (machine-)users
+    and want to ensure that no users have been clicked without documentation.
+
+    You can use both the 'credential' or the 'username'
+    filter. 'credential' will have an SLA of 4h,
+    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html),
+    but the added benefit of performing less API calls, whereas
+    'username' will make more API calls, but have a SLA of your cache.
+
+    :example:
+
+      .. code-block: yaml
+
+        # using a 'credential' filter'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: credential
+              key: user
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+        # using a 'username' filter with 'UserName'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: UserName
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+         # using a 'username' filter with 'Arn'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: Arn
+              op: not-in
+              value:
+                - arn:aws:iam:123456789012:user/valid-user-1
+                - arn:aws:iam:123456789012:user/valid-user-2
+          actions:
+            - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteUser',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            client.delete_user(UserName=r['UserName'])
+        self.log.debug('Deleted user "%s"' % (r['UserName']))
+
+
 @User.action_registry.register('remove-keys')
 class UserRemoveAccessKey(BaseAction):
     """Delete or disable user's access keys.
@@ -862,7 +928,7 @@ class UserRemoveAccessKey(BaseAction):
             keys = r['AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(

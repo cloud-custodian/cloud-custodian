@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
+                "Version": "$LATEST", 
+                "CodeSha256": "NLea8ZDC16RKlQpOPkJ3qYnYL4u5eUGsGw9SZGrB910=", 
+                "FunctionName": "func-d", 
+                "MemorySize": 128, 
+                "CodeSize": 168, 
+                "FunctionArn": "arn:aws:lambda:us-west-1:644160558196:function:func-d", 
+                "Handler": "index.handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 3, 
+                "LastModified": "2017-09-06T18:07:44.060+0000", 
+                "Runtime": "python2.7", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4850c1aa-932e-11e7-a02d-b3e19cb578ce", 
+            "HTTPHeaders": {
+                "date": "Wed, 06 Sep 2017 18:07:44 GMT", 
+                "x-amzn-requestid": "4850c1aa-932e-11e7-a02d-b3e19cb578ce", 
+                "content-length": "602", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

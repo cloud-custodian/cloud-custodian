@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policyText": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::185106417252:root\"\n    },\n    \"Action\" : [ \"ecr:GetDownloadUrlForLayer\", \"ecr:BatchGetImage\", \"ecr:BatchCheckLayerAvailability\", \"ecr:ListImages\", \"ecr:DescribeImages\" ]\n  } ]\n}", 
+        "repositoryName": "test-ecr-remove-matched", 
+        "registryId": "644160558196", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c7584c6f-92e8-11e7-b532-1f00b919fdc9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c7584c6f-92e8-11e7-b532-1f00b919fdc9", 
+                "content-length": "458", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 06 Sep 2017 09:50:13 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

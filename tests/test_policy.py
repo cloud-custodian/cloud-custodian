@@ -153,9 +153,12 @@ class PolicyPermissions(BaseTest):
                          'has-statement', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
+                qk = "%s.filters.%s" % (k, n)
+                if qk in ('route-table.filters.route',):
+                    continue
                 if not perms:
-                    missing.append("%s.filters.%s" % (
-                        k, n))
+                    missing.append(qk)
+
         if missing:
             self.fail("Missing permissions %d on \n\t%s" % (
                 len(missing),
