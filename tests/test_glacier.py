@@ -105,3 +105,98 @@ class GlacierTagTest(BaseTest):
         tags = client.list_tags_for_vault(vaultName=resources[0]['VaultName'])
         self.assertEqual(len(tags['Tags']), 2)
         self.assertTrue('maid_status' in tags['Tags'])
+
+
+class GlacierStatementTest(BaseTest):
+
+    @functional
+    def test_glacier_remove_matched(self):
+        session_factory = self.replay_flight_data('test_glacier_remove_matched')
+        client = session_factory().client('glacier')
+        name = 'test-glacier-remove-matched'
+        client.create_vault(vaultName=name)
+        self.addCleanup(client.delete_vault, vaultName=name)
+
+        client.set_vault_access_policy(
+            vaultName=name,
+            policy={'Policy':json.dumps({
+                "Version": "2008-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::123456789012:root"
+                        },
+                        "Action": [
+                            "glacier:DeleteArchive"
+                        ]
+                    },
+                    {
+                        "Sid": "Public",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": [
+                            "glacier:ListVaults"
+                        ]
+                    }
+                ]
+            })})
+
+        p = self.load_policy({
+            'name': 'glacier-rm-matched',
+            'resource': 'glacier',
+            'filters': [
+                {'vaultName': name},
+                {'type': 'cross-account',
+                 'whitelist': ["123456789012"]}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': ['matched']}]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual([r['vaultName'] for r in resources], [name])
+        data = json.loads(
+            client.get_vault_access_policy(
+                vaultName=resources[0]['vaultName']).get('policy'))['Policy']
+        self.assertEqual(
+            [s['Sid'] for s in data.get('Statement', ())],
+            ['SpecificAllow'])
+
+    @functional
+    def test_glacier_remove_named(self):
+        session_factory = self.replay_flight_data('test_glacier_remove_named')
+        client = session_factory().client('glacier')
+        name = 'test-glacier-remove-named'
+
+        client.create_vault(vaultName=name)
+        self.addCleanup(client.delete_vault, vaultName=name)
+
+        client.set_vault_access_policy(
+            vaultName=name,
+            policy={'Policy':json.dumps({
+                "Version": "2008-10-17",
+                "Statement": [
+                    {"Sid": "WhatIsIt",
+                     "Effect": "Allow",
+                     "Principal": "*",
+                     "Action": ["glacier:*"]}]})})
+
+        p = self.load_policy({
+            'name': 'glacier-stat',
+            'resource': 'glacier',
+            'filters': [{'vaultName': name}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': ['WhatIsIt']}]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            ClientError,
+            client.get_vault_access_policy,
+            vaultName=resources[0]['vaultName'])
+    
