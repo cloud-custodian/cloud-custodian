@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:123456789012:test-sns-remove-named"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "39a89b02-ee30-5c86-8966-c935d31b181a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "39a89b02-ee30-5c86-8966-c935d31b181a", 
+                "date": "Sat, 16 Sep 2017 14:53:30 GMT", 
+                "content-length": "860", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
