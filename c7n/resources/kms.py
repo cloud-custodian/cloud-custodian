@@ -46,7 +46,7 @@ class KeyBase(object):
                     self.log.warning(
                         "Access denied getting tags for key:%s",
                         key_id)
-                    
+
             tag_list = []
             for t in tags:
                 tag_list.append({'Key': t['TagKey'], 'Value': t['TagValue']})
