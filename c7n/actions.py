@@ -782,7 +782,7 @@ class RemovePolicyBase(BaseAction):
             matched_key, ())
 
         for s in list(statements):
-            if statement_ids == ['matched']:
+            if statement_ids == 'matched':
                 if s in resource_statements:
                     found.append(s)
                     statements.remove(s)
