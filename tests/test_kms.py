@@ -51,7 +51,6 @@ class KMSTest(BaseTest):
         session_factory = self.replay_flight_data('test_kms_remove_matched')
         client = session_factory().client('kms')
         key_id = client.create_key()['KeyMetadata']['KeyId']
-        print(key_id)
         self.addCleanup(client.schedule_key_deletion, KeyId=key_id, PendingWindowInDays=7)
 
         client.put_key_policy(
@@ -120,7 +119,6 @@ class KMSTest(BaseTest):
         session_factory = self.replay_flight_data('test_kms_remove_named')
         client = session_factory().client('kms')
         key_id = client.create_key()['KeyMetadata']['KeyId']
-        print(key_id)
         self.addCleanup(client.schedule_key_deletion, KeyId=key_id, PendingWindowInDays=7)
 
         client.put_key_policy(
