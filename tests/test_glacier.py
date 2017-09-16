@@ -13,8 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import json
 from .common import BaseTest, functional
-
+from botocore.exceptions import ClientError
 
 class GlacierTagTest(BaseTest):
 
@@ -116,11 +117,11 @@ class GlacierStatementTest(BaseTest):
         name = 'test-glacier-remove-matched'
         client.create_vault(vaultName=name)
         self.addCleanup(client.delete_vault, vaultName=name)
-
+        vault_arn = client.describe_vault(vaultName=name)['VaultARN']
         client.set_vault_access_policy(
             vaultName=name,
             policy={'Policy':json.dumps({
-                "Version": "2008-10-17",
+                "Version": "2012-10-17",
                 "Statement": [
                     {
                         "Sid": "SpecificAllow",
@@ -128,17 +129,17 @@ class GlacierStatementTest(BaseTest):
                         "Principal": {
                             "AWS": "arn:aws:iam::123456789012:root"
                         },
-                        "Action": [
-                            "glacier:DeleteArchive"
-                        ]
+                        "Action": "glacier:AddTagsToVault",
+                        "Resource": vault_arn
                     },
                     {
                         "Sid": "Public",
                         "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": [
-                            "glacier:ListVaults"
-                        ]
+                        "Principal": {
+                            "AWS": "*"
+                        },
+                        "Action": "glacier:AddTagsToVault",
+                        "Resource": vault_arn
                     }
                 ]
             })})
@@ -147,19 +148,20 @@ class GlacierStatementTest(BaseTest):
             'name': 'glacier-rm-matched',
             'resource': 'glacier',
             'filters': [
-                {'vaultName': name},
+                {'VaultName': name},
                 {'type': 'cross-account',
                  'whitelist': ["123456789012"]}],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': ['matched']}]
+                 'statement_ids': 'matched'}]
             },
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual([r['vaultName'] for r in resources], [name])
+        self.assertEqual([r['VaultName'] for r in resources], [name])
+
         data = json.loads(
             client.get_vault_access_policy(
-                vaultName=resources[0]['vaultName']).get('policy'))['Policy']
+                vaultName=resources[0]['VaultName']).get('policy')['Policy'])
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
@@ -172,21 +174,27 @@ class GlacierStatementTest(BaseTest):
 
         client.create_vault(vaultName=name)
         self.addCleanup(client.delete_vault, vaultName=name)
-
+        vault_arn = client.describe_vault(vaultName=name)['VaultARN']
         client.set_vault_access_policy(
             vaultName=name,
             policy={'Policy':json.dumps({
-                "Version": "2008-10-17",
+                "Version": "2012-10-17",
                 "Statement": [
-                    {"Sid": "WhatIsIt",
-                     "Effect": "Allow",
-                     "Principal": "*",
-                     "Action": ["glacier:*"]}]})})
+                    {
+                        "Sid": "WhatIsIt",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["glacier:DescribeVault"],
+                        "Resource": vault_arn
+                    }
+                ]
+            })}
+        )
 
         p = self.load_policy({
-            'name': 'glacier-stat',
+            'name': 'glacier-rm-named',
             'resource': 'glacier',
-            'filters': [{'vaultName': name}],
+            'filters': [{'VaultName': name}],
             'actions': [
                 {'type': 'remove-statements',
                  'statement_ids': ['WhatIsIt']}]
@@ -198,5 +206,5 @@ class GlacierStatementTest(BaseTest):
         self.assertRaises(
             ClientError,
             client.get_vault_access_policy,
-            vaultName=resources[0]['vaultName'])
+            vaultName=resources[0]['VaultName'])
     
