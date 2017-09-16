@@ -129,7 +129,6 @@ class TestSqsAction(BaseTest):
         self.assertEqual([r['QueueUrl'] for r in resources], [queue_url])
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
         
-        print(data)
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
