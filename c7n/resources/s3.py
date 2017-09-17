@@ -842,8 +842,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 if f.exception():
                     self.log.error('error modifying bucket:%s\n%s',
                                    b['Name'], f.exception())
-                elif f.result():
-                    results.append(b)
+                results += filter(None, [f.result()])
             return results
 
     def process_bucket(self, bucket):
