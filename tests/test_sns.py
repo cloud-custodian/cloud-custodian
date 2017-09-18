@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
+import json, time
 
 from .common import BaseTest, functional
 
@@ -74,8 +74,8 @@ class TestSNS(BaseTest):
         resources = p.run()
 
         self.assertEqual([r['TopicArn'] for r in resources], [topic_arn])
-        data = json.loads(client.get_topic_attributes(TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
-        
+
+        data = json.loads(client.get_topic_attributes(TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])        
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
@@ -95,7 +95,14 @@ class TestSNS(BaseTest):
                 "Version": "2012-10-17",
                 "Statement": [
                     {
-                        "Sid": "WhatIsIt",
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:Subscribe"],
+                        "Resource": topic_arn
+                    },
+                    {
+                        "Sid": "RemoveMe",
                         "Effect": "Allow",
                         "Principal": "*",
                         "Action": ["SNS:GetTopicAttributes"],
@@ -111,10 +118,13 @@ class TestSNS(BaseTest):
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': ['WhatIsIt']}]
+                 'statement_ids': ['RemoveMe']}]
             },
             session_factory=session_factory)
 
         resources = p.run()
         self.assertEqual(len(resources), 1) 
+
+        data = json.loads(client.get_topic_attributes(TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
+        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
     

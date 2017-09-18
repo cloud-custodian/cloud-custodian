@@ -93,8 +93,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         client = local_session(self.manager.session_factory).client('sns')
         for r in resources:
             try:
-                if self.process_resource(client, r):
-                    results.append(r)
+                results += filter(None, [self.process_resource(client, r)])
             except:
                 self.log.exception(
                     "Error processing sns:%s", r['TopicArn'])
@@ -117,6 +116,6 @@ class RemovePolicyStatement(RemovePolicyBase):
             AttributeName='Policy',
             AttributeValue=json.dumps(p)
         )
-        return {'Name': resource['TopicName'],
+        return {'Name': resource['TopicArn'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
