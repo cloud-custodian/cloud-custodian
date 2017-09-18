@@ -13,9 +13,102 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+import json
+
+from botocore.exceptions import ClientError
+from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda
+from c7n.mu import PythonPackageArchive
+
+
+SAMPLE_FUNC = """\
+def handler(event, context):
+    print("hello world")
+"""
+
+
+class LambdaPermissionTest(BaseTest):
+
+    def create_function(self, client, name):
+        archive = PythonPackageArchive()
+        self.addCleanup(archive.remove)
+        archive.add_contents('index.py', SAMPLE_FUNC)
+        archive.close()
+
+        lfunc = client.create_function(
+            FunctionName=name,
+            Runtime="python2.7",
+            MemorySize=128,
+            Handler='index.handler',
+            Publish=True,
+            Role='arn:aws:iam::644160558196:role/lambda_basic_execution',
+            Code={'ZipFile': archive.get_bytes()})
+        self.addCleanup(client.delete_function, FunctionName=name)
+        return lfunc
+
+    @functional
+    def test_lambda_permission_matched(self):
+        factory = self.replay_flight_data('test_lambda_permission_matched')
+        client = factory().client('lambda')
+        name = "func-b"
+
+        self.create_function(client, name)
+        client.add_permission(
+            FunctionName=name,
+            StatementId="PublicInvoke",
+            Principal="*",
+            Action="lambda:InvokeFunction")
+        client.add_permission(
+            FunctionName=name,
+            StatementId="SharedInvoke",
+            Principal="arn:aws:iam::185106417252:root",
+            Action="lambda:InvokeFunction")
+        p = self.load_policy({
+            'name': 'lambda-perms',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': name},
+                {'type': 'cross-account',
+                 'whitelist': ["185106417252"]}],
+            'actions': [{
+                'type': 'remove-statements',
+                'statement_ids': ['matched']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        policy = json.loads(client.get_policy(FunctionName=name).get('Policy'))
+        self.assertEqual(
+            [s['Sid'] for s in policy.get('Statement', ())],
+            ['SharedInvoke'])
+
+    @functional
+    def test_lambda_permission_named(self):
+        factory = self.replay_flight_data('test_lambda_permission_named')
+        client = factory().client('lambda')
+        name = "func-d"
+
+        self.create_function(client, name)
+        client.add_permission(
+            FunctionName=name,
+            StatementId="PublicInvoke",
+            Principal="*",
+            Action="lambda:InvokeFunction")
+
+        p = self.load_policy({
+            'name': 'lambda-perms',
+            'resource': 'lambda',
+            'filters': [{'FunctionName': name}],
+            'actions': [{
+                'type': 'remove-statements',
+                'statement_ids': ['PublicInvoke']}]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            ClientError, client.get_policy, FunctionName=name)
+
 
 class LambdaTest(BaseTest):
 

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ def factory(config):
     if not config.cache or not config.cache_period:
         log.debug("Disabling cache")
         return NullCache(config)
+    elif config.cache == 'memory':
+        log.debug("Using in-memory cache")
+        return InMemoryCache()
 
     return FileCacheManager(config)
 
@@ -49,6 +52,24 @@ class NullCache(object):
 
     def save(self, key, data):
         pass
+
+
+class InMemoryCache(object):
+    # Running in a temporary environment, so keep as a cache.
+
+    __shared_state = {}
+
+    def __init__(self):
+        self.data = self.__shared_state
+
+    def load(self):
+        return True
+
+    def get(self, key):
+        return self.data.get(pickle.dumps(key))
+
+    def save(self, key, data):
+        self.data[pickle.dumps(key)] = data
 
 
 class FileCacheManager(object):

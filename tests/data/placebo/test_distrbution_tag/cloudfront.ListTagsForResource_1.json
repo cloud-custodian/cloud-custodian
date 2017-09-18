@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "81d97b0f-5879-11e7-9942-356c97d49caf", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "81d97b0f-5879-11e7-9942-356c97d49caf", 
+                "date": "Sat, 24 Jun 2017 01:07:34 GMT", 
+                "content-length": "192", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Tags": {
+            "Items": [
+                {
+                    "Value": "456", 
+                    "Key": "123"
+                }, 
+                {
+                    "Value": "def", 
+                    "Key": "abc"
+                }
+            ]
+        }
+    }
+}

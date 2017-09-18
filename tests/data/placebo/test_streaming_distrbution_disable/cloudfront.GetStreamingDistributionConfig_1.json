@@ -1,23 +1,23 @@
 {
     "status_code": 200, 
     "data": {
-        "ETag": "E2VDLDBW36NT7T", 
+        "ETag": "E38AUG67ZAJC5T", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "623fcbee-3cd8-11e7-af79-07e1379b8dee", 
+            "RequestId": "7c3b59c5-587d-11e7-a2d0-c7d9d46d8e4d", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "623fcbee-3cd8-11e7-af79-07e1379b8dee", 
-                "date": "Fri, 19 May 2017 21:16:10 GMT", 
-                "content-length": "575", 
-                "etag": "E2VDLDBW36NT7T", 
+                "x-amzn-requestid": "7c3b59c5-587d-11e7-a2d0-c7d9d46d8e4d", 
+                "date": "Sat, 24 Jun 2017 01:36:03 GMT", 
+                "content-length": "584", 
+                "etag": "E38AUG67ZAJC5T", 
                 "content-type": "text/xml"
             }
         }, 
         "StreamingDistributionConfig": {
             "S3Origin": {
                 "OriginAccessIdentity": "", 
-                "DomainName": "test.s3.amazonaws.com"
+                "DomainName": "rando20170506.s3.amazonaws.com"
             }, 
             "Comment": "", 
             "Logging": {
@@ -31,7 +31,7 @@
                 "Enabled": false, 
                 "Quantity": 0
             }, 
-            "CallerReference": "1495228375713", 
+            "CallerReference": "1498268099518", 
             "Aliases": {
                 "Quantity": 0
             }

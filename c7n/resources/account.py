@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters import Filter, FilterRegistry, ValueFilter, FilterValidationError
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -385,10 +385,17 @@ class ServiceLimit(Filter):
                 filters:
                   - type: service-limit
                     services:
+                      - EC2
+                    threshold: 1.0
+              - name: specify-region-for-global-service
+                region: us-east-1
+                resource: account
+                filters:
+                  - type: service-limit
+                    services:
                       - IAM
                     limits:
                       - Roles
-                    threshold: 1.0
     """
 
     schema = type_schema(
@@ -403,13 +410,28 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+    global_services = set(['IAM'])
+
+    def validate(self):
+        region = self.manager.data.get('region', '')
+        if len(self.global_services.intersection(self.data.get('services', []))):
+            if region != 'us-east-1':
+                raise FilterValidationError(
+                    "Global services: %s must be targeted in us-east-1 on the policy"
+                    % ', '.join(self.global_services))
+        return self
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('support')
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name='us-east-1')
         checks = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
 
+        region = self.manager.config.region
+        checks['flaggedResources'] = [r for r in checks['flaggedResources']
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')]
         resources[0]['c7n:ServiceLimits'] = checks
+
         delta = timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(checks['timestamp'])
         if datetime.now(tz=tzutc()) - delta > check_date:
@@ -478,7 +500,7 @@ class RequestLimitIncrease(BaseAction):
     permissions = ('support:CreateCase',)
 
     default_subject = 'Raise the account limit of {service} - {limits} in {region}'
-    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
+    default_template = 'Please raise the limit of {service} - {limits} by {percent}% in {region}'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -492,7 +514,7 @@ class RequestLimitIncrease(BaseAction):
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
-        client = session.client('support')
+        client = session.client('support', region_name='us-east-1')
 
         services_done = set()
         for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
@@ -515,7 +537,8 @@ class RequestLimitIncrease(BaseAction):
             body = body.format(**{
                 'service': service,
                 'limits': limits,
-                'percent': self.data.get('percent-increase')
+                'percent': self.data.get('percent-increase'),
+                'region': region
             })
 
             client.create_case(
@@ -599,6 +622,7 @@ class EnableTrail(BaseAction):
         **{
             'trail': {'type': 'string'},
             'bucket': {'type': 'string'},
+            'bucket-region': {'type': 'string'},
             'multi-region': {'type': 'boolean'},
             'global-events': {'type': 'boolean'},
             'notify': {'type': 'string'},
@@ -614,6 +638,7 @@ class EnableTrail(BaseAction):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         bucket_name = self.data['bucket']
+        bucket_region = self.data.get('bucket-region', 'us-east-1')
         trail_name = self.data.get('trail', 'default-trail')
         multi_region = self.data.get('multi-region', True)
         global_events = self.data.get('global-events', True)
@@ -623,7 +648,16 @@ class EnableTrail(BaseAction):
         kms_key = self.data.get('kms-key', '')
 
         s3client = session.client('s3')
-        s3client.create_bucket(Bucket=bucket_name)
+        try:
+            s3client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={'LocationConstraint': bucket_region}
+            )
+        except ClientError as ce:
+            if not ('Error' in ce.response and
+            ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
+                raise ce
+
         try:
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
         except ClientError:

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -196,9 +196,11 @@ def resource_format(resource, resource_type):
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
     elif resource_type == 'log-group':
-        return "name: %s last_write: %s" % (
-            resource['logGroupName'],
-            resource['lastWrite'])
+        if 'lastWrite' in resource:
+            return "name: %s last_write: %s" % (
+                resource['logGroupName'],
+                resource['lastWrite'])
+        return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
@@ -225,6 +227,40 @@ def resource_format(resource, resource_type):
             resource['State'],
             resource['CidrBlock'],
             resource['AvailableIpAddressCount'])
+    elif resource_type == 'account':
+        return " %s %s" % (
+            resource['account_id'],
+            resource['account_name'])
+    elif resource_type == 'cloudtrail':
+        return " %s %s" % (
+            resource['account_id'],
+            resource['account_name'])
+    elif resource_type == 'vpc':
+        return "%s " % (
+            resource['VpcId'])
+    elif resource_type == 'iam-group':
+        return " %s %s %s" % (
+            resource['GroupName'],
+            resource['Arn'],
+            resource['CreateDate'])
+    elif resource_type == 'rds-snapshot':
+        return " %s %s %s" % (
+            resource['DBSnapshotIdentifier'],
+            resource['DBInstanceIdentifier'],
+            resource['SnapshotCreateTime'])
+    elif resource_type == 'iam-user':
+        return " %s " % (
+            resource['UserName'])
+    elif resource_type == 'iam-role':
+        return " %s %s " % (
+            resource['RoleName'],
+            resource['CreateDate'])
+    elif resource_type == 'iam-policy':
+        return " %s " % (
+            resource['PolicyName'])
+    elif resource_type == 'iam-profile':
+        return " %s " % (
+            resource['InstanceProfileId'])
     else:
         print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)

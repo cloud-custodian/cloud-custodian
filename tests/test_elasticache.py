@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class TestElastiCacheCluster(BaseTest):
         self.assertEqual(len(resources), 3)
         self.assertEqual(
             sorted([r['CacheClusterId'] for r in resources]),
-            ['dev-test-001', 'dev-test-002', 'dev-test-003'])
+            ['myec-001', 'myec-002', 'myec-003'])
 
     def test_elasticache_subnet_filter(self):
         session_factory = self.replay_flight_data(
@@ -44,13 +44,13 @@ class TestElastiCacheCluster(BaseTest):
             'filters': [
                 {'type': 'subnet',
                  'key': 'MapPublicIpOnLaunch',
-                 'value': True}]},
+                 'value': False}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
             sorted([r['CacheClusterId'] for r in resources]),
-            ['dev-test-001', 'dev-test-002', 'dev-test-003'])
+            ['myec-001', 'myec-002', 'myec-003'])
 
     def test_elasticache_cluster_simple(self):
         session_factory = self.replay_flight_data(
@@ -60,7 +60,7 @@ class TestElastiCacheCluster(BaseTest):
             'resource': 'cache-cluster'},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 3)
 
     def test_elasticache_cluster_simple_filter(self):
         session_factory = self.replay_flight_data(
@@ -71,10 +71,10 @@ class TestElastiCacheCluster(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'memcached'}]},
+                 'value': 'redis'}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
 
     def test_elasticache_snapshot_copy_cluster_tags(self):
         session_factory = self.replay_flight_data(
@@ -82,7 +82,7 @@ class TestElastiCacheCluster(BaseTest):
 
         results = session_factory().client(
             'elasticache').list_tags_for_resource(
-                ResourceName='arn:aws:elasticache:us-west-2:644160558196:snapshot:test-tags-backup')['TagList']
+                ResourceName='arn:aws:elasticache:us-east-1:644160558196:snapshot:myec-backup')['TagList']
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags, {})
 
@@ -91,8 +91,8 @@ class TestElastiCacheCluster(BaseTest):
             'resource': 'cache-snapshot',
             'actions': [{
                 'type': 'copy-cluster-tags',
-                'tags': ['tag_new']}]},
-            config={'region': 'us-west-2'},
+                'tags': ['tagkey']}]},
+            config={'region': 'us-east-1'},
             session_factory=session_factory)
 
         resources = policy.run()
@@ -102,7 +102,7 @@ class TestElastiCacheCluster(BaseTest):
             'elasticache').list_tags_for_resource(ResourceName=arn)['TagList']
 
         tags = {t['Key']: t['Value'] for t in results}
-        self.assertEqual(tags['tag_new'], 'test_tag')
+        self.assertEqual(tags['tagkey'], 'tagval')
 
     def test_elasticache_cluster_available(self):
         session_factory = self.replay_flight_data(
@@ -116,7 +116,7 @@ class TestElastiCacheCluster(BaseTest):
                  'value': 'available'}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
         self.assertEqual(resources[0]['CacheClusterStatus'], "available")
 
     def test_elasticache_cluster_mark(self):
@@ -129,16 +129,15 @@ class TestElastiCacheCluster(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'memcached'}],
+                 'value': 'redis'}],
             'actions': [
                 {'type': 'mark-for-op', 'days': 30,
                 'op': 'delete'}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
         arn = p.resource_manager.generate_arn(
             resources[0]['CacheClusterId'])
-        self.assertEqual(len(resources), 1)
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertTrue('maid_status' in tag_map)
@@ -154,14 +153,14 @@ class TestElastiCacheCluster(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'memcached'}],
+                 'value': 'redis'}],
             'actions': [
                 {'type': 'unmark'}]},
             session_factory=session_factory)
         resources = p.run()
         arn = p.resource_manager.generate_arn(
             resources[0]['CacheClusterId'])
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
         tags = client.list_tags_for_resource(ResourceName=arn)
         self.assertFalse('maid_status' in tags)
 
@@ -174,12 +173,12 @@ class TestElastiCacheCluster(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'memcached'}],
+                 'value': 'redis'}],
             'actions': [
                 {'type': 'delete'}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
 
     def test_elasticache_cluster_snapshot(self):
         session_factory = self.replay_flight_data(
@@ -190,7 +189,7 @@ class TestElastiCacheCluster(BaseTest):
             'actions': [{'type': 'snapshot'}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 3)
 
 
 class TestElastiCacheSubnetGroup(BaseTest):
@@ -215,17 +214,17 @@ class TestElastiCacheSnapshot(BaseTest):
             'resource': 'cache-snapshot'},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
 
     def test_elasticache_snapshot_age_filter(self):
         factory = self.replay_flight_data('test_elasticache_snapshot')
         p = self.load_policy({
             'name': 'elasticache-snapshot-age-filter',
             'resource': 'cache-snapshot',
-            'filters': [{'type': 'age', 'days': 2}]},
+            'filters': [{'type': 'age', 'days': 2, 'op': 'gt'}]},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
 
     def test_elasticache_snapshot_mark(self):
         session_factory = self.replay_flight_data(
@@ -237,7 +236,7 @@ class TestElastiCacheSnapshot(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'SnapshotName',
-                 'value': 'redis-snapshot-1'}],
+                 'value': 'backup-myec-001-2017-06-23'}],
             'actions': [
                 {'type': 'mark-for-op', 'days': 30,
                 'op': 'delete'}]},
@@ -262,7 +261,7 @@ class TestElastiCacheSnapshot(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'SnapshotName',
-                 'value': 'redis-snapshot-1'}],
+                 'value': 'backup-myec-001-2017-06-23'}],
             'actions': [
                 {'type': 'unmark'}]},
             session_factory=session_factory)
@@ -281,7 +280,7 @@ class TestElastiCacheSnapshot(BaseTest):
             'actions': ['delete']},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

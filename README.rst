@@ -59,6 +59,7 @@ Features
 - Battle-tested - in production on some very large AWS accounts.
 - Supports cross-account usage via STS role assumption.
 - Supports integration with custom/user supplied lambdas as actions.
+- Supports both Python 2.7 and Python 3.6 (beta) lambda runtimes
 
 
 Links

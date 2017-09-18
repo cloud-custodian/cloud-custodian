@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,9 +100,9 @@ class UrlValueTest(BaseTest):
         self.assertRaises(ValueError, values.get_values)
 
     def test_txt(self):
-        out = io.StringIO()
+        out = io.BytesIO()
         for i in ['a', 'b', 'c', 'd']:
-            out.write('%s\n' % i)
+            out.write(('%s\n' % i).encode('utf8'))
         values = self.get_values_from({'url': 'letters.txt'}, out.getvalue())
         self.assertEqual(
             values.get_values(),

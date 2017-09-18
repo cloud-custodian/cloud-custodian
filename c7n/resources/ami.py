@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class AMI(QueryResourceManager):
         service = 'ec2'
         type = 'image'
         enum_spec = (
-            'describe_images', 'Images', {'Owners': ['self']})
+            'describe_images', 'Images', None)
         detail_spec = None
         id = 'ImageId'
         filter_name = 'ImageIds'
@@ -49,6 +49,12 @@ class AMI(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+    def resources(self, query=None):
+        query = query or {}
+        if query.get('Owners') is None:
+            query['Owners'] = ['self']
+        return super(AMI, self).resources(query=query)
 
 
 @actions.register('deregister')

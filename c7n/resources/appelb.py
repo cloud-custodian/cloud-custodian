@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ Application Load Balancers
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import json
 import logging
 
 from collections import defaultdict
@@ -25,8 +26,10 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema, get_retry
+
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.utils import (
+    local_session, chunks, type_schema, get_retry, set_annotation)
 
 log = logging.getLogger('custodian.app-elb')
 
@@ -63,14 +66,37 @@ class AppELB(QueryResourceManager):
     def get_permissions(cls):
         # override as the service is not the iam prefix
         return ("elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
                 "elasticloadbalancing:DescribeTags")
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeAppElb(self)
+        elif source_type == 'config':
+            return ConfigAppElb(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeAppElb(DescribeSource):
 
     def augment(self, albs):
         _describe_appelb_tags(
-            albs, self.session_factory,
-            self.executor_factory, self.retry)
+            albs,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry)
 
         return albs
+
+
+class ConfigAppElb(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigAppElb, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in json.loads(item['Tags'])]
+        return resource
 
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
@@ -115,6 +141,72 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@actions.register('set-s3-logging')
+class SetS3Logging(BaseAction):
+    """Action to enable/disable S3 logging for an application loadbalancer.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: elbv2-test
+                resource: app-elb
+                filters:
+                  - type: value
+                    key: Attributes."access_logs.s3.enabled"
+                    value: False
+                actions:
+                  - type: enable-s3-logging
+                    bucket: elbv2logtest
+                    prefix: dahlogs
+    """
+    schema = type_schema(
+        'set-s3-logging',
+        state={'enum': ['enabled', 'disabled']},
+        bucket={'type': 'string'},
+        prefix={'type': 'string'},
+        required=('state',))
+
+    permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)
+
+    def validate(self):
+        if self.data.get('state') == 'enabled':
+            if 'bucket' not in self.data or 'prefix' not in self.data:
+                raise FilterValidationError((
+                    "alb logging enablement requires `bucket` "
+                    "and `prefix` specification"))
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for elb in resources:
+            elb_arn = elb['LoadBalancerArn']
+            attributes = [{
+                'Key': 'access_logs.s3.enabled',
+                'Value': (
+                    self.data.get('state') == 'enabled' and 'true' or 'value')}]
+
+            if self.data.get('state') == 'enabled':
+                attributes.append({
+                    'Key': 'access_logs.s3.bucket',
+                    'Value': self.data['bucket']})
+
+                prefix_template = self.data['prefix']
+                info = {t['Key']: t['Value'] for t in elb.get('Tags', ())}
+                info['DNSName'] = elb.get('DNSName', '')
+                info['AccountId'] = elb['LoadBalancerArn'].split(':')[4]
+                info['LoadBalancerName'] = elb['LoadBalancerName']
+
+                attributes.append({
+                    'Key': 'access_logs.s3.prefix',
+                    'Value': prefix_template.format(**info)})
+
+            self.manager.retry(
+                client.modify_load_balancer_attributes,
+                LoadBalancerArn=elb_arn, Attributes=attributes)
 
 
 @actions.register('mark-for-op')
@@ -282,14 +374,112 @@ class AppELBAttributeFilterBase(object):
     def initialize(self, albs):
         def _process_attributes(alb):
             if 'Attributes' not in alb:
+                alb['Attributes'] = {}
+
                 client = local_session(
                     self.manager.session_factory).client('elbv2')
                 results = client.describe_load_balancer_attributes(
                     LoadBalancerArn=alb['LoadBalancerArn'])
-                alb['Attributes'] = results['Attributes']
+                # flatten out the list of dicts and cast
+                for pair in results['Attributes']:
+                    k = pair['Key']
+                    v = pair['Value']
+                    if v.isdigit():
+                        v = int(v)
+                    elif v == 'true':
+                        v = True
+                    elif v == 'false':
+                        v = False
+                    alb['Attributes'][k] = v
 
         with self.manager.executor_factory(max_workers=2) as w:
             list(w.map(_process_attributes, albs))
+
+
+@filters.register('is-logging')
+class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
+    """ Matches AppELBs that are logging to S3.
+        bucket and prefix are optional
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+                - name: alb-is-logging-test
+                  resource: app-elb
+                  filters:
+                    - type: is-logging
+
+                - name: alb-is-logging-bucket-and-prefix-test
+                  resource: app-elb
+                  filters:
+                    - type: is-logging
+                      bucket: prodlogs
+                      prefix: alblogs
+
+    """
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('is-logging',
+                         bucket={'type': 'string'},
+                         prefix={'type': 'string'}
+                         )
+
+    def process(self, resources, event=None):
+        self.initialize(resources)
+        bucket_name = self.data.get('bucket', None)
+        bucket_prefix = self.data.get('prefix', None)
+
+        return [alb for alb in resources
+                if alb['Attributes']['access_logs.s3.enabled'] and
+                (not bucket_name or bucket_name == alb['Attributes'].get(
+                    'access_logs.s3.bucket', None)) and
+                (not bucket_prefix or bucket_prefix == alb['Attributes'].get(
+                    'access_logs.s3.prefix', None))
+                ]
+
+
+@filters.register('is-not-logging')
+class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
+    """ Matches AppELBs that are NOT logging to S3.
+        or do not match the optional bucket and/or prefix.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+                - name: alb-is-not-logging-test
+                  resource: app-elb
+                  filters:
+                    - type: is-not-logging
+
+                - name: alb-is-not-logging-bucket-and-prefix-test
+                  resource: app-elb
+                  filters:
+                    - type: is-not-logging
+                      bucket: prodlogs
+                      prefix: alblogs
+
+    """
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('is-not-logging',
+                         bucket={'type': 'string'},
+                         prefix={'type': 'string'}
+                         )
+
+    def process(self, resources, event=None):
+        self.initialize(resources)
+        bucket_name = self.data.get('bucket', None)
+        bucket_prefix = self.data.get('prefix', None)
+
+        return [alb for alb in resources
+                if not alb['Attributes']['access_logs.s3.enabled'] or
+                (bucket_name and bucket_name != alb['Attributes'].get(
+                    'access_logs.s3.bucket', None)) or
+                (bucket_prefix and bucket_prefix != alb['Attributes'].get(
+                    'access_logs.s3.prefix', None))
+                ]
 
 
 class AppELBTargetGroupFilterBase(object):
@@ -307,24 +497,65 @@ class AppELBTargetGroupFilterBase(object):
 
 @filters.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
-    """Filter ALB based on matching listener attributes"""
+    """Filter ALB based on matching listener attributes
 
-    schema = type_schema('listener', rinherit=ValueFilter.schema)
+    Adding the `matched` flag will filter on previously matched listeners
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: app-elb-invalid-ciphers
+                resource: app-elb
+                filters:
+                  - type: listener
+                    key: Protocol
+                    value: HTTPS
+                  - type: listener
+                    key: SslPolicy
+                    value: ['ELBSecurityPolicy-TLS-1-1-2017-01','ELBSecurityPolicy-TLS-1-2-2017-01']
+                    op: ni
+                    matched: true
+                actions:
+                  - type: modify-listener
+                    sslpolicy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+    """
+
+    schema = type_schema(
+        'listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+
+    def validate(self):
+        if not self.data.get('matched'):
+            return
+        listeners = [f for f in self.manager.filters
+                     if isinstance(f, self.__class__)]
+        found = False
+        for f in listeners[:listeners.index(self)]:
+            if not f.data.get('matched', False):
+                found = True
+                break
+        if not found:
+            raise FilterValidationError(
+                "matched listener filter, requires preceding listener filter")
+        return self
 
     def process(self, albs, event=None):
         self.initialize(albs)
         return super(AppELBListenerFilter, self).process(albs, event)
 
     def __call__(self, alb):
-        matched = []
-        for listener in self.listener_map[alb['LoadBalancerArn']]:
+        listeners = self.listener_map[alb['LoadBalancerArn']]
+        if self.data.get('matched', False):
+            listeners = alb.pop('c7n:MatchedListeners', [])
+
+        found_listeners = False
+        for listener in listeners:
             if self.match(listener):
-                matched.append(listener)
-        if not matched:
-            return False
-        alb['c7n:MatchedListeners'] = matched
-        return True
+                set_annotation(alb, 'c7n:MatchedListeners', listener)
+                found_listeners = True
+        return found_listeners
 
 
 @actions.register('modify-listener')

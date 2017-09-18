@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1257,7 +1257,10 @@ class Resume(Action):
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        ec2_client.start_instances(InstanceIds=instance_ids)
+
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.

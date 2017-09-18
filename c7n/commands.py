@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -156,12 +156,15 @@ def validate(options):
             raise ValueError("Invalid path for config %r" % config_file)
 
         options.dryrun = True
-        format = config_file.rsplit('.', 1)[-1]
+        fmt = config_file.rsplit('.', 1)[-1]
         with open(config_file) as fh:
-            if format in ('yml', 'yaml'):
+            if fmt in ('yml', 'yaml'):
                 data = yaml.safe_load(fh.read())
-            if format in ('json',):
+            elif fmt in ('json',):
                 data = json.load(fh)
+            else:
+                log.error("The config file must end in .json, .yml or .yaml.")
+                raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         errors += schema.validate(data, schm)
         conf_policy_names = {p['name'] for p in data.get('policies', ())}

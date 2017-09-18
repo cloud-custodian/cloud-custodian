@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"PublicInvoke\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-1:644160558196:function:func-d\"}]}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "57653b14-932e-11e7-9053-35df8de5ea71", 
+            "HTTPHeaders": {
+                "date": "Wed, 06 Sep 2017 18:08:09 GMT", 
+                "x-amzn-requestid": "57653b14-932e-11e7-9053-35df8de5ea71", 
+                "content-length": "252", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

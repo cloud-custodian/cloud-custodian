@@ -15,12 +15,12 @@ jsonschema>=2.5.1
 MarkupSafe==1.0
 python-dateutil>=2.5.3
 PyYAML>=3.11
-redis==2.10.5
+redis>=2.10.5
 rq-dashboard>=0.3.7
 rq>=0.6.0
 s3transfer>=0.1.9
 six==1.10.0
 skew==0.16.1
-supervisor==3.3.2
+supervisor>=3.3.2
 Werkzeug>=0.11.11
 wsgiref==0.1.2
