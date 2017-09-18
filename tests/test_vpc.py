@@ -1163,3 +1163,53 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')
+
+
+class NATGatewayTest(BaseTest):
+
+    def test_query_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_query')
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['State'],
+            "available")
+
+    def test_tag_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_tag')
+        p = self.load_policy({
+            'name': 'tag-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:xyz': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_delete')
+        p = self.load_policy({
+            'name': 'delete-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'delete'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
