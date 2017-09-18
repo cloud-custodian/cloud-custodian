@@ -105,7 +105,10 @@ class KMSTest(BaseTest):
         
         resources = p.run()
         self.assertEqual([r['KeyId'] for r in resources], [key_id])
-        #time.sleep(60) # takes time before new policy reflected
+
+        if self.recording:
+            time.sleep(60) # takes time before new policy reflected
+
         data = json.loads(
             client.get_key_policy(
                 KeyId=resources[0]['KeyId'],PolicyName='default').get('Policy'))
@@ -137,7 +140,7 @@ class KMSTest(BaseTest):
                       "Resource": "*"
                     },
                     {
-                        "Sid": "WhatIsIt",
+                        "Sid": "RemoveMe",
                         "Effect": "Allow",
                         "Principal": "*",
                         "Action": ["kms:*"]
@@ -152,10 +155,19 @@ class KMSTest(BaseTest):
             'filters': [{'KeyId': key_id}],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': ['WhatIsIt']}]
+                 'statement_ids': ['RemoveMe']}]
             },
             session_factory=session_factory)
 
         resources = p.run()
         self.assertEqual(len(resources), 1)  
+
+        if self.recording:
+            time.sleep(60) # takes time before new policy reflected
+
+        data = json.loads(
+            client.get_key_policy(
+                KeyId=resources[0]['KeyId'],PolicyName='default').get('Policy'))
+
+        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
     

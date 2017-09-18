@@ -248,8 +248,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
             try:
-                if self.process_resource(client, r, key_id):
-                    results.append(r)
+                results += filter(None, [self.process_resource(client, r, key_id)])
             except:
                 self.log.exception(
                     "Error processing sns:%s", key_id)
@@ -275,6 +274,8 @@ class RemovePolicyStatement(RemovePolicyBase):
         if not found:
             return
 
+        # NB: KMS supports only one key policy 'default'
+        # http://docs.aws.amazon.com/kms/latest/developerguide/programming-key-policies.html#list-policies
         client.put_key_policy(
             KeyId=key_id,
             PolicyName='default',
