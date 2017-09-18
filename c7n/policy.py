@@ -490,8 +490,8 @@ class LambdaMode(PolicyExecutionMode):
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
             variables = {
-                 'account_id': self.policy.options.account_id,
-                 'policy': self.policy.data
+                'account_id': self.policy.options.account_id,
+                'policy': self.policy.data
             }
             self.policy.data = self.expand_variables(variables)
             try:
