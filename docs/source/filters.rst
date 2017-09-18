@@ -127,9 +127,9 @@ JMESPath Filter
             - type: value
               key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
               op: intersect
-        value_from:
-            url: s3://cloud-custodian-bucket/PublicSubnets.txt
-            format: txt
+              value_from:
+                  url: s3://cloud-custodian-bucket/PublicSubnets.txt
+                  format: txt
 
      # This policy will compare rds instances subnet group list against a
      # inline user provided list of public subnets.
