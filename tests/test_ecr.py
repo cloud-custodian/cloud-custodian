@@ -89,7 +89,7 @@ class TestECR(BaseTest):
                  'whitelist': ["185106417252"]}],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': ['matched']}]
+                 'statement_ids': 'matched'}]
             },
             session_factory=session_factory)
         resources = p.run()

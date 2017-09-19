@@ -20,7 +20,7 @@ from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.actions import RemovePolicyBase
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session
 
 
 @resources.register('ecr')
@@ -95,13 +95,6 @@ class RemovePolicyStatement(RemovePolicyBase):
                     statement_ids: matched
     """
 
-    schema = type_schema(
-        'remove-statements',
-        required=['statement_ids'],
-        statement_ids={'oneOf': [
-            {'enum': ['matched']},
-            {'type': 'array', 'items': {'type': 'string'}}]})
-
     permissions = ("ecr:SetRepositoryPolicy", "ecr:GetRepositoryPolicy")
 
     def process(self, resources):
@@ -109,8 +102,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         client = local_session(self.manager.session_factory).client('ecr')
         for r in resources:
             try:
-                if self.process_resource(client, r):
-                    results.append(r)
+                results += filter(None, [self.process_resource(client, r)])
             except:
                 self.log.exception(
                     "Error processing ecr registry:%s", r['repositoryArn'])
@@ -133,7 +125,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         statements, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
-        if statements is None:
+        if not found:
             return
 
         if not statements:
