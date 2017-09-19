@@ -3,28 +3,28 @@
     "data": {
         "Attributes": {
             "ApproximateNumberOfMessagesNotVisible": "0", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WhatIsIt\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}", 
             "MessageRetentionPeriod": "345600", 
             "ApproximateNumberOfMessagesDelayed": "0", 
             "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1505583890", 
+            "CreatedTimestamp": "1505779455", 
             "ApproximateNumberOfMessages": "0", 
             "ReceiveMessageWaitTimeSeconds": "0", 
             "DelaySeconds": "0", 
             "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1505583890", 
+            "LastModifiedTimestamp": "1505779455", 
             "QueueArn": "arn:aws:sqs:us-east-1:123456789012:test-sqs-remove-named"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2e8e6e95-3961-5e8e-877a-3ca25c322298", 
+            "RequestId": "a219b783-52fb-5d8b-a494-e5b933bb30bc", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2e8e6e95-3961-5e8e-877a-3ca25c322298", 
-                "content-length": "1466", 
+                "x-amzn-requestid": "a219b783-52fb-5d8b-a494-e5b933bb30bc", 
+                "content-length": "1675", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:44:51 GMT", 
+                "date": "Tue, 19 Sep 2017 00:04:16 GMT", 
                 "content-type": "text/xml"
             }
         }

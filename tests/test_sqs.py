@@ -127,8 +127,10 @@ class TestSqsAction(BaseTest):
         resources = p.run()
 
         self.assertEqual([r['QueueUrl'] for r in resources], [queue_url])
+
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
-        
+        if self.recording:
+            time.sleep(10)
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
@@ -148,7 +150,15 @@ class TestSqsAction(BaseTest):
                 "Version": "2012-10-17",
                 "Statement": [
                     {
-                        "Sid": "WhatIsIt",
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::644160558196:root"
+                        },
+                        "Action": ["sqs:Subscribe"]
+                    },
+                    {
+                        "Sid": "RemoveMe",
                         "Effect": "Allow",
                         "Principal": "*",
                         "Action": ["sqs:GetqueueAttributes"]
@@ -163,10 +173,15 @@ class TestSqsAction(BaseTest):
             'filters': [{'QueueUrl': queue_url}],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': ['WhatIsIt']}]
+                 'statement_ids': ['RemoveMe']}]
             },
             session_factory=session_factory)
 
         resources = p.run()
         self.assertEqual(len(resources), 1) 
+
+        data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
+        if self.recording:
+            time.sleep(10)
+        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
        

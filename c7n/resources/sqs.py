@@ -125,8 +125,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         client = local_session(self.manager.session_factory).client('sqs')
         for r in resources:
             try:
-                if self.process_resource(client, r):
-                    results.append(r)
+                results += filter(None, [self.process_resource(client, r)])
             except:
                 self.log.exception(
                     "Error processing sns:%s", r['QueueUrl'])
