@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from .common import BaseTest
 from c7n.utils import local_session
 from c7n.filters import FilterValidationError
+from jsonschema.exceptions import ValidationError
 
 
 TRAIL = 'nosetest'
@@ -359,6 +360,95 @@ class AccountTests(BaseTest):
                 found = True
                 break
         self.assertTrue(found)
+
+    def test_raise_service_limit_percent(self):
+        magic_string = 'Programmatic test--PLEASE IGNORE {account} {service} in {region}'
+
+        session_factory = self.replay_flight_data('test_account_raise_service_limit_percent')
+        p = self.load_policy({
+            'name': 'raise-service-limit-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'services': ['VPC', 'RDS'],
+                'limits': ['VPCs', 'DB parameter groups'],
+                'threshold': 0,
+            }],
+            'actions': [{
+                'type': 'request-limit-increase',
+                'percent-increase': 10,
+                'subject': magic_string,
+            }]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Validate that a case was created
+        support = session_factory().client('support')
+        cases = support.describe_cases()
+        found = []
+        for case in cases['cases']:
+            if case['subject'].startswith('Programmatic test--PLEASE IGNORE'):
+                self.assertTrue('VPC' in case['subject'] or 'RDS' in case['subject'] and '644160558196' in case['subject'])
+                found.append(case)
+
+        self.assertEqual(len(found), 2)
+        self.assertTrue(found)
+
+    def test_raise_service_limit_amount(self):
+        magic_string = 'Programmatic test--PLEASE IGNORE'
+
+        session_factory = self.replay_flight_data('test_account_raise_service_limit_percent')
+        p = self.load_policy({
+            'name': 'raise-service-limit-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'services': ['VPC', 'RDS'],
+                'limits': ['VPCs', 'DB parameter groups'],
+                'threshold': 0,
+            }],
+            'actions': [{
+                'type': 'request-limit-increase',
+                'amount-increase': 10,
+                'subject': magic_string ,
+            }]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Validate that a case was created
+        support = session_factory().client('support')
+        cases = support.describe_cases()
+        found = []
+        for case in cases['cases']:
+            if case['subject'].startswith('Programmatic test--PLEASE IGNORE'):
+                self.assertTrue('VPC' in case['subject'] or 'RDS' in case['subject'])
+                self.assertTrue('644160558196' in case['subject'])
+                found.append(case)
+
+        self.assertEqual(len(found), 2)
+        self.assertTrue(found)
+
+    def test_raise_service_limit_percent_and_amount(self):
+        policy = {
+            'name': 'raise-service-limit-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'service-limit',
+                'services': ['VPC', 'IAM'],
+                'limits': ['VPCs', 'Roles'],
+                'threshold': 0.01,
+            }],
+            'actions': [{
+                'type': 'request-limit-increase',
+                'amount-increase': 10,
+                'percent-increase': 10,
+            }]},
+        self.assertRaises(ValidationError, self.load_policy, policy)
+
 
     def test_enable_trail(self):
         factory = self.replay_flight_data('test_cloudtrail_enable')
