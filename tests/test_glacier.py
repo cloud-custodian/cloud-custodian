@@ -166,6 +166,7 @@ class GlacierStatementTest(BaseTest):
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
 
+
     @functional
     def test_glacier_remove_named(self):
         session_factory = self.replay_flight_data('test_glacier_remove_named')
@@ -207,4 +208,56 @@ class GlacierStatementTest(BaseTest):
             ClientError,
             client.get_vault_access_policy,
             vaultName=resources[0]['VaultName'])
+
+    @functional
+    def test_glacier_remove_statement(self):
+        session_factory = self.replay_flight_data('test_glacier_remove_statement')
+        client = session_factory().client('glacier')
+        name = 'test-glacier-remove-statement'
+
+        client.create_vault(vaultName=name)
+        self.addCleanup(client.delete_vault, vaultName=name)
+        vault_arn = client.describe_vault(vaultName=name)['VaultARN']
+        client.set_vault_access_policy(
+            vaultName=name,
+            policy={'Policy':json.dumps({
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "*"
+                        },
+                        "Action": "glacier:AddTagsToVault",
+                        "Resource": vault_arn
+                    },
+                    {
+                        "Sid": "RemoveMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["glacier:DescribeVault"],
+                        "Resource": vault_arn
+                    }
+                ]
+            })}
+        )
+
+        p = self.load_policy({
+            'name': 'glacier-rm-statement',
+            'resource': 'glacier',
+            'filters': [{'VaultName': name}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': ['RemoveMe']}]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+        data = json.loads(
+            client.get_vault_access_policy(
+                vaultName=resources[0]['VaultName']).get('policy')['Policy'])
+        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
     
