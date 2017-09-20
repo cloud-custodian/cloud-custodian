@@ -1557,6 +1557,47 @@ class S3Test(BaseTest):
         report_resources = report_policy.run()
         self.assertEqual(report_resources[0]['KeyRemediated'], 0)
 
+    def test_encrypt_keys_aes256_sufficient(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data(
+            'test_s3_encrypt_aes256_sufficient')
+        bname = "custodian-encrypt-sufficient-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        kms = session.client('kms')
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        key_id = [
+            k for k in kms.list_aliases().get('Aliases', ())
+            if k['AliasName'] == 'alias/aws/s3'][0]['AliasArn']
+
+        client.put_object(
+            Bucket=bname, Key='testing-abc', ServerSideEncryption='aws:kms',
+            SSEKMSKeyId=key_id)
+        client.put_object(
+            Bucket=bname, Key='testing-123', ServerSideEncryption='AES256')
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'encrypt-keys'}]},
+            session_factory=session_factory)
+
+        p.run()
+
+        result = client.head_object(Bucket=bname, Key='testing-123')
+        self.assertTrue(result['ServerSideEncryption'] == 'AES256')
+
+        result = client.head_object(Bucket=bname, Key='testing-abc')
+        self.assertTrue(result['ServerSideEncryption'] == 'aws:kms')
+        data = json.load(open(
+            os.path.join(p.ctx.output_path, 'action-encryptextantkeys')))
+        self.assertEqual(
+            [{'Count': 2, 'Remediated': 0, 'Bucket': bname}], data)
+
     def test_encrypt_keys_key_id_option(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         session_factory = self.replay_flight_data(

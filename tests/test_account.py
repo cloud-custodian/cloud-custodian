@@ -447,7 +447,7 @@ class AccountTests(BaseTest):
                 'amount-increase': 10,
                 'percent-increase': 10,
             }]},
-        self.assertRaises(ValidationError, self.load_policy, policy)
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
 
 
     def test_enable_trail(self):

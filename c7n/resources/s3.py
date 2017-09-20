@@ -1494,10 +1494,12 @@ class EncryptExtantKeys(ScanBucket):
         if info.get('ServerSideEncryption') == 'AES256' and not self.kms_id:
             return False
 
-        # If the data is already encrypted with KMS and the same key is provided
-        # then we don't need to do anything
-        if info.get('ServerSideEncryption') == 'aws:kms' and self.kms_id:
-            # Test using `in` because SSEKMSKeyId is the full ARN
+        if info.get('ServerSideEncryption') == 'aws:kms':
+            # If we're not looking for a specific key any key will do.
+            if not self.kms_id:
+                return False
+            # If we're configured to use a specific key and the key matches
+            # note this is not a strict equality match.
             if self.kms_id in info.get('SSEKMSKeyId', ''):
                 return False
 
