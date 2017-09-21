@@ -26,6 +26,8 @@ class Directory(QueryResourceManager):
         name = "Name"
         id = "DirectoryId"
         dimension = None
+        filter_name = 'DirectoryIds'
+        filter_type = 'list'
 
 
 @resources.register('cloud-directory')
@@ -37,3 +39,4 @@ class CloudDirectory(QueryResourceManager):
         id = "DirectoryArn"
         name = "Name"
         dimension = None
+        filter_name = None

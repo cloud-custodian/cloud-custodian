@@ -22,10 +22,11 @@ class ShieldProtection(QueryResourceManager):
 
     class resource_type(object):
         service = 'shield'
-        enum_spec = ('list_projections', 'Protections', None)
+        enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
         dimension = None
+        filter_name = None
 
 
 @resources.register('shield-attack')
@@ -38,3 +39,5 @@ class ShieldAttack(QueryResourceManager):
         id = 'AttackId'
         date = 'StartTime'
         dimension = None
+        filter_name = 'ResourceArns'
+        filter_type = 'list'

@@ -70,6 +70,8 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         name = id = 'MountTargetId'
         date = None
         dimension = None
+        filter_name = 'MountTargetId'
+        filter_type = 'scalar'
 
 
 @ElasticFileSystem.action_registry.register('delete')

@@ -53,6 +53,7 @@ class Account(ResourceManager):
     class resource_type(object):
         id = 'account_id'
         name = 'account_name'
+        filter_name = None
 
     @classmethod
     def get_permissions(cls):

@@ -35,6 +35,7 @@ class Distribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
+        filter_name = None
 
     augment = universal_augment
 
@@ -66,6 +67,7 @@ class StreamingDistribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
+        filter_name = None
 
     augment = universal_augment
 

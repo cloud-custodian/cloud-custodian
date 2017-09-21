@@ -91,6 +91,7 @@ class Policy(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Policy"
+        filter_name = None
 
     arn_path_prefix = "aws:policy/"
 
