@@ -32,6 +32,8 @@ class ECR(QueryResourceManager):
         name = "repositoryName"
         id = "repositoryArn"
         dimension = None
+        filter_name = 'repositoryNames'
+        filter_type = 'list'
 
 
 ErrPolicyNotFound = 'RepositoryPolicyNotFoundException'
