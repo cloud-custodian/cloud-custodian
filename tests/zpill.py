@@ -108,6 +108,9 @@ placebo.pill.deserialize = deserialize
 ##########################################################################
 
 
+RUNTIME = 'python2.7' if str is bytes else 'python3.6'
+
+
 class ZippedPill(pill.Pill):
 
     def __init__(self, path, prefix=None, debug=False):
@@ -240,8 +243,10 @@ class PillTest(unittest.TestCase):
     def cleanUp(self):
         pass
 
-    def record_flight_data(self, test_case, zdata=False):
+    def record_flight_data(self, test_case, zdata=False, vary_on_runtime=False):
         self.recording = True
+        if vary_on_runtime:
+            test_case = os.path.join(test_case, RUNTIME)
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if os.path.exists(test_dir):
@@ -271,9 +276,11 @@ class PillTest(unittest.TestCase):
 
         return factory
 
-    def replay_flight_data(self, test_case, zdata=False):
+    def replay_flight_data(self, test_case, zdata=False, vary_on_runtime=False):
         if os.environ.get('C7N_FUNCTIONAL') == 'yes':
             return lambda region=None, assume=None: boto3.Session(region_name=region)
+        if vary_on_runtime:
+            test_case = os.path.join(test_case, RUNTIME)
 
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
