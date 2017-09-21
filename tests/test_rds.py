@@ -196,7 +196,7 @@ class RDSTest(BaseTest):
             'resource': 'rds',
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
-                 'op': 'delete'}]},
+                 'op': 'delete', 'skew': 1}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -323,7 +323,7 @@ class RDSTest(BaseTest):
             {'name': 'rds-delete',
              'resource': 'rds',
              'filters': [
-                 {'tag:Target': 'test'}],
+                 {'tag:Owner': 'test'}],
              'actions': [
                  {'type': 'delete',
                   'skip-snapshot': True}]},
@@ -393,22 +393,22 @@ class RDSTest(BaseTest):
              'resource': 'rds',
              'filters': [
                  {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                  'op': 'upgrade'}],
+                  'op': 'upgrade', 'skew': 4}],
              'actions': [{
                  'type': 'upgrade',
                  'immediate': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(
             {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
              for r in resources},
-            {u'5.7.10': None, u'5.6.23': u'5.6.29'})
+            {u'5.6.29': u'5.6.35'})
         self.assertEqual(
-            resources[1]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
         self.assertEqual(
-            resources[1]['EngineVersion'], '5.6.23')
+            resources[0]['EngineVersion'], '5.6.29')
         self.assertEqual(
-            resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
+            resources[0]['c7n-rds-engine-upgrade'], '5.6.35')
 
     def test_rds_eligible_start_stop(self):
         resource = {
