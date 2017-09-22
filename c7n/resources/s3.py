@@ -1900,7 +1900,7 @@ class RemoveBucketTag(RemoveTag):
     """
 
     schema = type_schema(
-        'unmark', aliases=('remove-tag'), tags={'type': 'array'})
+        'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
     def process_resource_set(self, resource_set, tags):
         modify_bucket_tags(
