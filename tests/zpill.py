@@ -23,6 +23,7 @@ import zipfile
 
 import boto3
 from botocore.response import StreamingBody
+from c7n.mu import RUNTIME
 import jmespath
 from placebo import pill
 import placebo
@@ -106,9 +107,6 @@ placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
 ## END PLACEBO MONKEY
 ##########################################################################
-
-
-RUNTIME = 'python2.7' if str is bytes else 'python3.6'
 
 
 class ZippedPill(pill.Pill):

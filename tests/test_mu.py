@@ -28,7 +28,7 @@ import unittest
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda,
+    RUNTIME, custodian_archive, LambdaFunction, LambdaManager, PolicyLambda,
     PythonPackageArchive, CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
@@ -37,7 +37,6 @@ from .data import helloworld
 
 
 ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
-RUNTIME = 'python2.7' if str is bytes else 'python3.6'
 HELLO_WORLD_HANDLER = '''\
 def handle(event, context):
     return 'Hello, world!'

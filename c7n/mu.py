@@ -43,6 +43,7 @@ from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
+RUNTIME = "python%d.%d" % sys.version_info[:2]
 
 
 class PythonPackageArchive(object):
@@ -462,10 +463,6 @@ class AbstractLambdaFunction:
         """Name for the lambda function"""
 
     @abc.abstractproperty
-    def runtime(self):
-        """ """
-
-    @abc.abstractproperty
     def description(self):
         """ """
 
@@ -527,7 +524,7 @@ class AbstractLambdaFunction:
             'MemorySize': self.memory_size,
             'Role': self.role,
             'Description': self.description,
-            'Runtime': self.runtime,
+            'Runtime': RUNTIME,
             'Handler': self.handler,
             'Timeout': self.timeout,
             'DeadLetterConfig': self.dead_letter_config,
@@ -548,8 +545,7 @@ class LambdaFunction(AbstractLambdaFunction):
         self.func_data = func_data
         required = set((
             'name', 'handler', 'memory_size',
-            'timeout', 'role', 'runtime',
-            'description'))
+            'timeout', 'role', 'description'))
         missing = required.difference(func_data)
         if missing:
             raise ValueError("Missing required keys %s" % " ".join(missing))
@@ -574,10 +570,6 @@ class LambdaFunction(AbstractLambdaFunction):
     @property
     def timeout(self):
         return self.func_data['timeout']
-
-    @property
-    def runtime(self):
-        return self.func_data['runtime']
 
     @property
     def role(self):
@@ -631,7 +623,6 @@ class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy
