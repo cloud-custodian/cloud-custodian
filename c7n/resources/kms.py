@@ -64,6 +64,7 @@ class KeyAlias(KeyBase, QueryResourceManager):
         name = "AliasName"
         id = "AliasArn"
         dimension = None
+        filter_name = None
 
     def augment(self, resources):
         return [r for r in resources if 'TargetKeyId' in r]
@@ -79,6 +80,7 @@ class Key(KeyBase, QueryResourceManager):
         name = "KeyId"
         id = "KeyArn"
         dimension = None
+        filter_name = None
 
 
 @Key.filter_registry.register('key-rotation-status')
