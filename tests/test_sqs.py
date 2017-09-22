@@ -129,8 +129,6 @@ class TestSqsAction(BaseTest):
         self.assertEqual([r['QueueUrl'] for r in resources], [queue_url])
 
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
-        if self.recording:
-            time.sleep(10)
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
@@ -181,7 +179,5 @@ class TestSqsAction(BaseTest):
         self.assertEqual(len(resources), 1) 
 
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
-        if self.recording:
-            time.sleep(10)
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
        
