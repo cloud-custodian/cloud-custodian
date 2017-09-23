@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import jinja2
 import json
@@ -110,9 +112,7 @@ def get_date_time_delta(delta):
 
 
 def format_struct(evt):
-    buf = StringIO()
-    json.dump(evt, buf, indent=2)
-    return buf.getvalue()
+    return json.dumps(evt, indent=2, ensure_ascii=False)
 
 
 def resource_tag(resource, k):
