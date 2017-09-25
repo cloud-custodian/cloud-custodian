@@ -42,5 +42,4 @@ class GameLiftFleet(QueryResourceManager):
         dimension = None
         batch_detail_spec = (
             "describe_fleet_attributes", "FleetIds", None, "FleetAttributes")
-        filter_name = 'BuildId'
-        filter_type = 'scalar'
+        filter_name = None
