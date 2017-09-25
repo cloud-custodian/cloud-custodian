@@ -472,6 +472,16 @@ class LambdaMode(PolicyExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
+    def destroy(self):
+        from c7n.mu import PolicyLambda, LambdaManager
+        with self.policy.ctx:
+            try:
+                manager = LambdaManager(self.policy.session_factory)
+            except ClientError:
+                manager = LambdaManager(
+                    lambda assume=False: self.policy.session_factory(assume))
+            return manager.remove(PolicyLambda(self.policy), 'current')
+
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
@@ -661,8 +671,18 @@ class Policy(object):
 
     def provision(self):
         """Provision policy as a lambda function."""
+        if not self.is_lambda:
+            log.warning("Cannot provision non-lambda policies.")
+            return
         mode = self.get_execution_mode()
         return mode.provision()
+
+    def destroy(self):
+        if not self.is_lambda:
+            log.warning("Cannot destroy non-lambda policies.")
+            return
+        mode = self.get_execution_mode()
+        return mode.destroy()
 
     def poll(self):
         """Query resources and apply policy."""

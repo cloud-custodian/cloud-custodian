@@ -469,3 +469,29 @@ class PullModeTest(BaseTest):
         self.assertIn(
             "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(policy_name),
             lines)
+
+    def test_provision_not_supported(self):
+        policy_name = 'rds-test-policy'
+        p = self.load_policy(
+            {'name': policy_name,
+             'resource': 'rds',
+             'region': 'us-east-1',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=None)
+        result = p.provision()
+        self.assertEqual(result, None)
+
+    def test_destroy_not_supported(self):
+        policy_name = 'rds-test-policy'
+        p = self.load_policy(
+            {'name': policy_name,
+             'resource': 'rds',
+             'region': 'us-east-1',
+             'filters': [
+                 {'type': 'default-vpc'}]},
+            config={'region': 'us-west-2'},
+            session_factory=None)
+        result = p.destroy()
+        self.assertEqual(result, None)

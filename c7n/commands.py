@@ -207,6 +207,22 @@ def validate(options):
 #        permissions.update(p.get_permissions())
 #    pprint.pprint(sorted(list(permissions)))
 
+@policy_command
+def destroy(options, policies):
+    exit_code = 0
+    for policy in policies:
+        try:
+            policy.destroy()
+        except Exception:
+            exit_code = 2
+            if options.debug:
+                raise
+            log.exception(
+                "Error while executing policy %s, continuing" % (
+                    policy.name))
+    if exit_code != 0:
+        sys.exit(exit_code)
+
 
 @policy_command
 def run(options, policies):

@@ -324,6 +324,14 @@ def setup_parser():
         ""
     ))
 
+    destroy = subs.add_parser(
+        "destroy", description="destroy the policy lambda functions",
+        help='This deletes all policies specified in the policy configuration yaml.',
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    destroy.set_defaults(command='c7n.commands.destroy')
+    _default_options(destroy)
+
     run = subs.add_parser(
         "run", description=run_desc, help=run_desc,
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -380,7 +388,7 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    if options.subparser in ('report', 'logs', 'metrics', 'run'):
+    if options.subparser in ('report', 'logs', 'metrics', 'run', 'destroy'):
         _default_region(options)
         _default_account_id(options)
 
