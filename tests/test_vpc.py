@@ -975,6 +975,145 @@ class SecurityGroupTest(BaseTest):
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    def test_self_reference_ingress_false_positives(self):
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd1234'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'SelfReference': True}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'SelfReference': False}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [
+                                    {'CidrIp': '10.42.2.0/24'},
+                                    {'CidrIp': '10.42.4.0/24'},
+                                ],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd5678'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.4.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'ne',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'in',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
     def test_permission_expansion(self):
         factory = self.replay_flight_data('test_security_group_perm_expand')
         client = factory().client('ec2')

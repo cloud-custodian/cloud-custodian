@@ -32,6 +32,8 @@ class ECR(QueryResourceManager):
         name = "repositoryName"
         id = "repositoryArn"
         dimension = None
+        filter_name = 'repositoryNames'
+        filter_type = 'list'
 
 
 ErrPolicyNotFound = 'RepositoryPolicyNotFoundException'
@@ -102,8 +104,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         client = local_session(self.manager.session_factory).client('ecr')
         for r in resources:
             try:
-                if self.process_resource(client, r):
-                    results.append(r)
+                results += filter(None, [self.process_resource(client, r)])
             except:
                 self.log.exception(
                     "Error processing ecr registry:%s", r['repositoryArn'])

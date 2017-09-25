@@ -64,6 +64,10 @@ def operator_ni(x, y):
     return x not in y
 
 
+def intersect(x, y):
+    return bool(set(x).intersection(y))
+
+
 OPERATORS = {
     'eq': operator.eq,
     'equal': operator.eq,
@@ -82,7 +86,8 @@ OPERATORS = {
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
-    'contains': operator.contains}
+    'contains': operator.contains,
+    'intersect': intersect}
 
 
 class FilterRegistry(PluginRegistry):

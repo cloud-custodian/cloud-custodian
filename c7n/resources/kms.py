@@ -13,8 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
+import json
 import logging
 
+from c7n.actions import RemovePolicyBase
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -35,7 +39,14 @@ class KeyBase(object):
             info = client.describe_key(KeyId=key_id)['KeyMetadata']
             r.update(info)
 
-            tags = client.list_resource_tags(KeyId=key_id)['Tags']
+            try:
+                tags = client.list_resource_tags(KeyId=key_id)['Tags']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied getting tags for key:%s",
+                        key_id)
+
             tag_list = []
             for t in tags:
                 tag_list.append({'Key': t['TagKey'], 'Value': t['TagValue']})
@@ -207,3 +218,70 @@ class ResourceKmsKeyAlias(ValueFilter):
                 if self.match(r.get('KeyAlias')):
                     matched.append(r)
         return matched
+
+
+@Key.action_registry.register('remove-statements')
+@KeyAlias.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from KMS
+
+    :example:
+
+        .. code-block: yaml
+
+           policies:
+              - name: kms-key-cross-account
+                resource: kms-key
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+
+    permissions = ('kms:GetKeyPolicy', 'kms:PutKeyPolicy')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('kms')
+        for r in resources:
+            key_id = r.get('TargetKeyId', r.get('KeyId'))
+            assert key_id, "Invalid key resources %s" % r
+            try:
+                results += filter(None, [self.process_resource(client, r, key_id)])
+            except:
+                self.log.exception(
+                    "Error processing sns:%s", key_id)
+        return results
+
+    def process_resource(self, client, resource, key_id):
+        if 'Policy' not in resource:
+            try:
+                resource['Policy'] = client.get_key_policy(
+                    KeyId=key_id, PolicyName='default')['Policy']
+            except ClientError as e:
+                if e.response['Error']['Code'] != "NotFoundException":
+                    raise
+                resource['Policy'] = None
+
+        if not resource['Policy']:
+            return
+
+        p = json.loads(resource['Policy'])
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        # NB: KMS supports only one key policy 'default'
+        # http://docs.aws.amazon.com/kms/latest/developerguide/programming-key-policies.html#list-policies
+        client.put_key_policy(
+            KeyId=key_id,
+            PolicyName='default',
+            Policy=json.dumps(p)
+        )
+
+        return {'Name': key_id,
+                'State': 'PolicyRemoved',
+                'Statements': found}
