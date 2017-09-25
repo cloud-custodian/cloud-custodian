@@ -18,7 +18,6 @@ import logging
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, AgeFilter, Filter, OPERATORS
-
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -76,18 +75,62 @@ class Deregister(BaseAction):
                     days: 90
                 actions:
                   - deregister
+                    delete_source: true
     """
 
-    schema = type_schema('deregister')
+    schema = type_schema('deregister', delete_source={'type': 'boolean'})
     permissions = ('ec2:DeregisterImage',)
 
     def process(self, images):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_image, images))
+        with self.executor_factory(max_workers=5) as w:
+            w.map(self.process_image, images)
+
+    def delete_ami_snapshots(self, ami_id, block_device_mappings, boto_client):
+        snapshots_to_delete = []
+        for snapshot in block_device_mappings:
+            if 'Ebs' in snapshot:
+                snapshots_to_delete.append(snapshot['Ebs']['SnapshotId'])
+        for snapshot_to_delete in snapshots_to_delete:
+            self.log.info("Terminating snapshot: %s associated with AMI %s" % (
+                snapshot_to_delete, ami_id))
+            boto_client.delete_snapshot(
+                SnapshotId=snapshot_to_delete,
+                DryRun=self.manager.config.dryrun
+            )
+
+    def delete_instance_store(self, ami_id, image_location):
+        s3_client = local_session(self.manager.session_factory).client('s3')
+        bucket_name = image_location.split('/')[0]
+        image_directory = '/'.join(image_location.split('/')[1:-1])
+        self.log.info("Terminating instance-store: %s associated with AMI %s" % (
+            image_location, ami_id))
+        while True:
+            s3_objects = s3_client.list_objects_v2(
+                Bucket=bucket_name,
+                Prefix=image_directory
+            )
+            objects_to_be_deleted = []
+            for s3_object in s3_objects['Contents']:
+                objects_to_be_deleted.append({'Key': s3_object['Key']})
+            s3_client.delete_objects(
+                Bucket=bucket_name,
+                Delete={'Objects': objects_to_be_deleted},
+                DryRun=self.manager.config.dryrun
+            )
+            # in theory an AMI could be hundreds of gigs, and each object is 10 megs.
+            # 10 megs is the default size for the image tools AWS publishes.
+            # so we'll paginate and delete ~1000 objects at a time until the AMI's S3
+            # data is completely cleaned.
+            if not objects_to_be_deleted['IsTruncated']:
+                return True
 
     def process_image(self, image):
-        client = local_session(self.manager.session_factory).client('ec2')
-        client.deregister_image(ImageId=image['ImageId'])
+        boto_client = local_session(self.manager.session_factory).client('ec2')
+        boto_client.deregister_image(ImageId=image['ImageId'], DryRun=self.manager.config.dryrun)
+        if self.data.get('delete_source', False):
+            self.delete_ami_snapshots(image['ImageId'], image['BlockDeviceMappings'], boto_client)
+            if image['RootDeviceType'] == 'instance-store':
+                self.delete_instance_store(image['ImageId'], image['ImageLocation'])
 
 
 @actions.register('remove-launch-permissions')
