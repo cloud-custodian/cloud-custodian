@@ -766,12 +766,16 @@ class SGPermission(Filter):
 
     def process_cidrs(self, perm):
         found = None
-        if 'IpRanges' in perm and 'Cidr' in self.data:
+        if 'Cidr' in self.data:
+            ip_perms = perm.get('IpRanges', [])
+            if not ip_perms:
+                return False
+
             match_range = self.data['Cidr']
             match_range['key'] = 'CidrIp'
             vf = ValueFilter(match_range)
             vf.annotate = False
-            for ip_range in perm.get('IpRanges', []):
+            for ip_range in ip_perms:
                 found = vf(ip_range)
                 if found:
                     break
@@ -812,6 +816,14 @@ class SGPermission(Filter):
                     yield ep
 
     def __call__(self, resource):
+        def _accumulate(f, x):
+            '''
+            Accumulate an intermediate found value into the overall result.
+            '''
+            if x is not None:
+                f = (f is not None and x & f or x)
+            return f
+
         matched = []
         sg_id = resource['GroupId']
 
@@ -824,21 +836,11 @@ class SGPermission(Filter):
                     found = False
                     break
             if found is None or found:
-                port_found = self.process_ports(perm)
-                if port_found is not None:
-                    found = (
-                        found is not None and port_found & found or port_found)
+                found = _accumulate(found, self.process_ports(perm))
             if found is None or found:
-                cidr_found = self.process_cidrs(perm)
-                if cidr_found is not None:
-                    found = (
-                        found is not None and cidr_found & found or cidr_found)
+                found = _accumulate(found, self.process_cidrs(perm))
             if found is None or found:
-                self_reference_found = self.process_self_reference(perm, sg_id)
-                if self_reference_found is not None:
-                    found = (
-                        found is not None and
-                        self_reference_found & found or self_reference_found)
+                found = _accumulate(found, self.process_self_reference(perm, sg_id))
             if not found:
                 continue
             matched.append(perm)

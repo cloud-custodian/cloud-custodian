@@ -116,7 +116,6 @@ class RDS(QueryResourceManager):
     action_registry = actions
     _generate_arn = None
     retry = staticmethod(get_retry(('Throttled',)))
-    augment = universal_augment
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
@@ -142,7 +141,7 @@ class DescribeRDS(DescribeSource):
 
     def augment(self, dbs):
         return universal_augment(
-            self, super(DescribeRDS, self).augment(dbs))
+            self.manager, super(DescribeRDS, self).augment(dbs))
 
 
 class ConfigRDS(ConfigSource):

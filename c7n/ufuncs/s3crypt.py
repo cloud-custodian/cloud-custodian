@@ -18,10 +18,9 @@ S3 Key Encrypt on Bucket Changes
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
-import urllib
 import boto3
 from botocore.exceptions import ClientError
-
+from six.moves.urllib.parse import unquote_plus
 from c7n.resources.s3 import EncryptExtantKeys
 from c7n.utils import get_retry
 
@@ -45,7 +44,7 @@ def process_key_event(event, context):
     processor = EncryptExtantKeys(config)
     for record in event.get('Records', []):
         bucket = record['s3']['bucket']['name']
-        key = {'Key': record['s3']['object']['key'],
+        key = {'Key': unquote_plus(record['s3']['object']['key']),
                'Size': record['s3']['object']['size']}
         version = record['s3']['object'].get('versionId')
         if version is not None:
@@ -62,17 +61,7 @@ def process_key_event(event, context):
             # Ensure we know which key caused an issue
             print("error %s:%s code:%s" % (
                 bucket, key['Key'], e.response['Error']))
-            print("trying with urldecoded key")
-            try:
-                decode = urllib.unquote(key['Key'])
-                key['Key'] = decode
-                result = retry(method, s3, key, bucket)
-            except ClientError as e:
-                # Ensure we know which key caused an issue
-                print("failed with urldecoded key")
-                print("error %s:%s code:%s" % (
-                    bucket, key['Key'], e.response['Error']))
-                raise
+            raise
         if not result:
             return
         print("remediated %s:%s" % (bucket, key['Key']))
