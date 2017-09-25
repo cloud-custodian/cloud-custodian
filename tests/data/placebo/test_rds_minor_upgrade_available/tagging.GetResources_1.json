@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-west-2:644160558196:db:test-delete", 
+                "Tags": [
+                    {
+                        "Value": "hello", 
+                        "Key": "test-delete"
+                    }, 
+                    {
+                        "Value": "production", 
+                        "Key": "workload-type"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:rds:us-west-2:644160558196:db:test-test", 
+                "Tags": [
+                    {
+                        "Value": "test", 
+                        "Key": "Owner"
+                    }, 
+                    {
+                        "Value": "postgres", 
+                        "Key": "Platform"
+                    }, 
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/09/13", 
+                        "Key": "custodian_next"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "587f288a-97c1-11e7-99c6-9dcc9ab97b69", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "587f288a-97c1-11e7-99c6-9dcc9ab97b69", 
+                "date": "Tue, 12 Sep 2017 13:50:32 GMT", 
+                "content-length": "437", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

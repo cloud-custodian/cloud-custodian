@@ -341,8 +341,9 @@ class PullMode(PolicyExecutionMode):
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
                         len(resources), time.time() - s))
-                self.policy._write_file(
-                    "action-%s" % a.name, utils.dumps(results))
+                if results:
+                    self.policy._write_file(
+                        "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources

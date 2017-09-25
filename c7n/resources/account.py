@@ -464,7 +464,7 @@ class ServiceLimit(Filter):
 
 @actions.register('request-limit-increase')
 class RequestLimitIncrease(BaseAction):
-    """ File support ticket to raise limit
+    r"""File support ticket to raise limit.
 
     :Example:
 
@@ -474,33 +474,41 @@ class RequestLimitIncrease(BaseAction):
           - name: account-service-limits
             resource: account
             filters:
-             - type: service-limit
-               services:
-                 - EBS
-               limits:
-                 - Provisioned IOPS (SSD) storage (GiB)
-               threshold: 60.5
-             actions:
-               - type: request-limit-increase
-                 notify: [email, email2]
-                 percent-increase: 50
-                 message: "Raise {service} - {limits} by {percent}%"
+              - type: service-limit
+                services:
+                  - EBS
+                limits:
+                  - Provisioned IOPS (SSD) storage (GiB)
+                threshold: 60.5
+            actions:
+              - type: request-limit-increase
+                notify: [email, email2]
+                ## You can use one of either percent-increase or an amount-increase.
+                percent-increase: 50
+                message: "Please raise the below account limit(s); \n {limits}"
     """
 
-    schema = type_schema(
-        'request-limit-increase',
-        **{'notify': {'type': 'array'},
-           'percent-increase': {'type': 'number'},
-           'subject': {'type': 'string'},
-           'message': {'type': 'string'},
-           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']},
-           'required': ['percent-increase'],
-           })
+    schema = {
+        'type': 'object',
+        'notify': {'type': 'array'},
+        'properties': {
+            'type': {'enum': ['request-limit-increase']},
+            'percent-increase': {'type': 'number', 'minimum': 1},
+            'amount-increase': {'type': 'number', 'minimum': 1},
+            'subject': {'type': 'string'},
+            'message': {'type': 'string'},
+            'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
+        },
+        'oneOf': [
+            {'required': ['type', 'percent-increase']},
+            {'required': ['type', 'amount-increase']}
+        ]
+    }
 
     permissions = ('support:CreateCase',)
 
-    default_subject = 'Raise the account limit of {service} - {limits} in {region}'
-    default_template = 'Please raise the limit of {service} - {limits} by {percent}% in {region}'
+    default_subject = '[Account:{account}]Raise the following limit(s) of {service} in {region}'
+    default_template = 'Please raise the below account limit(s); \n {limits}'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -515,32 +523,37 @@ class RequestLimitIncrease(BaseAction):
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('support', region_name='us-east-1')
+        account_id = self.manager.config.account_id
+        service_map = {}
+        region_map = {}
+        limit_exceeded = resources[0].get('c7n:ServiceLimitsExceeded', [])
+        percent_increase = self.data.get('percent-increase')
+        amount_increase = self.data.get('amount-increase')
 
-        services_done = set()
-        for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
-            service = resource['service']
-            limits = resource['check']
-            region = resource['region']
+        for s in limit_exceeded:
+            current_limit = int(s['limit'])
+            if percent_increase:
+                increase_by = current_limit * float(percent_increase) / 100
+                increase_by = max(increase_by, 1)
+            else:
+                increase_by = amount_increase
+            increase_by = round(increase_by)
+            msg = '\nIncrease %s by %d in %s \n\t Current Limit: %s\n\t Current Usage: %s\n\t ' \
+                  'Set New Limit to: %d' % (
+                      s['check'], increase_by, s['region'], s['limit'], s['extant'],
+                      (current_limit + increase_by))
+            service_map.setdefault(s['service'], []).append(msg)
+            region_map.setdefault(s['service'], s['region'])
 
-            if service in services_done:
-                continue
-
-            services_done.add(service)
-            services_done.add(limits)
-            services_done.add(region)
+        for service in service_map:
+            subject = self.data.get('subject', self.default_subject).format(
+                service=service, region=region_map[service], account=account_id)
             service_code = self.service_code_mapping.get(service)
-
-            subject = self.data.get('subject', self.default_subject)
-
-            subject = subject.format(service=service,limits=limits,region=region)
             body = self.data.get('message', self.default_template)
             body = body.format(**{
                 'service': service,
-                'limits': limits,
-                'percent': self.data.get('percent-increase'),
-                'region': region
+                'limits': '\n\t'.join(service_map[service]),
             })
-
             client.create_case(
                 subject=subject,
                 communicationBody=body,
