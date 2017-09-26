@@ -15,6 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
+import json
+
+from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -93,3 +96,69 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         return super(GlacierCrossAccountAccessFilter, self).process(
             resources, event)
+
+
+@Glacier.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from Glacier
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: glacier-cross-account
+                resource: glaier
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+
+    permissions = ('glacier:SetVaultAccessPolicy', 'glacier:GetVaultAccessPolicy')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('glacier')
+        for r in resources:
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except:
+                self.log.exception(
+                    "Error processing glacier:%s", r['VaultARN'])
+        return results
+
+    def process_resource(self, client, resource):
+        if 'Policy' not in resource:
+            try:
+                resource['Policy'] = client.get_vault_access_policy(
+                    vaultName=resource['VaultName'])['policy']['Policy']
+            except ClientError as e:
+                if e.response['Error']['Code'] != "ResourceNotFoundException":
+                    raise
+                resource['Policy'] = None
+
+        if not resource['Policy']:
+            return
+
+        p = json.loads(resource['Policy'])
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        if not statements:
+            client.delete_vault_access_policy(
+                vaultName=resource['VaultName'])
+        else:
+            client.set_vault_access_policy(
+                vaultName=resource['VaultName'],
+                policy={
+                    'Policy':json.dumps(p)
+                }
+            )
+        return {'Name': resource['VaultName'],
+                'State': 'PolicyRemoved',
+                'Statements': found}
