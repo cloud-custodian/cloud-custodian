@@ -437,7 +437,7 @@ def assemble_bucket(item):
                 continue
             else:
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    b.setdefault('c7n:DeniedMethods', []).append(m)
+                    b.setdefault('c7n_DeniedMethods', []).append(m)
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
