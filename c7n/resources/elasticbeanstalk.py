@@ -30,3 +30,5 @@ class ElasticBeanstalk(QueryResourceManager):
             'DateCreated',
             'DateUpdated'
         )
+        filter_name = 'ApplicationNames'
+        filter_type = 'list'

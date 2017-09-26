@@ -33,6 +33,7 @@ class CodeRepository(QueryResourceManager):
         name = 'repositoryName'
         date = 'creationDate'
         dimension = None
+        filter_name = None
 
 
 @resources.register('codebuild')
@@ -46,6 +47,7 @@ class CodeBuildProject(QueryResourceManager):
         name = id = 'project'
         date = 'created'
         dimension = None
+        filter_name = None
 
 
 @resources.register('codepipeline')
@@ -60,3 +62,4 @@ class CodeDeployPipeline(QueryResourceManager):
         dimension = filter_name = None
         name = id = 'name'
         date = 'created'
+        filter_name = None

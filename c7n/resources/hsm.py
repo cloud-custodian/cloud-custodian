@@ -28,6 +28,7 @@ class CloudHSM(QueryResourceManager):
         date = dimension = None
         detail_spec = (
             "describe_hsm", "HsmArn", None, None)
+        filter_name = None
 
 
 @resources.register('hsm-hapg')
@@ -41,6 +42,7 @@ class PartitionGroup(QueryResourceManager):
         name = 'HapgSerial'
         date = 'LastModifiedTimestamp'
         dimension = None
+        filter_name = None
 
 
 @resources.register('hsm-client')
@@ -53,3 +55,4 @@ class HSMClient(QueryResourceManager):
         id = 'ClientArn'
         name = 'Label'
         date = dimension = None
+        filter_name = None

@@ -27,6 +27,7 @@ class WAF(QueryResourceManager):
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
+        filter_name = None
 
 
 @resources.register('waf-regional')
@@ -39,3 +40,4 @@ class RegionalWAF(QueryResourceManager):
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
+        filter_name = None

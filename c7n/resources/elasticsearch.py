@@ -36,6 +36,7 @@ class ElasticSearchDomain(QueryResourceManager):
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
+        filter_name = None
 
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))

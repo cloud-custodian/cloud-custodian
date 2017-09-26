@@ -27,6 +27,8 @@ class CloudSearch(QueryResourceManager):
         enum_spec = ("describe_domains", "DomainStatusList", None)
         name = id = "DomainName"
         dimension = "DomainName"
+        filter_name = 'DomainNames'
+        filter_type = 'list'
 
 
 @CloudSearch.action_registry.register('delete')

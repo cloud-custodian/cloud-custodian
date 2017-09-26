@@ -35,6 +35,7 @@ class DataPipeline(QueryResourceManager):
         date = None
         dimension = 'name'
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
+        filter_name = None
 
     def augment(self, resources):
         filter(None, _datapipeline_info(

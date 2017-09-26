@@ -29,6 +29,7 @@ class ECSCluster(QueryResourceManager):
         name = "clusterName"
         id = "clusterArn"
         dimension = None
+        filter_name = None
 
 
 @ECSCluster.filter_registry.register('metrics')
