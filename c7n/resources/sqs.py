@@ -15,6 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
+import json
+
+from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.manager import resources
 from c7n.utils import local_session
@@ -82,7 +85,74 @@ class MetricsFilter(MetricsFilter):
 
 @SQS.filter_registry.register('cross-account')
 class SQSCrossAccount(CrossAccountAccessFilter):
+    """Filter SQS queues which have cross account permissions
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: sqs-cross-account
+                resource: sqs
+                filters:
+                  - type: cross-account
+    """
     permissions = ('sqs:GetQueueAttributes',)
+
+
+@SQS.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from SQS
+
+    :example:
+
+        .. code-block: yaml
+
+           policies:
+              - name: sqs-cross-account
+                resource: sqs
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+
+    permissions = ('sqs:GetQueueAttributes', 'sqs:SetQueueAttributes')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('sqs')
+        for r in resources:
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except:
+                self.log.exception(
+                    "Error processing sns:%s", r['QueueUrl'])
+        return results
+
+    def process_resource(self, client, resource):
+        p = resource.get('Policy')
+        if p is None:
+            return
+
+        p = json.loads(resource['Policy'])
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        client.set_queue_attributes(
+            QueueUrl=resource['QueueUrl'],
+            Attributes={
+                'Policy':json.dumps(p)
+            }
+        )
+
+        return {'Name': resource['QueueUrl'],
+                'State': 'PolicyRemoved',
+                'Statements': found}
 
 
 @SQS.action_registry.register('delete')
