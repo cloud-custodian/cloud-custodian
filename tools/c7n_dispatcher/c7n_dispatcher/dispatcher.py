@@ -58,6 +58,15 @@ class ElasticSearchMessenger(Messenger):
         self.client = Elasticsearch(host, **kwargs)
 
     def send(self, message, logger):
+        resources = message['resources']
+        # Reformat tags for ease of index/search
+        # Tags are stored in the following format:
+        # Tags: [ {'key': 'mykey', 'val': 'myval'}, {'key': 'mykey2', 'val': 'myval2'} ]
+        # and this makes searching for tags difficult. We will convert them to:
+        # Tags: ['mykey': 'myval', 'mykey2': 'myval2']
+        for r in resources:
+            r['Tags'] = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+
         res = self.client.index(
             index = self.config['messenger']['index'],
             doc_type = message['policy']['resource'],
@@ -122,4 +131,5 @@ class Dispatcher(object):
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name']))
-        self.messenger.send(sqs_message)
+
+        self.messenger.send(sqs_message, self.logger)
