@@ -69,7 +69,7 @@ def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, 
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        arn = generator(db[model.id],seperator=':')
+        arn = generator(db[model.id],separator=':')
         tag_list = None
         try:
             tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
