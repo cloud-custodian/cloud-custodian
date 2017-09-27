@@ -115,7 +115,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process_resource_set(self, dbs, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -147,7 +147,7 @@ class Tag(tags.Tag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
             client.add_tags_to_resource(ResourceName=arn, Tags=ts)
 
 
@@ -178,7 +178,7 @@ class RemoveTag(tags.RemoveTag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
 
