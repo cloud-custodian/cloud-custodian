@@ -1,6 +1,7 @@
 boto3
 botocore
 c7n
+elasticsearch
 ElasticMock
 flake8
 jsonschema
@@ -10,5 +11,6 @@ pytest-cov
 pytest-xdist
 pytest
 PyYAML
+requests
 six
 tox

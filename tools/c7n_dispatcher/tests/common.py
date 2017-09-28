@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 RESOURCE = {
-            "Website": null,
+            "Website": None,
             "Logging": {},
             "Name": "teapot",
             "Tags": [
@@ -35,11 +35,11 @@ RESOURCE = {
                 },
                 "Grants": []
             },
-            "Replication": null,
+            "Replication": None,
             "Location": {
-                "LocationConstraint": null
+                "LocationConstraint": None
             },
-            "Policy": null,
+            "Policy": None,
             "CreationDate": "2016-10-21T18:47:14+00:00",
             "Lifecycle": {
                 "Rules": [
