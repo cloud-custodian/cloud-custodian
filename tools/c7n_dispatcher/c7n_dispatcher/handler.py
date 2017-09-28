@@ -19,7 +19,7 @@ import json
 import logging
 import os
 
-from dispatcher import Dispatcher
+from .dispatcher import Dispatcher
 
 
 def get_config():

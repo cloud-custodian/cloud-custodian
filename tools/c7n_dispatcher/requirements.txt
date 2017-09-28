@@ -1,0 +1,14 @@
+boto3
+botocore
+c7n
+ElasticMock
+flake8
+jsonschema
+mock
+nose
+pytest-cov
+pytest-xdist
+pytest
+PyYAML
+six
+tox

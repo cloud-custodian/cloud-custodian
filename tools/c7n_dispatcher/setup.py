@@ -25,7 +25,7 @@ setup(
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
-    packages=find_packages(),
+    packages=find_packages('c7n_dispatcher'),
     entry_points={
         'console_scripts': [
             'c7n-dispatcher = c7n_dispatcher.cli:main'

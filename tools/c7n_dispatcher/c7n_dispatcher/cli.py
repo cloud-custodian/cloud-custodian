@@ -106,3 +106,7 @@ def main():
         import traceback, pdb, sys
         print(e, traceback.print_exc())
         pdb.post_mortem(sys.exc_info()[-1])
+
+
+if __name__ == '__main__':
+    main()
