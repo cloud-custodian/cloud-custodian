@@ -546,7 +546,6 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = archive.get_filenames()
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
-        self.assertTrue('ipaddress.py' in filenames)
 
 
     def make_file(self):

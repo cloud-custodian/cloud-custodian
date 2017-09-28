@@ -204,7 +204,7 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         users = client.list_users(PathPrefix="/test/").get('Users', [])
         self.assertEqual(users, [])
-        
+
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
             'test_iam_user_admin_policy')
@@ -588,7 +588,7 @@ class LambdaCrossAccount(BaseTest):
         archive.close()
 
         func = LambdaFunction({
-            'runtime': 'python2.7',
+            'runtime': 'python3.6',
             'name': name, 'description': '',
             'handler': 'handler.handler',
             'memory_size': 128,

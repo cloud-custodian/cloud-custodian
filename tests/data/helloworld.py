@@ -29,7 +29,7 @@ def get_function(session_factory, name, role, events):
     config = dict(
         name=name,
         handler='helloworld.main',
-        runtime='python2.7',
+        runtime='python3.6',
         memory_size=512,
         timeout=15,
         role=role,

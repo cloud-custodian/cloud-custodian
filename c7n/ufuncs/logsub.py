@@ -103,7 +103,7 @@ def get_function(session_factory, name, role, sns_topic, log_groups,
     config = dict(
         name=name,
         handler='logsub.process_log_event',
-        runtime='python2.7',
+        runtime='python3.6',
         memory_size=512,
         timeout=15,
         role=role,
