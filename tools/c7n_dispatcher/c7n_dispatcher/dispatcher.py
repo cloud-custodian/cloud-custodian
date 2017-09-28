@@ -39,6 +39,9 @@ def get_messenger(config):
     return klass(config)
 
 
+# TODO: register logstash as well?
+
+
 @messengers.register('elasticsearch')
 class ElasticSearchMessenger(Messenger):
 
@@ -69,7 +72,10 @@ class ElasticSearchMessenger(Messenger):
 
         res = self.client.index(
             index = self.config['messenger']['index'],
-            doc_type = message['policy']['resource'],
+            # One Index name per data type (mandatory from ES 6.x)
+            # Index name and type should be same.
+            # (this may reduce overhead when type will be removed in ES 7.x)
+            doc_type = self.config['messenger']['index'],
             body = message
         )
         logger.debug('Sent Message: {} \nGot Response: {}'.format(
