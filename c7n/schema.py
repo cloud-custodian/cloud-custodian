@@ -55,7 +55,7 @@ def validate(data, schema=None):
         if dupes:
             return [ValueError(
                 "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)))]
+                    ", ".join(dupes))), dupes[0]]
         return []
     try:
         resp = specific_error(errors[0])

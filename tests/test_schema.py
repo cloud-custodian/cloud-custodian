@@ -72,7 +72,7 @@ class SchemaTest(BaseTest):
                 ]}
 
         result = validate(data)
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.assertTrue(isinstance(result[0], ValueError))
         self.assertTrue('monday-morning' in str(result[0]))
 
