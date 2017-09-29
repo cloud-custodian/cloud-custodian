@@ -22,7 +22,7 @@
         "Timeout": 60, 
         "LastModified": "2016-08-08T10:55:26.537+0000", 
         "Handler": "custodian_policy.run", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": "cloud-custodian lambda policy"
     }
 }

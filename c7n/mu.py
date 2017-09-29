@@ -26,7 +26,6 @@ import io
 import json
 import logging
 import os
-import sys
 import time
 import tempfile
 import zipfile
@@ -197,7 +196,7 @@ def checksum(fh, hasher, blocksize=65536):
 
 def custodian_archive():
     """Create a lambda code archive for running custodian."""
-    return PythonPackageArchive('c7n', 'pkg_resources', 'ipaddress')
+    return PythonPackageArchive('c7n', 'pkg_resources')
 
 
 class LambdaManager(object):
@@ -624,7 +623,7 @@ class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python%d.%d" % sys.version_info[:2]
+    runtime = "python3.6"
 
     def __init__(self, policy):
         self.policy = policy

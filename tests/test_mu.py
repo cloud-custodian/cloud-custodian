@@ -233,7 +233,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-s3-bucket-policy',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60})
 
     def test_mu_metrics(self):
@@ -276,7 +276,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-ec2-encrypted-vol',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -311,7 +311,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'custodian-asg-spin-detector',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -347,7 +347,7 @@ class PolicyLambdaProvision(BaseTest):
             {'FunctionName': 'custodian-periodic-ec2-checker',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -412,7 +412,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bar'}},
@@ -437,7 +437,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bloo'}},
@@ -461,7 +461,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'baz'}},
@@ -546,7 +546,6 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = archive.get_filenames()
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
-        self.assertTrue('ipaddress.py' in filenames)
 
 
     def make_file(self):
