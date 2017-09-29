@@ -13,7 +13,7 @@
                 "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
                 "Timeout": 60, 
                 "LastModified": "2016-08-27T16:20:15.856+0000", 
-                "Runtime": "python2.7", 
+                "Runtime": "python3.6", 
                 "Description": "a policy to stop all others"
             }
         ], 

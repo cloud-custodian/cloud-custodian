@@ -23,7 +23,7 @@
         "Timeout": 15, 
         "LastModified": "2017-02-06T10:55:06.174+0000", 
         "Handler": "helloworld.main", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": "Hello World"
     }
 }

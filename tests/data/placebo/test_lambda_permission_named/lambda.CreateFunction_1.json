@@ -26,7 +26,7 @@
         "Timeout": 3, 
         "LastModified": "2017-09-06T18:07:44.060+0000", 
         "Handler": "index.handler", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": ""
     }
 }

@@ -23,7 +23,7 @@
         "Timeout": 30, 
         "LastModified": "2017-03-16T08:20:32.568+0000", 
         "Handler": "s3crypt.process_sns_event", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": "Custodian S3 Key Encrypt"
     }
 }

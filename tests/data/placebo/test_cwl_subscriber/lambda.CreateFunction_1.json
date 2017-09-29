@@ -15,7 +15,7 @@
         "Timeout": 15, 
         "LastModified": "2016-06-09T10:49:24.081+0000", 
         "Handler": "logsub.process_log_event", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": "Custodian Ops Error Notify"
     }
 }

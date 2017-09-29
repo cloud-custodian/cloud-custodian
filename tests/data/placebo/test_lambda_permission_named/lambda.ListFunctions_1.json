@@ -16,7 +16,7 @@
                 "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
                 "Timeout": 3, 
                 "LastModified": "2017-09-06T18:07:44.060+0000", 
-                "Runtime": "python2.7", 
+                "Runtime": "python3.6", 
                 "Description": ""
             }
         ], 

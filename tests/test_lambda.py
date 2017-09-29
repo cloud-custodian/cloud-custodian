@@ -38,7 +38,7 @@ class LambdaPermissionTest(BaseTest):
 
         lfunc = client.create_function(
             FunctionName=name,
-            Runtime="python2.7",
+            Runtime="python3.6",
             MemorySize=128,
             Handler='index.handler',
             Publish=True,

@@ -40,7 +40,7 @@
                 "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
                 "Timeout": 3, 
                 "LastModified": "2016-11-02T10:10:02.085+0000", 
-                "Runtime": "python2.7", 
+                "Runtime": "python3.6", 
                 "Description": "An Amazon S3 trigger that retrieves metadata for the object that has been updated."
             }, 
             {
@@ -54,7 +54,7 @@
                 "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
                 "Timeout": 300, 
                 "LastModified": "2016-10-20T17:26:47.706+0000", 
-                "Runtime": "python2.7", 
+                "Runtime": "python3.6", 
                 "Description": "c7n Cleanup Function"
             }
         ], 

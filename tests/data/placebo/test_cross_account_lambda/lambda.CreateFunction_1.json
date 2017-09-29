@@ -15,7 +15,7 @@
         "Timeout": 5, 
         "LastModified": "2016-06-26T16:32:56.891+0000", 
         "Handler": "handler.handler", 
-        "Runtime": "python2.7", 
+        "Runtime": "python3.6", 
         "Description": ""
     }
 }
