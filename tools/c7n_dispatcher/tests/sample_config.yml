@@ -1,0 +1,11 @@
+queue_url: 'https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-dispatcher'
+
+role: 'arn:aws:iam::123456789012:role/CloudCustodianDispatcher'
+
+messenger:
+  type: 'elasticsearch'
+  host: 'lolcalhost'
+  port: 80
+  user: 'u'
+  password: 'p'
+  index: 'custodian_index'

@@ -28,7 +28,7 @@ from c7n_dispatcher import handler
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'endpoint'],
+    'required': ['queue_url', 'role', 'messenger'],
     'properties': {
         'queue_url': {'type': 'string'},
         'http_proxy': {'type': 'string'},
@@ -65,6 +65,19 @@ CONFIG_SCHEMA = {
 }
 
 
+def get_config(config):
+    with open(config) as fh:
+        config = yaml.safe_load(fh.read())
+    jsonschema.validate(config, CONFIG_SCHEMA)
+    config.setdefault('region', 'us-east-1')
+    config.setdefault('memory', 1024)
+    config.setdefault('timeout', 300)
+    config.setdefault('subnets', None)
+    config.setdefault('security_groups', None)
+    config.setdefault('dead_letter_config', {})
+    return config
+
+
 def get_logger(debug=False):
     logging.basicConfig(level=(debug and logging.DEBUG or logging.INFO))
     logging.getLogger('botocore').setLevel(logging.WARNING)
@@ -90,9 +103,7 @@ def cli():
 @click.option('--debug/--no-debug', default=False)
 def deploy(config, debug=False):
     # validate the config file
-    with open(config) as fh:
-        config = yaml.safe_load(fh.read())
-    jsonschema.validate(config, CONFIG_SCHEMA)
+    config = get_config(config)
     handler.provision(config, functools.partial(session_factory, config))
 
 

@@ -16,48 +16,48 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 RESOURCE = {
-            "Website": None,
-            "Logging": {},
-            "Name": "teapot",
-            "Tags": [
-                {
-                    "Value": "418",
-                    "Key": "Status"
-                }
-            ],
-            "Notification": {
-                "LambdaFunctionConfigurations": []
-            },
-            "Acl": {
-                "Owner": {
-                    "DisplayName": "teapot-owner",
-                    "ID": "imalittleteapot"
-                },
-                "Grants": []
-            },
-            "Replication": None,
-            "Location": {
-                "LocationConstraint": None
-            },
-            "Policy": None,
-            "CreationDate": "2016-10-21T18:47:14+00:00",
-            "Lifecycle": {
-                "Rules": [
-                    {
-                        "Status": "Enabled",
-                        "Prefix": "",
-                        "AbortIncompleteMultipartUpload": {
-                            "DaysAfterInitiation": 1
-                        },
-                        "Expiration": {
-                            "Days": 15
-                        },
-                        "ID": "dev-standard"
-                    }
-                ]
-            },
-            "Versioning": {}
+    "Website": None,
+    "Logging": {},
+    "Name": "teapot",
+    "Tags": [
+        {
+            "Value": "418",
+            "Key": "Status"
         }
+    ],
+    "Notification": {
+        "LambdaFunctionConfigurations": []
+    },
+    "Acl": {
+        "Owner": {
+            "DisplayName": "teapot-owner",
+            "ID": "imalittleteapot"
+        },
+        "Grants": []
+    },
+    "Replication": None,
+    "Location": {
+        "LocationConstraint": None
+    },
+    "Policy": None,
+    "CreationDate": "2016-10-21T18:47:14+00:00",
+    "Lifecycle": {
+        "Rules": [
+            {
+                "Status": "Enabled",
+                "Prefix": "",
+                "AbortIncompleteMultipartUpload": {
+                    "DaysAfterInitiation": 1
+                },
+                "Expiration": {
+                    "Days": 15
+                },
+                "ID": "dev-standard"
+            }
+        ]
+    },
+    "Versioning": {}
+}
 
 SQS_MESSAGE = {
     "account": "dev",
@@ -67,7 +67,7 @@ SQS_MESSAGE = {
         "to": [],
         "type": "notify",
         "transport": {
-            "topic": "arn:aws:sns:us-east-1:123456789012:find-teapots",
+            "topic": "arn:aws:sns:us-east-1:123456789012:noteafy",
             "type": "sns"
         }
     },
@@ -80,7 +80,7 @@ SQS_MESSAGE = {
                 "to": [],
                 "type": "notify",
                 "transport": {
-                    "topic": "arn:aws:sns:us-east-1:123456789012:find-teapots",
+                    "topic": "arn:aws:sns:us-east-1:123456789012:noteafy",
                     "type": "sns"
                 }
             }

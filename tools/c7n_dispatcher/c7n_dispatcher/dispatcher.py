@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+import elasticsearch
 
 import base64
 import json
@@ -39,9 +39,6 @@ def get_messenger(config):
     return klass(config)
 
 
-# TODO: register logstash as well?
-
-
 @messengers.register('elasticsearch')
 class ElasticSearchMessenger(Messenger):
 
@@ -50,7 +47,7 @@ class ElasticSearchMessenger(Messenger):
 
         host = [config['messenger'].get('host', 'localhost')]
         kwargs = {}
-        kwargs['connection_class'] = RequestsHttpConnection
+        kwargs['connection_class'] = elasticsearch.RequestsHttpConnection
         kwargs['port'] = config['messenger'].get('port', 9200)
 
         user = config['messenger'].get('user', False)
@@ -58,7 +55,7 @@ class ElasticSearchMessenger(Messenger):
         if user and password:
             kwargs['http_auth'] = (user, password)
 
-        self.client = Elasticsearch(host, **kwargs)
+        self.client = elasticsearch.Elasticsearch(host, **kwargs)
 
     def send(self, message, logger):
         resources = message['resources']
@@ -80,6 +77,7 @@ class ElasticSearchMessenger(Messenger):
         )
         logger.debug('Sent Message: {} \nGot Response: {}'.format(
             message, res))
+        return res
 
 
 class Dispatcher(object):
