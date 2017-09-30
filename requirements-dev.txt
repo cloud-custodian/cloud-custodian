@@ -1,6 +1,5 @@
 -r requirements.txt
 coverage>=4.2
-ElasticMock
 fakeredis
 flake8
 ldap3
@@ -21,6 +20,8 @@ twine
 -e tools/c7n_sphinxext
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
+# Local package required for c7n_dispatcher tests
+-e tools/c7n_dispatcher
 
 # requires pandoc, fails on ci server, only used for pypi metadata
 # setuptools-markdown==0.2
