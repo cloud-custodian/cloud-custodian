@@ -1,5 +1,6 @@
 -r requirements.txt
 coverage>=4.2
+ElasticMock
 fakeredis
 flake8
 ldap3
