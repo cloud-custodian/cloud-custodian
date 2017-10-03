@@ -57,9 +57,11 @@ from botocore.vendored.requests.exceptions import SSLError
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
-from c7n.actions import ActionRegistry, BaseAction, AutoTagUser, PutMetric, RemovePolicyBase
+from c7n.actions import (
+    ActionRegistry, BaseAction, AutoTagUser, PutMetric, RemovePolicyBase)
 from c7n.filters import (
-    FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter)
+    FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
+    ValueFilter)
 from c7n.manager import resources
 from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
@@ -113,25 +115,16 @@ class S3(query.QueryResourceManager):
         perms.extend([n[0] for n in S3_AUGMENT_TABLE])
         return perms
 
-    def augment(self, buckets):
-        with self.executor_factory(
-                max_workers=min((10, len(buckets) + 1))) as w:
-            results = w.map(
-                assemble_bucket,
-                zip(itertools.repeat(self.session_factory), buckets))
-            results = list(filter(None, results))
-            return results
-
 
 class DescribeS3(query.DescribeSource):
 
     def augment(self, buckets):
         with self.manager.executor_factory(
-                max_workers=min((10, len(buckets)))) as w:
+                max_workers=min((10, len(buckets) + 1))) as w:
             results = w.map(
                 assemble_bucket,
                 zip(itertools.repeat(self.manager.session_factory), buckets))
-            results = filter(None, results)
+            results = list(filter(None, results))
             return results
 
 
@@ -188,7 +181,7 @@ class ConfigS3(query.ConfigSource):
                 'owner']['displayName']
         resource['Acl']['Grants'] = grants = []
 
-        for g in item_value['grantList']:
+        for g in (item_value.get('grantList') or ()):
             if 'id' not in g['grantee']:
                 assert g['grantee'] in self.GRANTEE_MAP, "unknown grantee %s" % g
                 rg = {'Type': 'Group', 'URI': self.GRANTEE_MAP[g['grantee']]}
@@ -259,7 +252,7 @@ class ConfigS3(query.ConfigSource):
             rr['ID'] = r['id']
             if r.get('prefix'):
                 rr['Prefix'] = r['prefix']
-            if 'filter' not in r:
+            if 'filter' not in r or not r['filter']:
                 continue
 
             rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
@@ -302,8 +295,9 @@ class ConfigS3(query.ConfigSource):
             ninfo['Id'] = nid
             ninfo['Events'] = n['events']
             rules = []
-            for r in n['filter'].get('s3KeyFilter', {}).get('filterRules', []):
-                rules.append({'Name': r['name'], 'Value': r['value']})
+            if n['filter']:
+                for r in n['filter'].get('s3KeyFilter', {}).get('filterRules', []):
+                    rules.append({'Name': r['name'], 'Value': r['value']})
             if rules:
                 ninfo['Filter'] = {'Key': {'FilterRules': rules}}
         resource['Notification'] = d
@@ -1905,6 +1899,89 @@ class RemoveBucketTag(RemoveTag):
     def process_resource_set(self, resource_set, tags):
         modify_bucket_tags(
             self.manager.session_factory, resource_set, remove_tags=tags)
+
+
+@filters.register('data-events')
+class DataEvents(Filter):
+
+    schema = type_schema('data-events', state={'enum': ['present', 'absent']})
+    permissions = (
+        'cloudtrail:DescribeTrails',
+        'cloudtrail:GetEventSelectors')
+
+    def get_event_buckets(self, client, trails):
+        """Return a mapping of bucket name to cloudtrail.
+
+        For wildcard trails the bucket name is ''.
+        """
+        event_buckets = {}
+        for t in trails:
+            for events in client.get_event_selectors(
+                    TrailName=t['Name']).get('EventSelectors', ()):
+                if 'DataResources' not in events:
+                    continue
+                for data_events in events['DataResources']:
+                    if data_events['Type'] != 'AWS::S3::Object':
+                        continue
+                    for b in data_events['Values']:
+                        event_buckets[b.rsplit(':')[-1].strip('/')] = t['Name']
+        return event_buckets
+
+    def process(self, resources, event=None):
+        trails = self.manager.get_resource_manager('cloudtrail').resources()
+        client = local_session(
+            self.manager.session_factory).client('cloudtrail')
+        event_buckets = self.get_event_buckets(client, trails)
+        ops = {
+            'present': lambda x: (
+                x['Name'] in event_buckets or '' in event_buckets),
+            'absent': (
+                lambda x: x['Name'] not in event_buckets and ''
+                not in event_buckets)}
+
+        op = ops[self.data['state']]
+        results = []
+        for b in resources:
+            if op(b):
+                results.append(b)
+        return results
+
+
+@filters.register('inventory')
+class Inventory(ValueFilter):
+    """Filter inventories for a bucket"""
+    schema = type_schema('inventory', rinherit=ValueFilter.schema)
+
+    permissions = ('s3:GetInventoryConfiguration',)
+
+    def process(self, buckets, event=None):
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = {}
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for f in as_completed(futures):
+                b = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Error processing bucket: %s error: %s",
+                        b['Name'], f.exception())
+                    continue
+                if f.result():
+                    results.append(b)
+        return results
+
+    def process_bucket(self, b):
+        if 'c7n:inventories' not in b:
+            client = bucket_client(local_session(self.manager.session_factory), b)
+            inventories = client.list_bucket_inventory_configurations(
+                Bucket=b['Name']).get('InventoryConfigurationList', [])
+            b['c7n:inventories'] = inventories
+
+        for i in b['c7n:inventories']:
+            if self.match(i):
+                return True
 
 
 @actions.register('set-inventory')

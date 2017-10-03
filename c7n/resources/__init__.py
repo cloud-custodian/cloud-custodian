@@ -16,8 +16,18 @@
 #
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
+
+
+LOADED = False
+
 
 def load_resources():
+
+    global LOADED
+    if LOADED:
+        return
+
     import c7n.resources.account
     import c7n.resources.acm
     import c7n.resources.ami
@@ -75,5 +85,8 @@ def load_resources():
     import c7n.resources.waf
 
     # Load external plugins (private sdks etc)
+    print("load resources")
     from c7n.manager import resources
     resources.load_plugins()
+
+    LOADED = True

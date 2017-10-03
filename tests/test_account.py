@@ -14,17 +14,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
 from c7n.filters import FilterValidationError
 from jsonschema.exceptions import ValidationError
 
 
-TRAIL = 'nosetest'
-
 import datetime
 from dateutil import parser
+
 from .test_offhours import mock_datetime_now
-from .common import Config
+from .common import Config, functional
+
+TRAIL = 'nosetest'
 
 
 class AccountTests(BaseTest):
@@ -484,3 +486,79 @@ class AccountTests(BaseTest):
         arn = test_trail['TrailARN']
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status['IsLogging'])
+
+
+class AccountDataEvents(BaseTest):
+
+    def test_modify_data_events(self):
+        session_factory = self.replay_flight_data(
+            'test_account_modify_data_events')
+        p = self.load_policy({
+            'name': 's3-data-events',
+            'resource': 'account',
+            'actions': [
+                {'type': 'enable-data-events',
+                 'data-trail': {
+                     'create': True,
+                     'name': 'S3-DataEvent-1',
+                     's3-bucket': 'custodian-skunk-trails',
+                     's3-prefix': 'DataEvents',
+                     'multi-region': 'us-east-1'}}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n_data_trail']['Name'], 'S3-DataEvent-1')
+        client = session_factory().client('cloudtrail')
+        self.assertEqual(
+            client.get_event_selectors(
+                TrailName='S3-DataEvent-1').get('EventSelectors')[-1],
+            {'DataResources': [{'Type': 'AWS::S3::Object',
+                                'Values': ['arn:aws:s3:::']}],
+             'IncludeManagementEvents': False,
+             'ReadWriteType': 'All'})
+
+    @functional
+    def test_data_events(self):
+        session_factory = self.replay_flight_data('test_account_data_events')
+        client = session_factory().client('cloudtrail')
+        self.assertFalse(
+            'S3-DataEvents' in {t['Name'] for t in
+                                client.describe_trails().get('trailList')})
+        self.addCleanup(client.delete_trail, Name='S3-DataEvents')
+
+        p = self.load_policy({
+            'name': 's3-data-events',
+            'resource': 'account',
+            'actions': [
+                {'type': 'enable-data-events',
+                 'data-trail': {
+                     'create': True,
+                     'name': 'S3-DataEvents',
+                     's3-bucket': 'custodian-skunk-trails',
+                     's3-prefix': 'DataEvents',
+                     'multi-region': 'us-east-1'}}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            client.get_event_selectors(
+                TrailName='S3-DataEvents').get('EventSelectors')[0],
+            {'DataResources': [{'Type': 'AWS::S3::Object',
+                                'Values': ['arn:aws:s3:::']}],
+             'IncludeManagementEvents': False,
+             'ReadWriteType': 'All'})
+
+        # Check s3 filter for data events reports them correctly
+        from c7n.resources import s3
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        p = self.load_policy({
+            'name': 's3-data-check',
+            'resource': 's3',
+            'filters': [
+                {'Name': 'custodian-skunk-trails'},
+                {'type': 'data-events',
+                 'state': 'present'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

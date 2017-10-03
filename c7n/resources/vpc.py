@@ -26,14 +26,14 @@ import c7n.filters.vpc as net_filters
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
-from c7n.query import QueryResourceManager, ConfigSource
+from c7n import query
 from c7n.manager import resources
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
 
 @resources.register('vpc')
-class Vpc(QueryResourceManager):
+class Vpc(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -192,7 +192,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
 
 
 @resources.register('subnet')
-class Subnet(QueryResourceManager):
+class Subnet(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -211,7 +211,7 @@ Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 
 @resources.register('security-group')
-class SecurityGroup(QueryResourceManager):
+class SecurityGroup(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -232,7 +232,7 @@ class SecurityGroup(QueryResourceManager):
         return super(SecurityGroup, self).get_source(source_type)
 
 
-class ConfigSG(ConfigSource):
+class ConfigSG(query.ConfigSource):
 
     def augment(self, resources):
         for r in resources:
@@ -963,7 +963,7 @@ class RemovePermissions(BaseAction):
 
 
 @resources.register('eni')
-class NetworkInterface(QueryResourceManager):
+class NetworkInterface(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -976,6 +976,16 @@ class NetworkInterface(QueryResourceManager):
         date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeENI(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError("invalid source %s" % source_type)
+
+
+class DescribeENI(query.DescribeSource):
 
     def augment(self, resources):
         for r in resources:
@@ -1072,7 +1082,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @resources.register('route-table')
-class RouteTable(QueryResourceManager):
+class RouteTable(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1144,7 +1154,7 @@ class Route(ValueFilter):
 
 
 @resources.register('peering-connection')
-class PeeringConnection(QueryResourceManager):
+class PeeringConnection(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1198,7 +1208,7 @@ class MissingRoute(Filter):
 
 
 @resources.register('network-acl')
-class NetworkAcl(QueryResourceManager):
+class NetworkAcl(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1291,7 +1301,7 @@ class AclAwsS3Cidrs(Filter):
 
 
 @resources.register('network-addr')
-class Address(QueryResourceManager):
+class Address(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1307,7 +1317,7 @@ class Address(QueryResourceManager):
 
 
 @resources.register('customer-gateway')
-class CustomerGateway(QueryResourceManager):
+class CustomerGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1324,7 +1334,7 @@ class CustomerGateway(QueryResourceManager):
 
 
 @resources.register('internet-gateway')
-class InternetGateway(QueryResourceManager):
+class InternetGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1340,7 +1350,7 @@ class InternetGateway(QueryResourceManager):
 
 
 @resources.register('nat-gateway')
-class NATGateway(QueryResourceManager):
+class NATGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1367,7 +1377,7 @@ class DeleteNATGateway(BaseAction):
 
 
 @resources.register('vpn-connection')
-class VPNConnection(QueryResourceManager):
+class VPNConnection(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1383,7 +1393,7 @@ class VPNConnection(QueryResourceManager):
 
 
 @resources.register('vpn-gateway')
-class VPNGateway(QueryResourceManager):
+class VPNGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1399,7 +1409,7 @@ class VPNGateway(QueryResourceManager):
 
 
 @resources.register('vpc-endpoint')
-class VpcEndpoint(QueryResourceManager):
+class VpcEndpoint(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1414,7 +1424,7 @@ class VpcEndpoint(QueryResourceManager):
 
 
 @resources.register('key-pair')
-class KeyPair(QueryResourceManager):
+class KeyPair(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'

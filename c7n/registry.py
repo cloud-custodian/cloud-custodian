@@ -67,6 +67,9 @@ class PluginRegistry(object):
         if name in self._factories:
             del self._factories[name]
 
+    def __getitem__(self, name):
+        return self.get(name)
+
     def get(self, name):
         return self._factories.get(name)
 

@@ -257,13 +257,13 @@ class ConfigSource(object):
         results = []
         m = self.manager.get_model()
         for i in ids:
-            results.append(
-                self.load_resource(
-                    client.get_resource_config_history(
-                        resourceId=i,
-                        resourceType=m.config_type,
-                        limit=1)[
-                            'configurationItems'][0]))
+            revisions = client.get_resource_config_history(
+                resourceId=i,
+                resourceType=m.config_type,
+                limit=1).get('configurationItems')
+            if not revisions:
+                continue
+            results.append(self.load_resource(revisions[0]))
         return results
 
     def load_resource(self, item):
@@ -279,6 +279,7 @@ class ConfigSource(object):
         pages = paginator.paginate(
             resourceType=self.manager.get_model().config_type)
         results = []
+
         with self.manager.executor_factory(max_workers=5) as w:
             resource_ids = [
                 r['resourceId'] for r in
@@ -293,8 +294,8 @@ class ConfigSource(object):
                 futures.append(w.submit(self.get_resources, resource_set))
                 for f in as_completed(futures):
                     if f.exception():
-                        self.log.error(
-                            "Exception creating snapshot set \n %s" % (
+                        self.manager.log.error(
+                            "Exception getting resources from config \n %s" % (
                                 f.exception()))
                     results.extend(f.result())
         return results
