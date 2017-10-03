@@ -121,49 +121,49 @@ class UrlValueTest(BaseTest):
             ['a', 'b', 'c', 'd'])
 
     def test_csv_expr(self):
-        with open('test.csv', 'w') as out:
+        with open('test_expr.csv', 'w') as out:
             writer = csv.writer(out)
             writer.writerows([range(5) for r in range(5)])
-        with open('test.csv', 'r') as out:
+        with open('test_expr.csv', 'r') as out:
             values = self.get_values_from(
                 {'url': 'sun.csv', 'expr': '[*][2]'},
                 out.read(),
             )
-        os.remove('test.csv')
+        os.remove('test_expr.csv')
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
 
     def test_csv_expr_using_dict(self):
-        with open('test.csv', 'w') as out:
+        with open('test_dict.csv', 'w') as out:
             writer = csv.writer(out)
             writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
             writer.writerows([range(5) for r in range(5)])
-        with open('test.csv', 'r') as out:
+        with open('test_dict.csv', 'r') as out:
             values = self.get_values_from(
                 {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'},
                 out.read(),
             )
-        os.remove('test.csv')
+        os.remove('test_dict.csv')
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
-        with open('test.csv', 'w') as out:
+        with open('test_column.csv', 'w') as out:
             writer = csv.writer(out)
             writer.writerows([range(5) for r in range(5)])
-        with open('test.csv', 'r') as out:
+        with open('test_column.csv', 'r') as out:
             values = self.get_values_from(
                 {'url': 'sun.csv', 'expr': 1},
                 out.read(),
             )
-        os.remove('test.csv')
+        os.remove('test_column.csv')
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
 
     def test_csv_raw(self):
-        with open('test.csv', 'w') as out:
+        with open('test_raw.csv', 'w') as out:
             writer = csv.writer(out)
             writer.writerows([range(3, 4) for r in range(5)])
-        with open('test.csv', 'r') as out:
+        with open('test_raw.csv', 'r') as out:
             values = self.get_values_from({'url': 'sun.csv'}, out.read())
-        os.remove('test.csv')
+        os.remove('test_raw.csv')
         self.assertEqual(
             values.get_values(),
             [['3'], ['3'], ['3'], ['3'], ['3']])
