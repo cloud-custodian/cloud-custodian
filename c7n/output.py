@@ -188,7 +188,7 @@ class FSOutput(LogOutput):
             for f in files:
                 fp = os.path.join(root, f)
                 with gzip.open(fp + ".gz", "wb", compresslevel=7) as zfh:
-                    with open(fp) as sfh:
+                    with open(fp, "rb") as sfh:
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 

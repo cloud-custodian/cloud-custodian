@@ -345,7 +345,8 @@ class SecurityGroupDiff(object):
             ev.sort()
             for e in ev:
                 buf += "%s-" % e
-        return abs(zlib.crc32(buf.encode('ascii')))
+        # mask to generate the same numeric value across all Python versions
+        return zlib.crc32(buf.encode('ascii')) & 0xffffffff
 
 
 @SecurityGroup.action_registry.register('patch')

@@ -151,7 +151,7 @@ class Action(object):
         except ClientError as e:
             if (e.response['Error']['Code'] == 'DryRunOperation' and
             e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
-            'would have succeeded' in e.message):
+            'would have succeeded' in e.response['Error']['Message']):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))

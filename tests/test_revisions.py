@@ -77,7 +77,14 @@ class SGDiffLibTest(BaseTest):
                              u'PrefixListIds': [],
                              u'UserIdGroupPairs': []}]},
              'ingress': {
-                 'added': [{u'FromPort': 8485,
+                 'added': [{u'FromPort': 22,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 22,
+                            u'UserIdGroupPairs': []},
+                           {u'FromPort': 8485,
                             u'IpProtocol': u'tcp',
                             u'IpRanges': [],
                             u'Ipv6Ranges': [],
@@ -85,13 +92,7 @@ class SGDiffLibTest(BaseTest):
                             u'ToPort': 8485,
                             u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
                                                    u'UserId': u'644160558196'}]},
-                           {u'FromPort': 22,
-                            u'IpProtocol': u'tcp',
-                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
-                            u'Ipv6Ranges': [],
-                            u'PrefixListIds': [],
-                            u'ToPort': 22,
-                            u'UserIdGroupPairs': []}]},
+                        ]},
              'tags': {'added': {u'Scope': u'account'}}})
 
     def test_sg_patch_pitr(self):

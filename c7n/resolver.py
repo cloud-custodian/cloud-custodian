@@ -17,6 +17,7 @@ import csv
 import io
 import json
 import os.path
+from six import text_type
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
 
@@ -36,7 +37,7 @@ class URIResolver(object):
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
             fh = urlopen(uri)
-            contents = fh.read()
+            contents = fh.read().decode('utf-8')
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
@@ -119,7 +120,7 @@ class ValuesFrom(object):
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = self.resolver.resolve(self.data['url'])
+        contents = text_type(self.resolver.resolve(self.data['url']))
         return contents, format
 
     def get_values(self):
@@ -130,7 +131,7 @@ class ValuesFrom(object):
             if 'expr' in self.data:
                 return jmespath.search(self.data['expr'], data)
         elif format == 'csv' or format == 'csv2dict':
-            data = csv.reader(io.BytesIO(contents))
+            data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
             else:
@@ -141,5 +142,4 @@ class ValuesFrom(object):
                 return jmespath.search(self.data['expr'], data)
             return data
         elif format == 'txt':
-            return [s.strip().decode('utf8')
-                    for s in io.BytesIO(contents).readlines()]
+            return [s.strip() for s in io.StringIO(contents).readlines()]

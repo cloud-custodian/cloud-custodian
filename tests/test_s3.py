@@ -53,15 +53,17 @@ class BucketScanLogTests(TestCase):
         self.log = s3.BucketScanLog(self.log_dir, 'test')
 
     def test_scan_log(self):
+        first_five = list(range(5))
+        next_five = list(range(5, 10))
         with self.log:
-            self.log.add(range(10)[:5])
-            self.log.add(range(10)[5:])
+            self.log.add(first_five)
+            self.log.add(next_five)
 
         with open(self.log.path) as fh:
             data = json.load(fh)
             self.assertEqual(
                 data,
-                [range(10)[:5], range(10)[5:], []])
+                [first_five, next_five, []])
 
 
 def destroyBucket(client, bucket):

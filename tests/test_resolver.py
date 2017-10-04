@@ -18,6 +18,7 @@ import io
 import json
 import os
 import tempfile
+from six import binary_type
 
 from .common import Bag, BaseTest
 from .test_s3 import destroyBucket
@@ -40,6 +41,8 @@ class FakeCache(object):
 class FakeResolver(object):
 
     def __init__(self, contents):
+        if isinstance(contents, binary_type):
+            contents = contents.decode('utf8')
         self.contents = contents
 
     def resolve(self, uri):
@@ -83,6 +86,13 @@ class ResolverTest(BaseTest):
 
 class UrlValueTest(BaseTest):
 
+    def setUp(self):
+        self.old_dir = os.getcwd()
+        os.chdir(tempfile.gettempdir())
+
+    def tearDown(self):
+        os.chdir(self.old_dir)
+
     def get_values_from(self, data, content):
         mgr = Bag({'session_factory': None, '_cache': None})
         values = ValuesFrom(data, mgr)
@@ -100,44 +110,60 @@ class UrlValueTest(BaseTest):
         self.assertRaises(ValueError, values.get_values)
 
     def test_txt(self):
-        out = io.BytesIO()
-        for i in ['a', 'b', 'c', 'd']:
-            out.write(('%s\n' % i).encode('utf8'))
-        values = self.get_values_from({'url': 'letters.txt'}, out.getvalue())
+        with open('resolver_test.txt', 'w') as out:
+            for i in ['a', 'b', 'c', 'd']:
+                out.write('%s\n' % i)
+        with open('resolver_test.txt', 'r') as out:
+            values = self.get_values_from({'url': 'letters.txt'}, out.read())
+        os.remove('resolver_test.txt')
         self.assertEqual(
             values.get_values(),
             ['a', 'b', 'c', 'd'])
 
     def test_csv_expr(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': '[*][2]'}, out.getvalue())
+        with open('test_expr.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open('test_expr.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': '[*][2]'},
+                out.read(),
+            )
+        os.remove('test_expr.csv')
         self.assertEqual(values.get_values(), ['2', '2', '2', '2', '2'])
 
     def test_csv_expr_using_dict(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'}, out.getvalue())
+        with open('test_dict.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerow(['aa', 'bb', 'cc', 'dd', 'ee'])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open('test_dict.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': 'bb[1]', 'format': 'csv2dict'},
+                out.read(),
+            )
+        os.remove('test_dict.csv')
         self.assertEqual(values.get_values(), '1')
 
     def test_csv_column(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(5) for r in range(5)])
-        values = self.get_values_from(
-            {'url': 'sun.csv', 'expr': 1}, out.getvalue())
+        with open('test_column.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open('test_column.csv', 'r') as out:
+            values = self.get_values_from(
+                {'url': 'sun.csv', 'expr': 1},
+                out.read(),
+            )
+        os.remove('test_column.csv')
         self.assertEqual(values.get_values(), ['1', '1', '1', '1', '1'])
 
     def test_csv_raw(self):
-        out = io.BytesIO()
-        writer = csv.writer(out)
-        writer.writerows([range(3, 4) for r in range(5)])
-        values = self.get_values_from({'url': 'sun.csv'}, out.getvalue())
+        with open('test_raw.csv', 'w') as out:
+            writer = csv.writer(out)
+            writer.writerows([range(3, 4) for r in range(5)])
+        with open('test_raw.csv', 'r') as out:
+            values = self.get_values_from({'url': 'sun.csv'}, out.read())
+        os.remove('test_raw.csv')
         self.assertEqual(
             values.get_values(),
             [['3'], ['3'], ['3'], ['3'], ['3']])

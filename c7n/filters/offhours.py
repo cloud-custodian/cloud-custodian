@@ -427,9 +427,9 @@ class OffHour(Time):
         if self.weekends_only:
             default[self.time_type][0]['days'] = [4]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -450,9 +450,9 @@ class OnHour(Time):
             # turn on monday
             default[self.time_type][0]['days'] = [0]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -604,5 +604,5 @@ class ScheduleParser(object):
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1] + 1)
-        return range(min(day_range), max(day_range) + 1)
+            return list(range(day_range[0], 7)) + list(range(day_range[1] + 1))
+        return list(range(min(day_range), max(day_range) + 1))
