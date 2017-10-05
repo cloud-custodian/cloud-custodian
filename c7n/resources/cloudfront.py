@@ -16,11 +16,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 from c7n.actions import BaseAction
-from c7n.filters import MetricsFilter, ShieldMetrics
+from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment
-from c7n.utils import generate_arn, local_session, type_schema
+from c7n.utils import generate_arn, local_session, type_schema, get_retry
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -121,6 +121,80 @@ class DistributionMetrics(MetricsFilter):
         return [{'Name': self.model.dimension,
                  'Value': resource[self.model.id]},
                 {'Name': 'Region', 'Value': 'Global'}]
+
+
+@Distribution.filter_registry.register('waf-enabled')
+class IsWafEnabled(Filter):
+    # useful primarily to use the same name across accounts, else webaclid
+    # attribute works as well
+
+    schema = type_schema(
+        'waf-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('waf:ListWebACLs',)
+
+    def process(self, resources, event=None):
+        target_acl = self.data.get('web-acl')
+        wafs = self.manager.get_resource_manager('waf').resources()
+        waf_name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+
+        if target_acl_id and target_acl_id not in waf_name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        state = self.data.get('state', False)
+        results = []
+        for r in resources:
+            if state and target_acl_id is None and r.get('WebACLId'):
+                results.append(r)
+            elif not state and target_acl_id is None and not r.get('WebACLId'):
+                results.append(r)
+            elif state and target_acl_id and r['WebACLId'] == target_acl_id:
+                results.append(r)
+            elif not state and target_acl_id and r['WebACLId'] != target_acl_id:
+                results.append(r)
+        return results
+
+
+@Distribution.action_registry.register('set-waf')
+class SetWaf(BaseAction):
+
+    permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
+    schema = type_schema(
+        'set-waf', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry(('Throttling',)))
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('waf').resources()
+        waf_name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+
+        if target_acl_id not in waf_name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront')
+        force = self.data.get('force', False)
+
+        for r in resources:
+            if r.get('WebACLId') and not force:
+                continue
+            if r.get('WebACLId') == target_acl_id:
+                continue
+            result = client.get_distribution_config(Id=r['Id'])
+            config = result['DistributionConfig']
+            config['WebACLId'] = target_acl_id
+            self.retry(
+                client.update_distribution,
+                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
 
 
 @Distribution.action_registry.register('disable')
