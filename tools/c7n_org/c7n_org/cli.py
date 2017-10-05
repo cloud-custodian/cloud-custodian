@@ -29,6 +29,7 @@ import yaml
 import click
 import jsonschema
 from botocore.compat import OrderedDict
+from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
 from c7n.executor import MainThreadExecutor
@@ -315,6 +316,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 def run_account(account, region, policies_config, output_path, cache_period, dryrun, debug):
     """Execute a set of policies on an account.
     """
+    logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
     output_path = os.path.join(output_path, account['name'], region)
@@ -342,6 +344,15 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
                     continue
                 log.info("Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
                          account['name'], region, p.name, len(resources), time.time()-st)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    log.warning('Access denied account:%s region:%s',
+                                account['name'], region)
+                    return policy_counts
+                log.error(
+                    "Exception running policy:%s account:%s region:%s error:%s",
+                    p.name, account['name'], region, e)
+                continue
             except Exception as e:
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
