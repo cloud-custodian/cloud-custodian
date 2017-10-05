@@ -46,7 +46,7 @@ from c7n_org.utils import environ, account_tags
 log = logging.getLogger('c7n_org')
 
 
-WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count * 4)
+WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4)
 
 
 CONFIG_SCHEMA = {
