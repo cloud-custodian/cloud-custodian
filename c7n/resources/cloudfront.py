@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 from c7n.actions import BaseAction
-from c7n.filters import MetricsFilter, ShieldMetrics, Filter
+from c7n.filters import MetricsFilter, Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment
