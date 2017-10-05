@@ -992,6 +992,7 @@ class AttachLambdaEncrypt(BucketActionBase):
     schema = type_schema(
         'attach-encrypt',
         role={'type': 'string'},
+        tags={'type': 'object'},
         topic={'type': 'string'})
 
     permissions = (
@@ -1023,7 +1024,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
         func = get_function(
             None, self.data.get('role', self.manager.config.assume_role),
-            account_id=account_id)
+            account_id=account_id, tags=self.data.get('tags'))
 
         regions = set([
             b.get('Location', {

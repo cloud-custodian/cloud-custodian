@@ -31,6 +31,8 @@ from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
 from c7n.utils import (
     local_session, chunks, type_schema, get_retry, set_annotation)
 
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+
 log = logging.getLogger('custodian.app-elb')
 
 filters = FilterRegistry('app-elb.filters')
@@ -68,6 +70,9 @@ class AppELB(QueryResourceManager):
         return ("elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeLoadBalancerAttributes",
                 "elasticloadbalancing:DescribeTags")
+
+    def get_arn(self, r):
+        return r[self.resource_type.id]
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -126,6 +131,10 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
     client.remove_tags(
         ResourceArns=[alb['LoadBalancerArn'] for alb in albs],
         TagKeys=tag_keys)
+
+
+filters.register('shield-enabled', IsShieldProtected)
+actions.register('set-shield', SetShieldProtection)
 
 
 @filters.register('security-group')
