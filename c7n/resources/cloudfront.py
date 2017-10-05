@@ -120,7 +120,7 @@ class IsWafEnabled(Filter):
             'web-acl': {'type': 'string'},
             'state': {'type': 'boolean'}})
 
-    permissions = ('waf:ListWebACLs')
+    permissions = ('waf:ListWebACLs',)
 
     def process(self, resources, event=None):
         target_acl = self.data.get('web-acl')
