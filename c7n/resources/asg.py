@@ -34,7 +34,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
@@ -52,7 +52,7 @@ actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('asg')
-class ASG(QueryResourceManager):
+class ASG(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -63,6 +63,8 @@ class ASG(QueryResourceManager):
         enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
         filter_name = 'AutoScalingGroupNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::AutoScalingGroup'
+
         default_report_fields = (
             'AutoScalingGroupName',
             'CreatedTime',
@@ -1323,7 +1325,7 @@ class Delete(Action):
 
 
 @resources.register('launch-config')
-class LaunchConfig(QueryResourceManager):
+class LaunchConfig(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -1335,6 +1337,17 @@ class LaunchConfig(QueryResourceManager):
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::LaunchConfiguration'
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeLaunchConfig(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
         for r in resources:
