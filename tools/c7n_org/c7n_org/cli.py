@@ -18,6 +18,7 @@ from collections import Counter
 import csv
 import logging
 import os
+import multiprocessing
 import time
 import subprocess
 
@@ -43,6 +44,10 @@ from c7n.utils import CONN_CACHE, dumps
 from c7n_org.utils import environ, account_tags
 
 log = logging.getLogger('c7n_org')
+
+
+WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count * 4)
+
 
 CONFIG_SCHEMA = {
     '$schema': 'http://json-schema.org/schema#',
@@ -74,6 +79,7 @@ CONFIG_SCHEMA = {
         }
     }
 }
+
 
 
 @click.group()
@@ -184,7 +190,7 @@ def report(config, output, use, output_dir, accounts, field, tags, region, debug
         raise ValueError("can only report on one resource type at a time")
 
     records = []
-    with executor(max_workers=16) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']
@@ -286,7 +292,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
         print("command to run: `%s`" % (" ".join(script_args)))
         return
 
-    with executor(max_workers=4) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']
@@ -383,7 +389,7 @@ def run(config, use, output_dir, accounts, tags, region, policy, cache_period, d
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy)
     policy_counts = Counter()
-    with executor(max_workers=32) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']

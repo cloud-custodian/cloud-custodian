@@ -69,7 +69,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     regions = set([p.options.region for p in policies])
     policy_names = set([p.name for p in policies])
     formatter = Formatter(
-        policies[0].resource_manager,
+        policies[0].resource_manager.resource_type,
         extra_fields=options.field,
         include_default_fields=not options.no_default_fields,
         include_region=len(regions) > 1,
