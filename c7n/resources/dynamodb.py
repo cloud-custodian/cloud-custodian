@@ -48,7 +48,7 @@ class Table(query.QueryResourceManager):
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('dynamodb:ListTagsOfResource')
 
-    def get_soruce(self, source_type):
+    def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeTable(self)
         elif source_type == 'config':
@@ -59,14 +59,14 @@ class Table(query.QueryResourceManager):
 class DescribeTable(query.DescribeSource):
 
     def augment(self, tables):
-        resources = super(Table, self).augment(tables)
+        resources = super(DescribeTable, self).augment(tables)
         return list(filter(None, _dynamodb_table_tags(
-            self.get_model(),
+            self.manager.get_model(),
             resources,
-            self.session_factory,
-            self.executor_factory,
-            self.retry,
-            self.log)))
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry,
+            self.manager.log)))
 
 
 def _dynamodb_table_tags(
