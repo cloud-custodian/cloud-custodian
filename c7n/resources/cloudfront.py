@@ -16,11 +16,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 from c7n.actions import BaseAction
-from c7n.filters import MetricsFilter
+from c7n.filters import MetricsFilter, ShieldMetrics
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment
 from c7n.utils import generate_arn, local_session, type_schema
+
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
 @resources.register('distribution')
@@ -38,6 +40,9 @@ class Distribution(QueryResourceManager):
         filter_name = None
 
     augment = universal_augment
+
+    def get_arn(self, r):
+        return r['ARN']
 
     @property
     def generate_arn(self):
@@ -71,6 +76,9 @@ class StreamingDistribution(QueryResourceManager):
 
     augment = universal_augment
 
+    def get_arn(self, r):
+        return r['ARN']
+
     @property
     def generate_arn(self):
         """ Generates generic arn if ID is not already arn format.
@@ -83,6 +91,11 @@ class StreamingDistribution(QueryResourceManager):
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+
+Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
+Distribution.filter_registry.register('shield-enabled', IsShieldProtected)
+Distribution.action_registry.register('set-shield', SetShieldProtection)
 
 
 @Distribution.filter_registry.register('metrics')
