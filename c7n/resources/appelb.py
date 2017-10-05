@@ -152,6 +152,117 @@ class SubnetFilter(net_filters.SubnetFilter):
 filters.register('network-location', net_filters.NetworkLocation)
 
 
+@AppELB.filter_registry.register('waf-enabled')
+class WafEnabled(Filter):
+
+    schema = type_schema(
+        'waf-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('waf-regional:ListResourcesForWebACL', 'waf-regional:ListWebACLs')
+
+    # TODO verify name uniqueness within region/account
+    # TODO consider associated resource fetch in augment
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'waf-regional')
+
+        target_acl = self.data.get('web-acl')
+        state = self.data.get('state', False)
+
+        name_id_map = {}
+        resource_map = {}
+
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
+
+        for w in wafs:
+            if 'c7n:AssociatedResources' not in w:
+                arns = client.list_resources_for_web_acl(
+                    WebACLId=w['WebACLId']).get('ResourceArns', [])
+                w['c7n:AssociatedResources'] = arns
+            name_id_map[w['Name']] = w['WebACLId']
+            for r in w['c7n:AssociatedResources']:
+                resource_map[r] = w['WebACLId']
+
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+
+        # generally frown on runtime validation errors, but also frown on
+        # api calls during validation.
+        if target_acl_id not in name_id_map.values():
+            raise ValueError("Invalid target acl:%s, acl not found" % target_acl)
+
+        arn_key = self.manager.resource_type.id
+
+        state_map = {}
+        for r in resources:
+            arn = r[arn_key]
+            if arn in resource_map:
+                r['c7n_webacl'] = resource_map[arn]
+                if not target_acl:
+                    state_map[arn] = True
+                    continue
+                r_acl = resource_map[arn]
+                if r_acl == target_acl_id:
+                    state_map[arn] = True
+                    continue
+                state_map[arn] = False
+            else:
+                state_map[arn] = False
+        return [r for r in resources if state_map[r[arn_key]] == state]
+
+
+@AppELB.action_registry.register('set-waf')
+class SetWaf(BaseAction):
+    """Enable/Disable waf protection on applicable resource.
+
+    """
+    permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
+
+    schema = type_schema(
+        'set-waf', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            # 'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    def validate(self):
+        found = False
+        for f in self.manager.filters:
+            if isinstance(f, WafEnabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise FilterValidationError(
+                "set-waf should be used in conjunction with waf-enabled filter")
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
+
+        if state and target_acl_id not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = local_session(
+            self.manager.session_factory).client('waf-regional')
+
+        arn_key = self.manager.resource_type.id
+
+        # TODO implement force to reassociate.
+        # TODO investigate limits on waf association.
+        for r in resources:
+            if state:
+                client.associate_web_acl(
+                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
+            else:
+                client.disassociate_web_acl(
+                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
+
+
 @actions.register('set-s3-logging')
 class SetS3Logging(BaseAction):
     """Action to enable/disable S3 logging for an application loadbalancer.

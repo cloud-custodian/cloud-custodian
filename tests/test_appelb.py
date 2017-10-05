@@ -304,6 +304,34 @@ class AppELBTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_appelb_waf(self):
+        factory = self.replay_flight_data('test_appelb_waf')
+
+        p = self.load_policy({
+            'name': 'appelb-waf',
+            'resource': 'app-elb',
+            'filters': [
+                {'type': 'waf-enabled',
+                 'web-acl': 'waf-default',
+                 'state': False}],
+            'actions': [
+                {'type': 'set-waf',
+                 'web-acl': 'waf-default'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy({
+            'name': 'appelb-waf',
+            'resource': 'app-elb',
+            'filters': [
+                {'type': 'waf-enabled',
+                 'web-acl': 'waf-default',
+                 'state': True}]},
+            session_factory=factory)
+        post_resources = p.run()
+        self.assertEqual(resources[0]['LoadBalancerArn'],
+                         post_resources[0]['LoadBalancerArn'])
+
 
 class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
