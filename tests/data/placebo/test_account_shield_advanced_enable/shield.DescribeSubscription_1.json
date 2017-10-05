@@ -1,0 +1,21 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "8afa11d6-a9d2-11e7-826f-518bd679fab1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8afa11d6-a9d2-11e7-826f-518bd679fab1", 
+                "date": "Thu, 05 Oct 2017 13:38:59 GMT", 
+                "content-length": "83", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "The subscription does not exist.", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

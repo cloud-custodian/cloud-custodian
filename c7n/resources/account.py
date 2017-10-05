@@ -925,7 +925,8 @@ class ShieldEnabled(Filter):
         client = self.manager.session_factory().client('shield')
 
         try:
-            subscription = client.describe_subscription().get('Subscription', None)
+            subscription = client.describe_subscription().get(
+                'Subscription', None)
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
                 raise
