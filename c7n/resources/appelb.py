@@ -155,7 +155,7 @@ class WafEnabled(Filter):
 
     # TODO verify name uniqueness within region/account
     # TODO consider associated resource fetch in augment
-    def process(self, resources):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'waf-regional')
 
@@ -165,12 +165,12 @@ class WafEnabled(Filter):
         name_id_map = {}
         resource_map = {}
 
-        wafs = self.get_resource_manager('waf-regional').resources()
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
 
         for w in wafs:
             if 'c7n:AssociatedResources' not in w:
                 arns = client.list_resources_for_web_acl(
-                    WebAclId=w['WebACLId']).get('ResourceArns', [])
+                    WebACLId=w['WebACLId']).get('ResourceArns', [])
                 w['c7n:AssociatedResources'] = arns
             name_id_map[w['Name']] = w['WebACLId']
             for r in w['c7n:AssociatedResources']:
@@ -189,6 +189,7 @@ class WafEnabled(Filter):
         for r in resources:
             arn = r[arn_key]
             if arn in resource_map:
+                r['c7n_webacl'] = resource_map[arn]
                 if not target_acl:
                     state_map[arn] = True
                     continue
@@ -199,8 +200,7 @@ class WafEnabled(Filter):
                 state_map[arn] = False
             else:
                 state_map[arn] = False
-
-        return [r for r in resources if state_map[r[arn_key]] != state]
+        return [r for r in resources if state_map[r[arn_key]] == state]
 
 
 @AppELB.action_registry.register('set-waf')
@@ -226,14 +226,16 @@ class SetWaf(BaseAction):
             # try to ensure idempotent usage
             raise FilterValidationError(
                 "set-waf should be used in conjunction with waf-enabled filter")
+        return self
 
     def process(self, resources):
         wafs = self.manager.get_resource_manager('waf-regional').resources()
         name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
 
-        if target_acl_id not in name_id_map.values():
+        if state and target_acl_id not in name_id_map.values():
             raise ValueError("invalid web acl: %s" % (target_acl_id))
 
         client = local_session(
@@ -241,12 +243,15 @@ class SetWaf(BaseAction):
 
         arn_key = self.manager.resource_type.id
 
+        # TODO implement force to reassociate.
+        # TODO investigate limits on waf association.
         for r in resources:
-            client.associate_web_acl(
-                WebACLId=target_acl_id,
-                ResourceArn=r[arn_key])
-            # TODO implement force to reassociate.
-            # TODO investigate limits on waf association.
+            if state:
+                client.associate_web_acl(
+                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
+            else:
+                client.disassociate_web_acl(
+                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
 
 
 @actions.register('set-s3-logging')
