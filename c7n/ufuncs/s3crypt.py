@@ -85,7 +85,7 @@ def get_function(session_factory, role, buckets=None, account_id=None, tags=None
         memory_size=256,
         timeout=30,
         role=role,
-        tags=tags,
+        tags=tags or {},
         runtime="python2.7",
         description='Custodian S3 Key Encrypt')
 
