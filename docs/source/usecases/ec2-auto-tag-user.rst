@@ -10,7 +10,10 @@ EC2 - auto-tag aws userName on resources
        resource: ec2
        mode:
          type: cloudtrail
-         role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+         role: arn:aws:iam::{account_id}:role/custodian-auto-tagger
+         # note {account_id} is optional. If you put that there instead of
+         # your actual account number, when the policy is provisioned it
+         # will automatically inherit the account_id properly
          events:
            - RunInstances
        filters:
