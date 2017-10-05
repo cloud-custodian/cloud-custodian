@@ -21,8 +21,7 @@ from c7n.utils import local_session
 class CloudFrontWaf(BaseTest):
 
     def test_waf(self):
-        factory = self.record_flight_data('test_distribution_waf')
-
+        factory = self.replay_flight_data('test_distribution_waf')
         p = self.load_policy({
             'name': 'waf-cfront',
             'resource': 'distribution',
