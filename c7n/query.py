@@ -314,7 +314,7 @@ def pager(p, retry):
 
     while True:
         try:
-            page = retry(iterator.next)
+            page = retry(next, iterator)
         except StopIteration:
             return results
         if isinstance(page, tuple) and len(page) == 2:
