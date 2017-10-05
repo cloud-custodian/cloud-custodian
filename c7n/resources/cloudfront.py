@@ -156,7 +156,7 @@ class SetWaf(BaseAction):
             'force': {'type': 'boolean'},
             'state': {'type': 'boolean'}})
 
-    retry = get_retry(('Throttling',))
+    retry = staticmethod(get_retry(('Throttling',)))
 
     def process(self, resources):
         wafs = self.manager.get_resource_manager('waf').resources()

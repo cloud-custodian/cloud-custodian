@@ -18,6 +18,38 @@ from .common import BaseTest
 from c7n.utils import local_session
 
 
+class CloudFrontWaf(BaseTest):
+
+    def test_waf(self):
+        factory = self.record_flight_data('test_distribution_waf')
+
+        p = self.load_policy({
+            'name': 'waf-cfront',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'waf-enabled',
+                'web-acl': 'test',
+                'state': False}],
+            'actions': [
+                {'type': 'set-waf',
+                 'web-acl': 'test',
+                 'state': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+            
+
+        p = self.load_policy({
+            'name': 'waf-cfront',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'waf-enabled',
+                'web-acl': 'test',
+                'state': False}]},
+            session_factory=factory)
+        self.assertEqual(p.run(), [])
+
+
 class CloudFront(BaseTest):
 
     def test_distribution_metric_filter(self):
