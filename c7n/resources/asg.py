@@ -1349,7 +1349,7 @@ class LaunchConfig(query.QueryResourceManager):
 
 class DescribeLaunchConfig(query.DescribeSource):
 
-    def augment(self, resource):
+    def augment(self, resources):
         for r in resources:
             r.pop('UserData', None)
         return resources
