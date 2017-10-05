@@ -22,11 +22,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-
 log = logging.getLogger('custodian.cfn')
-
-filters = FilterRegistry('cfn.filters')
-actions = ActionRegistry('cfn.actions')
 
 
 @resources.register('cfn')
@@ -42,12 +38,10 @@ class CloudFormation(QueryResourceManager):
         name = 'StackName'
         date = 'CreationTime'
         dimension = None
-
-    action_registry = actions
-    filter_registry = filters
+        config_type = 'AWS::CloudFormation::Stack'
 
 
-@actions.register('delete')
+@CloudFormation.action_registry.register('delete')
 class Delete(BaseAction):
     """Action to delete cloudformation stacks
 
