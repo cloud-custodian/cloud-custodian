@@ -184,6 +184,8 @@ class MetricsFilter(Filter):
 class ShieldMetrics(MetricsFilter):
     """Specialized metrics filter for shield
     """
+    schema = type_schema('shield-metrics', rinherit=MetricsFilter.schema)
+
     namespace = "AWS/DDoSProtection"
     metrics = (
         'DDoSAttackBitsPerSecond',
