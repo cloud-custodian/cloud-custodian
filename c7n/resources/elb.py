@@ -25,7 +25,8 @@ from botocore.exceptions import ClientError
 from c7n.actions import (
     ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction)
 from c7n.filters import (
-    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter,
+    ShieldMetrics)
 import c7n.filters.vpc as net_filters
 from datetime import datetime
 from dateutil.tz import tzutc
@@ -34,14 +35,19 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, chunks, type_schema, get_retry, worker
 
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+
 log = logging.getLogger('custodian.elb')
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
 
 actions.register('auto-tag-user', AutoTagUser)
+actions.register('set-shield', SetShieldProtection)
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
+filters.register('shield-enabled', IsShieldProtected)
+filters.register('shield-metrics', ShieldMetrics)
 
 
 @resources.register('elb')
@@ -76,6 +82,12 @@ class ELB(QueryResourceManager):
         return ('elasticloadbalancing:DescribeLoadBalancers',
                 'elasticloadbalancing:DescribeLoadBalancerAttributes',
                 'elasticloadbalancing:DescribeTags')
+
+    def get_arn(self, r):
+        return "arn:aws:elasticloadbalancing:%s:%s:loadbalancer/%s" % (
+            self.config.region,
+            self.config.account_id,
+            r[self.resource_type.id])
 
     def augment(self, resources):
         _elb_tags(
