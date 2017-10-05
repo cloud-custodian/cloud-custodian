@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Protections": [
+            {
+                "ResourceArn": "arn:aws:route53:::hostedzone/XXXXURLYV5DGGG", 
+                "Id": "090f33b5-1a15-4723-925b-9f9227e342f8", 
+                "Name": "invitro.cloud."
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b8c5f010-a9d4-11e7-afd9-d30a115f5b96", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b8c5f010-a9d4-11e7-afd9-d30a115f5b96", 
+                "date": "Thu, 05 Oct 2017 13:54:34 GMT", 
+                "content-length": "153", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

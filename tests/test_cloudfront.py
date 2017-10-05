@@ -20,6 +20,20 @@ from c7n.utils import local_session
 
 class CloudFront(BaseTest):
 
+    def test_shield_metric_filter(self):
+        factory = self.replay_flight_data('test_distribution_shield_metrics')
+        p = self.load_policy({
+            'name': 'ddos-filter',
+            'resource': 'distribution',
+            'filters': [{
+                'type': 'shield-metrics',
+                'name': 'DDoSDetected',
+                'value': 1,
+                'op': 'ge'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_distribution_metric_filter(self):
         factory = self.replay_flight_data('test_distribution_metric_filter')
         p = self.load_policy({
