@@ -909,3 +909,58 @@ class EnableDataEvents(BaseAction):
             client.start_logging(Name=tconfig['name'])
 
         resources[0]['c7n_data_trail'] = trail
+
+
+@filters.register('shield-enabled')
+class ShieldEnabled(Filter):
+
+    permissions = ('shield:DescribeSubscription',)
+
+    schema = type_schema(
+        'shield-enabled',
+        state={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', False)
+        client = self.manager.session_factory().client('shield')
+
+        try:
+            subscription = client.describe_subscription().get(
+                'Subscription', None)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
+            subscription = None
+
+        resources[0]['c7n:ShieldSubscription'] = subscription
+        if state and subscription:
+            return resources
+        elif not state and not subscription:
+            return resources
+        return []
+
+
+@actions.register('set-shield-advanced')
+class SetShieldAdvanced(BaseAction):
+    """Enable/disable Shield Advanced on an account."""
+
+    permissions = (
+        'shield:CreateSubscription', 'shield:DeleteSubscription')
+
+    schema = type_schema(
+        'set-shield-advanced',
+        state={'type': 'boolean'})
+
+    def process(self, resources):
+        client = self.manager.session_factory().client('shield')
+        state = self.data.get('state', True)
+
+        if state:
+            client.create_subscription()
+        else:
+            try:
+                client.delete_subscription()
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    return
+                raise
