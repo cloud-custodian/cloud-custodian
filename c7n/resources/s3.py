@@ -740,8 +740,10 @@ class EncryptionEnabledFilter(Filter):
                 encryption_statement["Sid"] = s["Sid"]
             except:
                 log.info("Bucket:%s doesn't have Sid" % b['Name'])
-
-            encryption_statement["Resource"] = s["Resource"]
+            try:
+                encryption_statement["Resource"] = s["Resource"]
+            except:
+                log.info("Bucket:%s doesn't have Resource" % b['Name'])
             if s == encryption_statement:
                 log.info(
                     "Bucket:%s contains correct encryption policy", b['Name'])
