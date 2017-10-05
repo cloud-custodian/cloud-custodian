@@ -25,7 +25,7 @@ import json
 
 import six
 from botocore.client import ClientError
-from botocore.paginate import set_value_from_jmespath, merge_dicts
+from botocore.paginate import set_value_from_jmespath
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
