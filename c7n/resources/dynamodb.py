@@ -52,7 +52,7 @@ class Table(query.QueryResourceManager):
         if source_type == 'describe':
             return DescribeTable(self)
         elif source_type == 'config':
-            return ConfigSource(self)
+            return query.ConfigSource(self)
         raise ValueError('invalid source %s' % source_type)
 
 
