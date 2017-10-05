@@ -53,7 +53,7 @@ class TestEC2Report(unittest.TestCase):
         self.rows = data['ec2']['rows']
 
     def test_csv(self):
-        formatter = Formatter(EC2_POLICY.resource_manager)
+        formatter = Formatter(EC2_POLICY.resource_manager.resource_type)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -75,7 +75,7 @@ class TestEC2Report(unittest.TestCase):
 
         # First do a test with adding custom fields to the normal ones
         formatter = Formatter(
-            EC2_POLICY.resource_manager,
+            EC2_POLICY.resource_manager.resource_type,
             extra_fields=extra_fields,
         )
         recs = [self.records['full']]
@@ -84,7 +84,7 @@ class TestEC2Report(unittest.TestCase):
 
         # Then do a test with only having custom fields
         formatter = Formatter(
-            EC2_POLICY.resource_manager,
+            EC2_POLICY.resource_manager.resource_type,
             extra_fields=extra_fields,
             include_default_fields=False,
         )
@@ -101,7 +101,7 @@ class TestASGReport(unittest.TestCase):
         self.rows = data['asg']['rows']
 
     def test_csv(self):
-        formatter = Formatter(ASG_POLICY.resource_manager)
+        formatter = Formatter(ASG_POLICY.resource_manager.resource_type)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -121,7 +121,7 @@ class TestELBReport(unittest.TestCase):
         self.rows = data['elb']['rows']
 
     def test_csv(self):
-        formatter = Formatter(ELB_POLICY.resource_manager)
+        formatter = Formatter(ELB_POLICY.resource_manager.resource_type)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -143,7 +143,8 @@ class TestMultiReport(unittest.TestCase):
 
     def test_csv(self):
         # Test the extra headers for multi-policy
-        formatter = Formatter(EC2_POLICY.resource_manager, include_region=True, include_policy=True)
+        formatter = Formatter(EC2_POLICY.resource_manager.resource_type,
+                              include_region=True, include_policy=True)
         tests = [
             (['minimal'], ['minimal_multipolicy']),
         ]

@@ -25,6 +25,7 @@ import json
 
 import six
 from botocore.client import ClientError
+from botocore.paginate import set_value_from_jmespath
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
@@ -245,6 +246,8 @@ class ChildDescribeSource(DescribeSource):
 @sources.register('config')
 class ConfigSource(object):
 
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+
     def __init__(self, manager):
         self.manager = manager
 
@@ -257,14 +260,15 @@ class ConfigSource(object):
         results = []
         m = self.manager.get_model()
         for i in ids:
-            revisions = client.get_resource_config_history(
+            revisions = self.retry(
+                client.get_resource_config_history,
                 resourceId=i,
                 resourceType=m.config_type,
                 limit=1).get('configurationItems')
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return results
+        return filter(None, results)
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
@@ -281,9 +285,9 @@ class ConfigSource(object):
         results = []
 
         with self.manager.executor_factory(max_workers=5) as w:
+            ridents = pager(pages, self.retry)
             resource_ids = [
-                r['resourceId'] for r in
-                pages.build_full_result()['resourceIdentifiers']]
+                r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
             self.manager.log.debug(
                 "querying %d %s resources",
                 len(resource_ids),
@@ -302,6 +306,28 @@ class ConfigSource(object):
 
     def augment(self, resources):
         return resources
+
+
+def pager(p, retry):
+    results = {}
+    iterator = iter(p)
+
+    while True:
+        try:
+            page = retry(next, iterator)
+        except StopIteration:
+            return results
+        if isinstance(page, tuple) and len(page) == 2:
+            page = page[1]
+        for rexpr in p.result_keys:
+            rv = rexpr.search(page)
+            if rv is None:
+                continue
+            ev = rexpr.search(results)
+            if ev is None:
+                set_value_from_jmespath(results, rexpr.expression, rv)
+                continue
+            ev.extend(rv)
 
 
 @six.add_metaclass(QueryMeta)
