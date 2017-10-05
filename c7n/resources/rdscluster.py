@@ -56,6 +56,15 @@ class RDSCluster(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
 
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds', region=self.config.region,
+                account_id=self.account_id,
+                resource_type=self.resource_type.type, separator=':')
+        return self._generate_arn
+
     def augment(self, dbs):
         filter(None, _rds_cluster_tags(
             self.get_model(),
@@ -69,7 +78,7 @@ def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, 
 
     def process_tags(db):
         client = local_session(session_factory).client('rds')
-        arn = generator(db[model.id],separator=':')
+        arn = generator(db[model.id])
         tag_list = None
         try:
             tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
@@ -115,7 +124,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     def process_resource_set(self, dbs, tags):
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
@@ -147,7 +156,7 @@ class Tag(tags.Tag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=ts)
 
 
@@ -178,7 +187,7 @@ class RemoveTag(tags.RemoveTag):
         client = local_session(
             self.manager.session_factory).client('rds')
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'],separator=':')
+            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
             client.remove_tags_from_resource(
                 ResourceName=arn, TagKeys=tag_keys)
 
