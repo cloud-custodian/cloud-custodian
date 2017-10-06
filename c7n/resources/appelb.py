@@ -729,7 +729,8 @@ class AppELBModifyListenerPolicy(BaseAction):
         if 'certificate' in self.data:
             args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
         with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_alb, load_balancers, [args]))
+            result = list(w.map(self.process_alb, load_balancers, [args]))
+            return result
 
     def process_alb(self, alb, args):
         client = local_session(self.manager.session_factory).client('elbv2')
