@@ -2203,3 +2203,61 @@ class DeleteBucket(ScanBucket):
             Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
         if self.get_bucket_style(bucket) != 'versioned':
             return results
+
+
+@actions.register('configure-lifecycle')
+class Lifecycle(BucketActionBase):
+    """Action applies a lifecycle policy to versioned S3 buckets
+    :example:
+        .. code-block: yaml
+            policies:
+              - name: s3-apply-lifecycle
+                resource: s3
+                actions:
+                  - type: configure-lifecycle
+                    rules:
+                      - ID: my-lifecycle-id
+                        Status: Enabled
+                        Prefix: foo/
+                        Transitions:
+                          - Days: 60
+                            StorageClass: GLACIER
+
+    """
+
+    schema = type_schema(
+        'configure-lifecycle',
+        **{
+            'rules': {'type': 'array', 'required': True},
+        }
+    )
+
+    permissions = ('s3:PutLifecycleConfiguration',)
+
+    def process(self, buckets):
+
+        # TODO - we should check for ID and Status here, or put it in the schema
+
+        for bucket in buckets:
+            s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+            # put_bucket_lifecycle_configuration replaces any existing lifecycle
+            # with the supplied one.  So we need to fetch the existing one and
+            # merge the new one in appropriately.
+            resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket['Name'])
+            if 'Rules' not in resp:
+                config = self.data['rules']
+            else:
+                config = resp['Rules']
+                for rule in self.data['rules']:
+                    for index, existing_rule in enumerate(config):
+                        # If a matching lifecycle is found then replace it
+                        if rule['ID'] == existing_rule['ID']:
+                            config[index] = rule
+                            break
+                    else:
+                        # If no match is found, add to existing ones
+                        config.append(rule)
+
+            s3.put_bucket_lifecycle_configuration(
+                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
