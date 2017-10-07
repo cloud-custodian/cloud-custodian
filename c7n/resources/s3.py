@@ -2232,7 +2232,7 @@ class Lifecycle(BucketActionBase):
         }
     )
 
-    permissions = ('s3:PutLifecycleConfiguration',)
+    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
     def process(self, buckets):
 
