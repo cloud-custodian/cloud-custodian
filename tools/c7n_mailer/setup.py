@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_mailer",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Reference Mailer",
     classifiers=[
         "Topic :: System :: Systems Administration",
