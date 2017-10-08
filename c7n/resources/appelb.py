@@ -17,6 +17,7 @@ Application Load Balancers
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import itertools
 import logging
 
 from collections import defaultdict
@@ -729,7 +730,7 @@ class AppELBModifyListenerPolicy(BaseAction):
         if 'certificate' in self.data:
             args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
         with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_alb, load_balancers, [args]))
+            list(w.map(self.process_alb, load_balancers, itertools.repeat(args)))
 
     def process_alb(self, alb, args):
         client = local_session(self.manager.session_factory).client('elbv2')
