@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "L9cR8PihUFJl2BXObPtj+2nh62A131ZUA3vCDPhN9O3intyddO9IscHBQgHQHYnq/eCnOERlHCc=", 
+            "RequestId": "114DA8E8AC5915B3", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "L9cR8PihUFJl2BXObPtj+2nh62A131ZUA3vCDPhN9O3intyddO9IscHBQgHQHYnq/eCnOERlHCc=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "114DA8E8AC5915B3", 
+                "date": "Fri, 14 Jul 2017 05:11:28 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The lifecycle configuration does not exist", 
+            "Code": "NoSuchLifecycleConfiguration", 
+            "BucketName": "www.laiello.com"
+        }
+    }
+}

@@ -1811,3 +1811,411 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    # def test_has_lifecycle(self):
+    #     self.patch(s3, 'S3_AUGMENT_TABLE', [
+    #         ('get_bucket_lifecycle', 'Lifecycle', None, None),
+    #         ('get_bucket_location', 'Location', None, None)])
+    #     session_factory = self.record_flight_data('test_s3_has_lifecycle')
+    #     session = session_factory()
+    #     client = session.client('s3')
+    #     bname = 'test-cloud-custodian-lifecycle'
+    #     client.create_bucket(Bucket=bname)
+    #     client.put_bucket_lifecycle_configuration(
+    #       Bucket=bname,
+    #       LifecycleConfiguration={
+    #         'Rules': [
+    #           {
+    #             'Expiration': {
+    #               'Days': 400
+    #             },
+    #             'NoncurrentVersionExpiration': {
+    #               'NoncurrentDays': 400
+    #             },
+    #             'AbortIncompleteMultipartUpload': {
+    #               'DaysAfterInitiation': 7
+    #             },
+    #             'Transitions': [
+    #               {
+    #                 'Days': 30,
+    #                 'StorageClass': 'STANDARD_IA'
+    #               },
+    #               {
+    #                 'Days': 90,
+    #                 'StorageClass': 'GLACIER'
+    #               }
+    #             ],
+    #             'NoncurrentVersionTransitions': [
+    #               {
+    #                 'NoncurrentDays': 30,
+    #                 'StorageClass': 'STANDARD_IA'
+    #               },
+    #               {
+    #                 'NoncurrentDays': 90,
+    #                 'StorageClass': 'GLACIER'
+    #               }
+    #             ],
+    #             'ID': 'test-cc-lifecycle',
+    #             'Status': 'Enabled',
+    #             'Prefix': ''
+    #           }
+    #         ]
+    #       }
+    #     )
+    #     self.addCleanup(client.delete_bucket, Bucket=bname)
+
+    #     # Find policy with multiple attributes
+    #     p = self.load_policy({
+    #         'name': 's3-has-lifecycle',
+    #         'resource': 's3',
+    #         'filters': [{'type': 'has-lifecycle',
+    #                      'id': 'test-cc-lifecycle',
+    #                      'delete_days': 400,
+    #                      'delete_previous_version_days': 400,
+    #                      'multipart_days': 7,
+    #                      'ia_days': 30,
+    #                      'glacier_days': 90,
+    #                      'previous_version_ia_days': 30,
+    #                      'previous_version_glacier_days': 90}]},
+    #         session_factory=session_factory)
+    #     resources = p.run()
+    #     self.assertEqual(len(resources), 1)
+
+    def test_does_not_have_lifecycle_1(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_lifecycle', 'Lifecycle', None, None),
+            ('get_bucket_location', 'Location', None, None)])
+        session_factory = self.replay_flight_data('test_s3_does_not_have_lifecycle_1')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'test-cloud-custodian-lifecycle-no-lifecycle'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_lifecycle_configuration(
+          Bucket=bname,
+          LifecycleConfiguration={
+            'Rules': [
+              {
+                'Expiration': {
+                  'Days': 400
+                },
+                'NoncurrentVersionExpiration': {
+                  'NoncurrentDays': 400
+                },
+                'AbortIncompleteMultipartUpload': {
+                  'DaysAfterInitiation': 7
+                },
+                'Transitions': [
+                  {
+                    'Days': 30,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'Days': 90,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'NoncurrentVersionTransitions': [
+                  {
+                    'NoncurrentDays': 30,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'NoncurrentDays': 90,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'ID': 'test-cc-lifecycle',
+                'Status': 'Enabled',
+                'Prefix': ''
+              }
+            ]
+          }
+        )
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        # Nonexistent policy
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'multipart_days': 5 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 450 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_previous_version_days': 450}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_does_not_have_lifecycle_2(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_lifecycle', 'Lifecycle', None, None),
+            ('get_bucket_location', 'Location', None, None)])
+        session_factory = self.replay_flight_data('test_s3_does_not_have_lifecycle_2')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'test-cloud-custodian-lifecycle-no-lifecycle'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_lifecycle_configuration(
+          Bucket=bname,
+          LifecycleConfiguration={
+            'Rules': [
+              {
+                'Expiration': {
+                  'Days': 400
+                },
+                'ID': 'test-cc-lifecycle',
+                'Status': 'Enabled',
+                'Prefix': ''
+              }
+            ]
+          }
+        )
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        # Nonexistent policy
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'multipart_days': 5 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_ia_days': 35 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'previous_version_glacier_days': 95 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 450 }]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_previous_version_days': 450}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_configure_lifecycle(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
+            ('get_bucket_location', 'Location', None, None)])
+        session_factory = self.replay_flight_data('test_s3_configure_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'test-cloud-custodian-configure-lifecycle'
+        client.create_bucket(Bucket=bname)
+        client.put_bucket_lifecycle_configuration(
+          Bucket=bname,
+          LifecycleConfiguration={
+            'Rules': [
+              {
+                'Expiration': {
+                  'Days': 500
+                },
+                'NoncurrentVersionExpiration': {
+                  'NoncurrentDays': 500
+                },
+                'AbortIncompleteMultipartUpload': {
+                  'DaysAfterInitiation': 4
+                },
+                'Transitions': [
+                  {
+                    'Days': 40,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'Days': 110,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'NoncurrentVersionTransitions': [
+                  {
+                    'NoncurrentDays': 40,
+                    'StorageClass': 'STANDARD_IA'
+                  },
+                  {
+                    'NoncurrentDays': 110,
+                    'StorageClass': 'GLACIER'
+                  }
+                ],
+                'ID': 'test-cc-lifecycle',
+                'Status': 'Enabled',
+                'Prefix': ''
+              }
+            ]
+          }
+        )
+
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        # Configure the policy
+        p = self.load_policy({
+            'name': 's3-configure-lifecycle',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'configure-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400,
+                         'delete_previous_version_days': 400,
+                         'multipart_days': 7,
+                         'ia_days': 30,
+                         'glacier_days': 90,
+                         'previous_version_ia_days': 30,
+                         'previous_version_glacier_days': 90,
+                         'max_workers': 15}]},
+            session_factory=session_factory)
+        p.run()
+
+        # Find policy with multiple attributes
+        p = self.load_policy({
+            'name': 's3-has-lifecycle',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400,
+                         'delete_previous_version_days': 400,
+                         'multipart_days': 7,
+                         'ia_days': 30,
+                         'glacier_days': 90,
+                         'previous_version_ia_days': 30,
+                         'previous_version_glacier_days': 90}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Configure the policy again, for code coverage
+        p = self.load_policy({
+            'name': 's3-configure-lifecycle-again',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'configure-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400,
+                         'delete_previous_version_days': 400,
+                         'multipart_days': 7,
+                         'ia_days': 30,
+                         'glacier_days': 90,
+                         'previous_version_ia_days': 30,
+                         'previous_version_glacier_days': 90,
+                         'max_workers': 15}]},
+            session_factory=session_factory)
+        p.run()
+
+        # Only look for one attribute
+        p = self.load_policy({
+            'name': 's3-has-lifecycle-one-element',
+            'resource': 's3',
+            'filters': [{'type': 'has-lifecycle',
+                         'id': 'test-cc-lifecycle',
+                         'delete_days': 400}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

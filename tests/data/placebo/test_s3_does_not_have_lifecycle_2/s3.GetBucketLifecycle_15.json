@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "Prefix": "", 
+                "Expiration": {
+                    "Days": 400
+                }, 
+                "ID": "test-cc-lifecycle"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "nMZYpP+vY1+gbGCWKUR1GrtTWgO79bxCuANtjx3f3rpl72cUpsjaRkh+hTKk5UjBAM9EtQbqHW0=", 
+            "RequestId": "328799DC4B0F219F", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "nMZYpP+vY1+gbGCWKUR1GrtTWgO79bxCuANtjx3f3rpl72cUpsjaRkh+hTKk5UjBAM9EtQbqHW0=", 
+                "date": "Fri, 28 Jul 2017 14:27:55 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "328799DC4B0F219F", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

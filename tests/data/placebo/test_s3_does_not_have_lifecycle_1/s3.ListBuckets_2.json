@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "larello732", 
+            "ID": "da1df7e8f5833d450286f71183943d61214484adf7c8f8a19cd81ec4b327d254"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 54
+                }, 
+                "Name": "laiello.com"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 45
+                }, 
+                "Name": "test-cloud-custodian-lifecycle-no-lifecycle"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 54
+                }, 
+                "Name": "www.laiello.com"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "z7fm269hGiIqI0U0jxoB+z2a411Efthb+VgHAs3jy782csSAV56Q/9xd0/6fEhNP", 
+            "RequestId": "89A66B311B194576", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "z7fm269hGiIqI0U0jxoB+z2a411Efthb+VgHAs3jy782csSAV56Q/9xd0/6fEhNP", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "89A66B311B194576", 
+                "date": "Fri, 28 Jul 2017 13:48:59 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -78,6 +78,7 @@ actions.register('auto-tag-user', AutoTagUser)
 actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
+DEFAULT_WORKERS = 10
 
 
 @resources.register('s3')
@@ -655,6 +656,261 @@ class BucketActionBase(BaseAction):
         return self.permissions
 
 
+@filters.register('has-lifecycle')
+class HasLifecycle(Filter):
+    """Filter out S3 buckets that have lifecycle rules for
+    transitioning objects to different storage types."""
+
+    permissions = ('s3:GetLifecycleConfiguration', )
+
+    schema = type_schema('has-lifecycle',
+                         required=['id'],
+                         id={'type': 'string'},
+                         prefix={'type': 'string'},
+                         delete_days={'type': 'number'},
+                         delete_previous_version_days={'type': 'number'},
+                         multipart_days={'type': 'number'},
+                         ia_days={'type': 'number'},
+                         previous_version_ia_days={'type': 'number'},
+                         glacier_days={'type': 'number'},
+                         previous_version_glacier_days={'type': 'number'})
+
+    def process(self, buckets, event=None):
+
+        # Make sure lifecycle is within configured policy limits
+        ia_days_in_policy = self.data.get('ia_days', None)
+        prv_ia_days_in_policy = self.data.get('previous_version_ia_days', None)
+        glacier_days_in_policy = self.data.get('glacier_days', None)
+        prv_glacier_days_in_policy = self.data.get('previous_version_glacier_days', None)
+        delete_days_in_policy = self.data.get('delete_days')
+        prv_delete_days_in_policy = self.data.get('delete_previous_version_days')
+        multipart_days_in_policy = self.data.get('multipart_days', None)
+
+        session = local_session(self.manager.session_factory)
+        glacier_supported_regions = session.get_available_regions('glacier')
+
+        prefix = self.data.get('prefix', '')
+        results = []
+        for b in buckets:
+            bucket_region = get_bucket_region(b)
+            if bucket_region in glacier_supported_regions:
+                glacier_days_in_policy = self.data.get('glacier_days', None)
+            else:
+                glacier_days_in_policy = None
+
+            if b['Lifecycle']:
+                for rule in b['Lifecycle']['Rules']:
+                    if rule['ID'] == self.data.get('id'):
+
+                        if rule['Status'] == 'Disabled':
+                            continue
+
+                        # Handle lifecycles created using new Amazon web interface
+                        if 'Filter' in rule:
+                            if rule['Filter']['Prefix'] != prefix:
+                                continue
+                        else:
+                            if rule['Prefix'] != prefix:
+                                continue
+
+                        # Current version transitions
+                        if 'Transitions' in rule:
+                            # Can only have STANDARD_IA and GLACIER transitions
+                            if (len(rule['Transitions']) < 2) and\
+                                    ia_days_in_policy and\
+                                    glacier_days_in_policy:
+                                continue
+                            else:
+                                if self.mismatched_transitions(rule,
+                                                               ia_days_in_policy,
+                                                               glacier_days_in_policy):
+                                    continue
+
+                        elif ia_days_in_policy or glacier_days_in_policy:
+                            continue
+
+                        # Previous version transitions
+                        if 'NoncurrentVersionTransitions' in rule:
+                            if (len(rule['NoncurrentVersionTransitions']) < 2) and\
+                                    prv_ia_days_in_policy and\
+                                    prv_glacier_days_in_policy:
+                                continue
+                            else:
+                                if self.mismatched_previous_version_transitions(
+                                        rule,
+                                        prv_ia_days_in_policy,
+                                        prv_glacier_days_in_policy):
+                                    continue
+
+                        elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
+                            continue
+
+                        # Current version deletions
+                        if 'Expiration' in rule and 'Days' in rule['Expiration']:
+                            if delete_days_in_policy and\
+                                    rule['Expiration']['Days'] != delete_days_in_policy:
+                                continue
+                        elif delete_days_in_policy:
+                            continue
+
+                        # Previous version deletions
+                        if 'NoncurrentVersionExpiration' in rule and\
+                                'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
+                            if prv_delete_days_in_policy and\
+                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'] !=\
+                                    prv_delete_days_in_policy:
+                                continue
+                        elif prv_delete_days_in_policy:
+                            continue
+
+                        # Multipart uploads
+                        if 'AbortIncompleteMultipartUpload' in rule:
+                            multipart_days_in_rule =\
+                                rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                            if multipart_days_in_policy and\
+                                    (multipart_days_in_rule != multipart_days_in_policy):
+                                continue
+                        elif multipart_days_in_policy:
+                            continue
+
+                        results.append(b)
+                        break
+
+        self.log.info("Found %d buckets with the lifecycle specified, out of %d buckets",
+                      len(results),
+                      len(buckets))
+
+        return results
+
+    def mismatched_transitions(self, rule, ia_days_in_policy, glacier_days_in_policy):
+        """Returns true if user input doesn't match what is in the policy."""
+        for t in rule['Transitions']:
+            if (t['StorageClass'] == 'STANDARD_IA'):
+                if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
+                    return True
+
+            if (t['StorageClass'] == 'GLACIER'):
+                if glacier_days_in_policy and\
+                        (t['Days'] != glacier_days_in_policy):
+                    return True
+        return False
+
+    def mismatched_previous_version_transitions(self,
+                                                rule,
+                                                prv_ia_days_in_policy,
+                                                prv_glacier_days_in_policy):
+        """Returns true if user input doesn't match what is in the policy."""
+        for t in rule['NoncurrentVersionTransitions']:
+            if (t['StorageClass'] == 'STANDARD_IA'):
+                if prv_ia_days_in_policy and (t['NoncurrentDays'] != prv_ia_days_in_policy):
+                    return True
+
+            if (t['StorageClass'] == 'GLACIER'):
+                if prv_glacier_days_in_policy and\
+                        (t['NoncurrentDays'] != prv_glacier_days_in_policy):
+                    return True
+        return False
+
+
+def get_bucket_region(b):
+    bucket_region = b['Location']['LocationConstraint']
+    if bucket_region is None:
+        return 'us-east-1'
+    # EU = eu-west-1.
+    # From docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+    elif bucket_region == "EU":
+        return 'eu-west-1'
+    else:
+        return bucket_region
+
+
+class S3BucketLifecycle(object):
+    """Object representing an S3 lifecycle rule."""
+
+    def __init__(self, prefix, rule_id):
+        self.lifecycle = {
+            'ID': rule_id,
+            'Status': 'Enabled',
+            'Filter': {
+                'Prefix': prefix
+            }
+        }
+
+    def set_deletes_objects_days(self, days):
+        self.lifecycle['Expiration'] = {'Days': days}
+
+    def set_expired_delete_marker(self, value):
+        if 'Expiration' in self.lifecycle:
+            raise Exception('You cannot enable clean up expired object' +
+                            'delete markers if you enable Expiration.')
+        self.lifecycle['Expiration'] = {'ExpiredObjectDeleteMarker': value}
+
+    def set_stale_multipart_uploads_days(self, days):
+        self.lifecycle['AbortIncompleteMultipartUpload'] = {'DaysAfterInitiation': days}
+
+    def set_ia_transition_days(self, days):
+        if 'Transitions' not in self.lifecycle:
+            self.lifecycle['Transitions'] = []
+
+        for i in range(0, len(self.lifecycle['Transitions'])):
+            if self.lifecycle['Transitions'][i]['StorageClass'] == 'STANDARD_IA':
+                self.lifecycle['Transitions'][i]['Days'] = days
+                return
+
+        self.lifecycle['Transitions'].append({
+            'StorageClass': 'STANDARD_IA',
+            'Days': days
+        })
+
+    def set_glacier_transition_days(self, days):
+        if 'Transitions' not in self.lifecycle:
+            self.lifecycle['Transitions'] = []
+
+        for i in range(0, len(self.lifecycle['Transitions'])):
+            if self.lifecycle['Transitions'][i]['StorageClass'] == 'GLACIER':
+                self.lifecycle['Transitions'][i]['Days'] = days
+                return
+
+        self.lifecycle['Transitions'].append({
+            'StorageClass': 'GLACIER',
+            'Days': days
+        })
+
+    def set_delete_previous_versions(self, days):
+        self.lifecycle['NoncurrentVersionExpiration'] = {'NoncurrentDays': days}
+
+    def set_ia_previous_transition_days(self, days):
+        if 'NoncurrentVersionTransitions' not in self.lifecycle:
+            self.lifecycle['NoncurrentVersionTransitions'] = []
+
+        for i in range(0, len(self.lifecycle['NoncurrentVersionTransitions'])):
+            if self.lifecycle['NoncurrentVersionTransitions'][i]['StorageClass'] == 'STANDARD_IA':
+                self.lifecycle['NoncurrentVersionTransitions'][i]['NoncurrentDays'] = days
+                return
+
+        self.lifecycle['NoncurrentVersionTransitions'].append({
+            'StorageClass': 'STANDARD_IA',
+            'NoncurrentDays': days
+        })
+
+    def set_glacier_previous_transition_days(self, days):
+        if 'NoncurrentVersionTransitions' not in self.lifecycle:
+            self.lifecycle['NoncurrentVersionTransitions'] = []
+
+        for i in range(0, len(self.lifecycle['NoncurrentVersionTransitions'])):
+            if self.lifecycle['NoncurrentVersionTransitions'][i]['StorageClass'] == 'GLACIER':
+                self.lifecycle['NoncurrentVersionTransitions'][i]['NoncurrentDays'] = days
+                return
+
+        self.lifecycle['NoncurrentVersionTransitions'].append({
+            'StorageClass': 'GLACIER',
+            'NoncurrentDays': days
+        })
+
+    def json(self):
+        return self.lifecycle
+
+
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
     """Find buckets with set of named policy statements.
@@ -1079,6 +1335,222 @@ class AttachLambdaEncrypt(BucketActionBase):
             source = BucketLambdaNotification(
                 {'account_s3': account_id}, session_factory, bucket)
         return source.add(func)
+
+
+@actions.register('configure-lifecycle')
+class ConfigureLifecycle(BucketActionBase):
+    """Action that aggregates all rules with whole bucket prefix and
+    changes them to the configured policy values."""
+
+    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration', )
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': True,
+        'properties': {
+            'type': {'enum': ['configure-lifecycle']},
+            'id': {'type': 'string'},
+            'prefix': {'type': 'string'},
+            'delete_days': {'type': 'number'},
+            'delete_previous_version_days': {'type': 'number'},
+            'multipart_days': {'type': 'number'},
+            'ia_days': {'type': 'number'},
+            'previous_version_ia_days': {'type': 'number'},
+            'glacier_days': {'type': 'number'},
+            'previous_version_glacier_days': {'type': 'number'},
+            'max_workers': {'type': 'number'}
+        },
+        'required': ['id']
+    }
+
+    def process(self, buckets):
+            max_workers = self.data.get('max_workers', DEFAULT_WORKERS)
+
+            with self.executor_factory(max_workers=max_workers) as w:
+                w.map(self.put_lifecycle, buckets)
+
+    def put_lifecycle(self, bucket):
+        prefix = self.data.get('prefix', '')
+
+        # Make sure lifecycle is within configured policy limits
+        ia_days_in_policy = self.data.get('ia_days', None)
+        prv_ia_days_in_policy = self.data.get('previous_version_ia_days', None)
+        glacier_days_in_policy = self.data.get('glacier_days', None)
+        prv_glacier_days_in_policy = self.data.get('previous_version_glacier_days', None)
+        delete_days_in_policy = self.data.get('delete_days')
+        prv_delete_days_in_policy = self.data.get('delete_previous_version_days')
+        multipart_days_in_policy = self.data.get('multipart_days', None)
+
+        session = local_session(self.manager.session_factory)
+        s3 = bucket_client(session, bucket)
+        bname = bucket['Name']
+
+        # Glacier storage is not enabled in sa-east-1 or ap-northeast-1
+        bucket_region = get_bucket_region(bucket)
+        glacier_supported_regions = session.get_available_regions('glacier')
+
+        rem_lifecycle = S3BucketLifecycle(prefix, self.data.get('id'))
+        if ia_days_in_policy:
+            rem_lifecycle.set_ia_transition_days(ia_days_in_policy)
+        if prv_ia_days_in_policy:
+            rem_lifecycle.set_ia_previous_transition_days(prv_ia_days_in_policy)
+        if glacier_days_in_policy and (bucket_region in glacier_supported_regions):
+            rem_lifecycle.set_glacier_transition_days(glacier_days_in_policy)
+        if prv_glacier_days_in_policy and (bucket_region in glacier_supported_regions):
+            rem_lifecycle.set_glacier_previous_transition_days(prv_glacier_days_in_policy)
+        if multipart_days_in_policy:
+            rem_lifecycle.set_stale_multipart_uploads_days(multipart_days_in_policy)
+        if delete_days_in_policy:
+            rem_lifecycle.set_deletes_objects_days(delete_days_in_policy)
+        if prv_delete_days_in_policy:
+            rem_lifecycle.set_delete_previous_versions(prv_delete_days_in_policy)
+
+        changed_bucket_lifecycle = True
+        rules = {'Rules': []}
+        if bucket['Lifecycle']:
+            lifecycle = bucket['Lifecycle']
+            for rule in lifecycle['Rules']:
+                if rule['ID'] == self.data.get('id'):
+                    changed_bucket_lifecycle = False
+
+                    if rule['Status'] == 'Disabled':
+                        changed_bucket_lifecycle = True
+
+                    # Handle lifecycles created using new Amazon web interface
+                    if 'Filter' in rule:
+                        if rule['Filter']['Prefix'] != prefix:
+                            changed_bucket_lifecycle = True
+                    else:
+                        if rule['Prefix'] != prefix:
+                            changed_bucket_lifecycle = True
+
+                    # Current version transitions
+                    if 'Transitions' in rule:
+                        # Can only have STANDARD_IA and GLACIER transitions
+                        if (len(rule['Transitions']) < 2) and\
+                                ia_days_in_policy and\
+                                glacier_days_in_policy:
+                            changed_bucket_lifecycle = True
+                        else:
+                            for t in rule['Transitions']:
+                                if (t['StorageClass'] == 'STANDARD_IA'):
+                                    if ia_days_in_policy and (t['Days'] != ia_days_in_policy):
+                                        rem_lifecycle.set_ia_transition_days(ia_days_in_policy)
+                                        changed_bucket_lifecycle = True
+                                    else:
+                                        rem_lifecycle.set_ia_transition_days(t['Days'])
+
+                                if (t['StorageClass'] == 'GLACIER'):
+                                    if glacier_days_in_policy and\
+                                            (t['Days'] != glacier_days_in_policy):
+                                        rem_lifecycle.set_glacier_transition_days(
+                                            glacier_days_in_policy
+                                        )
+                                        changed_bucket_lifecycle = True
+                                    else:
+                                        rem_lifecycle.set_glacier_transition_days(t['Days'])
+
+                    elif ia_days_in_policy or glacier_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    # Old version transitions
+                    if 'NoncurrentVersionTransitions' in rule:
+                        if (len(rule['NoncurrentVersionTransitions']) < 2) and\
+                                prv_ia_days_in_policy and\
+                                prv_glacier_days_in_policy:
+                            changed_bucket_lifecycle = True
+                        for t in rule['NoncurrentVersionTransitions']:
+                            if (t['StorageClass'] == 'STANDARD_IA'):
+                                if prv_ia_days_in_policy and (t['NoncurrentDays'] !=
+                                                              prv_ia_days_in_policy):
+                                    rem_lifecycle.set_ia_previous_transition_days(
+                                        prv_ia_days_in_policy)
+                                    changed_bucket_lifecycle = True
+                                else:
+                                    rem_lifecycle.set_ia_previous_transition_days(
+                                        t['NoncurrentDays'])
+
+                            if (t['StorageClass'] == 'GLACIER'):
+                                if prv_glacier_days_in_policy and\
+                                        (t['NoncurrentDays'] != prv_glacier_days_in_policy):
+                                    rem_lifecycle.set_glacier_previous_transition_days(
+                                        prv_glacier_days_in_policy
+                                    )
+                                    changed_bucket_lifecycle = True
+                                else:
+                                    rem_lifecycle.set_glacier_previous_transition_days(
+                                        t['NoncurrentDays'])
+
+                    elif prv_ia_days_in_policy or prv_glacier_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    # Old version deletions
+                    if 'NoncurrentVersionExpiration' in rule:
+                        if 'NoncurrentDays' in rule['NoncurrentVersionExpiration']:
+                            prv_delete_days_in_rule = rule['NoncurrentVersionExpiration']
+                            ['NoncurrentDays']
+
+                            if delete_days_in_policy and\
+                                    (delete_days_in_policy != prv_delete_days_in_rule):
+                                changed_bucket_lifecycle = True
+                            else:
+                                rem_lifecycle.set_deletes_objects_days(
+                                    rule['NoncurrentVersionExpiration']['NoncurrentDays'])
+                        if 'ExpiredObjectDeleteMarker' in rule['NoncurrentVersionExpiration']:
+                            rem_lifecycle.set_expired_delete_marker(
+                                rule['NoncurrentVersionExpiration']['ExpiredObjectDeleteMarker']
+                            )
+                    elif delete_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    # Current version deletions
+                    if 'Expiration' in rule:
+                        if 'Days' in rule['Expiration']:
+                            delete_days_in_rule = rule['Expiration']['Days']
+                            if delete_days_in_policy and\
+                                    (delete_days_in_policy != delete_days_in_rule):
+                                changed_bucket_lifecycle = True
+                            else:
+                                rem_lifecycle.set_deletes_objects_days(rule['Expiration']['Days'])
+                        if 'ExpiredObjectDeleteMarker' in rule['Expiration']:
+                            rem_lifecycle.set_expired_delete_marker(
+                                rule['Expiration']['ExpiredObjectDeleteMarker']
+                            )
+                    elif delete_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    # Multipart uploads
+                    if 'AbortIncompleteMultipartUpload' in rule:
+                        multipart_days_in_rule = rule['AbortIncompleteMultipartUpload']
+                        ['DaysAfterInitiation']
+                        if multipart_days_in_policy and\
+                                (multipart_days_in_rule != multipart_days_in_policy):
+                            changed_bucket_lifecycle = True
+                        else:
+                            rem_lifecycle.set_stale_multipart_uploads_days(
+                                rule['AbortIncompleteMultipartUpload']['DaysAfterInitiation']
+                            )
+                    elif multipart_days_in_policy:
+                        changed_bucket_lifecycle = True
+
+                    if not changed_bucket_lifecycle:
+                        rules['Rules'].append(rule)
+                else:
+                    rules['Rules'].append(rule)
+
+                    # Convert rule to V2
+                    if 'Prefix' in rule:
+                        rule.update({'Filter': {'Prefix': rule.pop('Prefix')}})
+
+        if changed_bucket_lifecycle:
+            rules['Rules'].append(rem_lifecycle.json())
+            try:
+                s3.put_bucket_lifecycle_configuration(Bucket=bname,
+                                                      LifecycleConfiguration=rules)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchBucket':
+                    return
+                raise
 
 
 @actions.register('encryption-policy')
