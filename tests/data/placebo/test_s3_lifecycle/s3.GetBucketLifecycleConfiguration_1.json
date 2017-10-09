@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "PS8qK2RsVRx/1/IEmaDjPASjdvSnWHiaJXiAQCg8TJzTJc+FqL6ajpmlJ67gNSU28BuFZjDwWOM=", 
+            "RequestId": "562F8CFA4F157AE8", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "PS8qK2RsVRx/1/IEmaDjPASjdvSnWHiaJXiAQCg8TJzTJc+FqL6ajpmlJ67gNSU28BuFZjDwWOM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "562F8CFA4F157AE8", 
+                "date": "Mon, 09 Oct 2017 03:39:29 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The lifecycle configuration does not exist", 
+            "Code": "NoSuchLifecycleConfiguration", 
+            "BucketName": "custodian-lifecycle-test"
+        }
+    }
+}

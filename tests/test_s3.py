@@ -1811,3 +1811,102 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class S3LifecycleTest(BaseTest):
+
+    def test_lifecycle(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.record_flight_data('test_s3_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-lifecycle-test'
+
+        # Make a bucket
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        lifecycle_id1 = 'test-lifecycle'
+        rule = {
+            'ID': lifecycle_id1,
+            'Status': 'Enabled',
+            'Prefix': 'foo/',
+            'Transitions': [{
+                'Days': 60,
+                'StorageClass': 'GLACIER',
+            }],
+        }
+
+        policy = {
+            'name': 's3-lifecycle',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{
+                'type': 'configure-lifecycle',
+                'rules': [rule],
+            }]
+        }
+
+        #
+        # Add the first lifecycle
+        #
+        p = self.load_policy(policy, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Note: when recording this test, I needed to add a delay here or else
+        # the lifecycle was not found.
+        time.sleep(5)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
+
+        #
+        # Now add another lifecycle rule to ensure it doesn't clobber the first one
+        #
+        lifecycle_id2 = 'test-lifecycle-two'
+        rule['ID'] = lifecycle_id2
+        rule['Prefix'] = 'bar/'
+
+        # Add the lifecycle
+        p = self.load_policy(policy, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Note: when recording this test, I needed to add a delay here or else
+        # the lifecycle was not found.
+        time.sleep(5)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        #
+        # Last test - overwrite one of the lifecycles and make sure it changed
+        #
+        rule['Prefix'] = 'baz/'
+
+        # Add the lifecycle
+        p = self.load_policy(policy, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Note: when recording this test, I needed to add a delay here or else
+        # the lifecycle was not found.
+        time.sleep(5)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        for rule in lifecycle['Rules']:
+            if rule['ID'] == lifecycle_id2:
+                self.assertEqual(rule['Prefix'], 'baz/')

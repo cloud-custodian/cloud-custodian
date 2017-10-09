@@ -2248,6 +2248,18 @@ class Lifecycle(BucketActionBase):
 
     permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
+    def get_lifecycle_configuration(self, s3, bucket):
+        # If no lifecycle exists AWS gives a 404.  Protect against that.
+        try:
+            resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+                resp = {}
+            else:
+                raise
+
+        return resp
+
     def process(self, buckets):
 
         for bucket in buckets:
@@ -2256,7 +2268,7 @@ class Lifecycle(BucketActionBase):
             # put_bucket_lifecycle_configuration replaces any existing lifecycle
             # with the supplied one.  So we need to fetch the existing one and
             # merge the new one in appropriately.
-            resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket['Name'])
+            resp = self.get_lifecycle_configuration(s3, bucket['Name'])
             if 'Rules' not in resp:
                 config = self.data['rules']
             else:

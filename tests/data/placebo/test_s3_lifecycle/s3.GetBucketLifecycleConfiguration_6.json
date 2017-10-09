@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "Prefix": "foo/", 
+                "Transitions": [
+                    {
+                        "Days": 60, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "test-lifecycle"
+            }, 
+            {
+                "Status": "Enabled", 
+                "Prefix": "baz/", 
+                "Transitions": [
+                    {
+                        "Days": 60, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "test-lifecycle-two"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "3XeXUV6fktcbHAS77wffCyw5rYHiv/g1APMEyc6xZVhFDoAgdkRS7FKF+n8gvVM8tt4OXgeTtnU=", 
+            "RequestId": "E34CC6AC9C1F8529", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "3XeXUV6fktcbHAS77wffCyw5rYHiv/g1APMEyc6xZVhFDoAgdkRS7FKF+n8gvVM8tt4OXgeTtnU=", 
+                "date": "Mon, 09 Oct 2017 03:39:50 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E34CC6AC9C1F8529", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
