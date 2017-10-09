@@ -2208,8 +2208,11 @@ class DeleteBucket(ScanBucket):
 @actions.register('configure-lifecycle')
 class Lifecycle(BucketActionBase):
     """Action applies a lifecycle policy to versioned S3 buckets
+
     :example:
+
         .. code-block: yaml
+
             policies:
               - name: s3-apply-lifecycle
                 resource: s3
@@ -2228,15 +2231,24 @@ class Lifecycle(BucketActionBase):
     schema = type_schema(
         'configure-lifecycle',
         **{
-            'rules': {'type': 'array', 'required': True},
+            'rules': {
+                'type': 'array',
+                'required': True,
+                'items': {
+                    'type': 'object',
+                    'required': ['ID', 'Status'],
+                    'properties': {
+                        'ID': {'type': 'string'},
+                        'Status': {'type': 'string'},
+                    },
+                },
+            },
         }
     )
 
     permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
     def process(self, buckets):
-
-        # TODO - we should check for ID and Status here, or put it in the schema
 
         for bucket in buckets:
             s3 = bucket_client(local_session(self.manager.session_factory), bucket)
