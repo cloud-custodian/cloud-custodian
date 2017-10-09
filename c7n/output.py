@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import tempfile
 import os
 
 from boto3.s3.transfer import S3Transfer
-from c7n.utils import local_session, parse_s3
+from c7n.utils import local_session, parse_s3, get_retry
 from c7n.log import CloudWatchLogHandler
 
 DEFAULT_NAMESPACE = "CloudMaid"
@@ -42,6 +42,8 @@ class MetricsOutput(object):
     """
 
     permissions = ("cloudWatch:PutMetricData",)
+
+    retry = staticmethod(get_retry(('Throttling',)))
 
     @staticmethod
     def select(metrics_enabled):
@@ -81,7 +83,8 @@ class MetricsOutput(object):
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
-        return watch.put_metric_data(Namespace=ns, MetricData=metrics)
+        return self.retry(
+            watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
 
 class NullMetricsOutput(MetricsOutput):
@@ -185,7 +188,7 @@ class FSOutput(LogOutput):
             for f in files:
                 fp = os.path.join(root, f)
                 with gzip.open(fp + ".gz", "wb", compresslevel=7) as zfh:
-                    with open(fp) as sfh:
+                    with open(fp, "rb") as sfh:
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 

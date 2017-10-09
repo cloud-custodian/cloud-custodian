@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
@@ -51,7 +51,7 @@ filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('asg')
-class ASG(QueryResourceManager):
+class ASG(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -62,6 +62,8 @@ class ASG(QueryResourceManager):
         enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
         filter_name = 'AutoScalingGroupNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::AutoScalingGroup'
+
         default_report_fields = (
             'AutoScalingGroupName',
             'CreatedTime',
@@ -1256,7 +1258,10 @@ class Resume(Action):
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        ec2_client.start_instances(InstanceIds=instance_ids)
+
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.
@@ -1319,7 +1324,7 @@ class Delete(Action):
 
 
 @resources.register('launch-config')
-class LaunchConfig(QueryResourceManager):
+class LaunchConfig(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -1331,6 +1336,17 @@ class LaunchConfig(QueryResourceManager):
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::LaunchConfiguration'
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeLaunchConfig(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
         for r in resources:

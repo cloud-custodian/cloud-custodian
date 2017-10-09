@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +15,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
-from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
-
+from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
-
 log = logging.getLogger('custodian.cfn')
-
-filters = FilterRegistry('cfn.filters')
-actions = ActionRegistry('cfn.actions')
 
 
 @resources.register('cfn')
@@ -42,12 +36,10 @@ class CloudFormation(QueryResourceManager):
         name = 'StackName'
         date = 'CreationTime'
         dimension = None
-
-    action_registry = actions
-    filter_registry = filters
+        config_type = 'AWS::CloudFormation::Stack'
 
 
-@actions.register('delete')
+@CloudFormation.action_registry.register('delete')
 class Delete(BaseAction):
     """Action to delete cloudformation stacks
 

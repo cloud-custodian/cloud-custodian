@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import tempfile
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
+from c7n.query import ConfigSource
 
 from .common import BaseTest, Config, Bag
 
@@ -87,6 +88,58 @@ class PolicyPermissions(BaseTest):
                  'ec2:DescribeTags',
                  'cloudwatch:GetMetricStatistics')))
 
+    def xtest_resource_filter_name(self):
+        # resources without a filter name won't play nice in
+        # lambda policies
+        missing = []
+        marker = object
+        for k, v in manager.resources.items():
+            if getattr(v.resource_type, 'filter_name', marker) is marker:
+                missing.append(k)
+        if missing:
+            self.fail("Missing filter name %s" % (', '.join(missing)))
+
+    def test_resource_augment_universal_mask(self):
+        # universal tag had a potential bad patterm of masking
+        # resource augmentation, scan resources to ensure
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'universal_taggable', None):
+                continue
+            if v.augment.__name__ == 'universal_augment' and getattr(
+                    v.resource_type, 'detail_spec', None):
+                self.fail(
+                    "%s resource has universal augment masking resource augment" % k)
+
+    def test_resource_shadow_source_augment(self):
+        shadowed = []
+        bad = []
+        cfg = Config.empty()
+
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'config_type', None):
+                continue
+
+            p = Bag({'name': 'permcheck', 'resource': k})
+            ctx = self.get_context(config=cfg, policy=p)
+            mgr = v(ctx, p)
+
+            source = mgr.get_source('config')
+            if not isinstance(source, ConfigSource):
+                bad.append(k)
+
+            if v.__dict__.get('augment'):
+                shadowed.append(k)
+
+        if shadowed:
+            self.fail(
+                "%s have resource managers shadowing source augments" % (
+                    ", ".join(shadowed)))
+
+        if bad:
+            self.fail(
+                "%s have config types but no config source" % (
+                    ", ".join(bad)))
+
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')
         missing = []
@@ -128,12 +181,15 @@ class PolicyPermissions(BaseTest):
                          'capacity-delta', 'is-ssl', 'global-grants',
                          'missing-policy-statement', 'missing-statement',
                          'healthcheck-protocol-mismatch', 'image-age',
-                         'has-statement',
+                         'has-statement', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
+                qk = "%s.filters.%s" % (k, n)
+                if qk in ('route-table.filters.route',):
+                    continue
                 if not perms:
-                    missing.append("%s.filters.%s" % (
-                        k, n))
+                    missing.append(qk)
+
         if missing:
             self.fail("Missing permissions %d on \n\t%s" % (
                 len(missing),

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,25 @@ from c7n.resources.route53 import HostedZone
 
 
 class Route53HostedZoneTest(BaseTest):
+
+    def test_hostedzone_shield(self):
+        session_factory = self.replay_flight_data('test_zone_shield_enable')
+        p = self.load_policy({
+            'name': 'zone-activate',
+            'resource': 'hostedzone',
+            'filters': [
+                {'Config.PrivateZone': False},
+                {'Name': 'invitro.cloud.'},
+                {'type': 'shield-enabled', 'state': False}],
+            'actions': ['set-shield']},
+            session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
+        p = self.load_policy({
+            'name': 'zone-verify',
+            'resource': 'hostedzone',
+            'filters': [{'type': 'shield-enabled', 'state': True}]},
+            session_factory=session_factory)
+        self.assertEqual(p.run()[0]['Id'], "/hostedzone/XXXXURLYV5DGGG")
 
     def test_route53_hostedzone_tag(self):
         session_factory = self.replay_flight_data('test_route53_hostedzone_tag')

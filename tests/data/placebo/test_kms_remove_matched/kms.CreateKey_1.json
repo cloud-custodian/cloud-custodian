@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "Origin": "AWS_KMS", 
+            "KeyId": "78b73bc3-b72f-4051-8eb3-e83d82e63c69", 
+            "Description": "", 
+            "KeyManager": "CUSTOMER", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 13, 
+                "__class__": "datetime", 
+                "month": 9, 
+                "second": 57, 
+                "microsecond": 151000, 
+                "year": 2017, 
+                "day": 16, 
+                "minute": 13
+            }, 
+            "Arn": "arn:aws:kms:us-east-1:123456789012:key/78b73bc3-b72f-4051-8eb3-e83d82e63c69", 
+            "AWSAccountId": "123456789012"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6c79a2b4-9b02-11e7-9bd7-1f82ea56500f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6c79a2b4-9b02-11e7-9bd7-1f82ea56500f", 
+                "content-length": "335", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sat, 16 Sep 2017 17:13:57 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

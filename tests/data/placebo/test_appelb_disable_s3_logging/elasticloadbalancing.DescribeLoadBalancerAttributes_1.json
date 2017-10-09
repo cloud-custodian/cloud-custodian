@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": [
+            {
+                "Value": "false", 
+                "Key": "access_logs.s3.enabled"
+            }, 
+            {
+                "Value": "elbv2logtest", 
+                "Key": "access_logs.s3.bucket"
+            }, 
+            {
+                "Value": "gah5", 
+                "Key": "access_logs.s3.prefix"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8041da7d-5ab1-11e7-b054-31e8cab402c8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8041da7d-5ab1-11e7-b054-31e8cab402c8", 
+                "date": "Mon, 26 Jun 2017 20:53:26 GMT", 
+                "content-length": "887", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

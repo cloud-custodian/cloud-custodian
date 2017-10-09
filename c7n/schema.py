@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ def validate(data, schema=None):
         if dupes:
             return [ValueError(
                 "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)))]
+                    ", ".join(dupes))), dupes[0]]
         return []
     try:
         resp = specific_error(errors[0])

@@ -25,9 +25,9 @@
                 ], 
                 "IpPermissions": [], 
                 "GroupName": "db-tier", 
-                "VpcId": "vpc-fcaa6085", 
+                "VpcId": "vpc-6c63dd15", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-09053177"
+                "GroupId": "sg-37278946"
             }, 
             {
                 "IpPermissionsEgress": [
@@ -52,21 +52,21 @@
                 ], 
                 "IpPermissions": [], 
                 "GroupName": "web-tier", 
-                "VpcId": "vpc-fcaa6085", 
+                "VpcId": "vpc-6c63dd15", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-a81a2ed6"
+                "GroupId": "sg-c253fdb3"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "aa27da99-bf74-4c56-a527-c37f9fd35a7b", 
+            "RequestId": "5d0ddff6-a7df-404f-9a21-7d2adc01287a", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 30 May 2017 01:17:33 GMT"
+                "date": "Mon, 26 Jun 2017 18:46:20 GMT"
             }
         }
     }

@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "52c2174f-fa2e-11e6-8621-874c2142796d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "52c2174f-fa2e-11e6-8621-874c2142796d", 
+                "date": "Fri, 24 Feb 2017 01:12:34 GMT", 
+                "content-length": "353", 
+                "content-type": "application/json"
+            }
+        }, 
+        "FileSystems": [
+            {
+                "SizeInBytes": {
+                    "Value": 6144
+                }, 
+                "Name": "Hello World", 
+                "CreationToken": "console-3a10683e-25bc-41ed-ae8f-3aa0c07b9552", 
+                "CreationTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "FileSystemId": "fs-e6268aaf", 
+                "NumberOfMountTargets": 2, 
+                "LifeCycleState": "available", 
+                "OwnerId": "424107330309"
+            }
+        ]
+    }
+}

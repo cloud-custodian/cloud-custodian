@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,9 +77,10 @@ per-resource basis. Note that the name of the tag is configurable via the
 
 The value of the tag must be one of the following:
 
-- **(empty)** - An empty tag value implies night and weekend offhours using
-  the default time zone configured in the policy (tz=est if unspecified) and the
-  default onhour and offhour values configured in the policy.
+- **(empty)** or **on** - An empty tag value or a value of "on" implies night
+  and weekend offhours using the default time zone configured in the policy
+  (tz=est if unspecified) and the default onhour and offhour values configured
+  in the policy.
 - **off** - If offhours is configured to run in opt-out mode, this tag can be
   specified to disable offhours on a given instance. If offhours is configured
   to run in opt-in mode, this tag will have no effect (the resource will still
@@ -186,6 +187,20 @@ As a result of this, if custodian stops an instance or suspends an ASG and you
 need to start/resume it, you can safely do so manually and custodian won't touch
 it again until the next day.
 
+ElasticBeanstalk, EFS and Other Services with Tag Value Restrictions
+====================================================================
+
+A number of AWS services have restrictions on the characters that can be used
+in tag values, such as `ElasticBeanstalk <http://docs.aws.amazon.com/elasticbean
+stalk/latest/dg/using-features.tagging.html>`_ and `EFS <http://docs.aws.amazon.
+com/efs/latest/ug/API_Tag.html>`_. In particular, these services do not allow
+parenthesis, square brackets, commas, or semicolons, or empty tag values. This
+proves to be problematic with the tag-based schedule configuration described
+above. The best current workaround is to define a separate policy with a unique
+``tag`` name for each unique schedule that you want to use, and then tag
+resources with that tag name and a value of ``on``. Note that this can only be
+used in opt-in mode, not opt-out.
+
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -233,6 +248,8 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',
@@ -346,20 +363,17 @@ class Time(Filter):
                 schedule = self.default_schedule
         else:
             schedule = None
-
         if schedule is None:
             log.warning(
                 "Invalid schedule on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
-
         tz = self.get_tz(schedule['tz'])
         if not tz:
             log.warning(
                 "Could not resolve tz on resource:%s value:%s", rid, value)
             self.parse_errors.append((rid, value))
             return False
-
         now = datetime.datetime.now(tz).replace(
             minute=0, second=0, microsecond=0)
         return self.match(now, schedule)
@@ -413,9 +427,9 @@ class OffHour(Time):
         if self.weekends_only:
             default[self.time_type][0]['days'] = [4]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -436,9 +450,9 @@ class OnHour(Time):
             # turn on monday
             default[self.time_type][0]['days'] = [0]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -590,5 +604,5 @@ class ScheduleParser(object):
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1] + 1)
-        return range(min(day_range), max(day_range) + 1)
+            return list(range(day_range[0], 7)) + list(range(day_range[1] + 1))
+        return list(range(min(day_range), max(day_range) + 1))

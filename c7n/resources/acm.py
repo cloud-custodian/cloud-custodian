@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,3 +31,4 @@ class Certificate(QueryResourceManager):
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
+        filter_name = None

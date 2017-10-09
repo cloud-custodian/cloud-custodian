@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ class DataPipeline(QueryResourceManager):
         date = None
         dimension = 'name'
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
+        filter_name = None
 
     def augment(self, resources):
         filter(None, _datapipeline_info(

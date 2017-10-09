@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,18 @@
 #
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
+
+
+LOADED = False
+
 
 def load_resources():
+
+    global LOADED
+    if LOADED:
+        return
+
     import c7n.resources.account
     import c7n.resources.acm
     import c7n.resources.ami
@@ -75,6 +85,9 @@ def load_resources():
     import c7n.resources.waf
 
     # Load external plugins (private sdks etc)
+    print("load resources")
     from c7n.manager import resources
     resources.load_plugins()
     resources.notify(resources.EVENT_FINAL)
+
+    LOADED = True

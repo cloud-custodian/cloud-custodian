@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 5
+                }, 
+                "Name": "c7n-fire-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 49
+                }, 
+                "Name": "custodian-log-archive"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "mLcLoopOahOFnnUqkbEG/aFg9I3qJo9jRMSxRlqsHSORRLWGzYwyBdzzrNCSjnPjKsCAG/+1Glk=", 
+            "RequestId": "8D71FCE69DE25B02", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "mLcLoopOahOFnnUqkbEG/aFg9I3qJo9jRMSxRlqsHSORRLWGzYwyBdzzrNCSjnPjKsCAG/+1Glk=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "8D71FCE69DE25B02", 
+                "date": "Mon, 02 Oct 2017 10:05:16 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

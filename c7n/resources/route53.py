@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ import functools
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
-from c7n.tags import (
-    TagActionFilter, UniversalTag, UniversalUntag, UniversalTagDelayedAction)
 from c7n.utils import chunks, get_retry, generate_arn, local_session
+
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
 class Route53Base(object):
@@ -37,6 +37,9 @@ class Route53Base(object):
                 self.get_model().service,
                 resource_type=self.get_model().type)
         return self._generate_arn
+
+    def get_arn(self, r):
+        return self.generate_arn(r[self.get_model().id].split("/")[-1])
 
     def augment(self, resources):
         _describe_route53_tags(
@@ -95,6 +98,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         name = 'Name'
         date = None
         dimension = None
+        universal_taggable = True
 
     def get_arns(self, resource_set):
         arns = []
@@ -104,11 +108,9 @@ class HostedZone(Route53Base, QueryResourceManager):
         return arns
 
 
-@resources.register('healthcheck')
-class HealthCheck(Route53Base, QueryResourceManager):
+HostedZone.filter_registry.register('shield-enabled', IsShieldProtected)
+HostedZone.action_registry.register('set-shield', SetShieldProtection)
 
-    filter_registry = FilterRegistry('healthcheck.filters')
-    filter_registry.register('marked-for-op', TagActionFilter)
 
     action_registry = ActionRegistry('healthcheck.actions')
     action_registry.register('mark', UniversalTag)
@@ -126,14 +128,16 @@ class HealthCheck(Route53Base, QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
+        universal_taggable = True
 
 
 @resources.register('rrset')
-class ResourceRecordSet(QueryResourceManager):
+class ResourceRecordSet(ChildResourceManager):
 
     class resource_type(object):
         service = 'route53'
         type = 'rrset'
+        parent_spec = ('hostedzone', 'HostedZoneId')
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         filter_name = None

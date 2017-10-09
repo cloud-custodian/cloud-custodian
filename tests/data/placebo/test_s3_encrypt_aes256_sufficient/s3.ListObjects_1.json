@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-encrypt-sufficient-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ghaHAfn081CgmWcD8QICRJZI1mAMHTTRQ1XFHyrjCwNvNwLHbYJsCp6/ScT9mGL8kwwXQ79CyXo=", 
+            "RequestId": "BA4F0112EF83536B", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "ghaHAfn081CgmWcD8QICRJZI1mAMHTTRQ1XFHyrjCwNvNwLHbYJsCp6/ScT9mGL8kwwXQ79CyXo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "BA4F0112EF83536B", 
+                "date": "Wed, 20 Sep 2017 09:04:00 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 3
+                }, 
+                "ETag": "\"d41d8cd98f00b204e9800998ecf8427e\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "testing-123", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Size": 0
+            }, 
+            {
+                "LastModified": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 3
+                }, 
+                "ETag": "\"338dabb292d2616c3c2236dd08aba77a\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "testing-abc", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Size": 0
+            }
+        ]
+    }
+}

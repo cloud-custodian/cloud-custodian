@@ -13,5 +13,5 @@ MarkupSafe==1.0
 python-dateutil>=2.5.2
 ldap3
 PyYAML>=3.11
-six==1.10.0
+six==1.11.0
 redis

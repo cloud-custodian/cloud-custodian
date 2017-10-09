@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SizeInBytes": 0, 
+        "VaultARN": "arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-matched", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "uxvJGTnuLUkZZ-_LTokmXh2nm9yijHrA342Oeoe9YyuvJ7M", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "uxvJGTnuLUkZZ-_LTokmXh2nm9yijHrA342Oeoe9YyuvJ7M", 
+                "date": "Sat, 16 Sep 2017 19:28:15 GMT", 
+                "content-length": "234", 
+                "content-type": "application/json"
+            }
+        }, 
+        "NumberOfArchives": 0, 
+        "CreationDate": "2017-09-16T19:28:15.878Z", 
+        "VaultName": "test-glacier-remove-matched"
+    }
+}
