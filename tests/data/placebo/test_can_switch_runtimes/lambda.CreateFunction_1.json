@@ -2,12 +2,12 @@
     "status_code": 201,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "dfbe3b78-acdf-11e7-a73f-25dcdbe5950c",
+            "RequestId": "0ad37ac9-ace1-11e7-9461-3578f4902886",
             "HTTPStatusCode": 201,
             "HTTPHeaders": {
                 "content-type": "application/json",
-                "date": "Mon, 09 Oct 2017 10:51:59 GMT",
-                "x-amzn-requestid": "dfbe3b78-acdf-11e7-a73f-25dcdbe5950c",
+                "date": "Mon, 09 Oct 2017 11:00:20 GMT",
+                "x-amzn-requestid": "0ad37ac9-ace1-11e7-9461-3578f4902886",
                 "content-length": "527",
                 "connection": "keep-alive"
             },
@@ -22,9 +22,9 @@
         "Description": "test",
         "Timeout": 3,
         "MemorySize": 128,
-        "LastModified": "2017-10-09T10:51:58.988+0000",
+        "LastModified": "2017-10-09T11:00:20.771+0000",
         "CodeSha256": "ew9B4mPOBIrnVUHiOtpiLdOzD9Af661xI2dXo8PkuqY=",
-        "Version": "16",
+        "Version": "17",
         "TracingConfig": {
             "Mode": "PassThrough"
         }

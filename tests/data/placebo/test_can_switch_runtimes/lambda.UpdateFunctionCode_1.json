@@ -2,19 +2,19 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "dfeb8d00-acdf-11e7-8444-438990db7407",
+            "RequestId": "0afb9c03-ace1-11e7-bf7c-2553b9c15b73",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "application/json",
-                "date": "Mon, 09 Oct 2017 10:51:58 GMT",
-                "x-amzn-requestid": "dfeb8d00-acdf-11e7-8444-438990db7407",
+                "date": "Mon, 09 Oct 2017 11:00:21 GMT",
+                "x-amzn-requestid": "0afb9c03-ace1-11e7-bf7c-2553b9c15b73",
                 "content-length": "530",
                 "connection": "keep-alive"
             },
             "RetryAttempts": 0
         },
         "FunctionName": "test-foo-bar",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar:16",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar:17",
         "Runtime": "python2.7",
         "Role": "arn:aws:iam::644160558196:role/custodian-mu",
         "Handler": "index.handler",
@@ -22,9 +22,9 @@
         "Description": "test",
         "Timeout": 3,
         "MemorySize": 128,
-        "LastModified": "2017-10-09T10:51:58.988+0000",
+        "LastModified": "2017-10-09T11:00:20.771+0000",
         "CodeSha256": "ew9B4mPOBIrnVUHiOtpiLdOzD9Af661xI2dXo8PkuqY=",
-        "Version": "16",
+        "Version": "17",
         "TracingConfig": {
             "Mode": "PassThrough"
         }

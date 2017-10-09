@@ -348,7 +348,6 @@ class LambdaManager(object):
 
             new_config = func.get_config()
             new_config['Role'] = role
-            del new_config['Runtime']
             new_tags = new_config.pop('Tags', {})
 
             if self.delta_function(old_config, new_config):
