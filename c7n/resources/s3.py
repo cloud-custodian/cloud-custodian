@@ -2209,6 +2209,8 @@ class DeleteBucket(ScanBucket):
 class Lifecycle(BucketActionBase):
     """Action applies a lifecycle policy to versioned S3 buckets
 
+    The schema to supply to the rule follows the schema here: goo.gl/yULzNc
+
     :example:
 
         .. code-block: yaml

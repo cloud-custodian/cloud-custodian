@@ -1818,7 +1818,7 @@ class S3LifecycleTest(BaseTest):
     def test_lifecycle(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.record_flight_data('test_s3_lifecycle')
+        session_factory = self.replay_flight_data('test_s3_lifecycle')
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-lifecycle-test'
@@ -1859,7 +1859,7 @@ class S3LifecycleTest(BaseTest):
 
         # Note: when recording this test, I needed to add a delay here or else
         # the lifecycle was not found.
-        time.sleep(5)
+        #time.sleep(5)
 
         # Verify the lifecycle
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
@@ -1879,7 +1879,7 @@ class S3LifecycleTest(BaseTest):
 
         # Note: when recording this test, I needed to add a delay here or else
         # the lifecycle was not found.
-        time.sleep(5)
+        #time.sleep(5)
 
         # Verify the lifecycle
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
@@ -1899,7 +1899,7 @@ class S3LifecycleTest(BaseTest):
 
         # Note: when recording this test, I needed to add a delay here or else
         # the lifecycle was not found.
-        time.sleep(5)
+        #time.sleep(5)
 
         # Verify the lifecycle
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
