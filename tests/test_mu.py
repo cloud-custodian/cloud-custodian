@@ -28,12 +28,46 @@ import unittest
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaManager, PolicyLambda, PythonPackageArchive,
+    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda, PythonPackageArchive,
     CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from .common import BaseTest, Config, event_data
 from .data import helloworld
+
+
+ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+class Publish(BaseTest):
+
+    def make_func(self, **kw):
+        func_data = dict(
+            name='test-foo-bar',
+            handler='index.handler',
+            memory_size=128,
+            timeout=3,
+            role=ROLE,
+            runtime='python2.7',
+            description='test')
+        func_data.update(kw)
+
+        archive = PythonPackageArchive()
+        archive.add_contents('index.py',
+            '''def handler(*a, **kw):\n    print("Greetings, program!")''')
+        archive.close()
+        self.addCleanup(archive.remove)
+
+        return LambdaFunction(func_data, archive)
+
+
+    def test_publishes_a_lambda(self):
+        session_factory = self.replay_flight_data('test_publishes_a_lambda')
+        mgr = LambdaManager(session_factory)
+        func = self.make_func()
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result['CodeSize'], 169)
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -53,7 +87,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assertEqual(result['FunctionName'], 'custodian-sg-modified')
         self.addCleanup(mgr.remove, pl)
 
@@ -85,7 +119,7 @@ class PolicyLambdaProvision(BaseTest):
         params = dict(
             session_factory=session_factory,
             name="c7n-log-sub",
-            role=self.role,
+            role=ROLE,
             sns_topic="arn:",
             log_groups=[linfo])
 
@@ -161,7 +195,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.addCleanup(mgr.remove, pl)
 
         p = Policy({
@@ -183,7 +217,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
 
         output = self.capture_logging('custodian.lambda', level=logging.DEBUG)
-        result2 = mgr.publish(PolicyLambda(p), 'Dev', role=self.role)
+        result2 = mgr.publish(PolicyLambda(p), 'Dev', role=ROLE)
 
         lines = output.getvalue().strip().split('\n')
         self.assertTrue(
@@ -216,7 +250,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
 
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
@@ -269,7 +303,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'Description': 'cloud-custodian lambda policy',
@@ -305,7 +339,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'FunctionName': 'custodian-asg-spin-detector',
@@ -341,7 +375,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'FunctionName': 'custodian-periodic-ec2-checker',
