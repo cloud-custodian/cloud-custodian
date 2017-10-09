@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "dfe683ce-acdf-11e7-b781-43c38e193fc0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Mon, 09 Oct 2017 10:51:58 GMT",
+                "x-amzn-requestid": "dfe683ce-acdf-11e7-b781-43c38e193fc0",
+                "content-length": "1709",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "Configuration": {
+            "FunctionName": "test-foo-bar",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "index.handler",
+            "CodeSize": 169,
+            "Description": "test",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2017-10-09T10:51:58.988+0000",
+            "CodeSha256": "ew9B4mPOBIrnVUHiOtpiLdOzD9Af661xI2dXo8PkuqY=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.amazonaws.com/snapshots/644160558196/test-foo-bar-1612f96e-9942-4f72-a50a-d25d8c9b1fd9?X-Amz-Security-Token=FQoDYXdzEKP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDObeF1QgGhFpfjQ%2BNiK3A4XID4Ome15VvdiRxQPkxM2BFVq813qtpu%2BvuPtBT1YAhrNqxiwwPyWMrbT7qoSN0qfjFYeY7mAuythHkTMU0e8ZbGHJ3aKAGjDHhdihC6v6AmD9m4h3HdwIRtnB%2B%2FWRxeZSLxoDqfL8oNuDpEVuBVAZfnDlzMti2uXT6RVrl3rzBQJfYAIzCJBtdaew4MfPzAMvTDkzn8%2BzJmojq9Hwovfj92%2Fr4ix1g%2FpnbpDfi6SVog7NSi4%2BCbq%2FjURr9FmYMeEsG7YjxHWgTGY8a3zcN%2F6cm36IosrlvBh4h%2FNOjLkuOoNp8TkCfx5Qf%2F9RrC4GwpXgrY6S8xak6P5PuV4Vhe0pKelupZ0bA1Mh8xXcuR9p%2BixnPjGFFnlfwQ8WwDFFhvjio%2FSeaReC%2FOsTUtirkJqjvOuXymKl%2FX3EP9IDoTeAfn%2BZlxT8zDOCkNPZo2yseZvhHH7BDe7uaLPQ9crvPcds5UHSlgACiLx9Ysjo5lJJzOM2SiL4JKqZkOVsqllsYBm5gPBU8w06WIVSd2dckNpHYp3DJ7%2B3YOuGmv9rUkXTOjQb2thl4Fpu7vWYhOfE23lpf5EgTwso6ontzgU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20171009T105159Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAID4OFUACHKLFAOLQ%2F20171009%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d966f498bd7634e0b01498589268485d5c02638796e0d7087584034d7774423f"
+        }
+    }
+}

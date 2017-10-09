@@ -69,6 +69,18 @@ class Publish(BaseTest):
         result = mgr.publish(func)
         self.assertEqual(result['CodeSize'], 169)
 
+    def test_can_switch_runtimes(self):
+        session_factory = self.replay_flight_data('test_can_switch_runtimes')
+        func = self.make_func()
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result['Runtime'], 'python2.7')
+
+        func.func_data['runtime'] = 'python3.6'
+        result = mgr.publish(func)
+        self.assertEqual(result['Runtime'], 'python3.6')
+
 
 class PolicyLambdaProvision(BaseTest):
 

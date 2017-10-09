@@ -1,0 +1,32 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "dfbe3b78-acdf-11e7-a73f-25dcdbe5950c",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Mon, 09 Oct 2017 10:51:59 GMT",
+                "x-amzn-requestid": "dfbe3b78-acdf-11e7-a73f-25dcdbe5950c",
+                "content-length": "527",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "FunctionName": "test-foo-bar",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+        "Runtime": "python2.7",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "index.handler",
+        "CodeSize": 169,
+        "Description": "test",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2017-10-09T10:51:58.988+0000",
+        "CodeSha256": "ew9B4mPOBIrnVUHiOtpiLdOzD9Af661xI2dXo8PkuqY=",
+        "Version": "16",
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        }
+    }
+}
