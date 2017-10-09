@@ -37,7 +37,6 @@ log = logging.getLogger('custodian.redshift')
 
 filters = FilterRegistry('redshift.filters')
 actions = ActionRegistry('redshift.actions')
-
 filters.register('marked-for-op', tags.TagActionFilter)
 
 
