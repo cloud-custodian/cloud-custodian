@@ -688,10 +688,10 @@ class Resize(Action):
 
     schema = type_schema(
         'resize',
-        # min_size={'type': 'string'},
-        # max_size={'type': 'string'},
+        min_size={'type': 'string'},
+        max_size={'type': 'string'},
         desired_size={'type': 'string'},
-        required=('desired_size',))
+        required=())
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
     def validate(self):
@@ -704,19 +704,37 @@ class Resize(Action):
         client = local_session(self.manager.session_factory).client(
             'autoscaling')
         for a in asgs:
+            update = {}
             current_size = len(a['Instances'])
-            min_size = a['MinSize']
-            if self.data['desired_size'] is 'current':
-                desired = min((current_size, a['DesiredCapacity']))
+
+            if 'min_size' in self.data:
+                update['MinSize'] = int(self.data['min_size'])
+
+            if 'max_size' in self.data:
+                update['MaxSize'] = int(self.data['max_size'])
+
+            if 'desired_size' in self.data:
+                if self.data['desired_size'] is 'current':
+                    update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
+                    if 'MinSize' not in update:
+                        # unless we got a specific new value for min_size then
+                        # ensure it is at least as low as current_size
+                        update['MinSize'] = min(current_size, a['MinSize'])
+                else:
+                    update['DesiredCapacity'] = int(self.data['desired_size'])
+
+            if update:
+                log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
+                    % (a['AutoScalingGroupName'], current_size, a['MinSize'],
+                    a['MaxSize'], a['DesiredCapacity']))
+                log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
+                    str(update)))
+                self.manager.retry(
+                    client.update_auto_scaling_group,
+                    AutoScalingGroupName=a['AutoScalingGroupName'],
+                    **update)
             else:
-                desired = int(self.data['desired_size'])
-            log.debug('desired %d to %s, min %d to %d',
-                      desired, current_size, min_size, current_size)
-            self.manager.retry(
-                client.update_auto_scaling_group,
-                AutoScalingGroupName=a['AutoScalingGroupName'],
-                DesiredCapacity=desired,
-                MinSize=min((current_size, min_size)))
+                log.debug('nothing to resize')
 
 
 @actions.register('remove-tag')
