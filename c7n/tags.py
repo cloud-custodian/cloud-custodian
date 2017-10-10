@@ -534,7 +534,7 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
+        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
