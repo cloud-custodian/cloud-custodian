@@ -17,8 +17,8 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import ActionRegistry, RemovePolicyBase
-from c7n.filters import CrossAccountAccessFilter, FilterRegistry
+from c7n.actions import RemovePolicyBase
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import get_retry, local_session
@@ -26,17 +26,6 @@ from c7n.utils import get_retry, local_session
 
 @resources.register('glacier')
 class Glacier(QueryResourceManager):
-
-    filter_registry = FilterRegistry('glacier.filters')
-    filter_registry.register('marked-for-op', TagActionFilter)
-
-    action_registry = ActionRegistry('glacier.actions')
-    action_registry.register('mark', UniversalTag)
-    action_registry.register('tag', UniversalTag)
-    action_registry.register('mark-for-op', UniversalTagDelayedAction)
-    action_registry.register('remove-tag', UniversalUntag)
-    action_registry.register('unmark', UniversalUntag)
-    action_registry.register('untag', UniversalUntag)
 
     permissions = ('glacier:ListTagsForVault',)
     retry = staticmethod(get_retry(('Throttled',)))

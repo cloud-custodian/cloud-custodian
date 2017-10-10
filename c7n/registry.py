@@ -63,16 +63,16 @@ class PluginRegistry(object):
     def register(self, name, klass=None):
         # invoked as function
         if klass:
-            self.notify(self.EVENT_REGISTER, name)
             klass.type = name
             self._factories[name] = klass
+            self.notify(self.EVENT_REGISTER, klass)
             return klass
 
         # invoked as class decorator
         def _register_class(klass):
-            self.notify(self.EVENT_REGISTER, name)
             self._factories[name] = klass
             klass.type = name
+            self.notify(self.EVENT_REGISTER, klass)
             return klass
         return _register_class
 

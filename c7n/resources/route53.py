@@ -15,8 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from c7n.actions import ActionRegistry
-from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session
@@ -77,17 +75,6 @@ def _describe_route53_tags(
 @resources.register('hostedzone')
 class HostedZone(Route53Base, QueryResourceManager):
 
-    filter_registry = FilterRegistry('hostedzone.filters')
-    filter_registry.register('marked-for-op', TagActionFilter)
-
-    action_registry = ActionRegistry('hostedzone.actions')
-    action_registry.register('mark', UniversalTag)
-    action_registry.register('tag', UniversalTag)
-    action_registry.register('mark-for-op', UniversalTagDelayedAction)
-    action_registry.register('remove-tag', UniversalUntag)
-    action_registry.register('unmark', UniversalUntag)
-    action_registry.register('untag', UniversalUntag)
-
     class resource_type(object):
         service = 'route53'
         type = 'hostedzone'
@@ -112,13 +99,8 @@ HostedZone.filter_registry.register('shield-enabled', IsShieldProtected)
 HostedZone.action_registry.register('set-shield', SetShieldProtection)
 
 
-    action_registry = ActionRegistry('healthcheck.actions')
-    action_registry.register('mark', UniversalTag)
-    action_registry.register('tag', UniversalTag)
-    action_registry.register('mark-for-op', UniversalTagDelayedAction)
-    action_registry.register('remove-tag', UniversalUntag)
-    action_registry.register('unmark', UniversalUntag)
-    action_registry.register('untag', UniversalUntag)
+@resources.register('healthcheck')
+class HealthCheck(Route53Base, QueryResourceManager):
 
     class resource_type(object):
         service = 'route53'

@@ -16,17 +16,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from c7n import cache
-from c7n.actions import AutoTagUser
+from c7n.actions import add_auto_tag_user
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.utils import dumps
-
-
-def add_auto_tag_user(registry, _):
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
-            klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
 resources = PluginRegistry('resources')

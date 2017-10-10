@@ -659,6 +659,13 @@ class AutoTagUser(EventAction):
         return new_tags
 
 
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
+         klass = registry.get(resource)
+         if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
+             klass.action_registry.register('auto-tag-user', AutoTagUser)
+
+
 class PutMetric(BaseAction):
     """Action to put metrics based on an expression into CloudWatch metrics
 
