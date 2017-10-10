@@ -85,7 +85,6 @@ def load_resources():
     import c7n.resources.waf
 
     # Load external plugins (private sdks etc)
-    print("load resources")
     from c7n.manager import resources
     resources.load_plugins()
 
