@@ -184,7 +184,7 @@ def validate(options):
                     p.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
-                        p.get('name', 'unknown'), e)
+                        p.data.get('name', 'unknown'), e)
                     errors.append(msg)
         if not errors:
             log.info("Configuration valid: {}".format(config_file))
