@@ -2256,7 +2256,7 @@ class Lifecycle(BucketActionBase):
             resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket)
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
-                resp = {}
+                resp = {'Rules': []}
             else:
                 raise
 
@@ -2267,23 +2267,18 @@ class Lifecycle(BucketActionBase):
         for bucket in buckets:
             s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
-            # put_bucket_lifecycle_configuration replaces any existing lifecycle
-            # with the supplied one.  So we need to fetch the existing one and
-            # merge the new one in appropriately.
+            # Fetch the existing lifecycle and merge in any new rules appropriately.
             resp = self.get_lifecycle_configuration(s3, bucket['Name'])
-            if 'Rules' not in resp:
-                config = self.data['rules']
-            else:
-                config = resp['Rules']
-                for rule in self.data['rules']:
-                    for index, existing_rule in enumerate(config):
-                        # If a matching lifecycle is found then replace it
-                        if rule['ID'] == existing_rule['ID']:
-                            config[index] = rule
-                            break
-                    else:
-                        # If no match is found, add to existing ones
-                        config.append(rule)
+            config = resp['Rules']
+            for rule in self.data['rules']:
+                for index, existing_rule in enumerate(config):
+                    # If a matching lifecycle is found then replace it
+                    if rule['ID'] == existing_rule['ID']:
+                        config[index] = rule
+                        break
+                else:
+                    # If no match is found, add to existing ones
+                    config.append(rule)
 
             s3.put_bucket_lifecycle_configuration(
                 Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
