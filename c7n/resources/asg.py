@@ -1324,6 +1324,134 @@ class Delete(Action):
             raise
 
 
+@actions.register('terminate')
+class Terminate(Action):
+    """Terminate all instances in an ASG by setting size to zero
+
+    Previous values for min/max/desired can be saved in a tag and used by
+    asg.actions.restore
+
+    :example:
+
+        .. code-block: yaml
+            # here we are using asg.actions.terminate for an off-hours policy
+            policies:
+              - name: offhours-asg-terminate
+                resource: asg
+                filters:
+                  - type: offhour
+                    offhour: 19
+                    default_tz: bst
+                actions:
+                  - type: terminate
+                    tag: OffHoursPrevious
+    """
+    schema = type_schema('terminate', tag={'type': 'string'})
+    permissions = (
+        "autoscaling:UpdateAutoScalingGroup",
+        "autoscaling:CreateOrUpdateTags",
+    )
+    asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
+
+    def process(self, asgs):
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_asg, asgs))
+
+    def process_asg(self, asg):
+        session = local_session(self.manager.session_factory)
+        asg_client = session.client('autoscaling')
+
+        log.debug('terminating instances in ASG %s' % (asg['AutoScalingGroupName']))
+
+        if 'tag' in self.data:
+            # optionally store current ASG parameters in a tag
+            # example value: MinSize=4;MaxSize=12;DesiredCapacity=6
+            self.manager.retry(asg_client.create_or_update_tags, Tags=[dict(
+                Key=self.data['tag'],
+                Value=';'.join({'%s=%d' % (p, asg[p]) for p in self.asg_params}),
+                ResourceType='auto-scaling-group',
+                ResourceId=asg['AutoScalingGroupName'],
+                PropagateAtLaunch=False,
+            )])
+
+        # set min/desired to zero, thereby terminating all instances in the ASG
+        self.manager.retry(
+            asg_client.update_auto_scaling_group,
+            AutoScalingGroupName=asg['AutoScalingGroupName'],
+            MinSize=0, DesiredCapacity=0)
+
+
+@actions.register('restore')
+class Restore(Action):
+    """Restore ASG size parameters to those saved previously in a tag by terminate
+
+    The inverse of asg.actions.terminate
+
+    :example:
+
+        .. code-block: yaml
+            # here we are using asg.actions.restore for an off-hours policy
+            policies:
+              - name: offhours-asg-restore
+                resource: asg
+                filters:
+                  - type: onhour
+                    onhour: 8
+                    default_tz: bst
+                actions:
+                  - type: restore
+                    tag: OffHoursPrevious
+    """
+    schema = type_schema('restore', tag={'type': 'string'}, required=['tag'])
+    permissions = (
+        "autoscaling:UpdateAutoScalingGroup",
+        "autoscaling:DeleteTags",
+    )
+    asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
+
+    def process(self, asgs):
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_asg, asgs))
+
+    def process_asg(self, asg):
+        session = local_session(self.manager.session_factory)
+        asg_client = session.client('autoscaling')
+        tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])}
+
+        if self.data['tag'] not in tag_map:
+            log.debug('failed to restore ASG %s: no tag "%s"' %
+                (asg['AutoScalingGroupName'], self.data['tag']))
+            return
+
+        # parse tag value to prepare ASG update parameters
+        update = {}
+        for field in tag_map[self.data['tag']].split(';'):
+            if '=' in field:
+                (param, value) = field.split('=')
+                if param in self.asg_params:
+                    update[param] = int(value)
+
+        if update:
+            # restore ASG size
+            log.debug('restoring ASG %s with %s' %
+                (asg['AutoScalingGroupName'], str(update)))
+            self.manager.retry(
+                asg_client.update_auto_scaling_group,
+                AutoScalingGroupName=asg['AutoScalingGroupName'],
+                **update)
+        else:
+            # no valid fields found to update, something went wrong
+            log.debug('failed to restore ASG %s: no params found in tag "%s"' %
+                (asg['AutoScalingGroupName'], self.data['tag']))
+
+        # remove tag
+        self.manager.retry(asg_client.delete_tags, Tags=[dict(
+            Key=self.data['tag'],
+            ResourceType='auto-scaling-group',
+            ResourceId=asg['AutoScalingGroupName'],
+        )])
+
+
 @resources.register('launch-config')
 class LaunchConfig(query.QueryResourceManager):
 
