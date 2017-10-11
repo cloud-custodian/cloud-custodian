@@ -273,7 +273,8 @@ class PillTest(unittest.TestCase):
 
     def replay_flight_data(self, test_case, zdata=False):
         if os.environ.get('C7N_FUNCTIONAL') == 'yes':
-            return lambda region=None, assume=None: boto3.Session(region_name=region)
+            return lambda region=None, assume=None: boto3.Session(
+                region_name=region)
 
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)

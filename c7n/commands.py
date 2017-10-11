@@ -167,7 +167,8 @@ def validate(options):
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         errors += schema.validate(data, schm)
-        conf_policy_names = {p['name'] for p in data.get('policies', ())}
+        conf_policy_names = {
+            p.get('name', 'unknown') for p in data.get('policies', ())}
         dupes = conf_policy_names.intersection(used_policy_names)
         if len(dupes) >= 1:
             errors.append(ValueError(
@@ -180,8 +181,8 @@ def validate(options):
             null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
                 try:
-                    p = Policy(p, null_config, Bag())
-                    p.validate()
+                    policy = Policy(p, null_config, Bag())
+                    policy.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)

@@ -21,7 +21,7 @@ log = logging.getLogger('salactus.acl')
 
 
 class Groups(object):
-    
+
     AllUsers = "http://acs.amazonaws.com/groups/global/AllUsers"
     AuthenticatedUsers = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
     LogDelivery = 'http://acs.amazonaws.com/groups/s3/LogDelivery'
@@ -52,10 +52,10 @@ class ObjectAclCheck(object):
             return False
         if self.data.get('report-only'):
             return {'key': key['Key'], 'grants': grants}
-        
+
         self.remove_grants(client, bucket_name, key, acl, grants)
         return {'key': key['Key'], 'grants': grants}
-        
+
     def process_version(self, client, bucket_name, key):
         acl = client.get_object_acl(
             Bucket=bucket_name, Key=key['Key'], VersionId=key['VersionId'])
@@ -64,11 +64,18 @@ class ObjectAclCheck(object):
 
         if not grants:
             return False
+
+        result = {
+            'key': key['Key'],
+            'version': key['VersionId'],
+            'is_latest': key['IsLatest'],
+            'grants': grants
+        }
         if self.data.get('report-only'):
-            return {'key': key['Key'], 'version': key['VersionId'], 'grants': grants}
+            return result
 
         self.remove_grants(client, bucket_name, key, acl, grants)
-        return {'key': key['Key'], 'version': key['VersionId'], 'grants': grants}
+        return result
 
     def record_users(self, acl):
         users = {}
@@ -93,7 +100,7 @@ class ObjectAclCheck(object):
                 found.append(grant)
             elif 'ID' in grantee:
                 if '*' in self.whitelist_accounts:
-                   continue
+                    continue
                 if grantee['ID'] not in self.whitelist_accounts:
                     found.append(grant)
             else:
@@ -109,8 +116,3 @@ class ObjectAclCheck(object):
             acl['Grants'].remove(g)
         params['AccessControlPolicy'] = acl
         client.put_object_acl(**params)
-
-
-
-
-    

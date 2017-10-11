@@ -553,6 +553,60 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
 
 
+@filters.register('image')
+class ImageFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter asg by image
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-image-tag
+                resource: asg
+                filters:
+                  - type: image
+                    value: "tag:ImageTag"
+                    key: "TagValue"
+                    op: eq
+    """
+    permissions = (
+        "ec2:DescribeImages",
+        "autoscaling:DescribeLaunchConfigurations")
+
+    schema = type_schema('image', rinherit=ValueFilter.schema)
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(ImageFilter, self).process(asgs, event)
+
+    def initialize(self, asgs):
+        super(ImageFilter, self).initialize(asgs)
+        image_ids = set()
+        for cfg in self.configs.values():
+            image_ids.add(cfg['ImageId'])
+        results = self.manager.get_resource_manager('ami').resources()
+        base_image_map = {i['ImageId']: i for i in results}
+        resources = {i: base_image_map[i] for i in image_ids if i in base_image_map}
+        missing = list(set(image_ids) - set(resources.keys()))
+        if missing:
+            loaded = self.manager.get_resource_manager('ami').get_resources(missing, False)
+            resources.update({image['ImageId']: image for image in loaded})
+        self.images = resources
+
+    def __call__(self, i):
+        cfg = self.configs[i['LaunchConfigurationName']]
+        image = self.images.get(cfg['ImageId'], {})
+        # Finally, if we have no image...
+        if not image:
+            self.log.warning(
+                "Could not locate image for instance:%s ami:%s" % (
+                    i['InstanceId'], i["ImageId"]))
+            # Match instead on empty skeleton?
+            return False
+        return self.match(image)
+
+
 @filters.register('vpc-id')
 class VpcIdFilter(ValueFilter):
     """Filters ASG based on the VpcId
