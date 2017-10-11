@@ -22,7 +22,7 @@ class ElasticFileSystem(BaseTest):
 
     @functional
     def test_resource_manager(self):
-        factory = self.replay_flight_data('test_efs_query')
+        factory = self.get_session_factory('test_efs_query')
         client = factory().client('efs')
         token = str(uuid.uuid4())
         fs_id = client.create_file_system(
@@ -43,7 +43,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(resources[0]['Tags'], tags)
 
     def test_mount_target_loading(self):
-        factory = self.replay_flight_data('test_efs_subresource')
+        factory = self.get_session_factory('test_efs_subresource')
         p = self.load_policy({
             'name': 'test-mount-targets',
             'resource': 'efs-mount-target',
@@ -52,7 +52,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_delete(self):
-        factory = self.replay_flight_data('test_efs_delete')
+        factory = self.get_session_factory('test_efs_delete')
         p = self.load_policy({
             'name': 'efs-query',
             'resource': 'efs',

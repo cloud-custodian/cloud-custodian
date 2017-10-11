@@ -319,7 +319,7 @@ class TestPolicy(BaseTest):
             IOError, policy.load, Config.empty(), "/asdf12")
 
     def test_lambda_policy_metrics(self):
-        session_factory = self.replay_flight_data('test_lambda_policy_metrics')
+        session_factory = self.get_session_factory('test_lambda_policy_metrics')
         p = self.load_policy({
             'name': 'ec2-tag-compliance-v6',
             'resource': 'ec2',
@@ -354,7 +354,7 @@ class TestPolicy(BaseTest):
                              u'Unit': u'Count'}]})
 
     def test_policy_metrics(self):
-        session_factory = self.replay_flight_data('test_policy_metrics')
+        session_factory = self.get_session_factory('test_policy_metrics')
         p = self.load_policy(
             {'name': 's3-encrypt-keys',
              'resource': 's3',
@@ -435,7 +435,7 @@ class TestPolicy(BaseTest):
             ],
             'actions': [{'days': 10, 'type': 'retention'}],
         }
-        session_factory = self.replay_flight_data('test_logs_from_group')
+        session_factory = self.get_session_factory('test_logs_from_group')
         config = {'log_group': 'test-logs'}
         policy = self.load_policy(p_data, config, session_factory)
         logs = list(

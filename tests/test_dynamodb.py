@@ -21,7 +21,7 @@ from c7n.executor import MainThreadExecutor
 class DynamodbTest(BaseTest):
 
     def test_resources(self):
-        session_factory = self.replay_flight_data('test_dynamodb_table')
+        session_factory = self.get_session_factory('test_dynamodb_table')
         p = self.load_policy(
             {'name': 'tables',
              'resource': 'dynamodb-table'},
@@ -32,7 +32,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(resources[0]['TableStatus'], 'ACTIVE')
 
     def test_invoke_action(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_dynamodb_invoke_action')
         p = self.load_policy(
             {'name': 'tables',
@@ -46,7 +46,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_delete_tables(self):
-        session_factory = self.replay_flight_data('test_dynamodb_delete_table')
+        session_factory = self.get_session_factory('test_dynamodb_delete_table')
         self.patch(DeleteTable, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
             'name': 'delete-empty-tables',
@@ -59,7 +59,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(resources[0]['TableName'], 'c7n.DynamoDB.01')
 
     def test_tag_filter(self):
-        session_factory = self.replay_flight_data('test_dynamodb_tag_filter')
+        session_factory = self.get_session_factory('test_dynamodb_tag_filter')
         client = session_factory().client('dynamodb')
         p = self.load_policy({
             'name': 'dynamodb-tag-filters',
@@ -75,7 +75,7 @@ class DynamodbTest(BaseTest):
         self.assertTrue('test_key' in tag_map)
 
     def test_dynamodb_mark(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_dynamodb_mark')
         client = session_factory().client('dynamodb')
         p = self.load_policy({
@@ -95,7 +95,7 @@ class DynamodbTest(BaseTest):
         self.assertTrue('test_key' in tag_map)
 
     def test_dynamodb_tag(self):
-        session_factory = self.replay_flight_data('test_dynamodb_tag')
+        session_factory = self.get_session_factory('test_dynamodb_tag')
         client = session_factory().client('dynamodb')
         p = self.load_policy({
                 'name': 'dynamodb-tag-table',
@@ -118,7 +118,7 @@ class DynamodbTest(BaseTest):
             tag_map)
 
     def test_dynamodb_unmark(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_dynamodb_unmark')
         client = session_factory().client('dynamodb')
         p = self.load_policy({

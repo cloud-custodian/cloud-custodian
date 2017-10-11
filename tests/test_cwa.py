@@ -20,7 +20,7 @@ class AlarmTest(BaseTest):
 
     def test_delete(self):
         alarm_name = 'c7n-test-alarm-delete'
-        factory = self.replay_flight_data('test_alarm_delete')
+        factory = self.get_session_factory('test_alarm_delete')
         client = factory().client('cloudwatch')
         client.put_metric_alarm(
             AlarmName=alarm_name,

@@ -19,7 +19,7 @@ from .common import BaseTest
 class TestAMI(BaseTest):
 
     def test_query(self):
-        factory = self.replay_flight_data('test_ami')
+        factory = self.get_session_factory('test_ami')
         p = self.load_policy({
             'name': 'test-ami',
             'resource': 'ami',
@@ -32,7 +32,7 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_unused_ami_true(self):
-        factory = self.replay_flight_data('test_unused_ami_true')
+        factory = self.get_session_factory('test_unused_ami_true')
         p = self.load_policy({
             'name': 'test-unused-ami',
             'resource': 'ami',
@@ -42,7 +42,7 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_unused_ami_false(self):
-        factory = self.replay_flight_data('test_unused_ami_false')
+        factory = self.get_session_factory('test_unused_ami_false')
         p = self.load_policy({
             'name': 'test-unused-ami',
             'resource': 'ami',

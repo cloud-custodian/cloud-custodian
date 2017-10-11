@@ -21,7 +21,7 @@ class VpcTest(BaseTest):
 
     @functional
     def test_flow_logs(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_vpc_flow_logs')
 
         session = factory()
@@ -73,7 +73,7 @@ class VpcTest(BaseTest):
         #
         # 'vpc-4a9ff72e' - has no flow logs
         # 'vpc-d0e386b7' - has flow logs
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_vpc_flow_logs_absent')
         session = factory()
         ec2 = session.client('ec2')
@@ -106,7 +106,7 @@ class VpcTest(BaseTest):
         #
         # Only the first should be returned by the filter
 
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_vpc_flow_logs_misconfigured')
 
         vpc_id1 = 'vpc-4a9ff72e'
@@ -139,7 +139,7 @@ class VpcTest(BaseTest):
 class NetworkLocationTest(BaseTest):
 
     def test_network_location_sg_missing(self):
-        self.factory = self.replay_flight_data(
+        self.factory = self.get_session_factory(
             'test_network_location_sg_missing_loc')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -192,7 +192,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_sg_cardinality(self):
-        self.factory = self.replay_flight_data(
+        self.factory = self.get_session_factory(
             'test_network_location_sg_cardinality')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -248,7 +248,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_resource_missing(self):
-        self.factory = self.replay_flight_data('test_network_location_resource_missing')
+        self.factory = self.get_session_factory('test_network_location_resource_missing')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -290,7 +290,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_triple_intersect(self):
-        self.factory = self.replay_flight_data('test_network_location_intersection')
+        self.factory = self.get_session_factory('test_network_location_intersection')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -330,7 +330,7 @@ class NetworkAclTest(BaseTest):
 
     @functional
     def test_s3_cidr_network_acl_present(self):
-        factory = self.replay_flight_data('test_network_acl_s3_present')
+        factory = self.get_session_factory('test_network_acl_s3_present')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -346,7 +346,7 @@ class NetworkAclTest(BaseTest):
 
     @functional
     def test_s3_cidr_network_acl_not_present(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_network_acl_s3_missing')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -373,7 +373,7 @@ class NetworkInterfaceTest(BaseTest):
 
     @functional
     def test_interface_subnet(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_network_interface_filter')
 
         client = factory().client('ec2')
@@ -431,7 +431,7 @@ class NetworkInterfaceTest(BaseTest):
 class RouteTableTest(BaseTest):
 
     def test_rt_subnet_filter(self):
-        factory = self.replay_flight_data('test_rt_subnet_filter')
+        factory = self.get_session_factory('test_rt_subnet_filter')
         p = self.load_policy({
             'name': 'subnet-find',
             'resource': 'route-table',
@@ -445,7 +445,7 @@ class RouteTableTest(BaseTest):
         self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-389e3d53'])
 
     def test_rt_route_filter(self):
-        factory = self.replay_flight_data('test_rt_route_filter')
+        factory = self.get_session_factory('test_rt_route_filter')
         p = self.load_policy({
             'name': 'subnet-find',
             'resource': 'route-table',
@@ -469,7 +469,7 @@ class PeeringConnectionTest(BaseTest):
 
     def test_peer_missing_route(self):
         # peer from all routes
-        factory = self.replay_flight_data('test_peer_miss_route_filter')
+        factory = self.get_session_factory('test_peer_miss_route_filter')
         p = self.load_policy({
             'name': 'route-miss',
             'resource': 'peering-connection',
@@ -481,7 +481,7 @@ class PeeringConnectionTest(BaseTest):
 
     def test_peer_missing_one_route(self):
         # peer in one route table, with both sides in the same account
-        factory = self.replay_flight_data('test_peer_miss_route_filter_one')
+        factory = self.get_session_factory('test_peer_miss_route_filter_one')
         p = self.load_policy({
             'name': 'route-miss',
             'resource': 'peering-connection',
@@ -493,7 +493,7 @@ class PeeringConnectionTest(BaseTest):
 
     def test_peer_missing_not_found(self):
         # peer in all sides in a single account.
-        factory = self.replay_flight_data('test_peer_miss_route_filter_not_found')
+        factory = self.get_session_factory('test_peer_miss_route_filter_not_found')
         p = self.load_policy({
             'name': 'route-miss',
             'resource': 'peering-connection',
@@ -519,7 +519,7 @@ class SecurityGroupTest(BaseTest):
     def test_stale(self):
         # setup a multi vpc security group reference, break the ref
         # and look for stale
-        factory = self.replay_flight_data('test_security_group_stale')
+        factory = self.get_session_factory('test_security_group_stale')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         vpc2_id = client.create_vpc(CidrBlock="10.5.0.0/16")['Vpc']['VpcId']
@@ -572,7 +572,7 @@ class SecurityGroupTest(BaseTest):
                    u'VpcPeeringConnectionId': peer_id}]}])
 
     def test_used(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_used')
         p = self.load_policy({
             'name': 'sg-used',
@@ -586,7 +586,7 @@ class SecurityGroupTest(BaseTest):
             set([r['GroupId'] for r in resources]))
 
     def test_unused(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_unused')
         p = self.load_policy({
             'name': 'sg-unused',
@@ -598,7 +598,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_only_ports(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_only_ports')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -642,7 +642,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_self_reference(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_self_reference')
         client = factory().client('ec2')
 
@@ -738,7 +738,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_security_group_delete(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_delete')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -775,7 +775,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_port_within_range(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_port_in_range')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -815,7 +815,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_ingress_remove(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_ingress_filter')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
@@ -854,7 +854,7 @@ class SecurityGroupTest(BaseTest):
     def test_default_vpc(self):
         # preconditions, more than one vpc, each with at least one
         # security group
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_default_vpc_filter')
         p = self.load_policy({
             'name': 'sg-test',
@@ -867,7 +867,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_config_source(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_config_source')
         p = self.load_policy({
             'name': 'sg-test',
@@ -1115,7 +1115,7 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_permission_expansion(self):
-        factory = self.replay_flight_data('test_security_group_perm_expand')
+        factory = self.get_session_factory('test_security_group_perm_expand')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1185,7 +1185,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_cidr_ingress(self):
-        factory = self.replay_flight_data('test_security_group_cidr_ingress')
+        factory = self.get_session_factory('test_security_group_cidr_ingress')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1222,7 +1222,7 @@ class SecurityGroupTest(BaseTest):
 
     @functional
     def test_cidr_size_egress(self):
-        factory = self.replay_flight_data('test_security_group_cidr_size')
+        factory = self.get_session_factory('test_security_group_cidr_size')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1284,7 +1284,7 @@ class SecurityGroupTest(BaseTest):
                  {'GroupName': 'sg2'}]})
 
     def test_vpc_by_security_group(self):
-        factory = self.replay_flight_data('test_vpc_by_security_group')
+        factory = self.get_session_factory('test_vpc_by_security_group')
         p = self.load_policy(
             {
                 'name': 'vpc-sg',
@@ -1307,7 +1307,7 @@ class SecurityGroupTest(BaseTest):
 class NATGatewayTest(BaseTest):
 
     def test_query_nat_gateways(self):
-        factory = self.replay_flight_data('test_nat_gateways_query')
+        factory = self.get_session_factory('test_nat_gateways_query')
         p = self.load_policy({
             'name': 'get-nat-gateways',
             'resource': 'nat-gateway',
@@ -1319,7 +1319,7 @@ class NATGatewayTest(BaseTest):
             "available")
 
     def test_tag_nat_gateways(self):
-        factory = self.replay_flight_data('test_nat_gateways_tag')
+        factory = self.get_session_factory('test_nat_gateways_tag')
         p = self.load_policy({
             'name': 'tag-nat-gateways',
             'resource': 'nat-gateway',
@@ -1341,7 +1341,7 @@ class NATGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_delete_nat_gateways(self):
-        factory = self.replay_flight_data('test_nat_gateways_delete')
+        factory = self.get_session_factory('test_nat_gateways_delete')
         p = self.load_policy({
             'name': 'delete-nat-gateways',
             'resource': 'nat-gateway',

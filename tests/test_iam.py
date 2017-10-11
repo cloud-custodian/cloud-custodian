@@ -43,7 +43,7 @@ from c7n.executor import MainThreadExecutor
 class UserCredentialReportTest(BaseTest):
 
     def test_credential_report_generatpoe(self):
-        session_factory = self.replay_flight_data('test_iam_user_unused_keys')
+        session_factory = self.get_session_factory('test_iam_user_unused_keys')
         p = self.load_policy({
             'name': 'user-access-unused-keys',
             'resource': 'iam-user',
@@ -62,7 +62,7 @@ class UserCredentialReportTest(BaseTest):
 
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
-        session_factory = self.replay_flight_data('test_iam_user_console_old')
+        session_factory = self.get_session_factory('test_iam_user_console_old')
         p = self.load_policy({
             'name': 'user-access-iam',
             'resource': 'iam-user',
@@ -82,7 +82,7 @@ class UserCredentialReportTest(BaseTest):
             ['kapil'])
 
     def test_old_console_users(self):
-        session_factory = self.replay_flight_data('test_iam_user_console_old')
+        session_factory = self.get_session_factory('test_iam_user_console_old')
         p = self.load_policy({
             'name': 'old-console-only-users',
             'resource': 'iam-user',
@@ -150,7 +150,7 @@ class IAMMFAFilter(BaseTest):
     def test_iam_mfa_filter(self):
         self.patch(
             UserMfaDevice, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_iam_mfa_filter')
+        session_factory = self.get_session_factory('test_iam_mfa_filter')
         p = self.load_policy({
             'name': 'iam-mfa',
             'resource': 'iam-user',
@@ -164,7 +164,7 @@ class IAMMFAFilter(BaseTest):
 class IamRoleFilterUsage(BaseTest):
 
     def test_iam_role_inuse(self):
-        session_factory = self.replay_flight_data('test_iam_role_inuse')
+        session_factory = self.get_session_factory('test_iam_role_inuse')
         self.patch(
             UsedIamRole, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -175,7 +175,7 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 3)
 
     def test_iam_role_unused(self):
-        session_factory = self.replay_flight_data('test_iam_role_unused')
+        session_factory = self.get_session_factory('test_iam_role_unused')
         self.patch(
             UnusedIamRole, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -190,7 +190,7 @@ class IamUserTest(BaseTest):
 
     @functional
     def test_iam_user_delete(self):
-        factory = self.replay_flight_data('test_iam_user_delete')
+        factory = self.get_session_factory('test_iam_user_delete')
         name = 'alice'
         client = factory().client('iam')
         client.create_user(UserName=name, Path="/test/")
@@ -206,7 +206,7 @@ class IamUserTest(BaseTest):
         self.assertEqual(users, [])
         
     def test_iam_user_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_user_admin_policy')
         self.patch(
             UserPolicy, 'executor_factory', MainThreadExecutor)
@@ -222,7 +222,7 @@ class IamUserTest(BaseTest):
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
 
     def test_iam_user_access_key_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_user_access_key_active')
         self.patch(
             UserAccessKey, 'executor_factory', MainThreadExecutor)
@@ -241,7 +241,7 @@ class IamUserTest(BaseTest):
 class IamUserGroupMembership(BaseTest):
 
     def test_iam_user_group_membership(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_user_group_membership')
         self.patch(
             GroupMembership, 'executor_factory', MainThreadExecutor)
@@ -262,7 +262,7 @@ class IamUserGroupMembership(BaseTest):
 class IamInstanceProfileFilterUsage(BaseTest):
 
     def test_iam_instance_profile_inuse(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_instance_profile_inuse')
         self.patch(
             UsedInstanceProfiles, 'executor_factory', MainThreadExecutor)
@@ -274,7 +274,7 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_iam_instance_profile_unused(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_instance_profile_unused')
         self.patch(
             UnusedInstanceProfiles, 'executor_factory', MainThreadExecutor)
@@ -289,7 +289,7 @@ class IamInstanceProfileFilterUsage(BaseTest):
 class IamPolicyFilterUsage(BaseTest):
 
     def test_iam_policy_get_resources(self):
-        session_factory = self.replay_flight_data('test_iam_policy_get_resource')
+        session_factory = self.get_session_factory('test_iam_policy_get_resource')
         p = self.load_policy({
             'name': 'iam-attached-profiles',
             'resource': 'iam-policy'}, session_factory=session_factory)
@@ -299,7 +299,7 @@ class IamPolicyFilterUsage(BaseTest):
         self.assertEqual(resources[0]['PolicyName'], 'AWSHealthFullAccess')
 
     def test_iam_attached_policies(self):
-        session_factory = self.replay_flight_data('test_iam_policy_attached')
+        session_factory = self.get_session_factory('test_iam_policy_attached')
         self.patch(
             UsedIamPolicies, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -310,7 +310,7 @@ class IamPolicyFilterUsage(BaseTest):
         self.assertEqual(len(resources), 6)
 
     def test_iam_unattached_policies(self):
-        session_factory = self.replay_flight_data('test_iam_policy_unattached')
+        session_factory = self.get_session_factory('test_iam_policy_unattached')
         self.patch(
             UnusedIamPolicies, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -324,7 +324,7 @@ class IamPolicyFilterUsage(BaseTest):
 class IamPolicyHasAllowAll(BaseTest):
 
     def test_iam_has_allow_all_policies(self):
-        session_factory = self.replay_flight_data('test_iam_policy_allow_all')
+        session_factory = self.get_session_factory('test_iam_policy_allow_all')
         self.patch(
             UnusedIamPolicies, 'executor_factory', MainThreadExecutor)
         p = self.load_policy({
@@ -343,7 +343,7 @@ class IamPolicyHasAllowAll(BaseTest):
 class IamGroupFilterUsage(BaseTest):
 
     def test_iam_group_used_users(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_group_used_users')
         self.patch(
             IamGroupUsers, 'executor_factory', MainThreadExecutor)
@@ -357,7 +357,7 @@ class IamGroupFilterUsage(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_iam_group_unused_users(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_group_unused_users')
         self.patch(
             IamGroupUsers, 'executor_factory', MainThreadExecutor)
@@ -374,7 +374,7 @@ class IamGroupFilterUsage(BaseTest):
 class IamManagedPolicyUsage(BaseTest):
 
     def test_iam_role_has_specific_managed_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_role_has_specific_managed_policy')
         self.patch(
             SpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
@@ -388,7 +388,7 @@ class IamManagedPolicyUsage(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_iam_role_no_specific_managed_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_role_no_specific_managed_policy')
         self.patch(
             NoSpecificIamRoleManagedPolicy, 'executor_factory', MainThreadExecutor)
@@ -405,7 +405,7 @@ class IamManagedPolicyUsage(BaseTest):
 class IamInlinePolicyUsage(BaseTest):
 
     def test_iam_role_has_inline_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_role_has_inline_policy')
         self.patch(
             IamRoleInlinePolicy, 'executor_factory', MainThreadExecutor)
@@ -419,7 +419,7 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_iam_role_no_inline_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_role_no_inline_policy')
         self.patch(
             IamRoleInlinePolicy, 'executor_factory', MainThreadExecutor)
@@ -434,7 +434,7 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(resources), 6)
 
     def test_iam_group_has_inline_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_group_has_inline_policy')
         self.patch(
             IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
@@ -448,7 +448,7 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_iam_group_has_inline_policy2(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_group_has_inline_policy')
         self.patch(
             IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
@@ -462,7 +462,7 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_iam_group_no_inline_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_iam_group_no_inline_policy')
         self.patch(
             IamGroupInlinePolicy, 'executor_factory', MainThreadExecutor)
@@ -481,7 +481,7 @@ class KMSCrossAccount(BaseTest):
     def test_kms_cross_account(self):
         self.patch(
             CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_cross_account_kms')
+        session_factory = self.get_session_factory('test_cross_account_kms')
         client = session_factory().client('kms')
 
         policy = {
@@ -528,7 +528,7 @@ class GlacierCrossAccount(BaseTest):
     def test_glacier_cross_account(self):
         self.patch(
             CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_cross_account_glacier')
+        session_factory = self.get_session_factory('test_cross_account_glacier')
         client = session_factory().client('glacier')
         name = 'c7n-cross-check'
 
@@ -577,7 +577,7 @@ class LambdaCrossAccount(BaseTest):
         self.patch(
             CrossAccountAccessFilter, 'executor_factory', MainThreadExecutor)
 
-        session_factory = self.replay_flight_data('test_cross_account_lambda')
+        session_factory = self.get_session_factory('test_cross_account_lambda')
         client = session_factory().client('lambda')
         name = 'c7n-cross-check'
 
@@ -617,7 +617,7 @@ class LambdaCrossAccount(BaseTest):
 class ECRCrossAccount(BaseTest):
 
     def test_ecr_cross_account(self):
-        session_factory = self.replay_flight_data('test_cross_account_ecr')
+        session_factory = self.get_session_factory('test_cross_account_ecr')
         client = session_factory().client('ecr')
         repo_name = 'c7n/cross-check'
 
@@ -650,7 +650,7 @@ class SQSCrossAccount(BaseTest):
 
     def test_sqs_cross_account(self):
 
-        session_factory = self.replay_flight_data('test_cross_account_sqs')
+        session_factory = self.get_session_factory('test_cross_account_sqs')
         client = session_factory().client('sqs')
         queue_name = 'c7n-cross-check'
         url = client.create_queue(QueueName=queue_name)['QueueUrl']
@@ -688,7 +688,7 @@ class SNSCrossAccount(BaseTest):
     def test_sns_cross_account(self):
         self.patch(SNS, 'executor_factory', MainThreadExecutor)
 
-        session_factory = self.replay_flight_data('test_cross_account_sns')
+        session_factory = self.get_session_factory('test_cross_account_sns')
         client = session_factory().client('sns')
         topic_name = 'c7n-cross-check'
         arn = client.create_topic(Name=topic_name)['TopicArn']

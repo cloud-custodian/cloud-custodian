@@ -24,7 +24,7 @@ from .common import BaseTest, Bag, Config
 class TestEMR(BaseTest):
 
     def test_get_emr_by_ids(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_emr_query_ids')
 
         ctx = Bag(
@@ -37,7 +37,7 @@ class TestEMR(BaseTest):
         self.assertEqual(resources[0]['Id'], "j-1EJMJNTXC63JW")
 
     def test_consolidate_query_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_emr_query_ids')
 
         ctx = Bag(
@@ -89,7 +89,7 @@ class TestEMR(BaseTest):
         )
 
     def test_get_emr_tags(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_get_emr_tags')
 
         policy = self.load_policy({
@@ -110,7 +110,7 @@ class TestEMR(BaseTest):
         self.assertEqual(tags['first_tag'], 'first')
 
     def test_emr_mark(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_emr_mark')
         p = self.load_policy({
             'name': 'emr-mark',
@@ -128,7 +128,7 @@ class TestEMR(BaseTest):
         self.assertTrue('test_tag' in tag_map)
 
     def test_emr_tag(self):
-        session_factory = self.replay_flight_data('test_emr_tag')
+        session_factory = self.get_session_factory('test_emr_tag')
         p = self.load_policy({
                 'name': 'emr-tag-table',
                 'resource': 'emr',
@@ -150,7 +150,7 @@ class TestEMR(BaseTest):
             tag_map)
 
     def test_emr_unmark(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_emr_unmark')
         p = self.load_policy({
             'name': 'emr-unmark',
@@ -237,7 +237,7 @@ class TestEMRQueryFilter(unittest.TestCase):
 class TestTerminate(BaseTest):
 
     def test_emr_terminate(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_emr_terminate')
         policy = self.load_policy({
             'name': 'emr-test-terminate',

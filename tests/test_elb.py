@@ -23,7 +23,7 @@ class ELBTagTest(BaseTest):
 
     def test_elb_tag_and_remove(self):
         self.patch(ELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_elb_tag_and_remove')
+        session_factory = self.get_session_factory('test_elb_tag_and_remove')
         client = session_factory().client('elb')
 
         policy = self.load_policy({
@@ -61,7 +61,7 @@ class ELBTagTest(BaseTest):
 
     def test_elb_tags(self):
         self.patch(ELB, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_tags')
         policy = self.load_policy({
             'name': 'elb-mark',
@@ -72,7 +72,7 @@ class ELBTagTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_mark_and_match(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_mark_and_match')
         policy = self.load_policy({
             'name': 'elb-mark',
@@ -104,7 +104,7 @@ class ELBTagTest(BaseTest):
 class ELBInstance(BaseTest):
 
     def test_instance_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_instance_filter')
         policy = self.load_policy({
             'name': 'elb-instance',
@@ -122,7 +122,7 @@ class ELBInstance(BaseTest):
 class HealthCheckProtocolMismatchTest(BaseTest):
 
     def test_healthcheck_protocol_mismatch(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_healthcheck_protocol_mismatch')
         policy = self.load_policy({
             'name': 'healthcheck-protocol-mismatch',
@@ -147,7 +147,7 @@ class HealthCheckProtocolMismatchTest(BaseTest):
 class SSLPolicyTest(BaseTest):
 
     def test_ssl_ciphers(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ssl_ciphers')
         policy = self.load_policy({
             'name': 'test-ssl-ciphers',
@@ -164,7 +164,7 @@ class SSLPolicyTest(BaseTest):
             'test-elb-invalid-policy')
 
     def test_set_ssl_listener_policy(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_set_ssl_listener')
         client = session_factory().client('elb')
         policy = self.load_policy({
@@ -210,7 +210,7 @@ class SSLPolicyTest(BaseTest):
             ['Protocol-TLSv1', 'AES128-SHA256'])
 
     def test_ssl_matching(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_ssl_ciphers')
         policy = self.load_policy({
             'name': 'test-ssl-matching',
@@ -253,7 +253,7 @@ class SSLPolicyTest(BaseTest):
 class TestDefaultVpc(BaseTest):
 
     def test_elb_default_vpc(self):
-        session_factory = self.replay_flight_data('test_elb_default_vpc')
+        session_factory = self.get_session_factory('test_elb_default_vpc')
         p = self.load_policy({
             'name': 'elb-default-filters',
             'resource': 'elb',
@@ -275,7 +275,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #   - running ELB in default VPC
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is
         #     attached to test ELB
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_remove_security_groups')
         client = session_factory().client('ec2')
         default_sg_id = client.describe_security_groups(
@@ -307,7 +307,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #   - running one ELB with 'default' VPC security group attached
         #   - security group named TEST-PROD-ONLY-SG exists in VPC and is not
         #     attached to ELB
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_add_security_group')
 
         policy = self.load_policy({
@@ -335,7 +335,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #   - security groups named TEST-PROD-ONLY-SG, TEST-SG1, and TEST-SG2
         #     exist in VPC - not attached to ELB
 
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_add_security_groups')
         policy = self.load_policy({
             'name': 'add-sgs-to-prod-elb',
@@ -361,7 +361,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # Test conditions:
         #   - running one ELB with 'default' and 'TEST-PROD-ONLY-SG' VPC
         #     security groups attached
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_elb_remove_all_security_groups')
         client = session_factory().client('ec2')
 
@@ -395,7 +395,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 class TestElbLogging(BaseTest):
 
     def test_enable_s3_logging(self):
-        session_factory = self.replay_flight_data('test_elb_enable_s3_logging')
+        session_factory = self.get_session_factory('test_elb_enable_s3_logging')
         policy = self.load_policy({
             'name': 'test-enable-s3-logging',
             'resource': 'elb',
@@ -427,7 +427,7 @@ class TestElbLogging(BaseTest):
 
 
     def test_disable_s3_logging(self):
-        session_factory = self.replay_flight_data('test_elb_disable_s3_logging')
+        session_factory = self.get_session_factory('test_elb_disable_s3_logging')
         policy = self.load_policy({
             'name': 'test-disable-s3-logging',
             'resource': 'elb',
@@ -459,7 +459,7 @@ class TestElbIsLoggingFilter(BaseTest):
             bucket: elbv2logtest
     """
     def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data('test_elb_is_logging_filter')
+        session_factory = self.get_session_factory('test_elb_is_logging_filter')
         policy = self.load_policy({
             'name': 'elb-is-logging-to-bucket-test',
             'resource': 'elb',
@@ -485,7 +485,7 @@ class TestElbIsNotLoggingFilter(BaseTest):
             bucket: otherbucket
     """
     def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data('test_elb_is_logging_filter')
+        session_factory = self.get_session_factory('test_elb_is_logging_filter')
         policy = self.load_policy({
             'name': 'elb-is-not-logging-to-bucket-test',
             'resource': 'elb',

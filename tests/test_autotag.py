@@ -23,7 +23,7 @@ class AutoTagCreator(BaseTest):
 
     def test_auto_tag_assumed(self):
         # verify auto tag works with assumed roles and can optionally update
-        session_factory = self.replay_flight_data('test_ec2_autotag_assumed')
+        session_factory = self.get_session_factory('test_ec2_autotag_assumed')
         policy = self.load_policy({
             'name': 'ec2-auto-tag',
             'resource': 'ec2',
@@ -52,7 +52,7 @@ class AutoTagCreator(BaseTest):
         self.assertEqual(tags['Owner'], 'Radiant')
 
     def test_auto_tag_creator(self):
-        session_factory = self.replay_flight_data('test_ec2_autotag_creator')
+        session_factory = self.get_session_factory('test_ec2_autotag_creator')
         policy = self.load_policy({
             'name': 'ec2-auto-tag',
             'resource': 'ec2',
@@ -120,7 +120,7 @@ class AutoTagCreator(BaseTest):
         event = {
             'detail': event_data('event-cloud-trail-run-instance-creator.json'),
             'debug': True}
-        session_factory = self.replay_flight_data('test_ec2_autotag_creator')
+        session_factory = self.get_session_factory('test_ec2_autotag_creator')
         policy = self.load_policy({
             'name': 'ec2-auto-tag',
             'resource': 'ec2',
@@ -156,7 +156,7 @@ class AutoTagCreator(BaseTest):
         self.assertEqual(result, {'CreatorName': 'c7nbot'})
 
         # check that it sets principalId with assumeRole
-        session_factory = self.replay_flight_data('test_ec2_autotag_assumed')
+        session_factory = self.get_session_factory('test_ec2_autotag_assumed')
         policy = self.load_policy({
             'name': 'ec2-auto-tag',
             'resource': 'ec2',

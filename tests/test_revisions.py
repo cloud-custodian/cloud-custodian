@@ -20,7 +20,7 @@ from c7n.resources.vpc import SecurityGroupDiff, SecurityGroupPatch
 class SGDiffLibTest(BaseTest):
 
     def test_sg_diff_remove_ingress(self):
-        factory = self.replay_flight_data('test_sg_config_ingres_diff')
+        factory = self.get_session_factory('test_sg_config_ingres_diff')
         p = self.load_policy({
             'name': 'sg-differ',
             'resource': 'security-group',
@@ -48,7 +48,7 @@ class SGDiffLibTest(BaseTest):
                                   u'UserId': u'644160558196'}]}]}})
 
     def test_sg_diff_pitr(self):
-        factory = self.replay_flight_data('test_sg_config_diff')
+        factory = self.get_session_factory('test_sg_config_diff')
         p = self.load_policy({
             'name': 'sg-differ',
             'resource': 'security-group',
@@ -96,7 +96,7 @@ class SGDiffLibTest(BaseTest):
              'tags': {'added': {u'Scope': u'account'}}})
 
     def test_sg_patch_pitr(self):
-        factory = self.replay_flight_data('test_sg_config_patch_pitr')
+        factory = self.get_session_factory('test_sg_config_patch_pitr')
         p = self.load_policy({
             'name': 'sg-differ',
             'resource': 'security-group',
@@ -120,7 +120,7 @@ class SGDiffLibTest(BaseTest):
             resources[0]['c7n:previous-revision']['resource'])
 
     def test_sg_diff_patch(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_security_group_revisions_delta')
         client = factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.42.0.0/16")['Vpc']['VpcId']

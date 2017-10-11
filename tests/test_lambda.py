@@ -49,7 +49,7 @@ class LambdaPermissionTest(BaseTest):
 
     @functional
     def test_lambda_permission_matched(self):
-        factory = self.replay_flight_data('test_lambda_permission_matched')
+        factory = self.get_session_factory('test_lambda_permission_matched')
         client = factory().client('lambda')
         name = "func-b"
 
@@ -84,7 +84,7 @@ class LambdaPermissionTest(BaseTest):
 
     @functional
     def test_lambda_permission_named(self):
-        factory = self.replay_flight_data('test_lambda_permission_named')
+        factory = self.get_session_factory('test_lambda_permission_named')
         client = factory().client('lambda')
         name = "func-d"
 
@@ -113,7 +113,7 @@ class LambdaPermissionTest(BaseTest):
 class LambdaTest(BaseTest):
 
     def test_delete(self):
-        factory = self.replay_flight_data('test_aws_lambda_delete')
+        factory = self.get_session_factory('test_aws_lambda_delete')
         p = self.load_policy({
             'name': 'lambda-events',
             'resource': 'lambda',
@@ -128,7 +128,7 @@ class LambdaTest(BaseTest):
         self.assertEqual(client.list_functions()['Functions'], [])
 
     def test_event_source(self):
-        factory = self.replay_flight_data('test_aws_lambda_source')
+        factory = self.get_session_factory('test_aws_lambda_source')
         p = self.load_policy({
             'name': 'lambda-events',
             'resource': 'lambda',
@@ -144,7 +144,7 @@ class LambdaTest(BaseTest):
             set(['iot.amazonaws.com']))
 
     def test_sg_filter(self):
-        factory = self.replay_flight_data('test_aws_lambda_sg')
+        factory = self.get_session_factory('test_aws_lambda_sg')
 
         p = self.load_policy({
             'name': 'sg-lambda',
@@ -166,7 +166,7 @@ class LambdaTagTest(BaseTest):
 
     def test_lambda_tag_and_remove(self):
         self.patch(AWSLambda, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_lambda_tag_and_remove')
+        session_factory = self.get_session_factory('test_lambda_tag_and_remove')
         client = session_factory().client('lambda')
 
         policy = self.load_policy({
@@ -202,7 +202,7 @@ class LambdaTagTest(BaseTest):
 
     def test_lambda_tags(self):
         self.patch(AWSLambda, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_lambda_tags')
         policy = self.load_policy({
             'name': 'lambda-mark',
@@ -213,7 +213,7 @@ class LambdaTagTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_mark_and_match(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_lambda_mark_and_match')
         client = session_factory().client('lambda')
         policy = self.load_policy({

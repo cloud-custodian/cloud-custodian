@@ -25,21 +25,21 @@ from .common import BaseTest
 class ResourceQueryTest(BaseTest):
 
     def test_query_filter(self):
-        session_factory = self.replay_flight_data('test_query_filter')
+        session_factory = self.get_session_factory('test_query_filter')
         q = ResourceQuery(session_factory)
         resources = q.filter(EC2.resource_type)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_get(self):
-        session_factory = self.replay_flight_data('test_query_get')
+        session_factory = self.get_session_factory('test_query_get')
         q = ResourceQuery(session_factory)
         resources = q.get(EC2.resource_type, ['i-9432cb49'])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_model_get(self):
-        session_factory = self.replay_flight_data('test_query_model')
+        session_factory = self.get_session_factory('test_query_model')
         q = ResourceQuery(session_factory)
         resources = q.filter(InternetGateway.resource_type)
         self.assertEqual(len(resources), 3)
@@ -54,7 +54,7 @@ class QueryResourceManagerTest(BaseTest):
         self.assertTrue(InternetGateway.action_registry)
 
     def test_resources(self):
-        session_factory = self.replay_flight_data('test_query_manager')
+        session_factory = self.get_session_factory('test_query_manager')
         p = self.load_policy(
             {'name': 'igw-check',
              'resource': 'internet-gateway',
@@ -70,7 +70,7 @@ class QueryResourceManagerTest(BaseTest):
         self.assertTrue("Using cached internet-gateway: 3", output.getvalue())
 
     def test_get_resources(self):
-        session_factory = self.replay_flight_data('test_query_manager_get')
+        session_factory = self.get_session_factory('test_query_manager_get')
         p = self.load_policy(
             {'name': 'igw-check',
              'resource': 'internet-gateway'},

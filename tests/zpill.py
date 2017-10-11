@@ -108,6 +108,9 @@ placebo.pill.deserialize = deserialize
 ##########################################################################
 
 
+C7N_RECORD = bool(os.environ.get('C7N_RECORD', ''))
+
+
 class ZippedPill(pill.Pill):
 
     def __init__(self, path, prefix=None, debug=False):
@@ -231,7 +234,16 @@ class PillTest(unittest.TestCase):
     output_dir = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', 'output')
 
-    recording = False
+    recording = C7N_RECORD
+
+    def get_session_factory(self, flight_name, record=False, zdata=False):
+        if record:
+            self.recording = True
+        if self.recording:
+            func = self.record_flight_data
+        else:
+            func = self.replay_flight_data
+        return func(flight_name, zdata)
 
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
@@ -241,7 +253,6 @@ class PillTest(unittest.TestCase):
         pass
 
     def record_flight_data(self, test_case, zdata=False):
-        self.recording = True
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if os.path.exists(test_dir):

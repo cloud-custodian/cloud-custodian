@@ -19,7 +19,7 @@ from .common import BaseTest
 class LogGroupTest(BaseTest):
 
     def test_last_write(self):
-        factory = self.replay_flight_data('test_log_group_last_write')
+        factory = self.get_session_factory('test_log_group_last_write')
         p = self.load_policy(
             {'name': 'set-retention',
              'resource': 'log-group',
@@ -35,7 +35,7 @@ class LogGroupTest(BaseTest):
 
     def test_retention(self):
         log_group = 'c7n-test-a'
-        factory = self.replay_flight_data('test_log_group_retention')
+        factory = self.get_session_factory('test_log_group_retention')
         client = factory().client('logs')
         client.create_log_group(logGroupName=log_group)
         self.addCleanup(client.delete_log_group, logGroupName=log_group)
@@ -56,7 +56,7 @@ class LogGroupTest(BaseTest):
 
     def test_delete(self):
         log_group = 'c7n-test-b'
-        factory = self.replay_flight_data('test_log_group_delete')
+        factory = self.get_session_factory('test_log_group_delete')
         client = factory().client('logs')
         client.create_log_group(logGroupName=log_group)
 

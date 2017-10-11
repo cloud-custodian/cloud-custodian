@@ -32,7 +32,7 @@ TRAIL = 'nosetest'
 class AccountTests(BaseTest):
 
     def test_root_mfa_enabled(self):
-        session_factory = self.replay_flight_data('test_account_root_mfa')
+        session_factory = self.get_session_factory('test_account_root_mfa')
         p = self.load_policy({
             'name': 'root-mfa',
             'resource': 'account',
@@ -44,7 +44,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_root_api_keys(self):
-        session_factory = self.replay_flight_data('test_account_root_api_keys')
+        session_factory = self.get_session_factory('test_account_root_api_keys')
         p = self.load_policy({
             'name': 'root-api',
             'resource': 'account',
@@ -55,7 +55,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_cloudtrail_enabled(self):
-        session_factory = self.replay_flight_data('test_account_trail')
+        session_factory = self.get_session_factory('test_account_trail')
         p = self.load_policy({
             'name': 'trail-enabled',
             'resource': 'account',
@@ -70,7 +70,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_cloudtrail_current_region_global(self):
-        session_factory = self.replay_flight_data('test_account_trail')
+        session_factory = self.get_session_factory('test_account_trail')
         p = self.load_policy({
             'name': 'trail-global',
             'resource': 'account',
@@ -82,7 +82,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_cloudtrail_current_region_specific_same(self):
-        session_factory = self.replay_flight_data('test_account_trail_same_region')
+        session_factory = self.get_session_factory('test_account_trail_same_region')
         p = self.load_policy({
             'name': 'trail-same-region',
             'resource': 'account',
@@ -94,7 +94,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_cloudtrail_current_region_specific_same(self):
-        session_factory = self.replay_flight_data('test_account_trail_different_region')
+        session_factory = self.get_session_factory('test_account_trail_different_region')
         p = self.load_policy({
             'name': 'trail-different-region',
             'resource': 'account',
@@ -106,7 +106,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_cloudtrail_notifies(self):
-        session_factory = self.replay_flight_data('test_account_trail')
+        session_factory = self.get_session_factory('test_account_trail')
         p = self.load_policy({
             'name': 'trail-enabled',
             'resource': 'account',
@@ -118,7 +118,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_config_enabled(self):
-        session_factory = self.replay_flight_data('test_account_config')
+        session_factory = self.get_session_factory('test_account_config')
         p = self.load_policy({
             'name': 'config-enabled',
             'resource': 'account',
@@ -131,7 +131,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_config_enabled_global(self):
-        session_factory = self.replay_flight_data('test_account_config_global')
+        session_factory = self.get_session_factory('test_account_config_global')
         p = self.load_policy({
             'name': 'config-enabled',
             'resource': 'account',
@@ -143,7 +143,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_credential_report(self):
-        session_factory = self.replay_flight_data('test_account_credential_report')
+        session_factory = self.get_session_factory('test_account_credential_report')
         p = self.load_policy({
             'name': 'credential-details',
             'resource': 'account',
@@ -159,7 +159,7 @@ class AccountTests(BaseTest):
 
 
     def test_service_limit(self):
-        session_factory = self.replay_flight_data('test_account_service_limit')
+        session_factory = self.get_session_factory('test_account_service_limit')
         p = self.load_policy({
             'name': 'service-limit',
             'resource': 'account',
@@ -171,7 +171,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 10)
 
     def test_service_limit_specific_check(self):
-        session_factory = self.replay_flight_data('test_account_service_limit')
+        session_factory = self.get_session_factory('test_account_service_limit')
         p = self.load_policy({
             'name': 'service-limit',
             'resource': 'account',
@@ -198,7 +198,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources[0]['c7n:ServiceLimitsExceeded']), 1)
 
     def test_service_limit_specific_service(self):
-        session_factory = self.replay_flight_data('test_account_service_limit')
+        session_factory = self.get_session_factory('test_account_service_limit')
         p = self.load_policy({
             'name': 'service-limit',
             'resource': 'account',
@@ -226,7 +226,7 @@ class AccountTests(BaseTest):
 
     def test_service_limit_no_threshold(self):
         # only warns when the default threshold goes to warning or above
-        session_factory = self.replay_flight_data('test_account_service_limit')
+        session_factory = self.get_session_factory('test_account_service_limit')
         p = self.load_policy({
             'name': 'service-limit',
             'resource': 'account',
@@ -238,7 +238,7 @@ class AccountTests(BaseTest):
 
     def test_account_virtual_mfa(self):
         # only warns when the default threshold goes to warning or above
-        session_factory = self.replay_flight_data('test_account_virtual_mfa')
+        session_factory = self.get_session_factory('test_account_virtual_mfa')
         p1 = self.load_policy({
             'name': 'account-virtual-mfa',
             'resource': 'account',
@@ -269,7 +269,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_missing_password_policy(self):
-        session_factory = self.replay_flight_data('test_account_missing_password_policy')
+        session_factory = self.get_session_factory('test_account_missing_password_policy')
         p = self.load_policy({
             'name': 'missing-password-policy',
             'resource': 'account',
@@ -280,7 +280,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_create_trail(self):
-        factory = self.replay_flight_data('test_cloudtrail_create')
+        factory = self.get_session_factory('test_cloudtrail_create')
         p = self.load_policy(
             {
                 'name': 'trail-test',
@@ -305,7 +305,7 @@ class AccountTests(BaseTest):
 
     def test_create_trail_bucket_exists_in_west(self):
         config = Config.empty(account_id='644160558196', region='us-west-1')
-        factory = self.replay_flight_data('test_cloudtrail_create_bucket_exists_in_west')
+        factory = self.get_session_factory('test_cloudtrail_create_bucket_exists_in_west')
         p = self.load_policy(
             {
                 'name': 'trail-test',
@@ -334,7 +334,7 @@ class AccountTests(BaseTest):
     def test_raise_service_limit(self):
         magic_string = 'Programmatic test'
 
-        session_factory = self.replay_flight_data('test_account_raise_service_limit')
+        session_factory = self.get_session_factory('test_account_raise_service_limit')
         p = self.load_policy({
             'name': 'raise-service-limit-policy',
             'resource': 'account',
@@ -453,7 +453,7 @@ class AccountTests(BaseTest):
 
 
     def test_enable_trail(self):
-        factory = self.replay_flight_data('test_cloudtrail_enable')
+        factory = self.get_session_factory('test_cloudtrail_enable')
         p = self.load_policy(
             {
                 'name': 'trail-test',

@@ -19,7 +19,7 @@ from .common import BaseTest
 class TestRedshift(BaseTest):
 
     def test_redshift_security_group_filter(self):
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_redshift_security_group_filter')
         p = self.load_policy({
             'name': 'redshift-query',
@@ -34,7 +34,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(resources[0]['ClusterIdentifier'], 'dev-test')
 
     def test_redshift_subnet_filter(self):
-        factory = self.replay_flight_data('test_redshift_subnet_filter')
+        factory = self.get_session_factory('test_redshift_subnet_filter')
         p = self.load_policy({
             'name': 'redshift-query',
             'resource': 'redshift',
@@ -48,7 +48,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(resources[0]['ClusterIdentifier'], 'dev-test')
 
     def test_redshift_query(self):
-        factory = self.replay_flight_data('test_redshift_query')
+        factory = self.get_session_factory('test_redshift_query')
         p = self.load_policy({
             'name': 'redshift-query',
             'resource': 'redshift'}, session_factory=factory)
@@ -56,7 +56,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(resources, [])
 
     def test_redshift_parameter(self):
-        factory = self.replay_flight_data('test_redshift_parameter')
+        factory = self.get_session_factory('test_redshift_parameter')
         p = self.load_policy({
             'name': 'redshift-ssl',
             'resource': 'redshift',
@@ -70,7 +70,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_redshift_simple_tag_filter(self):
-        factory = self.replay_flight_data('test_redshift_tag_filter')
+        factory = self.get_session_factory('test_redshift_tag_filter')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-tag-filter',
@@ -87,7 +87,7 @@ class TestRedshift(BaseTest):
         self.assertTrue('maid_status' in tag_map)
 
     def test_redshift_cluster_mark(self):
-        factory = self.replay_flight_data('test_redshift_cluster_mark')
+        factory = self.get_session_factory('test_redshift_cluster_mark')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-cluster-mark',
@@ -110,7 +110,7 @@ class TestRedshift(BaseTest):
         self.assertTrue('maid_status' in tag_map)
 
     def test_redshift_cluster_unmark(self):
-        factory = self.replay_flight_data('test_redshift_cluster_unmark')
+        factory = self.get_session_factory('test_redshift_cluster_unmark')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-cluster-unmark',
@@ -132,7 +132,7 @@ class TestRedshift(BaseTest):
         self.assertFalse('maid_status' in tag_map)
 
     def test_redshift_delete(self):
-        factory = self.replay_flight_data('test_redshift_delete')
+        factory = self.get_session_factory('test_redshift_delete')
         p = self.load_policy({
             'name': 'redshift-ssl',
             'resource': 'redshift',
@@ -145,7 +145,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_redshift_default_vpc(self):
-        session_factory = self.replay_flight_data('test_redshift_default_vpc')
+        session_factory = self.get_session_factory('test_redshift_default_vpc')
         p = self.load_policy(
             {'name': 'redshift-default-filters',
              'resource': 'redshift',
@@ -158,7 +158,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_redshift_retention(self):
-        session_factory = self.replay_flight_data('test_redshift_retention')
+        session_factory = self.get_session_factory('test_redshift_retention')
         p = self.load_policy({
             'name': 'redshift-retention',
             'resource': 'redshift',
@@ -172,7 +172,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_redshift_snapshot(self):
-        factory = self.replay_flight_data('test_redshift_snapshot')
+        factory = self.get_session_factory('test_redshift_snapshot')
         client = factory().client('redshift')
         cluster_tags = []
         p = self.load_policy({
@@ -206,7 +206,7 @@ class TestRedshift(BaseTest):
         self.assertEqual(cluster_tags, tag_snapshot)
 
     def test_redshift_vpc_routing(self):
-        factory = self.replay_flight_data('test_redshift_vpc_routing')
+        factory = self.get_session_factory('test_redshift_vpc_routing')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-vpc-routing',
@@ -235,7 +235,7 @@ class TestRedshift(BaseTest):
 class TestRedshiftSnapshot(BaseTest):
 
     def test_redshift_snapshot_simple(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_redshift_snapshot_simple')
         p = self.load_policy({
             'name': 'redshift-snapshot-simple',
@@ -245,7 +245,7 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_redshift_snapshot_simple_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_redshift_snapshot_simple')
         p = self.load_policy({
             'name': 'redshift-snapshot-simple-filter',
@@ -259,7 +259,7 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_redshift_snapshot_age_filter(self):
-        factory = self.replay_flight_data('test_redshift_snapshot_simple')
+        factory = self.get_session_factory('test_redshift_snapshot_simple')
         p = self.load_policy({
             'name': 'redshift-snapshot-age-filter',
             'resource': 'redshift-snapshot',
@@ -269,7 +269,7 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_redshift_snapshot_delete(self):
-        factory = self.replay_flight_data('test_redshift_snapshot_delete')
+        factory = self.get_session_factory('test_redshift_snapshot_delete')
         p = self.load_policy({
             'name': 'redshift-snapshot-delete',
             'resource': 'redshift-snapshot',
@@ -279,7 +279,7 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_redshift_snapshot_mark(self):
-        factory = self.replay_flight_data('test_redshift_snapshot_mark')
+        factory = self.get_session_factory('test_redshift_snapshot_mark')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-snapshot-mark',
@@ -302,7 +302,7 @@ class TestRedshiftSnapshot(BaseTest):
         self.assertTrue('maid_status' in tag_map)
 
     def test_redshift_snapshot_unmark(self):
-        factory = self.replay_flight_data('test_redshift_snapshot_unmark')
+        factory = self.get_session_factory('test_redshift_snapshot_unmark')
         client = factory().client('redshift')
         p = self.load_policy({
             'name': 'redshift-snapshot-unmark',
@@ -334,7 +334,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #        - translates to 1 cluster marked non-compliant
         #
         # Results in 2 clusters with default Security Group attached
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_redshift_remove_matched_security_groups')
         p = self.load_policy(
             {'name': 'redshift-remove-matched-security-groups',
@@ -380,7 +380,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # Results in 1 cluster with default Security Group and
         # PROD-ONLY-Test-Security-Group
 
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_redshift_add_security_group')
 
         p = self.load_policy({

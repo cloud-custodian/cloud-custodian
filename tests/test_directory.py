@@ -21,7 +21,7 @@ from .common import BaseTest, load_data
 class CloudDirectoryTest(BaseTest):
 
     def test_cloud_directory(self):
-        session_factory = self.replay_flight_data('test_cloud_directory')
+        session_factory = self.get_session_factory('test_cloud_directory')
         client = session_factory().client('clouddirectory')
 
         schema_arn = client.create_schema(Name='gooseberry').get('SchemaArn')

@@ -37,7 +37,7 @@ logger = logging.getLogger(name='c7n.tests')
 class RDSTest(BaseTest):
 
     def test_rds_stop(self):
-        session_factory = self.replay_flight_data('test_rds_stop')
+        session_factory = self.get_session_factory('test_rds_stop')
         db_instance_id = 'rds-test-instance-1'
         client = session_factory().client('rds')
         p = self.load_policy({
@@ -56,7 +56,7 @@ class RDSTest(BaseTest):
             result['DBInstances'][0]['DBInstanceStatus'], 'stopping')
 
     def test_rds_start(self):
-        session_factory = self.replay_flight_data('test_rds_start')
+        session_factory = self.get_session_factory('test_rds_start')
         db_instance_id = 'rds-test-instance-2'
         client = session_factory().client('rds')
         p = self.load_policy({
@@ -75,7 +75,7 @@ class RDSTest(BaseTest):
             result['DBInstances'][0]['DBInstanceStatus'], 'starting')
 
     def test_rds_autopatch(self):
-        session_factory = self.replay_flight_data('test_rds_auto_patch')
+        session_factory = self.get_session_factory('test_rds_auto_patch')
         p = self.load_policy({
             'name': 'rds-tags',
             'resource': 'rds',
@@ -89,7 +89,7 @@ class RDSTest(BaseTest):
     def test_rds_autopatch_with_window(self):
         window = 'mon:23:00-tue:01:00'
 
-        session_factory = self.replay_flight_data('test_rds_auto_patch_with_window')
+        session_factory = self.get_session_factory('test_rds_auto_patch_with_window')
         p = self.load_policy({
             'name': 'rds-tags',
             'resource': 'rds',
@@ -115,7 +115,7 @@ class RDSTest(BaseTest):
         self.assertEqual(details['PreferredMaintenanceWindow'], window)
 
     def test_rds_tags(self):
-        session_factory = self.replay_flight_data('test_rds_tags')
+        session_factory = self.get_session_factory('test_rds_tags')
         p = self.load_policy({
             'name': 'rds-tags',
             'resource': 'rds',
@@ -127,7 +127,7 @@ class RDSTest(BaseTest):
 
     def test_rds_tag_trim(self):
         self.patch(tags.TagTrim, 'max_tag_count', 1)
-        session_factory = self.replay_flight_data('test_rds_tag_trim')
+        session_factory = self.get_session_factory('test_rds_tag_trim')
         p = self.load_policy({
             'name': 'rds-tags',
             'resource': 'rds',
@@ -141,7 +141,7 @@ class RDSTest(BaseTest):
 
     def test_rds_tag_and_remove(self):
         self.patch(rds.RDS, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_rds_tag_and_remove')
+        session_factory = self.get_session_factory('test_rds_tag_and_remove')
         client = session_factory().client('rds')
 
         p = self.load_policy({
@@ -178,7 +178,7 @@ class RDSTest(BaseTest):
         self.assertFalse('xyz' in tag_map)
 
     def test_rds_mark_and_match(self):
-        session_factory = self.replay_flight_data('test_rds_mark_and_match')
+        session_factory = self.get_session_factory('test_rds_mark_and_match')
         p = self.load_policy({
             'name': 'rds-mark',
             'resource': 'rds',
@@ -202,7 +202,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_default_vpc(self):
-        session_factory = self.replay_flight_data('test_rds_default_vpc')
+        session_factory = self.get_session_factory('test_rds_default_vpc')
         p = self.load_policy(
             {'name': 'rds-default-filters',
              'resource': 'rds',
@@ -215,7 +215,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_rds_kms_alias(self):
-        session_factory = self.replay_flight_data('test_rds_kms_alias')
+        session_factory = self.get_session_factory('test_rds_kms_alias')
         p = self.load_policy(
             {'name': 'rds-aws-managed-kms-keys-filters',
              'resource': 'rds',
@@ -229,7 +229,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot(self):
-        session_factory = self.replay_flight_data('test_rds_snapshot')
+        session_factory = self.get_session_factory('test_rds_snapshot')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
@@ -241,7 +241,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_retention(self):
-        session_factory = self.replay_flight_data('test_rds_retention')
+        session_factory = self.get_session_factory('test_rds_retention')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
@@ -253,7 +253,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 6)
 
     def test_rds_retention_copy_tags(self):
-        session_factory = self.replay_flight_data('test_rds_retention')
+        session_factory = self.get_session_factory('test_rds_retention')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
@@ -266,7 +266,7 @@ class RDSTest(BaseTest):
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, 'executor_factory', MainThreadExecutor)
-        session_factory = self.replay_flight_data('test_rds_restore')
+        session_factory = self.get_session_factory('test_rds_restore')
         client = session_factory().client('rds')
         instance_id = 'mxtest'
         self.assertRaises(
@@ -294,7 +294,7 @@ class RDSTest(BaseTest):
             self.fail("DB Not found")
 
     def test_rds_delete_copy(self):
-        session_factory = self.replay_flight_data('test_rds_delete_copy_restore')
+        session_factory = self.get_session_factory('test_rds_delete_copy_restore')
         client = session_factory().client('rds')
         instance_id = 'mxtest'
         db_info = client.describe_db_instances(DBInstanceIdentifier=instance_id)
@@ -318,7 +318,7 @@ class RDSTest(BaseTest):
         self.assertTrue(snap_keys.issuperset(rds.RestoreInstance.restore_keys))
 
     def test_rds_delete(self):
-        session_factory = self.replay_flight_data('test_rds_delete')
+        session_factory = self.get_session_factory('test_rds_delete')
         p = self.load_policy(
             {'name': 'rds-delete',
              'resource': 'rds',
@@ -333,7 +333,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_available_engine_upgrades(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_available_engine_upgrades', zdata=True)
         client = session_factory().client('rds')
         upgrades = rds._get_available_engine_upgrades(client)
@@ -347,7 +347,7 @@ class RDSTest(BaseTest):
                          '12.00.5000.0.v1')
 
     def test_rds_upgrade_available(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_minor_upgrade_available')
         p = self.load_policy(
             {'name': 'rds-upgrade-available',
@@ -370,7 +370,7 @@ class RDSTest(BaseTest):
             {u'5.6.27': u'5.7.11'})
 
     def test_rds_minor_upgrade_unavailable(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_minor_upgrade_unavailable')
         p = self.load_policy(
             {'name': 'rds-upgrade-done',
@@ -386,7 +386,7 @@ class RDSTest(BaseTest):
             {u'5.5.41': u'5.5.46', u'5.6.29': None, u'5.7.11': None})
 
     def test_rds_minor_upgrade_do(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_minor_upgrade_do')
         p = self.load_policy(
             {'name': 'rds-upgrade-do',
@@ -577,7 +577,7 @@ class RDSTest(BaseTest):
 class RDSSnapshotTest(BaseTest):
 
     def test_rds_snapshot_access(self):
-        factory = self.replay_flight_data('test_rds_snapshot_access')
+        factory = self.get_session_factory('test_rds_snapshot_access')
         p = self.load_policy({
             'name': 'rds-snap-access',
             'resource': 'rds-snapshot',
@@ -593,7 +593,7 @@ class RDSSnapshotTest(BaseTest):
     def test_rds_latest_manual(self):
         # preconditions
         # one db with manual and automatic snapshots
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_rds_snapshot_latest')
         p = self.load_policy({
             'name': 'rds-latest-snaps',
@@ -609,7 +609,7 @@ class RDSSnapshotTest(BaseTest):
     def test_rds_latest(self):
         # preconditions
         # one db with manual and automatic snapshots
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_rds_snapshot_latest')
         p = self.load_policy({
             'name': 'rds-latest-snaps',
@@ -634,7 +634,7 @@ class RDSSnapshotTest(BaseTest):
 
     def test_rds_cross_region_copy_skip_same_region(self):
         self.change_environment(AWS_DEFAULT_REGION='us-east-2')
-        factory = self.replay_flight_data('test_rds_snapshot_latest')
+        factory = self.get_session_factory('test_rds_snapshot_latest')
         output = self.capture_logging('custodian.actions')
         p = self.load_policy({
             'name': 'rds-copy-skip',
@@ -654,7 +654,7 @@ class RDSSnapshotTest(BaseTest):
         # in this scenario we have 9 snapshots in source region,
         # 3 snaps already in target region, 6 to copy, which means
         # we will hit transfer limits.
-        factory = self.replay_flight_data(
+        factory = self.get_session_factory(
             'test_rds_snapshot_region_copy_many')
 
         # no sleep till, beastie boys ;-)
@@ -685,7 +685,7 @@ class RDSSnapshotTest(BaseTest):
     def test_rds_cross_region_copy(self):
         # preconditions
         # rds snapshot, encrypted in region with kms, and tags
-        factory = self.replay_flight_data('test_rds_snapshot_region_copy')
+        factory = self.get_session_factory('test_rds_snapshot_region_copy')
         client = factory().client('rds', region_name='us-east-2')
         self.change_environment(AWS_DEFAULT_REGION="us-east-1")
         p = self.load_policy({
@@ -718,7 +718,7 @@ class RDSSnapshotTest(BaseTest):
             tags)
 
     def test_rds_snapshot_tag_filter(self):
-        factory = self.replay_flight_data('test_rds_snapshot_tag_filter')
+        factory = self.get_session_factory('test_rds_snapshot_tag_filter')
         client = factory().client('rds')
         p = self.load_policy({
             'name': 'rds-snapshot-tag-filter',
@@ -736,7 +736,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertTrue('delete@' in tag_map['maid_status'])
 
     def test_rds_snapshot_age_filter(self):
-        factory = self.replay_flight_data('test_rds_snapshot_age_filter')
+        factory = self.get_session_factory('test_rds_snapshot_age_filter')
         p = self.load_policy({
             'name': 'rds-snapshot-age-filter',
             'resource': 'rds-snapshot',
@@ -746,7 +746,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot_trim(self):
-        factory = self.replay_flight_data('test_rds_snapshot_delete')
+        factory = self.get_session_factory('test_rds_snapshot_delete')
         p = self.load_policy({
             'name': 'rds-snapshot-trim',
             'resource': 'rds-snapshot',
@@ -756,7 +756,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_snapshot_tag(self):
-        factory = self.replay_flight_data('test_rds_snapshot_mark')
+        factory = self.get_session_factory('test_rds_snapshot_mark')
         client = factory().client('rds')
         p = self.load_policy({
             'name': 'rds-snapshot-tag',
@@ -775,7 +775,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertTrue('test-value' in tag_map['test-key'])
 
     def test_rds_snapshot_mark(self):
-        factory = self.replay_flight_data('test_rds_snapshot_mark')
+        factory = self.get_session_factory('test_rds_snapshot_mark')
         client = factory().client('rds')
         p = self.load_policy({
             'name': 'rds-snapshot-mark',
@@ -793,7 +793,7 @@ class RDSSnapshotTest(BaseTest):
         self.assertTrue('maid_status' in tag_map)
 
     def test_rds_snapshot_unmark(self):
-        factory = self.replay_flight_data('test_rds_snapshot_unmark')
+        factory = self.get_session_factory('test_rds_snapshot_unmark')
         client = factory().client('rds')
         p = self.load_policy({
             'name': 'rds-snapshot-unmark',
@@ -823,7 +823,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #
         # Results in 4 DB Instances with default Security Group attached
 
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_remove_matched_security_groups')
         p = self.load_policy(
             {'name': 'rds-remove-matched-security-groups',
@@ -874,7 +874,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         #
         # Results in 4 instances with default Security Group and
         # PROD-ONLY-Test-Security-Group
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_add_security_group')
         p = self.load_policy({
             'name': 'add-sg-to-prod-rds',
@@ -917,7 +917,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
 class TestHealthEventsFilter(BaseTest):
     def test_rds_health_events_filter(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.get_session_factory(
             'test_rds_health_events_filter')
         policy = self.load_policy({
             'name': 'rds-health-events-filter',
@@ -952,7 +952,7 @@ class TestRDSParameterGroupFilter(BaseTest):
     ]
 
     def test_param_value_cases(self):
-        session_factory = self.replay_flight_data('test_rds_param_filter')
+        session_factory = self.get_session_factory('test_rds_param_filter')
         policy = self.load_policy(
             {'name': 'rds-pg-filter', 'resource': 'rds'},
             session_factory=session_factory)
@@ -1051,7 +1051,7 @@ class Resize(BaseTest):
 
 
     def start(self, flight_data):
-        session_factory = self.replay_flight_data(flight_data)
+        session_factory = self.get_session_factory(flight_data)
         session = session_factory(region='us-west-2')
         client = session.client('rds')
         waiting_client = self.get_waiting_client(session_factory, session, 'rds')

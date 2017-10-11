@@ -19,7 +19,7 @@ from .common import BaseTest
 class HealthResource(BaseTest):
 
     def test_health_query(self):
-        session_factory = self.replay_flight_data('test_health_query')
+        session_factory = self.get_session_factory('test_health_query')
         p = self.load_policy({
             'name': 'account-health-query',
             'resource': 'health-event'}, session_factory=session_factory)
@@ -27,7 +27,7 @@ class HealthResource(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_health_resource_query(self):
-        session_factory = self.replay_flight_data('test_health_resource_query')
+        session_factory = self.get_session_factory('test_health_resource_query')
         p = self.load_policy({
             'name': 'account-health-ec2-query',
             'resource': 'health-event',
@@ -37,7 +37,7 @@ class HealthResource(BaseTest):
         self.assertEqual(resources[0]['service'], 'EC2')
 
     def test_health_augment(self):
-        session_factory = self.replay_flight_data('test_health_augment')
+        session_factory = self.get_session_factory('test_health_augment')
         p = self.load_policy({
             'name': 'account-health-augment',
             'resource': 'health-event',
