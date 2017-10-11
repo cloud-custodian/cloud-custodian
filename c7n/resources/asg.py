@@ -688,11 +688,14 @@ class Resize(Action):
 
     schema = type_schema(
         'resize',
-        min_size={'type': 'string'},
-        max_size={'type': 'string'},
+        min_size={'type': 'int'},
+        max_size={'type': 'int'},
         desired_size={'type': 'string'},
+        save_to_tag={'type': 'string'},
+        restore_from_tag={'type': 'string'},
         required=())
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
+
 
     def validate(self):
         # if self.data['desired_size'] != 'current':
@@ -701,32 +704,62 @@ class Resize(Action):
         return self
 
     def process(self, asgs):
+        # ASG parameters to save to/restore from a tag
+        asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
+
         client = local_session(self.manager.session_factory).client(
             'autoscaling')
         for a in asgs:
+            tag_map = {t['Key']: t['Value'] for t in a.get('Tags', [])}
             update = {}
             current_size = len(a['Instances'])
 
-            if 'min_size' in self.data:
-                update['MinSize'] = int(self.data['min_size'])
+            if 'restore_from_tag' in self.data:
+                # attempt to restore all ASG size params from saved data
+                if self.data['restore_from_tag'] in tag_map:
+                    log.debug('Want to restore ASG %s size from tag %s' %
+                        (a['AutoScalingGroupName'], self.data['restore_from_tag']))
+                    for field in tag_map[self.data['restore_from_tag']].split(';'):
+                        (param, value) = field.split('=')
+                        if param in asg_params:
+                            update[param] = int(value)
 
-            if 'max_size' in self.data:
-                update['MaxSize'] = int(self.data['max_size'])
+            else:
+                # we want to resize, parse provided params
+                if 'min_size' in self.data:
+                    update['MinSize'] = int(self.data['min_size'])
 
-            if 'desired_size' in self.data:
-                if self.data['desired_size'] is 'current':
-                    update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
-                    if 'MinSize' not in update:
-                        # unless we got a specific new value for min_size then
-                        # ensure it is at least as low as current_size
-                        update['MinSize'] = min(current_size, a['MinSize'])
-                else:
-                    update['DesiredCapacity'] = int(self.data['desired_size'])
+                if 'max_size' in self.data:
+                    update['MaxSize'] = int(self.data['max_size'])
+
+                if 'desired_size' in self.data:
+                    if self.data['desired_size'] is 'current':
+                        update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
+                        if 'MinSize' not in update:
+                            # unless we got a specific new value for min_size then
+                            # ensure it is at least as low as current_size
+                            update['MinSize'] = min(current_size, a['MinSize'])
+                    else:
+                        update['DesiredCapacity'] = int(self.data['desired_size'])
 
             if update:
                 log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
                     % (a['AutoScalingGroupName'], current_size, a['MinSize'],
                     a['MaxSize'], a['DesiredCapacity']))
+
+                if 'save_to_tag' in self.data:
+                    # save existing ASG params to a tag before changing them
+                    log.debug('Saving ASG %s size to tag %s' %
+                        (a['AutoScalingGroupName'], self.data['save_to_tag']))
+                    tags = [dict(
+                        Key=self.data['save_to_tag'],
+                        PropagateAtLaunch=False,
+                        Value=';'.join({'%s=%d' % (param, a[param]) for param in asg_params}),
+                        ResourceId=a['AutoScalingGroupName'],
+                        ResourceType='auto-scaling-group',
+                    )]
+                    self.manager.retry(client.create_or_update_tags, Tags=tags)
+
                 log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
                     str(update)))
                 self.manager.retry(
