@@ -2250,6 +2250,38 @@ class Lifecycle(BucketActionBase):
 
     permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error('error modifying bucket lifecycle: %s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        # Fetch the existing lifecycle and merge in any new rules appropriately.
+        resp = self.get_lifecycle_configuration(s3, bucket['Name'])
+        config = resp['Rules']
+        for rule in self.data['rules']:
+            for index, existing_rule in enumerate(config):
+                if rule['ID'] == existing_rule['ID']:
+                    config[index] = rule
+                    break
+            else:
+                config.append(rule)
+
+        s3.put_bucket_lifecycle_configuration(
+            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+
     def get_lifecycle_configuration(self, s3, bucket):
         # If no lifecycle exists AWS gives a 404.  Protect against that.
         try:
@@ -2261,24 +2293,3 @@ class Lifecycle(BucketActionBase):
                 raise
 
         return resp
-
-    def process(self, buckets):
-
-        for bucket in buckets:
-            s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-
-            # Fetch the existing lifecycle and merge in any new rules appropriately.
-            resp = self.get_lifecycle_configuration(s3, bucket['Name'])
-            config = resp['Rules']
-            for rule in self.data['rules']:
-                for index, existing_rule in enumerate(config):
-                    # If a matching lifecycle is found then replace it
-                    if rule['ID'] == existing_rule['ID']:
-                        config[index] = rule
-                        break
-                else:
-                    # If no match is found, add to existing ones
-                    config.append(rule)
-
-            s3.put_bucket_lifecycle_configuration(
-                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
