@@ -1850,18 +1850,18 @@ class S3LifecycleTest(BaseTest):
             }]
         }
 
+        def run_policy(policy):
+            p = self.load_policy(policy, session_factory=session_factory)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+            if self.recording:
+                time.sleep(5)
+
         #
         # Add the first lifecycle
         #
-        p = self.load_policy(policy, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        # Note: when recording this test, I needed to add a delay here or else
-        # the lifecycle was not found.
-        #time.sleep(5)
-
-        # Verify the lifecycle
+        run_policy(policy)
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
 
@@ -1871,15 +1871,7 @@ class S3LifecycleTest(BaseTest):
         lifecycle_id2 = 'test-lifecycle-two'
         rule['ID'] = lifecycle_id2
         rule['Prefix'] = 'bar/'
-
-        # Add the lifecycle
-        p = self.load_policy(policy, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        # Note: when recording this test, I needed to add a delay here or else
-        # the lifecycle was not found.
-        #time.sleep(5)
+        run_policy(policy)
 
         # Verify the lifecycle
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
@@ -1891,15 +1883,7 @@ class S3LifecycleTest(BaseTest):
         # Last test - overwrite one of the lifecycles and make sure it changed
         #
         rule['Prefix'] = 'baz/'
-
-        # Add the lifecycle
-        p = self.load_policy(policy, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        # Note: when recording this test, I needed to add a delay here or else
-        # the lifecycle was not found.
-        #time.sleep(5)
+        run_policy(policy)
 
         # Verify the lifecycle
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
