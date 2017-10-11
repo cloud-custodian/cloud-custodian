@@ -2205,6 +2205,19 @@ class DeleteBucket(ScanBucket):
             return results
 
 
+def get_lifecycle_configuration(s3, bucket):
+    # If no lifecycle exists AWS gives a 404.  Protect against that.
+    try:
+        resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
+            resp = {'Rules': []}
+        else:
+            raise
+
+    return resp
+
+
 @actions.register('configure-lifecycle')
 class Lifecycle(BucketActionBase):
     """Action applies a lifecycle policy to versioned S3 buckets
@@ -2269,7 +2282,7 @@ class Lifecycle(BucketActionBase):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
         # Fetch the existing lifecycle and merge in any new rules appropriately.
-        resp = self.get_lifecycle_configuration(s3, bucket['Name'])
+        resp = get_lifecycle_configuration(s3, bucket['Name'])
         config = resp['Rules']
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
@@ -2282,14 +2295,67 @@ class Lifecycle(BucketActionBase):
         s3.put_bucket_lifecycle_configuration(
             Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
 
-    def get_lifecycle_configuration(self, s3, bucket):
-        # If no lifecycle exists AWS gives a 404.  Protect against that.
-        try:
-            resp = s3.get_bucket_lifecycle_configuration(Bucket=bucket)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchLifecycleConfiguration':
-                resp = {'Rules': []}
-            else:
-                raise
 
-        return resp
+@actions.register('delete-lifecycle-rule')
+class Lifecycle(BucketActionBase):
+    """Action deletes named rules from the lifecycle.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-delete-lifecycle-rule
+                resource: s3
+                actions:
+                  - type: delete-lifecycle-rule
+                    rules:
+                      - my-lifecycle-rule-id
+                      - other-rule-id
+
+    """
+
+    schema = type_schema(
+        'delete-lifecycle-rule',
+        **{
+            'ids': {
+                'required': True,
+                'type': 'array',
+                'items': {'type': 'string'},
+            },
+        }
+    )
+
+    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error('error modifying bucket lifecycle: %s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        # Fetch the existing lifecycle and delete provided rule IDs
+        resp = get_lifecycle_configuration(s3, bucket['Name'])
+        config = resp['Rules']
+        new_config = []
+        for existing_rule in resp['Rules']:
+            if existing_rule['ID'] in self.data['ids']:
+                self.log.debug('Removing lifecycle rule %s from bucket %s',
+                               existing_rule['ID'], bucket['Name'])
+            else:
+                new_config.append(existing_rule)
+
+        s3.put_bucket_lifecycle_configuration(
+            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': new_config})
