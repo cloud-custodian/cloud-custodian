@@ -201,29 +201,28 @@ def _db_instance_eligible_for_backup(resource):
 
 
 def _db_instance_eligible_for_final_snapshot(resource):
-    db_instance_id = resource['DBInstanceIdentifier']
     status = resource.get('DBInstanceStatus', '')
-
     # If the DB instance you are deleting has a status of "Creating,"
     # you will not be able to have a final DB snapshot taken
     # If the DB instance is in a failure state with a status of "failed,"
     # "incompatible-restore," or "incompatible-network," you can only delete
     # the instance when the SkipFinalSnapshot parameter is set to "true."
-    if status in ['creating', 'failed',
-                  'incompatible-restore', 'incompatible-network']:
-        log.debug(
-            "DB instance %s is in invalid state",
-            db_instance_id)
-        return False
+    eligible_for_final_snapshot = True
+    if status in ['creating', 'failed', 'incompatible-restore', 'incompatible-network']:
+        eligible_for_final_snapshot = False
 
     # FinalDBSnapshotIdentifier can not be specified when deleting a
     # replica instance
     if resource.get('ReadReplicaSourceDBInstanceIdentifier', ''):
-        log.debug(
-            "DB instance %s is a read-replica",
-            db_instance_id)
-        return False
-    return True
+        eligible_for_final_snapshot = False
+
+    # if it's a rds-cluster, don't try to run the rds instance snapshot api call
+    if resource.get('DBClusterIdentifier', False):
+        eligible_for_final_snapshot = False
+
+    if not eligible_for_final_snapshot:
+        log.debug('DB instance is not eligible for a snapshot:/n %s', resource)
+    return eligible_for_final_snapshot
 
 
 def _get_available_engine_upgrades(client, major=False):
