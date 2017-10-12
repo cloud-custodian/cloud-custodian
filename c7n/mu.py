@@ -26,7 +26,6 @@ import io
 import json
 import logging
 import os
-import sys
 import time
 import tempfile
 import zipfile
@@ -620,10 +619,9 @@ def run(event, context):
 
 
 class PolicyLambda(AbstractLambdaFunction):
-    """Wraps a custodian policy to turn it into lambda function.
+    """Wraps a custodian policy to turn it into a lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy
@@ -641,6 +639,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def role(self):
         return self.policy.data['mode'].get('role', '')
+
+    @property
+    def runtime(self):
+        return self.policy.data['mode'].get('runtime', 'python2.7')
 
     @property
     def memory_size(self):

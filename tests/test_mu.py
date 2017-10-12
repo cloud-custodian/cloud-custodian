@@ -423,7 +423,11 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
+        def cleanup():
+            mgr.remove(pl)
+            if self.recording:
+                time.sleep(60)
+        self.addCleanup(cleanup)
         return mgr, mgr.publish(pl)
 
     def create_a_lambda_with_lots_of_config(self, flight):
@@ -495,6 +499,7 @@ class PolicyLambdaProvision(BaseTest):
         mgr, result = self.create_a_lambda_with_lots_of_config(
             'test_config_coverage_for_lambda_update_from_complex')
         result = self.update_a_lambda(mgr, **{
+            'runtime': 'python3.6',
             'environment': {'Variables': {'FOO': 'baz'}},
             'kms_key_arn': '',
             'dead_letter_config': {},
@@ -507,7 +512,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': 'python2.7',
+             'Runtime': 'python3.6',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'baz'}},
