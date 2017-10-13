@@ -2297,7 +2297,7 @@ class Lifecycle(BucketActionBase):
 
 
 @actions.register('delete-lifecycle-rule')
-class Lifecycle(BucketActionBase):
+class DeleteLifecycle(BucketActionBase):
     """Action deletes named rules from the lifecycle.
 
     :example:
@@ -2348,7 +2348,6 @@ class Lifecycle(BucketActionBase):
 
         # Fetch the existing lifecycle and delete provided rule IDs
         resp = get_lifecycle_configuration(s3, bucket['Name'])
-        config = resp['Rules']
         new_config = []
         for existing_rule in resp['Rules']:
             if existing_rule['ID'] in self.data['ids']:
