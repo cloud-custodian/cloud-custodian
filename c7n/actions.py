@@ -197,10 +197,10 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string', 'pattern': '^sg-*'},
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
+        'anyOf': [
+            {'required': ['isolation-group', 'remove', 'type']},
+            {'required': ['add', 'remove', 'type']},
+            {'required': ['add', 'type']}]
     }
 
     def get_groups(self, resources, metadata_key=None):

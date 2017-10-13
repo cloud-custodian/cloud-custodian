@@ -266,6 +266,7 @@ class RDSTest(BaseTest):
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, 'executor_factory', MainThreadExecutor)
+        self.change_environment(AWS_DEFAULT_REGION='us-east-2')
         session_factory = self.replay_flight_data('test_rds_restore')
         client = session_factory().client('rds')
         instance_id = 'mxtest'
