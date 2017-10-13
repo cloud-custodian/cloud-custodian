@@ -2251,12 +2251,14 @@ class Lifecycle(BucketActionBase):
                 'items': {
                     'type': 'object',
                     'required': ['ID', 'Status'],
+                    'additionalProperties': False,
                     'properties': {
                         'ID': {'type': 'string'},
                         'Status': {'enum': ['Enabled', 'Disabled']},
                         'Prefix': {'type': 'string'},
                         'Expiration': {
                             'type': 'object',
+                            'additionalProperties': False,
                             'properties': {
                                 'Date': {'type': 'string'},  # Date
                                 'Days': {'type': 'integer'},
@@ -2267,13 +2269,13 @@ class Lifecycle(BucketActionBase):
                             'type': 'object',
                             'minProperties': 1,
                             'maxProperties': 1,
+                            'additionalProperties': False,
                             'properties': {
                                 'Prefix': {'type': 'string'},
                                 'Tag': {
                                     'type': 'object',
-                                    'minProperties': 2,
-                                    'maxProperties': 2,
                                     'required': ['Key', 'Value'],
+                                    'additionalProperties': False,
                                     'properties': {
                                         'Key': {'type': 'string'},
                                         'Value': {'type': 'string'},
@@ -2281,15 +2283,15 @@ class Lifecycle(BucketActionBase):
                                 },
                                 'And': {
                                     'type': 'object',
+                                    'additionalProperties': False,
                                     'items': {
                                         'Prefix': {'type': 'string'},
                                         'Tags': {
                                             'type': 'array',
                                             'items': {
                                                 'type': 'object',
-                                                'minProperties': 2,
-                                                'maxProperties': 2,
                                                 'required': ['Key', 'Value'],
+                                                'additionalProperties': False,
                                                 'items': {
                                                     'Key': {'type': 'string'},
                                                     'Value': {'type': 'string'},
@@ -2304,6 +2306,7 @@ class Lifecycle(BucketActionBase):
                             'type': 'array',
                             'items': {
                                 'type': 'object',
+                                'additionalProperties': False,
                                 'properties': {
                                     'Date': {'type': 'string'},  # Date
                                     'Days': {'type': 'integer'},
@@ -2315,6 +2318,7 @@ class Lifecycle(BucketActionBase):
                             'type': 'array',
                             'items': {
                                 'type': 'object',
+                                'additionalProperties': False,
                                 'properties': {
                                     'NoncurrentDays': {'type': 'integer'},
                                     'StorageClass': {'type': 'string'},
@@ -2323,12 +2327,14 @@ class Lifecycle(BucketActionBase):
                         },
                         'NoncurrentVersionExpiration': {
                             'type': 'object',
+                            'additionalProperties': False,
                             'items': {
                                 'NoncurrentDays': {'type': 'integer'},
                             },
                         },
                         'AbortIncompleteMultipartUpload': {
                             'type': 'object',
+                            'additionalProperties': False,
                             'items': {
                                 'DaysAfterInitiation': {'type': 'integer'},
                             },
