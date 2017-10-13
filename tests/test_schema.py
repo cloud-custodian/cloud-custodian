@@ -285,3 +285,16 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 0)
 
+    def test_runtime(self):
+        data = lambda runtime: {
+            'policies': [{
+                'name': 'test',
+                'resource': 's3',
+                'mode': {
+                    'type': 'periodic',
+                    'runtime': runtime}}]
+            }
+        errors_with = lambda r: list(Validator(generate()).iter_errors(data(r)))
+        self.assertEqual(len(errors_with('python2.7')), 0)
+        self.assertEqual(len(errors_with('python3.6')), 0)
+        self.assertEqual(len(errors_with('python4.5')), 1)
