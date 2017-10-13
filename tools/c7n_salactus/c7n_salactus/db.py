@@ -110,6 +110,16 @@ class Bucket(object):
                     self.error_count)
 
     @property
+    def using_inventory(self):
+        # boolean
+        return bool(self.data['buckets-inventory'].get(self.bucket_id))
+
+    @property
+    def inventory(self):
+        # formatted...
+        return bool(self.data['buckets-inventory'].get(self.bucket_id)) and 'yes' or 'no'
+
+    @property
     def account(self):
         return self.bucket_id.split(':')[0]
 
@@ -204,6 +214,7 @@ def get_data():
     data['buckets-complete'] = list(
         conn.smembers('buckets-complete'))
     data['buckets-start'] = conn.hgetall('buckets-starts')
+    data['buckets-inventory'] = conn.hgetall('buckets-inventory')
     data['bucket-partitions'] = {
         k: int(v) for k, v in conn.hgetall('bucket-partition').items()}
     data['buckets-error'] = conn.hgetall(

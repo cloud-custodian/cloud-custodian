@@ -375,7 +375,7 @@ def accounts(dbpath, output, format, account,
 def format_plain(buckets, fh, keys=(), explicit_only=False):
     field_names = [
         'account', 'name', 'region', 'percent_scanned', 'matched',
-        'scanned', 'size', 'keys_denied', 'error_count', 'partitions']
+        'scanned', 'size', 'keys_denied', 'error_count', 'partitions', 'inventory']
 
     if explicit_only:
         field_names = keys
@@ -395,12 +395,12 @@ def format_plain(buckets, fh, keys=(), explicit_only=False):
 
 def format_csv(buckets, fh, keys=()):
     field_names = ['account', 'name', 'region', 'created', 'matched', 'scanned',
-                   'size', 'keys_denied', 'error_count', 'partitions']
+                   'size', 'keys_denied', 'error_count', 'partitions', 'inventory']
     for k in keys:
         field_names.insert(0, k)
 
     totals = Counter()
-    skip = set(('account', 'name', 'region', 'percent', 'created'))
+    skip = set(('account', 'name', 'region', 'percent', 'created', 'inventory'))
     skip.update(keys)
 
     for b in buckets:
@@ -447,6 +447,8 @@ def format_csv(buckets, fh, keys=()):
               help="filter to buckets in region", multiple=True)
 @click.option('--not-region',
               help="filter to buckets in region", multiple=True)
+@click.option('--inventory',
+              help="filter to buckets using inventory", is_flag=True)
 @click.option('--config', type=click.Path(),
               help="config file for accounts")
 @click.option('--sort',
@@ -458,8 +460,8 @@ def format_csv(buckets, fh, keys=()):
 def buckets(bucket=None, account=None, matched=False, kdenied=False,
             errors=False, dbpath=None, size=None, denied=False,
             format=None, incomplete=False, oversize=False, region=(),
-            not_region=(), output=None, config=None, sort=None, tagprefix=None,
-            exclude=None):
+            not_region=(), inventory=None, output=None, config=None, sort=None,
+            tagprefix=None, exclude=None):
     """Report on stats by bucket"""
 
     d = db.db(dbpath)
@@ -491,6 +493,8 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
         if errors and not b.error_count:
             continue
         if size and b.size < size:
+            continue
+        if inventory and not b.using_inventory:
             continue
         if denied and not b.denied:
             continue
@@ -646,6 +650,7 @@ def inspect_bucket(bucket):
     click.echo("Region: %s" % found.region)
     click.echo("Created: %s" % found.created)
     click.echo("Size: %s" % found.size)
+    click.echo("Inventory: %s" % found.inventory)
     click.echo("Partitions: %s" % found.partitions)
     click.echo("Scanned: %0.2f%%" % found.percent_scanned)
     click.echo("")
