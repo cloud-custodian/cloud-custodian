@@ -390,7 +390,7 @@ def dispatch_object_source(client, account_info, bid, bucket_info):
             bucket_info['name'],
             account_info['inventory'].get('id-selector', '*'))
         if inventory_info is not None:
-            invoke(
+            return invoke(
                 process_bucket_inventory, bid,
                 inventory_info['bucket'], inventory_info['prefix'])
 
@@ -716,10 +716,12 @@ def process_bucket_inventory(bid, inventory_bucket, inventory_prefix):
         page_iterator = load_bucket_inventory(
             s3, inventory_bucket, inventory_prefix, versioned, ifilters)
         if page_iterator is None:
+            log.info("bucket:%s could not find inventory" % bid)
             # case: inventory configured but not delivered yet
             # action: dispatch to bucket partition (assumes 100k+ for inventory)
             # - todo consider max inventory age/staleness for usage
-            invoke(process_bucket_partitions, bid)
+            return invoke(process_bucket_partitions, bid)
+        connection.hset('buckets-inventory', bid, 1)
         for page in page_iterator:
             invoke(process_keyset, bid, page)
 
@@ -911,7 +913,7 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
                 stats['denied'] += 1
                 if object_reporting:
                     stats['objects_denied'].append(k)
-            elif code == '404':  # Not Found
+            elif code in ('404', 'NoSuchKey'):  # Not Found
                 stats['missing'] += 1
             elif code in ('503', '500', 'SlowDown'):  # Slow down, or throttle
                 time.sleep(3)

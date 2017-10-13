@@ -58,7 +58,7 @@ from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, PutMetric, RemovePolicyBase)
+    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -74,7 +74,6 @@ log = logging.getLogger('custodian.s3')
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
 filters.register('marked-for-op', TagActionFilter)
-actions.register('auto-tag-user', AutoTagUser)
 actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
