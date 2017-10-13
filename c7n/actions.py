@@ -20,12 +20,14 @@ import base64
 from datetime import datetime
 import jmespath
 import logging
+import os
 import zlib
 
 import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
+from c7n.filters import FilterValidationError
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n import utils
@@ -657,6 +659,110 @@ class AutoTagUser(EventAction):
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
+
+
+class IndexMetrics(BaseAction):
+    """Store resource cloud watch metrics into a data store.
+    """
+    permissions = ()
+    schema = {
+        'type': 'object',
+        'required': ['type', 'indexer', 'metrics'],
+        'properties': {
+            'type': {'enum': ['index-metrics']},
+            'metrics': {'type': 'array', 'items': {'type': 'string'}},
+            'env-tags': {'type': 'array', 'items': {'type': 'string'}},
+            'resource-tags': {'type': 'array', 'items': {'type': 'string'}},
+            'tags': {'type': 'object'},
+            'indexer' : {
+                'oneOf': [
+                    {
+                        'type': 'object',
+                        'required': ['host', 'db', 'user', 'password'],
+                        'properties': {
+                            'type': {'enum': ['influx']},
+                            'host': {'type': 'string'},
+                            'db': {'type': 'string'},
+                            'user': {'type': 'string'},
+                            'password': {'type': 'string'}
+                        }
+                    }]
+            }
+        }
+    }
+
+    statistics = ('Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount')
+
+    def validate(self):
+        try:
+            from influxdb import InfluxDBClient
+        except:
+            raise FilterValidationError("missing python influxdb client library")
+        InfluxDBClient
+        return self
+
+    def process(self, resources):
+        from influxdb import InfluxDBClient
+        config = self.data.get('indexer')
+        sink = InfluxDBClient(
+            username=config['user'],
+            password=config['password'],
+            database=config['db'],
+            host=config.get('host'))
+
+        tags = {}
+        for e in self.data.get('env-tags', ()):
+            tags[e] = os.environ.get(e)
+        tags.update(self.data.get('tags', {}))
+
+        for resource_set in utils.chunks(resources, 50):
+            self.process_resource_set(sink, tags, resource_set)
+
+    def process_resource_set(self, sink, tags, resource_set):
+        points = []
+        model = self.manager.resource_type
+        for r in resource_set:
+            metrics_data = r.get('c7n.metrics', {})
+            metrics = metrics_data.keys()
+            for m in self.data.get('metrics'):
+                key = None
+                for mk in metrics:
+                    if m in mk:
+                        key = mk
+                        break
+                if key is None:
+                    self.log.warning("requested metric:%s not found", m)
+                    continue
+                point_set = metrics_data.get(key)
+                rtags = {
+                    'ResourceId': r[model.id],
+                    #  'Policy': self.manager.data.get('name'),
+                    'ResourceType': self.manager.data.get('resource'),
+                    'AccountId': self.manager.config.account_id,
+                    'Region': self.manager.config.region}
+                if self.data.get('resource-tags', ()):
+                    resource_tags = {t['Key']: t['Value'] for t in r.get('Tags', ())}
+                    for rt in self.data.get('resource-tags'):
+                        if rt in resource_tags:
+                            rtags[rt] = resource_tags[rt]
+                for p in point_set:
+                    p = dict(p)
+                    p['fields'] = {}
+                    for s in self.statistics:
+                        if s in p:
+                            p['fields'][s] = p.pop(s)
+                    if 'Unit' in p:
+                        pu = p.pop('Unit', None)
+                        if pu != 'None':
+                            p['fields']['Unit'] = pu
+                    p['measurement'] = ("%s_%s" % (
+                        self.manager.data['resource'], m)).lower()
+                    p['time'] = p.pop('Timestamp')
+                    p['tags'] = {}
+                    p['tags'].update(tags)
+                    p['tags'].update(rtags)
+                    points.append(p)
+        sink.write_points(points)
 
 
 class PutMetric(BaseAction):
