@@ -2253,7 +2253,86 @@ class Lifecycle(BucketActionBase):
                     'required': ['ID', 'Status'],
                     'properties': {
                         'ID': {'type': 'string'},
-                        'Status': {'type': 'string'},
+                        'Status': {'enum': ['Enabled', 'Disabled']},
+                        'Prefix': {'type': 'string'},
+                        'Expiration': {
+                            'type': 'object',
+                            'properties': {
+                                'Date': {'type': 'string'},  # Date
+                                'Days': {'type': 'integer'},
+                                'ExpiredObjectDeleteMarker': {'type': 'boolean'},
+                            },
+                        },
+                        'Filter': {
+                            'type': 'object',
+                            'minProperties': 1,
+                            'maxProperties': 1,
+                            'properties': {
+                                'Prefix': {'type': 'string'},
+                                'Tag': {
+                                    'type': 'object',
+                                    'minProperties': 2,
+                                    'maxProperties': 2,
+                                    'required': ['Key', 'Value'],
+                                    'properties': {
+                                        'Key': {'type': 'string'},
+                                        'Value': {'type': 'string'},
+                                    },
+                                },
+                                'And': {
+                                    'type': 'object',
+                                    'items': {
+                                        'Prefix': {'type': 'string'},
+                                        'Tags': {
+                                            'type': 'array',
+                                            'items': {
+                                                'type': 'object',
+                                                'minProperties': 2,
+                                                'maxProperties': 2,
+                                                'required': ['Key', 'Value'],
+                                                'items': {
+                                                    'Key': {'type': 'string'},
+                                                    'Value': {'type': 'string'},
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        'Transitions': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'Date': {'type': 'string'},  # Date
+                                    'Days': {'type': 'integer'},
+                                    'StorageClass': {'type': 'string'},
+                                },
+                            },
+                        },
+                        'NoncurrentVersionTransitions': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'NoncurrentDays': {'type': 'integer'},
+                                    'StorageClass': {'type': 'string'},
+                                },
+                            },
+                        },
+                        'NoncurrentVersionExpiration': {
+                            'type': 'object',
+                            'items': {
+                                'NoncurrentDays': {'type': 'integer'},
+                            },
+                        },
+                        'AbortIncompleteMultipartUpload': {
+                            'type': 'object',
+                            'items': {
+                                'DaysAfterInitiation': {'type': 'integer'},
+                            },
+                        },
                     },
                 },
             },
