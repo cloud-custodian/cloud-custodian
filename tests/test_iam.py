@@ -35,7 +35,7 @@ from c7n.resources.iam import (
     UsedIamRole, UnusedIamRole,
     IamGroupUsers, UserPolicy, GroupMembership,
     UserCredentialReport, UserAccessKey,
-    IamRoleInlinePolicy, IamGroupInlinePolicy,
+    IamUserInlinePolicy, IamRoleInlinePolicy, IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
 from c7n.executor import MainThreadExecutor
 
@@ -403,6 +403,34 @@ class IamManagedPolicyUsage(BaseTest):
 
 
 class IamInlinePolicyUsage(BaseTest):
+
+    def test_iam_user_has_inline_policy(self):
+        session_factory = self.replay_flight_data('test_iam_user_has_inline_policy')
+        self.patch(IamUserInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-with-inline-policy',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'has-inline-policy',
+                 'value': True}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_user_no_inline_policy(self):
+        session_factory = self.replay_flight_data('test_iam_user_no_inline_policy')
+        self.patch(IamUserInlinePolicy, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-user-without-inline-policy',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'has-inline-policy',
+                 'value': False}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 19)
 
     def test_iam_role_has_inline_policy(self):
         session_factory = self.replay_flight_data(

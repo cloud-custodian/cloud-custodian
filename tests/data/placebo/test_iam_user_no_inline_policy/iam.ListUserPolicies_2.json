@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PolicyNames": [
+            "policygen-andrewalexander-201612112039"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "06611371-b035-11e7-9be1-770d6944eb14", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "06611371-b035-11e7-9be1-770d6944eb14", 
+                "date": "Fri, 13 Oct 2017 16:39:03 GMT", 
+                "content-length": "403", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
