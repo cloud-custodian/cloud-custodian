@@ -16,14 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from c7n import cache
-from c7n.actions import add_auto_tag_user
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.utils import dumps
 
 
 resources = PluginRegistry('resources')
-resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
 class ResourceManager(object):
