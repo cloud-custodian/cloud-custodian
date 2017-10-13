@@ -185,6 +185,7 @@ def generate(resource_types=()):
         'policy-mode': {
             'type': 'object',
             'required': ['type'],
+            'additionalProperties': False,
             'properties': {
                 'type': {
                     'enum': [
@@ -202,8 +203,19 @@ def generate(resource_types=()):
                          'properties': {
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}]
-                }}
+                             'event': {'type': 'string'}}}],
+                }},
+
+                'role': {'type': 'string'},
+                'runtime': {'enum': ['python2.7', 'python3.6']},
+                'memory': {'type': 'number'},
+                'timeout': {'type': 'number'},
+
+                'dead_letter_config': {'type': 'object'},
+                'environment': {'type': 'object'},
+                'kms_key_arn': {'type': 'string'},
+                'tracing_config': {'type': 'object'},
+                'tags': {'type': 'object'},
             },
         },
     }
