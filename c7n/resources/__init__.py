@@ -87,5 +87,6 @@ def load_resources():
     # Load external plugins (private sdks etc)
     from c7n.manager import resources
     resources.load_plugins()
+    resources.notify(resources.EVENT_FINAL)
 
     LOADED = True
