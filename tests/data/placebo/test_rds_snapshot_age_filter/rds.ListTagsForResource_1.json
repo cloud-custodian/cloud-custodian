@@ -16,10 +16,12 @@
             {
                 "Value": "other", 
                 "Key": "workload-type"
-            },{
+            },
+            {
                 "Value": "test-value", 
                 "Key": "test-key"
-            },{
+            },
+            {
                 "Value": "delete@12/12/2012", 
                 "Key": "maid_status"
             }
