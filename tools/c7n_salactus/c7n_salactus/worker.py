@@ -913,7 +913,7 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
                 stats['denied'] += 1
                 if object_reporting:
                     stats['objects_denied'].append(k)
-            elif code in ('404', 'NoSuchKey'):  # Not Found
+            elif code in ('404', 'NoSuchKey', 'NoSuchVersion'):  # Not Found
                 stats['missing'] += 1
             elif code in ('503', '500', 'SlowDown'):  # Slow down, or throttle
                 time.sleep(3)
