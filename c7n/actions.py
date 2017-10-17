@@ -26,6 +26,7 @@ import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
+from c7n.manager import resources
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n import utils
@@ -151,7 +152,7 @@ class Action(object):
         except ClientError as e:
             if (e.response['Error']['Code'] == 'DryRunOperation' and
             e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
-            'would have succeeded' in e.message):
+            'would have succeeded' in e.response['Error']['Message']):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))
@@ -197,10 +198,10 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string', 'pattern': '^sg-*'},
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
+        'anyOf': [
+            {'required': ['isolation-group', 'remove', 'type']},
+            {'required': ['add', 'remove', 'type']},
+            {'required': ['add', 'type']}]
     }
 
     def get_groups(self, resources, metadata_key=None):
@@ -657,6 +658,16 @@ class AutoTagUser(EventAction):
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
+
+
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
+            klass.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
 class PutMetric(BaseAction):

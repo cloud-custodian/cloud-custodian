@@ -1,6 +1,7 @@
 *.pyc
 *.egg-info/
 *.swp
+src/
 deps/
 include/
 lib/

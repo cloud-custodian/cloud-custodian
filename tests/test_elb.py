@@ -194,8 +194,8 @@ class SSLPolicyTest(BaseTest):
             LoadBalancerName='test-elb',
             PolicyNames=['testpolicy-1493768308000']
         )
-        curr_pol = [t.encode('UTF8') for t in response_pol[
-            'LoadBalancerDescriptions'][0]['ListenerDescriptions'][0]['PolicyNames']]
+        curr_pol = response_pol['LoadBalancerDescriptions'][0]\
+            ['ListenerDescriptions'][0]['PolicyNames']
 
         curr_ciphers = []
         for x in response_ciphers['PolicyDescriptions'][0]['PolicyAttributeDescriptions']:

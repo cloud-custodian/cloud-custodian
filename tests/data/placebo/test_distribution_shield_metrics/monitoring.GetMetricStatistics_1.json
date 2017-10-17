@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6e7c2be3-aa01-11e7-8d53-8f953667e507", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6e7c2be3-aa01-11e7-8d53-8f953667e507", 
+                "date": "Thu, 05 Oct 2017 19:14:38 GMT", 
+                "content-length": "335", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Label": "DDoSDetected"
+    }
+}

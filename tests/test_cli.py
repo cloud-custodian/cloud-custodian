@@ -51,7 +51,7 @@ class CliTest(BaseTest):
         try:
             cli.main()
         except SystemExit as e:
-            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.message))
+            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.code))
         return out.getvalue(), err.getvalue()
 
     def run_and_expect_failure(self, argv, exit_code):
@@ -388,7 +388,12 @@ class RunTest(CliTest):
         #self.assertIn('metric:ResourceCount Count:1 policy:ec2-state-transition-age', logs)
 
         self.run_and_expect_success(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
         )
 
     def test_error(self):
@@ -412,7 +417,12 @@ class RunTest(CliTest):
         })
 
         self.run_and_expect_failure(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
             2
         )
 

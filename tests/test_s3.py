@@ -53,15 +53,17 @@ class BucketScanLogTests(TestCase):
         self.log = s3.BucketScanLog(self.log_dir, 'test')
 
     def test_scan_log(self):
+        first_five = list(range(5))
+        next_five = list(range(5, 10))
         with self.log:
-            self.log.add(range(10)[:5])
-            self.log.add(range(10)[5:])
+            self.log.add(first_five)
+            self.log.add(next_five)
 
         with open(self.log.path) as fh:
             data = json.load(fh)
             self.assertEqual(
                 data,
-                [range(10)[:5], range(10)[5:], []])
+                [first_five, next_five, []])
 
 
 def destroyBucket(client, bucket):
@@ -119,6 +121,7 @@ class BucketMetrics(BaseTest):
 
 class BucketInventory(BaseTest):
 
+    @functional
     def test_inventory(self):
         bname = 'custodian-test-data'
         inv_bname = 'custodian-inv'
@@ -219,6 +222,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
@@ -258,6 +262,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -333,6 +338,7 @@ class BucketDelete(BaseTest):
 
 class BucketTag(BaseTest):
 
+    @functional
     def test_tag_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(

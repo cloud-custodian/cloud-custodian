@@ -21,6 +21,7 @@ import tempfile
 from c7n import policy, manager
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
+from c7n.query import ConfigSource
 
 from .common import BaseTest, Config, Bag
 
@@ -108,6 +109,36 @@ class PolicyPermissions(BaseTest):
                     v.resource_type, 'detail_spec', None):
                 self.fail(
                     "%s resource has universal augment masking resource augment" % k)
+
+    def test_resource_shadow_source_augment(self):
+        shadowed = []
+        bad = []
+        cfg = Config.empty()
+
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'config_type', None):
+                continue
+
+            p = Bag({'name': 'permcheck', 'resource': k})
+            ctx = self.get_context(config=cfg, policy=p)
+            mgr = v(ctx, p)
+
+            source = mgr.get_source('config')
+            if not isinstance(source, ConfigSource):
+                bad.append(k)
+
+            if v.__dict__.get('augment'):
+                shadowed.append(k)
+
+        if shadowed:
+            self.fail(
+                "%s have resource managers shadowing source augments" % (
+                    ", ".join(shadowed)))
+
+        if bad:
+            self.fail(
+                "%s have config types but no config source" % (
+                    ", ".join(bad)))
 
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')

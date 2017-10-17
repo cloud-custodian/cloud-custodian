@@ -34,7 +34,7 @@ from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -47,7 +47,7 @@ filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
-class EC2(QueryResourceManager):
+class EC2(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -106,6 +106,16 @@ class EC2(QueryResourceManager):
                 qf.append(qd)
         return qf
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeEC2(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeEC2(query.DescribeSource):
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
@@ -119,11 +129,11 @@ class EC2(QueryResourceManager):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-
         # First if we're in event based lambda go ahead and skip this,
         # tags can't be trusted in ec2 instances immediately post creation.
-        if not resources or self.data.get('mode', {}).get('type', '') in (
-                'cloudtrail', 'ec2-instance-state'):
+        if not resources or self.manager.data.get(
+                'mode', {}).get('type', '') in (
+                    'cloudtrail', 'ec2-instance-state'):
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -141,8 +151,8 @@ class EC2(QueryResourceManager):
             return resources
 
         # Okay go and do the tag lookup
-        client = utils.local_session(self.session_factory).client('ec2')
-        tag_set = self.retry(
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        tag_set = self.manager.retry(
             client.describe_tags,
             Filters=[{'Name': 'resource-type',
                       'Values': ['instance']}])['Tags']
@@ -152,7 +162,7 @@ class EC2(QueryResourceManager):
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.get_model()
+        m = self.manager.get_model()
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources

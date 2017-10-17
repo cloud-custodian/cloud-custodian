@@ -78,7 +78,7 @@ def load_file(path, format=None, vars=None):
                 msg = 'Failed to substitute variable by positional argument.'
                 raise VarsSubstitutionError(msg)
             except KeyError as e:
-                msg = 'Failed to substitute variables.  KeyError on "{}"'.format(e.message)
+                msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':

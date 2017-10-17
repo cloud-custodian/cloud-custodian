@@ -25,5 +25,5 @@ from .core import (
     AgeFilter,
     EventFilter)
 from .iamaccess import CrossAccountAccessFilter
-from .metrics import MetricsFilter
+from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase

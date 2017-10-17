@@ -75,7 +75,7 @@ def process_event(event, context):
             process_key_event(event, context)
 
 
-def get_function(session_factory, role, buckets=None, account_id=None):
+def get_function(session_factory, role, buckets=None, account_id=None, tags=None):
     from c7n.mu import (
         LambdaFunction, custodian_archive, BucketLambdaNotification)
 
@@ -85,6 +85,7 @@ def get_function(session_factory, role, buckets=None, account_id=None):
         memory_size=256,
         timeout=30,
         role=role,
+        tags=tags or {},
         runtime="python2.7",
         description='Custodian S3 Key Encrypt')
 
