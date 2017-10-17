@@ -512,6 +512,9 @@ class Notify(EventAction):
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
+        elif 'queue.amazonaws.com' in queue:
+            region = queue[len('https://'):].split('.', 1)[0]
+            queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
