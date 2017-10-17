@@ -931,7 +931,6 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
     return stats
 
 
-
 def publish_object_records(bid, objects, reporting):
     found = False
     for k in objects.keys():
