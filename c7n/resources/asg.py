@@ -227,12 +227,34 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def get_images(self):
         manager = self.manager.get_resource_manager('ami')
         images = set()
-        # Verify image snapshot validity, i've been told by a TAM this
-        # is a possibility, but haven't seen evidence of it, since
-        # snapshots are strongly ref'd by amis, but its negible cost
-        # to verify.
-        for a in manager.resources():
+
+        image_ids = list({lc['ImageId'] for lc in self.configs})
+
+        # To pull third party images, we explicitly use a describe
+        # source without any cache.
+        #
+        # Can't use a config source since it won't have state for
+        # third party ami, we auto propagate source normally, so we
+        # explicitly pull a describe source. Can't use a cache either
+        # as their not in the account.
+        #
+        while True:
+            try:
+                amis = manager.get_source('describe').get_resources(
+                    image_ids, cache=False)
+                break
+            except ClientError as e:
+                msg = e.response['Error']['Message']
+                if e.response['Error']['Code'] != 'InvalidAMIID.NotFound':
+                    raise
+                for n in msg[msg.find('[') + 1: msg.find(']')].split(','):
+                    image_ids.remove(n.strip())
+
+        for a in amis:
             found = True
+            if a['OwnerId'] != self.manager.config.account_id:
+                images.add(a['ImageId'])
+                continue
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
