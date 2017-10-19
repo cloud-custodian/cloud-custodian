@@ -406,3 +406,26 @@ class AutoScalingTest(BaseTest):
         self.assertTrue('OffHoursPrevious' in tag_map)
         self.assertEqual(tag_map['OffHoursPrevious'],
             'DesiredCapacity=2;MinSize=2;MaxSize=2')
+
+    def test_asg_restore(self):
+        factory = self.replay_flight_data('test_asg_restore')
+        # OffHoursPrevious was the tag in which we saved ASG state
+        p = self.load_policy({
+            'name': 'asg-terminate',
+            'resource': 'asg',
+            'filters': [
+                {'tag:CustodianUnitTest': 'not-null'},
+                {'tag:OffHoursPrevious': 'not-null'}],
+            'actions': [
+                {'type': 'restore',
+                 'tag': 'OffHoursPrevious'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we set ASG min and desired to previous values (both 2)
+        self.assertEqual(result['MinSize'], 2)
+        self.assertEqual(result['DesiredCapacity'], 2)
