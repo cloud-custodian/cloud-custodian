@@ -58,7 +58,7 @@ from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, PutMetric, RemovePolicyBase)
+    ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -74,7 +74,6 @@ log = logging.getLogger('custodian.s3')
 filters = FilterRegistry('s3.filters')
 actions = ActionRegistry('s3.actions')
 filters.register('marked-for-op', TagActionFilter)
-actions.register('auto-tag-user', AutoTagUser)
 actions.register('put-metric', PutMetric)
 
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
@@ -731,22 +730,16 @@ class EncryptionEnabledFilter(Filter):
         if p is None:
             return b
         p = json.loads(p)
-        encryption_statement = ENCRYPTION_STATEMENT_GLOB
+        encryption_statement = dict(ENCRYPTION_STATEMENT_GLOB)
 
         statements = p.get('Statement', [])
         check = False
         for s in list(statements):
-            try:
+            if 'Sid' in s:
                 encryption_statement["Sid"] = s["Sid"]
-            except:
-                log.info("Bucket:%s doesn't have Sid" % b['Name'])
-            try:
+            if 'Resource' in s:
                 encryption_statement["Resource"] = s["Resource"]
-            except:
-                log.info("Bucket:%s doesn't have Resource" % b['Name'])
             if s == encryption_statement:
-                log.info(
-                    "Bucket:%s contains correct encryption policy", b['Name'])
                 check = True
                 break
         if check:

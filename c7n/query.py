@@ -50,11 +50,14 @@ class ResourceQuery(object):
             m = resource_type
         return m
 
-    def _invoke_client_enum(self, client, enum_op, params, path):
+    def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
             results = p.paginate(**params)
-            data = results.build_full_result()
+            if retry:
+                data = pager(results, retry)
+            else:
+                data = results.build_full_result()
         else:
             op = getattr(client, enum_op)
             data = op(**params)
@@ -65,20 +68,22 @@ class ResourceQuery(object):
 
         return data
 
-    def filter(self, resource_type, **params):
+    def filter(self, resource_manager, **params):
         """Query a set of resources."""
-        m = self.resolve(resource_type)
+        m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(
             m.service)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
-        return self._invoke_client_enum(client, enum_op, params, path) or []
+        return self._invoke_client_enum(
+            client, enum_op, params, path,
+            getattr(resource_manager, 'retry', None)) or []
 
-    def get(self, resource_type, identities):
+    def get(self, resource_manager, identities):
         """Get resources by identities
         """
-        m = self.resolve(resource_type)
+        m = self.resolve(resource_manager.resource_type)
         params = {}
         client_filter = False
 
@@ -92,7 +97,7 @@ class ResourceQuery(object):
         else:
             client_filter = True
 
-        resources = self.filter(resource_type, **params)
+        resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
             # https://github.com/capitalone/cloud-custodian/issues/1398
@@ -115,9 +120,10 @@ class ChildResourceQuery(ResourceQuery):
         self.session_factory = session_factory
         self.manager = manager
 
-    def filter(self, resource_type, **params):
+    def filter(self, resource_manager, **params):
         """Query a set of resources."""
-        m = self.resolve(resource_type)
+
+        m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(m.service)
 
         enum_op, path, extra_args = m.enum_spec
@@ -198,15 +204,10 @@ class DescribeSource(object):
         self.query = ResourceQuery(self.manager.session_factory)
 
     def get_resources(self, ids, cache=True):
-        return self.query.get(self.manager.resource_type, ids)
+        return self.query.get(self.manager, ids)
 
     def resources(self, query):
-        if self.manager.retry:
-            resources = self.manager.retry(
-                self.query.filter, self.manager.resource_type, **query)
-        else:
-            resources = self.query.filter(self.manager.resource_type, **query)
-        return resources
+        return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
         m = self.manager.get_model()

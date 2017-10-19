@@ -1100,7 +1100,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         policies:
           - name: set-default-instance-profile
             resource: ec2
-            query:
+            filters:
               - IamInstanceProfile: absent
             actions:
               - type: set-instance-profile

@@ -880,13 +880,81 @@ class UserDelete(BaseAction):
 
     """
     schema = type_schema('delete')
-    permissions = ('iam:DeleteUser',)
+    permissions = (
+        'iam:ListAttachedUserPolicies',
+        'iam:ListAccessKeys',
+        'iam:ListGroupsForUser',
+        'iam:ListMFADevices',
+        'iam:ListServiceSpecificCredentials',
+        'iam:ListSigningCertificates',
+        'iam:ListSSHPublicKeys',
+        'iam:DeactivateMFADevice',
+        'iam:DeleteAccessKey',
+        'iam:DeleteLoginProfile',
+        'iam:DeleteSigningCertificate',
+        'iam:DeleteSSHPublicKey',
+        'iam:DeleteUser',
+        'iam:DetachUserPolicy',
+        'iam:RemoveUserFromGroup')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         for r in resources:
-            client.delete_user(UserName=r['UserName'])
-        self.log.debug('Deleted user "%s"' % (r['UserName']))
+            self.log.debug('Deleting user %s' % r['UserName'])
+            self.process_user(client, r)
+
+    def process_user(self, client, r):
+        try:
+            client.delete_login_profile(
+                UserName=r['UserName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                raise
+
+        # Access Keys
+        response = client.list_access_keys(UserName=r['UserName'])
+        for access_key in response['AccessKeyMetadata']:
+            client.delete_access_key(UserName=r['UserName'],
+                                     AccessKeyId=access_key['AccessKeyId'])
+
+        # User Policies
+        response = client.list_attached_user_policies(UserName=r['UserName'])
+        for user_policy in response['AttachedPolicies']:
+            client.detach_user_policy(
+                UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
+
+        # HW MFA Devices
+        response = client.list_mfa_devices(UserName=r['UserName'])
+        for mfa_device in response['MFADevices']:
+            client.deactivate_mfa_device(
+                UserName=r['UserName'], SerialNumber=mfa_device['SerialNumber'])
+
+        # Groups
+        response = client.list_groups_for_user(UserName=r['UserName'])
+        for user_group in response['Groups']:
+            client.remove_user_from_group(
+                UserName=r['UserName'], GroupName=user_group['GroupName'])
+
+        # SSH Keys
+        response = client.list_ssh_public_keys(UserName=r['UserName'])
+        for key in response.get('SSHPublicKeys', ()):
+            client.delete_ssh_public_key(
+                UserName=r['UserName'], SSHPublicKeyId=key['SSHPublicKeyId'])
+
+        # Signing Certificates
+        response = client.list_signing_certificates(UserName=r['UserName'])
+        for cert in response.get('Certificates', ()):
+            client.delete_signing_certificate(
+                UserName=r['UserName'], CertificateId=cert['CertificateId'])
+
+        # Service specific user credentials (codecommit)
+        response = client.list_service_specific_credentials(UserName=r['UserName'])
+        for screds in response.get('ServiceSpecificCredentials', ()):
+            client.delete_service_specific_credential(
+                UserName=r['UserName'],
+                ServiceSpecificCredentialId=screds['ServiceSpecificCredentialId'])
+
+        client.delete_user(UserName=r['UserName'])
 
 
 @User.action_registry.register('remove-keys')

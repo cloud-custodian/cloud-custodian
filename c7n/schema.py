@@ -210,7 +210,7 @@ def generate(resource_types=()):
                 'runtime': {'enum': ['python2.7', 'python3.6']},
                 'memory': {'type': 'number'},
                 'timeout': {'type': 'number'},
-
+                'schedule': {'type': 'string'},
                 'dead_letter_config': {'type': 'object'},
                 'environment': {'type': 'object'},
                 'kms_key_arn': {'type': 'string'},
