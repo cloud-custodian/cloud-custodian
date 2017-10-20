@@ -1148,8 +1148,6 @@ class MarkForOp(tags.TagDelayedAction):
                     'Value': tag['Value'],
                     'PropagateAtLaunch': False
                 })
-        import ipdb
-        ipdb.set_trace()
         client.create_or_update_tags(Tags=asg_tags)
 
     def process_resource_set(self, resource_set, ts):
