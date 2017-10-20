@@ -14,13 +14,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime, timedelta
-import imp
+import importlib
 import json
 import logging
 import os
 import platform
 import py_compile
 import shutil
+import site
 import sys
 import tempfile
 import time
@@ -551,6 +552,52 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('c7n/resources/s3.py' in filenames)
         self.assertTrue('c7n/ufuncs/s3crypt.py' in filenames)
 
+    def _install_namespace_py2(self, tmp_sitedir):
+        # Install our test namespace package using the *.pth hack.
+        from setuptools import namespaces
+        installer = namespaces.Installer()
+        class Distribution: namespace_packages = ['namespace_package']
+        installer.distribution = Distribution()
+        installer.target = os.path.join(tmp_sitedir, 'test.pth')
+        installer.outputs = []
+        installer.dry_run = False
+        installer.install_namespaces()
+        site.addsitedir(tmp_sitedir, known_paths=site._init_pathinfo())
+
+    def _install_namespace_py3(self, tmp_sitedir):
+        # Install our test namespace package natively.
+        sys.path.append(tmp_sitedir)
+
+    def test_handles_namespace_packages(self):
+        bench = tempfile.mkdtemp()
+        def cleanup():
+            while bench in sys.path:
+                sys.path.remove(bench)
+            shutil.rmtree(bench)
+        self.addCleanup(cleanup)
+
+        subpackage = os.path.join(bench, 'namespace_package', 'subpackage')
+        os.makedirs(subpackage)
+        open(os.path.join(subpackage, '__init__.py'), 'w+').write('foo = 42\n')
+
+        def _():
+            from namespace_package.subpackage import foo
+            assert foo  # dodge linter
+        self.assertRaises(ImportError, _)
+
+        install = {
+            2: self._install_namespace_py2,
+            3: self._install_namespace_py3
+            }[sys.version_info[0]]
+        install(bench)
+
+        from namespace_package.subpackage import foo
+        self.assertEqual(foo, 42)
+
+        filenames = self.get_filenames('namespace_package')
+        self.assertTrue('namespace_package/__init__.py' not in filenames)
+        self.assertTrue('namespace_package/subpackage/__init__.py' in filenames)
+
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')
         self.assertTrue('README.ctypes' not in filenames)
@@ -660,7 +707,8 @@ class Constructor(PycCase):
         os.unlink(self.py_with_pyc('bar.py'))
 
         # Now: *.py takes precedence over *.pyc ...
-        get = lambda name: os.path.basename(imp.find_module(name)[1])
+        def get(name):
+            return os.path.basename(importlib.import_module(name).__file__)
         self.assertTrue(get('foo'), 'foo.py')
         try:
             # ... and while *.pyc is importable ...
@@ -678,7 +726,7 @@ class Constructor(PycCase):
             with self.assertRaises(ValueError) as raised:
                 PythonPackageArchive('bar')
             msg = raised.exception.args[0]
-            self.assertTrue(msg.startswith('We need a *.py source file instead'))
+            self.assertTrue(msg.startswith('Could not find a *.py source file'))
             self.assertTrue(msg.endswith('bar.pyc'))
 
         # We readily ignore a *.pyc if a *.py exists.
