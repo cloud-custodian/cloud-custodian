@@ -35,6 +35,19 @@ class MailerLdapTest(unittest.TestCase):
         # since '123456' doesn't have an underscore, it should return {}
         self.assertEqual(milton, {})
 
+    def test_sqlite_cache_set_escaping(self):
+        irish_guy = {
+            'dn': 'uid=john_oconnor,cn=users,dc=initech,dc=com',
+            'mail': 'john_oconnor@initech.com',
+            'manager': 'uid=bill_lumbergh,cn=users,dc=initech,dc=com',
+            'displayName': "John O'Connor",
+            'uid': 'john_oconnor'
+        }
+        set_result = self.ldap_lookup.caching.set(irish_guy['uid'], irish_guy)
+        self.assertEqual(set_result, None)
+        get_result = self.ldap_lookup.caching.get(irish_guy['uid'])
+        self.assertEqual(get_result, irish_guy)
+
     def test_regex_requiring_6chars_and_only_digits(self):
         # now we'll do some tests requiring the uid to be 6 characters only and digits
         self.ldap_lookup.uid_regex = '^[0-9]{6}$'
