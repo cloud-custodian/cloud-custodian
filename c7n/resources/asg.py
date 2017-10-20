@@ -14,13 +14,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.client import ClientError
-
+from c7n import tags
 from collections import Counter
 from concurrent.futures import as_completed
-
-from datetime import datetime, timedelta
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import logging
 import itertools
@@ -1115,7 +1112,7 @@ class RenameTag(Action):
 
 
 @actions.register('mark-for-op')
-class MarkForOp(Tag):
+class MarkForOp(tags.TagDelayedAction):
     """Action to create a delayed action for a later date
 
     :example:
@@ -1136,37 +1133,25 @@ class MarkForOp(Tag):
                     op: suspend
                     days: 7
     """
+    def _add_asg_tags(self, asgs, session_factory, ts):
+        client = local_session(session_factory).client('autoscaling')
+        for asg in asgs:
+            asg_tags = []
+            for tag in ts:
+                asg_tags.append({
+                    'ResourceId': asg['AutoScalingGroupName'],
+                    'ResourceType': 'auto-scaling-group',
+                    'Key': tag['Key'],
+                    'Value': tag['Value'],
+                    'PropagateAtLaunch': False
+                })
+        client.create_or_update_tags(Tags=asg_tags)
 
-    schema = type_schema(
-        'mark-for-op',
-        op={'enum': ['suspend', 'resume', 'delete']},
-        key={'type': 'string'},
-        tag={'type': 'string'},
-        message={'type': 'string'},
-        days={'type': 'number', 'minimum': 0})
-
-    default_template = (
-        'AutoScaleGroup does not meet org policy: {op}@{action_date}')
-
-    def process(self, asgs):
-        msg_tmpl = self.data.get('message', self.default_template)
-        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
-        op = self.data.get('op', 'suspend')
-        date = self.data.get('days', 4)
-
-        n = datetime.now(tz=tzutc())
-        stop_date = n + timedelta(days=date)
-        try:
-            msg = msg_tmpl.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
-        except Exception:
-            self.log.warning("invalid template %s" % msg_tmpl)
-            msg = self.default_template.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
-
-        self.log.info("Tagging %d asgs for %s on %s" % (
-            len(asgs), op, stop_date.strftime('%Y/%m/%d')))
-        self.tag(asgs, key, msg)
+    def process_resource_set(self, resource_set, ts):
+            self._add_asg_tags(
+                resource_set,
+                self.manager.session_factory,
+                ts)
 
 
 @actions.register('suspend')
