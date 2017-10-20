@@ -17,10 +17,7 @@ from botocore.client import ClientError
 from c7n import tags
 from collections import Counter
 from concurrent.futures import as_completed
-
-from datetime import datetime, timedelta
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import logging
 import itertools
