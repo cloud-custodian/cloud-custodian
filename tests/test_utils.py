@@ -106,6 +106,18 @@ class WorkerDecorator(BaseTest):
 
 class UtilTest(unittest.TestCase):
 
+    def test_group_by(self):
+        items = [{'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}, {}]
+        self.assertEqual(
+            list(utils.group_by(items, 'Type').keys()),
+            ['a', 'b', None])
+        items = [{'Type': {'Part': 'a'}},
+                 {'Type': {'Part': 'a'}},
+                 {'Type': {'Part': 'b'}}, {}]
+        self.assertEqual(
+            list(utils.group_by(items, 'Type.Part').keys()),
+            ['a', 'b', None])
+
     def write_temp_file(self, contents, suffix='.tmp'):
         """ Write a temporary file and return the filename.
 
