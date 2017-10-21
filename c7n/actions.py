@@ -552,8 +552,8 @@ class AutoTagUser(EventAction):
         - name: ec2-auto-tag-ownercontact
           resource: ec2
           description: |
-            Triggered when a new EC2 Instance is launched. Checks to see if 
-            it's missing the OwnerContact tag. If missing it gets created 
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the OwnerContact tag. If missing it gets created
             with the value of the ID of whomever called the RunInstances API
           mode:
             type: cloudtrail
