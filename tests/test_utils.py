@@ -110,7 +110,6 @@ class UtilTest(unittest.TestCase):
     def test_group_by(self):
         sorter = lambda x: x
         sorter = sys.version_info.major is 2 and sorted or sorter
-        import pdb; pdb.set_trace()
         items = [{'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}, {}]
         self.assertEqual(
             sorter(list(utils.group_by(items, 'Type').keys())),
