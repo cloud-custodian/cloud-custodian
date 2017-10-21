@@ -38,17 +38,7 @@ def dispatch(event, context):
 """
 
 
-def hack_ruamel():
-    # The way ruamel is installed it has no __init__.py(!). import finds it(!!)
-    # but imp.find_package doesn't(!!!). Hack it!
-    import ruamel
-    init_py = os.path.join(list(ruamel.__path__)[0], '__init__.py')
-    if not os.path.exists(init_py):
-        open(init_py, 'w+')
-
-
 def get_archive(config):
-    hack_ruamel()
     archive = PythonPackageArchive(
         'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'ruamel',
         'redis')
