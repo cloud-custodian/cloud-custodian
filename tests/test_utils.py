@@ -110,16 +110,18 @@ class UtilTest(unittest.TestCase):
     def test_group_by(self):
         sorter = lambda x: x
         sorter = sys.version_info.major is 2 and sorted or sorter
-        items = [{'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}, {}]
+        items = [{}, {'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}]
         self.assertEqual(
             sorter(list(utils.group_by(items, 'Type').keys())),
-            ['a', 'b', None])
-        items = [{'Type': {'Part': 'a'}},
-                 {'Type': {'Part': 'a'}},
-                 {'Type': {'Part': 'b'}}, {}]
+            [None, 'a', 'b'])
+        items = [
+            {},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'b'}}]
         self.assertEqual(
             sorter(list(utils.group_by(items, 'Type.Part').keys())),
-            ['a', 'b', None])
+            [None, 'a', 'b'])
 
     def write_temp_file(self, contents, suffix='.tmp'):
         """ Write a temporary file and return the filename.
