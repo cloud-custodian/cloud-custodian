@@ -113,7 +113,7 @@ class PythonPackageArchive(object):
                 self.add_file(path)
 
     def add_directory(self, path):
-        """Add *.py files under the directory ``path`` to the archive.
+        """Add ``*.py`` files under the directory ``path`` to the archive.
         """
         for root, dirs, files in os.walk(path):
             arc_prefix = os.path.relpath(root, os.path.dirname(path))
