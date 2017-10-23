@@ -109,7 +109,8 @@ PARTITION_QUEUE_THRESHOLD = 6
 DEFAULT_TTL = 60 * 60 * 48
 
 # Default size of the bucket before checking for inventory
-DEFAULT_INVENTORY_BUCKET_SIZE_THRESHOLD = 100000
+DEFAULT_INVENTORY_BUCKET_SIZE_THRESHOLD = \
+    int(os.environ.get("SALACTUS_INVENTORY_THRESHOLD", 100000))
 
 BUCKET_OBJ_DESC = {
     True: ('Versions', 'list_object_versions',
