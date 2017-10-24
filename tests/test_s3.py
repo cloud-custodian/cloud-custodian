@@ -121,6 +121,7 @@ class BucketMetrics(BaseTest):
 
 class BucketInventory(BaseTest):
 
+    @functional
     def test_inventory(self):
         bname = 'custodian-test-data'
         inv_bname = 'custodian-inv'
@@ -221,6 +222,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
@@ -260,6 +262,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -335,6 +338,7 @@ class BucketDelete(BaseTest):
 
 class BucketTag(BaseTest):
 
+    @functional
     def test_tag_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(

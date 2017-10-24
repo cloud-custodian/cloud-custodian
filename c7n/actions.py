@@ -26,6 +26,7 @@ import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
+from c7n.manager import resources
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n import utils
@@ -197,10 +198,10 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string', 'pattern': '^sg-*'},
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
+        'anyOf': [
+            {'required': ['isolation-group', 'remove', 'type']},
+            {'required': ['add', 'remove', 'type']},
+            {'required': ['add', 'type']}]
     }
 
     def get_groups(self, resources, metadata_key=None):
@@ -548,15 +549,19 @@ class AutoTagUser(EventAction):
     .. code-block:: yaml
 
       policies:
-        - name: ec2-auto-tag-owner
+        - name: ec2-auto-tag-ownercontact
           resource: ec2
+          description: |
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the OwnerContact tag. If missing it gets created
+            with the value of the ID of whomever called the RunInstances API
           mode:
             type: cloudtrail
             role: arn:aws:iam::123456789000:role/custodian-auto-tagger
             events:
               - RunInstances
           filters:
-           - tag:Owner: absent
+           - tag:OwnerContact: absent
           actions:
            - type: auto-tag-user
              tag: OwnerContact
@@ -657,6 +662,16 @@ class AutoTagUser(EventAction):
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
+
+
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
+            klass.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
 class PutMetric(BaseAction):

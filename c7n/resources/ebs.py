@@ -241,7 +241,7 @@ class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-    permissions = ('ec2.DeleteSnapshot',)
+    permissions = ('ec2:DeleteSnapshot',)
 
     def process(self, snapshots):
         self.image_snapshots = set()

@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 from botocore.exceptions import ClientError
 
-from c7n.actions import ActionRegistry, AutoTagUser, BaseAction, RemovePolicyBase
+from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -27,7 +27,6 @@ from c7n.utils import get_retry, local_session, type_schema
 filters = FilterRegistry('lambda.filters')
 actions = ActionRegistry('lambda.actions')
 filters.register('marked-for-op', TagActionFilter)
-actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('lambda')
