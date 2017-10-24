@@ -67,7 +67,7 @@ from botocore.exceptions import (
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from c7n.credentials import assumed_session
-from c7n.executor import MainThreadExecutor
+#from c7n.executor import MainThreadExecutor
 from c7n.resources.s3 import EncryptExtantKeys
 from c7n.utils import chunks, dumps
 
@@ -108,12 +108,16 @@ PARTITION_QUEUE_THRESHOLD = 6
 
 DEFAULT_TTL = 60 * 60 * 48
 
+# Default size of the bucket before checking for inventory
+DEFAULT_INVENTORY_BUCKET_SIZE_THRESHOLD = \
+    int(os.environ.get("SALACTUS_INVENTORY_THRESHOLD", 100000))
+
 BUCKET_OBJ_DESC = {
     True: ('Versions', 'list_object_versions',
            ('NextKeyMarker', 'NextVersionIdMarker')),
     False: ('Contents', 'list_objects_v2',
             ('NextContinuationToken',))
-    }
+}
 
 connection = redis.Redis(host=REDIS_HOST)
 # Increase timeouts to assist with non local regions, also
@@ -271,7 +275,7 @@ def bucket_key_count(client, bucket):
             hour=0, minute=0, second=0, microsecond=0) - timedelta(1),
         EndTime=datetime.now().replace(
             hour=0, minute=0, second=0, microsecond=0),
-        Period=60*60*24,
+        Period=60 * 60 * 24,
         Statistics=['Minimum'])
     response = client.get_metric_statistics(**params)
     if not response['Datapoints']:
@@ -377,14 +381,16 @@ def process_bucket_set(account_info, buckets):
             dispatch_object_source(s3, account_info, bid, info)
 
 
-
 def dispatch_object_source(client, account_info, bid, bucket_info):
     """Select and dispatch an object source for a bucket.
 
     Choices are bucket partition, inventory, or direct pagination.
     """
 
-    if account_info.get('inventory') and bucket_info['keycount'] > PARTITION_QUEUE_THRESHOLD:
+    if (account_info.get('inventory') and
+        bucket_info['keycount'] >
+            account_info['inventory'].get('bucket-size-threshold',
+                                          DEFAULT_INVENTORY_BUCKET_SIZE_THRESHOLD)):
         inventory_info = get_bucket_inventory(
             client,
             bucket_info['name'],
@@ -398,7 +404,6 @@ def dispatch_object_source(client, account_info, bid, bucket_info):
         invoke(process_bucket_partitions, bid)
     else:
         invoke(process_bucket_iterator, bid)
-
 
 
 class CharSet(object):
@@ -599,7 +604,7 @@ def detect_partition_strategy(bid, delimiters=('/', '-'), prefix=''):
         process_bucket_iterator, [bid], prefixes)
 
 
-@job('bucket-partition', timeout=3600*4, ttl=DEFAULT_TTL,
+@job('bucket-partition', timeout=3600 * 4, ttl=DEFAULT_TTL,
      connection=connection, result_ttl=0)
 def process_bucket_partitions(
         bid, prefix_set=('',), partition='/', strategy=None, limit=4):
@@ -672,8 +677,8 @@ def process_bucket_partitions(
         if len(prefix_queue) > PARTITION_QUEUE_THRESHOLD:
             log.info("Partition add friends, %s", statm(prefix))
             for s_prefix_set in chunks(
-                    prefix_queue[PARTITION_QUEUE_THRESHOLD-1:],
-                    PARTITION_QUEUE_THRESHOLD-1):
+                    prefix_queue[PARTITION_QUEUE_THRESHOLD - 1:],
+                    PARTITION_QUEUE_THRESHOLD - 1):
 
                 for s in list(s_prefix_set):
                     if strategy.is_depth_exceeded(prefix):
@@ -686,7 +691,7 @@ def process_bucket_partitions(
                        bid,
                        prefix_set=s_prefix_set, partition=partition,
                        strategy=strategy, limit=limit)
-            prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD-1]
+            prefix_queue = prefix_queue[:PARTITION_QUEUE_THRESHOLD - 1]
 
     if keyset:
         page = page_strip({contents_key: keyset}, versioned)
@@ -764,7 +769,7 @@ def process_bucket_iterator(bid, prefix="", delimiter="", **continuation):
                 with connection.pipeline() as p:
                     nptime = time.time()
                     p.hincrby('bucket-pages', bid, 1)
-                    p.hincrby('bucket-pages-time', bid, int(nptime-ptime))
+                    p.hincrby('bucket-pages-time', bid, int(nptime - ptime))
                     ptime = nptime
                     p.execute()
 
@@ -772,7 +777,7 @@ def process_bucket_iterator(bid, prefix="", delimiter="", **continuation):
             with connection.pipeline() as p:
                 nptime = time.time()
                 p.hincrby('bucket-pages', bid, 1)
-                p.hincrby('bucket-pages-time', bid, int(nptime-ptime))
+                p.hincrby('bucket-pages-time', bid, int(nptime - ptime))
                 p.execute()
 
 
@@ -830,8 +835,8 @@ def process_keyset(bid, key_set):
             futures = {}
             for kchunk in chunks(key_set, 100):
                 for v in visitors:
-                    processor = (versioned and v.process_version
-                                     or v.process_key)
+                    processor = (versioned and
+                        v.process_version or v.process_key)
                     futures[w.submit(
                         process_key_chunk, s3, bucket, kchunk,
                         processor, bool(object_reporting))] = v.name
@@ -875,7 +880,7 @@ def process_keyset(bid, key_set):
             p.hincrby('keys-scanned', bid, key_count)
             # track count again as we reset metrics period
             p.hincrby('keys-count', bid, key_count)
-            p.hincrby('keys-time', bid, int(time.time()-start_time))
+            p.hincrby('keys-time', bid, int(time.time() - start_time))
             p.execute()
 
     # write out object level info
@@ -951,4 +956,3 @@ def publish_object_records(bid, objects, reporting):
         Body=dumps(objects),
         ACL="bucket-owner-full-control",
         ServerSideEncryption="AES256")
-
