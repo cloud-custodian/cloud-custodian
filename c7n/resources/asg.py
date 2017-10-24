@@ -744,8 +744,8 @@ class Resize(Action):
         min_size={'type': 'int'},
         max_size={'type': 'int'},
         desired_size={'type': 'string'},
-        save_to_tag={'type': 'string'},
-        restore_from_tag={'type': 'string'},
+        save_options_tag={'type': 'string'},
+        restore_options_tag={'type': 'string'},
         required=())
     permissions = ('autoscaling:UpdateAutoScalingGroup',)
 
@@ -767,12 +767,12 @@ class Resize(Action):
             update = {}
             current_size = len(a['Instances'])
 
-            if 'restore_from_tag' in self.data:
+            if 'restore_options_tag' in self.data:
                 # attempt to restore all ASG size params from saved data
-                if self.data['restore_from_tag'] in tag_map:
+                if self.data['restore_options_tag'] in tag_map:
                     log.debug('Want to restore ASG %s size from tag %s' %
-                        (a['AutoScalingGroupName'], self.data['restore_from_tag']))
-                    for field in tag_map[self.data['restore_from_tag']].split(';'):
+                        (a['AutoScalingGroupName'], self.data['restore_options_tag']))
+                    for field in tag_map[self.data['restore_options_tag']].split(';'):
                         (param, value) = field.split('=')
                         if param in asg_params:
                             update[param] = int(value)
@@ -800,12 +800,12 @@ class Resize(Action):
                     % (a['AutoScalingGroupName'], current_size, a['MinSize'],
                     a['MaxSize'], a['DesiredCapacity']))
 
-                if 'save_to_tag' in self.data:
+                if 'save_options_tag' in self.data:
                     # save existing ASG params to a tag before changing them
                     log.debug('Saving ASG %s size to tag %s' %
-                        (a['AutoScalingGroupName'], self.data['save_to_tag']))
+                        (a['AutoScalingGroupName'], self.data['save_options_tag']))
                     tags = [dict(
-                        Key=self.data['save_to_tag'],
+                        Key=self.data['save_options_tag'],
                         PropagateAtLaunch=False,
                         Value=';'.join({'%s=%d' % (param, a[param]) for param in asg_params}),
                         ResourceId=a['AutoScalingGroupName'],
