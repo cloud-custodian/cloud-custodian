@@ -17,7 +17,9 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import RemovePolicyBase
+from c7n.actions import (
+        RemovePolicyBase, BaseAction
+)
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -162,3 +164,48 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['VaultName'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+@Glacier.action_registry.register('delete')
+class DeleteVault(BaseAction):
+    """Action to delete empty Glacier Vaults, will abort all multi-part uploads
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: glacier-cross-account
+                resource: glaier
+                actions:
+                  - type: delete
+    """
+
+    permissions = ('glacier:DeleteVault', 'glacier:AbortMultipartUpload')
+
+    def process(self, vaults):
+        results = []
+        client = local_session(self.manager.session_factory).client('glacier')
+
+        for v in vaults:
+            try:
+                results += filter(None, [self.process_resource(client, v)])
+            except:
+                self.log.exception(
+                        "Error processing glacier:%s", v['VaultARN'])
+        return results
+
+    def process_resource(self, client, resource):
+        uploads = client.list_multipart_uploads(vaultName=resource['VaultName'])
+        for u in uploads:
+            try:
+                client.abort_multipart_upload(
+                        vaultName=resource['VaultName'],
+                        uploadId=u['MultipartUploadId']
+                        )
+            except ClientError as e:
+                self.log.exception('Error aborting multipart upload:%s', e)
+        try:
+            r = client.delete_vault(vaultName=resource['VaultName'])
+        except ClientError as e:
+            self.log.exception('Error deleting vault:%s', e)
+        return
