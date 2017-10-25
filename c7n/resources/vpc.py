@@ -1183,7 +1183,7 @@ class MissingRoute(Filter):
     """
 
     schema = type_schema('missing-route')
-    permissions = ('DescribeRouteTables',)
+    permissions = ('ec2:DescribeRouteTables',)
 
     def process(self, resources, event=None):
         tables = self.manager.get_resource_manager(

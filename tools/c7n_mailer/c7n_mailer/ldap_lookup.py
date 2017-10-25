@@ -157,8 +157,7 @@ class LocalSqlite(object):
         self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
 
     def get(self, key):
-        sqlite_query = "select * FROM ldap_cache WHERE key='%s'" % key
-        sqlite_result = self.sqlite.execute(sqlite_query)
+        sqlite_result = self.sqlite.execute("select * FROM ldap_cache WHERE key=?", (key,))
         result = sqlite_result.fetchall()
         if len(result) != 1:
             error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
@@ -167,8 +166,8 @@ class LocalSqlite(object):
         return json.loads(result[0][1])
 
     def set(self, key, value):
-        sqlite_query = "INSERT INTO ldap_cache VALUES ('%s', '%s')" % (key, json.dumps(value))
-        self.sqlite.execute(sqlite_query)
+        # note, the ? marks are required to ensure escaping into the database.
+        self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
 
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)
