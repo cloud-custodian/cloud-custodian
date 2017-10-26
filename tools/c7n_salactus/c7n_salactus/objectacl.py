@@ -50,11 +50,16 @@ class ObjectAclCheck(object):
 
         if not grants:
             return False
+
+        result = {k: key[k] for k in ('Key', 'Owner')
+                    if k in key}
+        result['Grants'] = grants
+
         if self.data.get('report-only'):
-            return {'key': key['Key'], 'grants': grants}
+            return result
 
         self.remove_grants(client, bucket_name, key, acl, grants)
-        return {'key': key['Key'], 'grants': grants}
+        return result
 
     def process_version(self, client, bucket_name, key):
         acl = client.get_object_acl(
@@ -65,12 +70,10 @@ class ObjectAclCheck(object):
         if not grants:
             return False
 
-        result = {
-            'key': key['Key'],
-            'version': key['VersionId'],
-            'is_latest': key['IsLatest'],
-            'grants': grants
-        }
+        result = {k: key[k] for k in ('Key', 'VersionId', 'IsLatest', 'Owner')
+                    if k in key}
+        result['Grants'] = grants
+
         if self.data.get('report-only'):
             return result
 

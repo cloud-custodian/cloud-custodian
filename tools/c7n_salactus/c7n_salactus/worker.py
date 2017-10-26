@@ -40,6 +40,7 @@ monitor:
 import collections
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+import functools
 import gc
 import itertools
 import json
@@ -237,29 +238,8 @@ def page_strip(page, versioned):
     contents = page.get(contents_key, ())
 
     # aggressive size
-    if versioned:
-        keys = []
-        for k in contents:
-            if k['IsLatest']:
-                keys.append((k['Key'], k['VersionId'], True))
-            else:
-                keys.append((k['Key'], k['VersionId']))
-        return keys
-    else:
-        return [k['Key'] for k in contents]
-
-    if not contents:
-        return page
-
-    # Depending on use case we may want these
-    for k in contents:
-        k.pop('Owner', None)
-        k.pop('LastModified', None)
-        k.pop('ETag', None)
-        k.pop('StorageClass', None)
-        k.pop('Size', None)
-
-    return page
+    return [{k: c[k] for k in ('Key', 'VersionId', 'IsLatest', 'Owner') if k in c}
+            for c in contents]
 
 
 def bucket_key_count(client, bucket):
@@ -837,9 +817,11 @@ def process_keyset(bid, key_set):
                 for v in visitors:
                     processor = (versioned and
                         v.process_version or v.process_key)
+                    ownership = functools.partial(object_ownership, versioned)
                     futures[w.submit(
                         process_key_chunk, s3, bucket, kchunk,
-                        processor, bool(object_reporting))] = v.name
+                        processor, object_reporting, ownership,
+                        account_info)] = v.name
 
             for f in as_completed(futures):
                 if f.exception():
@@ -892,19 +874,14 @@ def process_keyset(bid, key_set):
         gc.collect()
 
 
-def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
+def process_key_chunk(s3, bucket, kchunk, processor, object_reporting, ownership, account_info):
     stats = collections.defaultdict(lambda: 0)
     if object_reporting:
         stats['objects'] = []
         stats['objects_denied'] = []
 
     for k in kchunk:
-        if isinstance(k, str):
-            k = {'Key': k}
-        elif isinstance(k, list) and len(k) == 2:
-            k = {'Key': k[0], 'VersionId': k[1], 'IsLatest': False}
-        else:
-            k = {'Key': k[0], 'VersionId': k[1], 'IsLatest': True}
+        # See page_strip and load_bucket_inventory/load_manifest_file
         try:
             result = processor(s3, bucket_name=bucket, key=k)
         except EndpointConnectionError:
@@ -917,6 +894,19 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
             if code in ('403', 'AccessDenied'):  # Permission Denied
                 stats['denied'] += 1
                 if object_reporting:
+                    # Object owner not present in inventory
+                    if object_reporting.get('access-denied-owner'):
+                        if 'Owner' not in k:
+                            owner = ownership(s3, bucket=bucket, key=k)
+                            if owner:
+                                k['Owner'] = owner
+
+                        # Lookup owner account details by canonical ID
+                        owner_account = account_info['id-map'].get(k['Owner']['ID'])
+                        if owner_account:
+                            k['Owner']['AccountName'] = owner_account[0]
+                            k['Owner']['AccountId'] = owner_account[1]
+
                     stats['objects_denied'].append(k)
             elif code in ('404', 'NoSuchKey', 'NoSuchVersion'):  # Not Found
                 stats['missing'] += 1
@@ -956,3 +946,31 @@ def publish_object_records(bid, objects, reporting):
         Body=dumps(objects),
         ACL="bucket-owner-full-control",
         ServerSideEncryption="AES256")
+
+
+def object_ownership(versioned, s3, bucket, key):
+    """S3 object ownership
+    """
+    if 'Owner' in key:
+        return key['Owner']
+
+    (_, contents_method, _) = BUCKET_OBJ_DESC[versioned]
+    params = {
+        'Bucket': bucket,
+        'Prefix': key['Key']
+    }
+    if not versioned:
+        params['FetchOwner'] = True
+    paginator = s3.get_paginator(contents_method).paginate(**params)
+    with bucket_ops(bucket, 'owner'):
+        for page in paginator:
+            page = page_strip(page, versioned)
+            for p in page:
+                if p['Key'] == key['Key']:
+                    if versioned:
+                        if p['VersionId'] == key['VersionId']:
+                            return p['Owner']
+                    else:
+                        return p['Owner']
+
+    return False
