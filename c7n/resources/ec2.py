@@ -674,7 +674,6 @@ class Start(BaseAction, StateTransitionFilter):
             self.log.warning(msg)
             raise RuntimeError(msg)
 
-
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
