@@ -664,14 +664,16 @@ class Start(BaseAction, StateTransitionFilter):
                 for batch in utils.chunks(z_instances, self.batch_size):
                     fails = self.process_instance_set(client, batch, itype, izone)
                     if fails:
-                        failures[(itype, izone)] = batch
+                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
 
         if failures:
             fail_count = sum(map(len, failures.values()))
-            raise RuntimeError(
-                "Could not start %d of %d instances %s" % (
-                    fail_count, len(instances),
-                    utils.format_event(failures)))
+            msg = "Could not start %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
+
 
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
