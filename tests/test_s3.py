@@ -1835,26 +1835,27 @@ class S3LifecycleTest(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertIn(bname, buckets)
 
-        lifecycle_id1 = 'test-lifecycle'
-        rule = {
-            'ID': lifecycle_id1,
-            'Status': 'Enabled',
-            'Prefix': 'foo/',
-            'Transitions': [{
-                'Days': 60,
-                'StorageClass': 'GLACIER',
-            }],
-        }
+        def get_policy(**kwargs):
+            rule = {
+                'Status': 'Enabled',
+                'Prefix': 'foo/',
+                'Transitions': [{
+                    'Days': 60,
+                    'StorageClass': 'GLACIER',
+                }],
+            }
+            rule.update(**kwargs)
 
-        policy = {
-            'name': 's3-lifecycle',
-            'resource': 's3',
-            'filters': [{'Name': bname}],
-            'actions': [{
-                'type': 'configure-lifecycle',
-                'rules': [rule],
-            }]
-        }
+            policy = {
+                'name': 's3-lifecycle',
+                'resource': 's3',
+                'filters': [{'Name': bname}],
+                'actions': [{
+                    'type': 'configure-lifecycle',
+                    'rules': [rule],
+                }]
+            }
+            return policy
 
         def run_policy(policy):
             p = self.load_policy(policy, session_factory=session_factory)
@@ -1867,6 +1868,8 @@ class S3LifecycleTest(BaseTest):
         #
         # Add the first lifecycle
         #
+        lifecycle_id1 = 'test-lifecycle'
+        policy = get_policy(ID=lifecycle_id1)
         run_policy(policy)
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
@@ -1875,8 +1878,7 @@ class S3LifecycleTest(BaseTest):
         # Now add another lifecycle rule to ensure it doesn't clobber the first one
         #
         lifecycle_id2 = 'test-lifecycle-two'
-        rule['ID'] = lifecycle_id2
-        rule['Prefix'] = 'bar/'
+        policy = get_policy(ID=lifecycle_id2, Prefix='bar/')
         run_policy(policy)
 
         # Verify the lifecycle
@@ -1886,9 +1888,9 @@ class S3LifecycleTest(BaseTest):
                             set([lifecycle_id1, lifecycle_id2]))
 
         #
-        # Last test - overwrite one of the lifecycles and make sure it changed
+        # Next, overwrite one of the lifecycles and make sure it changed
         #
-        rule['Prefix'] = 'baz/'
+        policy = get_policy(ID=lifecycle_id2, Prefix='baz/')
         run_policy(policy)
 
         # Verify the lifecycle
@@ -1900,3 +1902,13 @@ class S3LifecycleTest(BaseTest):
         for rule in lifecycle['Rules']:
             if rule['ID'] == lifecycle_id2:
                 self.assertEqual(rule['Prefix'], 'baz/')
+
+        #
+        # Test deleting a lifecycle
+        #
+        policy = get_policy(ID=lifecycle_id1, Status='absent')
+        run_policy(policy)
+        
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 1)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id2)

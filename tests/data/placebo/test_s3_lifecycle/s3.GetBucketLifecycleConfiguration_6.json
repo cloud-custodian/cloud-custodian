@@ -1,42 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Rules": [
-            {
-                "Status": "Enabled", 
-                "Prefix": "foo2/", 
-                "Transitions": [
-                    {
-                        "Days": 60, 
-                        "StorageClass": "GLACIER"
-                    }
-                ], 
-                "ID": "default-retention-policy"
-            }, 
-            {
-                "Status": "Enabled", 
-                "Prefix": "qux/", 
-                "Transitions": [
-                    {
-                        "Days": 100, 
-                        "StorageClass": "GLACIER"
-                    }
-                ], 
-                "ID": "scot-test-lc3"
-            }
-        ], 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
+            "HTTPStatusCode": 404, 
             "RetryAttempts": 0, 
-            "HostId": "u5uh9HsjYceGI3Ll9OSH8kMXVDXw8Mh8Ffx7qLVxu7jTtmVsXRpHDY02xMSD9d2gJveUeuYaTG0=", 
-            "RequestId": "EF717AC7F02F15C4", 
+            "HostId": "gEMCWuFp9RGZxtvL8OdFgCQtOMGXGDj5gf7z+Wqq6G/pmCFRM1TSlGuoC12cUwxBVbjSCfZlGXk=", 
+            "RequestId": "C3950398C10A9F19", 
             "HTTPHeaders": {
-                "x-amz-id-2": "u5uh9HsjYceGI3Ll9OSH8kMXVDXw8Mh8Ffx7qLVxu7jTtmVsXRpHDY02xMSD9d2gJveUeuYaTG0=", 
-                "date": "Fri, 27 Oct 2017 05:17:02 GMT", 
+                "x-amz-id-2": "gEMCWuFp9RGZxtvL8OdFgCQtOMGXGDj5gf7z+Wqq6G/pmCFRM1TSlGuoC12cUwxBVbjSCfZlGXk=", 
+                "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "EF717AC7F02F15C4", 
-                "server": "AmazonS3"
+                "x-amz-request-id": "C3950398C10A9F19", 
+                "date": "Fri, 27 Oct 2017 19:53:51 GMT", 
+                "content-type": "application/xml"
             }
+        }, 
+        "Error": {
+            "Message": "The lifecycle configuration does not exist", 
+            "Code": "NoSuchLifecycleConfiguration", 
+            "BucketName": "custodian-skunk-trails"
         }
     }
 }

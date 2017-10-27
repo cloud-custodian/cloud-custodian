@@ -4,37 +4,37 @@
         "Rules": [
             {
                 "Status": "Enabled", 
-                "Prefix": "foo/", 
+                "Prefix": "foo2/", 
                 "Transitions": [
                     {
                         "Days": 60, 
                         "StorageClass": "GLACIER"
                     }
                 ], 
-                "ID": "test-lifecycle"
+                "ID": "default-retention-policy"
             }, 
             {
                 "Status": "Enabled", 
-                "Prefix": "bar/", 
+                "Prefix": "qux/", 
                 "Transitions": [
                     {
-                        "Days": 60, 
+                        "Days": 100, 
                         "StorageClass": "GLACIER"
                     }
                 ], 
-                "ID": "test-lifecycle-two"
+                "ID": "scot-test-lc3"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "6/FcZqvpCpYW0MX9YV+uyoa198urHucqDqVwelqc43mwJXEKc+9UG2rJRaU7bykFaKTmIEcRdmE=", 
-            "RequestId": "16B87B6AF81A90BE", 
+            "HostId": "QTVdNSBq19061aCA2apzbC4bzulSF7a45KRJV0PnQ1JcWqh/McBnPfWd9OAb1AWjgP6fLadLil4=", 
+            "RequestId": "48865F468B7F00E9", 
             "HTTPHeaders": {
-                "x-amz-id-2": "6/FcZqvpCpYW0MX9YV+uyoa198urHucqDqVwelqc43mwJXEKc+9UG2rJRaU7bykFaKTmIEcRdmE=", 
-                "date": "Fri, 27 Oct 2017 19:54:10 GMT", 
+                "x-amz-id-2": "QTVdNSBq19061aCA2apzbC4bzulSF7a45KRJV0PnQ1JcWqh/McBnPfWd9OAb1AWjgP6fLadLil4=", 
+                "date": "Fri, 27 Oct 2017 19:54:12 GMT", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "16B87B6AF81A90BE", 
+                "x-amz-request-id": "48865F468B7F00E9", 
                 "server": "AmazonS3"
             }
         }

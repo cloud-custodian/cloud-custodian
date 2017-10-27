@@ -1,24 +1,42 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "Rg+pUDNw8isy+hChjgUyHLanRShnto3kSQp/gzbw4NW8Hcr+ZmFUzpuLcbj7haNVdMGxnd7zGTY=", 
-            "RequestId": "007C460467F9D91F", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "Rg+pUDNw8isy+hChjgUyHLanRShnto3kSQp/gzbw4NW8Hcr+ZmFUzpuLcbj7haNVdMGxnd7zGTY=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "007C460467F9D91F", 
-                "date": "Fri, 27 Oct 2017 05:17:16 GMT", 
-                "content-type": "application/xml"
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "Prefix": "foo2/", 
+                "Transitions": [
+                    {
+                        "Days": 60, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "default-retention-policy"
+            }, 
+            {
+                "Status": "Enabled", 
+                "Prefix": "qux/", 
+                "Transitions": [
+                    {
+                        "Days": 100, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "scot-test-lc3"
             }
-        }, 
-        "Error": {
-            "Message": "The lifecycle configuration does not exist", 
-            "Code": "NoSuchLifecycleConfiguration", 
-            "BucketName": "c7n-fire-logs"
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "XtJusmPDz6OqZXcrSUtEVb5fttyg8YgldIpo8pYY+Br+KHW1CKcV9pft9AvMbhRPEEgtoCKFUKw=", 
+            "RequestId": "476F1D7201741A63", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "XtJusmPDz6OqZXcrSUtEVb5fttyg8YgldIpo8pYY+Br+KHW1CKcV9pft9AvMbhRPEEgtoCKFUKw=", 
+                "date": "Fri, 27 Oct 2017 19:54:02 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "476F1D7201741A63", 
+                "server": "AmazonS3"
+            }
         }
     }
 }

@@ -1,31 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Rules": [
-            {
-                "Status": "Enabled", 
-                "Prefix": "foo/", 
-                "Transitions": [
-                    {
-                        "Days": 60, 
-                        "StorageClass": "GLACIER"
-                    }
-                ], 
-                "ID": "test-lifecycle"
-            }
-        ], 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
+            "HTTPStatusCode": 404, 
             "RetryAttempts": 0, 
-            "HostId": "3yP6UM1BCLxO7kvqH9zPz9qOHX+Idr3hnZWMIn4dckB85a/gllo/c9ovs4OgL+R2cnNR5Pt6fLg=", 
-            "RequestId": "1B9F9014FF671204", 
+            "HostId": "se3/86nJzEIs6uY+4jpiK719AeyYtEn5Cl58Y02H9HYnm+mzJuKZzKN3Sq5Vuo3XEHKKRo2yx3M=", 
+            "RequestId": "686D3774300552A8", 
             "HTTPHeaders": {
-                "x-amz-id-2": "3yP6UM1BCLxO7kvqH9zPz9qOHX+Idr3hnZWMIn4dckB85a/gllo/c9ovs4OgL+R2cnNR5Pt6fLg=", 
-                "date": "Fri, 27 Oct 2017 05:17:10 GMT", 
+                "x-amz-id-2": "se3/86nJzEIs6uY+4jpiK719AeyYtEn5Cl58Y02H9HYnm+mzJuKZzKN3Sq5Vuo3XEHKKRo2yx3M=", 
+                "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "1B9F9014FF671204", 
-                "server": "AmazonS3"
+                "x-amz-request-id": "686D3774300552A8", 
+                "date": "Fri, 27 Oct 2017 19:53:58 GMT", 
+                "content-type": "application/xml"
             }
+        }, 
+        "Error": {
+            "Message": "The lifecycle configuration does not exist", 
+            "Code": "NoSuchLifecycleConfiguration", 
+            "BucketName": "c7n-firehose-test"
         }
     }
 }

@@ -15,7 +15,7 @@
             }, 
             {
                 "Status": "Enabled", 
-                "Prefix": "bar/", 
+                "Prefix": "baz/", 
                 "Transitions": [
                     {
                         "Days": 60, 
@@ -28,13 +28,13 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "6/FcZqvpCpYW0MX9YV+uyoa198urHucqDqVwelqc43mwJXEKc+9UG2rJRaU7bykFaKTmIEcRdmE=", 
-            "RequestId": "16B87B6AF81A90BE", 
+            "HostId": "ccJil5cFHeX8EbJJiJDc7qeujdmnPnD14mXuKLeLFpFkP/QP5ICxXeL1sJ9L3K4HLoqtHLRPlFQ=", 
+            "RequestId": "23B7DAD8DE0600AE", 
             "HTTPHeaders": {
-                "x-amz-id-2": "6/FcZqvpCpYW0MX9YV+uyoa198urHucqDqVwelqc43mwJXEKc+9UG2rJRaU7bykFaKTmIEcRdmE=", 
-                "date": "Fri, 27 Oct 2017 19:54:10 GMT", 
+                "x-amz-id-2": "ccJil5cFHeX8EbJJiJDc7qeujdmnPnD14mXuKLeLFpFkP/QP5ICxXeL1sJ9L3K4HLoqtHLRPlFQ=", 
+                "date": "Fri, 27 Oct 2017 19:54:20 GMT", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "16B87B6AF81A90BE", 
+                "x-amz-request-id": "23B7DAD8DE0600AE", 
                 "server": "AmazonS3"
             }
         }

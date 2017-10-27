@@ -1,24 +1,31 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "fk0zIqoOb71jhosV6QsTf9jzybSvZOI9cJP+48zfsh6+fFzM+YMWRxFZ0CHldpiJYldT0V6gn5A=", 
-            "RequestId": "790704761E10D683", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "fk0zIqoOb71jhosV6QsTf9jzybSvZOI9cJP+48zfsh6+fFzM+YMWRxFZ0CHldpiJYldT0V6gn5A=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "790704761E10D683", 
-                "date": "Fri, 27 Oct 2017 05:17:07 GMT", 
-                "content-type": "application/xml"
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "Prefix": "foo/", 
+                "Transitions": [
+                    {
+                        "Days": 60, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "test-lifecycle"
             }
-        }, 
-        "Error": {
-            "Message": "The lifecycle configuration does not exist", 
-            "Code": "NoSuchLifecycleConfiguration", 
-            "BucketName": "c7n-fire-logs"
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
+            "RequestId": "21DF87BD43B3E42D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
+                "date": "Fri, 27 Oct 2017 19:53:58 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "21DF87BD43B3E42D", 
+                "server": "AmazonS3"
+            }
         }
     }
 }

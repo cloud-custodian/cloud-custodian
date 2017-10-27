@@ -21,6 +21,19 @@
             }, 
             {
                 "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 19
+                }, 
+                "Name": "c7n-firehose-test"
+            }, 
+            {
+                "CreationDate": {
                     "hour": 17, 
                     "__class__": "datetime", 
                     "month": 9, 
@@ -34,14 +47,14 @@
             }, 
             {
                 "CreationDate": {
-                    "hour": 5, 
+                    "hour": 19, 
                     "__class__": "datetime", 
                     "month": 10, 
-                    "second": 58, 
+                    "second": 49, 
                     "microsecond": 0, 
                     "year": 2017, 
                     "day": 27, 
-                    "minute": 16
+                    "minute": 53
                 }, 
                 "Name": "custodian-lifecycle-test"
             }, 
@@ -88,14 +101,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "XwrQYzU0DRyZpP4Okb+MPHxGQ+U2O7hZkdPv/jqpQ7CyKcfzABmkEEhbkIsmgm1qjUdIhRJsdlA=", 
-            "RequestId": "CB2CDB21A10E88FC", 
+            "HostId": "/Niqb5BU2PcNxHA9QuRujdTTNwUAlQpq6svjzEqAZ6wOAg68hsquHe0M1YEAWtlVfrCFzgitJRo=", 
+            "RequestId": "92EC2CEA0AF80AD5", 
             "HTTPHeaders": {
-                "x-amz-id-2": "XwrQYzU0DRyZpP4Okb+MPHxGQ+U2O7hZkdPv/jqpQ7CyKcfzABmkEEhbkIsmgm1qjUdIhRJsdlA=", 
+                "x-amz-id-2": "/Niqb5BU2PcNxHA9QuRujdTTNwUAlQpq6svjzEqAZ6wOAg68hsquHe0M1YEAWtlVfrCFzgitJRo=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "CB2CDB21A10E88FC", 
-                "date": "Fri, 27 Oct 2017 05:17:00 GMT", 
+                "x-amz-request-id": "92EC2CEA0AF80AD5", 
+                "date": "Fri, 27 Oct 2017 19:53:50 GMT", 
                 "content-type": "application/xml"
             }
         }

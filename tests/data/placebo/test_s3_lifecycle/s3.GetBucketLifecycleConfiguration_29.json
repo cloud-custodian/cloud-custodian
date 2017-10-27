@@ -3,22 +3,22 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "rt0xJ8HA5KoKx78OtdC9f431LjRDmyVBIojIitJegvC/i3w1PMZddbuma7gli1qqtWkCqKkIUUw=", 
-            "RequestId": "637207A6C819DB69", 
+            "RetryAttempts": 1, 
+            "HostId": "FYJpyL2vlvleHvCyKbNGti+oYma/10rGDEpaBw7HoTBR0802LOYePnDInAU09US1E4vSY21mvus=", 
+            "RequestId": "1445BFA31F549202", 
             "HTTPHeaders": {
-                "x-amz-id-2": "rt0xJ8HA5KoKx78OtdC9f431LjRDmyVBIojIitJegvC/i3w1PMZddbuma7gli1qqtWkCqKkIUUw=", 
+                "x-amz-id-2": "FYJpyL2vlvleHvCyKbNGti+oYma/10rGDEpaBw7HoTBR0802LOYePnDInAU09US1E4vSY21mvus=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "637207A6C819DB69", 
-                "date": "Fri, 27 Oct 2017 19:53:57 GMT", 
+                "x-amz-request-id": "1445BFA31F549202", 
+                "date": "Fri, 27 Oct 2017 19:54:19 GMT", 
                 "content-type": "application/xml"
             }
         }, 
         "Error": {
             "Message": "The lifecycle configuration does not exist", 
             "Code": "NoSuchLifecycleConfiguration", 
-            "BucketName": "c7n-fire-logs"
+            "BucketName": "custodian-log-archive"
         }
     }
 }
