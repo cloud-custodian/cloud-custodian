@@ -34,14 +34,14 @@
             }, 
             {
                 "CreationDate": {
-                    "hour": 3, 
+                    "hour": 5, 
                     "__class__": "datetime", 
                     "month": 10, 
-                    "second": 29, 
+                    "second": 58, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 9, 
-                    "minute": 39
+                    "day": 27, 
+                    "minute": 16
                 }, 
                 "Name": "custodian-lifecycle-test"
             }, 
@@ -88,14 +88,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "5HoytaTGim8G2o53d+VHbaZZhFvYcO5UFRiaOI2EYRt+yw9HzYR+pDiDup1X+nCTC61J5QbKP4w=", 
-            "RequestId": "9E0943927EB44A13", 
+            "HostId": "vGRgyxkFPELC39vbiqiA4wHAG2f2vHMYVBPRQqZ/QXHyJjGhWwb0TobqgWmQ3HzpFZW1pnW8fZA=", 
+            "RequestId": "8364B31620428F42", 
             "HTTPHeaders": {
-                "x-amz-id-2": "5HoytaTGim8G2o53d+VHbaZZhFvYcO5UFRiaOI2EYRt+yw9HzYR+pDiDup1X+nCTC61J5QbKP4w=", 
+                "x-amz-id-2": "vGRgyxkFPELC39vbiqiA4wHAG2f2vHMYVBPRQqZ/QXHyJjGhWwb0TobqgWmQ3HzpFZW1pnW8fZA=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "9E0943927EB44A13", 
-                "date": "Mon, 09 Oct 2017 03:39:29 GMT", 
+                "x-amz-request-id": "8364B31620428F42", 
+                "date": "Fri, 27 Oct 2017 05:16:59 GMT", 
                 "content-type": "application/xml"
             }
         }
