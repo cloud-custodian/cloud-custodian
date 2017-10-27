@@ -2363,7 +2363,8 @@ class Lifecycle(BucketActionBase):
                 if rule['Status'] != 'absent':
                     config.append(rule)
 
-        config = filter(None, config)
+        # The extra `list` conversion if required for python3
+        config = list(filter(None, config))
 
         s3.put_bucket_lifecycle_configuration(
             Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
