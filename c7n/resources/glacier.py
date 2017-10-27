@@ -163,6 +163,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 'State': 'PolicyRemoved',
                 'Statements': found}
 
+
 @Glacier.action_registry.register('delete')
 class DeleteVault(BaseAction):
     """Action to delete empty Glacier Vaults, will abort all multi-part uploads
@@ -189,7 +190,7 @@ class DeleteVault(BaseAction):
                 results += filter(None, [self.process_resource(client, r)])
             except:
                 self.log.exception(
-                        "Error processing glacier:%s", r['VaultARN'])
+                    "Error processing glacier:%s", r['VaultARN'])
         return results
 
     def process_resource(self, client, resource):
@@ -197,8 +198,8 @@ class DeleteVault(BaseAction):
         for u in uploads['UploadsList']:
             try:
                 client.abort_multipart_upload(
-                        vaultName=resource['VaultName'],
-                        uploadId=u['MultipartUploadId']
+                    vaultName=resource['VaultName'],
+                    uploadId=u['MultipartUploadId']
                 )
             except ClientError as e:
                 self.log.exception('Error aborting multipart upload:%s', e)
