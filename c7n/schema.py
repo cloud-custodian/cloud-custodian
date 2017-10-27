@@ -216,6 +216,22 @@ def generate(resource_types=()):
                 'kms_key_arn': {'type': 'string'},
                 'tracing_config': {'type': 'object'},
                 'tags': {'type': 'object'},
+                'execution-options': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'region': {'type': 'string'},
+                        'cache': {'type': 'string'},
+                        'profile': {'type': 'string'},
+                        'account_id': {'type': 'string'},
+                        'assume_role': {'type': 'string'},
+                        'log_group': {'type': 'string'},
+                        'metrics_enabled': {'type': 'boolean'},
+                        'output_dir': {'type': 'string'},
+                        'cache_period': {'type': 'number'},
+                        'dryrun': {'type': 'boolean'},
+                    }
+                }
             },
         },
     }
