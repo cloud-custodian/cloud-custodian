@@ -21,7 +21,7 @@ from c7n.actions import (RemovePolicyBase, BaseAction)
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import get_retry, local_session
+from c7n.utils import get_retry, local_session, type_schema
 
 
 @resources.register('glacier')
@@ -177,7 +177,7 @@ class DeleteVault(BaseAction):
                 actions:
                   - type: delete
     """
-
+    schema = type_schema('delete')
     permissions = ('glacier:DeleteVault', 'glacier:AbortMultipartUpload')
 
     def process(self, resources):
