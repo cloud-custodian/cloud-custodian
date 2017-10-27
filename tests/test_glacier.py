@@ -290,11 +290,11 @@ class GlacierDelete(BaseTest):
         name = 'test-glacier-vault-non-empty-delete'
 
         client.create_vault(vaultName=name)
-	client.upload_archive(
-		vaultName=name,
-		archiveDescription='test',
-		body=b'test'
-	)
+        client.upload_archive(
+            vaultName=name,
+            archiveDescription='test',
+            body=b'test'
+        )
         p = self.load_policy({
             'name': 'glacier-vault-delete',
             'resource': 'glacier',
