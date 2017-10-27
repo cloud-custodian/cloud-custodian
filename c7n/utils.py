@@ -169,9 +169,19 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 def group_by(resources, key):
+    """Return a mapping of key value to resources with the corresponding value.
+
+    Key may be specified as dotted form for nested dictionary lookup
+    """
     resource_map = {}
+    parts = key.split('.')
     for r in resources:
-        resource_map.setdefault(r.get(key), []).append(r)
+        v = r
+        for k in parts:
+            v = v.get(k)
+            if not isinstance(v, dict):
+                break
+        resource_map.setdefault(v, []).append(r)
     return resource_map
 
 
