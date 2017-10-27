@@ -2001,7 +2001,13 @@ class SetInventory(BucketActionBase):
 
     def process(self, buckets):
         with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_bucket, buckets))
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                bucket = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    self.log.error('Message: %s Bucket: %s', e, bucket['Name']);
 
     def process_bucket(self, b):
         inventory_name = self.data.get('name')
@@ -2049,26 +2055,11 @@ class SetInventory(BucketActionBase):
         if found is False:
             self.log.debug("updating bucket:%s inventory configuration id:%s",
                            b['Name'], inventory_name)
-        try:
-            client.put_bucket_inventory_configuration(
-                Bucket=b['Name'], Id=inventory_name, InventoryConfiguration=inventory)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                self.log.error('Error from put_bucket_inventory_configuration for bucket: %s error: %s', b['Name'],
-                               e.response['Error']['Message'])
-            else:
-                raise
+        client.put_bucket_inventory_configuration(
+            Bucket=b['Name'], Id=inventory_name, InventoryConfiguration=inventory)
 
     def get_inventory_delta(self, client, inventory, b):
-        try:
-            inventories = client.list_bucket_inventory_configurations(Bucket=b['Name'])
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                self.log.error('Error from list_bucket_inventory_configurations for bucket: %s error: %s', b['Name'],
-                               e.response['Error']['Message'])
-                return True
-            else:
-                raise
+        inventories = client.list_bucket_inventory_configurations(Bucket=b['Name'])
 
         found = None
         for i in inventories.get('InventoryConfigurationList', []):
