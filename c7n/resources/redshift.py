@@ -724,7 +724,7 @@ class RedshiftSnapshotTag(tags.Tag):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
-            arn = self.manager.generate_arn(r['SnapshotIdentifer'])
+            arn = self.manager.generate_arn(r['SnapshotIdentifier'])
             client.create_tags(ResourceName=arn, Tags=tags)
 
 
