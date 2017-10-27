@@ -2001,7 +2001,13 @@ class SetInventory(BucketActionBase):
 
     def process(self, buckets):
         with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_bucket, buckets))
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                bucket = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    self.log.error('Message: %s Bucket: %s', e, bucket['Name']);
 
     def process_bucket(self, b):
         inventory_name = self.data.get('name')
@@ -2054,6 +2060,7 @@ class SetInventory(BucketActionBase):
 
     def get_inventory_delta(self, client, inventory, b):
         inventories = client.list_bucket_inventory_configurations(Bucket=b['Name'])
+
         found = None
         for i in inventories.get('InventoryConfigurationList', []):
             if i['Id'] != inventory['Id']:
