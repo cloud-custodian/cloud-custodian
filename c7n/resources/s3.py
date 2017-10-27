@@ -2049,11 +2049,27 @@ class SetInventory(BucketActionBase):
         if found is False:
             self.log.debug("updating bucket:%s inventory configuration id:%s",
                            b['Name'], inventory_name)
-        client.put_bucket_inventory_configuration(
-            Bucket=b['Name'], Id=inventory_name, InventoryConfiguration=inventory)
+        try:
+            client.put_bucket_inventory_configuration(
+                Bucket=b['Name'], Id=inventory_name, InventoryConfiguration=inventory)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                self.log.error('Error from put_bucket_inventory_configuration for bucket: %s error: %s', b['Name'],
+                               e.response['Error']['Message'])
+            else:
+                raise
 
     def get_inventory_delta(self, client, inventory, b):
-        inventories = client.list_bucket_inventory_configurations(Bucket=b['Name'])
+        try:
+            inventories = client.list_bucket_inventory_configurations(Bucket=b['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                self.log.error('Error from list_bucket_inventory_configurations for bucket: %s error: %s', b['Name'],
+                               e.response['Error']['Message'])
+                return True
+            else:
+                raise
+
         found = None
         for i in inventories.get('InventoryConfigurationList', []):
             if i['Id'] != inventory['Id']:
