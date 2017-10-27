@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
 import unittest
 
 from datetime import datetime
 from dateutil import tz
+from mock import mock
 from jsonschema.exceptions import ValidationError
 
 from c7n.filters import FilterValidationError
@@ -505,6 +507,30 @@ class TestStart(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 2)
+
+    def test_ec2_start_fails(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_start')
+        policy = self.load_policy({
+            'name': 'ec2-test-start',
+            'resource': 'ec2',
+            'filters': [],
+            'actions': [
+                {'type': 'start'}]},
+            session_factory=session_factory)
+        output = self.capture_logging('custodian.actions', level=logging.DEBUG)
+        with mock.patch.object(ec2.Start, 'process_instance_set', return_value=True):
+            try:
+                resources = policy.run()
+            except RuntimeError as e:
+                pass
+            else:
+                self.fail("should have raised error")
+
+        log_output = output.getvalue()
+        self.assertIn('Could not start 1 of 1 instances', log_output)
+        self.assertIn("t2.micro us-west-2c", log_output)
+        self.assertIn("i-08270b9cfb568a1c4", log_output)
 
 
 class TestOr(BaseTest):
