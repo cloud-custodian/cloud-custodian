@@ -2204,6 +2204,10 @@ class Lifecycle(BucketActionBase):
 
     The schema to supply to the rule follows the schema here: goo.gl/yULzNc
 
+    One additional argument is provided by c7n: State=absent/present (default:
+    present).  If State is set to absent the rule will be removed from the
+    lifecycle.
+
     :example:
 
         .. code-block: yaml
@@ -2221,6 +2225,15 @@ class Lifecycle(BucketActionBase):
                           - Days: 60
                             StorageClass: GLACIER
 
+              - name: s3-remove-lifecycle
+                resource: s3
+                actions:
+                  - type: configure-lifecycle
+                    rules:
+                      - ID: some-lifecycle-id
+                        Status: Enabled
+                        State: absent
+
     """
 
     schema = type_schema(
@@ -2231,11 +2244,12 @@ class Lifecycle(BucketActionBase):
                 'required': True,
                 'items': {
                     'type': 'object',
-                    'required': ['ID', 'Status'],
+                    # Status is also required, but we default it to 'Enabled'
+                    'required': ['ID'],
                     'additionalProperties': False,
                     'properties': {
                         'ID': {'type': 'string'},
-                        'State': {'enum': ['present', 'absent']},
+                        'State': {'enum': ['present', 'absent']},  # c7n keyword
                         'Status': {'enum': ['Enabled', 'Disabled']},
                         'Prefix': {'type': 'string'},
                         'Expiration': {
@@ -2350,9 +2364,17 @@ class Lifecycle(BucketActionBase):
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
         config = (bucket['Lifecycle'] or {}).get('Rules', [])
         for rule in self.data['rules']:
+            # `State` is a c7n keyword.  Remove it before passing to AWS
+            remove_rule = rule.pop('State', 'present') == 'absent'
+
+            # This is required by AWS, but we don't require it because it would
+            # be unintuitive to pass this when trying to delete a policy.
+            if 'Status' not in rule:
+                rule['Status'] = 'Enabled'
+
             for index, existing_rule in enumerate(config):
                 if rule['ID'] == existing_rule['ID']:
-                    if rule.get('State') == 'absent':
+                    if remove_rule:
                         config[index] = None
                     else:
                         config[index] = rule
