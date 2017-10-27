@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "location": "/644160558196/vaults/test-glacier-vault-delete", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "ZaTM6dP54j60tjtiPr5vkOYG9Igw1XMZxPvYWrZ2ryf4T90", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ZaTM6dP54j60tjtiPr5vkOYG9Igw1XMZxPvYWrZ2ryf4T90", 
+                "date": "Fri, 27 Oct 2017 14:11:41 GMT", 
+                "content-length": "2", 
+                "content-type": "application/json", 
+                "location": "/644160558196/vaults/test-glacier-vault-delete"
+            }
+        }
+    }
+}

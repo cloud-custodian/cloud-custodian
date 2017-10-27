@@ -1,0 +1,22 @@
+{
+    "status_code": 201, 
+    "data": {
+        "archiveId": "GREWTBR8CCNnD9Fj6RQ88Mhvmp5Ed7b8swfceNv99T6Gh67j7qJNnNCSzuGarz-dHsCpfPVsuKH4W6rJcCu8wlfmUTt5p8_uqhdq-OcE19zbTpnAqNVWKS0AtFUuUMvjei8ck4f0bw", 
+        "checksum": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", 
+        "location": "/644160558196/vaults/test-glacier-vault-non-empty-delete/archives/GREWTBR8CCNnD9Fj6RQ88Mhvmp5Ed7b8swfceNv99T6Gh67j7qJNnNCSzuGarz-dHsCpfPVsuKH4W6rJcCu8wlfmUTt5p8_uqhdq-OcE19zbTpnAqNVWKS0AtFUuUMvjei8ck4f0bw", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "-j89688CZPxJqI6elx_C2f-7yR4oyrAGUFBS042THeOnFZk", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "-j89688CZPxJqI6elx_C2f-7yR4oyrAGUFBS042THeOnFZk", 
+                "content-length": "2", 
+                "x-amz-archive-id": "GREWTBR8CCNnD9Fj6RQ88Mhvmp5Ed7b8swfceNv99T6Gh67j7qJNnNCSzuGarz-dHsCpfPVsuKH4W6rJcCu8wlfmUTt5p8_uqhdq-OcE19zbTpnAqNVWKS0AtFUuUMvjei8ck4f0bw", 
+                "x-amz-sha256-tree-hash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", 
+                "date": "Fri, 27 Oct 2017 14:17:23 GMT", 
+                "content-type": "application/json", 
+                "location": "/644160558196/vaults/test-glacier-vault-non-empty-delete/archives/GREWTBR8CCNnD9Fj6RQ88Mhvmp5Ed7b8swfceNv99T6Gh67j7qJNnNCSzuGarz-dHsCpfPVsuKH4W6rJcCu8wlfmUTt5p8_uqhdq-OcE19zbTpnAqNVWKS0AtFUuUMvjei8ck4f0bw"
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UploadsList": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "QKQRGO6JwSdh1BsnjLsw2hdTDh2PhH9bEsgKu4_A60CvFfQ", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "QKQRGO6JwSdh1BsnjLsw2hdTDh2PhH9bEsgKu4_A60CvFfQ", 
+                "date": "Fri, 27 Oct 2017 14:11:41 GMT", 
+                "content-length": "32", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
