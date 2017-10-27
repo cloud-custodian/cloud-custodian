@@ -411,6 +411,9 @@ class IamInlinePolicyUsage(BaseTest):
             'name': 'iam-user-with-inline-policy',
             'resource': 'iam-user',
             'filters': [
+                {'or': [{'UserName': 'andrewalexander'},
+                        {'UserName': 'kapil'},
+                        {'UserName': 'scot@sixfeetup.com'}]},
                 {'type': 'has-inline-policy',
                  'value': True}
             ]},
@@ -425,12 +428,15 @@ class IamInlinePolicyUsage(BaseTest):
             'name': 'iam-user-without-inline-policy',
             'resource': 'iam-user',
             'filters': [
+                {'or': [{'UserName': 'andrewalexander'},
+                        {'UserName': 'kapil'},
+                        {'UserName': 'scot@sixfeetup.com'}]},
                 {'type': 'has-inline-policy',
                  'value': False}
             ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 19)
+        self.assertEqual(len(resources), 2)
 
     def test_iam_role_has_inline_policy(self):
         session_factory = self.replay_flight_data(
