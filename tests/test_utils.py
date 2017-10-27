@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import os
 import unittest
+import sys
 import tempfile
 import time
 
@@ -105,6 +106,22 @@ class WorkerDecorator(BaseTest):
 
 
 class UtilTest(unittest.TestCase):
+
+    def test_group_by(self):
+        sorter = lambda x: x
+        sorter = sys.version_info.major is 2 and sorted or sorter
+        items = [{}, {'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}]
+        self.assertEqual(
+            sorter(list(utils.group_by(items, 'Type').keys())),
+            [None, 'a', 'b'])
+        items = [
+            {},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'b'}}]
+        self.assertEqual(
+            sorter(list(utils.group_by(items, 'Type.Part').keys())),
+            [None, 'a', 'b'])
 
     def write_temp_file(self, contents, suffix='.tmp'):
         """ Write a temporary file and return the filename.

@@ -108,7 +108,7 @@ class ObjectAclCheck(object):
         return found
 
     def remove_grants(self, client, bucket, key, acl, grants):
-        params = {'Bucket': bucket, 'Key': 'Key'}
+        params = {'Bucket': bucket, 'Key': key['Key']}
 
         if 'VersionId' in key:
             params['VersionId'] = key['VersionId']

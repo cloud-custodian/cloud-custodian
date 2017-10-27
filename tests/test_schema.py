@@ -292,6 +292,7 @@ class SchemaTest(BaseTest):
                 'resource': 's3',
                 'mode': {
                     'type': 'periodic',
+                    'schedule': 'xyz',
                     'runtime': runtime}}]
             }
         errors_with = lambda r: list(Validator(generate()).iter_errors(data(r)))

@@ -261,6 +261,11 @@ def resource_format(resource, resource_type):
     elif resource_type == 'iam-profile':
         return " %s " % (
             resource['InstanceProfileId'])
+    elif resource_type == 'dynamodb-table':
+        return "name: %s created: %s status: %s" % (
+            resource['TableName'],
+            resource['CreationDateTime'],
+            resource['TableStatus'])
     else:
         print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)
