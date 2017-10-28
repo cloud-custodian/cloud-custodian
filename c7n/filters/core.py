@@ -16,7 +16,8 @@ Resource Filtering Logic
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 import fnmatch
 import logging
 import operator
@@ -441,14 +442,14 @@ class ValueFilter(Filter):
         elif self.vtype == 'swap':
             return value, sentinel
         elif self.vtype == 'age':
-            if not isinstance(sentinel, datetime):
-                sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
+            if not isinstance(sentinel, datetime.datetime):
+                sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
 
-            if not isinstance(value, datetime):
+            if not isinstance(value, datetime.datetime):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
                 try:
-                    value = parse(value, default=datetime.now(tz=tzutc()))
+                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
                 except (AttributeError, TypeError, ValueError):
                     value = 0
 
@@ -471,12 +472,12 @@ class ValueFilter(Filter):
         # Allows for expiration filtering, for events in the future as opposed
         # to events in the past which age filtering allows for.
         elif self.vtype == 'expiration':
-            if not isinstance(sentinel, datetime):
-                sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)
+            if not isinstance(sentinel, datetime.datetime):
+                sentinel = datetime.datetime.now(tz=tzutc()) + timedelta(sentinel)
 
-            if not isinstance(value, datetime):
+            if not isinstance(value, datetime.datetime):
                 try:
-                    value = parse(value, default=datetime.now(tz=tzutc()))
+                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
                 except (AttributeError, TypeError, ValueError):
                     value = 0
 
@@ -502,7 +503,7 @@ class AgeFilter(Filter):
 
     def get_resource_date(self, i):
         v = i[self.date_attribute]
-        if not isinstance(v, datetime):
+        if not isinstance(v, datetime.datetime):
             v = parse(v)
         if not v.tzinfo:
             v = v.replace(tzinfo=tzutc())
@@ -521,9 +522,9 @@ class AgeFilter(Filter):
             minutes = self.data.get('minutes', 0)
             # Work around placebo issues with tz
             if v.tzinfo:
-                n = datetime.now(tz=tzutc())
+                n = datetime.datetime.now(tz=tzutc())
             else:
-                n = datetime.now()
+                n = datetime.datetime.now()
             self.threshold_date = n - timedelta(days=days, hours=hours, minutes=minutes)
 
         return op(self.threshold_date, v)
