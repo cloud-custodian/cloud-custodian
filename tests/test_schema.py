@@ -291,6 +291,7 @@ class SchemaTest(BaseTest):
                 'name': 'test',
                 'resource': 's3',
                 'mode': {
+                    'execution-options': {'metrics_enabled': False},
                     'type': 'periodic',
                     'schedule': 'xyz',
                     'runtime': runtime}}]
