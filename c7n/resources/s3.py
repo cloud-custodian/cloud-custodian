@@ -829,6 +829,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 futures[w.submit(self.process_bucket, b)] = b
             for f in as_completed(futures):
                 if f.exception():
+                    b = futures[f]
                     self.log.error('error modifying bucket:%s\n%s',
                                    b['Name'], f.exception())
                 results += filter(None, [f.result()])
@@ -2345,11 +2346,13 @@ class Lifecycle(BucketActionBase):
             for b in buckets:
                 futures[w.submit(self.process_bucket, b)] = b
 
-            for f in as_completed(futures):
-                if f.exception():
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
                     self.log.error('error modifying bucket lifecycle: %s\n%s',
-                                   b['Name'], f.exception())
-                results += filter(None, [f.result()])
+                                   bucket['Name'], future.exception())
+                results += filter(None, [future.result()])
+
             return results
 
     def process_bucket(self, bucket):
