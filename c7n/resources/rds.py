@@ -45,7 +45,6 @@ Find rds instances that are not encrypted
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
-import json
 import itertools
 import logging
 import operator
