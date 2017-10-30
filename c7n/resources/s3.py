@@ -324,7 +324,9 @@ class ConfigS3(query.ConfigSource):
             {"Key": k, "Value": v} for k, v in item_value['tagSets'][0]['tags'].items()]
 
     def handle_BucketVersioningConfiguration(self, resource, item_value):
-        assert item_value['status'] in ('Enabled', 'Suspended')
+        # Config defaults versioning to 'Off' for a null value
+        if item_value['status'] not in ('Enabled', 'Suspended'):
+            return
         resource['Versioning'] = {'Status': item_value['status']}
         if item_value['isMfaDeleteEnabled']:
             resource['Versioning']['MFADelete'] = item_value[
