@@ -664,6 +664,18 @@ class S3ConfigSource(ConfigTest):
              })
 
 
+    def test_load_item_resource_config_event(self):
+        event = event_data('s3-from-rule.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+
+
 class S3Test(BaseTest):
 
     def test_multipart_large_file(self):
