@@ -907,7 +907,7 @@ class ConfigRDSSnapshot(ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigRDSSnapshot, self).load_resource(item)
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in json.loads(item['Tags'])]
+          for t in item['supplementaryConfiguration']['Tags']]
         # TODO: Load DBSnapshotAttributes into annotation
         return resource
 
