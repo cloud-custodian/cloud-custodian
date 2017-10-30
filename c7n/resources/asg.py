@@ -228,7 +228,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         manager = self.manager.get_resource_manager('ami')
         images = set()
 
-        image_ids = list({lc['ImageId'] for lc in self.configs})
+        image_ids = list({lc['ImageId'] for lc in self.configs.values()})
 
         # To pull third party images, we explicitly use a describe
         # source without any cache.
