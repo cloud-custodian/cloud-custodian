@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
-
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session, chunks, generate_arn
+from c7n.utils import local_session, chunks
 
 
 @resources.register('dms-instance')
@@ -54,9 +52,9 @@ class InstanceDescribe(DescribeSource):
             **{
                 'Filters': [
                     {'Name': 'replication-instance-id', 'Values': resource_ids}]})
-        
+
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('dms')        
+        client = local_session(self.manager.session_factory).client('dms')
         with self.manager.executor_factory(max_workers=2) as w:
             futures = []
             for resource_set in chunks(resources, 20):
@@ -90,5 +88,3 @@ class InstanceDelete(BaseAction):
         client = local_session(self.manager.session_factory).client('dms')
         for arn, r in zip(self.manager.get_arns(resources), resources):
             client.delete_replication_instance(ReplicationInstanceArn=arn)
-                
-                
