@@ -18,7 +18,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, type_schema
 
 
 @resources.register('dms-instance')
@@ -82,6 +82,7 @@ class InstanceDescribe(DescribeSource):
 @ReplicationInstance.action_registry.register('delete')
 class InstanceDelete(BaseAction):
 
+    schema = type_schema('delete')
     permissions = ('dms:DeleteReplicationInstance',)
 
     def process(self, resources):
