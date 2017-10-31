@@ -319,7 +319,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     a['name'], r, " ".join(script_args))
 
 
-def run_account(account, region, policies_config, output_path, cache_period, dryrun, debug):
+def run_account(account, region, policies_config, output_path, cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
@@ -333,7 +333,7 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
     bag = Bag.empty(
         region=region, assume_role=account['role'],
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
-        account_id=account['account_id'], metrics_enabled=False,
+        account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
     policies = PolicyCollection.from_data(policies_config, bag)
@@ -381,10 +381,12 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
 @click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
 @click.option('-p', '--policy', multiple=True)
 @click.option('--cache-period', default=15, type=int)
+@click.option("--metrics", default=False, is_flag=True)
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region, policy, cache_period, dryrun, debug, verbose):
+def run(config, use, output_dir, accounts, tags,
+        region, policy, cache_period, metrics, dryrun, debug, verbose):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy)
@@ -400,6 +402,7 @@ def run(config, use, output_dir, accounts, tags, region, policy, cache_period, d
                     custodian_config,
                     output_dir,
                     cache_period,
+                    metrics,
                     dryrun,
                     debug)] = (a, r)
 
