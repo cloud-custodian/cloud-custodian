@@ -952,11 +952,27 @@ class ToggleLogging(BucketActionBase):
             else:
                 r['Logging'] = {'Status': 'Disabled'}
             if enabled and (r['Logging']['Status'] == 'Disabled'):
+                # code to support expand_variables()
+                target_bucket = self.data.get('target_bucket')
+                session = local_session(self.manager.session_factory)
+                iam_client = session.client('iam')
+                aliases = iam_client.list_account_aliases().get('AccountAliases', ('',))
+                account_name = aliases and aliases[0] or ""
+
+                variables = {
+                    'account_id': self.manager.config.account_id,
+                    'account': account_name,
+                    'region': self.manager.config.region,
+                    'source_bucket_name': r['Name'],
+                    'target_bucket_name': target_bucket
+                }                
+#                target_bucket = self.expand_variables(variables)
+                # code to support expand_variables()
                 client.put_bucket_logging(
                     Bucket=r['Name'],
                     BucketLoggingStatus={
                         'LoggingEnabled': {
-                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetBucket': target_bucket,
                             'TargetPrefix': target_prefix}})
                 continue
             if not enabled and r['Logging']['Status'] == 'Enabled':
@@ -965,15 +981,19 @@ class ToggleLogging(BucketActionBase):
                     BucketLoggingStatus={})
                 continue
 
+    def expand_variables(self, variables):
+        """expand variables 
+        """
+        target_bucket_name = variables['target_bucket_name'].copy()
+        target_bucket_name = target_bucket_name.format(**variables)
+        return target_bucket_name
+
+
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
-
-    supports attachment via lambda bucket notification or sns notification
-    to invoke lambda. a special topic value of `default` will utilize
-    an extant notification or create one matching the bucket name.
-
+supports attachment via lambda bucket notification or sns notification to invoke lambda. a special topic value of `default` will utilize an extant notification or create one matching the bucket name.  
     :example:
 
         .. code-block: yaml
