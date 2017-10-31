@@ -309,7 +309,7 @@ class AutoScalingTest(BaseTest):
         self.assertFalse(result['SuspendedProcesses'])
 
     def test_asg_third_ami_filter(self):
-        factory = self.record_flight_data('test_asg_invalid_third_ami')
+        factory = self.replay_flight_data('test_asg_invalid_third_ami')
         p = self.load_policy({
             'name': 'asg-invalid-filter-3ami',
             'resource': 'asg',
