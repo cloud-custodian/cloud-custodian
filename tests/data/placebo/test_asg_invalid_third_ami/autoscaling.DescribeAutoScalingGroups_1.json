@@ -1,0 +1,72 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:ecf0c638-9414-4943-8fcc-8474aa37ddcb:autoScalingGroupName/dev-cluster", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "dev-cluster", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "dev-clustering", 
+                        "Key": "Name"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "dev-cluster", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-059c99fe889f7593b", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "dev-cluster"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610,subnet-e3b194de", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "dev-cluster", 
+                "CreatedTime": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 22, 
+                    "microsecond": 808000, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 45
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1d", 
+                    "us-east-1e"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d84e61d6-be17-11e7-ae5c-d33169319fa6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d84e61d6-be17-11e7-ae5c-d33169319fa6", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2272", 
+                "content-type": "text/xml", 
+                "date": "Tue, 31 Oct 2017 08:45:27 GMT"
+            }
+        }
+    }
+}

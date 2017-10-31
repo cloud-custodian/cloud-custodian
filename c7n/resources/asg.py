@@ -202,7 +202,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.elbs = self.get_elbs()
         self.appelb_target_groups = self.get_appelb_target_groups()
         self.snapshots = self.get_snapshots()
-        self.images = self.get_images()
+        self.images, self.image_snaps = self.get_images()
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
@@ -227,8 +227,16 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def get_images(self):
         manager = self.manager.get_resource_manager('ami')
         images = set()
-
+        image_snaps = set()
         image_ids = list({lc['ImageId'] for lc in self.configs.values()})
+
+        # Pull account images, we should be able to utilize cached values,
+        # drawn down the image population to just images not in the account.
+        account_images = [
+            i for i in manager.resources() if i['ImageId'] in image_ids]
+        account_image_ids = {i['ImageId'] for i in account_images}
+        image_ids = [image_id for image_id in image_ids
+                     if image_id not in account_image_ids]
 
         # To pull third party images, we explicitly use a describe
         # source without any cache.
@@ -242,6 +250,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             try:
                 amis = manager.get_source('describe').get_resources(
                     image_ids, cache=False)
+                account_images.extend(amis)
                 break
             except ClientError as e:
                 msg = e.response['Error']['Message']
@@ -250,22 +259,17 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
                 for n in msg[msg.find('[') + 1: msg.find(']')].split(','):
                     image_ids.remove(n.strip())
 
-        for a in amis:
-            if a['OwnerId'] != self.manager.config.account_id:
-                images.add(a['ImageId'])
-                continue
-
-            found = True
+        for a in account_images:
+            images.add(a['ImageId'])
+            # Capture any snapshots, images strongly reference their
+            # snapshots, and some of these will be third party in the
+            # case of a third party image.
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
-                if bd['Ebs']['SnapshotId'].strip() not in self.snapshots:
-                    found = False
-                    break
-            if found:
-                images.add(a['ImageId'])
+                image_snaps.add(bd['Ebs']['SnapshotId'].strip())
 
-        return images
+        return images, image_snaps
 
     def get_snapshots(self):
         manager = self.manager.get_resource_manager('ebs-snapshot')
@@ -322,6 +326,8 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
             snapshot_id = bd['Ebs']['SnapshotId'].strip()
+            if snapshot_id in self.image_snaps:
+                continue
             if snapshot_id not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
