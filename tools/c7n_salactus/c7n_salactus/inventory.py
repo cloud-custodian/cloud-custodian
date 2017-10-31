@@ -47,18 +47,17 @@ def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
         for key_set in chunks(reader, 1000):
             keys = []
             for kr in key_set:
-                k = kr[1]
+                # http://docs.aws.amazon.com/AmazonS3/latest/dev/storage-inventory.html#storage-inventory-contents
                 if inventory_filter(ifilters, schema, kr):
                     continue
+                k = kr[1]
                 if '%' in k:
                     k = unquote_plus(k)
+                key = {'Key': k}
                 if versioned:
-                    if kr[3] == 'true':
-                        keys.append((k, kr[2], True))
-                    else:
-                        keys.append((k, kr[2]))
-                else:
-                    keys.append(k)
+                    key['VersionId'] = kr[2]
+                    key['IsLatest'] = kr[3] == 'true'
+                keys.append(key)
             yield keys
 
 

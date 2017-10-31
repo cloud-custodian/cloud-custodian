@@ -88,7 +88,8 @@ CONFIG_SCHEMA = {
             'properties': {
                 'bucket': {'type': 'string'},
                 'prefix': {'type': 'string'},
-                'role': {'type': 'string'}
+                'role': {'type': 'string'},
+                'access-denied-owner': {'type': 'boolean'}
             }
         },
 
@@ -200,6 +201,11 @@ def run(config, tag, bucket, account, debug, region):
 
     with open(config) as fh:
         data = utils.yaml_load(fh.read())
+
+        # build map of canonical IDs to account name and ID
+        id_map = {account_info['canonical-id']: (account_info['name'], account_info['account-id'])
+                    for account_info in data.get('accounts', ())}
+
         for account_info in data.get('accounts', ()):
             if tag and tag not in account_info.get('tags', ()):
                 continue
@@ -216,6 +222,7 @@ def run(config, tag, bucket, account, debug, region):
                 account_info['buckets'] = bucket
             if region:
                 account_info['regions'] = region
+            account_info['id-map'] = id_map
 
             try:
                 worker.invoke(worker.process_account, account_info)
