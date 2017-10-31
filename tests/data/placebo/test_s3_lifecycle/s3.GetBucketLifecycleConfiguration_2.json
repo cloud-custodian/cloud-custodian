@@ -1,24 +1,31 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "et16AMxxb9HCXDvf/0H1w+S8twxiuqq+boMfHULNRtKRytWADNHh4mrICWZw80J7fnTFoqjdrJs=", 
-            "RequestId": "F1C80E3079DA3859", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "et16AMxxb9HCXDvf/0H1w+S8twxiuqq+boMfHULNRtKRytWADNHh4mrICWZw80J7fnTFoqjdrJs=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "F1C80E3079DA3859", 
-                "date": "Fri, 27 Oct 2017 19:53:49 GMT", 
-                "content-type": "application/xml"
+        "Rules": [
+            {
+                "Status": "Enabled", 
+                "Prefix": "foo/", 
+                "Transitions": [
+                    {
+                        "Days": 60, 
+                        "StorageClass": "GLACIER"
+                    }
+                ], 
+                "ID": "test-lifecycle"
             }
-        }, 
-        "Error": {
-            "Message": "The lifecycle configuration does not exist", 
-            "Code": "NoSuchLifecycleConfiguration", 
-            "BucketName": "c7n-firehose-test"
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
+            "RequestId": "21DF87BD43B3E42D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
+                "date": "Fri, 27 Oct 2017 19:53:58 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "21DF87BD43B3E42D", 
+                "server": "AmazonS3"
+            }
         }
     }
 }
