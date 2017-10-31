@@ -966,7 +966,10 @@ class ToggleLogging(BucketActionBase):
                     'source_bucket_name': r['Name'],
                     'target_bucket_name': target_bucket
                 }                
-#                target_bucket = self.expand_variables(variables)
+                target_bucket = self.expand_variables(variables)
+                log.info(
+                        "target_bucket=%s" % target_bucket)
+
                 # code to support expand_variables()
                 client.put_bucket_logging(
                     Bucket=r['Name'],
@@ -984,7 +987,7 @@ class ToggleLogging(BucketActionBase):
     def expand_variables(self, variables):
         """expand variables 
         """
-        target_bucket_name = variables['target_bucket_name'].copy()
+        target_bucket_name = variables['target_bucket_name']
         target_bucket_name = target_bucket_name.format(**variables)
         return target_bucket_name
 
