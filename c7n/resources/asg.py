@@ -238,7 +238,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         # explicitly pull a describe source. Can't use a cache either
         # as their not in the account.
         #
-        while True:
+        while image_ids:
             try:
                 amis = manager.get_source('describe').get_resources(
                     image_ids, cache=False)
@@ -251,10 +251,11 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
                     image_ids.remove(n.strip())
 
         for a in amis:
-            found = True
             if a['OwnerId'] != self.manager.config.account_id:
                 images.add(a['ImageId'])
                 continue
+
+            found = True
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
@@ -263,6 +264,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
                     break
             if found:
                 images.add(a['ImageId'])
+
         return images
 
     def get_snapshots(self):
