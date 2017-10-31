@@ -1025,7 +1025,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
         regions = set([
             b.get('Location', {
-                'LocationConstraint': 'us-east-1'})['LocationConstraint']
+                'LocationConstraint': 'us-east-1'})['LocationConstraint'] or 'us-east-1'
             for b in buckets])
 
         # session managers by region
@@ -1048,7 +1048,7 @@ class AttachLambdaEncrypt(BucketActionBase):
             for b in buckets:
                 region = b.get('Location', {
                     'LocationConstraint': 'us-east-1'}).get(
-                        'LocationConstraint')
+                        'LocationConstraint') or 'us-east-1'
                 futures.append(
                     w.submit(
                         self.process_bucket,
