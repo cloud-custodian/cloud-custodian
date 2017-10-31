@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import functools
 import json
 import os
@@ -23,6 +24,7 @@ import time  # NOQA needed for some recordings
 from unittest import TestCase
 
 from botocore.exceptions import ClientError
+from dateutil.tz import tzutc
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
@@ -662,6 +664,39 @@ class S3ConfigSource(ConfigTest):
                      }
                  ]}
              })
+
+
+    def test_load_item_resource_config_event(self):
+        event = event_data('s3-from-rule.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource,
+            {u'Acl': {
+                u'Grants': [{
+                    u'Grantee': {
+                        u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
+                        u'Type': u'CanonicalUser'},
+                        u'Permission': u'FULL_CONTROL'}],
+                u'Owner': {u'DisplayName': u'mandeep.bal',
+                           u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}},
+             u'CreationDate': datetime.datetime(2017, 9, 15, 2, 5, 40, tzinfo=tzutc()),
+             u'Lifecycle': None,
+             u'Location': None,
+             u'Logging': None,
+             u'Name': u'c7n-fire-logs',
+             u'Notification': {},
+             u'Policy': None,
+             u'Replication': None,
+             u'Tags': [],
+             u'Versioning': None,
+             u'Website': None})
 
 
 class S3Test(BaseTest):
