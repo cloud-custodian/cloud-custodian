@@ -20,8 +20,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 import base64
-import imp
 import hashlib
+import importlib
 import io
 import json
 import logging
@@ -87,21 +87,42 @@ class PythonPackageArchive(object):
         files, including compiled modules. You'll have to add such files
         manually using :py:meth:`add_file`.
         """
-        for module in modules:
-            path = imp.find_module(module)[1]
-            if os.path.isfile(path):
+        for name in modules:
+            module = importlib.import_module(name)
+
+            if hasattr(module, '__path__'):
+                # https://docs.python.org/3/reference/import.html#module-path
+                for directory in module.__path__:
+                    self.add_directory(directory)
+
+            elif hasattr(module, '__file__'):
+                # https://docs.python.org/3/reference/import.html#__file__
+                path = module.__file__
+
+                if path.endswith('.pyc'):
+                    _path = path[:-1]
+                    if not os.path.isfile(_path):
+                        raise ValueError(
+                            'Could not find a *.py source file behind ' + path)
+                    path = _path
+
                 if not path.endswith('.py'):
-                    raise ValueError('We need a *.py source file instead of ' + path)
+                    raise ValueError(
+                        'We need a *.py source file instead of ' + path)
+
                 self.add_file(path)
-            elif os.path.isdir(path):
-                for root, dirs, files in os.walk(path):
-                    arc_prefix = os.path.relpath(root, os.path.dirname(path))
-                    for f in files:
-                        if not f.endswith('.py'):
-                            continue
-                        f_path = os.path.join(root, f)
-                        dest_path = os.path.join(arc_prefix, f)
-                        self.add_file(f_path, dest_path)
+
+    def add_directory(self, path):
+        """Add ``*.py`` files under the directory ``path`` to the archive.
+        """
+        for root, dirs, files in os.walk(path):
+            arc_prefix = os.path.relpath(root, os.path.dirname(path))
+            for f in files:
+                if not f.endswith('.py'):
+                    continue
+                f_path = os.path.join(root, f)
+                dest_path = os.path.join(arc_prefix, f)
+                self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest=None):
         """Add the file at ``src`` to the archive.

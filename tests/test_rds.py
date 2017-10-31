@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
@@ -36,6 +36,16 @@ logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
+    def test_rds_config_event(self):
+        event = event_data('rds-from-rule.json', 'config')        
+        p = self.load_policy({'name': 'rds', 'resource': 'rds'})
+        source = p.resource_manager.get_source('config')
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource['Tags'],
+            [{u'Key': u'workload-type', u'Value': u'other'}])
+        
     def test_rds_stop(self):
         session_factory = self.replay_flight_data('test_rds_stop')
         db_instance_id = 'rds-test-instance-1'
