@@ -492,8 +492,21 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
 
 def get_region(b):
-    return b.get('Location', {
-        'LocationConstraint': 'us-east-1'})['LocationConstraint'] or 'us-east-1'
+    """Tries to get the bucket region from Location.LocationConstraint
+
+    Special cases:
+        LocationConstraint EU defaults to eu-west-1
+        LocationConstraint null defaults to us-east-1
+
+    Args:
+        b (object): A bucket object
+
+    Returns:
+        string: an aws region string
+    """
+    remap = {None: 'us-east-1', 'EU': 'eu-west-1'}
+    region = b.get('Location', {}).get('LocationConstraint')
+    return remap.get(region, region)
 
 
 @filters.register('metrics')
