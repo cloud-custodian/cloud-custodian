@@ -914,7 +914,7 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
         except ClientError as e:
             #  https://goo.gl/HZLv9b
             code = e.response['Error']['Code']
-            if code in ('403', 'AccessDenied'):  # Permission Denied
+            if code in ('403', 'AccessDenied', '405', 'MethodNotAllowed'):  # Permission Denied
                 stats['denied'] += 1
                 if object_reporting:
                     stats['objects_denied'].append(k)
