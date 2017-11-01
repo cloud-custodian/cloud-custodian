@@ -4,9 +4,31 @@
         "trailList": [
             {
                 "IncludeGlobalServiceEvents": true, 
+                "Name": "S3-DataEvent-1", 
+                "S3KeyPrefix": "DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvent-1", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": true, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
                 "Name": "S3-DataEvents", 
                 "S3KeyPrefix": "DataEvents", 
                 "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": true, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "S3-DataEvents-ftest-1509546582", 
+                "S3KeyPrefix": "DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-ftest-1509546582", 
                 "LogFileValidationEnabled": true, 
                 "IsMultiRegionTrail": true, 
                 "HasCustomEventSelectors": true, 
@@ -28,11 +50,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2ff6a2e0-a759-11e7-a699-03b05d10b302", 
+            "RequestId": "8b4aa00c-6050-403b-b05d-3aa429d38aa9", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2ff6a2e0-a759-11e7-a699-03b05d10b302", 
-                "date": "Mon, 02 Oct 2017 10:05:14 GMT", 
-                "content-length": "706", 
+                "x-amzn-requestid": "8b4aa00c-6050-403b-b05d-3aa429d38aa9", 
+                "date": "Wed, 01 Nov 2017 14:29:45 GMT", 
+                "content-length": "1372", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

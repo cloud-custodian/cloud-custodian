@@ -8,15 +8,15 @@
                 "ReadWriteType": "All"
             }
         ], 
-        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-ftest-1509546582", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2f727f36-a759-11e7-b1a6-bd32358664de", 
+            "RequestId": "aa62ffb9-5df9-4b93-8995-5bf65af81158", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2f727f36-a759-11e7-b1a6-bd32358664de", 
-                "date": "Mon, 02 Oct 2017 10:05:14 GMT", 
-                "content-length": "169", 
+                "x-amzn-requestid": "aa62ffb9-5df9-4b93-8995-5bf65af81158", 
+                "date": "Wed, 01 Nov 2017 14:29:43 GMT", 
+                "content-length": "186", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

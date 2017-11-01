@@ -19,9 +19,9 @@ from c7n.utils import local_session
 from c7n.filters import FilterValidationError
 from jsonschema.exceptions import ValidationError
 
-
 import datetime
 from dateutil import parser
+import time
 
 from .test_offhours import mock_datetime_now
 from .common import Config, functional
@@ -549,12 +549,13 @@ class AccountDataEvents(BaseTest):
 
     @functional
     def test_data_events(self):
+        trail_name = 'S3-DataEvents-ftest-{}'.format(int(time.time()))
         session_factory = self.replay_flight_data('test_account_data_events')
         client = session_factory().client('cloudtrail')
         self.assertFalse(
-            'S3-DataEvents' in {t['Name'] for t in
-                                client.describe_trails().get('trailList')})
-        self.addCleanup(client.delete_trail, Name='S3-DataEvents')
+            trail_name in {t['Name'] for t in
+                           client.describe_trails().get('trailList')})
+        self.addCleanup(client.delete_trail, Name=trail_name)
 
         p = self.load_policy({
             'name': 's3-data-events',
@@ -563,7 +564,7 @@ class AccountDataEvents(BaseTest):
                 {'type': 'enable-data-events',
                  'data-trail': {
                      'create': True,
-                     'name': 'S3-DataEvents',
+                     'name': trail_name,
                      's3-bucket': 'custodian-skunk-trails',
                      's3-prefix': 'DataEvents',
                      'multi-region': 'us-east-1'}}]},
@@ -571,7 +572,7 @@ class AccountDataEvents(BaseTest):
         resources = p.run()
         self.assertEqual(
             client.get_event_selectors(
-                TrailName='S3-DataEvents').get('EventSelectors')[0],
+                TrailName=trail_name).get('EventSelectors')[0],
             {'DataResources': [{'Type': 'AWS::S3::Object',
                                 'Values': ['arn:aws:s3:::']}],
              'IncludeManagementEvents': False,

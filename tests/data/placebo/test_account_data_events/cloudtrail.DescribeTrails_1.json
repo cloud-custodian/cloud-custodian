@@ -4,6 +4,28 @@
         "trailList": [
             {
                 "IncludeGlobalServiceEvents": true, 
+                "Name": "S3-DataEvent-1", 
+                "S3KeyPrefix": "DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvent-1", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": true, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "S3-DataEvents", 
+                "S3KeyPrefix": "DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": true, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
                 "Name": "skunk-trails", 
                 "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
                 "LogFileValidationEnabled": true, 
@@ -17,11 +39,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2ef1dd7e-a759-11e7-b1a6-bd32358664de", 
+            "RequestId": "c5476bb9-b065-4da3-8f05-140bf48d53c4", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2ef1dd7e-a759-11e7-b1a6-bd32358664de", 
-                "date": "Mon, 02 Oct 2017 10:05:13 GMT", 
-                "content-length": "391", 
+                "x-amzn-requestid": "c5476bb9-b065-4da3-8f05-140bf48d53c4", 
+                "date": "Wed, 01 Nov 2017 14:29:42 GMT", 
+                "content-length": "1023", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

@@ -3,20 +3,27 @@
     "data": {
         "EventSelectors": [
             {
-                "IncludeManagementEvents": true, 
-                "DataResources": [], 
+                "IncludeManagementEvents": false, 
+                "DataResources": [
+                    {
+                        "Values": [
+                            "arn:aws:s3:::"
+                        ], 
+                        "Type": "AWS::S3::Object"
+                    }
+                ], 
                 "ReadWriteType": "All"
             }
         ], 
-        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "302a0ef4-a759-11e7-a699-03b05d10b302", 
+            "RequestId": "5a7da41d-2f00-47a0-87e5-b14298dadcec", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "302a0ef4-a759-11e7-a699-03b05d10b302", 
-                "date": "Mon, 02 Oct 2017 10:05:15 GMT", 
-                "content-length": "168", 
+                "x-amzn-requestid": "5a7da41d-2f00-47a0-87e5-b14298dadcec", 
+                "date": "Wed, 01 Nov 2017 14:29:45 GMT", 
+                "content-length": "223", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
