@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EventSelectors": [
+            {
+                "IncludeManagementEvents": true, 
+                "DataResources": [], 
+                "ReadWriteType": "All"
+            }
+        ], 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4acb506-d97e-4681-959b-59a7615e6403", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a4acb506-d97e-4681-959b-59a7615e6403", 
+                "date": "Wed, 01 Nov 2017 14:29:45 GMT", 
+                "content-length": "168", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
