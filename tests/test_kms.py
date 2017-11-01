@@ -134,7 +134,7 @@ class KMSTest(BaseTest):
                       "Sid": "DefaultRoot",
                       "Effect": "Allow",
                       "Principal": {
-                        "AWS": "arn:aws:iam::123456789012:root"
+                        "AWS": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
                       },
                       "Action": "kms:*",
                       "Resource": "*"
@@ -170,4 +170,3 @@ class KMSTest(BaseTest):
                 KeyId=resources[0]['KeyId'],PolicyName='default').get('Policy'))
 
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
-    
