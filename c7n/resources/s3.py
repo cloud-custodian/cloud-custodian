@@ -458,11 +458,7 @@ def assemble_bucket(item):
 
 
 def bucket_client(session, b, kms=False):
-    location = b.get('Location')
-    if location is None:
-        region = 'us-east-1'
-    else:
-        region = location['LocationConstraint'] or 'us-east-1'
+    region = get_region(b)
 
     if kms:
         # Need v4 signature for aws:kms crypto, else let the sdk decide
@@ -493,6 +489,24 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
             log.exception(
                 'Exception tagging bucket %s: %s', bucket['Name'], e)
             continue
+
+
+def get_region(b):
+    """Tries to get the bucket region from Location.LocationConstraint
+
+    Special cases:
+        LocationConstraint EU defaults to eu-west-1
+        LocationConstraint null defaults to us-east-1
+
+    Args:
+        b (object): A bucket object
+
+    Returns:
+        string: an aws region string
+    """
+    remap = {None: 'us-east-1', 'EU': 'eu-west-1'}
+    region = b.get('Location', {}).get('LocationConstraint')
+    return remap.get(region, region)
 
 
 @filters.register('metrics')
@@ -1024,10 +1038,7 @@ class AttachLambdaEncrypt(BucketActionBase):
             None, self.data.get('role', self.manager.config.assume_role),
             account_id=account_id, tags=self.data.get('tags'))
 
-        regions = set([
-            b.get('Location', {
-                'LocationConstraint': 'us-east-1'})['LocationConstraint']
-            for b in buckets])
+        regions = set([get_region(b) for b in buckets])
 
         # session managers by region
         region_sessions = {}
@@ -1047,9 +1058,7 @@ class AttachLambdaEncrypt(BucketActionBase):
             results = []
             futures = []
             for b in buckets:
-                region = b.get('Location', {
-                    'LocationConstraint': 'us-east-1'}).get(
-                        'LocationConstraint')
+                region = get_region(b)
                 futures.append(
                     w.submit(
                         self.process_bucket,
