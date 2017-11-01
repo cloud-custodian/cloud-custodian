@@ -7,31 +7,30 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 201, 
-            "RequestId": "044defa8-84db-11e7-9018-150d1b08e163", 
+            "RequestId": "ef163d56-bf15-11e7-ba33-cf09421587b9", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "044defa8-84db-11e7-9018-150d1b08e163", 
-                "date": "Sat, 19 Aug 2017 12:36:26 GMT", 
-                "content-length": "388", 
+                "x-amzn-requestid": "ef163d56-bf15-11e7-ba33-cf09421587b9", 
+                "date": "Wed, 01 Nov 2017 15:04:18 GMT", 
+                "content-length": "300", 
                 "content-type": "application/json"
             }
         }, 
-        "CreationToken": "e6986d0c-4720-4a08-881d-d694695c6d51", 
-        "Encrypted": true, 
+        "CreationToken": "b2bf7400-c02d-4b31-9f88-5691cb3db076", 
+        "Encrypted": false, 
         "CreationTime": {
-            "hour": 7, 
+            "hour": 10, 
             "__class__": "datetime", 
-            "month": 8, 
-            "second": 26, 
+            "month": 11, 
+            "second": 18, 
             "microsecond": 0, 
             "year": 2017, 
-            "day": 19, 
-            "minute": 36
+            "day": 1, 
+            "minute": 4
         }, 
         "PerformanceMode": "generalPurpose", 
-        "FileSystemId": "fs-1ac6a253", 
+        "FileSystemId": "fs-f2603dbb", 
         "NumberOfMountTargets": 0, 
         "LifeCycleState": "creating", 
-        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5", 
         "OwnerId": "644160558196"
     }
 }
