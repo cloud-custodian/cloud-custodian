@@ -788,12 +788,12 @@ def get_key_visitors(account_info):
     for v in account_info.get('visitors'):
         if v['type'] == 'encrypt-keys':
             vi = EncryptExtantKeys(v)
-            vi.name = 'encrypt-keys'
+            vi.visitor_name = 'encrypt-keys'
             vi.inventory_filter = filter_encrypted
             visitors.append(vi)
         elif v['type'] == 'object-acl':
             vi = ObjectAclCheck(v)
-            vi.name = 'object-acl'
+            vi.visitor_name = 'object-acl'
             vi.inventory_filter = None
             visitors.append(vi)
     return visitors
@@ -825,7 +825,7 @@ def process_keyset(bid, key_set):
     key_count = len(key_set)
     start_time = time.time()
 
-    objects = {v.name: [] for v in visitors}
+    objects = {v.visitor_name: [] for v in visitors}
     objects['objects_denied'] = []
 
     with bucket_ops(bid, 'key'):
@@ -839,7 +839,7 @@ def process_keyset(bid, key_set):
                         v.process_version or v.process_key)
                     futures[w.submit(
                         process_key_chunk, s3, bucket, kchunk,
-                        processor, bool(object_reporting))] = v.name
+                        processor, bool(object_reporting))] = v.visitor_name
 
             for f in as_completed(futures):
                 if f.exception():
