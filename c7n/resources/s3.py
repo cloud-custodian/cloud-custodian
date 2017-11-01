@@ -391,7 +391,7 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_website', 'Website', None, None),
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None),
-    ('get_bucket_lifecycle', 'Lifecycle', None, None),
+    ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
     #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -831,6 +831,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 futures[w.submit(self.process_bucket, b)] = b
             for f in as_completed(futures):
                 if f.exception():
+                    b = futures[f]
                     self.log.error('error modifying bucket:%s\n%s',
                                    b['Name'], f.exception())
                 results += filter(None, [f.result()])
@@ -2204,3 +2205,177 @@ class DeleteBucket(ScanBucket):
             Bucket=bucket['Name'], Delete={'Objects': objects}).get('Deleted', ())
         if self.get_bucket_style(bucket) != 'versioned':
             return results
+
+
+@actions.register('configure-lifecycle')
+class Lifecycle(BucketActionBase):
+    """Action applies a lifecycle policy to versioned S3 buckets
+
+    The schema to supply to the rule follows the schema here: goo.gl/yULzNc
+
+    To delete a lifecycle rule, supply Status=absent
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-apply-lifecycle
+                resource: s3
+                actions:
+                  - type: configure-lifecycle
+                    rules:
+                      - ID: my-lifecycle-id
+                        Status: Enabled
+                        Prefix: foo/
+                        Transitions:
+                          - Days: 60
+                            StorageClass: GLACIER
+
+    """
+
+    schema = type_schema(
+        'configure-lifecycle',
+        **{
+            'rules': {
+                'type': 'array',
+                'required': True,
+                'items': {
+                    'type': 'object',
+                    'required': ['ID', 'Status'],
+                    'additionalProperties': False,
+                    'properties': {
+                        'ID': {'type': 'string'},
+                        # c7n intercepts `absent`
+                        'Status': {'enum': ['Enabled', 'Disabled', 'absent']},
+                        'Prefix': {'type': 'string'},
+                        'Expiration': {
+                            'type': 'object',
+                            'additionalProperties': False,
+                            'properties': {
+                                'Date': {'type': 'string'},  # Date
+                                'Days': {'type': 'integer'},
+                                'ExpiredObjectDeleteMarker': {'type': 'boolean'},
+                            },
+                        },
+                        'Filter': {
+                            'type': 'object',
+                            'minProperties': 1,
+                            'maxProperties': 1,
+                            'additionalProperties': False,
+                            'properties': {
+                                'Prefix': {'type': 'string'},
+                                'Tag': {
+                                    'type': 'object',
+                                    'required': ['Key', 'Value'],
+                                    'additionalProperties': False,
+                                    'properties': {
+                                        'Key': {'type': 'string'},
+                                        'Value': {'type': 'string'},
+                                    },
+                                },
+                                'And': {
+                                    'type': 'object',
+                                    'additionalProperties': False,
+                                    'items': {
+                                        'Prefix': {'type': 'string'},
+                                        'Tags': {
+                                            'type': 'array',
+                                            'items': {
+                                                'type': 'object',
+                                                'required': ['Key', 'Value'],
+                                                'additionalProperties': False,
+                                                'items': {
+                                                    'Key': {'type': 'string'},
+                                                    'Value': {'type': 'string'},
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        'Transitions': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'Date': {'type': 'string'},  # Date
+                                    'Days': {'type': 'integer'},
+                                    'StorageClass': {'type': 'string'},
+                                },
+                            },
+                        },
+                        'NoncurrentVersionTransitions': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'NoncurrentDays': {'type': 'integer'},
+                                    'StorageClass': {'type': 'string'},
+                                },
+                            },
+                        },
+                        'NoncurrentVersionExpiration': {
+                            'type': 'object',
+                            'additionalProperties': False,
+                            'items': {
+                                'NoncurrentDays': {'type': 'integer'},
+                            },
+                        },
+                        'AbortIncompleteMultipartUpload': {
+                            'type': 'object',
+                            'additionalProperties': False,
+                            'items': {
+                                'DaysAfterInitiation': {'type': 'integer'},
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    )
+
+    permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error('error modifying bucket lifecycle: %s\n%s',
+                                   bucket['Name'], future.exception())
+                results += filter(None, [future.result()])
+
+            return results
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
+        config = (bucket['Lifecycle'] or {}).get('Rules', [])
+        for rule in self.data['rules']:
+            for index, existing_rule in enumerate(config):
+                if rule['ID'] == existing_rule['ID']:
+                    if rule['Status'] == 'absent':
+                        config[index] = None
+                    else:
+                        config[index] = rule
+                    break
+            else:
+                if rule['Status'] != 'absent':
+                    config.append(rule)
+
+        # The extra `list` conversion if required for python3
+        config = list(filter(None, config))
+
+        s3.put_bucket_lifecycle_configuration(
+            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
