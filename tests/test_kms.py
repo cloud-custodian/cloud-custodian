@@ -60,19 +60,19 @@ class KMSTest(BaseTest):
                 "Version": "2008-10-17",
                 "Statement": [
                     {
-                      "Sid": "DefaultRoot",
-                      "Effect": "Allow",
-                      "Principal": {
-                        "AWS": "arn:aws:iam::123456789012:root"
-                      },
-                      "Action": "kms:*",
-                      "Resource": "*"
+                        "Sid": "DefaultRoot",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
+                        },
+                        "Action": "kms:*",
+                        "Resource": "*"
                     },
                     {
                         "Sid": "SpecificAllow",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::123456789012:root"
+                            "AWS": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
                         },
                         "Action": [
                             "kms:*"
@@ -96,7 +96,7 @@ class KMSTest(BaseTest):
             'filters': [
                 {'KeyId': key_id},
                 {'type': 'cross-account',
-                 'whitelist': ["123456789012"]}],
+                 'whitelist': ["644160558196"]}],
             'actions': [
                 {'type': 'remove-statements',
                  'statement_ids': 'matched'}]
