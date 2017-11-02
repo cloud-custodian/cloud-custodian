@@ -4,35 +4,13 @@
         "trailList": [
             {
                 "IncludeGlobalServiceEvents": true, 
-                "Name": "S3-DataEvent-1", 
+                "Name": "S3-DataEvents-test2", 
                 "S3KeyPrefix": "DataEvents", 
-                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvent-1", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-test2", 
                 "LogFileValidationEnabled": true, 
                 "IsMultiRegionTrail": true, 
                 "HasCustomEventSelectors": true, 
-                "S3BucketName": "custodian-skunk-trails", 
-                "HomeRegion": "us-east-1"
-            }, 
-            {
-                "IncludeGlobalServiceEvents": true, 
-                "Name": "S3-DataEvents", 
-                "S3KeyPrefix": "DataEvents", 
-                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
-                "LogFileValidationEnabled": true, 
-                "IsMultiRegionTrail": true, 
-                "HasCustomEventSelectors": true, 
-                "S3BucketName": "custodian-skunk-trails", 
-                "HomeRegion": "us-east-1"
-            }, 
-            {
-                "IncludeGlobalServiceEvents": true, 
-                "Name": "S3-DataEvents-ftest-1509546582", 
-                "S3KeyPrefix": "DataEvents", 
-                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-ftest-1509546582", 
-                "LogFileValidationEnabled": true, 
-                "IsMultiRegionTrail": true, 
-                "HasCustomEventSelectors": true, 
-                "S3BucketName": "custodian-skunk-trails", 
+                "S3BucketName": "skunk-trails-test-us-east-1", 
                 "HomeRegion": "us-east-1"
             }, 
             {
@@ -50,11 +28,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "8b4aa00c-6050-403b-b05d-3aa429d38aa9", 
+            "RequestId": "3f3a290e-a337-4dec-9bfd-1d9b22fff991", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "8b4aa00c-6050-403b-b05d-3aa429d38aa9", 
-                "date": "Wed, 01 Nov 2017 14:29:45 GMT", 
-                "content-length": "1372", 
+                "x-amzn-requestid": "3f3a290e-a337-4dec-9bfd-1d9b22fff991", 
+                "date": "Thu, 02 Nov 2017 04:45:02 GMT", 
+                "content-length": "723", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

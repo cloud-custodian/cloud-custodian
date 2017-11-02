@@ -573,14 +573,15 @@ class AccountDataEvents(BaseTest):
         client.delete_bucket(Bucket=bucket)
         
     def test_modify_data_events(self):
-        trail_name = 'S3-DataEvents-test1'
-        bucket_name = 'skunk-trails-test3'
-
         session_factory = self.replay_flight_data('test_account_modify_data_events')
-        self.make_bucket(session_factory, bucket_name)
         client = session_factory().client('cloudtrail')
-        self.addCleanup(client.delete_trail, Name=trail_name)
+
         region = client._client_config.region_name
+        trail_name = 'S3-DataEvents-test1'
+        bucket_name = 'skunk-trails-test-{}'.format(region)
+
+        self.make_bucket(session_factory, bucket_name)
+        self.addCleanup(client.delete_trail, Name=trail_name)
 
         p = self.load_policy({
             'name': 's3-data-events',
@@ -610,13 +611,14 @@ class AccountDataEvents(BaseTest):
 
     @functional
     def test_data_events(self):
-        trail_name = 'S3-DataEvents-test2'
-        bucket_name = 'skunk-trails-test3'
-
         session_factory = self.replay_flight_data('test_account_data_events')
-        self.make_bucket(session_factory, bucket_name)
         client = session_factory().client('cloudtrail')
+
         region = client._client_config.region_name
+        trail_name = 'S3-DataEvents-test2'
+        bucket_name = 'skunk-trails-test-{}'.format(region)
+
+        self.make_bucket(session_factory, bucket_name)
 
         existing_trails = {t['Name'] for t in client.describe_trails().get('trailList')}
         if trail_name in existing_trails:
