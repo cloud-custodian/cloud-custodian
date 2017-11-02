@@ -304,6 +304,10 @@ def process_account(account_info):
     buckets = [n['Name'] for n in buckets
                if not account_buckets or
                n['Name'] in account_buckets]
+    account_not_buckets = account_info.pop('not-buckets', None)
+    buckets = [n for n in buckets
+               if not account_not_buckets or
+               n not in account_not_buckets]
     log.info("processing %d buckets in account %s",
              len(buckets), account_info['name'])
     for bucket_set in chunks(buckets, 50):
