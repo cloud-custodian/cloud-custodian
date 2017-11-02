@@ -1922,18 +1922,27 @@ class DataEvents(Filter):
 
         For wildcard trails the bucket name is ''.
         """
+        regions = {t.get('HomeRegion') for t in trails}
+        clients = {None: client}
+        for region in regions:
+            if region == client._client_config.region_name:
+                clients[region] = client
+            else:
+                clients[region] = local_session(
+                    self.manager.session_factory).client('cloudtrail', region_name=region)
+
         event_buckets = {}
         for t in trails:
-            if t.get('HomeRegion') == client._client_config.region_name:
-                for events in client.get_event_selectors(
-                        TrailName=t['Name']).get('EventSelectors', ()):
-                    if 'DataResources' not in events:
+            region_client = clients[t.get('HomeRegion')]
+            for events in region_client.get_event_selectors(
+                    TrailName=t['Name']).get('EventSelectors', ()):
+                if 'DataResources' not in events:
+                    continue
+                for data_events in events['DataResources']:
+                    if data_events['Type'] != 'AWS::S3::Object':
                         continue
-                    for data_events in events['DataResources']:
-                        if data_events['Type'] != 'AWS::S3::Object':
-                            continue
-                        for b in data_events['Values']:
-                            event_buckets[b.rsplit(':')[-1].strip('/')] = t['Name']
+                    for b in data_events['Values']:
+                        event_buckets[b.rsplit(':')[-1].strip('/')] = t['Name']
         return event_buckets
 
     def process(self, resources, event=None):
