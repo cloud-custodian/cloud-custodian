@@ -1914,15 +1914,16 @@ class DataEvents(Filter):
         """
         event_buckets = {}
         for t in trails:
-            for events in client.get_event_selectors(
-                    TrailName=t['Name']).get('EventSelectors', ()):
-                if 'DataResources' not in events:
-                    continue
-                for data_events in events['DataResources']:
-                    if data_events['Type'] != 'AWS::S3::Object':
+            if t.get('HomeRegion') == client._client_config.region_name:
+                for events in client.get_event_selectors(
+                        TrailName=t['Name']).get('EventSelectors', ()):
+                    if 'DataResources' not in events:
                         continue
-                    for b in data_events['Values']:
-                        event_buckets[b.rsplit(':')[-1].strip('/')] = t['Name']
+                    for data_events in events['DataResources']:
+                        if data_events['Type'] != 'AWS::S3::Object':
+                            continue
+                        for b in data_events['Values']:
+                            event_buckets[b.rsplit(':')[-1].strip('/')] = t['Name']
         return event_buckets
 
     def process(self, resources, event=None):
