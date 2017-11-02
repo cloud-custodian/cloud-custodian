@@ -22,7 +22,6 @@ from jsonschema.exceptions import ValidationError
 import datetime
 from dateutil import parser
 import json
-import time
 
 from .test_offhours import mock_datetime_now
 from .common import Config, functional
