@@ -3,6 +3,7 @@ build:
   unit_tests:
     image: python:2-slim
     commands:
+      - make clean
       - pip install tox
       - tox -e py27
 
