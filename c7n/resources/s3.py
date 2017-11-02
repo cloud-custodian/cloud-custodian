@@ -946,14 +946,12 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(local_session(self.manager.session_factory), r)
-            target_prefix = self.data.get('target_prefix', r['Name'] + '/')
             if 'TargetBucket' in r['Logging']:
                 r['Logging'] = {'Status': 'Enabled'}
             else:
                 r['Logging'] = {'Status': 'Disabled'}
             if enabled and (r['Logging']['Status'] == 'Disabled'):
                 # code to support expand_variables()
-                target_bucket = self.data.get('target_bucket')
                 session = local_session(self.manager.session_factory)
                 iam_client = session.client('iam')
                 aliases = iam_client.list_account_aliases().get('AccountAliases', ('',))
@@ -964,19 +962,21 @@ class ToggleLogging(BucketActionBase):
                     'account': account_name,
                     'region': self.manager.config.region,
                     'source_bucket_name': r['Name'],
-                    'target_bucket_name': target_bucket
+                    'target_bucket_name': self.data.get('target_bucket'),
+                    'target_prefix':      self.data.get('target_prefix'),
+                    'data': self.data.copy()
                 }                
-                target_bucket = self.expand_variables(variables)
-                log.info(
-                        "target_bucket=%s" % target_bucket)
+                self.data = self.expand_variables(variables)
+                # log.info("target_bucket=%s" % target_bucket)
 
                 # code to support expand_variables()
+                target_prefix = self.data.get('target_prefix', r['Name'] + '/')
                 client.put_bucket_logging(
                     Bucket=r['Name'],
                     BucketLoggingStatus={
                         'LoggingEnabled': {
-                            'TargetBucket': target_bucket,
-                            'TargetPrefix': target_prefix}})
+                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetPrefix': target_prefix }})
                 continue
             if not enabled and r['Logging']['Status'] == 'Enabled':
                 client.put_bucket_logging(
@@ -987,9 +987,14 @@ class ToggleLogging(BucketActionBase):
     def expand_variables(self, variables):
         """expand variables 
         """
+        data = variables['data'].copy()
+        # log.info("variables %s" % variables)
         target_bucket_name = variables['target_bucket_name']
-        target_bucket_name = target_bucket_name.format(**variables)
-        return target_bucket_name
+        data['target_bucket'] = target_bucket_name.format(**variables)
+        target_prefix = variables['target_prefix']
+        if target_prefix:
+            data['target_prefix'] = target_prefix.format(**variables)
+        return data
 
 
 
