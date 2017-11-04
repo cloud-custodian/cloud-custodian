@@ -493,6 +493,23 @@ class TestStop(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestReboot(BaseTest):
+
+    def test_ec2_reboot(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_reboot')
+        policy = self.load_policy({
+            'name': 'ec2-test-reboot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'reboot'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
 class TestStart(BaseTest):
 
     def test_ec2_start(self):
