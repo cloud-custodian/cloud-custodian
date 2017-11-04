@@ -46,6 +46,7 @@ class Vpc(query.QueryResourceManager):
         dimension = None
         config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
+        shape = 'Vpc'
 
 
 @Vpc.filter_registry.register('flow-logs')
@@ -205,6 +206,7 @@ class Subnet(query.QueryResourceManager):
         dimension = None
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
+        shape = 'Subnet'
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
@@ -225,6 +227,7 @@ class SecurityGroup(query.QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
+        shape = "SecurityGroup"
 
     def get_source(self, source_type):
         if source_type == 'config':
@@ -977,6 +980,7 @@ class NetworkInterface(query.QueryResourceManager):
         date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+        shape = 'NetworkInterface'
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -1095,6 +1099,7 @@ class RouteTable(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "rtb-"
+        shape = 'RouteTable'
 
 
 @RouteTable.filter_registry.register('subnet')
@@ -1168,6 +1173,7 @@ class PeeringConnection(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
+        shape = 'VpcPeeringConnection'
 
 
 @PeeringConnection.filter_registry.register('missing-route')
@@ -1222,6 +1228,7 @@ class NetworkAcl(query.QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::NetworkAcl"
         id_prefix = "acl-"
+        shape = 'NetworkAcl'
 
 
 @NetworkAcl.filter_registry.register('subnet')
@@ -1315,6 +1322,7 @@ class Address(query.QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::EIP"
         taggable = False
+        shape = 'Address'
 
 
 @resources.register('customer-gateway')
@@ -1332,6 +1340,7 @@ class CustomerGateway(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "cgw-"
+        shape = 'CustomerGateway'
 
 
 @resources.register('internet-gateway')
@@ -1348,6 +1357,7 @@ class InternetGateway(query.QueryResourceManager):
         date = None
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+        shape = 'InternetGateway'
 
 
 @resources.register('nat-gateway')
@@ -1391,6 +1401,7 @@ class VPNConnection(query.QueryResourceManager):
         date = None
         config_type = 'AWS::EC2::VPNConnection'
         id_prefix = "vpn-"
+        shape = 'VpnConnection'
 
 
 @resources.register('vpn-gateway')
@@ -1407,6 +1418,7 @@ class VPNGateway(query.QueryResourceManager):
         date = None
         config_type = 'AWS::EC2::VPNGateway'
         id_prefix = "vgw-"
+        shape = 'VpnGateway'
 
 
 @resources.register('vpc-endpoint')
@@ -1437,3 +1449,4 @@ class KeyPair(query.QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
+        shape = 'KeyPair'

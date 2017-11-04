@@ -46,6 +46,7 @@ class Group(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Group"
+        shape = "Group"
 
 
 @resources.register('iam-role')
@@ -62,6 +63,7 @@ class Role(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Role"
+        shape = "Role"
 
 
 @resources.register('iam-user')
@@ -77,6 +79,7 @@ class User(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::User"
+        shape = "User"
 
 
 @resources.register('iam-policy')
@@ -92,6 +95,7 @@ class Policy(QueryResourceManager):
         dimension = None
         config_type = "AWS::IAM::Policy"
         filter_name = None
+        shape = "Policy"
 
     arn_path_prefix = "aws:policy/"
 

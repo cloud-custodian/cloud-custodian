@@ -73,6 +73,7 @@ class ASG(query.QueryResourceManager):
             'HealthCheckType',
             'list:LoadBalancerNames',
         )
+        shape = 'AutoScalingGroup'
 
     filter_registry = filters
     action_registry = actions
@@ -1421,6 +1422,7 @@ class LaunchConfig(query.QueryResourceManager):
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::LaunchConfiguration'
+        shape = 'LaunchConfiguration'
 
     def get_source(self, source_type):
         if source_type == 'describe':

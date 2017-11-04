@@ -98,6 +98,7 @@ class RDS(QueryResourceManager):
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+        shape = "DBInstance"
 
         default_report_fields = (
             'DBInstanceIdentifier',
@@ -850,6 +851,7 @@ class RDSSubscription(QueryResourceManager):
         # filter_type = 'scalar'
         filter_name = None
         filter_type = None
+        shape = "EventSubscription"
 
 
 @resources.register('rds-snapshot')
@@ -869,6 +871,7 @@ class RDSSnapshot(QueryResourceManager):
         config_type = "AWS::RDS::DBSnapshot"
         # Need resource_type for Universal Tagging
         resource_type = "rds:snapshot"
+        shape = "DBSnapshot"
 
     filter_registry = FilterRegistry('rds-snapshot.filters')
     action_registry = ActionRegistry('rds-snapshot.actions')

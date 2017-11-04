@@ -63,6 +63,7 @@ class ELB(QueryResourceManager):
         name = 'DNSName'
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
+        shape = "LoadBalancerDescription"
 
         default_report_fields = (
             'LoadBalancerName',

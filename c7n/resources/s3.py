@@ -92,6 +92,7 @@ class S3(query.QueryResourceManager):
         date = 'CreationDate'
         dimension = 'BucketName'
         config_type = 'AWS::S3::Bucket'
+        shape = "Bucket" # not inclusive of subdocs
 
     filter_registry = filters
     action_registry = actions
@@ -387,7 +388,9 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_policy', 'Policy', None, 'Policy'),
     ('get_bucket_acl', 'Acl', None, None),
     ('get_bucket_replication', 'Replication', None, None),
+    # shape GetBucketVersioningOutput
     ('get_bucket_versioning', 'Versioning', None, None),
+    # shape GetBucketWebsiteOutput
     ('get_bucket_website', 'Website', None, None),
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None),

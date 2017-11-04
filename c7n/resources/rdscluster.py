@@ -53,6 +53,7 @@ class RDSCluster(QueryResourceManager):
         filter_type = None
         dimension = 'DBClusterIdentifier'
         date = None
+        shape = "DBCluster"
 
     filter_registry = filters
     action_registry = actions

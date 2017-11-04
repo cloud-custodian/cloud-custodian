@@ -30,5 +30,6 @@ class Certificate(QueryResourceManager):
         detail_spec = (
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
+        filter_name = None        
         config_type = "AWS::ACM::Certificate"
-        filter_name = None
+        shape = 'CertificateSummary'

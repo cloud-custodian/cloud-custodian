@@ -36,6 +36,7 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
         config_type = 'AWS::CloudWatch::Alarm'
+        shape = "MetricAlarm"
 
     retry = staticmethod(get_retry(('Throttled',)))
 

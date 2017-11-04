@@ -44,6 +44,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsPending',
             'SubscriptionsDeleted'
         )
+        shape = "Topic"
 
 
 @SNS.filter_registry.register('cross-account')

@@ -43,6 +43,7 @@ class Table(query.QueryResourceManager):
         date = 'CreationDateTime'
         dimension = 'TableName'
         config_type = 'AWS::DynamoDB::Table'
+        shape = 'TableDescription'
 
     filter_registry = filters
     retry = staticmethod(get_retry(('Throttled',)))
@@ -263,3 +264,4 @@ class Stream(query.QueryResourceManager):
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
+        shape = 'StreamDescription'

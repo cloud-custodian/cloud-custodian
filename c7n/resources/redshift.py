@@ -54,6 +54,7 @@ class Redshift(QueryResourceManager):
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
         config_type = "AWS::Redshift::Cluster"
+        shape = "Cluster"
 
     filter_registry = filters
     action_registry = actions
@@ -544,6 +545,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
         dimension = None
         date = None
         config_type = "AWS::Redshift::ClusterSubnetGroup"
+        shape = "ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')
@@ -577,6 +579,7 @@ class RedshiftSnapshot(QueryResourceManager):
         dimension = None
         date = 'SnapshotCreateTime'
         config_type = "AWS::Redshift::ClusterSnapshot"
+        shape = "Snapshot"
 
 
 @actions.register('modify-security-groups')

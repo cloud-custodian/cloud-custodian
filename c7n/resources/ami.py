@@ -46,6 +46,7 @@ class AMI(QueryResourceManager):
         name = 'Name'
         dimension = None
         date = 'CreationDate'
+        shape = 'Image'
 
     filter_registry = filters
     action_registry = actions

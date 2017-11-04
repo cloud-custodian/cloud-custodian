@@ -32,3 +32,4 @@ class CloudTrail(QueryResourceManager):
         name = 'Name'
         dimension = None
         config_type = "AWS::CloudTrail::Trail"
+        shape = 'Trail'

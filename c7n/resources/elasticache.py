@@ -56,6 +56,7 @@ class ElastiCacheCluster(QueryResourceManager):
         date = 'CacheClusterCreateTime'
         dimension = 'CacheClusterId'
         universal_taggable = True
+        shape = "CacheCluster"
 
     filter_registry = filters
     action_registry = actions
@@ -297,6 +298,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
         date = 'StartTime'
         dimension = None
         universal_taggable = True
+        shape = "Snapshot"
 
     permissions = ('elasticache:ListTagsForResource',)
     filter_registry = FilterRegistry('elasticache-snapshot.filters')

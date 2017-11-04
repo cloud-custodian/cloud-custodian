@@ -64,6 +64,7 @@ class Snapshot(QueryResourceManager):
         name = 'SnapshotId'
         date = 'StartTime'
         dimension = None
+        shape = 'Snapshot'
 
         default_report_fields = (
             'SnapshotId',
@@ -385,6 +386,7 @@ class EBS(QueryResourceManager):
         dimension = 'VolumeId'
         metrics_namespace = 'AWS/EBS'
         config_type = "AWS::EC2::Volume"
+        shape = 'Volume'
         default_report_fields = (
             'VolumeId',
             'Attachments[0].InstanceId',

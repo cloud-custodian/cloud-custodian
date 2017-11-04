@@ -40,6 +40,7 @@ class AWSLambda(QueryResourceManager):
         filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
+        shape = "FunctionConfiguration"
 
     filter_registry = filters
     action_registry = actions
