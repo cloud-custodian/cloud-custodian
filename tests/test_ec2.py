@@ -507,7 +507,10 @@ class TestReboot(BaseTest):
                 {'type': 'reboot'}]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        session = session_factory()
+        client = session.client('ec2')
+        results = client.describe_instance_status()
+        ### then validate the contents of result to find that you got what you were looking for
 
 
 class TestStart(BaseTest):
