@@ -29,6 +29,7 @@ def get_jinja_env():
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
+    env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
             os.path.abspath(
@@ -115,7 +116,7 @@ def format_struct(evt):
     return buf.getvalue()
 
 
-def resource_tag(resource, k):
+def get_resource_tag_value(resource, k):
     for t in resource.get('Tags', []):
         if t['Key'] == k:
             return t['Value']
