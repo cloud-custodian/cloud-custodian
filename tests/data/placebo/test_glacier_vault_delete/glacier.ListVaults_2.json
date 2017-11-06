@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VaultList": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fgASrxsL6O5H4umIsLBkMrhYMwpflpo9sS-9li8aQ0xJSZU", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fgASrxsL6O5H4umIsLBkMrhYMwpflpo9sS-9li8aQ0xJSZU", 
+                "date": "Fri, 27 Oct 2017 14:11:41 GMT", 
+                "content-length": "30", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

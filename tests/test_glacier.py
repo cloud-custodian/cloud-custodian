@@ -260,4 +260,51 @@ class GlacierStatementTest(BaseTest):
             client.get_vault_access_policy(
                 vaultName=resources[0]['VaultName']).get('policy')['Policy'])
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
-    
+
+class GlacierDelete(BaseTest):
+    @functional
+    def test_glacier_delete(self):
+        session_factory = self.replay_flight_data('test_glacier_vault_delete')
+        client = session_factory().client('glacier')
+        name = 'test-glacier-vault-delete'
+
+        client.create_vault(vaultName=name)
+        p = self.load_policy({
+            'name': 'glacier-vault-delete',
+            'resource': 'glacier',
+            'filters': [{'VaultName': name}],
+            'actions': [
+                {'type': 'delete'}]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        v = client.list_vaults()
+        self.assertEqual(len(v['VaultList']), 0)
+
+    @functional
+    def test_glacier_non_empty_delete(self):
+        session_factory = self.replay_flight_data('test_glacier_vault_non_empty_delete')
+        client = session_factory().client('glacier')
+        name = 'test-glacier-vault-non-empty-delete'
+
+        client.create_vault(vaultName=name)
+        client.upload_archive(
+            vaultName=name,
+            archiveDescription='test',
+            body=b'test'
+        )
+        p = self.load_policy({
+            'name': 'glacier-vault-delete',
+            'resource': 'glacier',
+            'filters': [{'VaultName': name}],
+            'actions': [
+                {'type': 'delete'}]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        v = client.list_vaults()
+        self.assertEqual(len(v['VaultList']), 1)

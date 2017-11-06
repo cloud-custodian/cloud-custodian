@@ -17,11 +17,11 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import RemovePolicyBase
+from c7n.actions import (RemovePolicyBase, BaseAction)
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import get_retry, local_session
+from c7n.utils import get_retry, local_session, type_schema
 
 
 @resources.register('glacier')
@@ -108,7 +108,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
             policies:
               - name: glacier-cross-account
-                resource: glaier
+                resource: glacier
                 filters:
                   - type: cross-account
                 actions:
@@ -162,3 +162,49 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['VaultName'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@Glacier.action_registry.register('delete')
+class DeleteVault(BaseAction):
+    """Action to delete empty Glacier Vaults, will abort all multi-part uploads
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: glacier-delete-empty-vaults
+                resource: glacier
+                actions:
+                  - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('glacier:DeleteVault', 'glacier:AbortMultipartUpload')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('glacier')
+
+        for r in resources:
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except:
+                self.log.exception(
+                    "Error processing glacier:%s", r['VaultARN'])
+        return results
+
+    def process_resource(self, client, resource):
+        uploads = client.list_multipart_uploads(vaultName=resource['VaultName'])
+        for u in uploads['UploadsList']:
+            try:
+                client.abort_multipart_upload(
+                    vaultName=resource['VaultName'],
+                    uploadId=u['MultipartUploadId']
+                )
+            except ClientError as e:
+                self.log.exception('Error aborting multipart upload:%s', e)
+        try:
+            client.delete_vault(vaultName=resource['VaultName'])
+        except ClientError as e:
+            self.log.exception('Error deleting vault:%s', e)
+        return
