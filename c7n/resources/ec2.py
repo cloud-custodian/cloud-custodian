@@ -644,44 +644,35 @@ class Start(BaseAction, StateTransitionFilter):
     batch_size = 10
     exception = None
 
-    def _filter_ec2_with_volumes(self, instances):
-        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
-
-    def process(self, instances):
-        instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+        def process(self, instances):
         if not len(instances):
             return
 
         client = utils.local_session(self.manager.session_factory).client('ec2')
         failures = {}
 
-        # Play nice around aws having insufficient capacity...
-        for itype, t_instances in utils.group_by(
-                instances, 'InstanceType').items():
-            for izone, z_instances in utils.group_by(
-                    t_instances, 'Placement.AvailabilityZone').items():
-                for batch in utils.chunks(z_instances, self.batch_size):
-                    fails = self.process_instance_set(client, batch, itype, izone)
-                    if fails:
-                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
+        for batch in utils.chunks(instances, self.batch_size):
+            fails = self.process_instance_set(client, batch)
+            if fails:
+                failures = [i['InstanceId'] for i in batch]
+            return list(instances)
 
         if failures:
             fail_count = sum(map(len, failures.values()))
-            msg = "Could not start %d of %d instances %s" % (
+            msg = "Could not reboot %d of %d instances %s" % (
                 fail_count, len(instances),
                 utils.dumps(failures))
             self.log.warning(msg)
             raise RuntimeError(msg)
 
-    def process_instance_set(self, client, instances, itype, izone):
-        # Setup retry with insufficient capacity as well
+    def process_instance_set(self, client, instances):
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
                      'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
-            retry(client.start_instances, InstanceIds=instance_ids)
+            retry(client.reboot_instances, InstanceIds=instance_ids)
+            #print('try to reboot now %s'% instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in retryable:
                 return True
@@ -883,7 +874,7 @@ class Reboot(BaseAction, StateTransitionFilter):
                     fails = self.process_instance_set(client, batch, itype, izone)
                     if fails:
                         failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
-
+                    return list(instances)
         if failures:
             fail_count = sum(map(len, failures.values()))
             msg = "Could not reboot %d of %d instances %s" % (
