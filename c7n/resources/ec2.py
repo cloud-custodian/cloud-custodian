@@ -652,7 +652,7 @@ class Start(BaseAction, StateTransitionFilter):
         failures = {}
 
         for batch in utils.chunks(instances, self.batch_size):
-            fails = self.process_instance_set(client, batch)
+            fails = self.process_reboot_instance_set(client, batch)
             if fails:
                 failures = [i['InstanceId'] for i in batch]
             return list(instances)
@@ -665,14 +665,13 @@ class Start(BaseAction, StateTransitionFilter):
             self.log.warning(msg)
             raise RuntimeError(msg)
 
-    def process_instance_set(self, client, instances):
+    def process_reboot_instance_set(self, client, instances):
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
                      'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.reboot_instances, InstanceIds=instance_ids)
-            #print('try to reboot now %s'% instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in retryable:
                 return True
