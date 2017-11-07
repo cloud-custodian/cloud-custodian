@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"eb-ad78f54a-f239-4c90-adda-49e5f56cb51e\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/aws-elasticbeanstalk-ec2-role\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::elasticbeanstalk-eu-west-1-060725138335/resources/environments/logs/*\"},{\"Sid\":\"eb-af163bf3-d27b-4712-b795-d1e33e331ca4\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/aws-elasticbeanstalk-ec2-role\"},\"Action\":[\"s3:ListBucket\",\"s3:ListBucketVersions\",\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::elasticbeanstalk-eu-west-1-060725138335\",\"arn:aws:s3:::elasticbeanstalk-eu-west-1-060725138335/resources/environments/*\"]},{\"Sid\":\"eb-58950a8c-feb6-11e2-89e0-0800277d041b\",\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"s3:DeleteBucket\",\"Resource\":\"arn:aws:s3:::elasticbeanstalk-eu-west-1-060725138335\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "tSpZxjPEoOe38PKCbSAZIEN2blBMsAUAyPMPB+gjXK6V5vC9Y5TYtSh0OK+Hf44vboS1UZQI8rE=", 
+            "RequestId": "CD0EC79539D9C9D8", 
+            "HTTPHeaders": {
+                "content-length": "877", 
+                "x-amz-id-2": "tSpZxjPEoOe38PKCbSAZIEN2blBMsAUAyPMPB+gjXK6V5vC9Y5TYtSh0OK+Hf44vboS1UZQI8rE=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "CD0EC79539D9C9D8", 
+                "date": "Tue, 07 Nov 2017 21:19:31 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

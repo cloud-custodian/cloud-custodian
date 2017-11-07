@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::tr-corporate-nonprod-cloudtrail-acct-logs\"},{\"Sid\":\"AWSCloudTrailWrite\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::tr-corporate-nonprod-cloudtrail-acct-logs/*/AWSLogs/060725138335/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "pJUkZDNQi2VP5COOz3gLHAbdzh2X/kPisxnUSulYsXF0UjTv9l0yDN2WWYJCZEPINxMTYeLmyF8=", 
+            "RequestId": "460AD2A1AF53F44F", 
+            "HTTPHeaders": {
+                "content-length": "521", 
+                "x-amz-id-2": "pJUkZDNQi2VP5COOz3gLHAbdzh2X/kPisxnUSulYsXF0UjTv9l0yDN2WWYJCZEPINxMTYeLmyF8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "460AD2A1AF53F44F", 
+                "date": "Tue, 07 Nov 2017 21:19:54 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

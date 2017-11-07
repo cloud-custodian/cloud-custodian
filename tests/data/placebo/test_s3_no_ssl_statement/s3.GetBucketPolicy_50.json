@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::cri-sustainability-development-goals/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "k88DI3MPYuoCanqSqtHABYHLxtEDT4kcXA4IpuLuVegzwuaY4q6DwCYKFQj8djpQAJKiyz/3ZRw=", 
+            "RequestId": "0EBFFDCACBB18166", 
+            "HTTPHeaders": {
+                "content-length": "190", 
+                "x-amz-id-2": "k88DI3MPYuoCanqSqtHABYHLxtEDT4kcXA4IpuLuVegzwuaY4q6DwCYKFQj8djpQAJKiyz/3ZRw=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "0EBFFDCACBB18166", 
+                "date": "Tue, 07 Nov 2017 21:19:26 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

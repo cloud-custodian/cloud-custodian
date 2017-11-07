@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::127311923021:root\",\"arn:aws:iam::156460612806:root\"]},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::nad-s4s-eu-west-1-060725138335-alb-access-logs/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "FfyGOT+elcPTo4OEWeX4CaydNoJ/E8V0///7JM0yDWkzoOrSvcMCDs86oqF59gl9CxfGkY5Z/LI=", 
+            "RequestId": "40665344A6092FD0", 
+            "HTTPHeaders": {
+                "content-length": "244", 
+                "x-amz-id-2": "FfyGOT+elcPTo4OEWeX4CaydNoJ/E8V0///7JM0yDWkzoOrSvcMCDs86oqF59gl9CxfGkY5Z/LI=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "40665344A6092FD0", 
+                "date": "Tue, 07 Nov 2017 21:19:45 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AddPerm\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::mfa-qa-cloudfront/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "JY3Sc0qwBso9sXYbAYfzVfCPlgPopPQN/tlzlcDRnZePJ3MBpl0QKJgtYcMaE86bitEtWsPXW60=", 
+            "RequestId": "25AAC957F3C2F977", 
+            "HTTPHeaders": {
+                "content-length": "159", 
+                "x-amz-id-2": "JY3Sc0qwBso9sXYbAYfzVfCPlgPopPQN/tlzlcDRnZePJ3MBpl0QKJgtYcMaE86bitEtWsPXW60=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "25AAC957F3C2F977", 
+                "date": "Tue, 07 Nov 2017 21:19:43 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

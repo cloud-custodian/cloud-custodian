@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "3ivYiPN8VlSN3cd6wlNmQCBPj8kl3+Xco3ztWgkEj/HYC36Z1yeYWnX2O4WtJdcTKyR1xCEcWNE=", 
+            "RequestId": "48D9B9606D571131", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "3ivYiPN8VlSN3cd6wlNmQCBPj8kl3+Xco3ztWgkEj/HYC36Z1yeYWnX2O4WtJdcTKyR1xCEcWNE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "48D9B9606D571131", 
+                "date": "Tue, 07 Nov 2017 21:19:22 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "cicdutils-codepipeline-source"
+        }
+    }
+}

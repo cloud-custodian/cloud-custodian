@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":\"AES256\"}}},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piProjectProvisionerRole-dev\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev/collector/v2/apps/*\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piCollectorConfigRole-dev\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev/collector/v2/config.json\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piCollectorConfigRole-dev\"},\"Action\":\"s3:GetObject\",\"Resource\":[\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev/collector/v2/apps/*\",\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev/collector/v2/config.json\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piCollectorConfigRole-dev\"},\"Action\":\"s3:ListBucket\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-config-dev\",\"Condition\":{\"StringLike\":{\"s3:prefix\":\"collector/v2/apps/*\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "gknObdH9p009xKb8PxA/60zMQyGR+ue0Fmyc1YgqTQSob+rypWwvkIpsW7irqAjyP9PjXXJYfYM=", 
+            "RequestId": "0AF8069FC094AF05", 
+            "HTTPHeaders": {
+                "content-length": "1225", 
+                "x-amz-id-2": "gknObdH9p009xKb8PxA/60zMQyGR+ue0Fmyc1YgqTQSob+rypWwvkIpsW7irqAjyP9PjXXJYfYM=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "0AF8069FC094AF05", 
+                "date": "Tue, 07 Nov 2017 21:19:56 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

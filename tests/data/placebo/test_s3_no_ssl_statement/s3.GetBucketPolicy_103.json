@@ -1,0 +1,23 @@
+{
+    "status_code": 403, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 403, 
+            "RetryAttempts": 0, 
+            "HostId": "bbLB43LOh9gs0vR7OfoG2Rqy1d8axqENP6XNUfwt3lSXuw1RxaIKXZzj/07zsE3QkJGogcCxf2M=", 
+            "RequestId": "F35B6C21F6C351D3", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "bbLB43LOh9gs0vR7OfoG2Rqy1d8axqENP6XNUfwt3lSXuw1RxaIKXZzj/07zsE3QkJGogcCxf2M=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "F35B6C21F6C351D3", 
+                "date": "Tue, 07 Nov 2017 21:19:42 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "Access Denied", 
+            "Code": "AccessDenied"
+        }
+    }
+}

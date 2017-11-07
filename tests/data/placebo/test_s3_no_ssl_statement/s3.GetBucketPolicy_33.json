@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowGetObject\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::ccoe-solace-installation/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "IjxzG1lzPXFuDznt4npv+Wb2L3me1DFwKMk1KszsNJxS6Z7M8tjo+HN5ak/HpnctmeYTvKrMPmQ=", 
+            "RequestId": "5B6799386FE19225", 
+            "HTTPHeaders": {
+                "content-length": "181", 
+                "x-amz-id-2": "IjxzG1lzPXFuDznt4npv+Wb2L3me1DFwKMk1KszsNJxS6Z7M8tjo+HN5ak/HpnctmeYTvKrMPmQ=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "5B6799386FE19225", 
+                "date": "Tue, 07 Nov 2017 21:19:18 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

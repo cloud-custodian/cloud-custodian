@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "fvG5DylDx5IBbtXYVj+7qHEZpYjgDk406En3S6ANTTiOufFURgsuU+37NjnbEIl75OvYpa58aSo=", 
+            "RequestId": "40FA49242292630C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "fvG5DylDx5IBbtXYVj+7qHEZpYjgDk406En3S6ANTTiOufFURgsuU+37NjnbEIl75OvYpa58aSo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "40FA49242292630C", 
+                "date": "Tue, 07 Nov 2017 21:19:50 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "solace-poc"
+        }
+    }
+}

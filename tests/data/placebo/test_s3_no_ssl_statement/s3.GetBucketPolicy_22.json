@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "HWRuzarwmRmEQaw0iMg0E9ooaeACKn9cdK14Zd1Jfv62TcAi1w2NF2VmTgXWQGjf+AUjmNf+fhY=", 
+            "RequestId": "9F96F04F4E10223A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "HWRuzarwmRmEQaw0iMg0E9ooaeACKn9cdK14Zd1Jfv62TcAi1w2NF2VmTgXWQGjf+AUjmNf+fhY=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "9F96F04F4E10223A", 
+                "date": "Tue, 07 Nov 2017 21:19:15 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "bams-codepipeline-source"
+        }
+    }
+}

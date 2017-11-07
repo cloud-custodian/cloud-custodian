@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ruChkYFqWRm+zfG6qsZKKTc6veZTVhfQ+10sEqHflO2kuRrGwXVMQ/ln0ZKhnEClH7LkuWWEP7M=", 
+            "RequestId": "5CE0F566A0E79CE9", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ruChkYFqWRm+zfG6qsZKKTc6veZTVhfQ+10sEqHflO2kuRrGwXVMQ/ln0ZKhnEClH7LkuWWEP7M=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "5CE0F566A0E79CE9", 
+                "date": "Tue, 07 Nov 2017 21:19:58 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "worklet-bucket"
+        }
+    }
+}

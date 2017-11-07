@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CloudFrontAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E3CAFL7BLXVM0E\"},\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::gcsops-nonprod-eu-west-1/static/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "x/pQQoIZ+1Y0hJ5UDVkgJ+6n+EhzVnt3cEXRf52iax3CiJT9znZwYLSuWU0MvfY1vmt57Dxq2Hs=", 
+            "RequestId": "58A6CB16CFD983E0", 
+            "HTTPHeaders": {
+                "content-length": "266", 
+                "x-amz-id-2": "x/pQQoIZ+1Y0hJ5UDVkgJ+6n+EhzVnt3cEXRf52iax3CiJT9znZwYLSuWU0MvfY1vmt57Dxq2Hs=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "58A6CB16CFD983E0", 
+                "date": "Tue, 07 Nov 2017 21:19:33 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

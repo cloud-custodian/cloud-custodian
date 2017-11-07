@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "3wPYKpTvIoGxCfrw6GF8o8ra4jjEqps5ss4wTXsLcyOWDGI8P0reA8e2w0GcMsDFI/vW8kK3vMU=", 
+            "RequestId": "8517A4A78DBFE56F", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "3wPYKpTvIoGxCfrw6GF8o8ra4jjEqps5ss4wTXsLcyOWDGI8P0reA8e2w0GcMsDFI/vW8kK3vMU=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "8517A4A78DBFE56F", 
+                "date": "Tue, 07 Nov 2017 21:19:46 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "nad-s4s-eu-west-1-060725138335-trts-dependencies"
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "7pcgvFMciacITY2c1NbzpMIsRKDACqW9e25rlq/gCpwRylfNSrdSkDcUtPzRN9Gcc8qPsyp+R7o=", 
+            "RequestId": "E0BBA6039382FC33", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "7pcgvFMciacITY2c1NbzpMIsRKDACqW9e25rlq/gCpwRylfNSrdSkDcUtPzRN9Gcc8qPsyp+R7o=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E0BBA6039382FC33", 
+                "date": "Tue, 07 Nov 2017 21:19:48 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "nate-biles-source"
+        }
+    }
+}

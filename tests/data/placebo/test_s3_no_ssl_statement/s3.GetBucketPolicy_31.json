@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"bucketOps\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::720139907389:root\"},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\"],\"Resource\":\"arn:aws:s3:::ccoe-dbchange-codepipe-artifacts\"},{\"Sid\":\"getObj\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::720139907389:root\"},\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":\"arn:aws:s3:::ccoe-dbchange-codepipe-artifacts/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "qdoC3wN6l5nTOiRzeWygbQafNpWapflJvzFCqHeeYYfS8RoaRCVybnePbESArzOnJGxNW9+j1/c=", 
+            "RequestId": "39421A4ABA1AF557", 
+            "HTTPHeaders": {
+                "content-length": "433", 
+                "x-amz-id-2": "qdoC3wN6l5nTOiRzeWygbQafNpWapflJvzFCqHeeYYfS8RoaRCVybnePbESArzOnJGxNW9+j1/c=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "39421A4ABA1AF557", 
+                "date": "Tue, 07 Nov 2017 21:19:18 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

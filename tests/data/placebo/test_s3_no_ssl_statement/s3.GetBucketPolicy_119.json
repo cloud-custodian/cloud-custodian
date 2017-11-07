@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "Urce5ob4vSDJfyPoyJVDpnthVQSY+H9E04e+FdwcObfPhZQxSuCFI6gaOxw4SqHABAQcQCRFbvE=", 
+            "RequestId": "7DF47BF5316E87B3", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Urce5ob4vSDJfyPoyJVDpnthVQSY+H9E04e+FdwcObfPhZQxSuCFI6gaOxw4SqHABAQcQCRFbvE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "7DF47BF5316E87B3", 
+                "date": "Tue, 07 Nov 2017 21:19:49 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "nick-hauschild-temp"
+        }
+    }
+}

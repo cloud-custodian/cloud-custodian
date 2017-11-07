@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"lvc-bucket-policy-qa2-eu-west-1\",\"Statement\":[{\"Sid\":\"lvc-bucket-sid-qa2-eu-west-1\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::156460612806:root\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::lvc-s3-alblog-qa2-eu-west-1/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "EB/DEx3K2XTaTcgrdrSatTGDTuYFrym5Chmx1la4eoHHIJGHSSiIZZ3FD21C9K9VDAvaXZ/4VW4=", 
+            "RequestId": "D958D529D0F42B2B", 
+            "HTTPHeaders": {
+                "content-length": "266", 
+                "x-amz-id-2": "EB/DEx3K2XTaTcgrdrSatTGDTuYFrym5Chmx1la4eoHHIJGHSSiIZZ3FD21C9K9VDAvaXZ/4VW4=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "D958D529D0F42B2B", 
+                "date": "Tue, 07 Nov 2017 21:19:37 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-ssl-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Zldy+jDTM6lgL6yS+A5fhsp1VLqFxYyO30C/crdWfVf6nBSqAYSG/dFbVU8OzqAT3EK7IC+uz2c=", 
+            "RequestId": "E81844722A9F75E9", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "Zldy+jDTM6lgL6yS+A5fhsp1VLqFxYyO30C/crdWfVf6nBSqAYSG/dFbVU8OzqAT3EK7IC+uz2c=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E81844722A9F75E9", 
+                "date": "Tue, 07 Nov 2017 21:20:00 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

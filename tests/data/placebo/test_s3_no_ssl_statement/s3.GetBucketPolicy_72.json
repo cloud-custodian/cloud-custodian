@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "IQhLsw5yq8BH+gOakBKYpLszli++TcazvKO0CCl4wbBCSbHnhKAD81OmLl8WNNAQZqZ5VbDvNIw=", 
+            "RequestId": "AD612E7EE3C3FAB9", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "IQhLsw5yq8BH+gOakBKYpLszli++TcazvKO0CCl4wbBCSbHnhKAD81OmLl8WNNAQZqZ5VbDvNIw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "AD612E7EE3C3FAB9", 
+                "date": "Tue, 07 Nov 2017 21:19:32 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "hosted-pipeline-solution-git-bucket"
+        }
+    }
+}

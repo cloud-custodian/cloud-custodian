@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"MyPolicy\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/idj-s3-test-AkkadiaIAMRole-N2LSZV9C2RVL\"},\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::idj-s3-test-bucket9/*\",\"arn:aws:s3:::idj-s3-test-bucket9\"]}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "lzb1BbAJzccSC1gDJ9NBtYuoB+EzY3Bj2gbLZIz3pDqPh9ZhzGt181CcpEzbcGC8zc05WZFUGxo=", 
+            "RequestId": "03A817E0DD2470CA", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "lzb1BbAJzccSC1gDJ9NBtYuoB+EzY3Bj2gbLZIz3pDqPh9ZhzGt181CcpEzbcGC8zc05WZFUGxo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "03A817E0DD2470CA", 
+                "date": "Tue, 07 Nov 2017 21:19:34 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

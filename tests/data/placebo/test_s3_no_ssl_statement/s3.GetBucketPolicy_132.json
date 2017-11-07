@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "aDAc5w4Vc4yACJAif4nSFwCCJggpo6e1rzoXJeWcKf9euC70YZgjjSiIXw0+7tUqAMl63DCYeQs=", 
+            "RequestId": "82EF35E7D4F16188", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "aDAc5w4Vc4yACJAif4nSFwCCJggpo6e1rzoXJeWcKf9euC70YZgjjSiIXw0+7tUqAMl63DCYeQs=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "82EF35E7D4F16188", 
+                "date": "Tue, 07 Nov 2017 21:19:51 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "sse-terraform-remote-state-ppe"
+        }
+    }
+}

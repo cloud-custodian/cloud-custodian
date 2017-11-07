@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::aws-serverless-demo-wr1/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "DNFpuHj3wf7ARw8Mdxi9ARQxbFyfJIZ2u5RztrhowY53bRdshLb8nXHFvrIIJ+lX23gejOPm7d8=", 
+            "RequestId": "DFFBB4325CCC34E3", 
+            "HTTPHeaders": {
+                "content-length": "149", 
+                "x-amz-id-2": "DNFpuHj3wf7ARw8Mdxi9ARQxbFyfJIZ2u5RztrhowY53bRdshLb8nXHFvrIIJ+lX23gejOPm7d8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "DFFBB4325CCC34E3", 
+                "date": "Tue, 07 Nov 2017 21:19:16 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

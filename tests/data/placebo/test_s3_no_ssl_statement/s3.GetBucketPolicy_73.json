@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ucpAc+HsWz9RiDRDAyu8bVaTNZ+vBRxXgHZUkbJc6Nxrdledm0KmCUpYKWcv6lGgdoMdbs2PscE=", 
+            "RequestId": "BB77DACA7AEE8AF4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ucpAc+HsWz9RiDRDAyu8bVaTNZ+vBRxXgHZUkbJc6Nxrdledm0KmCUpYKWcv6lGgdoMdbs2PscE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "BB77DACA7AEE8AF4", 
+                "date": "Tue, 07 Nov 2017 21:19:33 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "hosted-pipeline-solution-lambda-artifacts"
+        }
+    }
+}

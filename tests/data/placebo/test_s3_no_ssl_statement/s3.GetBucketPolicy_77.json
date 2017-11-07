@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLambdaAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-stack-reg-LambdaExecutionRole-1DJDTL0YPTY19\"},\"Action\":[\"s3:GetBucketPolicy\",\"s3:PutBucketPolicy\"],\"Resource\":\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket\"},{\"Sid\":\"InfraFullAccess\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"NotAction\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\"],\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket\"],\"Condition\":{\"ForAnyValue:StringLike\":{\"aws:userid\":\"*AROAJFYT3SYFOZEQ27OJS*\"}}},{\"Sid\":\"DenyUnlessAdmin\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\",\"s3:PutLifecycleConfiguration\"],\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":\"*AROAIX2QEKKD2JHV2WBHO*\"}}},{\"Sid\":\"akkadia-keys-ReadOnlyRole\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket/akkadia-keys/*\",\"Condition\":{\"StringLike\":{\"aws:userid\":[\"*AROAI7XQVTYLLCAFDRAQ4*\",\"*AROAJLIFYIAH3UM2EU7CI*\"]}}},{\"Sid\":\"DenyAccessIfNotInWhitelist\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-reg-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":[\"*AROAI7XQVTYLLCAFDRAQ4*\",\"*AROAJLIFYIAH3UM2EU7CI*\",\"*AROAJFYT3SYFOZEQ27OJS*\",\"*AROAIX2QEKKD2JHV2WBHO*\",\"*AROAJTVSXNQDHUSCXGLZO*\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "aeSBb4wI5ZBRC0Ez+1qfOPe4iJw6s2AZ3HxitcPA10HRtY934TMEU4To2kA4E70VCQVQu4ps62s=", 
+            "RequestId": "CAE49C5601DFB47C", 
+            "HTTPHeaders": {
+                "content-length": "1757", 
+                "x-amz-id-2": "aeSBb4wI5ZBRC0Ez+1qfOPe4iJw6s2AZ3HxitcPA10HRtY934TMEU4To2kA4E70VCQVQu4ps62s=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "CAE49C5601DFB47C", 
+                "date": "Tue, 07 Nov 2017 21:19:35 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

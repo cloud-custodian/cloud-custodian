@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "KTNKt1E1L2swhfpbhJmjfhmk1b9oVMODvLAduqt5wD7ytTaGV5ZbTr+qiryfnRV32soBeAfJlW0=", 
+            "RequestId": "A57C339B7DB93862", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "KTNKt1E1L2swhfpbhJmjfhmk1b9oVMODvLAduqt5wD7ytTaGV5ZbTr+qiryfnRV32soBeAfJlW0=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "A57C339B7DB93862", 
+                "date": "Tue, 07 Nov 2017 21:19:16 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "bb-test-script-bucket"
+        }
+    }
+}

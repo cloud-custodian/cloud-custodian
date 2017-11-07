@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLambdaAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-stack-ci-LambdaExecutionRole-1L73H11FK30M8\"},\"Action\":[\"s3:PutObject\",\"s3:GetBucketPolicy\",\"s3:PutBucketPolicy\",\"s3:DeleteObject\",\"s3:DeleteBucketPolicy\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/*\"]},{\"Sid\":\"InfraFullAccess\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"NotAction\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/*\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket\"],\"Condition\":{\"ForAnyValue:StringLike\":{\"aws:userid\":\"*AROAJFYT3SYFOZEQ27OJS*\"}}},{\"Sid\":\"DenyUnlessAdmin\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\",\"s3:PutLifecycleConfiguration\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/*\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":\"*AROAIX2QEKKD2JHV2WBHO*\"}}},{\"Sid\":\"akkadia-siris-binaries-PowerAccessRole\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/akkadia-siris-binaries/*\",\"Condition\":{\"StringLike\":{\"aws:userid\":\"*AROAJTETK2VOBCIHEP7VM*\"}}},{\"Sid\":\"akkadia-siris-versioning-policy\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetBucketVersioning\",\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/*\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket\"],\"Condition\":{\"StringLike\":{\"aws:userid\":\"*AROAJTETK2VOBCIHEP7VM*\"}}},{\"Sid\":\"DenyAccessIfNotInWhitelist\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::resources-akkadia-siris-binaries-main-ci-use1-bucket/*\",\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":[\"*AROAJTETK2VOBCIHEP7VM*\",\"*AROAJFYT3SYFOZEQ27OJS*\",\"*AROAIX2QEKKD2JHV2WBHO*\",\"*AROAIDIHR2BM523XGGDHA*\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "mPAIABPvHLZR9m2FzvVAYOtszz2Pukzcd0ya13//ZTGm6SQxpTDE6ZRGJLUcZrQ61tG86dk0lBg=", 
+            "RequestId": "E58650B946633B44", 
+            "HTTPHeaders": {
+                "content-length": "2112", 
+                "x-amz-id-2": "mPAIABPvHLZR9m2FzvVAYOtszz2Pukzcd0ya13//ZTGm6SQxpTDE6ZRGJLUcZrQ61tG86dk0lBg=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "E58650B946633B44", 
+                "date": "Tue, 07 Nov 2017 21:19:50 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

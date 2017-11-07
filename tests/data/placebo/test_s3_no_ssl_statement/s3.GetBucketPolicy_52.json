@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::data-services-cfn/*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}},{\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::data-services-cfn/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "N0q9yvSN4tj6O+0duYwh0ehB4A6sKZhY7gKomZUquPj9oVPIbxR60C3TmwEr/nfJNtUQeIzTn6Q=", 
+            "RequestId": "C4A22F0BEBD36E80", 
+            "HTTPHeaders": {
+                "content-length": "380", 
+                "x-amz-id-2": "N0q9yvSN4tj6O+0duYwh0ehB4A6sKZhY7gKomZUquPj9oVPIbxR60C3TmwEr/nfJNtUQeIzTn6Q=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "C4A22F0BEBD36E80", 
+                "date": "Tue, 07 Nov 2017 21:19:28 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

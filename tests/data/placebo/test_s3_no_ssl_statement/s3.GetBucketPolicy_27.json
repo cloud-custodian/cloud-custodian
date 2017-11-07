@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "DhGLwFV0nl4qXimVQ613RRc1i5vn5WZbl7npG2y5j9NVa/SNeVACbfRjxqwG9pMf1mKr7k6MmO8=", 
+            "RequestId": "2F28737BB883A672", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "DhGLwFV0nl4qXimVQ613RRc1i5vn5WZbl7npG2y5j9NVa/SNeVACbfRjxqwG9pMf1mKr7k6MmO8=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "2F28737BB883A672", 
+                "date": "Tue, 07 Nov 2017 21:19:16 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "botplatform-dev"
+        }
+    }
+}

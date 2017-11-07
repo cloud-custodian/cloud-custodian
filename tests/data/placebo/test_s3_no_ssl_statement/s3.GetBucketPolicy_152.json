@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ixCW29qlaa/4UB6EJI4yKJszJ4mwgi9T4FYxV+GdBsRhNZ9EfeYFJj6KSW4pz4R3S2wx+cOwTLA=", 
+            "RequestId": "A9B62B46EC84F8B1", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ixCW29qlaa/4UB6EJI4yKJszJ4mwgi9T4FYxV+GdBsRhNZ9EfeYFJj6KSW4pz4R3S2wx+cOwTLA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "A9B62B46EC84F8B1", 
+                "date": "Tue, 07 Nov 2017 21:19:59 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "xray-lambda"
+        }
+    }
+}

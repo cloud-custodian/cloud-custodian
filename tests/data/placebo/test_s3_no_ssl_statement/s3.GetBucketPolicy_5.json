@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "MEaGxxTWN1JV+0/Pd3E2TUeZqA3Az41wU1HtMfjBtlfwDYzFQRgTvfFfOHwHsxI7BH4kvMUhf7E=", 
+            "RequestId": "AB4E843CD4BDCA4A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "MEaGxxTWN1JV+0/Pd3E2TUeZqA3Az41wU1HtMfjBtlfwDYzFQRgTvfFfOHwHsxI7BH4kvMUhf7E=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "AB4E843CD4BDCA4A", 
+                "date": "Tue, 07 Nov 2017 21:19:12 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "akkadia-cloudformation-templates"
+        }
+    }
+}

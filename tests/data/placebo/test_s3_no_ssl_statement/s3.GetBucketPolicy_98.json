@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "1Z/nZ8LjciCkN1S/tw9Upt9YjV164ZlIDwgwOToZrWGK1BzgCyOHkoLIm4GU44TnETCqR2TtvUw=", 
+            "RequestId": "35ED6C5ADF51AE19", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "1Z/nZ8LjciCkN1S/tw9Upt9YjV164ZlIDwgwOToZrWGK1BzgCyOHkoLIm4GU44TnETCqR2TtvUw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "35ED6C5ADF51AE19", 
+                "date": "Tue, 07 Nov 2017 21:19:41 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "master-migration-tracker"
+        }
+    }
+}

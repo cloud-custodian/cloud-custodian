@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLambdaAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-stack-sta-LambdaExecutionRole-4ZVRJZTLYJTH\"},\"Action\":[\"s3:GetBucketPolicy\",\"s3:PutBucketPolicy\"],\"Resource\":\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket\"},{\"Sid\":\"InfraFullAccess\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"NotAction\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\"],\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket\"],\"Condition\":{\"ForAnyValue:StringLike\":{\"aws:userid\":\"*AROAJFYT3SYFOZEQ27OJS*\"}}},{\"Sid\":\"DenyUnlessAdmin\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\",\"s3:PutLifecycleConfiguration\"],\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":\"*AROAIX2QEKKD2JHV2WBHO*\"}}},{\"Sid\":\"akkadia-keys-ReadOnlyRole\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket/akkadia-keys/*\",\"Condition\":{\"StringLike\":{\"aws:userid\":[\"*AROAJMBWO3J3NS3G4XGS2*\",\"*AROAIGM3TG666CK5LW55Y*\"]}}},{\"Sid\":\"DenyAccessIfNotInWhitelist\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket/*\",\"arn:aws:s3:::infrastructure-use1-akkadia-keys-main-stable-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":[\"*AROAJMBWO3J3NS3G4XGS2*\",\"*AROAIGM3TG666CK5LW55Y*\",\"*AROAJFYT3SYFOZEQ27OJS*\",\"*AROAIX2QEKKD2JHV2WBHO*\",\"*AROAIK27NQ5ESIZTDEZYA*\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "iCiJlA+jnVzX2JRgPbul6FFG02BNx0RL6rfy1GFsxLidLBuvY8wtl8PLCAAHDSNPpRkjtstMgYM=", 
+            "RequestId": "A848F4F0654E609C", 
+            "HTTPHeaders": {
+                "content-length": "1780", 
+                "x-amz-id-2": "iCiJlA+jnVzX2JRgPbul6FFG02BNx0RL6rfy1GFsxLidLBuvY8wtl8PLCAAHDSNPpRkjtstMgYM=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "A848F4F0654E609C", 
+                "date": "Tue, 07 Nov 2017 21:19:35 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

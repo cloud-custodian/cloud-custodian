@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "PqhUEuV/6E8gJhPKwik/62Tpb5RACLg/039qYr0VSXclGdEMHYun9SnY9dsCFS8Z1ImH25nGntE=", 
+            "RequestId": "7586201D5F69AEBE", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "PqhUEuV/6E8gJhPKwik/62Tpb5RACLg/039qYr0VSXclGdEMHYun9SnY9dsCFS8Z1ImH25nGntE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "7586201D5F69AEBE", 
+                "date": "Tue, 07 Nov 2017 21:19:52 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "tr-corp-nonprod-us-east-1-splunkcloud"
+        }
+    }
+}

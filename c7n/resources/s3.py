@@ -778,6 +778,67 @@ class EncryptionEnabledFilter(Filter):
             return b
 
 
+SSL_STATEMENT_GLOB = {
+    'Effect': 'Deny',
+    'Principal': '*',
+    'Condition': {
+        'Bool': {
+            'aws:SecureTransport': 'false'
+        }
+    }
+}
+
+
+@filters.register('no-ssl-statement')
+class SSLEnabledFilter(Filter):
+    """Find buckets with missing SSL policy statement
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+                - name: s3-bucket-no-ssl
+                  resource: s3
+                  filters:
+                    - type: no-ssl-statement
+    """
+    schema = type_schema(
+        'no-ssl-statement'
+    )
+
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('s3').get_permissions()
+        return perms
+
+    def process(self, buckets, event=None):
+        return list(filter(None, map(self.process_bucket, buckets)))
+
+    def process_bucket(self, b):
+        p = b.get('Policy')
+        if p is None:
+            return b
+        p = json.loads(p)
+        ssl_statement = dict(SSL_STATEMENT_GLOB)
+
+        statements = p.get('Statement', [])
+        check = False
+        for s in list(statements):
+            if 'Sid' in s:
+                ssl_statement["Sid"] = s["Sid"]
+            if 'Resource' in s:
+                ssl_statement["Resource"] = s["Resource"]
+            if 'Action' in s:
+                ssl_statement["Action"] = s["Action"]
+            if s == ssl_statement:
+                check = True
+                break
+        if check:
+            return None
+        else:
+            return b
+
+
 @filters.register('missing-statement')
 @filters.register('missing-policy-statement')
 class MissingPolicyStatementFilter(Filter):

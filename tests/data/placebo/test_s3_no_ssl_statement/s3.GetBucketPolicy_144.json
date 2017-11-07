@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/human-role/203981-PowerUser\"},\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev\",\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev/*\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piJournalFirehoseRole-dev\"},\"Action\":[\"s3:AbortMultipartUpload\",\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev/data/*\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piJournalFirehoseRole-dev\"},\"Action\":\"s3:ListBucket\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev\",\"Condition\":{\"StringLike\":{\"s3:prefix\":\"data/*\"}}},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piJournalFirehoseRole-dev\"},\"Action\":\"s3:ListBucketMultipartUploads\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/piJournalFirehoseRole-dev\"},\"Action\":\"s3:GetBucketLocation\",\"Resource\":\"arn:aws:s3:::tr-platforms-ecp-productinsight-journal-dev\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "fNk0nqu3PpohinLW+jWTkXqmuCv3GBM1CD+gk9U8enmjwQ+mcDDFYJX3EnG3yOAb1b9Lvq9nz2A=", 
+            "RequestId": "1B3F8B10D60F7C51", 
+            "HTTPHeaders": {
+                "content-length": "1181", 
+                "x-amz-id-2": "fNk0nqu3PpohinLW+jWTkXqmuCv3GBM1CD+gk9U8enmjwQ+mcDDFYJX3EnG3yOAb1b9Lvq9nz2A=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "1B3F8B10D60F7C51", 
+                "date": "Tue, 07 Nov 2017 21:19:56 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

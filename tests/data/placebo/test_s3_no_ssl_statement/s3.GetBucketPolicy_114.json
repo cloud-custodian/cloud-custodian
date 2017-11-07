@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "M2XUybZy2+Ue6epEv1JPi9r8GrHMLgo+NmrFo4/KB891VDq7ScQWs2LjK863oIO3a2ld+cTAPkI=", 
+            "RequestId": "DB9486E15DE441AF", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "M2XUybZy2+Ue6epEv1JPi9r8GrHMLgo+NmrFo4/KB891VDq7ScQWs2LjK863oIO3a2ld+cTAPkI=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DB9486E15DE441AF", 
+                "date": "Tue, 07 Nov 2017 21:19:47 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "nad-s4s-us-east-1-060725138335-trts-asset-stores"
+        }
+    }
+}

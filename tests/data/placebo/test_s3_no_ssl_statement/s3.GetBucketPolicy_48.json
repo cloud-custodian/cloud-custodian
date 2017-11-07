@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "oN6p/45PJZ/QJ1osAN9ENq8h9YgVsvENzLuAGXPnQgHXSTPDVSarJjx00F5y5KSnG9wHDMgppWQ=", 
+            "RequestId": "BD3740F3C03BE51E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "oN6p/45PJZ/QJ1osAN9ENq8h9YgVsvENzLuAGXPnQgHXSTPDVSarJjx00F5y5KSnG9wHDMgppWQ=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "BD3740F3C03BE51E", 
+                "date": "Tue, 07 Nov 2017 21:19:24 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "coe-cfn-shared-nonprod"
+        }
+    }
+}

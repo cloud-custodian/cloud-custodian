@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "Pv4yZOqEnP7sCXlCETNE/3GmZy4ZizYDdOkp3sr/yVwYRQnb3DBIQdN2x6nnwYcecl3te4KFR00=", 
+            "RequestId": "0045CAB87BAD0709", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Pv4yZOqEnP7sCXlCETNE/3GmZy4ZizYDdOkp3sr/yVwYRQnb3DBIQdN2x6nnwYcecl3te4KFR00=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "0045CAB87BAD0709", 
+                "date": "Tue, 07 Nov 2017 21:19:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "akkadia-rpm"
+        }
+    }
+}

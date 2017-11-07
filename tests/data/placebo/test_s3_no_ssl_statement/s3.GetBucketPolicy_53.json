@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "hmS0IVK2KjDIZzRS9ij5lMMH4bQIa3BAoY/GwzT+jOvqNZDhf5lTnmxftlihFIu/t0E+va/zI5k=", 
+            "RequestId": "9AC19BA609E33C2E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "hmS0IVK2KjDIZzRS9ij5lMMH4bQIa3BAoY/GwzT+jOvqNZDhf5lTnmxftlihFIu/t0E+va/zI5k=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "9AC19BA609E33C2E", 
+                "date": "Tue, 07 Nov 2017 21:19:27 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "data-services-git-bucket"
+        }
+    }
+}

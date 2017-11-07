@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "W++yKYXtxCC1Wlws+DXmGMi4BeQSzyFN6pak+CBrh2t4ylnQ0RPzbJmSuuDTe76CnswAgiYvIRg=", 
+            "RequestId": "401F87FB7BEA9244", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "W++yKYXtxCC1Wlws+DXmGMi4BeQSzyFN6pak+CBrh2t4ylnQ0RPzbJmSuuDTe76CnswAgiYvIRg=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "401F87FB7BEA9244", 
+                "date": "Tue, 07 Nov 2017 21:19:14 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "aws-codepipeline-base-test"
+        }
+    }
+}

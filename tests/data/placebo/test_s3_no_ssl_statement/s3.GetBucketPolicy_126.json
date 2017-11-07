@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"MyPolicy\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/robert-sigler-source-bucket-AkkadiaIAMRole-1J1W0TEJWLAR2\"},\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::robert-sigler-source/*\",\"arn:aws:s3:::robert-sigler-source\"]}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "HEEbecyru9wh17hQ1LQL/hp1lPlpH8m7YErY5GmMyaISlaqYfUdudnsRnM/BAxCaJT8C7NYh2aY=", 
+            "RequestId": "BCB06009FF0B333D", 
+            "HTTPHeaders": {
+                "content-length": "327", 
+                "x-amz-id-2": "HEEbecyru9wh17hQ1LQL/hp1lPlpH8m7YErY5GmMyaISlaqYfUdudnsRnM/BAxCaJT8C7NYh2aY=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "BCB06009FF0B333D", 
+                "date": "Tue, 07 Nov 2017 21:19:51 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"RequireSSL\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::custodian-ssl-test/*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "7/Z6mNU2DXFrpf8nBzBbsFw5eSwSwisR5mZpulsHEqYBoZO67OIBaOwGhEeHUDGfGUb85U+A4NU=", 
+            "RequestId": "EDA8723DFA093E48", 
+            "HTTPHeaders": {
+                "content-length": "208", 
+                "x-amz-id-2": "7/Z6mNU2DXFrpf8nBzBbsFw5eSwSwisR5mZpulsHEqYBoZO67OIBaOwGhEeHUDGfGUb85U+A4NU=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "EDA8723DFA093E48", 
+                "date": "Tue, 07 Nov 2017 21:19:27 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

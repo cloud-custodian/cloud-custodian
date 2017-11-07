@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "EJ8X5BDtcsPUPirdaKgJyXu5jFVnWYnMqyh/xleZIMYvdd42UNDjx/KCBB2uLARniU42x4Z6PPI=", 
+            "RequestId": "DC2314174020A04C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "EJ8X5BDtcsPUPirdaKgJyXu5jFVnWYnMqyh/xleZIMYvdd42UNDjx/KCBB2uLARniU42x4Z6PPI=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DC2314174020A04C", 
+                "date": "Tue, 07 Nov 2017 21:19:15 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "bams-webapp"
+        }
+    }
+}

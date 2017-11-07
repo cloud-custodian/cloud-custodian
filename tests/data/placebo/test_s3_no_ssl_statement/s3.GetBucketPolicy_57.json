@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "eeNjCB9yYMGK+92fsrJeezdaGe51QtA9QDq/XP4gk9c6VjF5qdU7Y670lkqnUvVVjkT3JQDvxcE=", 
+            "RequestId": "38C19FD0E8EE90F5", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "eeNjCB9yYMGK+92fsrJeezdaGe51QtA9QDq/XP4gk9c6VjF5qdU7Y670lkqnUvVVjkT3JQDvxcE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "38C19FD0E8EE90F5", 
+                "date": "Tue, 07 Nov 2017 21:19:28 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "eap-automation-cloudformation"
+        }
+    }
+}

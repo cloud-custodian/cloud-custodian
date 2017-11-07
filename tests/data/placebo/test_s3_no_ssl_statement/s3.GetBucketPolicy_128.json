@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"NotPrincipal\":{\"AWS\":[\"AROAJJFXSVE37P3C2VPLC:ervan.setiawan@thomsonreuters.com\",\"AROAJJFXSVE37P3C2VPLC\"]},\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::s3bucketcreationtest1/*\",\"Condition\":{\"StringNotLike\":{\"aws:userId\":\"AROAI6XDB5TMYT7FZZPGG:*\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "FnUVREaL9DZatC9uhnvTGvtQLDtQN93MMjFbjre+JHSyTCTcpQVWNR/a4S4ngyAe2a9QYMNTEic=", 
+            "RequestId": "976341F300AAC6D5", 
+            "HTTPHeaders": {
+                "content-length": "301", 
+                "x-amz-id-2": "FnUVREaL9DZatC9uhnvTGvtQLDtQN93MMjFbjre+JHSyTCTcpQVWNR/a4S4ngyAe2a9QYMNTEic=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "976341F300AAC6D5", 
+                "date": "Tue, 07 Nov 2017 21:19:51 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

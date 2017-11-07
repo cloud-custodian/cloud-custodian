@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"SSEAndSSLPolicy\",\"Statement\":[{\"Sid\":\"DenyUnEncryptedObjectUploads\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::codepipeline-us-west-2-727867362174/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":\"aws:kms\"}}},{\"Sid\":\"DenyInsecureConnections\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::codepipeline-us-west-2-727867362174/*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "ZKTLpx/FjAedjDMp3E6lsc7QNRy8YUcVQh0gxR4j/kjRCLAQnwfEnvCGp0lQhLkfwlBEUN/26Fg=", 
+            "RequestId": "7466DD2175686B8B", 
+            "HTTPHeaders": {
+                "content-length": "497", 
+                "x-amz-id-2": "ZKTLpx/FjAedjDMp3E6lsc7QNRy8YUcVQh0gxR4j/kjRCLAQnwfEnvCGp0lQhLkfwlBEUN/26Fg=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "7466DD2175686B8B", 
+                "date": "Tue, 07 Nov 2017 21:19:25 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

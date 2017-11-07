@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "edKefyF08Japcby0yGbEUWYJu3BzQ9IinehqHFMdEnfbwxrnC+LxbOKHXQaVu9PhUoY3OrnKI4I=", 
+            "RequestId": "E43EE17B62A6B0B4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "edKefyF08Japcby0yGbEUWYJu3BzQ9IinehqHFMdEnfbwxrnC+LxbOKHXQaVu9PhUoY3OrnKI4I=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E43EE17B62A6B0B4", 
+                "date": "Tue, 07 Nov 2017 21:19:55 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "tr-platforms-ecp-productinsight-backlog-dev"
+        }
+    }
+}

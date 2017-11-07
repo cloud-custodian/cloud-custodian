@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-ssl-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "mObAATBvG/HtPKHuFHOC+gaqCCTgQFJZxpnpzSeZ9E5ECfCvejinIx7U2yTU4ZczcZeyC6Z6ahk=", 
+            "RequestId": "B53055015B7745C9", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "mObAATBvG/HtPKHuFHOC+gaqCCTgQFJZxpnpzSeZ9E5ECfCvejinIx7U2yTU4ZczcZeyC6Z6ahk=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "B53055015B7745C9", 
+                "location": "/custodian-ssl-test", 
+                "date": "Tue, 07 Nov 2017 21:19:12 GMT"
+            }
+        }
+    }
+}

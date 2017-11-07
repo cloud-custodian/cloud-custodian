@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::773778111642:root\",\"arn:aws:iam::367379483300:root\",\"arn:aws:iam::720139907389:root\",\"arn:aws:iam::219514130011:root\",\"arn:aws:iam::591518367534:root\",\"arn:aws:iam::948154210131:root\",\"arn:aws:iam::036263847021:root\",\"arn:aws:iam::612360232994:root\",\"arn:aws:iam::608014515287:root\",\"arn:aws:iam::511033592916:root\",\"arn:aws:iam::060725138335:root\",\"arn:aws:iam::642157181326:root\",\"arn:aws:iam::692062991129:root\",\"arn:aws:iam::304853478528:root\",\"arn:aws:iam::980461583422:root\",\"arn:aws:iam::015887481462:root\",\"arn:aws:iam::280910660413:root\",\"arn:aws:iam::443862268467:root\",\"arn:aws:iam::669760289733:root\"]},\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::tri-0373b437878fa63c9/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "QFUBhrZjLm//jOvunpFgkJswqATdCnBrVTvb/54EusbrF9JjW/bST90ekwUcYgNr25ow0uaCm3Y=", 
+            "RequestId": "D53E5F4806BC3477", 
+            "HTTPHeaders": {
+                "content-length": "781", 
+                "x-amz-id-2": "QFUBhrZjLm//jOvunpFgkJswqATdCnBrVTvb/54EusbrF9JjW/bST90ekwUcYgNr25ow0uaCm3Y=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "D53E5F4806BC3477", 
+                "date": "Tue, 07 Nov 2017 21:19:57 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

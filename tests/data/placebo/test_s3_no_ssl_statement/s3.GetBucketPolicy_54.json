@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"SSEAndSSLPolicy\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::720139907389:root\"},\"Action\":[\"s3:Get*\",\"s3:Put*\"],\"Resource\":\"arn:aws:s3:::data-services-infrastructure/*\"},{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::720139907389:root\"},\"Action\":\"s3:ListBucket\",\"Resource\":\"arn:aws:s3:::data-services-infrastructure\"},{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:root\"},\"Action\":[\"s3:Get*\",\"s3:Put*\"],\"Resource\":\"arn:aws:s3:::data-services-infrastructure/*\"},{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:root\"},\"Action\":\"s3:ListBucket\",\"Resource\":\"arn:aws:s3:::data-services-infrastructure\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "zKxFqea5di1ZLUeZps6OSUS7cymz7r5T6YZKDcHlTWLvQK8F6AU7b3QFzJJK/WrzdtFPGKLCUf8=", 
+            "RequestId": "22E31DFE4164D461", 
+            "HTTPHeaders": {
+                "content-length": "721", 
+                "x-amz-id-2": "zKxFqea5di1ZLUeZps6OSUS7cymz7r5T6YZKDcHlTWLvQK8F6AU7b3QFzJJK/WrzdtFPGKLCUf8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "22E31DFE4164D461", 
+                "date": "Tue, 07 Nov 2017 21:19:28 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

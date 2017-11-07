@@ -922,6 +922,43 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_no_ssl_statement(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'),
+        ])
+        session_factory = self.record_flight_data('test_s3_no_ssl_statement')
+        bname = "custodian-ssl-test"
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'RequireSSL',
+                    'Effect': 'Allow',
+                    'Principal': '*',
+                    'Action': 's3:*',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname,
+                    'Condition': {
+                        'Bool': {
+                            'aws:SecureTransport': 'false'}}}]}))
+        p = self.load_policy({
+            'name': 's3-no-ssl-policy',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'no-ssl-statement'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_missing_policy_statement(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(

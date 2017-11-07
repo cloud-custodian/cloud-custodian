@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "ynLuEYcRBB7Uajwvrsm0SY55LeEYqbiCEdAf7oAAQAgYvJLksIsXIfmzzdNYFUxKHd3W5IxDkTA=", 
+            "RequestId": "915380A4C1A5093A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ynLuEYcRBB7Uajwvrsm0SY55LeEYqbiCEdAf7oAAQAgYvJLksIsXIfmzzdNYFUxKHd3W5IxDkTA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "915380A4C1A5093A", 
+                "date": "Tue, 07 Nov 2017 21:19:48 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "pi-quicksight-test"
+        }
+    }
+}

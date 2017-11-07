@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "QZuSOMC93fspUM3QMJMnUbautjeNIicM/muVbROSh23CkR0MAWS75ZXr+ujcknsH69ZzE4y/4Ck=", 
+            "RequestId": "1F3B616630115C0D", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "QZuSOMC93fspUM3QMJMnUbautjeNIicM/muVbROSh23CkR0MAWS75ZXr+ujcknsH69ZzE4y/4Ck=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "1F3B616630115C0D", 
+                "date": "Tue, 07 Nov 2017 21:19:17 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "cf-204503-logabstraction-qa-p-artifactstorebucket-as2oq0hx5oqp"
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1499287466722\",\"Statement\":[{\"Sid\":\"Stmt1499287465242\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"AROAI3CWCLGZMPCXFSWAO\"},\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::tri-spinnaker-inspector-test-debian-storage\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Sh6LCKPAe9ZNx7OdWA2QB1NlfT+CkC2FsHKCsUYCg/XSxRpQ8XwDIqo5gWvjA7ey1+/nsXqt50M=", 
+            "RequestId": "3262B4460723ECEE", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Sh6LCKPAe9ZNx7OdWA2QB1NlfT+CkC2FsHKCsUYCg/XSxRpQ8XwDIqo5gWvjA7ey1+/nsXqt50M=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "3262B4460723ECEE", 
+                "date": "Tue, 07 Nov 2017 21:19:57 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

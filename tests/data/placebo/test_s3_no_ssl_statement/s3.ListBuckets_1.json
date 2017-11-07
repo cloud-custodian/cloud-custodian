@@ -1,0 +1,2001 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "tr-aws-sub015", 
+            "ID": "ad16965bc71b0ab830c57f1a914bd9b3293033c3955f050eabe1fc9d64ff1e6a"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 48
+                }, 
+                "Name": "204503-logabstraction"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 30
+                }, 
+                "Name": "204503-logabstraction-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 33
+                }, 
+                "Name": "204503-logabstraction-config"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 5
+                }, 
+                "Name": "akkadia-artifact-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 29
+                }, 
+                "Name": "akkadia-cloudformation-templates"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 9
+                }, 
+                "Name": "akkadia-explorer"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 48
+                }, 
+                "Name": "akkadia-integration-nonversioning-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 23
+                }, 
+                "Name": "akkadia-integration-versioning-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 8
+                }, 
+                "Name": "akkadia-rpm"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 17
+                }, 
+                "Name": "akkadia-shared-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 11
+                }, 
+                "Name": "akkadia-spinnaker-config"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 18
+                }, 
+                "Name": "as-awsspec-testing-miscellaneousstack-ju-s3bucket-1707ax5yms1mn"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 10
+                }, 
+                "Name": "autotag-testing-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 49
+                }, 
+                "Name": "aws-codepipeline-base-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 49
+                }, 
+                "Name": "aws-codepipeline-demo-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 11
+                }, 
+                "Name": "aws-logs-060725138335-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 27
+                }, 
+                "Name": "aws-registry-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 17
+                }, 
+                "Name": "aws-registry-source"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 39
+                }, 
+                "Name": "aws-serverless-demo-wr"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 41
+                }, 
+                "Name": "aws-serverless-demo-wr1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 30
+                }, 
+                "Name": "aws-website-tr-cloud-tech-radar-b0zmx"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 34
+                }, 
+                "Name": "bams-codepipeline-source"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 28
+                }, 
+                "Name": "bams-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 27
+                }, 
+                "Name": "bams-webapp"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 23, 
+                    "minute": 45
+                }, 
+                "Name": "bb-codedeploybucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 2
+                }, 
+                "Name": "bb-test-script-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 41
+                }, 
+                "Name": "botplatform-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 44
+                }, 
+                "Name": "botplatform-qa"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 52
+                }, 
+                "Name": "bucket-policy-test-aakash"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 18
+                }, 
+                "Name": "c3-rdpoc-template"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 15
+                }, 
+                "Name": "ccoe-dbchange-codepipe-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 12
+                }, 
+                "Name": "ccoe-dbchange-infrastructure-use1.tr-corp-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 32
+                }, 
+                "Name": "ccoe-solace-installation"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 20
+                }, 
+                "Name": "cf-204503-logabstraction-qa-p-artifactstorebucket-as2oq0hx5oqp"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 34
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-ap-southeast-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 4
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-ap-southeast-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 38
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-eu-central-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 51
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 10
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 10
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-us-east-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 19
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-us-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 19
+                }, 
+                "Name": "cf-templates-xkzgao6tiahl-us-west-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 49
+                }, 
+                "Name": "cicdutils-codepipeline-source"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 48
+                }, 
+                "Name": "cicdutils-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 38
+                }, 
+                "Name": "cloudformation-akkadia-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 3
+                }, 
+                "Name": "codepipeline-us-east-1-659334270186"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 9, 
+                    "minute": 57
+                }, 
+                "Name": "codepipeline-us-west-2-727867362174"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 10
+                }, 
+                "Name": "coe-cfn-shared-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 58
+                }, 
+                "Name": "config-bucket-060725138335"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 45
+                }, 
+                "Name": "cri-sustainability-development-goals"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 19
+                }, 
+                "Name": "custodian-ssl-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 27
+                }, 
+                "Name": "data-services-cfn"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 44
+                }, 
+                "Name": "data-services-git-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 13
+                }, 
+                "Name": "data-services-infrastructure"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 29
+                }, 
+                "Name": "data-services-lambda"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 12
+                }, 
+                "Name": "data-services-test-bucket-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 10
+                }, 
+                "Name": "eap-automation-cloudformation"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 54
+                }, 
+                "Name": "ecp-registry-ci-codesource"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 39
+                }, 
+                "Name": "ecp-registry-qa-codesource"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 3
+                }, 
+                "Name": "ecp-registry-qa1-coremetadata"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 56
+                }, 
+                "Name": "ecp-registry-u0169954-codesource"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 46
+                }, 
+                "Name": "ecp-registry-u0169954-coremetadata"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 0
+                }, 
+                "Name": "elasticbeanstalk-eu-west-1-060725138335"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 35
+                }, 
+                "Name": "elasticbeanstalk-us-east-1-060725138335"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 55
+                }, 
+                "Name": "encrypteds3test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 37
+                }, 
+                "Name": "gcsops-nonprod-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 28
+                }, 
+                "Name": "gcsops-nonprod-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 50
+                }, 
+                "Name": "gm228219"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 54
+                }, 
+                "Name": "henry-lambda-code-tr"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 51
+                }, 
+                "Name": "hosted-pipeline-solution-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 47, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 26
+                }, 
+                "Name": "hosted-pipeline-solution-cloudformation"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 12
+                }, 
+                "Name": "hosted-pipeline-solution-git-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 39
+                }, 
+                "Name": "hosted-pipeline-solution-lambda-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 23
+                }, 
+                "Name": "idj-s3-test-bucket8"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 22
+                }, 
+                "Name": "idj-s3-test-bucket9"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 47
+                }, 
+                "Name": "infrastructure-use1-akkadia-keys-main-ci-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 33
+                }, 
+                "Name": "infrastructure-use1-akkadia-keys-main-reg-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 1
+                }, 
+                "Name": "infrastructure-use1-akkadia-keys-main-stable-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 0
+                }, 
+                "Name": "infrastructure-use1-akkadia-keys-main-test-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 23, 
+                    "minute": 42
+                }, 
+                "Name": "jeff-cf-test-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 48
+                }, 
+                "Name": "jenkins-akkadia-stack-jenkinss3bucket-spzv5nwahp19"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 29
+                }, 
+                "Name": "jh-demo-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 25
+                }, 
+                "Name": "jh-pipeline-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 32
+                }, 
+                "Name": "jh-tf-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 19
+                }, 
+                "Name": "kyle-zuul-static"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 59
+                }, 
+                "Name": "lvc-s3-alblog-qa-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 13
+                }, 
+                "Name": "lvc-s3-alblog-qa-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 20
+                }, 
+                "Name": "lvc-s3-alblog-qa2-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 52
+                }, 
+                "Name": "lvc-s3-alblog-qa2-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 23
+                }, 
+                "Name": "lvc-s3-dbbackup-qa-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 29
+                }, 
+                "Name": "lvc-s3-dbbackup-qa-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 50
+                }, 
+                "Name": "lvc-s3-dbbackup-qa2-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 3
+                }, 
+                "Name": "lvc-s3-dbbackup-qa2-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 27
+                }, 
+                "Name": "lvc-s3-thumbnail-qa-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 29
+                }, 
+                "Name": "lvc-s3-thumbnail-qa-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 50
+                }, 
+                "Name": "lvc-s3-thumbnail-qa2-eu-west-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 3, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 3
+                }, 
+                "Name": "lvc-s3-thumbnail-qa2-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 0
+                }, 
+                "Name": "master-migration-tracker"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 43
+                }, 
+                "Name": "mcj-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 22
+                }, 
+                "Name": "mfa-qa-cloudfront"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 54
+                }, 
+                "Name": "mfa-qa-code-ppe"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 32
+                }, 
+                "Name": "mfa-serverless-terraform-remote"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 34
+                }, 
+                "Name": "mfa-terraform-remote"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 4
+                }, 
+                "Name": "mfa-test-policy"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335-alb-access-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335-trts-asset-stores"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335-trts-dependencies"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "nad-s4s-eu-west-1-060725138335-trts-releases"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335-alb-access-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335-artifacts"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 11
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335-trts-asset-stores"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 11
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335-trts-dependencies"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 9
+                }, 
+                "Name": "nad-s4s-us-east-1-060725138335-trts-releases"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 0
+                }, 
+                "Name": "nate-biles-source"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 56
+                }, 
+                "Name": "nguyeti"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 59
+                }, 
+                "Name": "nick-hauschild-temp"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 57
+                }, 
+                "Name": "pi-quicksight-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 43
+                }, 
+                "Name": "resource-coe-main-dev-use1-tr-corp-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 47
+                }, 
+                "Name": "resources-akkadia-siris-binaries-main-ci-use1-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 33
+                }, 
+                "Name": "resources-akkadia-siris-binaries-main-reg-use1-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 1
+                }, 
+                "Name": "resources-akkadia-siris-binaries-main-stable-use1-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 0
+                }, 
+                "Name": "resources-akkadia-siris-binaries-main-test-use1-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 28
+                }, 
+                "Name": "robert-sigler-source"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 49
+                }, 
+                "Name": "s3bucketcreationtest"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 37
+                }, 
+                "Name": "s3bucketcreationtest1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 4
+                }, 
+                "Name": "slalwani"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 7
+                }, 
+                "Name": "solace-poc"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "Name": "sse-jenkins-remote-state"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 13
+                }, 
+                "Name": "sse-terraform-remote-state-ppe"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 28
+                }, 
+                "Name": "ststoken-demo-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 49
+                }, 
+                "Name": "sustainable-development-goals.int.thomsonreuters.com"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 42
+                }, 
+                "Name": "test-pipeline-inspector"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 1
+                }, 
+                "Name": "tr-corp-nonprod-us-east-1-splunkcloud"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 30
+                }, 
+                "Name": "tr-corporate-nonprod-cloudtrail-acct-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 7
+                }, 
+                "Name": "tr-corporate-nonprod-splunkcloud"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 18
+                }, 
+                "Name": "tr-corporate-nonprod-test-us-east-1-splunkcloud"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 53
+                }, 
+                "Name": "tr-jenkins-cluster-db4ac8"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 22
+                }, 
+                "Name": "tr-labs-store-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 10
+                }, 
+                "Name": "tr-platforms-ecp-productinsight-backlog-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 4
+                }, 
+                "Name": "tr-platforms-ecp-productinsight-config-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 48
+                }, 
+                "Name": "tr-platforms-ecp-productinsight-journal-dev"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 55
+                }, 
+                "Name": "tr-spe-pse-backup-primary"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 5
+                }, 
+                "Name": "tri-0373b437878fa63c9"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 45
+                }, 
+                "Name": "tri-spinnaker-inspector-test-debian-storage"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 57
+                }, 
+                "Name": "trlabs-andrei-store-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 17
+                }, 
+                "Name": "trlabs-shared-repo"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 18
+                }, 
+                "Name": "trlabs-test-store-nonprod"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 12
+                }, 
+                "Name": "worklet-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 13
+                }, 
+                "Name": "xray-lambda"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "eC/DDlAvQjXyzTBtIbUP4F8Irbv5/FDVSnqNfqHSWzn7sBMh0czasVW6xzspbFh5uj9+9iHGKr0=", 
+            "RequestId": "E896B49E3E18C435", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "eC/DDlAvQjXyzTBtIbUP4F8Irbv5/FDVSnqNfqHSWzn7sBMh0czasVW6xzspbFh5uj9+9iHGKr0=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E896B49E3E18C435", 
+                "date": "Tue, 07 Nov 2017 21:19:13 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLambdaAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-stack-sta-LambdaExecutionRole-1QW9PMJE5Y6OZ\"},\"Action\":[\"s3:PutObject\",\"s3:GetBucketPolicy\",\"s3:PutBucketPolicy\",\"s3:DeleteObject\",\"s3:DeleteBucketPolicy\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket/*\"]},{\"Sid\":\"InfraFullAccess\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"NotAction\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket/*\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket\"],\"Condition\":{\"ForAnyValue:StringLike\":{\"aws:userid\":\"*AROAJFYT3SYFOZEQ27OJS*\"}}},{\"Sid\":\"DenyUnlessAdmin\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\",\"s3:PutLifecycleConfiguration\"],\"Resource\":[\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket/*\",\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket\"],\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":\"*AROAIX2QEKKD2JHV2WBHO*\"}}},{\"Sid\":\"akkadia-siris-binaries-PowerAccessRole\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket/akkadia-siris-binaries/*\",\"Condition\":{\"StringLike\":{\"aws:userid\":\"*AROAIGM3TG666CK5LW55Y*\"}}},{\"Sid\":\"DenyAccessIfNotInWhitelist\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::resources-akkadia-siris-binaries-main-stable-use1-bucket/*\",\"Condition\":{\"ForAnyValue:StringNotLike\":{\"aws:userid\":[\"*AROAIGM3TG666CK5LW55Y*\",\"*AROAJFYT3SYFOZEQ27OJS*\",\"*AROAIX2QEKKD2JHV2WBHO*\",\"*AROAIQCAPWRAZ47RMNHKK*\"]}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ZnEEOeHehCF0GHcM9h9YGBZIuG2b3x4jZU/BsVTkukop/nc35Xd/Wsklp5utdWcdcjhyLq5kD1Y=", 
+            "RequestId": "30E9F7C40793F7A7", 
+            "HTTPHeaders": {
+                "content-length": "1817", 
+                "x-amz-id-2": "ZnEEOeHehCF0GHcM9h9YGBZIuG2b3x4jZU/BsVTkukop/nc35Xd/Wsklp5utdWcdcjhyLq5kD1Y=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "30E9F7C40793F7A7", 
+                "date": "Tue, 07 Nov 2017 21:19:51 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

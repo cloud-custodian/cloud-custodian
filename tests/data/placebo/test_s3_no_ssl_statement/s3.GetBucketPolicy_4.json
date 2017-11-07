@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"MyPolicy\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-stack-test-Art-AkkadiaIAMRole-1VKIM5Z4CV2VT\"},\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::akkadia-artifact-bucket/*\",\"arn:aws:s3:::akkadia-artifact-bucket\"]}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "8x3ziD61hs3M20DMWXdY5S2F/+LsqLaCGWaopBsYK2HZPWB/XQo377C2mZ7uQ21/voL/Rnq1OzQ=", 
+            "RequestId": "A38ED0E38049FF9E", 
+            "HTTPHeaders": {
+                "content-length": "341", 
+                "x-amz-id-2": "8x3ziD61hs3M20DMWXdY5S2F/+LsqLaCGWaopBsYK2HZPWB/XQo377C2mZ7uQ21/voL/Rnq1OzQ=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "A38ED0E38049FF9E", 
+                "date": "Tue, 07 Nov 2017 21:19:14 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

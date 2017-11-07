@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "fOJ7i2QjJAL8aK5YZudGpq/2Ww7Wg2HCinR2r31hFynbqf5f3f5onk2HrRV6vSg1+FD2M63XlQc=", 
+            "RequestId": "86C69C7DDAAA2A7C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "fOJ7i2QjJAL8aK5YZudGpq/2Ww7Wg2HCinR2r31hFynbqf5f3f5onk2HrRV6vSg1+FD2M63XlQc=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "86C69C7DDAAA2A7C", 
+                "date": "Tue, 07 Nov 2017 21:19:51 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "slalwani"
+        }
+    }
+}

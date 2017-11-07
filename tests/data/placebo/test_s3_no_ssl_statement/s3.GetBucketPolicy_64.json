@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"eb-ad78f54a-f239-4c90-adda-49e5f56cb51e\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/aws-elasticbeanstalk-ec2-role\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::elasticbeanstalk-us-east-1-060725138335/resources/environments/logs/*\"},{\"Sid\":\"eb-58950a8c-feb6-11e2-89e0-0800277d041b\",\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"s3:DeleteBucket\",\"Resource\":\"arn:aws:s3:::elasticbeanstalk-us-east-1-060725138335\"},{\"Sid\":\"eb-af163bf3-d27b-4712-b795-d1e33e331ca4\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::060725138335:role/MFA-Portal-QA\",\"arn:aws:iam::060725138335:role/aws-elasticbeanstalk-ec2-role\"]},\"Action\":[\"s3:ListBucket\",\"s3:ListBucketVersions\",\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::elasticbeanstalk-us-east-1-060725138335\",\"arn:aws:s3:::elasticbeanstalk-us-east-1-060725138335/resources/environments/*\"]}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "lXuprHJmGgR9da0IUa065zjBhKzUa39u5a+uaKwoWfjXwqb5gK/cGkp097MudlUewLpAHCeQbXc=", 
+            "RequestId": "220A9DAA3740A558", 
+            "HTTPHeaders": {
+                "content-length": "926", 
+                "x-amz-id-2": "lXuprHJmGgR9da0IUa065zjBhKzUa39u5a+uaKwoWfjXwqb5gK/cGkp097MudlUewLpAHCeQbXc=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "220A9DAA3740A558", 
+                "date": "Tue, 07 Nov 2017 21:19:31 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "S9LlmVtWvC/NJRw/vLVohoYmL5wdFdfeazr9klcb3dlATbfb/+9r6GvOPbRlM4b1rXUhi6VtyeI=", 
+            "RequestId": "56A6BA1A1953256E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "S9LlmVtWvC/NJRw/vLVohoYmL5wdFdfeazr9klcb3dlATbfb/+9r6GvOPbRlM4b1rXUhi6VtyeI=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "56A6BA1A1953256E", 
+                "date": "Tue, 07 Nov 2017 21:19:39 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "lvc-s3-thumbnail-qa-eu-west-1"
+        }
+    }
+}

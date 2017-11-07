@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "OX6UzoUtRXGGFf9PAfXnl5ZTbJD6XFMPO8okBXqoFTY/YyJtAiXCHUq5rlFDlHK/D1jCbBRHxaQ=", 
+            "RequestId": "E88BD55E56C40F44", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "OX6UzoUtRXGGFf9PAfXnl5ZTbJD6XFMPO8okBXqoFTY/YyJtAiXCHUq5rlFDlHK/D1jCbBRHxaQ=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E88BD55E56C40F44", 
+                "date": "Tue, 07 Nov 2017 21:19:16 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "c3-rdpoc-template"
+        }
+    }
+}

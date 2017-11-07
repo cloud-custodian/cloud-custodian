@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLambdaAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::060725138335:role/akkadia-orchestrator-test-Akka-LambdaExecutionRole-ND4DQ9NPCWBR\"},\"Action\":[\"s3:PutObject\",\"s3:GetBucketPolicy\",\"s3:PutBucketPolicy\",\"s3:DeleteObject\",\"s3:DeleteBucketPolicy\"],\"Resource\":[\"arn:aws:s3:::bucket-policy-test-aakash\",\"arn:aws:s3:::bucket-policy-test-aakash/*\"]},{\"Sid\":\"InfraFullAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:sts::060725138335:assumed-role/204503-PowerUser/Aakash.Sheth@thomsonreuters.com\"},\"NotAction\":[\"s3:DeleteObjectVersion\",\"s3:DeleteBucket\"],\"Resource\":[\"arn:aws:s3:::bucket-policy-test-aakash/*\",\"arn:aws:s3:::bucket-policy-test-aakash\"]}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "kmjlsgQAuTZIPQcy7X0YFKTIiUeq7oYnJf877xKFdrT/80wrcaP2qTCZ8OpOf2o9KRErbF9APvY=", 
+            "RequestId": "AD325322BFCE0189", 
+            "HTTPHeaders": {
+                "content-length": "714", 
+                "x-amz-id-2": "kmjlsgQAuTZIPQcy7X0YFKTIiUeq7oYnJf877xKFdrT/80wrcaP2qTCZ8OpOf2o9KRErbF9APvY=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "AD325322BFCE0189", 
+                "date": "Tue, 07 Nov 2017 21:19:18 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
