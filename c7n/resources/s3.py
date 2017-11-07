@@ -978,9 +978,9 @@ class ToggleLogging(BucketActionBase):
                     'region': self.manager.config.region,
                     'source_bucket_name': r['Name'],
                     'target_bucket_name': self.data.get('target_bucket'),
-                    'target_prefix':      self.data.get('target_prefix'),
+                    'target_prefix': self.data.get('target_prefix'),
                     'data': self.data.copy()
-                }                
+                }
                 self.data = self.expand_variables(variables)
                 # log.info("target_bucket=%s" % target_bucket)
 
@@ -991,7 +991,7 @@ class ToggleLogging(BucketActionBase):
                     BucketLoggingStatus={
                         'LoggingEnabled': {
                             'TargetBucket': self.data.get('target_bucket'),
-                            'TargetPrefix': target_prefix }})
+                            'TargetPrefix': target_prefix}})
                 continue
             if not enabled and r['Logging']['Status'] == 'Enabled':
                 client.put_bucket_logging(
@@ -1000,7 +1000,7 @@ class ToggleLogging(BucketActionBase):
                 continue
 
     def expand_variables(self, variables):
-        """expand variables 
+        """expand variables
         """
         data = variables['data'].copy()
         # log.info("variables %s" % variables)
@@ -1011,12 +1011,12 @@ class ToggleLogging(BucketActionBase):
             data['target_prefix'] = target_prefix.format(**variables)
         return data
 
-
-
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
-supports attachment via lambda bucket notification or sns notification to invoke lambda. a special topic value of `default` will utilize an extant notification or create one matching the bucket name.  
+       supports attachment via lambda bucket notification or sns notification 
+       to invoke lambda. a special topic value of `default` will utilize an 
+       extant notification or create one matching the bucket name.
     :example:
 
         .. code-block: yaml
