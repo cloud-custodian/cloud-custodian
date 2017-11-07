@@ -1118,6 +1118,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 class EncryptionRequiredPolicy(BucketActionBase):
     """Action to apply an encryption policy to S3 buckets
 
+
     :example:
 
         .. code-block: yaml
