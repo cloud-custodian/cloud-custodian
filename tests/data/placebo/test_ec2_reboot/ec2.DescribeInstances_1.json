@@ -1,0 +1,387 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "enabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "Platform": "windows", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 9, 
+                            "second": 57, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 14, 
+                            "minute": 29
+                        }, 
+                        "PrivateIpAddress": "11.128.120.75", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-sdfsdfsdfsdf", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-011212121212112", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-dae4b4a1", 
+                        "PrivateDnsName": "ip-11-128-120-75.somewhere.com", 
+                        "KeyName": "operations", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "Internal", 
+                                "GroupId": "sg-sdfsdfsdf"
+                            }, 
+                            {
+                                "GroupName": "AWS External", 
+                                "GroupId": "sg-sfdsdfsdfsdf"
+                            }, 
+                            {
+                                "GroupName": "Internal-SG-Access", 
+                                "GroupId": "sg-sdfsdfsf"
+                            }, 
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-sdfsdfsf"
+                            }
+                        ], 
+                        "ClientToken": "d533c9c5-da4e-4a09-82e0-47aed7d6b5c1_subnet-sdfsdfsdfsd", 
+                        "SubnetId": "subnet-dsfsdfsfdsdfsdf", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0e:cb:2f:a9:12:10", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-dfgdfgdfgdfg", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-dsfsdfsfsf", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "11.128.120.75"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-sdfsdfsfsdf", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-dsfsfsf", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 9, 
+                                        "second": 57, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 14, 
+                                        "minute": 29
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "Internal", 
+                                        "GroupId": "sg-sdfsdfsfdsdfs"
+                                    }, 
+                                    {
+                                        "GroupName": "AWS External", 
+                                        "GroupId": "sg-sdfssdfsfsdfs"
+                                    }, 
+                                    {
+                                        "GroupName": "Internal-SG-Access", 
+                                        "GroupId": "sg-sdfsdfsdfsf"
+                                    }, 
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-sdfsdfsfsdf"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "OwnerId": "123456789000", 
+                                "PrivateIpAddress": "11.128.120.75"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1c"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/sda1", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-sgjkjslkjsdlfjls", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 9, 
+                                        "second": 58, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 14, 
+                                        "minute": 29
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "IamInstanceProfile": {
+                            "Id": "ADFSFSDFSDFSDFSDFSDFSDF", 
+                            "Arn": "arn:aws:iam::123456789000:instance-profile/CommandRole"
+                        }, 
+                        "RootDeviceName": "/dev/sda1", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "Nodes used to execute event triggered SSM commands", 
+                                "Key": "Resource Purpose"
+                            }, 
+                            {
+                                "Value": "NULL", 
+                                "Key": "Application"
+                            }, 
+                            {
+                                "Value": "PRD", 
+                                "Key": "Environment"
+                            }, 
+                            {
+                                "Value": "SSM-Executer-Nodes", 
+                                "Key": "Name"
+                            }, 
+                            {
+                                "Value": "NULL", 
+                                "Key": "Project"
+                            }, 
+                            {
+                                "Value": "TRUE", 
+                                "Key": "Testing"
+                            }, 
+                            {
+                                "Value": "SSM-Nodes-ASG", 
+                                "Key": "aws:autoscaling:groupName"
+                            }, 
+                            {
+                                "Value": "DAILY", 
+                                "Key": "Backup"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ], 
+                "ReservationId": "r-234234235242342", 
+                "RequesterId": "226008221399", 
+                "Groups": [], 
+                "OwnerId": "123456789000"
+            },  
+            {
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "enabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "Platform": "windows", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 9, 
+                            "second": 57, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 14, 
+                            "minute": 29
+                        }, 
+                        "PrivateIpAddress": "11.128.120.50", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-dsfsfdsfd", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-011313131313113", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-sdfsdfsdf", 
+                        "PrivateDnsName": "ip-11-128-120-50.somewhere.com", 
+                        "KeyName": "operations", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "Internal", 
+                                "GroupId": "sg-dfgdfgdgdg"
+                            }, 
+                            {
+                                "GroupName": "AWS External", 
+                                "GroupId": "sg-dfgfdgdg"
+                            }, 
+                            {
+                                "GroupName": "Internal-SG-Access", 
+                                "GroupId": "sg-sdfsdff"
+                            }, 
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-sdfsdf"
+                            }
+                        ], 
+                        "ClientToken": "sdfsdf-da4e-4a09-82e0-47aed7d6b5c1_subnet-sdfsdfsdfsdf", 
+                        "SubnetId": "subnet-0a9e357c", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0a:35:41:ff:a2:11", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-sdfsdfsdfd", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-sdfsdfsdfs", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "11.128.120.50"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-fsdfsdfsfsfs", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-sdfsdfsdfsf", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 9, 
+                                        "second": 57, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 14, 
+                                        "minute": 29
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "Internal", 
+                                        "GroupId": "sg-sdfsdfsdfsfdsdf"
+                                    }, 
+                                    {
+                                        "GroupName": "AWS External", 
+                                        "GroupId": "sg-sdfsdfsdfsfsd"
+                                    }, 
+                                    {
+                                        "GroupName": "Internal-SG-Access", 
+                                        "GroupId": "sg-sdfsdfsdfsdf"
+                                    }, 
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-sdfsdfsdfsdf"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "OwnerId": "1234567890000", 
+                                "PrivateIpAddress": "11.128.120.50"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1b"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/sda1", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-sdfsdgfsdfsdf", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 9, 
+                                        "second": 58, 
+                                        "microsecond": 0, 
+                                        "year": 2017, 
+                                        "day": 14, 
+                                        "minute": 29
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "IamInstanceProfile": {
+                            "Id": "ASDASDASDASDADASDS", 
+                            "Arn": "arn:aws:iam::123456789000:instance-profile/CommandRole"
+                        }, 
+                        "RootDeviceName": "/dev/sda1", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "NULL", 
+                                "Key": "Application"
+                            }, 
+                            {
+                                "Value": "NULL", 
+                                "Key": "Project"
+                            }, 
+                            {
+                                "Value": "stateful", 
+                                "Key": "LoadType"
+                            }, 
+                            {
+                                "Value": "SSM-Nodes-ASG", 
+                                "Key": "aws:autoscaling:groupName"
+                            }, 
+                            {
+                                "Value": "PRD", 
+                                "Key": "Environment"
+                            }, 
+                            {
+                                "Value": "TRUE", 
+                                "Key": "Testing"
+                            }, 
+                            {
+                                "Value": "DAILY", 
+                                "Key": "Backup"
+                            }, 
+                            {
+                                "Value": "Nodes used to execute event triggered SSM commands", 
+                                "Key": "Resource Purpose"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ], 
+                "ReservationId": "r-sdfsdfsdfsdf", 
+                "RequesterId": "226008221399", 
+                "Groups": [], 
+                "OwnerId": "123456789000"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "sdfsdfsfsdf-2eef-47fb-bfd6-83e8fd96eb72", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 07 Nov 2017 16:44:15 GMT"
+            }
+        }
+    }
+}
