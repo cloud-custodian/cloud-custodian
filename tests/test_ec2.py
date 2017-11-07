@@ -560,7 +560,9 @@ class TestStart(BaseTest):
             try:
                 resources = policy.run()
             except RuntimeError as e:
-                self.fail("raised error", e)
+                pass
+            else:
+                self.fail("should have raised error")
 
         log_output = output.getvalue()
         self.assertIn('Could not start 1 of 1 instances', log_output)
