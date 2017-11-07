@@ -839,7 +839,7 @@ class Stop(BaseAction, StateTransitionFilter):
 
 
 @actions.register('reboot')
-class Start(BaseAction, StateTransitionFilter):
+class Reboot(BaseAction, StateTransitionFilter):
     """reboots a previously running EC2 instance.
 
     :Example:
