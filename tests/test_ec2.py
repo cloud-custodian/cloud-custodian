@@ -496,7 +496,7 @@ class TestStop(BaseTest):
 class TestReboot(BaseTest):
 
     def test_ec2_reboot(self):
-        session_factory = self.replay_flight_data(
+        session_factory = self.record_flight_data(
             'test_ec2_reboot')
         policy = self.load_policy({
             'name': 'ec2-test-reboot',
@@ -507,11 +507,27 @@ class TestReboot(BaseTest):
                 {'type': 'reboot'}]},
             session_factory=session_factory)
         resources = policy.run()
-        session = session_factory()
-        client = session.client('ec2')
-        results = client.describe_instance_status()
-        ### then validate the contents of result to find that you got what you were looking for
+        self.assertEqual(len(resources), 1)
+        running = []
+        for i in resources:
+            if i['State']['Name'] == 'running':
+                running.append(i['InstanceId'])
+        if self.recording:
+            time.sleep(15)  
+        instances = utils.query_instances(
+            session_factory(),
+            InstanceIds=[r['InstanceId'] for r in resources])
 
+        cur_rebooting = []
+        for i in instances:
+            if i['State']['Name'] == 'rebooting':
+                cur_rebooting.append(i['InstanceId'])
+
+        cur_rebooting.sort()
+        running.sort()
+
+        self.assertEqual(cur_rebooting, running)
+   
 
 class TestStart(BaseTest):
 
