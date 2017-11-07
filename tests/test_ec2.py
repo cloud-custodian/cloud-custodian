@@ -508,7 +508,7 @@ class TestReboot(BaseTest):
                 {'type': 'reboot'}]},
             session_factory=session_factory)
         resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         running = []
         for i in resources:
             if i['State']['Name'] == 'running':
