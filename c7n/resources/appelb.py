@@ -23,7 +23,8 @@ import logging
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase,
+    MetricsFilter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -136,6 +137,23 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
 
 filters.register('shield-enabled', IsShieldProtected)
 actions.register('set-shield', SetShieldProtection)
+
+
+@filters.register('metrics')
+class AppElbMetrics(MetricsFilter):
+    """Filter app load balancer by metric values.
+
+    See available metrics here: https://goo.gl/TLQ9Fr
+    Custodian defaults to specifying dimensions for the app elb only.
+    Target Group dimension not supported atm.
+    """
+
+    def get_dimensions(self, resource):
+        return [{
+            'Name': self.model.dimension,
+            'Value': 'app/%s/%s' % (
+                resource[self.model.name],
+                resource[self.model.id].rsplit('/')[-1])}]
 
 
 @filters.register('security-group')

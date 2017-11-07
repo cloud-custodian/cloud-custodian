@@ -317,7 +317,7 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
         'stacktrace': data}
 
 
-def get_function(session_factory, name, handler, role,
+def get_function(session_factory, name, handler, runtime, role,
                  log_groups,
                  project, account_name, account_id,
                  sentry_dsn,
@@ -333,7 +333,7 @@ def get_function(session_factory, name, handler, role,
     config = dict(
         name=name,
         handler=handler,
-        runtime='python2.7',
+        runtime=runtime,
         memory_size=512,
         timeout=15,
         role=role,
@@ -462,6 +462,7 @@ def deploy_one(region_name, account, policy, sentry_dsn):
         session_factory=session_factory,
         name='cloud-custodian-sentry',
         handler='handler.process_log_event',
+        runtime=account.get('runtime', 'python2.7'),
         role=account['role'],
         log_groups=[{'logGroupName': log_group_name, 'arn': arn}],
         project=None,
@@ -479,7 +480,8 @@ def setup_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', default=False, action="store_true")
-    subs = parser.add_subparsers()
+    subs = parser.add_subparsers(dest='command')
+    subs.required = True
 
     cmd_orgreplay = subs.add_parser('orgreplay')
     common_parser(cmd_orgreplay)

@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import functools
 import json
 import os
@@ -23,6 +24,7 @@ import time  # NOQA needed for some recordings
 from unittest import TestCase
 
 from botocore.exceptions import ClientError
+from dateutil.tz import tzutc
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
@@ -662,6 +664,39 @@ class S3ConfigSource(ConfigTest):
                      }
                  ]}
              })
+
+
+    def test_load_item_resource_config_event(self):
+        event = event_data('s3-from-rule.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource,
+            {u'Acl': {
+                u'Grants': [{
+                    u'Grantee': {
+                        u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
+                        u'Type': u'CanonicalUser'},
+                        u'Permission': u'FULL_CONTROL'}],
+                u'Owner': {u'DisplayName': u'mandeep.bal',
+                           u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}},
+             u'CreationDate': datetime.datetime(2017, 9, 15, 2, 5, 40, tzinfo=tzutc()),
+             u'Lifecycle': None,
+             u'Location': None,
+             u'Logging': None,
+             u'Name': u'c7n-fire-logs',
+             u'Notification': {},
+             u'Policy': None,
+             u'Replication': None,
+             u'Tags': [],
+             u'Versioning': None,
+             u'Website': None})
 
 
 class S3Test(BaseTest):
@@ -1852,3 +1887,159 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_delete_bucket_notification(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_delete_bucket_notification')
+        bname = 'custodian-delete-bucket-notification-test'
+        config_id = 'c7n-notify-1'
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket-notification',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'bucket-notification',
+                 'kind': 'sns',
+                 'key': 'Id',
+                 'value': config_id,
+                 'op': 'eq'}
+            ],
+            'actions': [{'type': 'delete-bucket-notification',
+                         'statement_ids': 'matched'}]
+            }, session_factory=session_factory)
+
+        topic_arn = session.client('sns').create_topic(Name='bucket-notification-test')['TopicArn']
+        self.addCleanup(session.client('sns').delete_topic, TopicArn=topic_arn)
+        topic_policy = {
+            'Statement': [{
+                'Action': 'SNS:Publish',
+                'Effect': 'Allow',
+                'Resource': topic_arn,
+                'Principal': {'Service': 's3.amazonaws.com'}}]}
+        session.client('sns').set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName='Policy',
+            AttributeValue=json.dumps(topic_policy))
+        client.put_bucket_notification_configuration(
+            Bucket=bname,
+            NotificationConfiguration={
+                'TopicConfigurations': [
+                    {'TopicArn': topic_arn, 'Events': ['s3:ObjectCreated:*'], 'Id': config_id},
+                     {'TopicArn': topic_arn, 'Events': ['s3:ObjectRemoved:*'], 'Id': 'another1'}
+                ]
+            })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        topic_notifications = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        us = [t for t in topic_notifications if t.get('TopicArn') == topic_arn]
+        self.assertEqual(len(us), 1)
+
+
+class S3LifecycleTest(BaseTest):
+
+    def test_lifecycle(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3, 'S3_AUGMENT_TABLE',
+            [('get_bucket_lifecycle_configuration', 'Lifecycle', None, None)])
+        session_factory = self.replay_flight_data('test_s3_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-lifecycle-test'
+
+        # Make a bucket
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        def get_policy(**kwargs):
+            rule = {
+                'Status': 'Enabled',
+                'Prefix': 'foo/',
+                'Transitions': [{
+                    'Days': 60,
+                    'StorageClass': 'GLACIER',
+                }],
+            }
+            rule.update(**kwargs)
+
+            policy = {
+                'name': 's3-lifecycle',
+                'resource': 's3',
+                'filters': [{'Name': bname}],
+                'actions': [{
+                    'type': 'configure-lifecycle',
+                    'rules': [rule],
+                }]
+            }
+            return policy
+
+        def run_policy(policy):
+            p = self.load_policy(policy, session_factory=session_factory)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+            if self.recording:
+                time.sleep(5)
+
+        #
+        # Add the first lifecycle
+        #
+        lifecycle_id1 = 'test-lifecycle'
+        policy = get_policy(ID=lifecycle_id1)
+        run_policy(policy)
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
+
+        #
+        # Now add another lifecycle rule to ensure it doesn't clobber the first one
+        #
+        lifecycle_id2 = 'test-lifecycle-two'
+        policy = get_policy(ID=lifecycle_id2, Prefix='bar/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        #
+        # Next, overwrite one of the lifecycles and make sure it changed
+        #
+        policy = get_policy(ID=lifecycle_id2, Prefix='baz/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        for rule in lifecycle['Rules']:
+            if rule['ID'] == lifecycle_id2:
+                self.assertEqual(rule['Prefix'], 'baz/')
+
+        #
+        # Test deleting a lifecycle
+        #
+        policy = get_policy(ID=lifecycle_id1, Status='absent')
+        run_policy(policy)
+
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 1)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id2)
