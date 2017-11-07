@@ -25,56 +25,56 @@
                             "day": 14, 
                             "minute": 29
                         }, 
-                        "PrivateIpAddress": "10.128.130.75", 
+                        "PrivateIpAddress": "11.128.120.75", 
                         "ProductCodes": [], 
-                        "VpcId": "vpc-d5e582b1", 
+                        "VpcId": "vpc-sdfsdfsdfsdf", 
                         "StateTransitionReason": "", 
                         "InstanceId": "i-04f46178ef34570d6", 
                         "EnaSupport": true, 
                         "ImageId": "ami-dae4b4a1", 
-                        "PrivateDnsName": "ip-10-128-130-75.us.aegon.com", 
-                        "KeyName": "cloud-operations", 
+                        "PrivateDnsName": "ip-11-128-120-75.somewhere.com", 
+                        "KeyName": "operations", 
                         "SecurityGroups": [
                             {
-                                "GroupName": "AGT Internal", 
-                                "GroupId": "sg-78f30901"
+                                "GroupName": "Internal", 
+                                "GroupId": "sg-sdfsdfsdf"
                             }, 
                             {
-                                "GroupName": "AGT - AWS External", 
-                                "GroupId": "sg-0d2b4776"
+                                "GroupName": "AWS External", 
+                                "GroupId": "sg-sfdsdfsdfsdf"
                             }, 
                             {
-                                "GroupName": "AGT-Internal-SG-Access", 
-                                "GroupId": "sg-a6dae9df"
+                                "GroupName": "Internal-SG-Access", 
+                                "GroupId": "sg-sdfsdfsf"
                             }, 
                             {
                                 "GroupName": "default", 
-                                "GroupId": "sg-af817bd6"
+                                "GroupId": "sg-sdfsdfsf"
                             }
                         ], 
-                        "ClientToken": "d533c9c5-da4e-4a09-82e0-47aed7d6b5c1_subnet-08a86550_1", 
-                        "SubnetId": "subnet-08a86550", 
+                        "ClientToken": "d533c9c5-da4e-4a09-82e0-47aed7d6b5c1_subnet-sdfsdfsdfsd", 
+                        "SubnetId": "subnet-dsfsdfsfdsdfsdf", 
                         "InstanceType": "t2.micro", 
                         "NetworkInterfaces": [
                             {
                                 "Status": "in-use", 
-                                "MacAddress": "0e:cb:2f:a9:1a:30", 
+                                "MacAddress": "0e:cb:2f:a9:12:10", 
                                 "SourceDestCheck": true, 
-                                "VpcId": "vpc-d5e582b1", 
+                                "VpcId": "vpc-dfgdfgdfgdfg", 
                                 "Description": "", 
-                                "NetworkInterfaceId": "eni-e2c3354f", 
+                                "NetworkInterfaceId": "eni-dsfsdfsfsf", 
                                 "PrivateIpAddresses": [
                                     {
                                         "Primary": true, 
-                                        "PrivateIpAddress": "10.128.130.75"
+                                        "PrivateIpAddress": "11.128.120.75"
                                     }
                                 ], 
-                                "SubnetId": "subnet-08a86550", 
+                                "SubnetId": "subnet-sdfsdfsfsdf", 
                                 "Attachment": {
                                     "Status": "attached", 
                                     "DeviceIndex": 0, 
                                     "DeleteOnTermination": true, 
-                                    "AttachmentId": "eni-attach-cbfe100b", 
+                                    "AttachmentId": "eni-attach-dsfsfsf", 
                                     "AttachTime": {
                                         "hour": 20, 
                                         "__class__": "datetime", 
@@ -88,25 +88,25 @@
                                 }, 
                                 "Groups": [
                                     {
-                                        "GroupName": "AGT Internal", 
-                                        "GroupId": "sg-78f30901"
+                                        "GroupName": "Internal", 
+                                        "GroupId": "sg-sdfsdfsfdsdfs"
                                     }, 
                                     {
-                                        "GroupName": "AGT - AWS External", 
-                                        "GroupId": "sg-0d2b4776"
+                                        "GroupName": "AWS External", 
+                                        "GroupId": "sg-sdfssdfsfsdfs"
                                     }, 
                                     {
-                                        "GroupName": "AGT-Internal-SG-Access", 
-                                        "GroupId": "sg-a6dae9df"
+                                        "GroupName": "Internal-SG-Access", 
+                                        "GroupId": "sg-sdfsdfsdfsf"
                                     }, 
                                     {
                                         "GroupName": "default", 
-                                        "GroupId": "sg-af817bd6"
+                                        "GroupId": "sg-sdfsdfsfsdf"
                                     }
                                 ], 
                                 "Ipv6Addresses": [], 
-                                "OwnerId": "969859503720", 
-                                "PrivateIpAddress": "10.128.130.75"
+                                "OwnerId": "123456789000", 
+                                "PrivateIpAddress": "11.128.120.75"
                             }
                         ], 
                         "SourceDestCheck": true, 
@@ -122,7 +122,7 @@
                                 "Ebs": {
                                     "Status": "attached", 
                                     "DeleteOnTermination": true, 
-                                    "VolumeId": "vol-076e0da9cb4c994a2", 
+                                    "VolumeId": "vol-sgjkjslkjsdlfjls", 
                                     "AttachTime": {
                                         "hour": 20, 
                                         "__class__": "datetime", 
@@ -139,8 +139,8 @@
                         "Architecture": "x86_64", 
                         "RootDeviceType": "ebs", 
                         "IamInstanceProfile": {
-                            "Id": "AIPAIQ2IVMBADZWTGZIJ2", 
-                            "Arn": "arn:aws:iam::969859503720:instance-profile/CommandRole"
+                            "Id": "ADFSFSDFSDFSDFSDFSDFSDF", 
+                            "Arn": "arn:aws:iam::123456789000:instance-profile/CommandRole"
                         }, 
                         "RootDeviceName": "/dev/sda1", 
                         "VirtualizationType": "hvm", 
@@ -158,7 +158,7 @@
                                 "Key": "Environment"
                             }, 
                             {
-                                "Value": "AGT-SSM-Executer-Nodes", 
+                                "Value": "SSM-Executer-Nodes", 
                                 "Key": "Name"
                             }, 
                             {
@@ -174,18 +174,6 @@
                                 "Key": "aws:autoscaling:groupName"
                             }, 
                             {
-                                "Value": "AGT", 
-                                "Key": "Billing Cost Center"
-                            }, 
-                            {
-                                "Value": "stateful", 
-                                "Key": "LoadType"
-                            }, 
-                            {
-                                "Value": "JAMISON.T.ROBERTS@TRANSAMERICA.COM", 
-                                "Key": "Resource Contact"
-                            }, 
-                            {
                                 "Value": "DAILY", 
                                 "Key": "Backup"
                             }
@@ -193,10 +181,10 @@
                         "AmiLaunchIndex": 0
                     }
                 ], 
-                "ReservationId": "r-05617413543014a36", 
+                "ReservationId": "r-234234235242342", 
                 "RequesterId": "226008221399", 
                 "Groups": [], 
-                "OwnerId": "969859503720"
+                "OwnerId": "123456789000"
             },  
             {
                 "Instances": [
@@ -221,56 +209,56 @@
                             "day": 14, 
                             "minute": 29
                         }, 
-                        "PrivateIpAddress": "10.128.129.50", 
+                        "PrivateIpAddress": "11.128.120.50", 
                         "ProductCodes": [], 
-                        "VpcId": "vpc-d5e582b1", 
+                        "VpcId": "vpc-dsfsfdsfd", 
                         "StateTransitionReason": "", 
                         "InstanceId": "i-06fc46118cfdb40bb", 
                         "EnaSupport": true, 
-                        "ImageId": "ami-dae4b4a1", 
-                        "PrivateDnsName": "ip-10-128-129-50.us.aegon.com", 
-                        "KeyName": "cloud-operations", 
+                        "ImageId": "ami-sdfsdfsdf", 
+                        "PrivateDnsName": "ip-11-128-120-50.somewhere.com", 
+                        "KeyName": "operations", 
                         "SecurityGroups": [
                             {
-                                "GroupName": "AGT Internal", 
-                                "GroupId": "sg-78f30901"
+                                "GroupName": "Internal", 
+                                "GroupId": "sg-dfgdfgdgdg"
                             }, 
                             {
-                                "GroupName": "AGT - AWS External", 
-                                "GroupId": "sg-0d2b4776"
+                                "GroupName": "AWS External", 
+                                "GroupId": "sg-dfgfdgdg"
                             }, 
                             {
-                                "GroupName": "AGT-Internal-SG-Access", 
-                                "GroupId": "sg-a6dae9df"
+                                "GroupName": "Internal-SG-Access", 
+                                "GroupId": "sg-sdfsdff"
                             }, 
                             {
                                 "GroupName": "default", 
-                                "GroupId": "sg-af817bd6"
+                                "GroupId": "sg-sdfsdf"
                             }
                         ], 
-                        "ClientToken": "d533c9c5-da4e-4a09-82e0-47aed7d6b5c1_subnet-0a9e357c_1", 
+                        "ClientToken": "sdfsdf-da4e-4a09-82e0-47aed7d6b5c1_subnet-sdfsdfsdfsdf", 
                         "SubnetId": "subnet-0a9e357c", 
                         "InstanceType": "t2.micro", 
                         "NetworkInterfaces": [
                             {
                                 "Status": "in-use", 
-                                "MacAddress": "0a:35:41:ff:aa:94", 
+                                "MacAddress": "0a:35:41:ff:a2:11", 
                                 "SourceDestCheck": true, 
-                                "VpcId": "vpc-d5e582b1", 
+                                "VpcId": "vpc-sdfsdfsdfd", 
                                 "Description": "", 
-                                "NetworkInterfaceId": "eni-87f6a638", 
+                                "NetworkInterfaceId": "eni-sdfsdfsdfs", 
                                 "PrivateIpAddresses": [
                                     {
                                         "Primary": true, 
-                                        "PrivateIpAddress": "10.128.129.50"
+                                        "PrivateIpAddress": "11.128.120.50"
                                     }
                                 ], 
-                                "SubnetId": "subnet-0a9e357c", 
+                                "SubnetId": "subnet-fsdfsdfsfsfs", 
                                 "Attachment": {
                                     "Status": "attached", 
                                     "DeviceIndex": 0, 
                                     "DeleteOnTermination": true, 
-                                    "AttachmentId": "eni-attach-54bbfeb2", 
+                                    "AttachmentId": "eni-attach-sdfsdfsdfsf", 
                                     "AttachTime": {
                                         "hour": 20, 
                                         "__class__": "datetime", 
@@ -284,25 +272,25 @@
                                 }, 
                                 "Groups": [
                                     {
-                                        "GroupName": "AGT Internal", 
-                                        "GroupId": "sg-78f30901"
+                                        "GroupName": "Internal", 
+                                        "GroupId": "sg-sdfsdfsdfsfdsdf"
                                     }, 
                                     {
-                                        "GroupName": "AGT - AWS External", 
-                                        "GroupId": "sg-0d2b4776"
+                                        "GroupName": "AWS External", 
+                                        "GroupId": "sg-sdfsdfsdfsfsd"
                                     }, 
                                     {
-                                        "GroupName": "AGT-Internal-SG-Access", 
-                                        "GroupId": "sg-a6dae9df"
+                                        "GroupName": "Internal-SG-Access", 
+                                        "GroupId": "sg-sdfsdfsdfsdf"
                                     }, 
                                     {
                                         "GroupName": "default", 
-                                        "GroupId": "sg-af817bd6"
+                                        "GroupId": "sg-sdfsdfsdfsdf"
                                     }
                                 ], 
                                 "Ipv6Addresses": [], 
-                                "OwnerId": "969859503720", 
-                                "PrivateIpAddress": "10.128.129.50"
+                                "OwnerId": "1234567890000", 
+                                "PrivateIpAddress": "11.128.120.50"
                             }
                         ], 
                         "SourceDestCheck": true, 
@@ -318,7 +306,7 @@
                                 "Ebs": {
                                     "Status": "attached", 
                                     "DeleteOnTermination": true, 
-                                    "VolumeId": "vol-0f5a657e5c2c89f9c", 
+                                    "VolumeId": "vol-sdfsdgfsdfsdf", 
                                     "AttachTime": {
                                         "hour": 20, 
                                         "__class__": "datetime", 
@@ -335,8 +323,8 @@
                         "Architecture": "x86_64", 
                         "RootDeviceType": "ebs", 
                         "IamInstanceProfile": {
-                            "Id": "AIPAIQ2IVMBADZWTGZIJ2", 
-                            "Arn": "arn:aws:iam::969859503720:instance-profile/CommandRole"
+                            "Id": "ASDASDASDASDADASDS", 
+                            "Arn": "arn:aws:iam::123456789000:instance-profile/CommandRole"
                         }, 
                         "RootDeviceName": "/dev/sda1", 
                         "VirtualizationType": "hvm", 
@@ -370,18 +358,6 @@
                                 "Key": "Backup"
                             }, 
                             {
-                                "Value": "AGT", 
-                                "Key": "Billing Cost Center"
-                            }, 
-                            {
-                                "Value": "AGT-SSM-Executer-Nodes", 
-                                "Key": "Name"
-                            }, 
-                            {
-                                "Value": "JAMISON.T.ROBERTS@TRANSAMERICA.COM", 
-                                "Key": "Resource Contact"
-                            }, 
-                            {
                                 "Value": "Nodes used to execute event triggered SSM commands", 
                                 "Key": "Resource Purpose"
                             }
@@ -389,16 +365,16 @@
                         "AmiLaunchIndex": 0
                     }
                 ], 
-                "ReservationId": "r-09c33f752b7801e2a", 
+                "ReservationId": "r-sdfsdfsdfsdf", 
                 "RequesterId": "226008221399", 
                 "Groups": [], 
-                "OwnerId": "969859503720"
+                "OwnerId": "123456789000"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "db756eee-2eef-47fb-bfd6-83e8fd96eb72", 
+            "RequestId": "sdfsdfsfsdf-2eef-47fb-bfd6-83e8fd96eb72", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
