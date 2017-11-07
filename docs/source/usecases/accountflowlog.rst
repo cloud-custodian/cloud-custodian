@@ -1,7 +1,7 @@
 .. _accountaccountflowlog:
 
 Account - Flow Log Configuration Check
-=======================
+======================================
 
 The following example policy will find any flow log in your region that is not
 properly configured and notify a group via email.
