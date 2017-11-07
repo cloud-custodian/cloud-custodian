@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CustodianTest\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::custodian-test-data/*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"true\"}}}]}",
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "HostId": "1Rq9CYkzRw13z+nNcPXScbwhIwws5pStt1y23ja/ezc1EzMXgLnyURepJV2PFyBGoOM/QYId5yw=",
+            "RequestId": "476030C476C830D0"
+        }
+    }
+}

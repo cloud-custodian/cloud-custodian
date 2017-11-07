@@ -39,6 +39,7 @@ Actions:
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import copy
 import functools
 import json
 import itertools
@@ -67,7 +68,8 @@ from c7n.manager import resources
 from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
-    chunks, local_session, set_annotation, type_schema, dumps)
+    chunks, local_session, set_annotation, type_schema,
+    dumps, format_string_values)
 
 
 log = logging.getLogger('custodian.s3')
@@ -670,6 +672,14 @@ class BucketActionBase(BaseAction):
     def get_permissions(self):
         return self.permissions
 
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+            'bucket_region': get_region(bucket)
+        }
+
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {}
@@ -918,6 +928,87 @@ class NoOp(BucketActionBase):
 
     def process(self, buckets):
         return None
+
+
+@actions.register('set-statements')
+class SetPolicyStatement(BucketActionBase):
+    """Action to add or update policy statements to S3 buckets
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: force-s3-https
+                resource: s3
+                actions:
+                  - type: set-statements
+                    statements:
+                      - Sid: "DenyHttp"
+                        Effect: "Deny"
+                        Action: "s3:GetObject"
+                        Principal:
+                          AWS: "*"
+                        Resource: "arn:aws:s3:::{bucket_name}/*"
+                        Condition:
+                          Bool:
+                            "aws:SecureTransport": false
+    """
+
+    permissions = ('s3:PutBucketPolicy',)
+
+    schema = type_schema(
+        'set-statements',
+        **{
+            'statements': {
+                'type': 'array',
+                'required': True,
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'Sid': {'type': 'string'},
+                        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                        'Principal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Condition': {'type': 'object'}
+                    },
+                    'required': ['Sid', 'Effect'],
+                    'oneOf': [
+                        {'required': ['Action', 'Resource']},
+                        {'required': ['NotAction', 'Resource']},
+                        {'required': ['Action', 'NotResource']},
+                        {'required': ['NotAction', 'NotResource']}
+                    ]
+                }
+            }
+        }
+    )
+
+    def process_bucket(self, bucket):
+        policy = bucket.get('Policy', '{}')
+
+        fmtargs = self.get_std_format_args(bucket)
+
+        policy = json.loads(policy)
+        current = {s['Sid']: s for s in policy.get('Statement', [])}
+        new = copy.deepcopy(current)
+        additional = {s['Sid']: s for s in self.data.get('statements', [])}
+        additional = format_string_values(additional, **fmtargs)
+        new.update(additional)
+        if new == current:
+            return
+
+        statements = list(new.values())
+        policy['Statement'] = statements
+        policy = json.dumps(policy)
+
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
+        return {'Name': bucket['Name'], 'Policy': policy}
 
 
 @actions.register('remove-statements')

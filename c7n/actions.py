@@ -464,13 +464,12 @@ class Notify(EventAction):
         return p
 
     def process(self, resources, event=None):
-        aliases = self.manager.session_factory().client(
-            'iam').list_account_aliases().get('AccountAliases', ())
-        account_name = aliases and aliases[0] or ''
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
-            'account': account_name,
+            'account': alias,
             'region': self.manager.config.region,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
