@@ -841,15 +841,18 @@ class Stop(BaseAction, StateTransitionFilter):
 @actions.register('reboot')
 class Reboot(BaseAction, StateTransitionFilter):
     """Reboots a running EC2 instance.
+
     :Example:
+
     .. code-block: yaml
         policies:
-          - name: ec2-reboot-instances
-            resource: ec2
-            query:
-              - instance-state-name: running
-            actions:
-              - reboot
+        - name: ec2-reboot-instances
+          resource: ec2
+          query:
+            - instance-state-name: running
+          actions:
+            - reboot
+
     http://docs.aws.amazon.com/cli/latest/reference/ec2/reboot-instances.html
     """
 
