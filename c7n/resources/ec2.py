@@ -644,7 +644,7 @@ class Start(BaseAction, StateTransitionFilter):
     batch_size = 10
     exception = None
 
-        def process(self, instances):
+    def process(self, instances):
         if not len(instances):
             return
 
