@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "MaxKeys": 1000,
+        "Prefix": "",
+        "Name": "c7n-delete-bucket-notification-test",
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HostId": "J63DJ0U9QJjYTxqZ6014OJdOLaNMb7hLJKueDJKX5mbUGGMyGXkx9p5xRJgrA9VH",
+            "RequestId": "86F7B21E3B1EAE5B",
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1",
+                "x-amz-id-2": "J63DJ0U9QJjYTxqZ6014OJdOLaNMb7hLJKueDJKX5mbUGGMyGXkx9p5xRJgrA9VH",
+                "server": "AmazonS3",
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "86F7B21E3B1EAE5B",
+                "date": "Fri, 15 Sep 2017 20:06:08 GMT",
+                "content-type": "application/xml"
+            }
+        },
+        "Marker": "",
+        "EncodingType": "url",
+        "IsTruncated": false
+    }
+}

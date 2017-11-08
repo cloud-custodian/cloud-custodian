@@ -54,6 +54,7 @@ from botocore.client import Config
 from botocore.exceptions import ClientError
 from botocore.vendored.requests.exceptions import SSLError
 
+from collections import defaultdict
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
@@ -669,6 +670,19 @@ class BucketActionBase(BaseAction):
     def get_permissions(self):
         return self.permissions
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
 
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
@@ -802,6 +816,98 @@ class MissingPolicyStatementFilter(Filter):
         if not required:
             return False
         return True
+
+
+@filters.register('bucket-notification')
+class BucketNotificationFilter(ValueFilter):
+    """Filter based on bucket notification configuration.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: delete-incorrect-notification
+                resource: s3
+                filters:
+                  - type: bucket-notification
+                    kind: lambda
+                    key: Id
+                    value: "IncorrectLambda"
+                    op: eq
+                actions:
+                  - type: delete-bucket-notification
+                    statement_ids: matched
+    """
+
+    schema = type_schema(
+        'bucket-notification',
+        required=['kind'],
+        kind={'type': 'string', 'enum': ['lambda', 'sns', 'sqs']},
+        rinherit=ValueFilter.schema)
+
+    annotation_key = 'c7n:MatchedNotificationConfigurationIds'
+
+    permissions = ('s3:GetBucketNotification',)
+
+    FIELDS = {
+        'lambda': 'LambdaFunctionConfigurations',
+        'sns': 'TopicConfigurations',
+        'sqs': 'QueueConfigurations'
+    }
+
+    def process(self, buckets, event=None):
+        return super(BucketNotificationFilter, self).process(buckets, event)
+
+    def __call__(self, bucket):
+
+        field = self.FIELDS[self.data['kind']]
+        found = False
+        for config in bucket.get('Notification', {}).get(field, []):
+            if self.match(config):
+                set_annotation(
+                    bucket,
+                    BucketNotificationFilter.annotation_key,
+                    config['Id'])
+                found = True
+        return found
+
+
+@actions.register('delete-bucket-notification')
+class DeleteBucketNotification(BucketActionBase):
+    """Action to delete S3 bucket notification configurations"""
+
+    schema = type_schema(
+        'delete-bucket-notification',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = ('s3:PutBucketNotification',)
+
+    def process_bucket(self, bucket):
+        n = bucket['Notification']
+        if not n:
+            return
+
+        statement_ids = self.data.get('statement_ids')
+        if statement_ids == 'matched':
+            statement_ids = bucket.get(BucketNotificationFilter.annotation_key, ())
+        if not statement_ids:
+            return
+
+        cfg = defaultdict(list)
+
+        for t in six.itervalues(BucketNotificationFilter.FIELDS):
+            for c in n.get(t, []):
+                if c['Id'] not in statement_ids:
+                    cfg[t].append(c)
+
+        client = bucket_client(local_session(self.manager.session_factory), bucket)
+        client.put_bucket_notification_configuration(
+            Bucket=bucket['Name'],
+            NotificationConfiguration=cfg)
 
 
 @actions.register('no-op')
