@@ -388,3 +388,53 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')
+
+    def test_asg_terminate(self):
+        factory = self.replay_flight_data('test_asg_terminate')
+        # an arbitrary filter, actions includes "tag" in which to save ASG state
+        p = self.load_policy({
+            'name': 'asg-terminate',
+            'resource': 'asg',
+            'filters': [
+                {'tag:CustodianUnitTest': 'not-null'}],
+            'actions': [
+                {'type': 'terminate',
+                 'tag': 'OffHoursPrevious'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we set ASG size to zero
+        self.assertEqual(result['MinSize'], 0)
+        self.assertEqual(result['DesiredCapacity'], 0)
+        tag_map = {t['Key']: t['Value'] for t in result['Tags']}
+        # test that we saved state to a tag
+        self.assertTrue('OffHoursPrevious' in tag_map)
+        self.assertEqual(tag_map['OffHoursPrevious'],
+            'DesiredCapacity=2;MinSize=2;MaxSize=2')
+
+    def test_asg_restore(self):
+        factory = self.replay_flight_data('test_asg_restore')
+        # OffHoursPrevious was the tag in which we saved ASG state
+        p = self.load_policy({
+            'name': 'asg-terminate',
+            'resource': 'asg',
+            'filters': [
+                {'tag:CustodianUnitTest': 'not-null'},
+                {'tag:OffHoursPrevious': 'not-null'}],
+            'actions': [
+                {'type': 'restore',
+                 'tag': 'OffHoursPrevious'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we set ASG min and desired to previous values (both 2)
+        self.assertEqual(result['MinSize'], 2)
+        self.assertEqual(result['DesiredCapacity'], 2)

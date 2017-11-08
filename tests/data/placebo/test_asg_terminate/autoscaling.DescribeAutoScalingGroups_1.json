@@ -1,0 +1,180 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:eu-central-1:123456789012:autoScalingGroup:3b48641c-0af8-4f11-8d5c-988f142c8db3:autoScalingGroupName/MyTestASG.00a94f57ab332ef182d71fff07",
+                "TargetGroupARNs": [],
+                "SuspendedProcesses": [],
+                "DesiredCapacity": 2,
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyTestASG.00a94f57ab332ef182d71fff07",
+                        "PropagateAtLaunch": false,
+                        "Value": "yep",
+                        "Key": "CustodianUnitTest"
+                    },
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyTestASG.00a94f57ab332ef182d71fff07",
+                        "PropagateAtLaunch": true,
+                        "Value": "MyTestASG",
+                        "Key": "Name"
+                    },
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyTestASG.00a94f57ab332ef182d71fff07",
+                        "PropagateAtLaunch": true,
+                        "Value": "Bar",
+                        "Key": "Foo"
+                    }
+                ],
+                "EnabledMetrics": [
+                    {
+                        "Metric": "GroupStandbyInstances",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupTerminatingInstances",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupTotalInstances",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupDesiredCapacity",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupMaxSize",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupInServiceInstances",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupPendingInstances",
+                        "Granularity": "1Minute"
+                    },
+                    {
+                        "Metric": "GroupMinSize",
+                        "Granularity": "1Minute"
+                    }
+                ],
+                "LoadBalancerNames": [],
+                "AutoScalingGroupName": "MyTestASG.00a94f57ab332ef182d71fff07",
+                "DefaultCooldown": 300,
+                "MinSize": 2,
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "eu-central-1a",
+                        "InstanceId": "i-08393e5ae8486a947",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "MyTestASG.00a94f57ab332ef182d71fff07"
+                    },
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "eu-central-1c",
+                        "InstanceId": "i-0b9c4103aa5a430f0",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "MyTestASG.00a94f57ab332ef182d71fff07"
+                    }
+                ],
+                "MaxSize": 2,
+                "VPCZoneIdentifier": "subnet-a19706c9,subnet-c510cabf,subnet-b2e7e1f8",
+                "HealthCheckGracePeriod": 300,
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "LaunchConfigurationName": "MyTestASG.00a94f57ab332ef182d71fff07",
+                "CreatedTime": {
+                    "hour": 14,
+                    "__class__": "datetime",
+                    "month": 10,
+                    "second": 44,
+                    "microsecond": 600000,
+                    "year": 2017,
+                    "day": 19,
+                    "minute": 39
+                },
+                "AvailabilityZones": [
+                    "eu-central-1a",
+                    "eu-central-1c",
+                    "eu-central-1b"
+                ],
+                "HealthCheckType": "EC2",
+                "NewInstancesProtectedFromScaleIn": false
+            },
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:eu-central-1:123456789012:autoScalingGroup:25fdacd5-ac23-4588-9962-86db6ba4a958:autoScalingGroupName/MyOtherASG.00154b4345c0ac51fdb08952b2",
+                "TargetGroupARNs": [],
+                "SuspendedProcesses": [],
+                "DesiredCapacity": 1,
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyOtherASG.00154b4345c0ac51fdb08952b2",
+                        "PropagateAtLaunch": true,
+                        "Value": "MyOtherASG",
+                        "Key": "Name"
+                    }
+                ],
+                "EnabledMetrics": [],
+                "LoadBalancerNames": [],
+                "AutoScalingGroupName": "MyOtherASG.00154b4345c0ac51fdb08952b2",
+                "DefaultCooldown": 300,
+                "MinSize": 1,
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "eu-central-1a",
+                        "InstanceId": "i-06e2180cc66e4d054",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService",
+                        "LaunchConfigurationName": "MyOtherASG.00154b4345c0ac51fdb08952b2"
+                    }
+                ],
+                "MaxSize": 1,
+                "VPCZoneIdentifier": "subnet-a19706c9",
+                "HealthCheckGracePeriod": 300,
+                "TerminationPolicies": [
+                    "OldestLaunchConfiguration"
+                ],
+                "LaunchConfigurationName": "MyOtherASG.00154b4345c0ac51fdb08952b2",
+                "CreatedTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 10,
+                    "second": 33,
+                    "microsecond": 25000,
+                    "year": 2017,
+                    "day": 16,
+                    "minute": 22
+                },
+                "AvailabilityZones": [
+                    "eu-central-1a"
+                ],
+                "HealthCheckType": "EC2",
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "0973901e-b4dd-11e7-96ca-79281f2d98db",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0973901e-b4dd-11e7-96ca-79281f2d98db",
+                "vary": "Accept-Encoding",
+                "content-length": "8422",
+                "content-type": "text/xml",
+                "date": "Thu, 19 Oct 2017 14:51:49 GMT"
+            }
+        }
+    }
+}
