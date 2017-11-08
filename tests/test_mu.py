@@ -552,21 +552,18 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('c7n/resources/s3.py' in filenames)
         self.assertTrue('c7n/ufuncs/s3crypt.py' in filenames)
 
-    def _install_namespace_py2(self, tmp_sitedir):
-        # Install our test namespace package using the *.pth hack.
+    def _install_namespace_package(self, tmp_sitedir):
+        # Install our test namespace package in such a way that both py27 and
+        # py36 can find it.
         from setuptools import namespaces
         installer = namespaces.Installer()
         class Distribution: namespace_packages = ['namespace_package']
         installer.distribution = Distribution()
-        installer.target = os.path.join(tmp_sitedir, 'test.pth')
+        installer.target = os.path.join(tmp_sitedir, 'namespace_package.pth')
         installer.outputs = []
         installer.dry_run = False
         installer.install_namespaces()
         site.addsitedir(tmp_sitedir, known_paths=site._init_pathinfo())
-
-    def _install_namespace_py3(self, tmp_sitedir):
-        # Install our test namespace package natively.
-        sys.path.append(tmp_sitedir)
 
     def test_handles_namespace_packages(self):
         bench = tempfile.mkdtemp()
@@ -585,11 +582,7 @@ class PythonArchiveTest(unittest.TestCase):
             assert foo  # dodge linter
         self.assertRaises(ImportError, _)
 
-        install = {
-            2: self._install_namespace_py2,
-            3: self._install_namespace_py3
-            }[sys.version_info[0]]
-        install(bench)
+        self._install_namespace_package(bench)
 
         from namespace_package.subpackage import foo
         self.assertEqual(foo, 42)
@@ -597,6 +590,7 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = self.get_filenames('namespace_package')
         self.assertTrue('namespace_package/__init__.py' not in filenames)
         self.assertTrue('namespace_package/subpackage/__init__.py' in filenames)
+        self.assertTrue(filenames[-1].endswith('-nspkg.pth'))
 
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')

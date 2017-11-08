@@ -87,13 +87,24 @@ class PythonPackageArchive(object):
         files, including compiled modules. You'll have to add such files
         manually using :py:meth:`add_file`.
         """
-        for name in modules:
-            module = importlib.import_module(name)
+        for module_name in modules:
+            module = importlib.import_module(module_name)
 
             if hasattr(module, '__path__'):
                 # https://docs.python.org/3/reference/import.html#module-path
                 for directory in module.__path__:
                     self.add_directory(directory)
+                if not hasattr(module, '__file__'):
+
+                    # Likely a namespace package. Try to add *.pth files so
+                    # submodules are importable under Python 2.7.
+
+                    sitedir = list(module.__path__)[0].rsplit('/', 1)[0]
+                    for filename in os.listdir(sitedir):
+                        s = filename.startswith
+                        e = filename.endswith
+                        if s(module_name) and e('-nspkg.pth'):
+                            self.add_file(os.path.join(sitedir, filename))
 
             elif hasattr(module, '__file__'):
                 # https://docs.python.org/3/reference/import.html#__file__

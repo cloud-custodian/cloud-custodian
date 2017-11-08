@@ -178,11 +178,15 @@ def validate(config):
               help='scan only the given accounts', multiple=True)
 @click.option('--bucket', '-b',
               help='scan only the given buckets', multiple=True)
+@click.option('--not-account',
+              help='exclude the given accounts from scan', multiple=True)
+@click.option('--not-bucket',
+              help='exclude the given buckets from scan', multiple=True)
 @click.option('--debug', is_flag=True, default=False,
               help='synchronous scanning, no workers')
 @click.option('--region', multiple=True,
               help='limit scanning to specified regions')
-def run(config, tag, bucket, account, debug, region):
+def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
     """Run across a set of accounts and buckets."""
     logging.basicConfig(
         level=logging.INFO,
@@ -205,6 +209,8 @@ def run(config, tag, bucket, account, debug, region):
                 continue
             if account and account_info['name'] not in account:
                 continue
+            if not_account and account_info['name'] in not_account:
+                continue
             if 'inventory' in data and 'inventory' not in account_info:
                 account_info['inventory'] = data['inventory']
             if 'visitors' in data and 'visitors' not in account_info:
@@ -214,6 +220,8 @@ def run(config, tag, bucket, account, debug, region):
                 account_info['object-reporting']['record-prefix'] = datetime.utcnow().strftime('%Y/%m/%d')
             if bucket:
                 account_info['buckets'] = bucket
+            if not_bucket:
+                account_info['not-buckets'] = not_bucket
             if region:
                 account_info['regions'] = region
 
@@ -320,11 +328,11 @@ def format_accounts_plain(accounts, fh):
 @click.option('--not-region',
               help="only consider buckets not from the given region",
               multiple=True)
-@click.option('--exclude',
+@click.option('--not-bucket',
               help="Exclude bucket", multiple=True)
 def accounts(dbpath, output, format, account,
              config=None, tag=None, tagprefix=None, region=(),
-             not_region=(), exclude=None):
+             not_region=(), not_bucket=None):
     """Report on stats by account"""
     d = db.db(dbpath)
     accounts = d.accounts()
@@ -341,9 +349,9 @@ def accounts(dbpath, output, format, account,
             a.buckets = [b for b in a.buckets if b.region not in not_region]
         accounts = [a for a in accounts if a.bucket_count]
 
-    if exclude:
+    if not_bucket:
         for a in accounts:
-            a.buckets = [b for b in a.buckets if b.name not in exclude]
+            a.buckets = [b for b in a.buckets if b.name not in not_bucket]
     if config and tagprefix:
         account_map = {account.name: account for account in accounts}
 
@@ -455,13 +463,13 @@ def format_csv(buckets, fh, keys=()):
               help="sort output by column")
 @click.option('--tagprefix',
               help="include account tag value by prefix")
-@click.option('--exclude',
+@click.option('--not-bucket',
               help="Exclude bucket", multiple=True)
 def buckets(bucket=None, account=None, matched=False, kdenied=False,
             errors=False, dbpath=None, size=None, denied=False,
             format=None, incomplete=False, oversize=False, region=(),
             not_region=(), inventory=None, output=None, config=None, sort=None,
-            tagprefix=None, exclude=None):
+            tagprefix=None, not_bucket=None):
     """Report on stats by bucket"""
 
     d = db.db(dbpath)
@@ -484,7 +492,7 @@ def buckets(bucket=None, account=None, matched=False, kdenied=False,
                     key=operator.attrgetter('bucket_id')):
         if bucket and b.name not in bucket:
             continue
-        if exclude and b.name in exclude:
+        if not_bucket and b.name in not_bucket:
             continue
         if matched and not b.matched:
             continue
