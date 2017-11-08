@@ -1014,20 +1014,21 @@ class ToggleLogging(BucketActionBase):
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
-       supports attachment via lambda bucket notification or sns notification 
-       to invoke lambda. a special topic value of `default` will utilize an 
+       supports attachment via lambda bucket notification or sns notification
+       to invoke lambda. a special topic value of `default` will utilize an
        extant notification or create one matching the bucket name.
-    :example:
+       
+       :example:
 
-        .. code-block: yaml
+            .. code-block: yaml
 
-            policies:
-              - name: s3-logging-buckets
-                resource: s3
-                filters:
-                  - type: missing-policy-statement
-                actions:
-                  - attach-encrypt
+                policies:
+                  - name: s3-logging-buckets
+                    resource: s3
+                    filters:
+                      - type: missing-policy-statement
+                    actions:
+                      - attach-encrypt
     """
     schema = type_schema(
         'attach-encrypt',
