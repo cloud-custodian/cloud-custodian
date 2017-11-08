@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class PolicyCollection(object):
     @classmethod
     def from_data(cls, data, options):
         policies = [Policy(p, options,
-                           session_factory=cls.test_session_factory())
+                           session_factory=cls.session_factory())
                     for p in data.get('policies', ())]
         return PolicyCollection(policies, options)
 
@@ -176,7 +176,7 @@ class PolicyCollection(object):
 
                 policies.append(
                     Policy(p.data, options_copy,
-                           session_factory=self.test_session_factory()))
+                           session_factory=self.session_factory()))
         return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
@@ -211,9 +211,9 @@ class PolicyCollection(object):
             rtypes.add(p.resource_type)
         return rtypes
 
+    # cli/collection tests patch this
     @classmethod
-    def test_session_factory(self):
-        """ For testing: patched by tests to use a custom session_factory """
+    def session_factory(cls):
         return None
 
 
@@ -341,8 +341,9 @@ class PullMode(PolicyExecutionMode):
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
                         len(resources), time.time() - s))
-                self.policy._write_file(
-                    "action-%s" % a.name, utils.dumps(results))
+                if results:
+                    self.policy._write_file(
+                        "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
@@ -471,6 +472,17 @@ class LambdaMode(PolicyExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
+    def expand_variables(self, variables):
+        """expand variables in the mode role fields.
+        """
+        p = variables['policy'].copy()
+        if 'mode' in variables['policy']:
+            if 'role' in variables['policy']['mode']:
+                mode = variables['policy']['mode'].copy()
+                mode['role'] = mode['role'].format(**variables)
+                p['mode'] = mode
+        return p
+
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
@@ -478,6 +490,11 @@ class LambdaMode(PolicyExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
+            variables = {
+                'account_id': self.policy.options.account_id,
+                'policy': self.policy.data
+            }
+            self.policy.data = self.expand_variables(variables)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -537,8 +554,8 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
 
     def resolve_resources(self, event):
-        return [utils.camelResource(
-            self.cfg_event['configurationItem']['configuration'])]
+        source = self.policy.resource_manager.get_source('config')
+        return [source.load_resource(self.cfg_event['configurationItem'])]
 
     def run(self, event, lambda_context):
         self.cfg_event = json.loads(event['invokingEvent'])
@@ -557,6 +574,8 @@ class ConfigRuleMode(LambdaMode):
         if evaluation is None:
             resources = super(ConfigRuleMode, self).run(event, lambda_context)
             match = self.policy.data['mode'].get('match-compliant', False)
+            self.policy.log.info(
+                "found resources:%d match-compliant:%s", len(resources or ()), match)
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',

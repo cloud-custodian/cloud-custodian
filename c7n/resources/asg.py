@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import logging
 import itertools
 import time
 
-from c7n.actions import Action, ActionRegistry, AutoTagUser
+from c7n.actions import Action, ActionRegistry
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
@@ -34,7 +34,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
@@ -48,11 +48,10 @@ filters.register('offhour', OffHour)
 filters.register('onhour', OnHour)
 filters.register('tag-count', TagCountFilter)
 filters.register('marked-for-op', TagActionFilter)
-actions.register('auto-tag-user', AutoTagUser)
 
 
 @resources.register('asg')
-class ASG(QueryResourceManager):
+class ASG(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -63,6 +62,8 @@ class ASG(QueryResourceManager):
         enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
         filter_name = 'AutoScalingGroupNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::AutoScalingGroup'
+
         default_report_fields = (
             'AutoScalingGroupName',
             'CreatedTime',
@@ -201,7 +202,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.elbs = self.get_elbs()
         self.appelb_target_groups = self.get_appelb_target_groups()
         self.snapshots = self.get_snapshots()
-        self.images = self.get_images()
+        self.images, self.image_snaps = self.get_images()
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
@@ -226,21 +227,49 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def get_images(self):
         manager = self.manager.get_resource_manager('ami')
         images = set()
-        # Verify image snapshot validity, i've been told by a TAM this
-        # is a possibility, but haven't seen evidence of it, since
-        # snapshots are strongly ref'd by amis, but its negible cost
-        # to verify.
-        for a in manager.resources():
-            found = True
+        image_snaps = set()
+        image_ids = list({lc['ImageId'] for lc in self.configs.values()})
+
+        # Pull account images, we should be able to utilize cached values,
+        # drawn down the image population to just images not in the account.
+        account_images = [
+            i for i in manager.resources() if i['ImageId'] in image_ids]
+        account_image_ids = {i['ImageId'] for i in account_images}
+        image_ids = [image_id for image_id in image_ids
+                     if image_id not in account_image_ids]
+
+        # To pull third party images, we explicitly use a describe
+        # source without any cache.
+        #
+        # Can't use a config source since it won't have state for
+        # third party ami, we auto propagate source normally, so we
+        # explicitly pull a describe source. Can't use a cache either
+        # as their not in the account.
+        #
+        while image_ids:
+            try:
+                amis = manager.get_source('describe').get_resources(
+                    image_ids, cache=False)
+                account_images.extend(amis)
+                break
+            except ClientError as e:
+                msg = e.response['Error']['Message']
+                if e.response['Error']['Code'] != 'InvalidAMIID.NotFound':
+                    raise
+                for n in msg[msg.find('[') + 1: msg.find(']')].split(','):
+                    image_ids.remove(n.strip())
+
+        for a in account_images:
+            images.add(a['ImageId'])
+            # Capture any snapshots, images strongly reference their
+            # snapshots, and some of these will be third party in the
+            # case of a third party image.
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
-                if bd['Ebs']['SnapshotId'].strip() not in self.snapshots:
-                    found = False
-                    break
-            if found:
-                images.add(a['ImageId'])
-        return images
+                image_snaps.add(bd['Ebs']['SnapshotId'].strip())
+
+        return images, image_snaps
 
     def get_snapshots(self):
         manager = self.manager.get_resource_manager('ebs-snapshot')
@@ -297,6 +326,8 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
             snapshot_id = bd['Ebs']['SnapshotId'].strip()
+            if snapshot_id in self.image_snaps:
+                continue
             if snapshot_id not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
@@ -549,6 +580,60 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
         ami = self.images.get(cfg['ImageId'], {})
         return parse(ami.get(
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
+
+
+@filters.register('image')
+class ImageFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter asg by image
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-image-tag
+                resource: asg
+                filters:
+                  - type: image
+                    value: "tag:ImageTag"
+                    key: "TagValue"
+                    op: eq
+    """
+    permissions = (
+        "ec2:DescribeImages",
+        "autoscaling:DescribeLaunchConfigurations")
+
+    schema = type_schema('image', rinherit=ValueFilter.schema)
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(ImageFilter, self).process(asgs, event)
+
+    def initialize(self, asgs):
+        super(ImageFilter, self).initialize(asgs)
+        image_ids = set()
+        for cfg in self.configs.values():
+            image_ids.add(cfg['ImageId'])
+        results = self.manager.get_resource_manager('ami').resources()
+        base_image_map = {i['ImageId']: i for i in results}
+        resources = {i: base_image_map[i] for i in image_ids if i in base_image_map}
+        missing = list(set(image_ids) - set(resources.keys()))
+        if missing:
+            loaded = self.manager.get_resource_manager('ami').get_resources(missing, False)
+            resources.update({image['ImageId']: image for image in loaded})
+        self.images = resources
+
+    def __call__(self, i):
+        cfg = self.configs[i['LaunchConfigurationName']]
+        image = self.images.get(cfg['ImageId'], {})
+        # Finally, if we have no image...
+        if not image:
+            self.log.warning(
+                "Could not locate image for instance:%s ami:%s" % (
+                    i['InstanceId'], i["ImageId"]))
+            # Match instead on empty skeleton?
+            return False
+        return self.match(image)
 
 
 @filters.register('vpc-id')
@@ -1257,7 +1342,10 @@ class Resume(Action):
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        ec2_client.start_instances(InstanceIds=instance_ids)
+
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
     def resume_asg(self, asg):
         """Resume asg processes.
@@ -1320,7 +1408,7 @@ class Delete(Action):
 
 
 @resources.register('launch-config')
-class LaunchConfig(QueryResourceManager):
+class LaunchConfig(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'autoscaling'
@@ -1332,6 +1420,17 @@ class LaunchConfig(QueryResourceManager):
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
+        config_type = 'AWS::AutoScaling::LaunchConfiguration'
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeLaunchConfig(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
         for r in resources:

@@ -22,7 +22,9 @@ subnets:
 security_groups:
   - sg-abbdaaf3
   - sg-bbd3erfa
-
+# Dead Letter Config is optional
+dead_letter_config:
+  TargetArn: arn:aws:sqs:us-east-1:0911411411411:my-dead-letter-queue
 
 ## Mailer Infrastructure Config
 

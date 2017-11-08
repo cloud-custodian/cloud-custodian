@@ -1,0 +1,16 @@
+env: dev
+log-group: "Sphere11.Dev.Audit"
+db:
+  lock_table: "Sphere11.Dev.ResourceLocks"
+accounts:
+  "114002464496":
+    name: custodian-reinvent
+    role: "arn:aws:iam::114002464496:role/CloudCustodianRole"
+    # Only used for delta api, basically we're having the api assume back to
+    # itself to keep track of target account usage.
+    invoke-api-role: "arn:aws:iam::644160558196:role/Sphere11DivisionRead"
+    notify-locks: "arn:aws:sns:us-east-1:114002464496:sphere11-lock-notifications"
+  "644160558196":
+    name: custodian-skunkworks
+    role: "arn:aws:iam::644160558196:role/sphere11-account-role"
+    api-endpoint: "https://5xhc1cnb7h.execute-api.us-east-1.amazonaws.com/latest"

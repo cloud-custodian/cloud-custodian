@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,19 @@ class MailerLdapTest(unittest.TestCase):
         milton = self.ldap_lookup.get_metadata_from_uid('123456')
         # since '123456' doesn't have an underscore, it should return {}
         self.assertEqual(milton, {})
+
+    def test_sqlite_cache_set_escaping(self):
+        irish_guy = {
+            'dn': 'uid=john_oconnor,cn=users,dc=initech,dc=com',
+            'mail': 'john_oconnor@initech.com',
+            'manager': 'uid=bill_lumbergh,cn=users,dc=initech,dc=com',
+            'displayName': "John O'Connor",
+            'uid': 'john_oconnor'
+        }
+        set_result = self.ldap_lookup.caching.set(irish_guy['uid'], irish_guy)
+        self.assertEqual(set_result, None)
+        get_result = self.ldap_lookup.caching.get(irish_guy['uid'])
+        self.assertEqual(get_result, irish_guy)
 
     def test_regex_requiring_6chars_and_only_digits(self):
         # now we'll do some tests requiring the uid to be 6 characters only and digits

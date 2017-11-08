@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ def provision(config, session_factory):
         role=config['role'],
         subnets=config['subnets'],
         security_groups=config['security_groups'],
+        dead_letter_config=config.get('dead_letter_config', {}),
         events=[
             CloudWatchEventSource(
                 {'type': 'periodic',

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ class Account(ResourceManager):
     class resource_type(object):
         id = 'account_id'
         name = 'account_name'
+        filter_name = None
 
     @classmethod
     def get_permissions(cls):
@@ -464,7 +465,7 @@ class ServiceLimit(Filter):
 
 @actions.register('request-limit-increase')
 class RequestLimitIncrease(BaseAction):
-    """ File support ticket to raise limit
+    r"""File support ticket to raise limit.
 
     :Example:
 
@@ -474,33 +475,41 @@ class RequestLimitIncrease(BaseAction):
           - name: account-service-limits
             resource: account
             filters:
-             - type: service-limit
-               services:
-                 - EBS
-               limits:
-                 - Provisioned IOPS (SSD) storage (GiB)
-               threshold: 60.5
-             actions:
-               - type: request-limit-increase
-                 notify: [email, email2]
-                 percent-increase: 50
-                 message: "Raise {service} - {limits} by {percent}%"
+              - type: service-limit
+                services:
+                  - EBS
+                limits:
+                  - Provisioned IOPS (SSD) storage (GiB)
+                threshold: 60.5
+            actions:
+              - type: request-limit-increase
+                notify: [email, email2]
+                ## You can use one of either percent-increase or an amount-increase.
+                percent-increase: 50
+                message: "Please raise the below account limit(s); \n {limits}"
     """
 
-    schema = type_schema(
-        'request-limit-increase',
-        **{'notify': {'type': 'array'},
-           'percent-increase': {'type': 'number'},
-           'subject': {'type': 'string'},
-           'message': {'type': 'string'},
-           'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']},
-           'required': ['percent-increase'],
-           })
+    schema = {
+        'type': 'object',
+        'notify': {'type': 'array'},
+        'properties': {
+            'type': {'enum': ['request-limit-increase']},
+            'percent-increase': {'type': 'number', 'minimum': 1},
+            'amount-increase': {'type': 'number', 'minimum': 1},
+            'subject': {'type': 'string'},
+            'message': {'type': 'string'},
+            'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
+        },
+        'oneOf': [
+            {'required': ['type', 'percent-increase']},
+            {'required': ['type', 'amount-increase']}
+        ]
+    }
 
     permissions = ('support:CreateCase',)
 
-    default_subject = 'Raise the account limit of {service} - {limits} in {region}'
-    default_template = 'Please raise the account limit of {service} - {limits} by {percent}%'
+    default_subject = '[Account:{account}]Raise the following limit(s) of {service} in {region}'
+    default_template = 'Please raise the below account limit(s); \n {limits}'
     default_severity = 'normal'
 
     service_code_mapping = {
@@ -515,31 +524,37 @@ class RequestLimitIncrease(BaseAction):
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('support', region_name='us-east-1')
+        account_id = self.manager.config.account_id
+        service_map = {}
+        region_map = {}
+        limit_exceeded = resources[0].get('c7n:ServiceLimitsExceeded', [])
+        percent_increase = self.data.get('percent-increase')
+        amount_increase = self.data.get('amount-increase')
 
-        services_done = set()
-        for resource in resources[0].get('c7n:ServiceLimitsExceeded', []):
-            service = resource['service']
-            limits = resource['check']
-            region = resource['region']
+        for s in limit_exceeded:
+            current_limit = int(s['limit'])
+            if percent_increase:
+                increase_by = current_limit * float(percent_increase) / 100
+                increase_by = max(increase_by, 1)
+            else:
+                increase_by = amount_increase
+            increase_by = round(increase_by)
+            msg = '\nIncrease %s by %d in %s \n\t Current Limit: %s\n\t Current Usage: %s\n\t ' \
+                  'Set New Limit to: %d' % (
+                      s['check'], increase_by, s['region'], s['limit'], s['extant'],
+                      (current_limit + increase_by))
+            service_map.setdefault(s['service'], []).append(msg)
+            region_map.setdefault(s['service'], s['region'])
 
-            if service in services_done:
-                continue
-
-            services_done.add(service)
-            services_done.add(limits)
-            services_done.add(region)
+        for service in service_map:
+            subject = self.data.get('subject', self.default_subject).format(
+                service=service, region=region_map[service], account=account_id)
             service_code = self.service_code_mapping.get(service)
-
-            subject = self.data.get('subject', self.default_subject)
-
-            subject = subject.format(service=service,limits=limits,region=region)
             body = self.data.get('message', self.default_template)
             body = body.format(**{
                 'service': service,
-                'limits': limits,
-                'percent': self.data.get('percent-increase')
+                'limits': '\n\t'.join(service_map[service]),
             })
-
             client.create_case(
                 subject=subject,
                 communicationBody=body,
@@ -739,3 +754,213 @@ class HasVirtualMFA(Filter):
 
     def process(self, resources, event=None):
         return list(filter(self.account_has_virtual_mfa, resources))
+
+
+@actions.register('enable-data-events')
+class EnableDataEvents(BaseAction):
+    """Ensure all buckets in account are setup to log data events.
+
+    Note this works via a single trail for data events per
+    (https://goo.gl/1ux7RG).
+
+    This trail should NOT be used for api management events, the
+    configuration here is soley for data events. If directed to create
+    a trail this will do so without management events.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-remove-owner-tag
+                resource: actions
+                actions:
+                 - type: enable-data-events
+                   data-trail:
+                     name: s3-events
+                     multi-region: us-east-1
+    """
+
+    schema = type_schema(
+        'enable-data-events', required=['data-trail'], **{
+            'data-trail': {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['name'],
+                'properties': {
+                    'create': {
+                        'title': 'Should we create trail if needed for events?',
+                        'type': 'boolean'},
+                    'type': {'enum': ['ReadOnly', 'WriteOnly', 'All']},
+                    'name': {
+                        'title': 'The name of the event trail',
+                        'type': 'string'},
+                    'topic': {
+                        'title': 'If creating, the sns topic for the trail to send updates',
+                        'type': 'string'},
+                    's3-bucket': {
+                        'title': 'If creating, the bucket to store trail event data',
+                        'type': 'string'},
+                    's3-prefix': {'type': 'string'},
+                    'key-id': {
+                        'title': 'If creating, Enable kms on the trail',
+                        'type': 'string'},
+                    # region that we're aggregating via trails.
+                    'multi-region': {
+                        'title': 'If creating, use this region for all data trails',
+                        'type': 'string'}}}})
+
+    def validate(self):
+        if self.data['data-trail'].get('create'):
+            if 's3-bucket' not in self.data['data-trail']:
+                raise FilterValidationError(
+                    "If creating data trails, an s3-bucket is required")
+        return self
+
+    def get_permissions(self):
+        perms = [
+            'cloudtrail:DescribeTrails',
+            'cloudtrail:GetEventSelectors',
+            'cloudtrail:PutEventSelectors']
+
+        if self.data.get('data-trail', {}).get('create'):
+            perms.extend([
+                'cloudtrail:CreateTrail', 'cloudtrail:StartLogging'])
+        return perms
+
+    def add_data_trail(self, client, trail_cfg):
+        if not trail_cfg.get('create'):
+            raise ValueError(
+                "s3 data event trail missing and not configured to create")
+        params = dict(
+            Name=trail_cfg['name'],
+            S3BucketName=trail_cfg['s3-bucket'],
+            EnableLogFileValidation=True)
+
+        if 'key-id' in trail_cfg:
+            params['KmsKeyId'] = trail_cfg['key-id']
+        if 's3-prefix' in trail_cfg:
+            params['S3KeyPrefix'] = trail_cfg['s3-prefix']
+        if 'topic' in trail_cfg:
+            params['SnsTopicName'] = trail_cfg['topic']
+        if 'multi-region' in trail_cfg:
+            params['IsMultiRegionTrail'] = True
+
+        client.create_trail(**params)
+        return {'Name': trail_cfg['name']}
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        region = self.data['data-trail'].get('multi-region')
+
+        if region:
+            client = session.client('cloudtrail', region_name=region)
+        else:
+            client = session.client('cloudtrail')
+
+        added = False
+        tconfig = self.data['data-trail']
+        trails = client.describe_trails(
+            trailNameList=[tconfig['name']]).get('trailList', ())
+        if not trails:
+            trail = self.add_data_trail(client, tconfig)
+            added = True
+        else:
+            trail = trails[0]
+
+        events = client.get_event_selectors(
+            TrailName=trail['Name']).get('EventSelectors', [])
+
+        for e in events:
+            found = False
+            if not e.get('DataResources'):
+                continue
+            for data_events in e['DataResources']:
+                if data_events['Type'] != 'AWS::S3::Object':
+                    continue
+                for b in data_events['Values']:
+                    if b.rsplit(':')[-1].strip('/') == '':
+                        found = True
+                        break
+            if found:
+                resources[0]['c7n_data_trail'] = trail
+                return
+
+        # Opinionated choice, separate api and data events.
+        event_count = len(events)
+        events = [e for e in events if not e.get('IncludeManagementEvents')]
+        if len(events) != event_count:
+            self.log.warning("removing api trail from data trail")
+
+        # future proof'd for other data events, for s3 this trail
+        # encompasses all the buckets in the account.
+
+        events.append({
+            'IncludeManagementEvents': False,
+            'ReadWriteType': tconfig.get('type', 'All'),
+            'DataResources': [{
+                'Type': 'AWS::S3::Object',
+                'Values': ['arn:aws:s3:::']}]})
+        client.put_event_selectors(
+            TrailName=trail['Name'],
+            EventSelectors=events)
+
+        if added:
+            client.start_logging(Name=tconfig['name'])
+
+        resources[0]['c7n_data_trail'] = trail
+
+
+@filters.register('shield-enabled')
+class ShieldEnabled(Filter):
+
+    permissions = ('shield:DescribeSubscription',)
+
+    schema = type_schema(
+        'shield-enabled',
+        state={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', False)
+        client = self.manager.session_factory().client('shield')
+
+        try:
+            subscription = client.describe_subscription().get(
+                'Subscription', None)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
+            subscription = None
+
+        resources[0]['c7n:ShieldSubscription'] = subscription
+        if state and subscription:
+            return resources
+        elif not state and not subscription:
+            return resources
+        return []
+
+
+@actions.register('set-shield-advanced')
+class SetShieldAdvanced(BaseAction):
+    """Enable/disable Shield Advanced on an account."""
+
+    permissions = (
+        'shield:CreateSubscription', 'shield:DeleteSubscription')
+
+    schema = type_schema(
+        'set-shield-advanced',
+        state={'type': 'boolean'})
+
+    def process(self, resources):
+        client = self.manager.session_factory().client('shield')
+        state = self.data.get('state', True)
+
+        if state:
+            client.create_subscription()
+        else:
+            try:
+                client.delete_subscription()
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    return
+                raise

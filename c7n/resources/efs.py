@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+import functools
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.query import QueryResourceManager, ChildResourceManager
+from c7n.tags import universal_augment, register_universal_tags
+from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
 
 @resources.register('efs')
@@ -29,7 +31,47 @@ class ElasticFileSystem(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         dimension = None
-        detail_spec = ('describe_tags', 'FileSystemId', 'FileSystemId', None)
+        type = 'file-system'
+        # resource type for resource tagging api
+        resource_type = 'elasticfilesystem:file-system'
+        detail_spec = None
+        filter_name = 'FileSystemId'
+        filter_type = 'scalar'
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(ElasticFileSystem, self).augment(resources))
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                'elasticfilesystem',
+                region=self.config.region,
+                account_id=self.account_id,
+                resource_type='file-system',
+                separator='/')
+        return self._generate_arn
+
+
+register_universal_tags(
+    ElasticFileSystem.filter_registry,
+    ElasticFileSystem.action_registry)
+
+
+@resources.register('efs-mount-target')
+class ElasticFileSystemMountTarget(ChildResourceManager):
+
+    class resource_type(object):
+        service = 'efs'
+        parent_spec = ('efs', 'FileSystemId')
+        enum_spec = ('describe_mount_targets', 'MountTargets', None)
+        name = id = 'MountTargetId'
+        date = None
+        dimension = None
+        filter_name = 'MountTargetId'
+        filter_type = 'scalar'
 
 
 @ElasticFileSystem.action_registry.register('delete')

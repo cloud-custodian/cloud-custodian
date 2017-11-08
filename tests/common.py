@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import os
 import shutil
 import tempfile
 import unittest
+import uuid
 
 import six
 import yaml
@@ -51,7 +52,6 @@ skip_if_not_validating = unittest.skipIf(
 # Set this so that if we run nose directly the tests will not fail
 if 'AWS_DEFAULT_REGION' not in os.environ:
     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
-
 
 
 class BaseTest(PillTest):
@@ -176,6 +176,75 @@ class BaseTest(PillTest):
         return ACCOUNT_ID
 
 
+class ConfigTest(BaseTest):
+    """Test base class for integration tests with aws config.
+
+    To allow for integration testing with config.
+
+     - before creating and modifying use the
+       initialize_config_subscriber method to setup an sqs queue on
+       the config recorder's sns topic. returns the sqs queue url.
+
+     - after creating/modifying a resource, use the wait_for_config
+       with the queue url and the resource id.
+    """
+
+    def wait_for_config(self, session, queue_url, resource_id):
+        # lazy import to avoid circular
+        from c7n.sqsexec import MessageIterator
+        client = session.client('sqs')
+        messages = MessageIterator(client, queue_url, timeout=20)
+        results = []
+        while True:
+            for m in messages:
+                msg = json.loads(m['Body'])
+                change = json.loads(msg['Message'])
+                messages.ack(m)
+                if change['configurationItem']['resourceId'] != resource_id:
+                    continue
+                results.append(change['configurationItem'])
+                break
+            if results:
+                break
+        return results
+
+    def initialize_config_subscriber(self, session):
+        config = session.client('config')
+        sqs = session.client('sqs')
+        sns = session.client('sns')
+
+        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
+        assert channels, "config not enabled"
+
+        topic = channels[0]['snsTopicARN']
+        queue = "custodian-waiter-%s" % str(uuid.uuid4())
+        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
+        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
+
+        attrs = sqs.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
+        queue_arn = attrs['Attributes']['QueueArn']
+        policy = json.loads(attrs['Attributes'].get(
+            'Policy',
+            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
+        policy['Statement'].append({
+            "Sid": "ConfigTopicSubscribe",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": topic}}})
+        sqs.set_queue_attributes(
+            QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
+        subscription = sns.subscribe(
+            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get(
+                'SubscriptionArn')
+        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
+        return queue_url
+
+
 class TextTestIO(io.StringIO):
 
     def write(self, b):
@@ -195,10 +264,10 @@ def placebo_dir(name):
         os.path.dirname(__file__), 'data', 'placebo', name)
 
 
-def event_data(name):
+def event_data(name, event_type='cwe'):
     with open(
             os.path.join(
-                os.path.dirname(__file__), 'data', 'cwe', name)) as fh:
+                os.path.dirname(__file__), 'data', event_type, name)) as fh:
         return json.load(fh)
 
 

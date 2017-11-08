@@ -4,26 +4,26 @@
         "Datapoints": [
             {
                 "Timestamp": {
-                    "hour": 18, 
+                    "hour": 1, 
                     "__class__": "datetime", 
-                    "month": 11, 
+                    "month": 6, 
                     "second": 0, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 30, 
-                    "minute": 13
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 19
                 }, 
-                "Average": 5.0, 
+                "Average": 6.0, 
                 "Unit": "None"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "f9151e9c-c228-11e6-9a06-3bf675c01527", 
+            "RequestId": "2729ec15-587b-11e7-ba61-d700b23a9ed2", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "f9151e9c-c228-11e6-9a06-3bf675c01527", 
-                "date": "Wed, 14 Dec 2016 18:13:10 GMT", 
+                "x-amzn-requestid": "2729ec15-587b-11e7-ba61-d700b23a9ed2", 
+                "date": "Sat, 24 Jun 2017 01:19:21 GMT", 
                 "content-length": "488", 
                 "content-type": "text/xml"
             }

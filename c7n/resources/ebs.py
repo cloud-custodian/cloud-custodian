@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class Snapshot(QueryResourceManager):
         service = 'ec2'
         type = 'snapshot'
         enum_spec = (
-            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+            'describe_snapshots', 'Snapshots', None)
         detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
@@ -76,6 +76,12 @@ class Snapshot(QueryResourceManager):
 
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
+
+    def resources(self, query=None):
+        query = query or {}
+        if query.get('OwnerIds') is None:
+            query['OwnerIds'] = ['self']
+        return super(Snapshot, self).resources(query=query)
 
 
 @Snapshot.filter_registry.register('age')
@@ -235,7 +241,7 @@ class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-    permissions = ('ec2.DeleteSnapshot',)
+    permissions = ('ec2:DeleteSnapshot',)
 
     def process(self, snapshots):
         self.image_snapshots = set()

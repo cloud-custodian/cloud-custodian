@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,3 +31,4 @@ class StepFunction(QueryResourceManager):
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
+        filter_name = None

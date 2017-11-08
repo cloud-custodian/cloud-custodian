@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import functools
 import json
 import os
@@ -23,13 +24,15 @@ import time  # NOQA needed for some recordings
 from unittest import TestCase
 
 from botocore.exceptions import ClientError
+from dateutil.tz import tzutc
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 
-from .common import BaseTest, event_data, skip_if_not_validating
+from .common import (
+    BaseTest, ConfigTest, event_data, skip_if_not_validating, functional)
 
 
 class RestoreCompletionTest(TestCase):
@@ -52,15 +55,17 @@ class BucketScanLogTests(TestCase):
         self.log = s3.BucketScanLog(self.log_dir, 'test')
 
     def test_scan_log(self):
+        first_five = list(range(5))
+        next_five = list(range(5, 10))
         with self.log:
-            self.log.add(range(10)[:5])
-            self.log.add(range(10)[5:])
+            self.log.add(first_five)
+            self.log.add(next_five)
 
         with open(self.log.path) as fh:
             data = json.load(fh)
             self.assertEqual(
                 data,
-                [range(10)[:5], range(10)[5:], []])
+                [first_five, next_five, []])
 
 
 def destroyBucket(client, bucket):
@@ -118,6 +123,7 @@ class BucketMetrics(BaseTest):
 
 class BucketInventory(BaseTest):
 
+    @functional
     def test_inventory(self):
         bname = 'custodian-test-data'
         inv_bname = 'custodian-inv'
@@ -131,6 +137,7 @@ class BucketInventory(BaseTest):
         client = session_factory().client('s3')
         client.create_bucket(Bucket=bname)
         client.create_bucket(Bucket=inv_bname)
+
         self.addCleanup(client.delete_bucket, Bucket=bname)
         self.addCleanup(client.delete_bucket, Bucket=inv_bname)
 
@@ -217,6 +224,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
@@ -256,6 +264,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -319,7 +328,6 @@ class BucketDelete(BaseTest):
         # Make sure file got written
         denied_file = os.path.join(p.resource_manager.log_dir, 'denied.json')
         self.assertIn(bname, open(denied_file).read())
-        
         #
         # Now delete it for real
         #
@@ -332,6 +340,7 @@ class BucketDelete(BaseTest):
 
 class BucketTag(BaseTest):
 
+    @functional
     def test_tag_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -369,6 +378,325 @@ class BucketTag(BaseTest):
              'platform': 'serverless',
              'borrowed': 'new'},
             tags)
+
+
+class S3ConfigSource(ConfigTest):
+
+    maxDiff = None
+
+    @functional
+    def test_normalize(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        augments = list(s3.S3_AUGMENT_TABLE)
+        augments.remove(('get_bucket_location', 'Location', None, None))
+        self.patch(s3, 'S3_AUGMENT_TABLE', augments)
+
+        bname = 'custodian-test-data-23'
+        session_factory = self.replay_flight_data('test_s3_normalize')
+        session = session_factory()
+
+        queue_url = self.initialize_config_subscriber(session)
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        sns = session.client('sns')
+        notify_topic = sns.create_topic(Name=bname).get('TopicArn')
+        sns.set_topic_attributes(
+            TopicArn=notify_topic,
+            AttributeName='Policy',
+            AttributeValue=json.dumps({
+                'Statement': [{
+                    'Action': 'SNS:Publish',
+                    'Effect': 'Allow',
+                    'Resource': notify_topic,
+                    'Principal': {'Service': 's3.amazonaws.com'}}]}))
+        self.addCleanup(sns.delete_topic, TopicArn=notify_topic)
+
+        public = 'http://acs.amazonaws.com/groups/global/AuthenticatedUsers'
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "mandeep.bal",
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': public},
+                     'Permission': 'READ'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'WRITE'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'READ_ACP'},
+                    ]})
+        client.put_bucket_tagging(
+            Bucket=bname,
+            Tagging={'TagSet': [
+                {'Key': 'rudolph', 'Value': 'rabbit'},
+                {'Key': 'platform', 'Value': 'tyre'}]})
+        client.put_bucket_logging(
+            Bucket=bname,
+            BucketLoggingStatus={
+                'LoggingEnabled': {
+                    'TargetBucket': bname,
+                    'TargetPrefix': 's3-logs/'}})
+        client.put_bucket_versioning(
+            Bucket=bname,
+            VersioningConfiguration={'Status': 'Enabled'})
+        client.put_bucket_accelerate_configuration(
+            Bucket=bname,
+            AccelerateConfiguration={'Status': 'Enabled'})
+        client.put_bucket_website(
+            Bucket=bname,
+            WebsiteConfiguration={
+                'IndexDocument': {
+                    'Suffix': 'index.html'}})
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'Zebra',
+                    'Effect': 'Deny',
+                    'Principal': '*',
+                    'Action': 's3:PutObject',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname,
+                    'Condition': {
+                        'StringNotEquals': {
+                            's3:x-amz-server-side-encryption': [
+                                'AES256', 'aws:kms']}}}]}))
+        client.put_bucket_notification_configuration(
+            Bucket=bname,
+            NotificationConfiguration={
+                'TopicConfigurations': [{
+                    'Id': bname,
+                    'TopicArn': notify_topic,
+                    'Events': ['s3:ObjectCreated:*'],
+                    'Filter': {
+                        'Key': {
+                            'FilterRules': [
+                                {'Name': 'prefix',
+                                 'Value': 's3-logs/'}
+                                ]
+                            }
+                        }
+                    }]
+                })
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [{'Name': bname}]}, session_factory=session_factory)
+
+        manager = p.get_resource_manager()
+        resource_a = manager.get_resources([bname])[0]
+        results = self.wait_for_config(session, queue_url, bname)
+        resource_b = s3.ConfigS3(manager).load_resource(results[0])
+        self.maxDiff = None
+
+        for k in ('Logging',
+                  'Policy',
+                  'Versioning',
+                  'Name',
+                  'Website'):
+            self.assertEqual(resource_a[k], resource_b[k])
+
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resource_a.get('Tags')},
+            {t['Key']: t['Value'] for t in resource_b.get('Tags')})
+
+    def test_config_normalize_notification(self):
+        event = event_data('s3-rep-and-notify.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Notification'],
+            {u'TopicConfigurations': [
+                {u'Filter': {
+                    u'Key': {
+                        u'FilterRules': [
+                            {u'Name': 'Prefix', u'Value': 'oids/'}]}},
+                 u'Id': 'rabbit',
+                 u'TopicArn': 'arn:aws:sns:us-east-1:644160558196:custodian-test-data-22',
+                 u'Events': ['s3:ReducedRedundancyLostObject',
+                             's3:ObjectCreated:CompleteMultipartUpload']}],
+             u'LambdaFunctionConfigurations': [
+                 {u'Filter': {
+                     u'Key': {
+                         u'FilterRules': [
+                             {u'Name': 'Prefix', u'Value': 'void/'}]}},
+                  u'LambdaFunctionArn': 'arn:aws:lambda:us-east-1:644160558196:function:lambdaenv',
+                  u'Id': 'ZDAzZDViMTUtNGU3MS00ZWIwLWI0MzgtOTZiMWQ3ZWNkZDY1',
+                  u'Events': ['s3:ObjectRemoved:Delete']}],
+             u'QueueConfigurations': [
+                 {u'Filter': {
+                     u'Key': {
+                         u'FilterRules': [
+                             {u'Name': 'Prefix', u'Value': 'images/'}]}},
+                  u'Id': 'OGQ5OTAyNjYtYjBmNy00ZTkwLWFiMjUtZjE4ODBmYTgwNTE0',
+                  u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
+                  u'Events': ['s3:ObjectCreated:*']}]})
+
+    def test_config_normalize_lifecycle_and_predicate(self):
+        event = event_data('s3-lifecycle-and-predicate.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        rfilter = resource['Lifecycle']['Rules'][0]['Filter']
+
+        self.assertEqual(
+            rfilter['And']['Prefix'],
+            'docs/')
+        self.assertEqual(
+            rfilter['And']['Tags'],
+            [{"Value": "Archive", "Key": "Workflow"},
+             {"Value": "Complete", "Key": "State"}])
+
+    def test_config_normalize_lifecycle(self):
+        event = event_data('s3-lifecycle.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Lifecycle'], {
+                "Rules": [
+                    {
+                        "Status": "Enabled",
+                        "NoncurrentVersionExpiration": {
+                            "NoncurrentDays": 545
+                        },
+                        "Filter": {
+                            "Prefix": "docs/"
+                        },
+                        "Transitions": [{
+                            "Days": 30,
+                            "StorageClass": "STANDARD_IA"
+                        }],
+                        "Expiration": {
+                            "ExpiredObjectDeleteMarker": True
+                        },
+                        "AbortIncompleteMultipartUpload": {
+                            "DaysAfterInitiation": 7
+                        },
+                        "NoncurrentVersionTransitions": [{
+                            "NoncurrentDays": 180,
+                            "StorageClass": "GLACIER"
+                        }],
+                        "ID": "Docs"
+                    }
+                ]
+            })
+
+    def test_config_normalize_replication(self):
+        event = event_data('s3-rep-and-notify.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Replication'], {
+                u'ReplicationConfiguration': {
+                    u'Rules': [{u'Status': 'Enabled',
+                                u'Prefix': '',
+                                u'Destination': {
+                                    u'Bucket': 'arn:aws:s3:::testing-west'},
+                                u'ID': 'testing-99'}],
+                    u'Role': (
+                        'arn:aws:iam::644160558196:role'
+                        '/custodian-replicated-custodian-replicated'
+                        '-west-s3-repl-role')}})
+
+    def test_config_normalize_website(self):
+        event = event_data('s3-website.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {u'IndexDocument': {u'Suffix': 'index.html'},
+             u'RoutingRules': [
+                 {u'Redirect': {u'ReplaceKeyWith': 'error.html'},
+                  u'Condition': {u'HttpErrorCodeReturnedEquals': '404',
+                                 u'KeyPrefixEquals': 'docs/'}}]})
+
+    def test_load_item_resource(self):
+        event = event_data('s3.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        resource.pop('CreationDate')
+        self.assertEqual(
+            {'Planet': 'Earth', 'Verbose': 'Game'},
+            {t['Key']: t['Value'] for t in resource.pop('Tags')}
+        )
+        self.assertEqual(
+            resource,
+            {'Location': {'LocationConstraint': u'us-east-2'},
+             'Name': u'config-rule-sanity',
+             'Lifecycle': None,
+             'Website': None,
+             'Policy': None,
+             'Replication': None,
+             'Versioning': None,
+             'Logging': None,
+             'Notification': None,
+             "Acl": {
+                 "Owner": {
+                     "ID": u"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                 },
+                 "Grants": [
+                     {
+                         "Grantee": {
+                             "Type": "CanonicalUser",
+                             "ID": u"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                         },
+                         "Permission": "FULL_CONTROL"
+                     }
+                 ]}
+             })
+
+
+    def test_load_item_resource_config_event(self):
+        event = event_data('s3-from-rule.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource,
+            {u'Acl': {
+                u'Grants': [{
+                    u'Grantee': {
+                        u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
+                        u'Type': u'CanonicalUser'},
+                        u'Permission': u'FULL_CONTROL'}],
+                u'Owner': {u'DisplayName': u'mandeep.bal',
+                           u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}},
+             u'CreationDate': datetime.datetime(2017, 9, 15, 2, 5, 40, tzinfo=tzutc()),
+             u'Lifecycle': None,
+             u'Location': None,
+             u'Logging': None,
+             u'Name': u'c7n-fire-logs',
+             u'Notification': {},
+             u'Policy': None,
+             u'Replication': None,
+             u'Tags': [],
+             u'Versioning': None,
+             u'Website': None})
 
 
 class S3Test(BaseTest):
@@ -1270,6 +1598,47 @@ class S3Test(BaseTest):
         report_resources = report_policy.run()
         self.assertEqual(report_resources[0]['KeyRemediated'], 0)
 
+    def test_encrypt_keys_aes256_sufficient(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data(
+            'test_s3_encrypt_aes256_sufficient')
+        bname = "custodian-encrypt-sufficient-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        kms = session.client('kms')
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        key_id = [
+            k for k in kms.list_aliases().get('Aliases', ())
+            if k['AliasName'] == 'alias/aws/s3'][0]['AliasArn']
+
+        client.put_object(
+            Bucket=bname, Key='testing-abc', ServerSideEncryption='aws:kms',
+            SSEKMSKeyId=key_id)
+        client.put_object(
+            Bucket=bname, Key='testing-123', ServerSideEncryption='AES256')
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'encrypt-keys'}]},
+            session_factory=session_factory)
+
+        p.run()
+
+        result = client.head_object(Bucket=bname, Key='testing-123')
+        self.assertTrue(result['ServerSideEncryption'] == 'AES256')
+
+        result = client.head_object(Bucket=bname, Key='testing-abc')
+        self.assertTrue(result['ServerSideEncryption'] == 'aws:kms')
+        data = json.load(open(
+            os.path.join(p.ctx.output_path, 'action-encryptextantkeys')))
+        self.assertEqual(
+            [{'Count': 2, 'Remediated': 0, 'Bucket': bname}], data)
+
     def test_encrypt_keys_key_id_option(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         session_factory = self.replay_flight_data(
@@ -1481,3 +1850,159 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_delete_bucket_notification(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_delete_bucket_notification')
+        bname = 'custodian-delete-bucket-notification-test'
+        config_id = 'c7n-notify-1'
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket-notification',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'bucket-notification',
+                 'kind': 'sns',
+                 'key': 'Id',
+                 'value': config_id,
+                 'op': 'eq'}
+            ],
+            'actions': [{'type': 'delete-bucket-notification',
+                         'statement_ids': 'matched'}]
+            }, session_factory=session_factory)
+
+        topic_arn = session.client('sns').create_topic(Name='bucket-notification-test')['TopicArn']
+        self.addCleanup(session.client('sns').delete_topic, TopicArn=topic_arn)
+        topic_policy = {
+            'Statement': [{
+                'Action': 'SNS:Publish',
+                'Effect': 'Allow',
+                'Resource': topic_arn,
+                'Principal': {'Service': 's3.amazonaws.com'}}]}
+        session.client('sns').set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName='Policy',
+            AttributeValue=json.dumps(topic_policy))
+        client.put_bucket_notification_configuration(
+            Bucket=bname,
+            NotificationConfiguration={
+                'TopicConfigurations': [
+                    {'TopicArn': topic_arn, 'Events': ['s3:ObjectCreated:*'], 'Id': config_id},
+                     {'TopicArn': topic_arn, 'Events': ['s3:ObjectRemoved:*'], 'Id': 'another1'}
+                ]
+            })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        topic_notifications = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        us = [t for t in topic_notifications if t.get('TopicArn') == topic_arn]
+        self.assertEqual(len(us), 1)
+
+
+class S3LifecycleTest(BaseTest):
+
+    def test_lifecycle(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3, 'S3_AUGMENT_TABLE',
+            [('get_bucket_lifecycle_configuration', 'Lifecycle', None, None)])
+        session_factory = self.replay_flight_data('test_s3_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-lifecycle-test'
+
+        # Make a bucket
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        def get_policy(**kwargs):
+            rule = {
+                'Status': 'Enabled',
+                'Prefix': 'foo/',
+                'Transitions': [{
+                    'Days': 60,
+                    'StorageClass': 'GLACIER',
+                }],
+            }
+            rule.update(**kwargs)
+
+            policy = {
+                'name': 's3-lifecycle',
+                'resource': 's3',
+                'filters': [{'Name': bname}],
+                'actions': [{
+                    'type': 'configure-lifecycle',
+                    'rules': [rule],
+                }]
+            }
+            return policy
+
+        def run_policy(policy):
+            p = self.load_policy(policy, session_factory=session_factory)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+            if self.recording:
+                time.sleep(5)
+
+        #
+        # Add the first lifecycle
+        #
+        lifecycle_id1 = 'test-lifecycle'
+        policy = get_policy(ID=lifecycle_id1)
+        run_policy(policy)
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
+
+        #
+        # Now add another lifecycle rule to ensure it doesn't clobber the first one
+        #
+        lifecycle_id2 = 'test-lifecycle-two'
+        policy = get_policy(ID=lifecycle_id2, Prefix='bar/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        #
+        # Next, overwrite one of the lifecycles and make sure it changed
+        #
+        policy = get_policy(ID=lifecycle_id2, Prefix='baz/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        for rule in lifecycle['Rules']:
+            if rule['ID'] == lifecycle_id2:
+                self.assertEqual(rule['Prefix'], 'baz/')
+
+        #
+        # Test deleting a lifecycle
+        #
+        policy = get_policy(ID=lifecycle_id1, Status='absent')
+        run_policy(policy)
+
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 1)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id2)

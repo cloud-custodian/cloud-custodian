@@ -12,7 +12,7 @@ test:
 	./bin/tox -e py27
 
 nose-tests:
-	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 tests
+	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 --process-timeout=300 tests
 
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer --process-timeout=300 tests
@@ -24,6 +24,9 @@ depcache:
 	tar cvf custodian-deps.tgz deps
 	rm -Rf dep-download
 	rm -Rf deps
+
+ftest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
 
 sphinx:
 	make -f docs/Makefile.sphinx clean && \

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ class SchemaTest(BaseTest):
                 ]}
 
         result = validate(data)
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.assertTrue(isinstance(result[0], ValueError))
         self.assertTrue('monday-morning' in str(result[0]))
 
@@ -94,9 +94,11 @@ class SchemaTest(BaseTest):
                 error.absolute_schema_path))
 
         self.assertTrue(
-            "u'skipped_devices': []" in error.message)
+            "'skipped_devices': []" in error.message)
         self.assertTrue(
-            "u'type': u'ebs'" in error.message)
+            "u'type': u'ebs'" in error.message or
+            "'type': 'ebs'" in error.message
+        )
 
     @mock.patch('c7n.schema.specific_error')
     def test_handle_specific_error_fail(self, mock_specific_error):
@@ -142,10 +144,12 @@ class SchemaTest(BaseTest):
         self.assertTrue(
             len(errors[0].absolute_schema_path) < len(
                 error.absolute_schema_path))
-        self.assertEqual(
-            error.message,
-            ("Additional properties are not allowed "
-             "(u'skipped_devices' was unexpected)"))
+        self.assertTrue(
+            "Additional properties are not allowed " in error.message
+        )
+        self.assertTrue(
+            "'skipped_devices' was unexpected" in error.message
+        )
 
     def test_invalid_resource_type(self):
         data = {
@@ -281,3 +285,18 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 0)
 
+    def test_runtime(self):
+        data = lambda runtime: {
+            'policies': [{
+                'name': 'test',
+                'resource': 's3',
+                'mode': {
+                    'execution-options': {'metrics_enabled': False},
+                    'type': 'periodic',
+                    'schedule': 'xyz',
+                    'runtime': runtime}}]
+            }
+        errors_with = lambda r: list(Validator(generate()).iter_errors(data(r)))
+        self.assertEqual(len(errors_with('python2.7')), 0)
+        self.assertEqual(len(errors_with('python3.6')), 0)
+        self.assertEqual(len(errors_with('python4.5')), 1)

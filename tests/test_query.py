@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,23 +27,23 @@ class ResourceQueryTest(BaseTest):
     def test_query_filter(self):
         session_factory = self.replay_flight_data('test_query_filter')
         q = ResourceQuery(session_factory)
-        resources = q.filter(EC2.resource_type)
+        resources = q.filter(EC2)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_get(self):
         session_factory = self.replay_flight_data('test_query_get')
         q = ResourceQuery(session_factory)
-        resources = q.get(EC2.resource_type, ['i-9432cb49'])
+        resources = q.get(EC2, ['i-9432cb49'])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_model_get(self):
         session_factory = self.replay_flight_data('test_query_model')
         q = ResourceQuery(session_factory)
-        resources = q.filter(InternetGateway.resource_type)
+        resources = q.filter(InternetGateway)
         self.assertEqual(len(resources), 3)
-        resources = q.get(InternetGateway.resource_type, ['igw-3d9e3d56'])
+        resources = q.get(InternetGateway, ['igw-3d9e3d56'])
         self.assertEqual(len(resources), 1)
 
 
@@ -59,26 +59,23 @@ class QueryResourceManagerTest(BaseTest):
             {'name': 'igw-check',
              'resource': 'internet-gateway',
              'filters': [{
-                 'InternetGatewayId': 'igw-5bce113e'}]},
+                 'InternetGatewayId': 'igw-2e65104a'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         output = self.capture_logging(
             name=p.resource_manager.log.name, level=logging.DEBUG)
         p.run()
         self.assertTrue("Using cached internet-gateway: 3", output.getvalue())
-        
+
     def test_get_resources(self):
         session_factory = self.replay_flight_data('test_query_manager_get')
         p = self.load_policy(
             {'name': 'igw-check',
              'resource': 'internet-gateway'},
             session_factory=session_factory)
-        resources = p.resource_manager.get_resources(['igw-5bce113e'])
+        resources = p.resource_manager.get_resources(['igw-2e65104a'])
         self.assertEqual(len(resources), 1)
         resources = p.resource_manager.get_resources(['igw-5bce113f'])
         self.assertEqual(resources, [])
-    
-             
-            

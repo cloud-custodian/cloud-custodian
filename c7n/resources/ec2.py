@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from concurrent.futures import as_completed
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, AutoTagUser, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
@@ -34,7 +34,7 @@ from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -43,12 +43,11 @@ from c7n.utils import type_schema
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
-actions.register('auto-tag-user', AutoTagUser)
 filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
-class EC2(QueryResourceManager):
+class EC2(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -107,6 +106,16 @@ class EC2(QueryResourceManager):
                 qf.append(qd)
         return qf
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeEC2(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeEC2(query.DescribeSource):
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
@@ -120,11 +129,11 @@ class EC2(QueryResourceManager):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-
         # First if we're in event based lambda go ahead and skip this,
         # tags can't be trusted in ec2 instances immediately post creation.
-        if not resources or self.data.get('mode', {}).get('type', '') in (
-                'cloudtrail', 'ec2-instance-state'):
+        if not resources or self.manager.data.get(
+                'mode', {}).get('type', '') in (
+                    'cloudtrail', 'ec2-instance-state'):
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -142,8 +151,8 @@ class EC2(QueryResourceManager):
             return resources
 
         # Okay go and do the tag lookup
-        client = utils.local_session(self.session_factory).client('ec2')
-        tag_set = self.retry(
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        tag_set = self.manager.retry(
             client.describe_tags,
             Filters=[{'Name': 'resource-type',
                       'Values': ['instance']}])['Tags']
@@ -153,7 +162,7 @@ class EC2(QueryResourceManager):
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.get_model()
+        m = self.manager.get_model()
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
@@ -295,9 +304,28 @@ class AttachedVolume(ValueFilter):
 
 class InstanceImageBase(object):
 
-    def get_image_mapping(self, resources):
+    def prefetch_instance_images(self, instances):
+        image_ids = [i['ImageId'] for i in instances if 'c7n:instance-image' not in i]
+        self.image_map = self.get_local_image_mapping(image_ids)
+
+    def get_base_image_mapping(self):
         return {i['ImageId']: i for i in
                 self.manager.get_resource_manager('ami').resources()}
+
+    def get_instance_image(self, instance):
+        image = instance.get('c7n:instance-image', None)
+        if not image:
+            image = instance['c7n:instance-image'] = self.image_map.get(instance['ImageId'], None)
+        return image
+
+    def get_local_image_mapping(self, image_ids):
+        base_image_map = self.get_base_image_mapping()
+        resources = {i: base_image_map[i] for i in image_ids if i in base_image_map}
+        missing = list(set(image_ids) - set(resources.keys()))
+        if missing:
+            loaded = self.manager.get_resource_manager('ami').get_resources(missing, False)
+            resources.update({image['ImageId']: image for image in loaded})
+        return resources
 
 
 @filters.register('image-age')
@@ -330,15 +358,15 @@ class ImageAge(AgeFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(ImageAge, self).process(resources, event)
 
     def get_resource_date(self, i):
-        if i['ImageId'] not in self.image_map:
-            # our image is no longer available
+        image = self.get_instance_image(i)
+        if image:
+            return parse(image['CreationDate'])
+        else:
             return parse("2000-01-01T01:01:01.000Z")
-        image = self.image_map[i['ImageId']]
-        return parse(image['CreationDate'])
 
 
 @filters.register('image')
@@ -350,11 +378,12 @@ class InstanceImage(ValueFilter, InstanceImageBase):
         return self.manager.get_resource_manager('ami').get_permissions()
 
     def process(self, resources, event=None):
-        self.image_map = self.get_image_mapping(resources)
+        self.prefetch_instance_images(resources)
         return super(InstanceImage, self).process(resources, event)
 
     def __call__(self, i):
-        image = self.image_map.get(i['ImageId'])
+        image = self.get_instance_image(i)
+        # Finally, if we have no image...
         if not image:
             self.log.warning(
                 "Could not locate image for instance:%s ami:%s" % (
@@ -452,7 +481,7 @@ class EphemeralInstanceFilter(Filter):
     @staticmethod
     def is_ephemeral(i):
         for bd in i.get('BlockDeviceMappings', []):
-            if bd['DeviceName'] in ('/dev/sda1', '/dev/xvda'):
+            if bd['DeviceName'] in ('/dev/sda1', '/dev/xvda', 'xvda'):
                 if 'Ebs' in bd:
                     return False
                 return True
@@ -613,6 +642,7 @@ class Start(BaseAction, StateTransitionFilter):
     schema = type_schema('start')
     permissions = ('ec2:StartInstances',)
     batch_size = 10
+    exception = None
 
     def _filter_ec2_with_volumes(self, instances):
         return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
@@ -623,35 +653,38 @@ class Start(BaseAction, StateTransitionFilter):
         if not len(instances):
             return
 
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        failures = {}
 
         # Play nice around aws having insufficient capacity...
         for itype, t_instances in utils.group_by(
                 instances, 'InstanceType').items():
             for izone, z_instances in utils.group_by(
-                    t_instances, 'AvailabilityZone').items():
+                    t_instances, 'Placement.AvailabilityZone').items():
                 for batch in utils.chunks(z_instances, self.batch_size):
-                    self.process_instance_set(client, batch, itype, izone)
+                    fails = self.process_instance_set(client, batch, itype, izone)
+                    if fails:
+                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
+
+        if failures:
+            fail_count = sum(map(len, failures.values()))
+            msg = "Could not start %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
 
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
-        retry = utils.get_retry((
-            'InsufficientInstanceCapacity',
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
-            max_attempts=5)
+        retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+                     'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InsufficientInstanceCapacity':
-                self.log.exception(
-                    ("Could not start instances:%d type:%s"
-                     " zone:%s instances:%s error:%s"),
-                    len(instances), itype, izone,
-                    ", ".join(instance_ids), e)
-                return
-            self.log.exception("Error while starting instances error %s", e)
+            if e.response['Error']['Code'] in retryable:
+                return True
             raise
 
 
@@ -977,9 +1010,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         interfaces = []
         for i in instances:
             for eni in i['NetworkInterfaces']:
-                if i.get('c7n.matched-security-groups'):
-                    eni['c7n.matched-security-groups'] = i[
-                        'c7n.matched-security-groups']
+                if i.get('c7n:matched-security-groups'):
+                    eni['c7n:matched-security-groups'] = i[
+                        'c7n:matched-security-groups']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
@@ -1065,7 +1098,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         policies:
           - name: set-default-instance-profile
             resource: ec2
-            query:
+            filters:
               - IamInstanceProfile: absent
             actions:
               - type: set-instance-profile
@@ -1141,6 +1174,7 @@ EC2_VALID_FILTERS = {
     'tag-key': str,
     'tag-value': str,
     'tag:': str,
+    'tenancy': ('dedicated', 'default', 'host'),
     'vpc-id': str}
 
 

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +26,15 @@ import fnmatch
 import functools
 import jsonschema
 import logging
+import sys
 import time
 import os
 import operator
 from tabulate import tabulate
 import yaml
+
+from c7n.executor import MainThreadExecutor
+MainThreadExecutor.async = False
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('c7n.worker').setLevel(logging.DEBUG)
@@ -43,6 +47,17 @@ CONFIG_SCHEMA = {
     '$schema': 'http://json-schema.org/schema#',
     'id': 'http://schema.cloudcustodian.io/v0/logexporter.json',
     'definitions': {
+        'subscription': {
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['destination-arn'],
+            'properties': {
+                'destination-arn': {'type': 'string'},
+                'destination-role': {'type': 'string'},
+                'managed-policy': {'type': 'boolean'},
+                'name': {'type': 'string'},
+                },
+        },
         'destination': {
             'type': 'object',
             'additionalProperties': False,
@@ -75,7 +90,8 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
         },
-        'destination': {'$ref': '#/definitions/destination'}
+        'destination': {'$ref': '#/definitions/destination'},
+        'subscription': {'$ref': '#/definitions/subscription'}
     }
 }
 
@@ -127,19 +143,87 @@ def validate(config):
 
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
+@click.option('-a', '--accounts', multiple=True)
+@click.option('--force', is_flag=True, default=False)
+@click.option('--debug', is_flag=True, default=False)
+def subscribe(config, accounts, force, debug):
+    """subscribe accounts log groups to target account log group destination"""
+    config = validate.callback(config)
+    subscription = config.get('subscription')
+
+    if subscription is None:
+        log.error("config file: logs subscription missing")
+        sys.exit(1)
+
+    def converge_destination_policy(client, config):
+        destination_name = subscription['destination-arn'].rsplit(':', 1)[-1]
+        try:
+            client.get_get_destinations(
+                DestinationNamePrefix=destination_name)
+        except ClientError:
+            log.error("Log group destination not found: %s",
+                      subscription['destination-arn'])
+            sys.exit(1)
+        account_ids = [a['role'].split(':')[4] for a in config.get('accounts')]
+        client.put_destination_policy(
+            destinationName=destination_name,
+            accessPolicy=json.dumps({
+                'Statement': [{
+                    'Action': 'logs:PutSubscriptionFilter',
+                    'Effect': 'Allow',
+                    'Principal': {'AWS': account_ids},
+                    'Resource': subscription['destination-arn'],
+                    'Sid': 'CrossAccountDelivery'}]}))
+
+    def subscribe_account(account, subscription):
+        session = get_session(account['role'])
+        client = session.client('logs')
+
+        for g in account.get('groups'):
+            client.put_subscription_filter(
+                logGroupName=g,
+                filterName=subscription.get('name', 'FlowLogStream'),
+                filterPattern="",
+                distribution=subscription.get('distribution', 'ByLogStream'))
+
+    if subscription.get('managed-policy'):
+        if subscription.get('destination-role'):
+            session = get_session(subscription['destination-role'])
+        else:
+            session = boto3.Session()
+        converge_destination_policy(session.client('logs'), config)
+
+    executor = debug and MainThreadExecutor or ThreadPoolExecutor
+
+    with executor(max_workers=32) as w:
+        futures = {}
+        for account in config.get('accounts', ()):
+            if accounts and account['name'] not in accounts:
+                continue
+            futures[w.submit(subscribe_account, account, subscription)] = account
+
+        for f in as_completed(futures):
+            account = futures[f]
+            if f.exception():
+                log.error("Error on account %s err: %s",
+                          account['name'], f.exception())
+            log.info("Completed %s", account['name'])
+
+
+@cli.command()
+@click.option('--config', type=click.Path(), required=True)
 @click.option('--start', required=True)
 @click.option('--end')
 @click.option('-a', '--accounts', multiple=True)
+@click.option('--debug', is_flag=True, default=False)
 def run(config, start, end, accounts):
     """run export across accounts and log groups specified in config."""
     config = validate.callback(config)
     destination = config.get('destination')
     start = start and parse(start) or start
     end = end and parse(end) or datetime.now()
-    #from c7n.executor import MainThreadExecutor
-    #MainThreadExecutor.async = False
-    #with MainThreadExecutor() as w:
-    with ThreadPoolExecutor(max_workers=32) as w:
+    executor = debug and MainThreadExecutor or ThreadPoolExecutor
+    with executor(max_workers=32) as w:
         futures = {}
         for account in config.get('accounts', ()):
             if accounts and account['name'] not in accounts:
@@ -183,13 +267,13 @@ def process_account(account, start, end, destination, incremental=True):
     client = session.client('logs')
 
     paginator = client.get_paginator('describe_log_groups')
-    groups = []
+    all_groups = []
     for p in paginator.paginate():
-        groups.extend([g for g in p.get('logGroups', ())])
+        all_groups.extend([g for g in p.get('logGroups', ())])
 
-    group_count = len(groups)
+    group_count = len(all_groups)
     groups = filter_creation_date(
-        filter_group_names(groups, account['groups']),
+        filter_group_names(all_groups, account['groups']),
         start, end)
 
     if incremental:
@@ -201,6 +285,10 @@ def process_account(account, start, end, destination, incremental=True):
     log.info("account:%s matched %d groups of %d",
              account.get('name', account_id), len(groups), group_count)
 
+    if not groups:
+        log.warning("account:%s no groups matched, all groups \n  %s",
+                    account.get('name', account_id), "\n  ".join(
+                        [g['logGroupName'] for g in all_groups]))
     t = time.time()
     for g in groups:
         export.callback(
@@ -316,7 +404,7 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
         return sorted(days)
     last_export = parse(tags['LastExport'])
     if last_export.tzinfo is None:
-        last_export.replace(tzinfo=tzutc())
+        last_export = last_export.replace(tzinfo=tzutc())
     return [d for d in sorted(days) if d > last_export]
 
 
@@ -363,7 +451,7 @@ def access(config, accounts=()):
 def GetHumanSize(size, precision=2):
     # interesting discussion on 1024 vs 1000 as base
     # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes=['B','KB','MB','GB','TB', 'PB']
+    suffixes = ['B','KB','MB','GB','TB', 'PB']
     suffixIndex = 0
     while size > 1024:
         suffixIndex += 1
@@ -428,6 +516,7 @@ def size(config, accounts=(), day=None, group=None, human=True):
     accounts_report.sort(key=operator.itemgetter('count'), reverse=True)
     print(tabulate(accounts_report, headers='keys'))
     log.info("total size:%s", GetHumanSize(total_size))
+
 
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
@@ -633,7 +722,6 @@ def get_exports(client, bucket, prefix, latest=True):
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end')
 @click.option('--role', help="sts role to assume for log group access")
-@click.option('--role', help="sts role to assume for log group access")
 @click.option('--poll-period', type=float, default=300)
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
@@ -650,12 +738,17 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         session = get_session(role)
 
     client = session.client('logs')
+    for _group in client.describe_log_groups()['logGroups']:
+        if _group['logGroupName'] == group:
+            break
+    else:
+        raise ValueError('Log group not found.')
+    group = _group
 
     if prefix:
-        prefix = "%s/%s" % (prefix.rstrip('/'),
-            group['logGroupName'].strip('/'))
+        prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
     else:
-        prefix = group
+        prefix = group['logGroupName']
 
     named_group = "%s:%s" % (name, group['logGroupName'])
     log.info(
@@ -668,14 +761,16 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         group['storedBytes'])
 
     t = time.time()
-    days = [(start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+    days = [(start + timedelta(i)).replace(
+                minute=0, hour=0, second=0, microsecond=0)
             for i in range((end - start).days)]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)
 
     log.info("Group:%s filtering s3 extant keys from %d to %d start:%s end:%s",
-             named_group, day_count, len(days), days[0], days[-1])
+             named_group, day_count, len(days),
+             days[0] if days else '', days[-1] if days else '')
     t = time.time()
 
     retry = get_retry(('SlowDown',))
@@ -700,9 +795,9 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         # if stream_prefix:
         #    params['logStreamPrefix'] = stream_prefix
         try:
-            head = s3.head_object(Bucket=bucket, Key=prefix)
+            s3.head_object(Bucket=bucket, Key=prefix)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'NotFound':
+            if e.response['Error']['Code'] != '404':  # Not Found
                 raise
             s3.put_object(
                 Bucket=bucket,
@@ -728,7 +823,7 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
                             (counter * poll_period) / 60.0)
                     continue
                 raise
-            log_result = retry(
+            retry(
                 s3.put_object_tagging,
                 Bucket=bucket, Key=prefix,
                 Tagging={

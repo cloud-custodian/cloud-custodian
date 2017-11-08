@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class CliTest(BaseTest):
         try:
             cli.main()
         except SystemExit as e:
-            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.message))
+            self.fail('Expected sys.exit would not be called. Exit code was ({})'.format(e.code))
         return out.getvalue(), err.getvalue()
 
     def run_and_expect_failure(self, argv, exit_code):
@@ -262,6 +262,7 @@ class ReportTest(CliTest):
         # This test is to examine the warning output supplied when -p is used and
         # the resulting policy set is empty.  It is not specific to the `report`
         # subcommand - it is also used by `run` and a few other subcommands.
+
         policy_name = 'test-policy'
         valid_policies = {
             'policies':
@@ -366,8 +367,9 @@ class RunTest(CliTest):
         )
 
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory',
-                   staticmethod(lambda x=None: session_factory))
+        self.patch(
+            PolicyCollection, 'session_factory',
+            staticmethod(lambda x=None: session_factory))
 
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({
@@ -386,7 +388,12 @@ class RunTest(CliTest):
         #self.assertIn('metric:ResourceCount Count:1 policy:ec2-state-transition-age', logs)
 
         self.run_and_expect_success(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
         )
 
     def test_error(self):
@@ -410,7 +417,12 @@ class RunTest(CliTest):
         })
 
         self.run_and_expect_failure(
-            ['custodian', 'run', '-s', temp_dir, yaml_file],
+            [
+                'custodian', 'run',
+                '--cache', temp_dir + '/cache',
+                '-s', temp_dir,
+                yaml_file,
+            ],
             2
         )
 
@@ -433,10 +445,11 @@ class MetricsTest(CliTest):
 
     def test_metrics(self):
         session_factory = self.replay_flight_data('test_lambda_policy_metrics')
-
         from c7n.policy import PolicyCollection
-        self.patch(PolicyCollection, 'test_session_factory',
-                   staticmethod(lambda x=None: session_factory))
+
+        self.patch(
+            PolicyCollection, 'session_factory',
+            staticmethod(lambda x=None: session_factory))
 
         yaml_file = self.write_policy_file({
             'policies': [{

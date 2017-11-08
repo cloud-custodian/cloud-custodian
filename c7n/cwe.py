@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -114,15 +114,15 @@ class CloudWatchEvents(object):
     @classmethod
     def get_trail_ids(cls, event, mode):
         """extract resources ids from a cloud trail event."""
-        # Check if we have a short cut / alias
-        info = CloudWatchEvents.match(event)
-        if info:
-            return info['ids'].search(event)
         resource_ids = ()
         event_name = event['detail']['eventName']
         event_source = event['detail']['eventSource']
         for e in mode.get('events', []):
             if not isinstance(e, dict):
+                # Check if we have a short cut / alias
+                info = CloudWatchEvents.match(event)
+                if info:
+                    return info['ids'].search(event)
                 continue
             if event_name != e.get('event'):
                 continue

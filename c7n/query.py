@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import json
 
 import six
 from botocore.client import ClientError
+from botocore.paginate import set_value_from_jmespath
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
-from c7n.tags import register_tags
+from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
 from c7n.registry import PluginRegistry
@@ -49,33 +50,40 @@ class ResourceQuery(object):
             m = resource_type
         return m
 
-    def filter(self, resource_type, **params):
+    def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
+        if client.can_paginate(enum_op):
+            p = client.get_paginator(enum_op)
+            results = p.paginate(**params)
+            if retry:
+                data = pager(results, retry)
+            else:
+                data = results.build_full_result()
+        else:
+            op = getattr(client, enum_op)
+            data = op(**params)
+
+        if path:
+            path = jmespath.compile(path)
+            data = path.search(data)
+
+        return data
+
+    def filter(self, resource_manager, **params):
         """Query a set of resources."""
-        m = self.resolve(resource_type)
+        m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(
             m.service)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
+        return self._invoke_client_enum(
+            client, enum_op, params, path,
+            getattr(resource_manager, 'retry', None)) or []
 
-        if client.can_paginate(enum_op):
-            p = client.get_paginator(enum_op)
-            results = p.paginate(**params)
-            data = results.build_full_result()
-        else:
-            op = getattr(client, enum_op)
-            data = op(**params)
-        if path:
-            path = jmespath.compile(path)
-            data = path.search(data)
-        if data is None:
-            data = []
-        return data
-
-    def get(self, resource_type, identities):
+    def get(self, resource_manager, identities):
         """Get resources by identities
         """
-        m = self.resolve(resource_type)
+        m = self.resolve(resource_manager.resource_type)
         params = {}
         client_filter = False
 
@@ -89,7 +97,7 @@ class ResourceQuery(object):
         else:
             client_filter = True
 
-        resources = self.filter(resource_type, **params)
+        resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
             # https://github.com/capitalone/cloud-custodian/issues/1398
@@ -101,9 +109,58 @@ class ResourceQuery(object):
         return resources
 
 
+class ChildResourceQuery(ResourceQuery):
+    """A resource query for resources that must be queried with parent information.
+
+    Several resource types can only be queried in the context of their
+    parents identifiers. ie. efs mount targets (parent efs), route53 resource
+    records (parent hosted zone), ecs services (ecs cluster).
+    """
+    def __init__(self, session_factory, manager):
+        self.session_factory = session_factory
+        self.manager = manager
+
+    def filter(self, resource_manager, **params):
+        """Query a set of resources."""
+
+        m = self.resolve(resource_manager.resource_type)
+        client = local_session(self.session_factory).client(m.service)
+
+        enum_op, path, extra_args = m.enum_spec
+        if extra_args:
+            params.update(extra_args)
+
+        parent_type, parent_key = m.parent_spec
+        parents = self.manager.get_resource_manager(parent_type)
+        parent_ids = [p[parents.resource_type.id] for p in parents.resources()]
+
+        # Bail out with no parent ids...
+        existing_param = parent_key in params
+        if not existing_param and len(parent_ids) == 0:
+            return []
+
+        # Handle a query with parent id
+        if existing_param:
+            return self._invoke_client_enum(client, enum_op, params, path)
+
+        # Have to query separately for each parent's children.
+        results = []
+        for parent_id in parent_ids:
+            merged_params = dict(params, **{parent_key: parent_id})
+            subset = self._invoke_client_enum(
+                client, enum_op, merged_params, path)
+            if subset:
+                results.extend(subset)
+
+        return results
+
+
 class QueryMeta(type):
 
     def __new__(cls, name, parents, attrs):
+        if 'resource_type' not in attrs:
+            return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
+
         if 'filter_registry' not in attrs:
             attrs['filter_registry'] = FilterRegistry(
                 '%s.filters' % name.lower())
@@ -114,7 +171,7 @@ class QueryMeta(type):
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])
             # Generic cloud watch metrics support
-            if m.dimension and 'metrics':
+            if m.dimension:
                 attrs['filter_registry'].register('metrics', MetricsFilter)
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
@@ -123,8 +180,12 @@ class QueryMeta(type):
                     'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
-                    register_tags(
+                    register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
+            if getattr(m, 'universal_taggable', False):
+                register_universal_tags(
+                    attrs['filter_registry'], attrs['action_registry'])
+
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
@@ -135,29 +196,18 @@ def _napi(op_name):
 sources = PluginRegistry('sources')
 
 
-class Source(object):
-
-    def __init__(self, manager):
-        self.manager = manager
-
-
 @sources.register('describe')
-class DescribeSource(Source):
+class DescribeSource(object):
 
     def __init__(self, manager):
         self.manager = manager
         self.query = ResourceQuery(self.manager.session_factory)
 
     def get_resources(self, ids, cache=True):
-        return self.query.get(self.manager.resource_type, ids)
+        return self.query.get(self.manager, ids)
 
     def resources(self, query):
-        if self.manager.retry:
-            resources = self.manager.retry(
-                self.query.filter, self.manager.resource_type, **query)
-        else:
-            resources = self.query.filter(self.manager.resource_type, **query)
-        return resources
+        return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
         m = self.manager.get_model()
@@ -185,8 +235,22 @@ class DescribeSource(Source):
             return list(itertools.chain(*results))
 
 
+@sources.register('describe-child')
+class ChildDescribeSource(DescribeSource):
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+
+
 @sources.register('config')
-class ConfigSource(Source):
+class ConfigSource(object):
+
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+
+    def __init__(self, manager):
+        self.manager = manager
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -197,15 +261,22 @@ class ConfigSource(Source):
         results = []
         m = self.manager.get_model()
         for i in ids:
-            results.append(
-                camelResource(
-                    json.loads(
-                        client.get_resource_config_history(
-                            resourceId=i,
-                            resourceType=m.config_type,
-                            limit=1)[
-                                'configurationItems'][0]['configuration'])))
-        return results
+            revisions = self.retry(
+                client.get_resource_config_history,
+                resourceId=i,
+                resourceType=m.config_type,
+                limit=1).get('configurationItems')
+            if not revisions:
+                continue
+            results.append(self.load_resource(revisions[0]))
+        return filter(None, results)
+
+    def load_resource(self, item):
+        if isinstance(item['configuration'], six.string_types):
+            item_config = json.loads(item['configuration'])
+        else:
+            item_config = item['configuration']
+        return camelResource(item_config)
 
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
@@ -213,10 +284,11 @@ class ConfigSource(Source):
         pages = paginator.paginate(
             resourceType=self.manager.get_model().config_type)
         results = []
+
         with self.manager.executor_factory(max_workers=5) as w:
+            ridents = pager(pages, self.retry)
             resource_ids = [
-                r['resourceId'] for r in
-                pages.build_full_result()['resourceIdentifiers']]
+                r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
             self.manager.log.debug(
                 "querying %d %s resources",
                 len(resource_ids),
@@ -227,14 +299,36 @@ class ConfigSource(Source):
                 futures.append(w.submit(self.get_resources, resource_set))
                 for f in as_completed(futures):
                     if f.exception():
-                        self.log.error(
-                            "Exception creating snapshot set \n %s" % (
+                        self.manager.log.error(
+                            "Exception getting resources from config \n %s" % (
                                 f.exception()))
                     results.extend(f.result())
         return results
 
     def augment(self, resources):
         return resources
+
+
+def pager(p, retry):
+    results = {}
+    iterator = iter(p)
+
+    while True:
+        try:
+            page = retry(next, iterator)
+        except StopIteration:
+            return results
+        if isinstance(page, tuple) and len(page) == 2:
+            page = page[1]
+        for rexpr in p.result_keys:
+            rv = rexpr.search(page)
+            if rv is None:
+                continue
+            ev = rexpr.search(results)
+            if ev is None:
+                set_value_from_jmespath(results, rexpr.expression, rv)
+                continue
+            ev.extend(rv)
 
 
 @six.add_metaclass(QueryMeta)
@@ -254,11 +348,14 @@ class QueryResourceManager(ResourceManager):
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
-        self.source = sources.get(self.source_type)(self)
+        self.source = self.get_source(self.source_type)
 
     @property
     def source_type(self):
         return self.data.get('source', 'describe')
+
+    def get_source(self, source_type):
+        return sources.get(source_type)(self)
 
     @classmethod
     def get_model(cls):
@@ -287,7 +384,8 @@ class QueryResourceManager(ResourceManager):
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
                     len(resources)))
                 return self.filter_resources(resources)
 
@@ -337,11 +435,12 @@ class QueryResourceManager(ResourceManager):
     def get_arns(self, resources):
         arns = []
         for r in resources:
-            _id = r[self.manager.get_model().id]
+            _id = r[self.get_model().id]
             if 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))
+        return arns
 
     @property
     def generate_arn(self):
@@ -354,8 +453,18 @@ class QueryResourceManager(ResourceManager):
                 region=self.config.region,
                 account_id=self.account_id,
                 resource_type=self.get_model().type,
-                separator=':')
+                separator='/')
         return self._generate_arn
+
+
+class ChildResourceManager(QueryResourceManager):
+
+    @property
+    def source_type(self):
+        source = self.data.get('source', 'describe-child')
+        if source == 'describe':
+            source = 'describe-child'
+        return source
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):

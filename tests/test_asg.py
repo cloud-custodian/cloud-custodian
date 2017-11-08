@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,12 +111,12 @@ class AutoScalingTest(BaseTest):
             'resource': 'asg',
             'filters': [
                 {'type': 'vpc-id',
-                 'value': 'vpc-399e3d52'}]
+                 'value': 'vpc-d2d616b5'}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['LaunchConfigurationName'], 'CustodianASGTest')
+            resources[0]['LaunchConfigurationName'], 'foo-bar')
 
     def test_asg_tag_and_propagate(self):
         factory = self.replay_flight_data('test_asg_tag')
@@ -308,6 +308,15 @@ class AutoScalingTest(BaseTest):
                 'AutoScalingGroups'].pop()
         self.assertFalse(result['SuspendedProcesses'])
 
+    def test_asg_third_ami_filter(self):
+        factory = self.replay_flight_data('test_asg_invalid_third_ami')
+        p = self.load_policy({
+            'name': 'asg-invalid-filter-3ami',
+            'resource': 'asg',
+            'filters': ['invalid']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_asg_invalid_filter_good(self):
         factory = self.replay_flight_data('test_asg_invalid_filter_good')
         p = self.load_policy({
@@ -364,7 +373,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n:matched-security-groups'], ['sg-aa6c90c3'])
+            resources[0]['c7n:matched-security-groups'], ['sg-0b3d3377'])
 
     def test_asg_security_group(self):
         factory = self.replay_flight_data('test_asg_security_group')

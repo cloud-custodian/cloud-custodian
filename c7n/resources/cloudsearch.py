@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ class CloudSearch(QueryResourceManager):
         enum_spec = ("describe_domains", "DomainStatusList", None)
         name = id = "DomainName"
         dimension = "DomainName"
+        filter_name = 'DomainNames'
+        filter_type = 'list'
 
 
 @CloudSearch.action_registry.register('delete')

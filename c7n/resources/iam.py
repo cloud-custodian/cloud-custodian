@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import itertools
 import time
 
 from concurrent.futures import as_completed
-from dateutil.parser import parse
 from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
@@ -92,6 +91,7 @@ class Policy(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Policy"
+        filter_name = None
 
     arn_path_prefix = "aws:policy/"
 
@@ -822,6 +822,141 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.action_registry.register('delete')
+class UserDelete(BaseAction):
+    """Delete a user.
+
+    For example if you want to have a whitelist of valid (machine-)users
+    and want to ensure that no users have been clicked without documentation.
+
+    You can use both the 'credential' or the 'username'
+    filter. 'credential' will have an SLA of 4h,
+    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html),
+    but the added benefit of performing less API calls, whereas
+    'username' will make more API calls, but have a SLA of your cache.
+
+    :example:
+
+      .. code-block: yaml
+
+        # using a 'credential' filter'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: credential
+              key: user
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+        # using a 'username' filter with 'UserName'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: UserName
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+         # using a 'username' filter with 'Arn'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: Arn
+              op: not-in
+              value:
+                - arn:aws:iam:123456789012:user/valid-user-1
+                - arn:aws:iam:123456789012:user/valid-user-2
+          actions:
+            - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = (
+        'iam:ListAttachedUserPolicies',
+        'iam:ListAccessKeys',
+        'iam:ListGroupsForUser',
+        'iam:ListMFADevices',
+        'iam:ListServiceSpecificCredentials',
+        'iam:ListSigningCertificates',
+        'iam:ListSSHPublicKeys',
+        'iam:DeactivateMFADevice',
+        'iam:DeleteAccessKey',
+        'iam:DeleteLoginProfile',
+        'iam:DeleteSigningCertificate',
+        'iam:DeleteSSHPublicKey',
+        'iam:DeleteUser',
+        'iam:DetachUserPolicy',
+        'iam:RemoveUserFromGroup')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.log.debug('Deleting user %s' % r['UserName'])
+            self.process_user(client, r)
+
+    def process_user(self, client, r):
+        try:
+            client.delete_login_profile(
+                UserName=r['UserName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                raise
+
+        # Access Keys
+        response = client.list_access_keys(UserName=r['UserName'])
+        for access_key in response['AccessKeyMetadata']:
+            client.delete_access_key(UserName=r['UserName'],
+                                     AccessKeyId=access_key['AccessKeyId'])
+
+        # User Policies
+        response = client.list_attached_user_policies(UserName=r['UserName'])
+        for user_policy in response['AttachedPolicies']:
+            client.detach_user_policy(
+                UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
+
+        # HW MFA Devices
+        response = client.list_mfa_devices(UserName=r['UserName'])
+        for mfa_device in response['MFADevices']:
+            client.deactivate_mfa_device(
+                UserName=r['UserName'], SerialNumber=mfa_device['SerialNumber'])
+
+        # Groups
+        response = client.list_groups_for_user(UserName=r['UserName'])
+        for user_group in response['Groups']:
+            client.remove_user_from_group(
+                UserName=r['UserName'], GroupName=user_group['GroupName'])
+
+        # SSH Keys
+        response = client.list_ssh_public_keys(UserName=r['UserName'])
+        for key in response.get('SSHPublicKeys', ()):
+            client.delete_ssh_public_key(
+                UserName=r['UserName'], SSHPublicKeyId=key['SSHPublicKeyId'])
+
+        # Signing Certificates
+        response = client.list_signing_certificates(UserName=r['UserName'])
+        for cert in response.get('Certificates', ()):
+            client.delete_signing_certificate(
+                UserName=r['UserName'], CertificateId=cert['CertificateId'])
+
+        # Service specific user credentials (codecommit)
+        response = client.list_service_specific_credentials(UserName=r['UserName'])
+        for screds in response.get('ServiceSpecificCredentials', ()):
+            client.delete_service_specific_credential(
+                UserName=r['UserName'],
+                ServiceSpecificCredentialId=screds['ServiceSpecificCredentialId'])
+
+        client.delete_user(UserName=r['UserName'])
+
+
 @User.action_registry.register('remove-keys')
 class UserRemoveAccessKey(BaseAction):
     """Delete or disable user's access keys.
@@ -862,7 +997,7 @@ class UserRemoveAccessKey(BaseAction):
             keys = r['AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(

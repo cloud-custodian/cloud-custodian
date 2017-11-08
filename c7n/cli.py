@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ def _report_options(p):
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
         help="Format to output data in (default: %(default)s). "
-        "Options include simple, grid, rst")
+        "Options include simple, grid, csv")
 
 
 def _metrics_options(p):

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -140,7 +140,8 @@ class LdapLookup(object):
                 self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
                 self.caching.set(uid, ldap_user_metadata)
         else:
-            self.caching.set(uid, {})
+            if self.cache_engine:
+                self.caching.set(uid, {})
             return {}
         return ldap_user_metadata
 
@@ -156,8 +157,7 @@ class LocalSqlite(object):
         self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
 
     def get(self, key):
-        sqlite_query = "select * FROM ldap_cache WHERE key='%s'" % key
-        sqlite_result = self.sqlite.execute(sqlite_query)
+        sqlite_result = self.sqlite.execute("select * FROM ldap_cache WHERE key=?", (key,))
         result = sqlite_result.fetchall()
         if len(result) != 1:
             error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
@@ -166,8 +166,8 @@ class LocalSqlite(object):
         return json.loads(result[0][1])
 
     def set(self, key, value):
-        sqlite_query = "INSERT INTO ldap_cache VALUES ('%s', '%s')" % (key, json.dumps(value))
-        self.sqlite.execute(sqlite_query)
+        # note, the ? marks are required to ensure escaping into the database.
+        self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
 
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)

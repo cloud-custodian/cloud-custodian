@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ def validate(data, schema=None):
         if dupes:
             return [ValueError(
                 "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)))]
+                    ", ".join(dupes))), dupes[0]]
         return []
     try:
         resp = specific_error(errors[0])
@@ -185,6 +185,7 @@ def generate(resource_types=()):
         'policy-mode': {
             'type': 'object',
             'required': ['type'],
+            'additionalProperties': False,
             'properties': {
                 'type': {
                     'enum': [
@@ -202,8 +203,19 @@ def generate(resource_types=()):
                          'properties': {
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}]
-                }}
+                             'event': {'type': 'string'}}}],
+                }},
+                'execution-options': {'type': 'object'},
+                'role': {'type': 'string'},
+                'runtime': {'enum': ['python2.7', 'python3.6']},
+                'memory': {'type': 'number'},
+                'timeout': {'type': 'number'},
+                'schedule': {'type': 'string'},
+                'dead_letter_config': {'type': 'object'},
+                'environment': {'type': 'object'},
+                'kms_key_arn': {'type': 'string'},
+                'tracing_config': {'type': 'object'},
+                'tags': {'type': 'object'},
             },
         },
     }

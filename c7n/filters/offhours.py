@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -248,6 +248,8 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',
@@ -425,9 +427,9 @@ class OffHour(Time):
         if self.weekends_only:
             default[self.time_type][0]['days'] = [4]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -448,9 +450,9 @@ class OnHour(Time):
             # turn on monday
             default[self.time_type][0]['days'] = [0]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -602,5 +604,5 @@ class ScheduleParser(object):
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1] + 1)
-        return range(min(day_range), max(day_range) + 1)
+            return list(range(day_range[0], 7)) + list(range(day_range[1] + 1))
+        return list(range(min(day_range), max(day_range) + 1))

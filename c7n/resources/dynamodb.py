@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.filters import FilterRegistry
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
@@ -30,7 +30,7 @@ filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('dynamodb-table')
-class Table(QueryResourceManager):
+class Table(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'dynamodb'
@@ -42,20 +42,31 @@ class Table(QueryResourceManager):
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
+        config_type = 'AWS::DynamoDB::Table'
 
     filter_registry = filters
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('dynamodb:ListTagsOfResource')
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeTable(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeTable(query.DescribeSource):
+
     def augment(self, tables):
-        resources = super(Table, self).augment(tables)
+        resources = super(DescribeTable, self).augment(tables)
         return list(filter(None, _dynamodb_table_tags(
-            self.get_model(),
+            self.manager.get_model(),
             resources,
-            self.session_factory,
-            self.executor_factory,
-            self.retry,
-            self.log)))
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry,
+            self.manager.log)))
 
 
 def _dynamodb_table_tags(
@@ -230,7 +241,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
 
 @resources.register('dynamodb-stream')
-class Stream(QueryResourceManager):
+class Stream(query.QueryResourceManager):
 
     # Note stream management takes place on the table resource
 

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,17 +27,26 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil.tz import tzutc
 
-from c7n.actions import BaseAction as Action
+import itertools
+
+from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.filters import Filter, OPERATORS, FilterValidationError
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
 
+universal_tag_retry = utils.get_retry((
+    'Throttled',
+    'RequestLimitExceeded',
+    'Client.RequestLimitExceeded'
+))
 
-def register_tags(filters, actions):
+
+def register_ec2_tags(filters, actions):
     filters.register('marked-for-op', TagActionFilter)
     filters.register('tag-count', TagCountFilter)
 
+    actions.register('auto-tag-user', AutoTagUser)
     actions.register('mark-for-op', TagDelayedAction)
     actions.register('tag-trim', TagTrim)
 
@@ -49,6 +58,49 @@ def register_tags(filters, actions):
     actions.register('remove-tag', RemoveTag)
     actions.register('rename-tag', RenameTag)
     actions.register('normalize-tag', NormalizeTag)
+
+
+def register_universal_tags(filters, actions):
+    filters.register('marked-for-op', TagActionFilter)
+    filters.register('tag-count', TagCountFilter)
+
+    actions.register('mark', UniversalTag)
+    actions.register('tag', UniversalTag)
+
+    actions.register('auto-tag-user', AutoTagUser)
+    actions.register('mark-for-op', UniversalTagDelayedAction)
+
+    actions.register('unmark', UniversalUntag)
+    actions.register('untag', UniversalUntag)
+    actions.register('remove-tag', UniversalUntag)
+
+
+def universal_augment(self, resources):
+    # Resource Tagging API Support
+    # https://goo.gl/uccKc9
+
+    client = utils.local_session(
+        self.session_factory).client('resourcegroupstaggingapi')
+
+    paginator = client.get_paginator('get_resources')
+
+    resource_type = getattr(self.get_model(), 'resource_type', None)
+    if not resource_type:
+        resource_type = self.get_model().service
+        if self.get_model().type:
+            resource_type += ":" + self.get_model().type
+
+    resource_tag_map_list = list(itertools.chain(
+        *[p['ResourceTagMappingList'] for p in paginator.paginate(
+            ResourceTypeFilters=[resource_type])]))
+    resource_tag_map = {r['ResourceARN']: r for r in resource_tag_map_list}
+    for r in resources:
+        arn = self.get_arns([r])[0]
+        t = resource_tag_map.get(arn)
+        if t:
+            r['Tags'] = t['Tags']
+
+    return resources
 
 
 def _common_tag_processer(executor_factory, batch_size, concurrency,
@@ -482,7 +534,7 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
+        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
@@ -699,7 +751,7 @@ class UniversalTag(Tag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)
@@ -719,7 +771,6 @@ class UniversalUntag(RemoveTag):
     """
 
     batch_size = 20
-
     permissions = ('resourcegroupstaggingapi:UntagResources',)
 
     def process_resource_set(self, resource_set, tag_keys):
@@ -728,7 +779,7 @@ class UniversalUntag(RemoveTag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.untag_resources,
             ResourceARNList=arns,
             TagKeys=tag_keys)
@@ -803,7 +854,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = self.manager.retry(
+        response = universal_tag_retry(
             client.tag_resources,
             ResourceARNList=arns,
             Tags=tags)

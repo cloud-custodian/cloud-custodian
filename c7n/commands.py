@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,7 +167,8 @@ def validate(options):
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         errors += schema.validate(data, schm)
-        conf_policy_names = {p['name'] for p in data.get('policies', ())}
+        conf_policy_names = {
+            p.get('name', 'unknown') for p in data.get('policies', ())}
         dupes = conf_policy_names.intersection(used_policy_names)
         if len(dupes) >= 1:
             errors.append(ValueError(
@@ -180,8 +181,8 @@ def validate(options):
             null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
             for p in data.get('policies', ()):
                 try:
-                    p = Policy(p, null_config, Bag())
-                    p.validate()
+                    policy = Policy(p, null_config, Bag())
+                    policy.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)

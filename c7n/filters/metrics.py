@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
-from c7n.filters import Filter, OPERATORS
+from c7n.filters.core import Filter, OPERATORS, FilterValidationError
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -179,3 +179,48 @@ class MetricsFilter(Filter):
             elif self.op(collected_metrics[key][0][self.statistics], self.value):
                 matched.append(r)
         return matched
+
+
+class ShieldMetrics(MetricsFilter):
+    """Specialized metrics filter for shield
+    """
+    schema = type_schema('shield-metrics', rinherit=MetricsFilter.schema)
+
+    namespace = "AWS/DDoSProtection"
+    metrics = (
+        'DDoSAttackBitsPerSecond',
+        'DDoSAttackRequestsPerSecond',
+        'DDoSDetected')
+
+    attack_vectors = (
+        'ACKFlood',
+        'ChargenReflection',
+        'DNSReflection',
+        'GenericUDPReflection',
+        'MSSQLReflection',
+        'NetBIOSReflection',
+        'NTPReflection',
+        'PortMapper',
+        'RequestFlood',
+        'RIPReflection',
+        'SNMPReflection',
+        'SYNFlood',
+        'SSDPReflection',
+        'UDPTraffic',
+        'UDPFragment')
+
+    def validate(self):
+        if self.data.get('name') not in self.metrics:
+            raise FilterValidationError(
+                "invalid shield metric %s valid:%s" % (
+                    self.data['name'],
+                    ", ".join(self.metrics)))
+
+    def get_dimensions(self, resource):
+        return [{
+            'Name': 'ResourceArn',
+            'Value': self.manager.get_arn(resource)}]
+
+    def process(self, resources, event=None):
+        self.data['namespace'] = self.namespace
+        return super(ShieldMetrics, self).process(resources, event)

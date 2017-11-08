@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
@@ -36,6 +36,16 @@ logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
+    def test_rds_config_event(self):
+        event = event_data('rds-from-rule.json', 'config')        
+        p = self.load_policy({'name': 'rds', 'resource': 'rds'})
+        source = p.resource_manager.get_source('config')
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource['Tags'],
+            [{u'Key': u'workload-type', u'Value': u'other'}])
+        
     def test_rds_stop(self):
         session_factory = self.replay_flight_data('test_rds_stop')
         db_instance_id = 'rds-test-instance-1'
@@ -196,7 +206,7 @@ class RDSTest(BaseTest):
             'resource': 'rds',
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
-                 'op': 'delete'}]},
+                 'op': 'delete', 'skew': 1}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -266,6 +276,7 @@ class RDSTest(BaseTest):
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, 'executor_factory', MainThreadExecutor)
+        self.change_environment(AWS_DEFAULT_REGION='us-east-2')
         session_factory = self.replay_flight_data('test_rds_restore')
         client = session_factory().client('rds')
         instance_id = 'mxtest'
@@ -323,7 +334,7 @@ class RDSTest(BaseTest):
             {'name': 'rds-delete',
              'resource': 'rds',
              'filters': [
-                 {'tag:Target': 'test'}],
+                 {'tag:Owner': 'test'}],
              'actions': [
                  {'type': 'delete',
                   'skip-snapshot': True}]},
@@ -393,22 +404,22 @@ class RDSTest(BaseTest):
              'resource': 'rds',
              'filters': [
                  {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                  'op': 'upgrade'}],
+                  'op': 'upgrade', 'skew': 4}],
              'actions': [{
                  'type': 'upgrade',
                  'immediate': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(
             {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
              for r in resources},
-            {u'5.7.10': None, u'5.6.23': u'5.6.29'})
+            {u'5.6.29': u'5.6.35'})
         self.assertEqual(
-            resources[1]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
         self.assertEqual(
-            resources[1]['EngineVersion'], '5.6.23')
+            resources[0]['EngineVersion'], '5.6.29')
         self.assertEqual(
-            resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
+            resources[0]['c7n-rds-engine-upgrade'], '5.6.35')
 
     def test_rds_eligible_start_stop(self):
         resource = {

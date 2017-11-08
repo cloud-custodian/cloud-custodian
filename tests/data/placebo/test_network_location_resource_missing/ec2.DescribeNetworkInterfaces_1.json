@@ -4,43 +4,43 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "bee72e6b-b732-4e2a-8a62-d7f2fb27479c", 
+            "RequestId": "7573eaf1-0be4-4039-9cf1-18cc89258ba2", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 29 May 2017 11:26:26 GMT"
+                "date": "Mon, 26 Jun 2017 18:46:52 GMT"
             }
         }, 
         "NetworkInterfaces": [
             {
                 "Status": "available", 
-                "MacAddress": "0a:a9:35:76:df:bf", 
+                "MacAddress": "0e:34:db:fe:6a:1a", 
                 "SourceDestCheck": true, 
-                "VpcId": "vpc-40523729", 
+                "AvailabilityZone": "us-east-1b", 
                 "Description": "", 
-                "NetworkInterfaceId": "eni-a8b7b2e5", 
+                "NetworkInterfaceId": "eni-5d45e48b", 
                 "PrivateIpAddresses": [
                     {
                         "Primary": true, 
-                        "PrivateIpAddress": "10.4.9.56"
+                        "PrivateIpAddress": "10.4.9.76"
                     }
                 ], 
                 "RequesterManaged": false, 
+                "SubnetId": "subnet-dbbb0d81", 
+                "VpcId": "vpc-9760deee", 
+                "RequesterId": "AIDAIYEUEZZQWE5TZHHAE", 
                 "Groups": [
                     {
                         "GroupName": "web-tier", 
-                        "GroupId": "sg-88361ae1"
+                        "GroupId": "sg-8b2f81fa"
                     }
                 ], 
                 "Ipv6Addresses": [], 
-                "AvailabilityZone": "us-east-2c", 
-                "RequesterId": "AIDAJEZOTH6YPO3DY45QW", 
-                "SubnetId": "subnet-2f498962", 
                 "OwnerId": "644160558196", 
                 "TagSet": [], 
-                "PrivateIpAddress": "10.4.9.56"
+                "PrivateIpAddress": "10.4.9.76"
             }
         ]
     }

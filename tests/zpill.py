@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -231,6 +231,8 @@ class PillTest(unittest.TestCase):
     output_dir = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', 'output')
 
+    recording = False
+
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
         self.assertEqual(value, expected)
@@ -239,6 +241,7 @@ class PillTest(unittest.TestCase):
         pass
 
     def record_flight_data(self, test_case, zdata=False):
+        self.recording = True
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if os.path.exists(test_dir):
@@ -269,6 +272,10 @@ class PillTest(unittest.TestCase):
         return factory
 
     def replay_flight_data(self, test_case, zdata=False):
+        if os.environ.get('C7N_FUNCTIONAL') == 'yes':
+            return lambda region=None, assume=None: boto3.Session(
+                region_name=region)
+
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if not os.path.exists(test_dir):

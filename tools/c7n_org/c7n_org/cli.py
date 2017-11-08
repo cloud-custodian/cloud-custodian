@@ -18,6 +18,7 @@ from collections import Counter
 import csv
 import logging
 import os
+import multiprocessing
 import time
 import subprocess
 
@@ -29,6 +30,7 @@ import yaml
 import click
 import jsonschema
 from botocore.compat import OrderedDict
+from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
 from c7n.executor import MainThreadExecutor
@@ -42,6 +44,10 @@ from c7n.utils import CONN_CACHE, dumps
 from c7n_org.utils import environ, account_tags
 
 log = logging.getLogger('c7n_org')
+
+
+WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4)
+
 
 CONFIG_SCHEMA = {
     '$schema': 'http://json-schema.org/schema#',
@@ -73,6 +79,7 @@ CONFIG_SCHEMA = {
         }
     }
 }
+
 
 
 @click.group()
@@ -183,7 +190,7 @@ def report(config, output, use, output_dir, accounts, field, tags, region, debug
         raise ValueError("can only report on one resource type at a time")
 
     records = []
-    with executor(max_workers=16) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']
@@ -285,7 +292,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
         print("command to run: `%s`" % (" ".join(script_args)))
         return
 
-    with executor(max_workers=4) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']
@@ -312,9 +319,10 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     a['name'], r, " ".join(script_args))
 
 
-def run_account(account, region, policies_config, output_path, cache_period, dryrun, debug):
+def run_account(account, region, policies_config, output_path, cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
+    logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
     output_path = os.path.join(output_path, account['name'], region)
@@ -325,7 +333,7 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
     bag = Bag.empty(
         region=region, assume_role=account['role'],
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
-        account_id=account['account_id'], metrics_enabled=False,
+        account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
     policies = PolicyCollection.from_data(policies_config, bag)
@@ -342,6 +350,15 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
                     continue
                 log.info("Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
                          account['name'], region, p.name, len(resources), time.time()-st)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    log.warning('Access denied account:%s region:%s',
+                                account['name'], region)
+                    return policy_counts
+                log.error(
+                    "Exception running policy:%s account:%s region:%s error:%s",
+                    p.name, account['name'], region, e)
+                continue
             except Exception as e:
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
@@ -364,15 +381,17 @@ def run_account(account, region, policies_config, output_path, cache_period, dry
 @click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
 @click.option('-p', '--policy', multiple=True)
 @click.option('--cache-period', default=15, type=int)
+@click.option("--metrics", default=False, is_flag=True)
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region, policy, cache_period, dryrun, debug, verbose):
+def run(config, use, output_dir, accounts, tags,
+        region, policy, cache_period, metrics, dryrun, debug, verbose):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy)
     policy_counts = Counter()
-    with executor(max_workers=32) as w:
+    with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
             account_regions = region or a['regions']
@@ -383,6 +402,7 @@ def run(config, use, output_dir, accounts, tags, region, policy, cache_period, d
                     custodian_config,
                     output_dir,
                     cache_period,
+                    metrics,
                     dryrun,
                     debug)] = (a, r)
 
