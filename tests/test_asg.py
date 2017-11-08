@@ -469,8 +469,8 @@ class AutoScalingTest(BaseTest):
             'name': 'asg-capacity-delta',
             'resource': 'asg',
             'filters': [
-                {'type': 'capacity-delta',
-                 'tag:CustodianUnitTest': 'not-null'}],
+                {'type': 'capacity-delta'},
+                {'tag:CustodianUnitTest': 'not-null'}],
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -481,8 +481,8 @@ class AutoScalingTest(BaseTest):
             'name': 'asg-capacity-delta',
             'resource': 'asg',
             'filters': [
-                {'type': 'capacity-delta',
-                 'tag:CustodianUnitTest': 'not-null'}],
+                {'type': 'capacity-delta'},
+                {'tag:CustodianUnitTest': 'not-null'}],
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
