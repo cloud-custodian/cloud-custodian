@@ -12,7 +12,6 @@ network traffic as a security tool.  See more info on example dashboarding
 of VPC Flow Logs using Elasticsearch and Kibana
 https://aws.amazon.com/blogs/aws/cloudwatch-logs-subscription-consumer-elasticsearch-kibana-dashboards/
 
-
 .. code-block:: yaml
 
    policies:
