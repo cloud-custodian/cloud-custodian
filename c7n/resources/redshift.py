@@ -461,7 +461,7 @@ class Tag(tags.Tag):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifer'])
+            arn = self.manager.generate_arn(r['ClusterIdentifier'])
             client.create_tags(ResourceName=arn, Tags=tags)
 
 
@@ -724,7 +724,8 @@ class RedshiftSnapshotTag(tags.Tag):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
-            arn = self.manager.generate_arn(r['SnapshotIdentifier'])
+            arn = self.manager.generate_arn(
+                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
             client.create_tags(ResourceName=arn, Tags=tags)
 
 
@@ -754,5 +755,6 @@ class RedshiftSnapshotRemoveTag(tags.RemoveTag):
     def process_resource_set(self, resources, tag_keys):
         client = local_session(self.manager.session_factory).client('redshift')
         for r in resources:
-            arn = self.manager.generate_arn(r['SnapshotIdentifier'])
+            arn = self.manager.generate_arn(
+                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
             client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
