@@ -5,8 +5,8 @@ Security Groups - Detect and Remediate Violations
 
 The following example policy will automatically create a CloudWatch Event Rule
 triggered Lambda function in your account and region which will be triggered
-anytime a user creates or modifies a security group. This provides auto-remediation
-and near real-time action (typically within a minute) of the security group change.
+anytime a user creates or modifies a security group. This provides near real-time
+auto-remediation action (typically within a minute) of the security group change.
 By notifying the customer who tried to perform the action it helps drive user
 behaviour and lets them know why the security group keeps reverting their 0.0.0.0/0
 rule additions on them!
