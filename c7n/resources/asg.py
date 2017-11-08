@@ -809,14 +809,14 @@ class Resize(Action):
             'max-size': {'type': 'integer', 'minimum': 0},
             'desired-size': {
                 "anyOf": [
-                    {'enum': [ "current"]},
+                    {'enum': ["current"]},
                     {'type': 'integer', 'minimum': 0}
                 ]
             },
             # support previous key name with underscore
             'desired_size': {
                 "anyOf": [
-                    {'enum': [ "current"]},
+                    {'enum': ["current"]},
                     {'type': 'integer', 'minimum': 0}
                 ]
             },
@@ -828,7 +828,6 @@ class Resize(Action):
         'autoscaling:UpdateAutoScalingGroup',
         'autoscaling:CreateOrUpdateTags'
     )
-
 
     def validate(self):
         # if self.data['desired_size'] != 'current':
