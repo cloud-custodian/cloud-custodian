@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "cloudmaid", 
+            "ID": "075d8a7dbae6b983e7038f18870f110eceedb64cb13866dacf61c54624897516"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 27
+                }, 
+                "Name": "c7nreinvent-config-bucket"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 2
+                }, 
+                "Name": "kopstest2-pifft-com-state-store"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 37
+                }, 
+                "Name": "test-bucket-for-access-filter"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "TasWXPP9aS155VEh2pUKlbPAp8jB7932cQpcskXZRaChCesXc2B7ZdQkl41G7tmZlOzNnIpWYg0=", 
+            "RequestId": "B925BEBCD3E65FBA", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "TasWXPP9aS155VEh2pUKlbPAp8jB7932cQpcskXZRaChCesXc2B7ZdQkl41G7tmZlOzNnIpWYg0=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "B925BEBCD3E65FBA", 
+                "date": "Sat, 06 May 2017 09:37:01 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -665,6 +665,64 @@ class GlobalGrantsFilter(Filter):
             return b
 
 
+@filters.register('access')
+class AccessFilter(Filter):
+    """Filters for all S3 buckets that have access allowed/denied to a role
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-perm-check
+                resource: s3
+                filters:
+                  - type: access
+                    value: denied
+                    policy_source: arn:::
+    """
+
+    schema = type_schema('access',
+        policy_source={'type': 'string'},
+        caller={'type': 'string', 'required': False},
+        actions={'type': 'array', 'items': {'type': 'string'}},
+        value={'type': 'string', 'enum': ['allowed', 'denied']})
+
+    permissions = ('iam:GetContextKeysForPrincipalPolicy', 'iam:SimulatePrincipalPolicy')
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=5) as w:
+            results = w.map(self.process_bucket, buckets)
+            return list(filter(None, results))
+
+    def process_bucket(self, b):
+        session = local_session(self.manager.session_factory)
+        iam = session.client('iam')
+
+        policy_source = self.data['policy_source']
+
+        context_keys_extra, simulate_extra = {}, {}
+        if b.get('Policy'):
+            context_keys_extra['PolicyInputList'] = [b['Policy']]
+            simulate_extra['ResourcePolicy'] = b['Policy']
+
+        response = iam.get_context_keys_for_principal_policy(
+            PolicySourceArn=policy_source, **context_keys_extra)
+        if response.get('ContextKeyNames', []):
+            raise NotImplementedError("Sorry, we can't handle context keys.")
+
+        response = iam.simulate_principal_policy(
+            PolicySourceArn=policy_source,
+            CallerArn=self.data.get('caller', policy_source),
+            ActionNames=self.data.get('actions', ['s3:*']),
+            ResourceArns=['arn:aws:s3:::{}/*'.format(b['Name'])],
+            **simulate_extra)
+        results = b['c7n:EvaluationResults'] = response['EvaluationResults']
+        if results[0]['EvalDecision'] == self.data['value']:
+            return b
+        return None
+
+
 class BucketActionBase(BaseAction):
 
     def get_permissions(self):

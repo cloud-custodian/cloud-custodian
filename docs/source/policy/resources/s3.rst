@@ -20,6 +20,12 @@ Filters
   .. c7n-schema:: MissingPolicyStatementFilter
       :module: c7n.resources.s3
 
+``access``
+  Check buckets for access permissions from a given iam entity, per `simulate <http://docs.aws.amazon.com/IAM/latest/APIReference/API_SimulatePrincipalPolicy.html>`_
+
+  .. c7n-schema:: AccessFilter
+      :module: c7n.resources.s3
+
 Actions
 -------
 

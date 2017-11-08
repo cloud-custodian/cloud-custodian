@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalDecision": "explicitDeny", 
+                "MissingContextValues": [], 
+                "EvalActionName": "s3:*", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "user_test-user-for-access-filter_test-policy", 
+                        "StartPosition": {
+                            "Column": 40, 
+                            "Line": 1
+                        }, 
+                        "EndPosition": {
+                            "Column": 40, 
+                            "Line": 4
+                        }
+                    }
+                ], 
+                "EvalResourceName": "arn:aws:s3:::test-bucket-for-access-filter/*"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9c101e82-323f-11e7-933a-f908bcaa1037", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9c101e82-323f-11e7-933a-f908bcaa1037", 
+                "date": "Sat, 06 May 2017 09:37:24 GMT", 
+                "content-length": "1052", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

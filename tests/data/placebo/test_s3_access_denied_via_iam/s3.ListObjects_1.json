@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "test-bucket-for-access-filter", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "BrRGzVRPTR7OvaC3ttgOimoS7rK//WVbw0Cx/RQrjRQNkYRG7Lk3XOiTD56xogeufxEHVP4QWug=", 
+            "RequestId": "8B8CC65D7562AA7E", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "BrRGzVRPTR7OvaC3ttgOimoS7rK//WVbw0Cx/RQrjRQNkYRG7Lk3XOiTD56xogeufxEHVP4QWug=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "8B8CC65D7562AA7E", 
+                "date": "Sat, 06 May 2017 09:37:28 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

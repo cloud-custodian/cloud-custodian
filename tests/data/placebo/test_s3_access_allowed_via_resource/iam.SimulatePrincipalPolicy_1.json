@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalDecision": "allowed", 
+                "MissingContextValues": [], 
+                "EvalActionName": "s3:*", 
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "ResourcePolicy", 
+                        "StartPosition": {
+                            "Column": 38, 
+                            "Line": 1
+                        }, 
+                        "EndPosition": {
+                            "Column": 211, 
+                            "Line": 1
+                        }
+                    }
+                ], 
+                "EvalResourceName": "arn:aws:s3:::test-bucket-for-access-filter/*"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9a59bc9a-323f-11e7-8dba-0776c02973bd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9a59bc9a-323f-11e7-8dba-0776c02973bd", 
+                "date": "Sat, 06 May 2017 09:37:20 GMT", 
+                "content-length": "1018", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
