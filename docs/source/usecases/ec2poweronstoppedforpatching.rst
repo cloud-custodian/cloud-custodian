@@ -18,8 +18,8 @@ When the patching window is done the last 2 policies in this example will remove
 the PatchingInProgress tag from all instances in that group and remove the
 PowerOffWhenDone tag and stop those instances that were previously stopped. The
 cron expressions for this example read as the following:
-``cron(0 3 ? 1/1 SUN#1 /*)`` means trigger on the 1st Sunday of every month at 3:00 UTC
-then ``cron(0 13 ? 1/1 SUN#1 /*)`` is the same day at 13:00 UTC which allows for a 10
+cron(0 3 ? 1/1 SUN#1 \*) means trigger on the 1st Sunday of every month at 3:00 UTC
+then cron(0 13 ? 1/1 SUN#1 \*) is the same day at 13:00 UTC which allows for a 10
 Hour patching window.  Learn more on AWS cron rate expressions
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 
