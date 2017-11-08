@@ -7,6 +7,7 @@ The following example policy will automatically create a CloudWatch Event Rule
 triggered Lambda function in your account and region which will be triggered
 anytime a user creates or modifies a security group. This provides near real-time
 auto-remediation action (typically within a minute) of the security group change.
+Having such a quick auto-remediation action greatly reduces any attack window!
 By notifying the customer who tried to perform the action it helps drive user
 behaviour and lets them know why the security group keeps reverting their 0.0.0.0/0
 rule additions on them!
@@ -57,4 +58,11 @@ rule additions on them!
                  queue: https://sqs.us-east-1.amazonaws.com/12345678900/cloud-custodian-mailer
                  region: us-east-1
 
+By including ``- event-owner`` in the notify's to: field it tells Cloud Custodian
+to extract the id of the user who made the API call for the event and email them.
+Being that the above policy runs in a cloudtrail mode the API call's metadata event
+is present which is why the example uses event-owner.  If you were to remove the ``mode:``
+statement on the example policy and run it in a poll mode instead you could change
+``- event-owner`` to ``- resource-owner`` which would rely on the resources tags for
+a id or email to send the notification to as no API event would be available at that time.
 Note that the ``notify`` action requires the cloud custodian mailer tool to be installed.
