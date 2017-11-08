@@ -653,41 +653,39 @@ class Start(BaseAction, StateTransitionFilter):
         if not len(instances):
             return
 
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        failures = {}
 
         # Play nice around aws having insufficient capacity...
         for itype, t_instances in utils.group_by(
                 instances, 'InstanceType').items():
             for izone, z_instances in utils.group_by(
-                    t_instances, 'AvailabilityZone').items():
+                    t_instances, 'Placement.AvailabilityZone').items():
                 for batch in utils.chunks(z_instances, self.batch_size):
-                    self.process_instance_set(client, batch, itype, izone)
+                    fails = self.process_instance_set(client, batch, itype, izone)
+                    if fails:
+                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
 
-        # Raise an exception after all batches process
-        if self.exception:
-            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
-                self.log.exception("Error while starting instances error %s", self.exception)
-                raise self.exception
+        if failures:
+            fail_count = sum(map(len, failures.values()))
+            msg = "Could not start %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
 
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
-        retry = utils.get_retry((
-            'InsufficientInstanceCapacity',
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
-            max_attempts=5)
+        retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+                     'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            # Saving exception
-            self.exception = e
-            self.log.exception(
-                ("Could not start instances:%d type:%s"
-                 " zone:%s instances:%s error:%s"),
-                len(instances), itype, izone,
-                ", ".join(instance_ids), e)
-            return
+            if e.response['Error']['Code'] in retryable:
+                return True
+            raise
 
 
 @actions.register('resize')

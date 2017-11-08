@@ -1,0 +1,135 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-0749e67d", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-031e6c09f6598d374"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": false, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 100, 
+                            "SnapshotId": "snap-0849969e30adfb2bf"
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/devabc", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2017-10-31T08:18:50.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Name": "devabc"
+            }, 
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "[Copied ami-c772ddbd from us-east-1] devx", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-3848e742", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-07be51844bd81659c"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "VirtualName": "ephemeral1"
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/devx2", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2017-10-31T08:17:04.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Name": "devx2"
+            }, 
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "devx", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-c772ddbd", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-03215737c84137756"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "VirtualName": "ephemeral1"
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/devx", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2017-10-31T08:13:54.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Name": "devx"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8341d08c-bf57-4c3b-99df-1d90a2c9d724", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 31 Oct 2017 08:45:30 GMT"
+            }
+        }
+    }
+}

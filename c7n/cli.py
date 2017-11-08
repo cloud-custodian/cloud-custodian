@@ -170,7 +170,7 @@ def _report_options(p):
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
         help="Format to output data in (default: %(default)s). "
-        "Options include simple, grid, rst")
+        "Options include simple, grid, csv")
 
 
 def _metrics_options(p):

@@ -205,7 +205,7 @@ def generate(resource_types=()):
                              'ids': {'type': 'string'},
                              'event': {'type': 'string'}}}],
                 }},
-
+                'execution-options': {'type': 'object'},
                 'role': {'type': 'string'},
                 'runtime': {'enum': ['python2.7', 'python3.6']},
                 'memory': {'type': 'number'},

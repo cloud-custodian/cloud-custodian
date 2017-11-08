@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.query import QueryResourceManager
 from c7n.manager import resources
+from c7n.query import QueryResourceManager
 
 
 @resources.register('elasticbeanstalk')
@@ -31,4 +31,23 @@ class ElasticBeanstalk(QueryResourceManager):
             'DateUpdated'
         )
         filter_name = 'ApplicationNames'
+        filter_type = 'list'
+
+
+@resources.register('elasticbeanstalk-environment')
+class ElasticBeanstalkEnvironment(QueryResourceManager):
+    """ Resource manager for Elasticbeanstalk Environments
+    """
+
+    class resource_type(object):
+        service = 'elasticbeanstalk'
+        enum_spec = ('describe_environments', 'Environments', None)
+        name = id = "EnvironmentName"
+        dimension = None
+        default_report_fields = (
+            'EnvironmentName',
+            'DateCreated',
+            'DateUpdated',
+        )
+        filter_name = 'EnvironmentNames'
         filter_type = 'list'

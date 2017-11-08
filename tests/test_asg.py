@@ -382,6 +382,15 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(result['MinSize'], 1)
         self.assertEqual(result['DesiredCapacity'], 1)
 
+    def test_asg_third_ami_filter(self):
+        factory = self.replay_flight_data('test_asg_invalid_third_ami')
+        p = self.load_policy({
+            'name': 'asg-invalid-filter-3ami',
+            'resource': 'asg',
+            'filters': ['invalid']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_asg_invalid_filter_good(self):
         factory = self.replay_flight_data('test_asg_invalid_filter_good')
         p = self.load_policy({
