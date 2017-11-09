@@ -3,10 +3,19 @@
 AutoScaling Group - Verify ASGs have valid configurations
 =========================================================
 
-The following example policy will check all AutoScaling Groups for configuration
-issues which could prevent the ASG from functioning properly.  The following items
-are checked: invalid subnets, invalid security groups, invalid key pair name,
-invalid launch config volume snapshots, invalid amis, invalid elb health check etc.
+The following example policy will check all AutoScaling Groups in the current
+account and region for configuration issues which could prevent the ASG from
+functioning properly or launching an instance. Then the ASG resource owner
+and a cloud admins group get an email showing the affected ASG(s).
+
+The following ASG items are checked when using the `` - invalid `` filter:
+  * invalid subnets
+  * invalid security groups
+  * invalid key pair name
+  * invalid launch config volume snapshots
+  * invalid AMIs
+  * invalid ELB health check
+
 
 .. code-block:: yaml
 
