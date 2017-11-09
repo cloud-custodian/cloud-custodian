@@ -7,10 +7,12 @@ The following example policy workflow uses the mark-for-op and marked-for-op fil
 actions to chain together a set of policies to accomplish a task.  In this example it will
 find and tag any instances that are in a stopped state.  The example specifies a custom tag
 called c7n_stopped_instance and the value of the tag will be an op action of terminate for
-60 days in the future.
+60 days in the future.  The reasoning behind terminating unpatchable instances is after 60
+days the instance will be far enough behind on patching and virus defs(if used) that
+starting the instance after 60 days would  present too large of a security risk. 
 
-Note the use of the skew option with the marked-for-op filter to notify customers X number
-of days ahead of the scheduled marked-for-op action date.
+Note the use of the skew option with the marked-for-op filter in some of the policies to
+notify the resource owners X number of days ahead of the scheduled marked-for-op action date.
 
 .. code-block:: yaml
 
