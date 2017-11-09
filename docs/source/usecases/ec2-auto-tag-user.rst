@@ -21,4 +21,4 @@ EC2 - auto-tag aws userName on resources
        actions:
          - type: auto-tag-user
            tag: CreatorName
-           principal_id_tag: CreatorId
+           full_principal_id_tag: CreatorId

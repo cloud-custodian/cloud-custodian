@@ -610,7 +610,8 @@ class AutoTagUser(EventAction):
                       ]}},
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
-           'principal_id_tag': {'type': 'string'}
+           'principal_id_tag': {'type': 'string'},
+           'full_principal_id_tag': {'type': 'string'}
            }
     )
 
@@ -634,13 +635,17 @@ class AutoTagUser(EventAction):
             return
 
         user = None
+        # if old_principal_id_tag is set (and value), we'll set the principalId tag.
+        role_principal_id_tag = self.data.get('principal_id_tag', None)
+        full_principal_id_tag = self.data.get('full_principal_id_tag', None)
+        principal_id_value = event['userIdentity'].get('principalId', '')
         if utype == "IAMUser":
             user = event['userIdentity']['userName']
-            principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
+            if role_principal_id_tag:
+                principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             user = event['userIdentity']['arn']
             prefix, user = user.rsplit('/', 1)
-            principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):
                 return
@@ -671,10 +676,10 @@ class AutoTagUser(EventAction):
         new_tags = {
             self.data['tag']: user
         }
-        # if principal_id_key is set (and value), we'll set the principalId tag.
-        principal_id_key = self.data.get('principal_id_tag', None)
-        if principal_id_key and principal_id_value:
-            new_tags[principal_id_key] = principal_id_value
+        if role_principal_id_tag and principal_id_value:
+            new_tags[role_principal_id_tag] = principal_id_value
+        elif full_principal_id_tag and principal_id_value:
+            new_tags[full_principal_id_tag] = principal_id_value
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags

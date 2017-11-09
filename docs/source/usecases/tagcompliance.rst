@@ -175,7 +175,7 @@ Enforce Tag Compliance
             days: 1
           - type: auto-tag-user
             tag: CreatorName
-            principal_id_tag: CreatorId
+            full_principal_id_tag: CreatorId
           - type: notify
             template: default.html
             priority_header: 1
