@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-delete-bucket-encryption-aes256", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "CBLeRjy/GPW/rh1/e7WF06YZlxnPs0q02AeS2m/1T7oN16vjuCEJ4BXsP7S5KwYslsNCppL+Y8E=", 
+            "RequestId": "BA4D83ADEB74AA09", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "CBLeRjy/GPW/rh1/e7WF06YZlxnPs0q02AeS2m/1T7oN16vjuCEJ4BXsP7S5KwYslsNCppL+Y8E=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "BA4D83ADEB74AA09", 
+                "location": "/custodian-delete-bucket-encryption-aes256", 
+                "date": "Mon, 13 Nov 2017 02:01:53 GMT"
+            }
+        }
+    }
+}

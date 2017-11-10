@@ -53,4 +53,4 @@ notify:
 cache:
   mount:
     - /root/.cache/pip
-    - .tox
+  # - .tox
