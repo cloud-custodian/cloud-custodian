@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ServerSideEncryptionConfiguration": {
+            "Rules": [
+                {
+                    "ApplyServerSideEncryptionByDefault": {
+                        "KMSMasterKeyID": "9c3fc605-5b44-4bb9-ace3-c09f7b641378", 
+                        "SSEAlgorithm": "aws:kms"
+                    }
+                }
+            ]
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "LZ0vuVXVoQvrdSnIDyt2S18WNcERNSONw4sS48ceM9KfjtRVw3j1uYaDrM555+xJIaGfq33KBhs=", 
+            "RequestId": "B407FA94E3A1E496", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "LZ0vuVXVoQvrdSnIDyt2S18WNcERNSONw4sS48ceM9KfjtRVw3j1uYaDrM555+xJIaGfq33KBhs=", 
+                "date": "Mon, 13 Nov 2017 21:59:00 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "B407FA94E3A1E496", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

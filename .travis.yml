@@ -3,13 +3,14 @@ dist: trusty
 sudo: false
 cache:
   directories:
-   - .tox
+#   - .tox
 
 python:
   - "2.7"
   - "3.6"
 install:
   - pip install coveralls tox
+  - pip install -r requirements.txt
 script:
   - TOXENV=`tools/dev/citoxenv.py` tox
 after_success:

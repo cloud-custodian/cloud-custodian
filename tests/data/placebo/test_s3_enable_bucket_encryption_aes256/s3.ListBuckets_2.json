@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "theli", 
+            "ID": "0c1a762e1e05a612e78266a2fa632bb0d3ccb108f8df1d1862670073065a6db7"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 2
+                }, 
+                "Name": "custodian-enable-bucket-encryption-aes256"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Rqx5dzcPg9bBkwpDSyBcEnAJ7Aib4jvp4f+HcmxFa7M7n0ijQxoV8k8icLhgqCNGND4S6s/RrOo=", 
+            "RequestId": "DA944D099D8F0AB2", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "Rqx5dzcPg9bBkwpDSyBcEnAJ7Aib4jvp4f+HcmxFa7M7n0ijQxoV8k8icLhgqCNGND4S6s/RrOo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DA944D099D8F0AB2", 
+                "date": "Mon, 13 Nov 2017 02:02:14 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

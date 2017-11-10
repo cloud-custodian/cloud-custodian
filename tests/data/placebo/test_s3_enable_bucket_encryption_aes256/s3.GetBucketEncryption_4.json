@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ServerSideEncryptionConfiguration": {
+            "Rules": [
+                {
+                    "ApplyServerSideEncryptionByDefault": {
+                        "SSEAlgorithm": "AES256"
+                    }
+                }
+            ]
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "TCA9Lbgph5v1saNilstUxDyoJMc9FUaHtwE2paKI9AF8V+xa82YSZ7OfMRRX0uynXAvO/NAoP+Q=", 
+            "RequestId": "D6EF52DBC165B456", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "TCA9Lbgph5v1saNilstUxDyoJMc9FUaHtwE2paKI9AF8V+xa82YSZ7OfMRRX0uynXAvO/NAoP+Q=", 
+                "date": "Mon, 13 Nov 2017 02:02:20 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "D6EF52DBC165B456", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}
