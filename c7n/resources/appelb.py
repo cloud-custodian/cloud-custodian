@@ -1038,7 +1038,7 @@ class AppELBTargetGroupDeleteAction(BaseAction):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_targetgroup, target_group))
 
-    def process_elb(self, target_group):
+    def process_targetgroup(self, target_group):
         client = local_session(self.manager.session_factory).client('elbv2')
         self.manager.retry(
             client.delete_target_group,
