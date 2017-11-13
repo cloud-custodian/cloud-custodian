@@ -796,8 +796,7 @@ class RemovePolicyBase(BaseAction):
 
         found = []
         statements = policy.get('Statement', [])
-        resource_statements = resource.get(
-            matched_key, ())
+        resource_statements = resource.get(matched_key, ())
 
         for s in list(statements):
             if statement_ids == 'matched':

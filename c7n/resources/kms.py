@@ -282,6 +282,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         if not found:
             return
+        p['Statement'] = found
 
         # NB: KMS supports only one key policy 'default'
         # http://docs.aws.amazon.com/kms/latest/developerguide/programming-key-policies.html#list-policies
