@@ -875,15 +875,10 @@ class Reboot(BaseAction, StateTransitionFilter):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         failures = {}
 
-        # Play nice around aws having insufficient capacity...
-        for itype, t_instances in utils.group_by(
-                instances, 'InstanceType').items():
-            for izone, z_instances in utils.group_by(
-                    t_instances, 'Placement.AvailabilityZone').items():
-                for batch in utils.chunks(z_instances, self.batch_size):
-                    fails = self.process_instance_set(client, batch, itype, izone)
-                    if fails:
-                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
+        for batch in utils.chunks(instances, self.batch_size):
+            fails = self.process_instance_set(client, batch)
+            if fails:
+                failures = [i['InstanceId'] for i in batch]
 
         if failures:
             fail_count = sum(map(len, failures.values()))
@@ -893,7 +888,7 @@ class Reboot(BaseAction, StateTransitionFilter):
             self.log.warning(msg)
             raise RuntimeError(msg)
 
-    def process_instance_set(self, client, instances, itype, izone):
+    def process_instance_set(self, client, instances):
         # Setup retry with insufficient capacity as well
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
                      'Client.RequestLimitExceeded'),
