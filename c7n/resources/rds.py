@@ -1309,11 +1309,42 @@ class RDSSubnetGroup(QueryResourceManager):
         date = None
 
 
+@RDSSubnetGroup.action_registry.register('delete')
+class RDSSubnetGroupDeleteAction(BaseAction):
+    """Action to delete RDS Subnet Group
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any rds subnet groups.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rsb-subnet-group-delete-unused
+                resource: elb
+                filters:
+                  - Instances: []
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteDBSubnetGroup',)
+
+    def process(self, subnet_group):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_subnetgroup, subnet_group))
+
+    def process_subnetgroup(self, subnet_group):
+        client = local_session(self.manager.session_factory).client('rds')
+        client.delete_db_subnet_group(DBSubnetGroupName=subnet_group['DBSubnetGroupName'])
+
+
 @filters.register('db-parameter')
 class ParameterFilter(ValueFilter):
     """
     Applies value type filter on set db parameter values.
-
     :example:
 
         .. code-block: yaml
