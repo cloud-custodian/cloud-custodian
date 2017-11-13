@@ -1024,7 +1024,7 @@ class AppELBTargetGroupDeleteAction(BaseAction):
 
             policies:
               - name: appelb-targetgroups-delete-unused
-                resource: elb
+                resource: app-elb-target-group
                 filters:
                   - Instances: []
                 actions:

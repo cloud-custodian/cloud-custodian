@@ -1348,8 +1348,8 @@ class RDSSubnetGroupDeleteAction(BaseAction):
         .. code-block: yaml
 
             policies:
-              - name: rsb-subnet-group-delete-unused
-                resource: elb
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
                 filters:
                   - Instances: []
                 actions:
@@ -1366,6 +1366,37 @@ class RDSSubnetGroupDeleteAction(BaseAction):
     def process_subnetgroup(self, subnet_group):
         client = local_session(self.manager.session_factory).client('rds')
         client.delete_db_subnet_group(DBSubnetGroupName=subnet_group['DBSubnetGroupName'])
+
+
+@RDSSubnetGroup.filter_registry.register('unused')
+class UnusedRDSSubnetGroup(Filter):
+    """Filters all launch rds subnet groups that are not in use but exist
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
+                filters:
+                  - unused
+    """
+
+    schema = type_schema('unused')
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds').get_permissions()
+
+    def process(self, configs, event=None):
+        rds = self.manager.get_resource_manager('rds').resources()
+        self.used = set([
+            r.get('DBSubnetGroupName', r['DBInstanceIdentifier'])
+            for r in rds])
+        return super(UnusedRDSSubnetGroup, self).process(configs)
+
+    def __call__(self, config):
+        return config['DBSubnetGroupName'] not in self.used
 
 
 @filters.register('db-parameter')
