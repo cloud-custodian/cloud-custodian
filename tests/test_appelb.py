@@ -412,7 +412,7 @@ class AppELBTargetGroupTest(BaseTest):
 
         resources = policy.run()
 
-        self.assertGreater(len(resources), 0, "Test should delete bucket")
+        self.assertGreater(len(resources), 0, "Test should delete app elb target group")
 
 
 class TestAppElbLogging(BaseTest):
