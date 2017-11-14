@@ -338,7 +338,7 @@ class Time(Filter):
 
         try:
             return self.process_resource_schedule(i, value, self.time_type)
-        except:
+        except Exception:
             log.exception(
                 "%s failed to process resource:%s value:%s",
                 self.__class__.__name__, i[self.id_key], value)

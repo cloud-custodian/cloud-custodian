@@ -242,7 +242,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             try:
                 if self.process_resource(client, r):
                     results.append(r)
-            except:
+            except Exception:
                 self.log.exception(
                     "Error processing lambda %s", r['FunctionArn'])
         return results

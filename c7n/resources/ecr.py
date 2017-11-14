@@ -105,7 +105,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         for r in resources:
             try:
                 results += filter(None, [self.process_resource(client, r)])
-            except:
+            except Exception:
                 self.log.exception(
                     "Error processing ecr registry:%s", r['repositoryArn'])
         return results

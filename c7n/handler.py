@@ -51,7 +51,7 @@ class Config(dict):
                 import boto3
                 session = boto3.Session()
                 account_id = get_account_id_from_sts(session)
-            except:
+            except Exception:
                 pass
 
         d = {}
