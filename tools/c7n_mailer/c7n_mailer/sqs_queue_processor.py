@@ -23,8 +23,8 @@ import zlib
 
 import six
 
-from email_delivery import EmailDelivery
-from sns_delivery import SnsDelivery
+from .email_delivery import EmailDelivery
+from .sns_delivery import SnsDelivery
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -45,12 +45,7 @@ class MailerSqsQueueIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.aws_sqs.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.aws_sqs.receive_message(
@@ -66,6 +61,13 @@ class MailerSqsQueueIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # python2.7
+
+    def ack(self, m):
+        self.aws_sqs.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class MailerSqsQueueProcessor(object):

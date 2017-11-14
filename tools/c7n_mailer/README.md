@@ -71,7 +71,7 @@ c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.y
 You should see output similar to the following:
 
 ```
-(env) $ c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+(env) $ c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 DEBUG:custodian.lambda:Created custodian lambda archive size: 3.01mb
 2017-01-12 07:55:16,227: custodian.policy:INFO Running policy c7n-mailer-test resource: sqs region:default c7n:0.8.22.0
 2017-01-12 07:55:16,229: custodian.policy:INFO policy: c7n-mailer-test resource:sqs has count:1 time:0.00
