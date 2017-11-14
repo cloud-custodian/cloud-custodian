@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/delete_inventory", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "y6aw7mR/BF9orgQdHXg2NMiQdF2keh6XzGsgfYwKof7hPFdLns+SHs6YJX3hMr94ymisnRRXMgE=", 
+            "RequestId": "B5D5CC6582976812", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "y6aw7mR/BF9orgQdHXg2NMiQdF2keh6XzGsgfYwKof7hPFdLns+SHs6YJX3hMr94ymisnRRXMgE=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "B5D5CC6582976812", 
+                "location": "/delete_inventory", 
+                "date": "Tue, 14 Nov 2017 20:02:05 GMT"
+            }
+        }
+    }
+}

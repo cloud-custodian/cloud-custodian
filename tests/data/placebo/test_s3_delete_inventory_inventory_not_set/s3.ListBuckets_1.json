@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "jnelson11", 
+            "ID": "cb8b9d465982cf7cc480d18ccfe6fd8e017a49374af0d4f5e764ab65a3773e8f"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 2
+                }, 
+                "Name": "delete_inventory"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "4SJ1r0EqHcWGcbE7zlxq/69cg2y1dAo6QYe6DyRRCvpLQWmTy2ljpsuQMXuJ94ZlanrEfvTL5Gc=", 
+            "RequestId": "E6B5E66C765B7958", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "4SJ1r0EqHcWGcbE7zlxq/69cg2y1dAo6QYe6DyRRCvpLQWmTy2ljpsuQMXuJ94ZlanrEfvTL5Gc=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E6B5E66C765B7958", 
+                "date": "Tue, 14 Nov 2017 20:02:06 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
