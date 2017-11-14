@@ -385,7 +385,6 @@ class IPv4Network(ipaddress.IPv4Network):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
 
-
     # Redefine from ipaddress backport to address that this is not
     # in the python 3.6 stdlib implementation.
     # Note this is copyright 2007 Google, 2007 and licensed to the PSF
