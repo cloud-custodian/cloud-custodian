@@ -385,6 +385,26 @@ class IPv4Network(ipaddress.IPv4Network):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
 
+    # Redefine from ipaddress backport to address that this is not
+    # in the python 3.6 stdlib implementation.
+    # Note this is copyright 2007 Google, 2007 and licensed to the PSF
+    # and released under the python license.
+    # https://docs.python.org/3/license.html
+
+    def supernet_of(self, other):
+        # always false if one is v4 and the other is v6.
+        if self._version != other._version:
+            return False
+        # dealing with another network.
+        if (hasattr(other, 'network_address') and
+                hasattr(other, 'broadcast_address')):
+            return (other.network_address >= self.network_address and
+                    other.broadcast_address <= self.broadcast_address)
+        # dealing with another address
+        else:
+            raise TypeError('Unable to test subnet containment with element '
+                            'of type %s' % type(other))
+
 
 worker_log = logging.getLogger('c7n.worker')
 
