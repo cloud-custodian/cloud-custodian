@@ -1,8 +1,6 @@
-boto3>=1.3.0
-botocore>=1.4.11
+boto3>=1.4.7
+botocore>=1.7.35
 docutils>=0.12
-functools32==3.2.3-2
-futures==3.1.1
 Jinja2>=2.8
 jmespath>=0.9.0
 vcversioner==2.16.0.0
@@ -12,6 +10,6 @@ Markup
 MarkupSafe==1.0
 python-dateutil>=2.5.2
 ldap3
-PyYAML>=3.11
+ruamel.yaml<0.15
 six==1.11.0
 redis
