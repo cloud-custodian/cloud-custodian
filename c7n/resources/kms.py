@@ -251,7 +251,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             assert key_id, "Invalid key resources %s" % r
             try:
                 results += filter(None, [self.process_resource(client, r, key_id)])
-            except:
+            except Exception:
                 self.log.exception(
                     "Error processing sns:%s", key_id)
         return results
