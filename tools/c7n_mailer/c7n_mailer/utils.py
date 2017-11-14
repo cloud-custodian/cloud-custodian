@@ -268,5 +268,4 @@ def resource_format(resource, resource_type):
             resource['CreationDateTime'],
             resource['TableStatus'])
     else:
-        print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)
