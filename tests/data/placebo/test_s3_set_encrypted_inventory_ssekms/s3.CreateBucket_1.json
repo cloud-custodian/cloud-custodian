@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-inventory-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Ia1tBQEHoUfbOect/5tK2ujKfjOJElnGa7NYfs+9AJ63LJrj7qybRbzj34OBWOL4oPgliECwGus=", 
+            "RequestId": "AA74E8B09804A689", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "Ia1tBQEHoUfbOect/5tK2ujKfjOJElnGa7NYfs+9AJ63LJrj7qybRbzj34OBWOL4oPgliECwGus=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "AA74E8B09804A689", 
+                "location": "/custodian-inventory-test", 
+                "date": "Tue, 14 Nov 2017 20:05:14 GMT"
+            }
+        }
+    }
+}
