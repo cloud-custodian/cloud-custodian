@@ -1026,7 +1026,7 @@ class AppELBTargetGroupDeleteAction(BaseAction):
               - name: appelb-targetgroups-delete-unused
                 resource: app-elb-target-group
                 filters:
-                  - Instances: []
+                  - "tag:SomeTag": absent
                 actions:
                   - delete
     """
