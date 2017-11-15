@@ -933,13 +933,13 @@ class CloudWatchEventSource(object):
     def pause(self, func):
         try:
             self.client.disable_rule(Name=func.name)
-        except:
+        except Exception:
             pass
 
     def resume(self, func):
         try:
             self.client.enable_rule(Name=func.name)
-        except:
+        except Exception:
             pass
 
     def remove(self, func):
