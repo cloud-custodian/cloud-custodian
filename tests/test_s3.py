@@ -123,6 +123,113 @@ class BucketMetrics(BaseTest):
 
 class BucketInventory(BaseTest):
 
+    def test_s3_set_encrypted_inventory_sses3(self):
+        bname = 'custodian-inventory-test'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_set_encrypted_inventory_sses3')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'enabled',
+                    'encryption': 'SSES3',
+                    'fields': ['Size', 'EncryptionStatus']
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        invs = client.list_bucket_inventory_configurations(
+            Bucket=bname).get('InventoryConfigurationList')
+        self.assertTrue(invs)
+        self.assertTrue('SSES3' in invs[0]['Destination']['S3BucketDestination']['Encryption'])
+        self.assertTrue('EncryptionStatus' in invs[0]['OptionalFields'])
+
+    def test_s3_set_encrypted_inventory_ssekms(self):
+        bname = 'custodian-inventory-test'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_set_encrypted_inventory_ssekms')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'enabled',
+                    'encryption': 'SSEKMS',
+                    'key_id': 'arn:valid:kms',
+                    'fields': ['Size', 'EncryptionStatus']
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        invs = client.list_bucket_inventory_configurations(
+            Bucket=bname).get('InventoryConfigurationList')
+        self.assertTrue(invs)
+        self.assertTrue('SSEKMS' in invs[0]['Destination']['S3BucketDestination']['Encryption'])
+        self.assertTrue('EncryptionStatus' in invs[0]['OptionalFields'])
+
+    def test_s3_delete_inventory_inventory_not_set(self):
+        bname = 'delete_inventory'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_delete_inventory_inventory_not_set')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'absent',
+                }
+            ]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        inventoryConfigList = client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList')
+        self.assertFalse(inventoryConfigList)
+
     @functional
     def test_inventory(self):
         bname = 'custodian-test-data'

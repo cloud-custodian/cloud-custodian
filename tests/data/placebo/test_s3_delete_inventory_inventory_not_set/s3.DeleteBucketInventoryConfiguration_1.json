@@ -1,0 +1,23 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "fpNbvsW4Ep5o0yWL8/zQ116Y2ZVWeQJUNLwYAkf2Te341Qc4tPzEsZAjAHalZtcOU+csHfHvnBk=", 
+            "RequestId": "DC4098F4BA93B262", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "fpNbvsW4Ep5o0yWL8/zQ116Y2ZVWeQJUNLwYAkf2Te341Qc4tPzEsZAjAHalZtcOU+csHfHvnBk=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DC4098F4BA93B262", 
+                "date": "Wed, 15 Nov 2017 13:59:08 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The specified configuration does not exist.", 
+            "Code": "NoSuchConfiguration"
+        }
+    }
+}

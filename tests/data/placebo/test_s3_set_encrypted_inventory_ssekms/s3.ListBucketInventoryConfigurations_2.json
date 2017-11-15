@@ -1,0 +1,45 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InventoryConfigurationList": [
+            {
+                "Schedule": {
+                    "Frequency": "Daily"
+                }, 
+                "IsEnabled": true, 
+                "Destination": {
+                    "S3BucketDestination": {
+                        "Encryption": {
+                            "SSEKMS": {
+                                "KeyId": "arn:valid:kms"
+                            }
+                        }, 
+                        "Prefix": "Inventories/644160558196", 
+                        "Bucket": "arn:aws:s3:::inv-dest", 
+                        "Format": "CSV"
+                    }
+                }, 
+                "OptionalFields": [
+                    "Size", 
+                    "EncryptionStatus"
+                ], 
+                "IncludedObjectVersions": "Current", 
+                "Id": "inv-name"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "z6B1JQbY43VPfhBWtExa4YK5DT50eakuy6WoZHBzPkHPRZzngMpo1QcFpPnPFLH5S/4yWhMj5Yw=", 
+            "RequestId": "72C0BD438E533198", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "z6B1JQbY43VPfhBWtExa4YK5DT50eakuy6WoZHBzPkHPRZzngMpo1QcFpPnPFLH5S/4yWhMj5Yw=", 
+                "date": "Tue, 14 Nov 2017 20:05:15 GMT", 
+                "content-length": "711", 
+                "x-amz-request-id": "72C0BD438E533198", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

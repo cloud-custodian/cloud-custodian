@@ -2109,11 +2109,13 @@ class SetInventory(BucketActionBase):
         name={'type': 'string', 'description': 'Name of inventory'},
         destination={'type': 'string', 'description': 'Name of destination bucket'},
         prefix={'type': 'string', 'description': 'Destination prefix'},
+        encryption={'enum': ['SSES3', 'SSEKMS']},
+        key_id={'type': 'string', 'description': 'Optional Customer KMS KeyId for SSE-KMS'},
         versions={'enum': ['All', 'Current']},
         schedule={'enum': ['Daily', 'Weekly']},
         fields={'type': 'array', 'items': {'enum': [
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
-            'IsMultipartUploaded', 'ReplicationStatus']}})
+            'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus']}})
 
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
 
@@ -2135,6 +2137,7 @@ class SetInventory(BucketActionBase):
         fields = self.data.get('fields', ['LastModifiedDate', 'Size'])
         versions = self.data.get('versions', 'Current')
         state = self.data.get('state', 'enabled')
+        encryption = self.data.get('encryption')
 
         if not prefix:
             prefix = "Inventories/%s" % (self.manager.config.account_id)
@@ -2149,11 +2152,14 @@ class SetInventory(BucketActionBase):
                     raise
             return
 
+        bucket = {
+            'Bucket': "arn:aws:s3:::%s" % destination,
+            'Format': 'CSV'
+        }
+
         inventory = {
             'Destination': {
-                'S3BucketDestination': {
-                    'Bucket': "arn:aws:s3:::%s" % destination,
-                    'Format': 'CSV'}
+                'S3BucketDestination': bucket
             },
             'IsEnabled': state == 'enabled' and True or False,
             'Id': inventory_name,
@@ -2165,7 +2171,14 @@ class SetInventory(BucketActionBase):
         }
 
         if prefix:
-            inventory['Destination']['S3BucketDestination']['Prefix'] = prefix
+            bucket['Prefix'] = prefix
+
+        if encryption:
+            bucket['Encryption'] = {encryption: {}}
+            if encryption == 'SSEKMS' and self.data.get('key_id'):
+                bucket['Encryption'] = {encryption: {
+                    'KeyId': self.data['key_id']
+                }}
 
         found = self.get_inventory_delta(client, inventory, b)
         if found:
