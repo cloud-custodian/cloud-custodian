@@ -3,19 +3,19 @@
     "data": {
         "MaxKeys": 1000, 
         "Prefix": "", 
-        "Name": "custodian-enable-bucket-encryption-aes256", 
+        "Name": "custodian-enable-bucket-encryption-kms-alias", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "xAI1rMD5m8c5VzCs2Gt4+cnh5sU5g/NqJDiaYYrVXDmnNn2PY6TmdCxL3qjcpPg3Eq36vQ+CMT4=", 
-            "RequestId": "F5349E8D45B693D9", 
+            "HostId": "IBgbHFMO/lFDmnf1TzE20l61NmECIL+TQN0fPhDNaD4dzEotN6LLolrn/Q2yJGslz7J42pHd7zw=", 
+            "RequestId": "26AC9C2B036C4B19", 
             "HTTPHeaders": {
                 "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "xAI1rMD5m8c5VzCs2Gt4+cnh5sU5g/NqJDiaYYrVXDmnNn2PY6TmdCxL3qjcpPg3Eq36vQ+CMT4=", 
+                "x-amz-id-2": "IBgbHFMO/lFDmnf1TzE20l61NmECIL+TQN0fPhDNaD4dzEotN6LLolrn/Q2yJGslz7J42pHd7zw=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "F5349E8D45B693D9", 
-                "date": "Wed, 15 Nov 2017 16:15:50 GMT", 
+                "x-amz-request-id": "26AC9C2B036C4B19", 
+                "date": "Wed, 15 Nov 2017 16:16:16 GMT", 
                 "content-type": "application/xml"
             }
         }, 

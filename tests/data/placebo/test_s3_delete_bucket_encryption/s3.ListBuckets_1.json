@@ -8,14 +8,14 @@
         "Buckets": [
             {
                 "CreationDate": {
-                    "hour": 2, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 53, 
+                    "second": 22, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 13, 
-                    "minute": 1
+                    "day": 15, 
+                    "minute": 15
                 }, 
                 "Name": "custodian-delete-bucket-encryption-aes256"
             }
@@ -23,14 +23,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "f8WVQ+2MurNPFSE9gt6SEvJpE2qMxvniplIalK3n8Oky6LU3C7z+3Vs2pb6F2SJvVwi3MHcY8+w=", 
-            "RequestId": "D6416CC58829423A", 
+            "HostId": "eUOSFwc09xpiUxekv9Zwp7E9GxA/kzzlEwEv4aWbwX6skrd1BjZVAqmAc1T+xwyshS7mOFWKcm8=", 
+            "RequestId": "0C646578A5588F7A", 
             "HTTPHeaders": {
-                "x-amz-id-2": "f8WVQ+2MurNPFSE9gt6SEvJpE2qMxvniplIalK3n8Oky6LU3C7z+3Vs2pb6F2SJvVwi3MHcY8+w=", 
+                "x-amz-id-2": "eUOSFwc09xpiUxekv9Zwp7E9GxA/kzzlEwEv4aWbwX6skrd1BjZVAqmAc1T+xwyshS7mOFWKcm8=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "D6416CC58829423A", 
-                "date": "Mon, 13 Nov 2017 02:01:55 GMT", 
+                "x-amz-request-id": "0C646578A5588F7A", 
+                "date": "Wed, 15 Nov 2017 16:15:23 GMT", 
                 "content-type": "application/xml"
             }
         }

@@ -5,7 +5,7 @@
             "Rules": [
                 {
                     "ApplyServerSideEncryptionByDefault": {
-                        "KMSMasterKeyID": "9c4a6837-f9ab-4fa8-8e9b-39fe4307777f", 
+                        "KMSMasterKeyID": "arn:aws:kms:us-east-1:015929227155:key/9c4a6837-f9ab-4fa8-8e9b-39fe4307777f", 
                         "SSEAlgorithm": "aws:kms"
                     }
                 }
@@ -14,13 +14,13 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "Qck+I4AA7sL1tvgyBCGlpdPrvebv1ptw4OzJrxL4CrBlEu7nST0JH5T8gSUw3uK4L4Jlk580D1g=", 
-            "RequestId": "4D66BA3E468088C0", 
+            "HostId": "vVDdCm8v/4eG84t8bqp8D5t/ERzmGWolhHZ0+BC/aIHEIJvGrswx70uJCpKQ1u2jgSZGP2u2PwU=", 
+            "RequestId": "5E295A52BAC7853D", 
             "HTTPHeaders": {
-                "x-amz-id-2": "Qck+I4AA7sL1tvgyBCGlpdPrvebv1ptw4OzJrxL4CrBlEu7nST0JH5T8gSUw3uK4L4Jlk580D1g=", 
-                "date": "Wed, 15 Nov 2017 00:10:07 GMT", 
+                "x-amz-id-2": "vVDdCm8v/4eG84t8bqp8D5t/ERzmGWolhHZ0+BC/aIHEIJvGrswx70uJCpKQ1u2jgSZGP2u2PwU=", 
+                "date": "Wed, 15 Nov 2017 16:16:09 GMT", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "4D66BA3E468088C0", 
+                "x-amz-request-id": "5E295A52BAC7853D", 
                 "server": "AmazonS3"
             }
         }
