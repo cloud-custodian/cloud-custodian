@@ -227,6 +227,8 @@ class BucketInventory(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        inventoryConfigList = client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList')
+        self.assertFalse(inventoryConfigList)
 
     @functional
     def test_inventory(self):

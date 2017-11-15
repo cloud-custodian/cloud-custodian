@@ -8,14 +8,14 @@
         "Buckets": [
             {
                 "CreationDate": {
-                    "hour": 20, 
+                    "hour": 13, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 15, 
+                    "second": 9, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 14, 
-                    "minute": 18
+                    "day": 15, 
+                    "minute": 59
                 }, 
                 "Name": "delete_inventory"
             }
@@ -23,14 +23,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "uq4sIqNbNdgyurKytuj7I00oeEF7EHc1oFcAmx3mcjsE1H5/amrGmds2+6dImNKFwDYTqHXUpDs=", 
-            "RequestId": "431AE0730FA6EE21", 
+            "HostId": "sUAPZ6pj92zf/D11Xl1vsg92MPTiUT3hnyaEvhoq5/pcCSsqI1k7V4xzMa8Of9j0ChL3LwwQLFs=", 
+            "RequestId": "13043984F2E703CF", 
             "HTTPHeaders": {
-                "x-amz-id-2": "uq4sIqNbNdgyurKytuj7I00oeEF7EHc1oFcAmx3mcjsE1H5/amrGmds2+6dImNKFwDYTqHXUpDs=", 
+                "x-amz-id-2": "sUAPZ6pj92zf/D11Xl1vsg92MPTiUT3hnyaEvhoq5/pcCSsqI1k7V4xzMa8Of9j0ChL3LwwQLFs=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "431AE0730FA6EE21", 
-                "date": "Tue, 14 Nov 2017 20:18:16 GMT", 
+                "x-amz-request-id": "13043984F2E703CF", 
+                "date": "Wed, 15 Nov 2017 13:59:09 GMT", 
                 "content-type": "application/xml"
             }
         }

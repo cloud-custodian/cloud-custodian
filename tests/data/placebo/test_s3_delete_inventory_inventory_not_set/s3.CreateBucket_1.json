@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "ydqUQwmaBB/TuvbCE37oVZIm68SucYYlj7R9a41nds+oFynF12kIXzpUUugVeEizcvPLtPI9CsM=", 
-            "RequestId": "0D4A77B4C3355BC6", 
+            "HostId": "dBSh7boO/cYWqofwJpNbT+ReHd7/QcUPmQUjb1uM9cMFx4xBCHTBUiCeSC86BVeN/5JhhCG4GKs=", 
+            "RequestId": "DDA33FC56FCD3893", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "ydqUQwmaBB/TuvbCE37oVZIm68SucYYlj7R9a41nds+oFynF12kIXzpUUugVeEizcvPLtPI9CsM=", 
+                "x-amz-id-2": "dBSh7boO/cYWqofwJpNbT+ReHd7/QcUPmQUjb1uM9cMFx4xBCHTBUiCeSC86BVeN/5JhhCG4GKs=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "0D4A77B4C3355BC6", 
+                "x-amz-request-id": "DDA33FC56FCD3893", 
                 "location": "/delete_inventory", 
-                "date": "Tue, 14 Nov 2017 20:18:15 GMT"
+                "date": "Wed, 15 Nov 2017 13:59:08 GMT"
             }
         }
     }
