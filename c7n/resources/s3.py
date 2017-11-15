@@ -472,12 +472,6 @@ def bucket_client(session, b, kms=False):
     return session.client('s3', region_name=region, config=config)
 
 
-def kms_client(session, b):
-    region = get_region(b)
-    config = Config(read_timeout=200, connect_timeout=120)
-    return session.client('kms', region_name=region, config=config)
-
-
 def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
     for bucket in buckets:
         client = bucket_client(local_session(session_factory), bucket)
@@ -2569,50 +2563,54 @@ class SetBucketEncryption(BucketActionBase):
                 'kms:ListAliases')
 
     def process(self, buckets):
+        config = None
+        aliases = None
+        regions = set()
+        regions = {get_region(b) for b in buckets}
+        key = self.data.get('key')
+
+        if self.data.get('enabled', True):
+            SSEAlgorithm = self.data.get('crypto', 'AES256')
+            config = {'Rules': [
+                {
+                    'ApplyServerSideEncryptionByDefault': {
+                        'SSEAlgorithm': SSEAlgorithm
+                    }
+                }
+            ]}
+            if key: 
+                config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key
+                if key.startswith('alias'): aliases = self.get_aliases(regions, key)
+
         with self.executor_factory(max_workers=3) as w:
             results = []
-            enabled = self.data.get('enabled', True)
-            if enabled:
-                SSEAlgorithm = self.data.get('crypto', 'AES256')
-                config = {'Rules': [
-                    {
-                        'ApplyServerSideEncryptionByDefault': {
-                            'SSEAlgorithm': SSEAlgorithm
-                        }
-                    }
-                ]}
-                key = self.data.get('key')
-                if key:
-                    config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key
-            else:
-                config = None
-            futures = {w.submit(self.process_bucket, b, config) : b for b in buckets}
+            futures = {w.submit(self.process_bucket, b, config, aliases) : b for b in buckets}
             for future in as_completed(futures):
                 if future.exception():
                     bucket = futures[future]
                     self.log.error('error enabling bucket encryption: %s\n%s',
                                    bucket['Name'], future.exception())
                 results += filter(None, [future.result()])
-            return results
 
-    def process_bucket(self, bucket, config):
+    def get_aliases(self, regions, key):
+        for r in regions:
+            # Per region aws:kms encryption, if alias does not exist in a region with a
+            # corresponding bucket, default to original input and encrypt with default
+            # aws:kms key (handled by put_bucket_encryption)
+            self.manager.get_resource_manager('kms').region = r
+            aliases = {r : i.get('TargetKeyId', key)
+                for i in self.manager.get_resource_manager('kms').resources()}
+
+        return aliases
+
+    def process_bucket(self, bucket, config, aliases):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        if config:
-            key = config['Rules'][0]['ApplyServerSideEncryptionByDefault'].get('KMSMasterKeyID')
-            if key and key.startswith('alias'):
-                # Unfortunately need to pull aliases per bucket as buckets can be in any region.
-                # To specify a key for a specific region using arn or id is better.
-                # Also, if key is invalid, s3 will still encrypt via kms.
-                kms = kms_client(local_session(self.manager.session_factory), bucket)
-                aliases = kms.list_aliases()
-                for a in aliases['Aliases']:
-                    if a['AliasName'] == self.data['key']:
-                        (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
-                            ['KMSMasterKeyID']) = a['TargetKeyId']
-                        continue
-            s3.put_bucket_encryption(
-                Bucket=bucket["Name"],
-                ServerSideEncryptionConfiguration=config
-            )
-        else:
-            s3.delete_bucket_encryption(Bucket=bucket["Name"])
+        a = None
+        if aliases: alias = aliases.get(get_region(bucket))
+        if not config: s3.delete_bucket_encryption(Bucket=bucket['Name']); return
+        if a: config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = a
+
+        s3.put_bucket_encryption(
+            Bucket=bucket['Name'],
+            ServerSideEncryptionConfiguration=config
+        )

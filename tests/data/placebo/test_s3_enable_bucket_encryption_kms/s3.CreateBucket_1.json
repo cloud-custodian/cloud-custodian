@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "tsobmGEjBAQmkH+EO9qF1NY/dhgjchXIPeXOKlVA303WlSPxyh7aZCn2WKT4F2U5sjVrzJHXh/Q=", 
-            "RequestId": "FFF82F8D7E1AB45D", 
+            "HostId": "vWVNOzki4NwvLHWbWEEV1/sR40mlHByfZUq7Hfzyx3hM9ORx04Ql1Xq33L7o+nyz2DiLYRqcHMk=", 
+            "RequestId": "3230F0FB9A78B859", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "tsobmGEjBAQmkH+EO9qF1NY/dhgjchXIPeXOKlVA303WlSPxyh7aZCn2WKT4F2U5sjVrzJHXh/Q=", 
+                "x-amz-id-2": "vWVNOzki4NwvLHWbWEEV1/sR40mlHByfZUq7Hfzyx3hM9ORx04Ql1Xq33L7o+nyz2DiLYRqcHMk=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "FFF82F8D7E1AB45D", 
+                "x-amz-request-id": "3230F0FB9A78B859", 
                 "location": "/custodian-enable-bucket-encryption-kms", 
-                "date": "Mon, 13 Nov 2017 21:58:53 GMT"
+                "date": "Wed, 15 Nov 2017 00:09:35 GMT"
             }
         }
     }

@@ -1944,8 +1944,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # sleep for bucket-encryption to propogate
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
@@ -1953,7 +1952,7 @@ class S3Test(BaseTest):
         self.assertEqual(rules['KMSMasterKeyID'], str(key['KeyId']))
 
         client.delete_bucket_encryption(Bucket=bname)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
         with self.assertRaises(Exception) as context:
             client.get_bucket_encryption(Bucket=bname)
         # Test without 'enabled'
@@ -1973,7 +1972,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # time.sleep(10)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
@@ -1981,7 +1980,7 @@ class S3Test(BaseTest):
         self.assertEqual(rules['KMSMasterKeyID'], str(key['KeyId']))
 
         client.delete_bucket_encryption(Bucket=bname)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
         with self.assertRaises(Exception) as context:
             client.get_bucket_encryption(Bucket=bname)
 
@@ -2008,7 +2007,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
@@ -2016,7 +2015,7 @@ class S3Test(BaseTest):
         self.assertEqual(rules['KMSMasterKeyID'], kms_alias_id)
 
         client.delete_bucket_encryption(Bucket=bname)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
         with self.assertRaises(Exception) as context:
             client.get_bucket_encryption(Bucket=bname)
 
@@ -2037,7 +2036,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
@@ -2072,14 +2071,14 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
         self.assertEqual(rules['SSEAlgorithm'], 'AES256')
 
         client.delete_bucket_encryption(Bucket=bname)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         with self.assertRaises(Exception) as context:
             client.get_bucket_encryption(Bucket=bname)
@@ -2099,7 +2098,7 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
 
         response = client.get_bucket_encryption(Bucket=bname)
         rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
@@ -2145,7 +2144,7 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        # time.sleep(5)
+        if self.recording: time.sleep(5)
         with self.assertRaises(Exception) as context:
             client.get_bucket_encryption(Bucket=bname)
 

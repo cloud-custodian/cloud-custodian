@@ -8,14 +8,14 @@
         "Buckets": [
             {
                 "CreationDate": {
-                    "hour": 21, 
+                    "hour": 0, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 53, 
+                    "second": 35, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 13, 
-                    "minute": 58
+                    "day": 15, 
+                    "minute": 9
                 }, 
                 "Name": "custodian-enable-bucket-encryption-kms"
             }
@@ -23,14 +23,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "uNduHWwFBgoYPtNjU8cyHabe3c8Ua1AyMuVBF3TYLJEH5sz8wjwZiuiNyXQEmBQWYwL4hGFv6S0=", 
-            "RequestId": "A6A9F3931C99F4DA", 
+            "HostId": "xBPpIDvUwv0PIahymj2smkuLCFVg/J2udiolP7l91br72ZE0/ToDi7UsMSHA6VBnLvHXbAuF+qE=", 
+            "RequestId": "04E6EE831C59A491", 
             "HTTPHeaders": {
-                "x-amz-id-2": "uNduHWwFBgoYPtNjU8cyHabe3c8Ua1AyMuVBF3TYLJEH5sz8wjwZiuiNyXQEmBQWYwL4hGFv6S0=", 
+                "x-amz-id-2": "xBPpIDvUwv0PIahymj2smkuLCFVg/J2udiolP7l91br72ZE0/ToDi7UsMSHA6VBnLvHXbAuF+qE=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "A6A9F3931C99F4DA", 
-                "date": "Mon, 13 Nov 2017 21:59:06 GMT", 
+                "x-amz-request-id": "04E6EE831C59A491", 
+                "date": "Wed, 15 Nov 2017 00:09:48 GMT", 
                 "content-type": "application/xml"
             }
         }
