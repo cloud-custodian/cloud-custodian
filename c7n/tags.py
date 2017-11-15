@@ -283,7 +283,7 @@ class TagActionFilter(Filter):
 
         try:
             action_date = parse(action_date_str)
-        except:
+        except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
 
