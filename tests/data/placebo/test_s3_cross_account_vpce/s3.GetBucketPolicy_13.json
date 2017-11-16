@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::scot-test-3\"},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::scot-test-3/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "BLtTT+3gUf8F5fdbETHRm8aLFvoE94gr2uM8LaE49O2Fpn6udedn60aZ3pJ6R+4Q8Psy3lzWi2k=", 
+            "RequestId": "33E56E8DA8D8FB82", 
+            "HTTPHeaders": {
+                "content-length": "454", 
+                "x-amz-id-2": "BLtTT+3gUf8F5fdbETHRm8aLFvoE94gr2uM8LaE49O2Fpn6udedn60aZ3pJ6R+4Q8Psy3lzWi2k=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "33E56E8DA8D8FB82", 
+                "date": "Thu, 16 Nov 2017 17:10:24 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

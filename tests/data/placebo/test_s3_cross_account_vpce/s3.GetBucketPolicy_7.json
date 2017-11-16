@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-west-2.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::custodian-log-archive\"},{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-west-2.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-log-archive/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "H2zyhu8twroXvUIWweVf6lhQq+cuD84jDK0CEMhKAd+2o0m8g2UNVg7uuRT/qcNoE4fvbWVqiLU=", 
+            "RequestId": "48AA775DA213D97D", 
+            "HTTPHeaders": {
+                "content-length": "409", 
+                "x-amz-id-2": "H2zyhu8twroXvUIWweVf6lhQq+cuD84jDK0CEMhKAd+2o0m8g2UNVg7uuRT/qcNoE4fvbWVqiLU=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "48AA775DA213D97D", 
+                "date": "Thu, 16 Nov 2017 17:10:21 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

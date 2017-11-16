@@ -191,6 +191,21 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 if so in allowed_accounts:
                     principal_ok = True
 
+            if s['Condition']['StringEquals'].get('aws:SourceVpc', None) in allowed_accounts:
+                principal_ok = True
+
+            if s['Condition']['StringEquals'].get('aws:SourceVpce', None) in allowed_accounts:
+                principal_ok = True
+            #if 'aws:SourceVpce' in s['Condition']['StringEquals']:
+            #    so = s['Condition']['StringEquals']['aws:SourceVpce']
+            #    if so in allowed_accounts:
+            #        principal_ok = True
+
+            #if 'aws:SourceVpc' in s['Condition']['StringEquals']:
+            #    so = s['Condition']['StringEquals']['aws:SourceVpc']
+            #    if so in allowed_accounts:
+            #        principal_ok = True
+
         # BEGIN S3 WhiteList
         # Note these are transient white lists for s3
         # we need to refactor this to verify ip against a
@@ -198,8 +213,15 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
         # accounts.
 
             # For now allow vpce/vpc conditions as sufficient on s3
+            '''for k in s['Condition']['StringEquals']:
+                if k and k.lower() not in whitelist_conditions:
+                    continue
+                if s['Condition']['StringEquals'][k] in allowed_accounts:
+                    principal_ok = True
             if list(s['Condition']['StringEquals'].keys())[0].lower() in whitelist_conditions:
-                principal_ok = True
+                for k in s['Condition']['StringEquals']:
+                    if s['Condition']['StringEquals'][k] in whitelist_values:
+                        principal_ok = True'''
 
         if 'StringLike' in s['Condition']:
             # For now allow vpce/vpc conditions as sufficient on s3
@@ -248,6 +270,16 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 aid = _account(arn)
                 if aid not in allowed_accounts:
                     violations.append(s)
+
+        '''if "Bool" in s['Condition']:
+            principal_ok = True
+            keys = ('aws:SecureTransport',)
+            for k in keys:
+                if k in s['Condition']['Bool']:
+                    v = s['Condition']['Bool'][k]
+            if v is None or 'false':
+                violations.append(s)'''
+
         if not principal_ok:
             violations.append(s)
     return violations

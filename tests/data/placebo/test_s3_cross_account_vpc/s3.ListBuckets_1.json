@@ -1,0 +1,194 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 40, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 5
+                }, 
+                "Name": "c7n-fire-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 0
+                }, 
+                "Name": "custodian-byebye"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 22
+                }, 
+                "Name": "custodian-filters-test-001"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 58
+                }, 
+                "Name": "custodian-filters-test-002"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 59
+                }, 
+                "Name": "custodian-filters-test-003"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 49
+                }, 
+                "Name": "custodian-log-archive"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 55
+                }, 
+                "Name": "custodian-skunk-trails-east-2"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 17
+                }, 
+                "Name": "custodian-test-encryption"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 43
+                }, 
+                "Name": "hvoslow-temp"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 12
+                }, 
+                "Name": "scot-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 23
+                }, 
+                "Name": "scot-test-3"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "I/ZkWVGHXYXJq53+44RHsbcACmslWoWK7Ju6JTxn1pf8IEZjy7ovwbuVeswisFjndn/ScV2pfow=", 
+            "RequestId": "66E970AB460FFF24", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "I/ZkWVGHXYXJq53+44RHsbcACmslWoWK7Ju6JTxn1pf8IEZjy7ovwbuVeswisFjndn/ScV2pfow=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "66E970AB460FFF24", 
+                "date": "Thu, 16 Nov 2017 17:10:08 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

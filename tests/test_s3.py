@@ -1910,6 +1910,48 @@ class S3Test(BaseTest):
         us = [t for t in topic_notifications if t.get('TopicArn') == topic_arn]
         self.assertEqual(len(us), 1)
 
+    def test_s3_cross_account_vpc(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'),])
+        session_factory = self.record_flight_data('test_s3_cross_account_vpc')
+        p = self.load_policy({
+            'name': 's3_cross_account_vpc',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist_conditions': ['aws:sourcevpc'],
+                 'whitelist': ['vpc-3078a556']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'custodian-filters-test-003')
+
+    def test_s3_cross_account_vpce(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'), ])
+        session_factory = self.record_flight_data(
+            'test_s3_cross_account_vpce')
+        p = self.load_policy({
+            'name': 's3_cross_account_vpce',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist_conditions': ['aws:sourcevpce'],
+                 'whitelist': ['vpce-57cb313e']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'custodian-filters-test-002')
+        # 'whitelist': ['644160558196', 'vpc-3078a556', 'vpce-57cb313e']}
+
 
 class S3LifecycleTest(BaseTest):
 

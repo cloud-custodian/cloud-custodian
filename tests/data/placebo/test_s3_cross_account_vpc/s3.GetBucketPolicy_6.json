@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy-02\",\"Statement\":[{\"Sid\":\"Condition-SourceVPC\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-filters-test-003/*\",\"Condition\":{\"StringEquals\":{\"aws:SourceVpc\":\"vpc-3078a556\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "TKNcVKSjdIUkbN+qnAzXviGcz2rOsKA67Rehj9PvVk5IqArttfwpuSTC1Nzi2gtgWsz2AIxHMhw=", 
+            "RequestId": "DB13E046932C08CF", 
+            "HTTPHeaders": {
+                "content-length": "259", 
+                "x-amz-id-2": "TKNcVKSjdIUkbN+qnAzXviGcz2rOsKA67Rehj9PvVk5IqArttfwpuSTC1Nzi2gtgWsz2AIxHMhw=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "DB13E046932C08CF", 
+                "date": "Thu, 16 Nov 2017 17:10:11 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
