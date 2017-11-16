@@ -2507,3 +2507,117 @@ class Lifecycle(BucketActionBase):
 
         s3.put_bucket_lifecycle_configuration(
             Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+
+
+@actions.register('set-bucket-encryption')
+class SetBucketEncryption(BucketActionBase):
+    """Action enables default encryption on S3 buckets
+
+    `enabled`: boolean Optional: Defaults to True
+    `crypto`: aws:kms | AES256` Optional: Defaults to AES256
+    `key`: arn, alias, or kms id key
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: s3-enable-default-encryption-kms
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # enabled: true <------ optional (true by default)
+                    crypto: aws:kms
+                    key: 1234abcd-12ab-34cd-56ef-1234567890ab
+
+              - name: s3-enable-default-encryption-kms-alias
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # enabled: true <------ optional (true by default)
+                    crypto: aws:kms
+                    key: alias/some/alias/key
+
+              - name: s3-enable-default-encryption-aes256
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                  # crypto: AES256 <----- optional (AES256 by default)
+                  # enabled: true <------ optional (true by default)
+
+              - name: s3-disable-default-encryption
+                resource: s3
+                actions:
+                  - type: set-bucket-encryption
+                    enabled: false
+    """
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['set-bucket-encryption']},
+            'enabled': {'type': 'boolean'},
+            'crypto': {'enum': ['aws:kms', 'AES256']},
+            'key': {'type': 'string'}
+        },
+        'dependencies': {
+            'key': {
+                'properties': {
+                    'crypto': {'pattern': 'aws:kms'}
+                },
+                'required': ['crypto']
+            }
+        }
+    }
+
+    permissions = ('s3:PutEncryptionConfiguration',
+                's3:GetEncryptionConfiguration',
+                'kms:ListAliases')
+
+    def process(self, buckets):
+        keys = {}
+        regions = set()
+        regions = {get_region(b) for b in buckets}
+        key = self.data.get('key')
+
+        if self.data.get('enabled', True) and key:
+            keys = self.resolve_keys(regions, key)
+
+        with self.executor_factory(max_workers=3) as w:
+            results = []
+            futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error('error enabling bucket encryption: %s\n%s',
+                                   bucket['Name'], future.exception())
+                results += filter(None, [future.result()])
+
+    def resolve_keys(self, regions, key):
+        arns = {}
+        for r in regions:
+            client = local_session(self.manager.session_factory).client('kms', region_name=r)
+            try:
+                arns[r] = client.describe_key(KeyId=key).get('KeyMetadata').get('Arn')
+            except ClientError as e:
+                self.log.error('Error validating ARNs for set-bucket-encryption: %s' % e)
+        return arns
+
+    def process_bucket(self, bucket, keys):
+        config = {'Rules': [
+            {'ApplyServerSideEncryptionByDefault': {
+                'SSEAlgorithm': self.data.get('crypto','AES256')}}
+        ]}
+        region = get_region(bucket)
+        if self.data.get('key') and region in keys:
+            (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
+                ['KMSMasterKeyID']) = keys[region]
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        if not self.data.get('enabled', True):
+            s3.delete_bucket_encryption(Bucket=bucket['Name'])
+            return
+        s3.put_bucket_encryption(
+            Bucket=bucket['Name'],
+            ServerSideEncryptionConfiguration=config
+        )
