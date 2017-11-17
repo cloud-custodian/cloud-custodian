@@ -2664,13 +2664,11 @@ class SetBucketEncryption(BucketActionBase):
         }
     }
 
-    permissions = ('s3:PutEncryptionConfiguration',
-                's3:GetEncryptionConfiguration',
-                'kms:ListAliases')
+    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
+                   'kms:ListAliases')
 
     def process(self, buckets):
         keys = {}
-        regions = set()
         regions = {get_region(b) for b in buckets}
         key = self.data.get('key')
 
@@ -2678,14 +2676,11 @@ class SetBucketEncryption(BucketActionBase):
             keys = self.resolve_keys(regions, key)
 
         with self.executor_factory(max_workers=3) as w:
-            results = []
-            futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
+            futures = {w.submit(self.process_bucket, b, keys): b for b in buckets}
             for future in as_completed(futures):
                 if future.exception():
-                    bucket = futures[future]
-                    self.log.error('error enabling bucket encryption: %s\n%s',
-                                   bucket['Name'], future.exception())
-                results += filter(None, [future.result()])
+                    self.log.error('Message: %s Bucket: %s', future.exception(),
+                                   futures[future]['Name'])
 
     def resolve_keys(self, regions, key):
         arns = {}
@@ -2700,7 +2695,7 @@ class SetBucketEncryption(BucketActionBase):
     def process_bucket(self, bucket, keys):
         config = {'Rules': [
             {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': self.data.get('crypto','AES256')}}
+                'SSEAlgorithm': self.data.get('crypto', 'AES256')}}
         ]}
         region = get_region(bucket)
         if self.data.get('key') and region in keys:
