@@ -2662,7 +2662,8 @@ class SetBucketEncryption(BucketActionBase):
         }
     }
 
-    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration', 'kms:ListAliases')
+    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
+                   'kms:ListAliases')
 
     def process(self, buckets):
         keys = {}
@@ -2676,7 +2677,8 @@ class SetBucketEncryption(BucketActionBase):
             futures = {w.submit(self.process_bucket, b, keys): b for b in buckets}
             for future in as_completed(futures):
                 if future.exception():
-                    self.log.error('Message: %s Bucket: %s', future.exception(), futures[future]['Name'])
+                    self.log.error('Message: %s Bucket: %s', future.exception(),
+                                   futures[future]['Name'])
 
     def resolve_keys(self, regions, key):
         arns = {}
