@@ -2694,7 +2694,7 @@ class SetBucketEncryption(BucketActionBase):
     def process_bucket(self, bucket, keys):
         config = {'Rules': [
             {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': self.data.get('crypto','AES256')}}
+                'SSEAlgorithm': self.data.get('crypto', 'AES256')}}
         ]}
         region = get_region(bucket)
         if self.data.get('key') and region in keys:
