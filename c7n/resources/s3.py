@@ -257,7 +257,8 @@ class ConfigS3(query.ConfigSource):
             if 'filter' not in r or not r['filter']:
                 continue
 
-            rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
+            if r['filter']['predicate']:
+                rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
 
         resource['Lifecycle'] = {'Rules': rules}
 
@@ -281,6 +282,7 @@ class ConfigS3(query.ConfigSource):
     NotifyTypeMap = {
         'QueueConfiguration': 'QueueConfigurations',
         'LambdaConfiguration': 'LambdaFunctionConfigurations',
+        'CloudFunctionConfiguration': 'LambdaFunctionConfigurations',
         'TopicConfiguration': 'TopicConfigurations'}
 
     def handle_BucketNotificationConfiguration(self, resource, item_value):
