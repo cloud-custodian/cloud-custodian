@@ -2676,14 +2676,13 @@ class SetBucketEncryption(BucketActionBase):
             keys = self.resolve_keys(regions, key)
 
         with self.executor_factory(max_workers=3) as w:
-            results = []
             futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
             for future in as_completed(futures):
-                if future.exception():
-                    bucket = futures[future]
-                    self.log.error('error enabling bucket encryption: %s\n%s',
-                                   bucket['Name'], future.exception())
-                results += filter(None, [future.result()])
+                bucket = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    self.log.error('Message: %s Bucket: %s', e, bucket['Name'])
 
     def resolve_keys(self, regions, key):
         arns = {}
