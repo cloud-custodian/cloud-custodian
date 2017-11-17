@@ -102,7 +102,7 @@ class ConfigAppElb(ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigAppElb, self).load_resource(item)
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in json.loads(item['Tags'])]
+          for t in json.loads(item['supplementaryConfiguration']['Tags'])]
         return resource
 
 

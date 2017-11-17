@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import six
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 from c7n.filters import FilterValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import AppELB, AppELBTargetGroup
@@ -23,6 +23,21 @@ from c7n.resources.appelb import AppELB, AppELBTargetGroup
 
 class AppELBTest(BaseTest):
 
+    def test_appelb_config_source(self):
+        event = event_data('app-elb.json', 'config')
+        p = self.load_policy({'name': 'appelbcfg', 'resource': 'app-elb'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        self.maxDiff = None
+        self.assertEqual(
+            resource['Tags'],
+            [{'Key': 'App', 'Value': 'ARTIFACTPLATFORM'},
+             {'Key': 'OwnerContact', 'Value': 'me@example.com'},
+             {'Key': 'TeamName', 'Value': 'Frogger'},
+             {'Key': 'Env', 'Value': 'QA'},
+             {'Key': 'Name', 'Value': 'Artifact ELB'}])
+                         
+            
     def test_appelb_simple(self):
         self.patch(AppELB, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_appelb_simple')
