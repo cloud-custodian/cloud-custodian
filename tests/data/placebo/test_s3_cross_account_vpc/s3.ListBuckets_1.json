@@ -8,172 +8,55 @@
         "Buckets": [
             {
                 "CreationDate": {
-                    "hour": 2, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 40, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 15, 
-                    "minute": 5
-                }, 
-                "Name": "c7n-fire-logs"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 39, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 5, 
-                    "minute": 26
-                }, 
-                "Name": "config-bucket-644160558196"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 20, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 50, 
+                    "second": 5, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 16, 
-                    "minute": 28
+                    "day": 17, 
+                    "minute": 45
                 }, 
                 "Name": "cross-account-invalid"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 20, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 50, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 16, 
-                    "minute": 28
-                }, 
-                "Name": "cross-account-valid"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 11, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 11, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 14, 
-                    "minute": 0
-                }, 
-                "Name": "custodian-byebye"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 9, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 27, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 16, 
-                    "minute": 49
-                }, 
-                "Name": "custodian-log-archive"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 56, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 5, 
-                    "minute": 26
-                }, 
-                "Name": "custodian-skunk-trails"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 1, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 3, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 2, 
-                    "minute": 55
-                }, 
-                "Name": "custodian-skunk-trails-east-2"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 4, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 2, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 10, 
-                    "minute": 17
-                }, 
-                "Name": "custodian-test-encryption"
             }, 
             {
                 "CreationDate": {
                     "hour": 16, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 36, 
+                    "second": 4, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 14, 
-                    "minute": 43
+                    "day": 17, 
+                    "minute": 45
                 }, 
-                "Name": "hvoslow-temp"
+                "Name": "cross-account-valid-1"
             }, 
             {
                 "CreationDate": {
-                    "hour": 0, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 51, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 7, 
-                    "minute": 12
-                }, 
-                "Name": "scot-test"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 2, 
+                    "hour": 16, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 23, 
+                    "second": 5, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 2, 
-                    "minute": 23
+                    "day": 17, 
+                    "minute": 45
                 }, 
-                "Name": "scot-test-3"
+                "Name": "cross-account-valid-2"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "YZjSRsGb65DY/TOi+aIa6hYNWdtNhzhbIfVqOe/wij2UKU3KyU3qY2CCm2lVrk0a6n3XKZoaxe8=", 
-            "RequestId": "07FAB8849A9402F3", 
+            "HostId": "NkeIOKXQsC06zcWbCseKTXHIb4V2buDMh6RNUZwSLOaE7dWWO3Ckx3RRJqYvAJUzW0gv6APoqxM=", 
+            "RequestId": "55425E4E36CEC1C2", 
             "HTTPHeaders": {
-                "x-amz-id-2": "YZjSRsGb65DY/TOi+aIa6hYNWdtNhzhbIfVqOe/wij2UKU3KyU3qY2CCm2lVrk0a6n3XKZoaxe8=", 
+                "x-amz-id-2": "NkeIOKXQsC06zcWbCseKTXHIb4V2buDMh6RNUZwSLOaE7dWWO3Ckx3RRJqYvAJUzW0gv6APoqxM=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "07FAB8849A9402F3", 
-                "date": "Thu, 16 Nov 2017 20:28:51 GMT", 
+                "x-amz-request-id": "55425E4E36CEC1C2", 
+                "date": "Fri, 17 Nov 2017 16:45:06 GMT", 
                 "content-type": "application/xml"
             }
         }

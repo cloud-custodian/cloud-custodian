@@ -1,18 +1,18 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1510863841605\",\"Statement\":[{\"Sid\":\"Stmt1510843305330\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::cross-account-invalid/*\"}]}", 
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1510863841605\",\"Statement\":[{\"Sid\":\"Stmt1510843305330\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::cross-account-valid-2/*\",\"Condition\":{\"StringEquals\":{\"aws:SourceVpc\":\"vpc-12345678\"}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "D+akURx1LYyWp5XmrB/LccrPpsxl/90NTmwOwh4vU9/9LMB9AeBDYSTy3JArgP3ghqHACHuXoS8=", 
-            "RequestId": "0400A9D39868B6B0", 
+            "HostId": "dYnEVAmrsa2hvWmQLrUSOjbeujf/oftZF3FRyuRMlUVcjOK/GWmfX4rB6pBFfRM9zGqC2r+Ej3E=", 
+            "RequestId": "B6B11F11F8F0345C", 
             "HTTPHeaders": {
-                "content-length": "200", 
-                "x-amz-id-2": "D+akURx1LYyWp5XmrB/LccrPpsxl/90NTmwOwh4vU9/9LMB9AeBDYSTy3JArgP3ghqHACHuXoS8=", 
+                "content-length": "262", 
+                "x-amz-id-2": "dYnEVAmrsa2hvWmQLrUSOjbeujf/oftZF3FRyuRMlUVcjOK/GWmfX4rB6pBFfRM9zGqC2r+Ej3E=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "0400A9D39868B6B0", 
-                "date": "Thu, 16 Nov 2017 20:28:53 GMT", 
+                "x-amz-request-id": "B6B11F11F8F0345C", 
+                "date": "Fri, 17 Nov 2017 16:45:08 GMT", 
                 "content-type": "application/json"
             }
         }

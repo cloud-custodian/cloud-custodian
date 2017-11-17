@@ -1,24 +1,20 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1510863841605\",\"Statement\":[{\"Sid\":\"Stmt1510843305330\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::cross-account-invalid/*\"}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
+            "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "uDIz1HQ8Ijgs8s74b3L5gUoYsk51LwZD91UYw5QIucitYYr1BjoYCVSMJQrhstd0YvcFEQhUZoA=", 
-            "RequestId": "C595A1B3A674CA43", 
+            "HostId": "ydIWDGJxhV0WDKcudNTisHxSCnVG3/Gq1WIPlcRZQJ9jW5+gcEMTVIJSrxhERYi0ftYEAP+hu4o=", 
+            "RequestId": "8107DA4EFF2E1E7B", 
             "HTTPHeaders": {
-                "x-amz-id-2": "uDIz1HQ8Ijgs8s74b3L5gUoYsk51LwZD91UYw5QIucitYYr1BjoYCVSMJQrhstd0YvcFEQhUZoA=", 
+                "content-length": "200", 
+                "x-amz-id-2": "ydIWDGJxhV0WDKcudNTisHxSCnVG3/Gq1WIPlcRZQJ9jW5+gcEMTVIJSrxhERYi0ftYEAP+hu4o=", 
                 "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "C595A1B3A674CA43", 
-                "date": "Thu, 16 Nov 2017 20:28:50 GMT", 
-                "content-type": "application/xml"
+                "x-amz-request-id": "8107DA4EFF2E1E7B", 
+                "date": "Fri, 17 Nov 2017 16:45:08 GMT", 
+                "content-type": "application/json"
             }
-        }, 
-        "Error": {
-            "Message": "The bucket policy does not exist", 
-            "Code": "NoSuchBucketPolicy", 
-            "BucketName": "c7n-fire-logs"
         }
     }
 }

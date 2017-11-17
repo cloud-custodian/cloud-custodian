@@ -3,19 +3,19 @@
     "data": {
         "MaxKeys": 1000, 
         "Prefix": "", 
-        "Name": "cross-account-invalid", 
+        "Name": "cross-account-valid-1", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "uIynSiwzsmjT/Cm595hdoYFcv0fYQuycrQiu7PmjVaQxokxHuQaRIiRxdfNahA1d72foApqE8iU=", 
-            "RequestId": "1729D95AA2E8A8A1", 
+            "HostId": "kc0LrIHtjWLEKXTZ04qmtxilMC9yRjjUe2b33GsvQ7gTXep6+A/vm6bosZpt8yh9+LKmQ7SszS0=", 
+            "RequestId": "D42739DDA14B3B4E", 
             "HTTPHeaders": {
                 "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "uIynSiwzsmjT/Cm595hdoYFcv0fYQuycrQiu7PmjVaQxokxHuQaRIiRxdfNahA1d72foApqE8iU=", 
+                "x-amz-id-2": "kc0LrIHtjWLEKXTZ04qmtxilMC9yRjjUe2b33GsvQ7gTXep6+A/vm6bosZpt8yh9+LKmQ7SszS0=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "1729D95AA2E8A8A1", 
-                "date": "Fri, 17 Nov 2017 16:47:31 GMT", 
+                "x-amz-request-id": "D42739DDA14B3B4E", 
+                "date": "Fri, 17 Nov 2017 16:47:33 GMT", 
                 "content-type": "application/xml"
             }
         }, 

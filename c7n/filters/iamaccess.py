@@ -256,14 +256,14 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
             # Other valid arn equals? / are invalids allowed?
             for k in ('aws:SourceArn', 'AWS:SourceArn'):
                 v = s['Condition']['ArnLike'].get(k)
-                if v:
-                    break
-            v = isinstance(v, six.string_types) and (v,) or v
-            principal_ok = True
-            for arn in v:
-                aid = _account(arn)
-                if aid not in allowed_accounts:
-                    violations.append(s)
+                if not v:
+                    continue
+                v = isinstance(v, six.string_types) and (v,) or v
+                principal_ok = True
+                for arn in v:
+                    aid = _account(arn)
+                    if aid not in allowed_accounts:
+                        violations.append(s)
 
         if not principal_ok:
             violations.append(s)

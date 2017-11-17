@@ -1,19 +1,19 @@
 {
     "status_code": 200, 
     "data": {
-        "Location": "/cross-account-invalid", 
+        "Location": "/cross-account-valid-2", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "nZNCLIFaV2YPnueOQRYWZVHiWl0wD2lrsxj0y5x7s5jXReM1qHCUMojb1ear9M6U/9xnZU5uH08=", 
-            "RequestId": "7450E95AF9519BBD", 
+            "HostId": "wJoRw0AVsdwYICE6QtB8jIgCJ0px8dGekP+dOhjIw0pF6DIRJG/2rOcf2VPRVQUg", 
+            "RequestId": "9015888AAC7BF212", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "nZNCLIFaV2YPnueOQRYWZVHiWl0wD2lrsxj0y5x7s5jXReM1qHCUMojb1ear9M6U/9xnZU5uH08=", 
+                "x-amz-id-2": "wJoRw0AVsdwYICE6QtB8jIgCJ0px8dGekP+dOhjIw0pF6DIRJG/2rOcf2VPRVQUg", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "7450E95AF9519BBD", 
-                "location": "/cross-account-invalid", 
-                "date": "Fri, 17 Nov 2017 04:10:41 GMT"
+                "x-amz-request-id": "9015888AAC7BF212", 
+                "location": "/cross-account-valid-2", 
+                "date": "Fri, 17 Nov 2017 16:47:21 GMT"
             }
         }
     }
