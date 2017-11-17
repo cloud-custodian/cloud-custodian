@@ -345,8 +345,8 @@ class ConfigS3(query.ConfigSource):
                 'Key': item_value['errorDocument']}
         if item_value['redirectAllRequestsTo']:
             website['RedirectAllRequestsTo'] = {
-                'HostName': item_value['redirectsAllRequestsTo']['hostName'],
-                'Protocol': item_value['redirectsAllRequestsTo']['protocol']}
+                'HostName': item_value['redirectAllRequestsTo']['hostName'],
+                'Protocol': item_value['redirectAllRequestsTo']['protocol']}
         for r in item_value['routingRules']:
             redirect = {}
             rule = {'Redirect': redirect}

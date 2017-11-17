@@ -719,6 +719,16 @@ class S3ConfigSource(ConfigTest):
                         '/custodian-replicated-custodian-replicated'
                         '-west-s3-repl-role')}})
 
+    def test_config_normalize_website_redirect(self):
+        event = event_data('s3-website-redirect.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {'RedirectAllRequestsTo': {'HostName': 'www.google.com/', 'Protocol': 'https'}})
+        
     def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
