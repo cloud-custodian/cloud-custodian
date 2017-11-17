@@ -175,6 +175,8 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
 
         whitelist_conditions = conditions
 
+        # common keys for StringEquals/StringLike checks
+        s_keys = ('aws:sourceVpc', 'aws:sourceVpce',)
         if 'StringEquals' in s['Condition']:
             # Default SNS Policy does this
             if 'AWS:SourceOwner' in s['Condition']['StringEquals']:
@@ -191,19 +193,12 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 if so in allowed_accounts:
                     principal_ok = True
 
-            if 'aws:sourceVpc' in s['Condition']['StringEquals']:
-                so = s['Condition']['StringEquals']['aws:sourceVpc']
-                if so in allowed_accounts:
-                    principal_ok = True
-                else:
-                    violations.append(s)
-
-            if 'aws:sourceVpce' in s['Condition']['StringEquals']:
-                so = s['Condition']['StringEquals']['aws:sourceVpce']
-                if so in allowed_accounts:
-                    principal_ok = True
-                else:
-                    violations.append(s)
+            for k in s_keys:
+                if k in s['Condition']['StringEquals']:
+                    if s['Condition']['StringEquals'][k] in allowed_accounts:
+                        principal_ok = True
+                    else:
+                        violations.append(s)
 
         # BEGIN S3 WhiteList
         # Note these are transient white lists for s3
@@ -214,19 +209,12 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 principal_ok = True
 
         if 'StringLike' in s['Condition']:
-            if 'aws:sourceVpc' in s['Condition']['StringLike']:
-                so = s['Condition']['StringLike']['aws:sourceVpc']
-                if so in allowed_accounts:
-                    principal_ok = True
-                else:
-                    violations.append(s)
-
-            if 'aws:sourceVpce' in s['Condition']['StringLike']:
-                so = s['Condition']['StringLike']['aws:sourceVpce']
-                if so in allowed_accounts:
-                    principal_ok = True
-                else:
-                    violations.append(s)
+            for k in s_keys:
+                if k in s['Condition']['StringLike']:
+                    if s['Condition']['StringLike'][k] in allowed_accounts:
+                        principal_ok = True
+                    else:
+                        violations.append(s)
 
             # For now allow username/userid conditions as sufficient on s3
             if list(s['Condition']['StringLike'].keys())[0].lower() in whitelist_conditions:
@@ -255,18 +243,14 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
             keys = ('aws:SourceArn', 'AWS:SourceArn')
             for k in keys:
                 v = s['Condition']['ArnEquals'].get(k, None)
-            if not v:
-                continue
-            else:
-                v = isinstance(v, six.string_types) and (v,) or v
-                print(v)
-                for arn in v:
-                    aid = _account(arn)
-                    if not any(aid == a for a in allowed_accounts):
-                        print(list(allowed_accounts))
-                    if aid not in allowed_accounts:
-                        print(aid)
-                        violations.append(s)
+                if not v:
+                    continue
+                else:
+                    v = isinstance(v, six.string_types) and (v,) or v
+                    for arn in v:
+                        aid = _account(arn)
+                        if aid not in allowed_accounts:
+                            violations.append(s)
 
         if 'ArnLike' in s['Condition']:
             # Other valid arn equals? / are invalids allowed?
