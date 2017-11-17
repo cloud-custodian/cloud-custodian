@@ -176,8 +176,110 @@ class TestSqsAction(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
-        self.assertEqual(len(resources), 1) 
+        self.assertEqual(len(resources), 1)
 
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
-       
+
+
+    @functional
+    def test_sqs_mark_for_op(self):
+        session_factory = self.replay_flight_data('test_sqs_mark_for_op')
+        client = session_factory().client('sqs')
+        name = 'test-sqs'
+        queue_url = client.create_queue(QueueName=name)['QueueUrl']
+        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+
+        p = self.load_policy({
+            'name': 'sqs-mark-for-op',
+            'resource': 'sqs',
+            'filters': [{'QueueUrl': queue_url}],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'tag': 'tag-for-op',
+                 'op': 'delete',
+                 'days': 1}]
+        },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags_after_run = client.list_queue_tags(
+            QueueUrl=queue_url).get('Tags', {})
+        self.assertTrue("tag-for-op" in tags_after_run)
+
+    @functional
+    def test_sqs_tag(self):
+        session_factory = self.replay_flight_data('test_sqs_tags')
+        client = session_factory().client('sqs')
+        name = 'test-sqs'
+        queue_url = client.create_queue(QueueName=name)['QueueUrl']
+        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+
+        p = self.load_policy({
+            'name': 'sqs-mark-for-op',
+            'resource': 'sqs',
+            'filters': [{'QueueUrl': queue_url}],
+            'actions': [
+                {'type': 'tag',
+                 'key': 'tag-this-queue',
+                 'value': 'This queue has been tagged'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags_after_run = client.list_queue_tags(
+            QueueUrl=queue_url).get('Tags', {})
+        self.assertTrue("tag-this-queue" in tags_after_run)
+
+    @functional
+    def test_sqs_remove_tag(self):
+        session_factory = self.replay_flight_data('test_sqs_remove_tag')
+        client = session_factory().client('sqs')
+        name = 'test-sqs'
+        queue_url = client.create_queue(QueueName=name)['QueueUrl']
+        client.tag_queue(
+            QueueUrl=queue_url,
+            Tags={
+                'remove-this-tag': 'tag to be removed'
+            })
+        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+
+        p = self.load_policy({
+            'name': 'sqs-mark-for-op',
+            'resource': 'sqs',
+            'filters': [{'QueueUrl': queue_url}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'tags': ['remove-this-tag']}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags_after_run = client.list_queue_tags(
+            QueueUrl=queue_url).get('Tags', {})
+        self.assertTrue("remove-this-tag" not in tags_after_run)
+
+    @functional
+    def test_sqs_marked_for_op(self):
+        session_factory = self.replay_flight_data('test_sqs_marked_for_op')
+        client = session_factory().client('sqs')
+        name = 'test-sqs'
+        queue_url = client.create_queue(QueueName=name)['QueueUrl']
+        client.tag_queue(
+            QueueUrl=queue_url,
+            Tags={
+                'tag-for-op': 'Resource does not meet policy: delete@2017/11/01'
+            })
+        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+
+        p = self.load_policy({
+            'name': 'sqs-marked-for-op',
+            'resource': 'sqs',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'tag-for-op',
+                 'op': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
