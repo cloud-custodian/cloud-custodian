@@ -265,15 +265,6 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 if aid not in allowed_accounts:
                     violations.append(s)
 
-        '''if "Bool" in s['Condition']:
-            principal_ok = True
-            keys = ('aws:SecureTransport',)
-            for k in keys:
-                if k in s['Condition']['Bool']:
-                    v = s['Condition']['Bool'][k]
-            if v is None or 'false':
-                violations.append(s)'''
-
         if not principal_ok:
             violations.append(s)
     return violations
