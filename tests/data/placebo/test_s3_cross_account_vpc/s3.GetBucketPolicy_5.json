@@ -1,20 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy-004\",\"Statement\":[{\"Sid\":\"Condition_SourceVPCe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-filters-test-002/*\",\"Condition\":{\"StringEquals\":{\"aws:SourceVpce\":\"vpce-57cb313e\"}}}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "RqIgmL8lSmI9Z8GGXrM330rdPf63juyvCTdFbiL8P22cyLdgUefQ1VBPG4XaBNe81VaWKi5tCRo=", 
-            "RequestId": "6D47103DC975D17A", 
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "+EU3TwD8Y6OXZrz5g7RE99z1GhFDllSeBKJGEeKgKmFeLjHXZ3nerhYL6PvGW++TuAODJl8M3/w=", 
+            "RequestId": "EA6B2F74769F3CD5", 
             "HTTPHeaders": {
-                "content-length": "263", 
-                "x-amz-id-2": "RqIgmL8lSmI9Z8GGXrM330rdPf63juyvCTdFbiL8P22cyLdgUefQ1VBPG4XaBNe81VaWKi5tCRo=", 
+                "x-amz-id-2": "+EU3TwD8Y6OXZrz5g7RE99z1GhFDllSeBKJGEeKgKmFeLjHXZ3nerhYL6PvGW++TuAODJl8M3/w=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "6D47103DC975D17A", 
-                "date": "Thu, 16 Nov 2017 17:10:11 GMT", 
-                "content-type": "application/json"
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "EA6B2F74769F3CD5", 
+                "date": "Thu, 16 Nov 2017 20:28:52 GMT", 
+                "content-type": "application/xml"
             }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "custodian-byebye"
         }
     }
 }

@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "cross-account-invalid", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "9m4c/VY4gR9KKq2zF/vn6i71mdYEPHN7wzWg+CFMwso+Ez/IS7Mn/kjcHZmkkh5M7IccmPlWFpo=", 
+            "RequestId": "CB92BC59424673BE", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "9m4c/VY4gR9KKq2zF/vn6i71mdYEPHN7wzWg+CFMwso+Ez/IS7Mn/kjcHZmkkh5M7IccmPlWFpo=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CB92BC59424673BE", 
+                "date": "Thu, 16 Nov 2017 20:47:35 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

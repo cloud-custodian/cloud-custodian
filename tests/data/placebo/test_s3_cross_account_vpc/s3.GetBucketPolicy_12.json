@@ -1,24 +1,20 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::scot-test-3\"},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::scot-test-3/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "RetryAttempts": 0, 
-            "HostId": "n9pHEJTyWZhjjvynlfVZYp+RzqyEQXbMsxvyupSLNlFa5f9AI99kfBFSuNQO+iaRIR5+5bTuLPM=", 
-            "RequestId": "843F184C6ED47830", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 1, 
+            "HostId": "LgtISDbIvGmZIbCN0f1hUJEpAjd2e6Fw2sKSkn+3vahOk3iyMpAyXHnVgut826IT1RlTMjfOnFA=", 
+            "RequestId": "AFFDCAA1C1B80E6C", 
             "HTTPHeaders": {
-                "x-amz-id-2": "n9pHEJTyWZhjjvynlfVZYp+RzqyEQXbMsxvyupSLNlFa5f9AI99kfBFSuNQO+iaRIR5+5bTuLPM=", 
+                "content-length": "454", 
+                "x-amz-id-2": "LgtISDbIvGmZIbCN0f1hUJEpAjd2e6Fw2sKSkn+3vahOk3iyMpAyXHnVgut826IT1RlTMjfOnFA=", 
                 "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "843F184C6ED47830", 
-                "date": "Thu, 16 Nov 2017 17:10:13 GMT", 
-                "content-type": "application/xml"
+                "x-amz-request-id": "AFFDCAA1C1B80E6C", 
+                "date": "Thu, 16 Nov 2017 20:28:58 GMT", 
+                "content-type": "application/json"
             }
-        }, 
-        "Error": {
-            "Message": "The bucket policy does not exist", 
-            "Code": "NoSuchBucketPolicy", 
-            "BucketName": "scot-test"
         }
     }
 }

@@ -1,20 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 404, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails-east-2\"},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails-east-2/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 1, 
-            "HostId": "J7VYO0I02SemGl0qB3Y6ersN/ss7ais9RpuZzp34GJ3G2mMayDLTM4qm+XvZ0pnIECuZ9TXklyQ=", 
-            "RequestId": "C525A867793F32C7", 
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "fxby2g2TWemZT/r7x7HWup92w42DbNq7gntOvC8wkUnlfboHj04DxHWja+NW98cxVTr/H0NQgfk=", 
+            "RequestId": "2CF3436A8D86AB47", 
             "HTTPHeaders": {
-                "content-length": "490", 
-                "x-amz-id-2": "J7VYO0I02SemGl0qB3Y6ersN/ss7ais9RpuZzp34GJ3G2mMayDLTM4qm+XvZ0pnIECuZ9TXklyQ=", 
+                "x-amz-id-2": "fxby2g2TWemZT/r7x7HWup92w42DbNq7gntOvC8wkUnlfboHj04DxHWja+NW98cxVTr/H0NQgfk=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "C525A867793F32C7", 
-                "date": "Thu, 16 Nov 2017 17:10:22 GMT", 
-                "content-type": "application/json"
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "2CF3436A8D86AB47", 
+                "date": "Thu, 16 Nov 2017 20:31:41 GMT", 
+                "content-type": "application/xml"
             }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "custodian-test-encryption"
         }
     }
 }

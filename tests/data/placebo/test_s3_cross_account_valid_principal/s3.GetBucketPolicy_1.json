@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "0zQPfA3F2UFRa79XBV9wJPxeSnvCXZH2iB0aPUAH6edYafb3L6J45UVhRG6lr64E9SycN1z7fqM=", 
+            "RequestId": "DBF422BAB050310E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "0zQPfA3F2UFRa79XBV9wJPxeSnvCXZH2iB0aPUAH6edYafb3L6J45UVhRG6lr64E9SycN1z7fqM=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "DBF422BAB050310E", 
+                "date": "Thu, 16 Nov 2017 21:01:36 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "c7n-fire-logs"
+        }
+    }
+}

@@ -1,18 +1,18 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy-02\",\"Statement\":[{\"Sid\":\"Condition-SourceVPC\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-filters-test-003/*\",\"Condition\":{\"StringEquals\":{\"aws:SourceVpc\":\"vpc-3078a556\"}}}]}", 
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-west-2.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::custodian-log-archive\"},{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-west-2.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-log-archive/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "TKNcVKSjdIUkbN+qnAzXviGcz2rOsKA67Rehj9PvVk5IqArttfwpuSTC1Nzi2gtgWsz2AIxHMhw=", 
-            "RequestId": "DB13E046932C08CF", 
+            "RetryAttempts": 1, 
+            "HostId": "1rIcXKZJPVg1BtZSRvb/nj2g0kwo5luEYz8seeHozQJV1GDX9uUqnDdNowroDugy4cwhr5zysDQ=", 
+            "RequestId": "01F99620707FB1B8", 
             "HTTPHeaders": {
-                "content-length": "259", 
-                "x-amz-id-2": "TKNcVKSjdIUkbN+qnAzXviGcz2rOsKA67Rehj9PvVk5IqArttfwpuSTC1Nzi2gtgWsz2AIxHMhw=", 
+                "content-length": "409", 
+                "x-amz-id-2": "1rIcXKZJPVg1BtZSRvb/nj2g0kwo5luEYz8seeHozQJV1GDX9uUqnDdNowroDugy4cwhr5zysDQ=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "DB13E046932C08CF", 
-                "date": "Thu, 16 Nov 2017 17:10:11 GMT", 
+                "x-amz-request-id": "01F99620707FB1B8", 
+                "date": "Thu, 16 Nov 2017 20:28:55 GMT", 
                 "content-type": "application/json"
             }
         }

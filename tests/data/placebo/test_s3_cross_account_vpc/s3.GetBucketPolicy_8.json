@@ -1,18 +1,18 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails\"},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSCloudTrailAclCheck20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails-east-2\"},{\"Sid\":\"AWSCloudTrailWrite20150319\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-skunk-trails-east-2/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "OMBCBttu+1bS8Xg8eGgpOje3mCkdjBM3POijXdnK4SBdVhUY87rIREbY3jswDNhPX+Dk4uOhVkk=", 
-            "RequestId": "62F1EDD6DA11A392", 
+            "RetryAttempts": 1, 
+            "HostId": "5nvNSIowcqXQyV3ztgnRjDnjGuB1O4h48uInesXKWg/J17nUk885RvPQbIQbJHfsPOYNkTxvwds=", 
+            "RequestId": "F6DFB34A59D73E9B", 
             "HTTPHeaders": {
-                "content-length": "476", 
-                "x-amz-id-2": "OMBCBttu+1bS8Xg8eGgpOje3mCkdjBM3POijXdnK4SBdVhUY87rIREbY3jswDNhPX+Dk4uOhVkk=", 
+                "content-length": "490", 
+                "x-amz-id-2": "5nvNSIowcqXQyV3ztgnRjDnjGuB1O4h48uInesXKWg/J17nUk885RvPQbIQbJHfsPOYNkTxvwds=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "62F1EDD6DA11A392", 
-                "date": "Thu, 16 Nov 2017 17:10:13 GMT", 
+                "x-amz-request-id": "F6DFB34A59D73E9B", 
+                "date": "Thu, 16 Nov 2017 20:28:56 GMT", 
                 "content-type": "application/json"
             }
         }

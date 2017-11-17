@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "WOpubLOf2Imoc+Xa479DW4Qwls6RaVPNrMyGd2/gCPO3xT+r4a6CZkiGbE8gls7zj96qZ0OZa+s=", 
+            "RequestId": "A0F394CECB1676EC", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "WOpubLOf2Imoc+Xa479DW4Qwls6RaVPNrMyGd2/gCPO3xT+r4a6CZkiGbE8gls7zj96qZ0OZa+s=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "A0F394CECB1676EC", 
+                "date": "Thu, 16 Nov 2017 21:01:42 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "scot-test"
+        }
+    }
+}

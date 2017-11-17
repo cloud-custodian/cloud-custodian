@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1510863841605\",\"Statement\":[{\"Sid\":\"Stmt1510843305330\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::cross-account-valid/*\",\"Condition\":{\"IpAddress\":{\"aws:sourceip\":\"192.168.143.0/24\"}}}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "8e7NHxHepSyqq5twGp/kgItk/xZQYuALGjPs7waxZQ6/M7k6x91+Zz7rWT94oCHAQrtCvTuiax4=", 
+            "RequestId": "6EBADFAAF7A120EC", 
+            "HTTPHeaders": {
+                "content-length": "260", 
+                "x-amz-id-2": "8e7NHxHepSyqq5twGp/kgItk/xZQYuALGjPs7waxZQ6/M7k6x91+Zz7rWT94oCHAQrtCvTuiax4=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "6EBADFAAF7A120EC", 
+                "date": "Thu, 16 Nov 2017 20:47:29 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

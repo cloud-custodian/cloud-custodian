@@ -1910,26 +1910,6 @@ class S3Test(BaseTest):
         us = [t for t in topic_notifications if t.get('TopicArn') == topic_arn]
         self.assertEqual(len(us), 1)
 
-    def test_s3_cross_account_vpc(self):
-        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        self.patch(
-            s3.MissingPolicyStatementFilter, 'executor_factory',
-            MainThreadExecutor)
-        self.patch(s3, 'S3_AUGMENT_TABLE', [
-            ('get_bucket_policy', 'Policy', None, 'Policy'),])
-        session_factory = self.record_flight_data('test_s3_cross_account_vpc')
-        p = self.load_policy({
-            'name': 's3_cross_account_vpc',
-            'resource': 's3',
-            'filters': [
-                {'type': 'cross-account',
-                 'whitelist_conditions': ['aws:sourcevpc'],
-                 'whitelist': ['vpc-3078a556']}
-            ]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(resources[0]['Name'], 'custodian-filters-test-003')
-
     def test_s3_cross_account_vpce(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -1937,20 +1917,319 @@ class S3Test(BaseTest):
             MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_policy', 'Policy', None, 'Policy'), ])
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_s3_cross_account_vpce')
+        bnames = ['cross-account-valid', 'cross-account-invalid']
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        for b in bnames:
+            client.create_bucket(Bucket=b)
+            self.addCleanup(destroyBucket, client, b)
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-valid/*",
+                    "Condition": {
+                        "StringLike": {
+                            "aws:SourceVpce": "vpc-12345678"
+                        }
+                    },
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[0], Policy=json.dumps(policy))
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-invalid/*",
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[1], Policy=json.dumps(policy))
         p = self.load_policy({
             'name': 's3_cross_account_vpce',
             'resource': 's3',
             'filters': [
                 {'type': 'cross-account',
-                 'whitelist_conditions': ['aws:sourcevpce'],
-                 'whitelist': ['vpce-57cb313e']}
+                 'whitelist': ['vpce-12345678']}
             ]
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(resources[0]['Name'], 'custodian-filters-test-002')
-        # 'whitelist': ['644160558196', 'vpc-3078a556', 'vpce-57cb313e']}
+        self.assertEqual(resources[0]['Name'], 'cross-account-invalid')
+
+    def test_s3_cross_account_vpc(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'), ])
+        session_factory = self.replay_flight_data(
+            'test_s3_cross_account_vpc')
+        bnames = ['cross-account-valid', 'cross-account-invalid']
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        for b in bnames:
+            client.create_bucket(Bucket=b)
+            self.addCleanup(destroyBucket, client, b)
+        policy = {
+          "Id": "Policy1510863841605",
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "Stmt1510843305330",
+              "Action": [
+                "s3:PutObject"
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:s3:::cross-account-valid/*",
+              "Condition": {
+                "StringLike": {
+                  "aws:SourceVpc": "vpc-12345678"
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+        client.put_bucket_policy(Bucket=bnames[0], Policy=json.dumps(policy))
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-invalid/*",
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[1], Policy=json.dumps(policy))
+        p = self.load_policy({
+            'name': 's3_cross_account_vpc',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist': ['vpc-12345678']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'cross-account-invalid')
+
+    def test_s3_cross_account_ip(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'), ])
+        session_factory = self.replay_flight_data(
+            'test_s3_cross_account_address')
+        bnames = ['cross-account-valid', 'cross-account-invalid']
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        for b in bnames:
+            client.create_bucket(Bucket=b)
+            self.addCleanup(destroyBucket, client, b)
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-valid/*",
+                    "Condition": {
+                        "IpAddress": {
+                            "aws:sourceip": "192.168.143.0/24"
+                        }
+                    },
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[0],
+                                 Policy=json.dumps(policy))
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-invalid/*",
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[1],
+                                 Policy=json.dumps(policy))
+        p = self.load_policy({
+            'name': 's3_cross_account_ip',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist': ['192.168.143.50']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'cross-account-invalid')
+
+    def test_s3_cross_account_source_arn(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'), ])
+        session_factory = self.replay_flight_data(
+            'test_s3_cross_account_source_arn')
+        bnames = ['cross-account-valid', 'cross-account-invalid']
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        for b in bnames:
+            client.create_bucket(Bucket=b)
+            self.addCleanup(destroyBucket, client, b)
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-valid/*",
+                    "Condition": {
+                        "ArnEquals": {
+                            "aws:sourcearn": "arn:aws:sns:us-east-1:123456789012:topic-name"
+                        }
+                    },
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[0],
+                                 Policy=json.dumps(policy))
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-invalid/*",
+                    "Principal": "*"
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[1],
+                                 Policy=json.dumps(policy))
+        p = self.load_policy({
+            'name': 's3_cross_account_source_arn',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist': ['123456789012']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'cross-account-invalid')
+
+    def test_s3_cross_account_valid_principal(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy', 'Policy', None, 'Policy'), ])
+        session_factory = self.replay_flight_data(
+            'test_s3_cross_account_valid_principal')
+        bnames = ['cross-account-valid', 'cross-account-invalid']
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        for b in bnames:
+            client.create_bucket(Bucket=b)
+            self.addCleanup(destroyBucket, client, b)
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-valid/*",
+                    "Principal": {"AWS": [
+                        "arn:aws:iam::644160558196:root"
+                    ]}
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[0],
+                                 Policy=json.dumps(policy))
+        policy = {
+            "Id": "Policy1510863841605",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Stmt1510843305330",
+                    "Action": [
+                        "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::cross-account-invalid/*",
+                    "Principal": {"AWS": [
+                        "arn:aws:iam::644160558196:root",
+                        "arn:aws:iam::185106417252:root",
+                    ]}
+                }
+            ]
+        }
+        client.put_bucket_policy(Bucket=bnames[1],
+                                 Policy=json.dumps(policy))
+        p = self.load_policy({
+            'name': 's3_cross_account_principal',
+            'resource': 's3',
+            'filters': [
+                {'type': 'cross-account',
+                 'whitelist': ['644160558196']}
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Name'], 'cross-account-invalid')
 
 
 class S3LifecycleTest(BaseTest):

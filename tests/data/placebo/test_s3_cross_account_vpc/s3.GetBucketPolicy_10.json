@@ -4,21 +4,21 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 404, 
             "RetryAttempts": 0, 
-            "HostId": "GEJDSnG9Qogw0DX5YT0Y/w5De7k0G9XOg6VuMXjcWul2uVtmhHRyQ8VnBcexVQW6rVIghwT9SRk=", 
-            "RequestId": "5CFB57A45B75B2E3", 
+            "HostId": "nclaAVCdORS25vsqqinv2OlThJ97FUOq4OANp0hG59P5154dv8KpKy7r7Q5G48sI5JVIjqm3J8Q=", 
+            "RequestId": "F5A84E7E1920DFF1", 
             "HTTPHeaders": {
-                "x-amz-id-2": "GEJDSnG9Qogw0DX5YT0Y/w5De7k0G9XOg6VuMXjcWul2uVtmhHRyQ8VnBcexVQW6rVIghwT9SRk=", 
+                "x-amz-id-2": "nclaAVCdORS25vsqqinv2OlThJ97FUOq4OANp0hG59P5154dv8KpKy7r7Q5G48sI5JVIjqm3J8Q=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "5CFB57A45B75B2E3", 
-                "date": "Thu, 16 Nov 2017 17:10:13 GMT", 
+                "x-amz-request-id": "F5A84E7E1920DFF1", 
+                "date": "Thu, 16 Nov 2017 20:28:55 GMT", 
                 "content-type": "application/xml"
             }
         }, 
         "Error": {
             "Message": "The bucket policy does not exist", 
             "Code": "NoSuchBucketPolicy", 
-            "BucketName": "custodian-test-encryption"
+            "BucketName": "hvoslow-temp"
         }
     }
 }

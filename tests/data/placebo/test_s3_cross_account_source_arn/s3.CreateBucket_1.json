@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/cross-account-valid", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "MR3lm2bh9WKLb3Ggs1GO2IlmKe6fF0kq/+3k50YeNxC97LPfRHC3SL57RF8GX4+25bTHMpnJdsA=", 
+            "RequestId": "668E20560AC0B014", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "MR3lm2bh9WKLb3Ggs1GO2IlmKe6fF0kq/+3k50YeNxC97LPfRHC3SL57RF8GX4+25bTHMpnJdsA=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "668E20560AC0B014", 
+                "location": "/cross-account-valid", 
+                "date": "Fri, 17 Nov 2017 04:10:40 GMT"
+            }
+        }
+    }
+}

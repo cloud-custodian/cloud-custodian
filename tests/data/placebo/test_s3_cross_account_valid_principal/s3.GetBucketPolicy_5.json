@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 1, 
+            "HostId": "fPyFceOHq5puAF7s0cdNmt32OFIq5QsRSZmyj6+bIV3yxWH5kOJEgbnEU64eINM2mWwrRL9yQEA=", 
+            "RequestId": "00AC619A9E652446", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "fPyFceOHq5puAF7s0cdNmt32OFIq5QsRSZmyj6+bIV3yxWH5kOJEgbnEU64eINM2mWwrRL9yQEA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "00AC619A9E652446", 
+                "date": "Thu, 16 Nov 2017 21:01:37 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "custodian-byebye"
+        }
+    }
+}

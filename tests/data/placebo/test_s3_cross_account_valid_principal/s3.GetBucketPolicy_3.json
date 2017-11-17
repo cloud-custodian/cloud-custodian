@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1510863841605\",\"Statement\":[{\"Sid\":\"Stmt1510843305330\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::644160558196:root\",\"arn:aws:iam::185106417252:root\"]},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::cross-account-invalid/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "JFRuEdGTCdFOFisebqnalghA019P6bqyYflPpkq23dt0jGhINRoA0ewuvRgGSRlBtYOET1qNDHg=", 
+            "RequestId": "CAA36A3B80D1414A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "JFRuEdGTCdFOFisebqnalghA019P6bqyYflPpkq23dt0jGhINRoA0ewuvRgGSRlBtYOET1qNDHg=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CAA36A3B80D1414A", 
+                "date": "Thu, 16 Nov 2017 21:01:38 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "status_code": 204, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 204, 
+            "RetryAttempts": 0, 
+            "HostId": "4nlQdycE0ZMFLgamv4P4x1P6nMIj1EBoOpB3aUhoV9Ep5U009JthFLLTizALhzBuuB+tlgYqO60=", 
+            "RequestId": "CF0952EA8304A072", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "4nlQdycE0ZMFLgamv4P4x1P6nMIj1EBoOpB3aUhoV9Ep5U009JthFLLTizALhzBuuB+tlgYqO60=", 
+                "date": "Thu, 16 Nov 2017 20:47:36 GMT", 
+                "x-amz-request-id": "CF0952EA8304A072", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

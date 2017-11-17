@@ -34,6 +34,32 @@
             }, 
             {
                 "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 31
+                }, 
+                "Name": "cross-account-invalid"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 31
+                }, 
+                "Name": "cross-account-valid"
+            }, 
+            {
+                "CreationDate": {
                     "hour": 11, 
                     "__class__": "datetime", 
                     "month": 11, 
@@ -44,45 +70,6 @@
                     "minute": 0
                 }, 
                 "Name": "custodian-byebye"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 15, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 16, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 14, 
-                    "minute": 22
-                }, 
-                "Name": "custodian-filters-test-001"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 13, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 55, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 16, 
-                    "minute": 58
-                }, 
-                "Name": "custodian-filters-test-002"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 13, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 7, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 16, 
-                    "minute": 59
-                }, 
-                "Name": "custodian-filters-test-003"
             }, 
             {
                 "CreationDate": {
@@ -179,14 +166,14 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "RgKnGbpL/tQgzeMga8i+ZUgLHywO5NIZN12cQIzwoGkKfigLarO09GFtV+h962UsLkDJ+VdHsAw=", 
-            "RequestId": "F601B6A46EC2AF16", 
+            "HostId": "mohzv7tF9kpl/fF+srEgalbuAFTtUojpqutyY36hhfbnSc5cmCLBMDIb0jW8jaTVFKXwyfI+U7s=", 
+            "RequestId": "592348CA057CE08D", 
             "HTTPHeaders": {
-                "x-amz-id-2": "RgKnGbpL/tQgzeMga8i+ZUgLHywO5NIZN12cQIzwoGkKfigLarO09GFtV+h962UsLkDJ+VdHsAw=", 
+                "x-amz-id-2": "mohzv7tF9kpl/fF+srEgalbuAFTtUojpqutyY36hhfbnSc5cmCLBMDIb0jW8jaTVFKXwyfI+U7s=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "F601B6A46EC2AF16", 
-                "date": "Thu, 16 Nov 2017 17:10:16 GMT", 
+                "x-amz-request-id": "592348CA057CE08D", 
+                "date": "Thu, 16 Nov 2017 20:31:37 GMT", 
                 "content-type": "application/xml"
             }
         }

@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "bSW/TqQxv7fAljkHK9W0+pEcEb8MxQEWmvTSx665zvN3FlzLmkaOuIjwvqL3wbo2UzmZIl5M/y4=", 
+            "RequestId": "0F280E42C9D0689B", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "bSW/TqQxv7fAljkHK9W0+pEcEb8MxQEWmvTSx665zvN3FlzLmkaOuIjwvqL3wbo2UzmZIl5M/y4=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "0F280E42C9D0689B", 
+                "date": "Thu, 16 Nov 2017 21:01:40 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The bucket policy does not exist", 
+            "Code": "NoSuchBucketPolicy", 
+            "BucketName": "hvoslow-temp"
+        }
+    }
+}
