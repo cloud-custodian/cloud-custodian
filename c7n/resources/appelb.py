@@ -1009,3 +1009,37 @@ class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
     def __call__(self, target_group):
         return (target_group.get('VpcId') and
                 self.match(target_group.get('VpcId')) or False)
+
+
+@AppELBTargetGroup.action_registry.register('delete')
+class AppELBTargetGroupDeleteAction(BaseAction):
+    """Action to delete ELB target group
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any app elb target groups.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: appelb-targetgroups-delete-unused
+                resource: app-elb-target-group
+                filters:
+                  - "tag:SomeTag": absent
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('elasticloadbalancing:DeleteTargetGroup',)
+
+    def process(self, target_group):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_targetgroup, target_group))
+
+    def process_targetgroup(self, target_group):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        self.manager.retry(
+            client.delete_target_group,
+            TargetGroupArn=target_group['TargetGroupArn'])

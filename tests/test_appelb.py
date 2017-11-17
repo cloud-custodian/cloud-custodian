@@ -415,6 +415,20 @@ class AppELBTargetGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_appelb_target_group_delete(self):
+        self.patch(AppELBTargetGroup, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appelb_target_group_delete')
+
+        policy = self.load_policy({
+            'name': 'app-elb-delete-target-group',
+            'resource': 'app-elb-target-group',
+            'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should delete app elb target group")
+
 
 class TestAppElbLogging(BaseTest):
 
