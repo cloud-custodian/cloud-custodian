@@ -806,6 +806,82 @@ class S3ConfigSource(ConfigTest):
              u'Website': None})
 
 
+class BucketPolicyStatements(BaseTest):
+
+    @functional
+    def test_policy(self):
+        bname = 'custodian-test-data'
+        sid = 'CustodianTest'
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_policy_statements')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-policy-statements',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [
+                {'type': 'set-statements',
+                 'statements': [{
+                    'Sid': sid,
+                    'Effect': 'Deny',
+                    'Action': 's3:GetObject',
+                    'Principal': {
+                        'AWS': '*'
+                    },
+                    'Resource': 'arn:aws:s3:::{bucket_name}/*',
+                    'Condition': {
+                        'Bool': {
+                            'aws:SecureTransport': False
+                        }
+                    }
+                }]}]
+            }, session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
+
+        policy = client.get_bucket_policy(Bucket=bname).get('Policy')
+        policy = json.loads(policy)
+
+        self.assertTrue(len(policy['Statement']) > 0)
+        self.assertTrue(len([
+            s for s in policy['Statement'] if s['Sid'] == sid and s['Resource'] == 'arn:aws:s3:::%s/*' % (bname)
+        ]) == 1)
+
+    @functional
+    def test_policy_no_change(self):
+        bname = 'custodian-test-data'
+        sid = 'CustodianTest'
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [('get_bucket_policy', 'Policy', None, 'Policy')])
+
+        session_factory = self.replay_flight_data('test_s3_policy_statements_no_change')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-policy-statements',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [
+                {'type': 'set-statements',
+                 'statements': []}]
+            }, session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
+
+
 class S3Test(BaseTest):
 
     def test_multipart_large_file(self):

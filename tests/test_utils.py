@@ -230,7 +230,7 @@ class UtilTest(unittest.TestCase):
               u'PrefixListIds': [],
               u'UserIdGroupPairs': [{u'GroupId': u'sg-6c7fa917',
                                      u'UserId': u'644160558196'}]}])
-                         
+
     def test_camel_case(self):
         d = {'zebraMoon': [{'instanceId': 123}, 'moon'],
              'color': {'yellow': 1, 'green': 2}}
@@ -338,3 +338,11 @@ class UtilTest(unittest.TestCase):
         json_file = os.path.join(os.path.dirname(__file__), 'data', 'ec2-instance.json')
         data = utils.load_file(json_file)
         self.assertTrue(data['InstanceId'] == 'i-1aebf7c0')
+
+    def test_format_string_values(self):
+        obj = {'Key1': 'Value1', 'Key2': 42, 'Key3': '{xx}', u'Key4': [True, {u'K': u'{yy}'}, '{xx}']}
+        fmt = utils.format_string_values(obj, **{'xx': 'aa', 'yy': 'bb'})
+
+        self.assertEqual(fmt['Key3'], 'aa')
+        self.assertEqual(fmt['Key4'][2], 'aa')
+        self.assertEqual(fmt['Key4'][1]['K'], 'bb')
