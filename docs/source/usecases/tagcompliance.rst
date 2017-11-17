@@ -31,9 +31,10 @@ Report on Tag Compliance
          comment: |
            Report on total count of non compliant instances
          filters:
-           - "tag:Owner": absent
-           - "tag:CostCenter": absent
-           - "tag:Project": absent
+           - or:
+               - "tag:Owner": absent
+               - "tag:CostCenter": absent
+               - "tag:Project": absent
 
 
 Enforce Tag Compliance
@@ -52,9 +53,10 @@ Enforce Tag Compliance
        filters:
          - "tag:aws:autoscaling:groupName": absent
          - "tag:c7n_status": absent
-         - "tag:Owner": absent
-         - "tag:CostCenter": absent
-         - "tag:Project": absent
+         - or:
+             - "tag:Owner": absent
+             - "tag:CostCenter": absent
+             - "tag:Project": absent
        actions:
          - type: mark-for-op
            op: stop
@@ -84,11 +86,12 @@ Enforce Tag Compliance
          policies.
        filters:
          - "tag:aws:autoscaling:groupName": absent
-         - "tag:Owner": absent
-         - "tag:CostCenter": absent
-         - "tag:Project": absent
          - type: marked-for-op
            op: stop
+         - or:
+             - "tag:Owner": absent
+             - "tag:CostCenter": absent
+             - "tag:Project": absent
        actions:
          - stop
          - type: mark-for-op
@@ -102,11 +105,12 @@ Enforce Tag Compliance
          by today's date.
        filters:
          - "tag:aws:autoscaling:groupName": absent
-         - "tag:Owner": absent
-         - "tag:CostCenter": absent
-         - "tag:Project": absent
          - type: marked-for-op
            op: terminate
+         - or:
+             - "tag:Owner": absent
+             - "tag:CostCenter": absent
+             - "tag:Project": absent
        actions:
          - type: terminate
            force: true
@@ -118,12 +122,13 @@ Enforce Tag Compliance
          starting 1 day before their termination.
        filters:
          - "tag:aws:autoscaling:groupName": absent
-         - "tag:CostCenter": absent
-         - "tag:Owner": absent
-         - "tag:Project": absent
          - type: marked-for-op
            op: terminate
            skew: 1
+         - or:
+             - "tag:CostCenter": absent
+             - "tag:Owner": absent
+             - "tag:Project": absent
        actions:
          - stop
 

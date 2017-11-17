@@ -219,6 +219,12 @@ def get_account_id_from_sts(session):
     return response.get('Account')
 
 
+def get_account_alias_from_sts(session):
+    response = session.client('iam').list_account_aliases()
+    aliases = response.get('AccountAliases', ())
+    return aliases and aliases[0] or ''
+
+
 def query_instances(session, client=None, **query):
     """Return a list of ec2 instances for the query.
     """
@@ -385,6 +391,26 @@ class IPv4Network(ipaddress.IPv4Network):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
 
+    # Redefine from ipaddress backport to address that this is not
+    # in the python 3.6 stdlib implementation.
+    # Note this is copyright 2007 Google, 2007 and licensed to the PSF
+    # and released under the python license.
+    # https://docs.python.org/3/license.html
+
+    def supernet_of(self, other):
+        # always false if one is v4 and the other is v6.
+        if self._version != other._version:
+            return False
+        # dealing with another network.
+        if (hasattr(other, 'network_address') and
+                hasattr(other, 'broadcast_address')):
+            return (other.network_address >= self.network_address and
+                    other.broadcast_address <= self.broadcast_address)
+        # dealing with another address
+        else:
+            raise TypeError('Unable to test subnet containment with element '
+                            'of type %s' % type(other))
+
 
 worker_log = logging.getLogger('c7n.worker')
 
@@ -401,7 +427,7 @@ def worker(f):
     def _f(*args, **kw):
         try:
             return f(*args, **kw)
-        except:
+        except Exception:
             worker_log.exception(
                 'Error invoking %s',
                 "%s.%s" % (f.__module__, f.__name__))
@@ -441,3 +467,24 @@ def get_profile_session(options):
     profile = getattr(options, 'profile', None)
     _profile_session = boto3.Session(profile_name=profile)
     return _profile_session
+
+
+def format_string_values(obj, *args, **kwargs):
+    """
+    Format all string values in an object.
+    Return the updated object
+    """
+    if isinstance(obj, dict):
+        new = {}
+        for key in obj.keys():
+            new[key] = format_string_values(obj[key], *args, **kwargs)
+        return new
+    elif isinstance(obj, list):
+        new = []
+        for item in obj:
+            new.append(format_string_values(item, *args, **kwargs))
+        return new
+    elif isinstance(obj, six.string_types):
+        return obj.format(*args, **kwargs)
+    else:
+        return obj
