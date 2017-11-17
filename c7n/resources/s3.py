@@ -2662,9 +2662,7 @@ class SetBucketEncryption(BucketActionBase):
         }
     }
 
-    permissions = ('s3:PutEncryptionConfiguration',
-                's3:GetEncryptionConfiguration',
-                'kms:ListAliases')
+    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration', 'kms:ListAliases')
 
     def process(self, buckets):
         keys = {}
