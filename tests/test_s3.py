@@ -651,6 +651,20 @@ class S3ConfigSource(ConfigTest):
                   u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
                   u'Events': ['s3:ObjectCreated:*']}]})
 
+    def test_config_normalize_lifecycle_null_predicate(self):
+        event = event_data('s3-lifecycle-null-predicate.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        rule = resource['Lifecycle']['Rules'][0]
+        self.assertEqual(
+            rule,
+            {'AbortIncompleteMultipartUpload': {'DaysAfterInitiation': 1},
+             'Expiration': {'Days': 1},
+             'ID': 'RemoveAbortedUploads',
+             'NoncurrentVersionExpiration': {'NoncurrentDays': -1},
+             'Status': 'Enabled'})
+
     def test_config_normalize_lifecycle_and_predicate(self):
         event = event_data('s3-lifecycle-and-predicate.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -719,6 +733,16 @@ class S3ConfigSource(ConfigTest):
                         '/custodian-replicated-custodian-replicated'
                         '-west-s3-repl-role')}})
 
+    def test_config_normalize_website_redirect(self):
+        event = event_data('s3-website-redirect.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {'RedirectAllRequestsTo': {'HostName': 'www.google.com/', 'Protocol': 'https'}})
+        
     def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
