@@ -2673,7 +2673,7 @@ class SetBucketEncryption(BucketActionBase):
             keys = self.resolve_keys(regions, key)
 
         with self.executor_factory(max_workers=3) as w:
-            futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
+            futures = {w.submit(self.process_bucket, b, keys): b for b in buckets}
             for future in as_completed(futures):
                 bucket = futures[future]
                 try:
