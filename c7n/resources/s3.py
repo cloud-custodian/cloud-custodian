@@ -2668,7 +2668,6 @@ class SetBucketEncryption(BucketActionBase):
 
     def process(self, buckets):
         keys = {}
-        regions = set()
         regions = {get_region(b) for b in buckets}
         key = self.data.get('key')
 
