@@ -48,7 +48,7 @@ Either way, `config.json` looks something like this:
             "": {
                 "policies": [
                     {
-                        "mode": "must by non-empty, but value is arbitrary",
+                        "mode": "must be non-empty, but value is arbitrary",
                         "name": "foo"
                     }
                 ]
