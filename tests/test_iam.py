@@ -744,3 +744,15 @@ class CrossAccountChecker(TestCase):
             violations = check_cross_account(
                 p, set(['221800032964']), False, (), None)
             self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies(self):
+        policies = load_data('iam/s3-policies.json')
+        for p, expected in zip(
+                policies, [True, False, True, False, False, True, False,
+                           True, True, True, False, False, True, False, False]):
+            violations = check_cross_account(
+                p,
+                set(['vpce-12345678', 'vpc-12345678',
+                     '192.168.143.50', '644160558196']),
+                False, (), None)
+            self.assertEqual(bool(violations), expected)

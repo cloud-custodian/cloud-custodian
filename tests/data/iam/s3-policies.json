@@ -1,0 +1,282 @@
+[
+  {
+    "Id": "Policy001",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": {
+          "AWS": [
+            "arn:aws:iam::644160558196:root",
+            "arn:aws:iam::185106417252:root"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Policy002",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Principal": {
+          "AWS": "arn:aws:iam::644160558196:root"
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Policy003",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy004",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-2/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:644160558196"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy005",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-1/*",
+        "Condition": {
+          "ArnEquals": {
+            "aws:sourcearn": "arn:aws:sns:us-east-1:644160558196:topic-name"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy006",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy007",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "IpAddress": {
+            "aws:SourceIp": "192.168.143.0/24"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy008",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "IpAddress": {
+            "aws:SourceIp": "10.0.0.0/8"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy009",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "IpAddress": {
+            "aws:SourceIp": [
+              "10.0.0.0/8",
+              "192.168.143.0/24"
+            ]
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy010",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy011",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-2/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpc": "vpc-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy012",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-1/*",
+        "Condition": {
+          "StringLike": {
+            "aws:sourceVpc": "vpc-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy013",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy014",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-2/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpce": "vpce-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "Policy015",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid-1/*",
+        "Condition": {
+          "StringLike": {
+            "aws:sourceVpce": "vpce-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  }
+]

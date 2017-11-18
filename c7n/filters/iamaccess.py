@@ -40,7 +40,7 @@ import six
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
+from c7n.utils import type_schema, parse_cidr
 
 
 class CrossAccountAccessFilter(Filter):
@@ -227,10 +227,21 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
                 principal_ok = True
 
         if 'IpAddress' in s['Condition']:
-            if s['Condition']['IpAddress']['aws:sourceip'] in allowed_accounts:
-                principal_ok = True
+            sources = s['Condition']['IpAddress']['aws:SourceIp']
+            ips = []
+            if isinstance(sources, list):
+                for src in sources:
+                    ips.append(parse_cidr(src))
             else:
+                ips.append(parse_cidr(sources))
+
+            whitelist_ips = filter(
+                None, [parse_cidr(a) for a in allowed_accounts])
+
+            if any(i not in ip for ip in ips for i in whitelist_ips):
                 violations.append(s)
+            else:
+                principal_ok = True
 
         # END S3 WhiteList
 
