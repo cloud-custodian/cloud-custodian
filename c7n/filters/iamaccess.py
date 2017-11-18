@@ -40,7 +40,7 @@ import six
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
+from c7n.utils import type_schema, parse_cidr
 
 
 class CrossAccountAccessFilter(Filter):
@@ -57,7 +57,8 @@ class CrossAccountAccessFilter(Filter):
         whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
         # white list accounts
         whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        source_cidrs={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
@@ -69,6 +70,7 @@ class CrossAccountAccessFilter(Filter):
             ("aws:sourcevpce", "aws:sourcevpc", "aws:userid", "aws:username")))
         self.actions = self.data.get('actions', ())
         self.accounts = self.get_accounts()
+        self.source_cidrs = self.data.get('source_cidrs')
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
     def get_accounts(self):
@@ -88,7 +90,8 @@ class CrossAccountAccessFilter(Filter):
         if p is None:
             return False
         violations = check_cross_account(
-            p, self.accounts, self.everyone_only, self.conditions, self.actions)
+            p, self.accounts, self.everyone_only, self.conditions, self.actions,
+            self.source_cidrs)
         if violations:
             r[self.annotation_key] = violations
             return True
@@ -103,7 +106,7 @@ def _account(arn):
 
 
 def check_cross_account(policy_text, allowed_accounts, everyone_only,
-                        conditions, check_actions):
+                        conditions, check_actions, target_cidrs):
     """Find cross account access policy grant not explicitly allowed
     """
     if isinstance(policy_text, six.string_types):
@@ -215,7 +218,21 @@ def check_cross_account(policy_text, allowed_accounts, everyone_only,
 
         if 'IpAddress' in s['Condition']:
             principal_ok = True
-
+            existed_srcs = s['Condition']['IpAddress']['aws:SourceIp']
+            if isinstance(existed_srcs, six.string_types):
+                existed_srcs = [existed_srcs]
+            if target_cidrs and set(target_cidrs) != set(existed_srcs):
+                parsed_target_cidrs = [parse_cidr(cidr) for cidr in target_cidrs]
+                for src in existed_srcs:
+                    src = parse_cidr(src)
+                    valid_src = False
+                    for cidr in parsed_target_cidrs:
+                        if src in cidr:
+                            valid_src = True
+                            break
+                    if not valid_src:
+                        principal_ok = False
+                        break
         # END S3 WhiteList
 
         if 'ArnEquals' in s['Condition']:
