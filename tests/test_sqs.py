@@ -79,7 +79,8 @@ class TestSqsAction(BaseTest):
     @functional
     def test_sqs_remove_matched(self):
         session_factory = self.replay_flight_data('test_sqs_remove_matched')
-        client = session_factory().client('sqs')
+        session = session_factory(region='us-east-1')
+        client = session.client('sqs')
         name = 'test-sqs-remove-matched-1'
         queue_url = client.create_queue(QueueName=name)['QueueUrl']
         self.addCleanup(client.delete_queue, QueueUrl=queue_url)
@@ -93,7 +94,7 @@ class TestSqsAction(BaseTest):
                         "Sid": "SpecificAllow",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::123456789012:root"
+                            "AWS": "arn:aws:iam::644160558196:root"
                         },
                         "Action": [
                             "sqs:Subscribe"
@@ -117,18 +118,20 @@ class TestSqsAction(BaseTest):
             'filters': [
                 {'QueueUrl': queue_url},
                 {'type': 'cross-account',
-                 'whitelist': ["123456789012"]}
+                 'whitelist': ['644160558196']}
             ],
             'actions': [
                 {'type': 'remove-statements',
-                 'statement_ids': 'matched'}]
+                 'statement_ids': ['matched']}]
             },
             session_factory=session_factory)
         resources = p.run()
 
         self.assertEqual([r['QueueUrl'] for r in resources], [queue_url])
 
-        data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
+        data = json.loads(client.get_queue_attributes(
+            QueueUrl=resources[0]['QueueUrl'],
+            AttributeNames=['Policy'])['Attributes']['Policy'])
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
