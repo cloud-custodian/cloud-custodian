@@ -257,7 +257,8 @@ class ConfigS3(query.ConfigSource):
             if 'filter' not in r or not r['filter']:
                 continue
 
-            rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
+            if r['filter']['predicate']:
+                rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
 
         resource['Lifecycle'] = {'Rules': rules}
 
@@ -281,6 +282,7 @@ class ConfigS3(query.ConfigSource):
     NotifyTypeMap = {
         'QueueConfiguration': 'QueueConfigurations',
         'LambdaConfiguration': 'LambdaFunctionConfigurations',
+        'CloudFunctionConfiguration': 'LambdaFunctionConfigurations',
         'TopicConfiguration': 'TopicConfigurations'}
 
     def handle_BucketNotificationConfiguration(self, resource, item_value):
@@ -345,8 +347,8 @@ class ConfigS3(query.ConfigSource):
                 'Key': item_value['errorDocument']}
         if item_value['redirectAllRequestsTo']:
             website['RedirectAllRequestsTo'] = {
-                'HostName': item_value['redirectsAllRequestsTo']['hostName'],
-                'Protocol': item_value['redirectsAllRequestsTo']['protocol']}
+                'HostName': item_value['redirectAllRequestsTo']['hostName'],
+                'Protocol': item_value['redirectAllRequestsTo']['protocol']}
         for r in item_value['routingRules']:
             redirect = {}
             rule = {'Redirect': redirect}
@@ -2662,13 +2664,11 @@ class SetBucketEncryption(BucketActionBase):
         }
     }
 
-    permissions = ('s3:PutEncryptionConfiguration',
-                's3:GetEncryptionConfiguration',
-                'kms:ListAliases')
+    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
+                   'kms:ListAliases')
 
     def process(self, buckets):
         keys = {}
-        regions = set()
         regions = {get_region(b) for b in buckets}
         key = self.data.get('key')
 
@@ -2676,14 +2676,11 @@ class SetBucketEncryption(BucketActionBase):
             keys = self.resolve_keys(regions, key)
 
         with self.executor_factory(max_workers=3) as w:
-            results = []
-            futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
+            futures = {w.submit(self.process_bucket, b, keys): b for b in buckets}
             for future in as_completed(futures):
                 if future.exception():
-                    bucket = futures[future]
-                    self.log.error('error enabling bucket encryption: %s\n%s',
-                                   bucket['Name'], future.exception())
-                results += filter(None, [future.result()])
+                    self.log.error('Message: %s Bucket: %s', future.exception(),
+                                   futures[future]['Name'])
 
     def resolve_keys(self, regions, key):
         arns = {}
@@ -2698,7 +2695,7 @@ class SetBucketEncryption(BucketActionBase):
     def process_bucket(self, bucket, keys):
         config = {'Rules': [
             {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': self.data.get('crypto','AES256')}}
+                'SSEAlgorithm': self.data.get('crypto', 'AES256')}}
         ]}
         region = get_region(bucket)
         if self.data.get('key') and region in keys:
