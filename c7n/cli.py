@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
 # is failing, move this above the license)
@@ -30,9 +30,12 @@ from dateutil.parser import parse as date_parse
 try:
     from setproctitle import setproctitle
 except ImportError:
-    setproctitle = lambda t: None
+    def setproctitle(t):
+        return None
 
+from c7n import utils
 from c7n.commands import schema_completer
+from c7n.utils import get_account_id_from_sts
 
 DEFAULT_REGION = 'us-east-1'
 
@@ -50,29 +53,42 @@ def _default_options(p, blacklist=""):
 
     if 'region' not in blacklist:
         provider.add_argument(
-            "-r", "--region", default=None,
-            help="AWS Region to target (Default: %(default)s)")
+            "-r", "--region", action='append', default=[],
+            dest='regions', metavar='REGION',
+            help="AWS Region to target.  Can be used multiple times")
     provider.add_argument(
         "--profile",
         help="AWS Account Config File Profile to utilize")
     provider.add_argument("--assume", default=None, dest="assume_role",
                           help="Role to assume")
+    provider.add_argument("--external-id", default=None, dest="external_id",
+                          help="External Id to provide when assuming a role")
 
     config = p.add_argument_group(
         "config", "Policy config file(s) and policy selectors")
     # -c is deprecated.  Supported for legacy reasons
     config.add_argument("-c", "--config", help=argparse.SUPPRESS)
     config.add_argument("configs", nargs='*',
-                          help="Policy configuration file(s)")
+                        help="Policy configuration file(s)")
     config.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=None, dest='resource_type',
                         help="Only use policies with the given resource type")
 
-    p.add_argument("-v", "--verbose", action="store_true",
-                   help="Verbose logging")
-    p.add_argument("--debug", default=False, help=argparse.SUPPRESS,
-                   action="store_true")
+    output = p.add_argument_group("output", "Output control")
+    output.add_argument("-v", "--verbose", action="count", help="Verbose logging")
+    if 'quiet' not in blacklist:
+        output.add_argument("-q", "--quiet", action="count",
+                            help="Less logging (repeatable, -qqq for no output)")
+    else:
+        output.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
+    output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
+                        action="store_true")
+
+    if 'vars' not in blacklist:
+        # p.add_argument('--vars', default=None,
+        #               help='Vars file to substitute into policy')
+        p.set_defaults(vars=None)
 
     if 'log-group' not in blacklist:
         p.add_argument(
@@ -98,25 +114,44 @@ def _default_options(p, blacklist=""):
 
 def _default_region(options):
     marker = object()
-    value = getattr(options, 'region', marker)
+    value = getattr(options, 'regions', marker)
     if value is marker:
         return
 
-    if value is not None:
+    if len(value) > 0:
         return
 
-    profile = getattr(options, 'profile', None)
     try:
-        import boto3
-        options.region = boto3.Session(profile_name=profile).region_name
-        log.debug("using default region:%s from boto" % options.region)
-    except:
-        return
+        options.regions = [utils.get_profile_session(options).region_name]
+    except Exception:
+        log.warning('Could not determine default region')
+        options.regions = [None]
+
+    if options.regions[0] is None:
+        log.error('No default region set. Specify a default via AWS_DEFAULT_REGION '
+                  'or setting a region in ~/.aws/config')
+        sys.exit(1)
+
+    log.debug("using default region:%s from boto" % options.regions[0])
+
+
+def _default_account_id(options):
+    if options.assume_role:
+        try:
+            options.account_id = options.assume_role.split(':')[4]
+            return
+        except IndexError:
+            pass
+    try:
+        session = utils.get_profile_session(options)
+        options.account_id = get_account_id_from_sts(session)
+    except Exception:
+        options.account_id = None
 
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    _default_options(p, blacklist=['region', 'cache', 'log-group'])
+    _default_options(p, blacklist=['cache', 'log-group', 'quiet'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -126,23 +161,21 @@ def _report_options(p):
     p.add_argument(
         '--field', action='append', default=[], type=_key_val_pair,
         metavar='HEADER=FIELD',
-        help='Repeatable. JMESPath of field to include in the output OR '\
-            'for a tag use prefix `tag:`')
+        help='Repeatable. JMESPath of field to include in the output OR '
+        'for a tag use prefix `tag:`. Special case fields `region` and'
+        '`policy` are available')
     p.add_argument(
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
-        help="Format to output data in (default: %(default)s). "\
-            "Options include simple, grid, rst")
-
-    # We don't include `region` because the report command ignores it
-    p.add_argument("--region", default=DEFAULT_REGION, help=argparse.SUPPRESS)
+        help="Format to output data in (default: %(default)s). "
+        "Options include simple, grid, csv")
 
 
 def _metrics_options(p):
     """ Add options specific to metrics subcommand. """
-    _default_options(p, blacklist=['log-group', 'output-dir', 'cache'])
+    _default_options(p, blacklist=['log-group', 'output-dir', 'cache', 'quiet'])
 
     p.add_argument(
         '--start', type=date_parse,
@@ -152,12 +185,12 @@ def _metrics_options(p):
     p.add_argument(
         '--days', type=int, default=14,
         help='Number of days of history to consider (default: %(default)i)')
-    p.add_argument('--period', type=int, default=60*24*24)
+    p.add_argument('--period', type=int, default=60 * 24 * 24)
 
 
 def _logs_options(p):
     """ Add options specific to logs subcommand. """
-    _default_options(p, blacklist=['cache'])
+    _default_options(p, blacklist=['cache', 'quiet'])
 
     # default time range is 0 to "now" (to include all log entries)
     p.add_argument(
@@ -190,9 +223,8 @@ def _schema_options(p):
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
     p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
-    p.add_argument(
-        '-v', '--verbose', action="store_true",
-        help="Verbose logging")
+    p.add_argument("-v", "--verbose", action="count", help="Verbose logging")
+    p.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
 
@@ -216,8 +248,7 @@ def setup_parser():
     c7n_desc = "Cloud fleet management"
     parser = argparse.ArgumentParser(description=c7n_desc)
 
-    # Setting `dest` means we capture which subparser was used.  We'll use it
-    # later on when doing post-parsing validation.
+    # Setting `dest` means we capture which subparser was used.
     subs = parser.add_subparsers(dest='subparser')
 
     report_desc = ("Report of resources that a policy matched/ran on. "
@@ -243,9 +274,8 @@ def setup_parser():
     version = subs.add_parser(
         'version', help="Display installed version of custodian")
     version.set_defaults(command='c7n.commands.version_cmd')
-    version.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Verbose Logging")
+    version.add_argument('-v', '--verbose', action="count", help="Verbose logging")
+    version.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     version.add_argument(
         "--debug", action="store_true",
         help="Print info for bug reports")
@@ -259,8 +289,8 @@ def setup_parser():
         "-c", "--config", help=argparse.SUPPRESS)
     validate.add_argument("configs", nargs='*',
                           help="Policy Configuration File(s)")
-    validate.add_argument("-v", "--verbose", action="store_true",
-                          help="Verbose Logging")
+    validate.add_argument("-v", "--verbose", action="count", help="Verbose Logging")
+    validate.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
     schema_desc = ("Browse the available vocabularies (resources, filters, and "
@@ -273,16 +303,31 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    #access_desc = ("Show permissions needed to execute the policies")
-    #access = subs.add_parser(
+    # access_desc = ("Show permissions needed to execute the policies")
+    # access = subs.add_parser(
     #    'access', description=access_desc, help=access_desc)
-    #access.set_defaults(command='c7n.commands.access')
-    #_default_options(access)
-    #access.add_argument(
+    # access.set_defaults(command='c7n.commands.access')
+    # _default_options(access)
+    # access.add_argument(
     #    '-m', '--access', default=False, action='store_true')
 
-    run_desc = ("Execute the policies in a config file")
-    run = subs.add_parser("run", description=run_desc, help=run_desc)
+    run_desc = "\n".join((
+        "Execute the policies in a config file",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc, help=run_desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
@@ -294,23 +339,50 @@ def setup_parser():
     return parser
 
 
+def _setup_logger(options):
+    level = 3 + (options.verbose or 0) - (options.quiet or 0)
+
+    if level <= 0:
+        # print nothing
+        log_level = logging.CRITICAL + 1
+    elif level == 1:
+        log_level = logging.ERROR
+    elif level == 2:
+        log_level = logging.WARNING
+    elif level == 3:
+        # default
+        log_level = logging.INFO
+    else:
+        log_level = logging.DEBUG
+
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+
+    external_log_level = logging.ERROR
+    if level <= 0:
+        external_log_level = logging.CRITICAL + 1
+    elif level >= 5:
+        external_log_level = logging.INFO
+
+    logging.getLogger('botocore').setLevel(external_log_level)
+    logging.getLogger('s3transfer').setLevel(external_log_level)
+
+
 def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
 
-    level = options.verbose and logging.DEBUG or logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
-    logging.getLogger('botocore').setLevel(logging.ERROR)
-    logging.getLogger('s3transfer').setLevel(logging.ERROR)
+    _setup_logger(options)
 
     # Support the deprecated -c option
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    _default_region(options)
+    if options.subparser in ('report', 'logs', 'metrics', 'run'):
+        _default_region(options)
+        _default_account_id(options)
 
     try:
         command = options.command
@@ -323,7 +395,6 @@ def main():
         process_name = [os.path.basename(sys.argv[0])]
         process_name.extend(sys.argv[1:])
         setproctitle(' '.join(process_name))
-
         command(options)
     except Exception:
         if not options.debug:
@@ -331,3 +402,6 @@ def main():
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
+
+if __name__ == '__main__':
+    main()

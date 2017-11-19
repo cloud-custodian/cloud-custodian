@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import json
 import os
@@ -19,7 +21,7 @@ from dateutil import zoneinfo
 
 from mock import mock
 
-from common import BaseTest, instance
+from .common import BaseTest, instance
 
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
@@ -52,7 +54,8 @@ def mock_datetime_now(tgt, dt):
         # Python2 & Python3 compatible metaclass
 
     MockedDatetime = DatetimeSubclassMeta(
-        'datetime', (BaseMockedDatetime,), {})
+        b'datetime' if str is bytes else 'datetime',  # hack Python2/3 port
+        (BaseMockedDatetime,), {})
     return mock.patch.object(dt, 'datetime', MockedDatetime)
 
 
@@ -107,6 +110,10 @@ class OffHoursFilterTest(BaseTest):
         instances = [
             instance(Tags=[]),
             instance(
+                Tags=[{'Key': 'maid_offhours', 'Value': ''}]),
+            instance(
+                Tags=[{'Key': 'maid_offhours', 'Value': 'on'}]),
+            instance(
                 Tags=[{'Key': 'maid_offhours', 'Value': 'off'}]),
             instance(
                 Tags=[
@@ -116,7 +123,9 @@ class OffHoursFilterTest(BaseTest):
             year=2015, month=12, day=1, hour=19, minute=5,
             tzinfo=zoneinfo.gettz('America/New_York'))
         with mock_datetime_now(t, datetime):
-            self.assertEqual(f.process(instances), [instances[0]])
+            self.assertEqual(
+                f.process(instances), [instances[0], instances[1], instances[2]]
+            )
 
     def test_opt_out_behavior(self):
         # Some users want to match based on policy filters to
@@ -130,6 +139,14 @@ class OffHoursFilterTest(BaseTest):
             i = instance(Tags=[])
             self.assertEqual(f(i), True)
             i = instance(
+                Tags=[{'Key': 'maid_offhours', 'Value': ''}]
+            )
+            self.assertEqual(f(i), True)
+            i = instance(
+                Tags=[{'Key': 'maid_offhours', 'Value': 'on'}]
+            )
+            self.assertEqual(f(i), True)
+            i = instance(
                 Tags=[{'Key': 'maid_offhours', 'Value': 'off'}])
             self.assertEqual(f(i), False)
             self.assertEqual(f.opted_out, [i])
@@ -138,19 +155,29 @@ class OffHoursFilterTest(BaseTest):
         # Given the addition of opt out behavior, verify if its
         # not configured that we don't touch an instance that
         # has no downtime tag
+        i = instance(Tags=[])
+        i2 = instance(Tags=[{'Key': 'maid_offhours', 'Value': ''}])
+        i3 = instance(Tags=[{'Key': 'maid_offhours', 'Value': 'on'}])
+
         t = datetime.datetime(
             year=2015, month=12, day=1, hour=19, minute=5,
             tzinfo=zoneinfo.gettz('America/New_York'))
-        i = instance(Tags=[])
         f = OffHour({})
 
         with mock_datetime_now(t, datetime):
             self.assertEqual(f(i), False)
-            t = datetime.datetime(
-                year=2015, month=12, day=1, hour=7, minute=5,
-                tzinfo=zoneinfo.gettz('America/New_York'))
-            f = OnHour({})
+            self.assertEqual(f(i2), True)
+            self.assertEqual(f(i3), True)
+
+        t = datetime.datetime(
+            year=2015, month=12, day=1, hour=7, minute=5,
+            tzinfo=zoneinfo.gettz('America/New_York'))
+        f = OnHour({})
+
+        with mock_datetime_now(t, datetime):
             self.assertEqual(f(i), False)
+            self.assertEqual(f(i2), True)
+            self.assertEqual(f(i3), True)
 
     def xtest_time_match_stops_after_skew(self):
         hour = 7
@@ -164,7 +191,7 @@ class OffHoursFilterTest(BaseTest):
 
         with mock_datetime_now(t, datetime) as dt:
             for n in range(0, 4):
-                dt.target = t.replace(hour=hour+n)
+                dt.target = t.replace(hour=hour + n)
                 results.append(f(i))
         self.assertEqual(results, [True, True, False, False])
 
@@ -191,7 +218,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(results, [True] * 7)
 
@@ -205,7 +232,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(results, [True] * 7)
 
@@ -220,7 +247,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(results, [
             False, True, False, False, False, False, False])
@@ -236,7 +263,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(results, [
             False, True, False, False, False, False, False])
@@ -250,7 +277,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(7):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(
             results,
@@ -265,7 +292,7 @@ class OffHoursFilterTest(BaseTest):
         results = []
         with mock_datetime_now(t, datetime) as dt:
             for n in range(0, 4):
-                dt.target = t.replace(day=start_day+n)
+                dt.target = t.replace(day=start_day + n)
                 results.append(f(i))
         self.assertEqual(results, [True, False, False, True])
 
@@ -291,14 +318,16 @@ class OffHoursFilterTest(BaseTest):
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
         with mock_datetime_now(t, datetime):
             results = [OffHour({})(i) for i in [
-                    instance(Tags=[
-                        {'Key': 'maid_offhours', 'Value': ''}]),
-                    instance(Tags=[
-                        {'Key': 'maid_offhours', 'Value': '"Offhours tz=ET"'}]),
-                    instance(Tags=[
-                        {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])]]
+                instance(Tags=[
+                    {'Key': 'maid_offhours', 'Value': ''}]),
+                instance(Tags=[
+                    {'Key': 'maid_offhours', 'Value': 'on'}]),
+                instance(Tags=[
+                    {'Key': 'maid_offhours', 'Value': '"Offhours tz=ET"'}]),
+                instance(Tags=[
+                    {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])]]
             # unclear what this is really checking
-            self.assertEqual(results, [True, True, True])
+            self.assertEqual(results, [True, True, True, True])
 
     def test_offhours_get_value(self):
         off = OffHour({'default_tz': 'ct'})
@@ -306,7 +335,7 @@ class OffHoursFilterTest(BaseTest):
             {'Key': 'maid_offhours', 'Value': 'Offhours tz=PT'}])
         self.assertEqual(off.get_tag_value(i), "offhours tz=pt")
         self.assertFalse(off.parser.has_resource_schedule(
-            off.get_tag_value(i)))
+            off.get_tag_value(i), 'off'))
         self.assertTrue(off.parser.keys_are_valid(
             off.get_tag_value(i)))
         self.assertEqual(off.parser.raw_data(
@@ -360,6 +389,18 @@ class OffHoursFilterTest(BaseTest):
                 results.append(OnHour({})(i))
             self.assertEqual(results, [True, False])
 
+    def test_arizona_tz(self):
+        t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
+        t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'off=(m-f,19);on=(m-f,7);tz=at'}])
+            self.assertEqual(OnHour({})(i), True)
+
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'off=(m-f,20);on=(m-f,6);tz=ast'}])
+            self.assertEqual(OnHour({})(i), False)
+
     def test_custom_bad_tz(self):
         t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
@@ -381,18 +422,18 @@ class OffHoursFilterTest(BaseTest):
             # This isn't considered a bad value, its basically omitted.
             i = instance(Tags=[{'Key': 'maid_offhours',
                                 'Value': 'off=();tz=et'}])
-            self.assertEqual(OffHour({})(i), True)
+            self.assertEqual(OffHour({})(i), False)
 
             i = instance(Tags=[{'Key': 'maid_offhours',
                                 'Value': 'off=(m-f,90);on=(m-f,7);tz=et'}])
-            #malformed value
+            # malformed value
             self.assertEqual(OffHour({})(i), False)
 
         t = t.replace(year=2016, month=5, day=26, hour=13, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{'Key': 'maid_offhours',
                                 'Value': 'off=();tz=et'}])
-            #will go to default values, but not work due to default time
+            # will go to default values, but not work due to default time
             self.assertEqual(OffHour({})(i), False)
 
             i = instance(Tags=[{'Key': 'maid_offhours',
@@ -405,6 +446,22 @@ class OffHoursFilterTest(BaseTest):
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{'Key': 'maid_offhours',
                                 'Value': 'tz=est'}])
+            self.assertEqual(OnHour({})(i), True)
+
+    def test_empty_tag(self):
+        t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
+        t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': ''}])
+            self.assertEqual(OnHour({})(i), True)
+
+    def test_on_tag(self):
+        t = datetime.datetime.now(zoneinfo.gettz('America/New_York'))
+        t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[{'Key': 'maid_offhours',
+                                'Value': 'on'}])
             self.assertEqual(OnHour({})(i), True)
 
 
@@ -455,7 +512,7 @@ class ScheduleParserTest(BaseTest):
           'tz': 'est'}),
 
         ################
-        ## Invalid Cases
+        # Invalid Cases
         ('', None),
         # invalid day
         ('off=(1-2,12);on=(m-f,10);tz=est', None),

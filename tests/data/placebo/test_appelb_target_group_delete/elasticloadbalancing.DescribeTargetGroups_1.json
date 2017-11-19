@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "97235f7e-8fe1-11e6-b7d6-7f12dd163996",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "97235f7e-8fe1-11e6-b7d6-7f12dd163996",
+                "vary": "Accept-Encoding",
+                "content-length": "2142",
+                "content-type": "text/xml",
+                "date": "Tue, 11 Oct 2016 18:36:14 GMT"
+            }
+        },
+        "TargetGroups": [
+            {
+                "HealthCheckPath": "/",
+                "HealthCheckIntervalSeconds": 30,
+                "VpcId": "vpc-47b2b823",
+                "Protocol": "HTTP",
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthCheckProtocol": "HTTP",
+                "LoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177"
+                ],
+                "UnhealthyThresholdCount": 2,
+                "HealthyThresholdCount": 5,
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-1/f9e509bf6804a101",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "HealthCheckPort": "traffic-port",
+                "Port": 80,
+                "TargetGroupName": "target-group-1"
+            },
+            {
+                "HealthCheckPath": "/",
+                "HealthCheckIntervalSeconds": 30,
+                "VpcId": "vpc-4a9ff72e",
+                "Protocol": "HTTPS",
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthCheckProtocol": "HTTP",
+                "LoadBalancerArns": [],
+                "UnhealthyThresholdCount": 2,
+                "HealthyThresholdCount": 5,
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/target-group-2/9c84115056e192c4",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "HealthCheckPort": "traffic-port",
+                "Port": 443,
+                "TargetGroupName": "target-group-2"
+            }
+        ]
+    }
+}

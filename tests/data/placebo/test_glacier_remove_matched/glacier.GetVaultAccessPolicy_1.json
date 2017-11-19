@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policy": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"glacier:AddTagsToVault\",\"Resource\":\"arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-matched\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"glacier:AddTagsToVault\",\"Resource\":\"arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-matched\"}]}"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6GsT2ob09DD8WgrtDTkUy8IQ5OcVL7CQ6yNaHG52v98uRzU", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6GsT2ob09DD8WgrtDTkUy8IQ5OcVL7CQ6yNaHG52v98uRzU", 
+                "date": "Sat, 16 Sep 2017 19:28:16 GMT", 
+                "content-length": "495", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import copy
 import json
 import fnmatch
 import itertools
@@ -18,7 +21,10 @@ import logging
 import os
 import time
 
+import boto3
 from botocore.client import ClientError
+import jmespath
+import six
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
@@ -26,6 +32,7 @@ from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
 from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
+from c7n.resources import load_resources
 from c7n import mu
 from c7n import utils
 from c7n.logs_support import (
@@ -36,71 +43,154 @@ from c7n.logs_support import (
 )
 from c7n.version import version
 
-from c7n.resources import load_resources
+log = logging.getLogger('c7n.policy')
 
 
-def load(options, path, format='yaml', validate=True):
+def load(options, path, format='yaml', validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
-    with open(path) as fh:
-        if format == 'yaml':
-            data = utils.yaml_load(fh.read())
-        elif format == 'json':
-            data = utils.loads(fh.read())
-            validate = False
+    data = utils.load_file(path, format=format, vars=vars)
+
+    if format == 'json':
+        validate = False
+
+    if isinstance(data, list):
+        log.warning('yaml in invalid format. The "policies:" line is probably missing.')
+        return None
 
     # Test for empty policy file
     if not data or data.get('policies') is None:
         return None
-            
+
     if validate:
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise Exception("Failed to validate on policy %s \n %s" % (errors[1], errors[0]))
-    return PolicyCollection(data, options)
+            raise Exception(
+                "Failed to validate on policy %s \n %s" % (
+                    errors[1], errors[0]))
+
+    collection = PolicyCollection.from_data(data, options)
+    if validate:
+        # non schema validation of policies
+        [p.validate() for p in collection]
+    return collection
+
+
+def get_service_region_map(regions, resource_types):
+    # we're not interacting with the apis just using the sdk meta information.
+    session = boto3.Session(
+        region_name='us-east-1',
+        aws_access_key_id='never',
+        aws_secret_access_key='found')
+
+    resource_service_map = {r: resources.get(r).resource_type.service
+                            for r in resource_types if r != 'account'}
+    # support for govcloud and china, we only utilize these regions if they
+    # are explicitly passed in on the cli.
+    partition_regions = {}
+    for p in ('aws-cn', 'aws-us-gov'):
+        for r in session.get_available_regions('s3', partition_name=p):
+            partition_regions[r] = p
+
+    partitions = ['aws']
+    for r in regions:
+        if r in partition_regions:
+            partitions.append(partition_regions[r])
+
+    service_region_map = {}
+    for s in set(itertools.chain(resource_service_map.values())):
+        for partition in partitions:
+            service_region_map.setdefault(s, []).extend(
+                session.get_available_regions(s, partition_name=partition))
+    return service_region_map, resource_service_map
 
 
 class PolicyCollection(object):
 
-    def __init__(self, data, options):
-        self.data = data
+    log = logging.getLogger('c7n.policies')
+
+    def __init__(self, policies, options):
         self.options = options
+        self.policies = policies
 
-        # We store all the policies passed in so we can refilter later
-        self._all_policies = []
-        for p in self.data.get('policies', []):
-            self._all_policies.append(
-                Policy(p, options, session_factory=self.test_session_factory()))
-        
-        # Do an initial filtering
-        self.policies = []
-        resource_type = getattr(self.options, 'resource_type', None)
-        policy_name = getattr(self.options, 'policy_filter', None)
-        self.policies = self.filter(policy_name, resource_type)
+    @classmethod
+    def from_data(cls, data, options):
+        policies = [Policy(p, options,
+                           session_factory=cls.session_factory())
+                    for p in data.get('policies', ())]
+        return PolicyCollection(policies, options)
 
-    @property
-    def unfiltered_policies(self):
-        return self._all_policies
+    def __add__(self, other):
+        return PolicyCollection(self.policies + other.policies, self.options)
+
+    def expand_regions(self, regions):
+        """Return a set of policies targetted to the given regions.
+
+        Supports symbolic regions like 'all'. This will automatically
+        filter out policies if their being targetted to a region that
+        does not support the service. Global services will target a
+        single region (us-east-1 if only all specified, else first
+        region in the list).
+
+        Note for region partitions (govcloud and china) an explicit
+        region from the partition must be passed in.
+        """
+        policies = []
+        service_region_map, resource_service_map = get_service_region_map(
+            regions, self.resource_types)
+
+        for p in self.policies:
+            available_regions = service_region_map.get(
+                resource_service_map.get(p.resource_type), ())
+
+            # its a global service/endpoint, use user provided region
+            # or us-east-1.
+            if not available_regions and regions:
+                candidates = [r for r in regions if r != 'all']
+                candidate = candidates and candidates[0] or 'us-east-1'
+                svc_regions = [candidate]
+            elif 'all' in regions:
+                svc_regions = available_regions
+            else:
+                svc_regions = regions
+
+            for region in svc_regions:
+                if available_regions and region not in available_regions:
+                    level = ('all' in self.options.regions and
+                             logging.DEBUG or logging.WARNING)
+                    self.log.log(
+                        level, "policy:%s resources:%s not available in region:%s",
+                        p.name, p.resource_type, region)
+                    continue
+                options_copy = copy.copy(self.options)
+                options_copy.region = str(region)
+
+                if len(regions) > 1 or 'all' in regions and getattr(
+                        self.options, 'output_dir', None):
+                    options_copy.output_dir = (
+                        self.options.output_dir.rstrip('/') + '/%s' % region)
+
+                policies.append(
+                    Policy(p.data, options_copy,
+                           session_factory=self.session_factory()))
+        return PolicyCollection(policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
-        policies = []
-        for policy in self.unfiltered_policies:
+        results = []
+        for policy in self.policies:
             if resource_type:
                 if policy.resource_type != resource_type:
                     continue
-
             if policy_name:
                 if not fnmatch.fnmatch(policy.name, policy_name):
                     continue
+            results.append(policy)
+        return PolicyCollection(results, self.options)
 
-            policies.append(policy)
-
-        return policies
-    
     def __iter__(self):
         return iter(self.policies)
 
@@ -121,8 +211,9 @@ class PolicyCollection(object):
             rtypes.add(p.resource_type)
         return rtypes
 
-    def test_session_factory(self):
-        """ For testing: patched by tests to use a custom session_factory """
+    # cli/collection tests patch this
+    @classmethod
+    def session_factory(cls):
         return None
 
 
@@ -145,6 +236,9 @@ class PolicyExecutionMode(object):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
 
+    def validate(self):
+        """Validate configuration settings for execution mode."""
+
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
         values = {}
@@ -165,7 +259,7 @@ class PolicyExecutionMode(object):
         client = session.client('cloudwatch')
 
         for m in metrics:
-            if isinstance(m, basestring):
+            if isinstance(m, six.string_types):
                 dimensions = default_dimensions
             else:
                 m, m_dimensions = m
@@ -201,7 +295,7 @@ class PullMode(PolicyExecutionMode):
             return
 
         with self.policy.ctx:
-            self.policy.log.info(
+            self.policy.log.debug(
                 "Running policy %s resource: %s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
                 self.policy.options.region or 'default',
@@ -211,9 +305,10 @@ class PullMode(PolicyExecutionMode):
             resources = self.policy.resource_manager.resources()
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s has count:%d time:%0.2f" % (
+                "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
                     self.policy.name,
                     self.policy.resource_type,
+                    self.policy.options.region,
                     len(resources), rt))
             self.policy.ctx.metrics.put_metric(
                 "ResourceCount", len(resources), "Count", Scope="Policy")
@@ -227,7 +322,8 @@ class PullMode(PolicyExecutionMode):
             elif (self.policy.max_resources is not None and
                   len(resources) > self.policy.max_resources):
                 msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources), self.policy.max_resources)
+                    self.policy.name, len(resources),
+                    self.policy.max_resources)
                 self.policy.log.warning(msg)
                 raise RuntimeError(msg)
 
@@ -244,9 +340,10 @@ class PullMode(PolicyExecutionMode):
                     " resources: %d"
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
-                        len(resources), time.time()-s))
-                self.policy._write_file(
-                    "action-%s" % a.name, utils.dumps(results))
+                        len(resources), time.time() - s))
+                if results:
+                    self.policy._write_file(
+                        "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
@@ -329,6 +426,13 @@ class LambdaMode(PolicyExecutionMode):
         TODO: better customization around execution context outputs
         TODO: support centralized lambda exec across accounts.
         """
+
+        mode = self.policy.data.get('mode', {})
+        if not bool(mode.get("log", True)):
+            root = logging.getLogger()
+            map(root.removeHandler, root.handlers[:])
+            root.handlers = [logging.NullHandler()]
+
         resources = self.resolve_resources(event)
         if not resources:
             return resources
@@ -344,22 +448,40 @@ class LambdaMode(PolicyExecutionMode):
                     self.policy.name, self.policy.resource_type))
             return
 
-        self.policy.ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
+        with self.policy.ctx:
+            self.policy.ctx.metrics.put_metric(
+                'ResourceCount', len(resources), 'Count', Scope="Policy",
+                buffer=False)
 
-        if 'debug' in event:
-            self.policy.log.info(
-                "Invoking actions %s", self.policy.resource_manager.actions)
-        for action in self.policy.resource_manager.actions:
-            self.policy.log.info(
-                "policy: %s invoking action: %s resources: %d",
-                self.policy.name, action.name, len(resources))
-            if isinstance(action, EventAction):
-                action.process(resources, event)
-            else:
-                action.process(resources)
+            if 'debug' in event:
+                self.policy.log.info(
+                    "Invoking actions %s", self.policy.resource_manager.actions)
+
+            self.policy._write_file(
+                'resources.json', utils.dumps(resources, indent=2))
+
+            for action in self.policy.resource_manager.actions:
+                self.policy.log.info(
+                    "policy: %s invoking action: %s resources: %d",
+                    self.policy.name, action.name, len(resources))
+                if isinstance(action, EventAction):
+                    results = action.process(resources, event)
+                else:
+                    results = action.process(resources)
+                self.policy._write_file(
+                    "action-%s" % action.name, utils.dumps(results))
         return resources
+
+    def expand_variables(self, variables):
+        """expand variables in the mode role fields.
+        """
+        p = variables['policy'].copy()
+        if 'mode' in variables['policy']:
+            if 'role' in variables['policy']['mode']:
+                mode = variables['policy']['mode'].copy()
+                mode['role'] = mode['role'].format(**variables)
+                p['mode'] = mode
+        return p
 
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
@@ -368,6 +490,11 @@ class LambdaMode(PolicyExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
+            variables = {
+                'account_id': self.policy.options.account_id,
+                'policy': self.policy.data
+            }
+            self.policy.data = self.expand_variables(variables)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -401,6 +528,15 @@ class PeriodicMode(LambdaMode, PullMode):
 class CloudTrailMode(LambdaMode):
     """A lambda policy using cloudwatch events rules on cloudtrail api logs."""
 
+    def validate(self):
+        events = self.policy.data['mode'].get('events')
+        assert events, "cloud trail mode requires specifiying events to subscribe"
+        for e in events:
+            if isinstance(e, six.string_types):
+                assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
+            if isinstance(e, dict):
+                jmespath.compile(e['ids'])
+
 
 class EC2InstanceState(LambdaMode):
     """a lambda policy that executes on ec2 instance state changes."""
@@ -418,13 +554,14 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
 
     def resolve_resources(self, event):
-        return [utils.camelResource(
-            self.cfg_event['configurationItem']['configuration'])]
+        source = self.policy.resource_manager.get_source('config')
+        return [source.load_resource(self.cfg_event['configurationItem'])]
 
     def run(self, event, lambda_context):
         self.cfg_event = json.loads(event['invokingEvent'])
         cfg_item = self.cfg_event['configurationItem']
         evaluation = None
+        resources = []
         # TODO config resource type matches policy check
         if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
@@ -437,6 +574,8 @@ class ConfigRuleMode(LambdaMode):
         if evaluation is None:
             resources = super(ConfigRuleMode, self).run(event, lambda_context)
             match = self.policy.data['mode'].get('match-compliant', False)
+            self.policy.log.info(
+                "found resources:%d match-compliant:%s", len(resources or ()), match)
             if (match and resources) or (not match and not resources):
                 evaluation = {
                     'compliance_type': 'COMPLIANT',
@@ -484,14 +623,15 @@ class Policy(object):
             session_factory = SessionFactory(
                 options.region,
                 options.profile,
-                options.assume_role)
+                options.assume_role,
+                options.external_id)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.get_resource_manager()
 
     def __repr__(self):
-        return "<Policy resource: %s name: %s>" % (
-            self.resource_type, self.name)
+        return "<Policy resource: %s name: %s region: %s>" % (
+            self.resource_type, self.name, self.options.region)
 
     @property
     def name(self):
@@ -522,6 +662,14 @@ class Policy(object):
         if 'mode' not in self.data:
             return False
         return True
+
+    def validate(self):
+        m = self.get_execution_mode()
+        m.validate()
+        for f in self.resource_manager.filters:
+            f.validate()
+        for a in self.resource_manager.actions:
+            a.validate()
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
@@ -555,22 +703,18 @@ class Policy(object):
             permissions.update(a.get_permissions())
         return permissions
 
-    def validate(self):
-        """validate settings, else raise validation error"""
-        for f in self.resource_manager.filters:
-            f.validate()
-        for a in self.resource_manager.actions:
-            a.validate()
-
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
         if self.options.dryrun:
-            return PullMode(self).run()
+            resources = PullMode(self).run()
         elif isinstance(mode, LambdaMode):
-            return mode.provision()
+            resources = mode.provision()
         else:
-            return mode.run()
+            resources = mode.run()
+        # clear out resource manager post run, to clear cache
+        self.resource_manager = self.get_resource_manager()
+        return resources
 
     run = __call__
 

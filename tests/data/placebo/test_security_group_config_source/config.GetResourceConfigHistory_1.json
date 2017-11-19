@@ -4,31 +4,16 @@
         "configurationItems": [
             {
                 "configurationItemCaptureTime": {
-                    "hour": 0, 
+                    "hour": 6, 
                     "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 23, 
-                    "microsecond": 464000, 
+                    "month": 8, 
+                    "second": 58, 
+                    "microsecond": 830000, 
                     "year": 2017, 
-                    "day": 26, 
-                    "minute": 28
+                    "day": 10, 
+                    "minute": 50
                 }, 
                 "relationships": [
-                    {
-                        "resourceType": "AWS::EC2::NetworkInterface", 
-                        "resourceId": "eni-0fac0bfc", 
-                        "relationshipName": "Is associated with NetworkInterface"
-                    }, 
-                    {
-                        "resourceType": "AWS::EC2::NetworkInterface", 
-                        "resourceId": "eni-23fd50d0", 
-                        "relationshipName": "Is associated with NetworkInterface"
-                    }, 
-                    {
-                        "resourceType": "AWS::EC2::NetworkInterface", 
-                        "resourceId": "eni-dd0bcf23", 
-                        "relationshipName": "Is associated with NetworkInterface"
-                    }, 
                     {
                         "resourceType": "AWS::EC2::VPC", 
                         "resourceId": "vpc-d2d616b5", 
@@ -37,29 +22,35 @@
                 ], 
                 "availabilityZone": "Not Applicable", 
                 "awsRegion": "us-east-1", 
-                "tags": {}, 
+                "tags": {
+                    "Name": "", 
+                    "c7n-test-tag": "c7n-test-val"
+                }, 
                 "resourceType": "AWS::EC2::SecurityGroup", 
                 "resourceId": "sg-6c7fa917", 
-                "configurationStateId": "1485408503464", 
-                "relatedEvents": [], 
+                "configurationStateId": "1502362258830", 
+                "relatedEvents": [
+                    "dc38f4d3-e652-4d54-9438-52821e74cf7c"
+                ], 
                 "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-6c7fa917", 
                 "version": "1.2", 
-                "configurationItemMD5Hash": "53f2d3b57aa239238047b5bf2cd75bfb", 
+                "configurationItemMD5Hash": "4e51d919fa402efb191edd0f11c29980", 
                 "supplementaryConfiguration": {}, 
-                "configuration": "{\"ownerId\":\"644160558196\",\"groupName\":\"default\",\"groupId\":\"sg-6c7fa917\",\"description\":\"default VPC security group\",\"ipPermissions\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[{\"userId\":\"644160558196\",\"groupName\":null,\"groupId\":\"sg-6c7fa917\",\"vpcId\":null,\"vpcPeeringConnectionId\":null,\"peeringStatus\":null}],\"ipRanges\":[\"108.56.181.242/32\"],\"prefixListIds\":[]}],\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]}],\"vpcId\":\"vpc-d2d616b5\",\"tags\":[]}", 
+                "resourceName": "default", 
+                "configuration": "{\"description\":\"default VPC security group\",\"groupName\":\"default\",\"ipPermissions\":[{\"ipProtocol\":\"-1\",\"ipv6Ranges\":[],\"prefixListIds\":[],\"userIdGroupPairs\":[{\"groupId\":\"sg-6c7fa917\",\"userId\":\"644160558196\"}],\"ipv4Ranges\":[{\"cidrIp\":\"108.56.181.242/32\"}],\"ipRanges\":[\"108.56.181.242/32\"]}],\"ownerId\":\"644160558196\",\"groupId\":\"sg-6c7fa917\",\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"ipv6Ranges\":[],\"prefixListIds\":[],\"userIdGroupPairs\":[],\"ipv4Ranges\":[{\"cidrIp\":\"0.0.0.0/0\"}],\"ipRanges\":[\"0.0.0.0/0\"]}],\"tags\":[{\"key\":\"Name\",\"value\":\"\"},{\"key\":\"c7n-test-tag\",\"value\":\"c7n-test-val\"}],\"vpcId\":\"vpc-d2d616b5\"}", 
                 "configurationItemStatus": "OK", 
                 "accountId": "644160558196"
             }
         ], 
-        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMTI1LDEwMCwtNzAsLTksLTY3LC0xLC02OSwtNSw1NSwtMTEyLDYsNTIsMTgsLTEyNywtMzIsLTU2LDUsODQsLTExNSwtMjcsLTc5LC0yOSwtNjAsLTEyMywtNjQsMzIsMzcsNDksODksNTksLTg0LC03NSwtODksLTgxLC0xMTYsMTAxLC00NSwtMzksMTIsLTEwNiwtODgsLTEyOCw1NCw2OCw1MCwtOTEsLTcxLDEzLC05NywtMzQsLTc1LC00Nyw0NiwtNDIsNDgsNDYsNzksOTksLTMsLTEwMCwtNzEsLTI1LC0xLC0xMTEsLTkwLDc1LC04NywtMTEwLDkwLC03NiwtODEsNDcsLTE3LC0xMDUsLTc3LC03MiwtMTExLDI4LDUyLC03MCw0MiwtMSwxMTYsLTEwNywxMTIsOCw2Myw2MSwtMjUsLTQsNTgsLTQ5LDM5LDU4LDEwOCwxMTQsMTEwLC02Niw0NSwtMTE3LDEwMywtODUsLTQxLC0zNiwxNywtNTQsOTgsLTYxLDE4LC05NiwxMDMsLTYxLC01NiwtNDAsLTIsOSwxNywtMTEsLTMzLDEyMSwtMTI4LC0xMywtODUsNjcsNjMsNDEsLTExOCwxMTgsLTEwNywtNTMsNjEsMTE1LC0xMjcsLTExMiwtMzcsMzksODEsMzMsMTUsNzEsNjAsNywtODYsNDgsLTEwNCwtMTI3LC0xMTYsLTEwMSwtMTEzLC01LC00NCw2OSw2NCwtMTIwLC02NCwxMjMsNjcsLTUsMTI3LDEwMSw4NSwxMDMsLTg0LDcyLDYzLC0xMDddLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbMTI1LDk1LC0zOCw0LC0yNiwtNDYsLTkzLDg1LDcsMSw3MCwxMjUsLTg4LDEsNjMsMzRdfX0=", 
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbLTM2LDMzLDExNSw3LDczLC05OSwtNjMsLTI2LDg0LC0xNiw3MCw0Niw4OCwtOCwtMTksMTAzLC0xMDgsNjIsMjEsLTExNCwtMTA0LC0yMCw4MiwtODYsLTE1LDgxLDY5LDEwMSw3MSw4OSwtNTIsNDgsLTg2LDU4LDUzLDEwNyw2LDExNCwtOCw3OSw5NSwtMTE0LDY2LDQ2LDYxLC01OCw2MiwzMiwtNDMsNzUsLTU0LC01OCwtMTEwLDEsLTI1LC04Miw1NCw3MywzNywtMTI2LC01OCwtNzUsMzYsLTk5LDQzLDEwNCwxMTcsNzgsNjksLTE2LC0yMiwtNzYsMjAsLTExMywtOTEsOTYsLTM1LDI3LDExNywtMTAwLC01MSwxMTUsNDUsLTYyLC04Miw2OSwxMTAsOTgsLTEyMCwtODIsNzIsMTEwLC0xMDksLTk0LDczLC0xMjAsNzksMTEzLDI3LDU4LC01NSw5OCwtMTA5LC0xMDQsLTQzLDczLC0xMjgsMzYsODQsNTcsLTcsLTYxLDQwLC00NywtMTcsNjMsLTY2LDI4LDk4LC04NCwtOTcsLTYzLDk3LC0xMTQsOTMsMyw5MSw4MCwxMCwtMTAwLDc1LC0xMTksNzYsLTc2LC0yMywzMywtNTEsLTE0LC03MCwtMzksNzYsLTEwNCwtNTAsLTcsLTEyNiwxMDQsLTk0LDc1LDY0LC02NiwxMjcsMTE5LDExNiwxMDksMjAsLTEyNSwxOSw0MywxMDUsLTQyLDE2LC02MSwxMjEsODUsNzIsLTEwM10sIm1hdGVyaWFsU2V0U2VyaWFsTnVtYmVyIjoxLCJpdlBhcmFtZXRlclNwZWMiOnsiaXYiOlstMzksLTM4LC05LDEyNywxMTMsNTYsMTYsMTMsLTMwLC0xOSwtNTMsNjUsMzgsLTM5LC02OSwxMTZdfX0=", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "0dcd7d7c-e9b2-11e6-89d1-b91eccf729ed", 
+            "RequestId": "2fb087b9-8350-11e7-bb70-11370d223f3a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "0dcd7d7c-e9b2-11e6-89d1-b91eccf729ed", 
-                "date": "Fri, 03 Feb 2017 01:42:42 GMT", 
-                "content-length": "2681", 
+                "x-amzn-requestid": "2fb087b9-8350-11e7-bb70-11370d223f3a", 
+                "date": "Thu, 17 Aug 2017 13:30:06 GMT", 
+                "content-length": "2443", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

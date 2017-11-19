@@ -6,81 +6,14 @@
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
                         "IpRanges": [
                             {
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
                         "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "108.56.181.242/32"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-6c7fa917"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-6c7fa917"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-7ed02904"
-                            }
-                        ], 
-                        "PrefixListIds": []
-                    }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-f9640c9e", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-7ed02904"
-            }, 
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "Description": "for apps", 
@@ -95,7 +28,8 @@
                         ], 
                         "ToPort": 61000, 
                         "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": []
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
                     }, 
                     {
                         "PrefixListIds": [], 
@@ -107,24 +41,26 @@
                         ], 
                         "ToPort": 62000, 
                         "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": []
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
                     }
                 ], 
                 "GroupName": "web-tier", 
-                "VpcId": "vpc-f9640c9e", 
+                "VpcId": "vpc-82c179fb", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-7fd02905"
+                "GroupId": "sg-52853023"
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9784c406-ef80-41fa-b683-59f8ab279151", 
+            "RequestId": "70e7f708-19d1-43d0-89a0-a2b1fdd57b73", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 09 Aug 2016 14:23:11 GMT"
+                "date": "Tue, 27 Jun 2017 15:42:59 GMT"
             }
         }
     }

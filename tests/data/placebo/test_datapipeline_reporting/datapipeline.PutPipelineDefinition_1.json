@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "validationErrors": [], 
+        "errored": false, 
+        "validationWarnings": [
+            {
+                "id": "SayHello", 
+                "warnings": [
+                    " It is recommended to set 'failureAndRerunMode'  to 'cascade' on Default object to enable cascade failure mode for Activity, Datanode, Precondition and Resource objects of a pipeline."
+                ]
+            }, 
+            {
+                "id": "Default", 
+                "warnings": [
+                    "'pipelineLogUri'is missing. It is recommended to set this value on Default object for better troubleshooting."
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "746b8998-07e1-11e7-90ed-1f399d793de2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "746b8998-07e1-11e7-90ed-1f399d793de2", 
+                "date": "Mon, 13 Mar 2017 11:37:35 GMT", 
+                "content-length": "421", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

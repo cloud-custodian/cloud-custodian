@@ -3,7 +3,7 @@
     "data": {
         "StartingInstances": [
             {
-                "InstanceId": "i-9432cb49", 
+                "InstanceId": "i-0aaaaec4b77188b69", 
                 "CurrentState": {
                     "Code": 0, 
                     "Name": "pending"
@@ -15,8 +15,16 @@
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a8e3a7b8-682a-4ee1-830d-ffc93d021f61"
+            "RequestId": "158998e4-2f81-4412-b390-9e5c634b6762", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 08 Jun 2017 18:24:05 GMT"
+            }
         }
     }
 }

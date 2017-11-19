@@ -4,18 +4,19 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "0c87b6c8-e9b2-11e6-88cd-3bd72eb352d1", 
+            "RequestId": "2f737e91-8350-11e7-aaa4-3379113bde23", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "0c87b6c8-e9b2-11e6-88cd-3bd72eb352d1", 
-                "date": "Fri, 03 Feb 2017 01:42:40 GMT", 
-                "content-length": "1495", 
+                "x-amzn-requestid": "2f737e91-8350-11e7-aaa4-3379113bde23", 
+                "date": "Thu, 17 Aug 2017 13:30:06 GMT", 
+                "content-length": "524", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
         "resourceIdentifiers": [
             {
                 "resourceType": "AWS::EC2::SecurityGroup", 
-                "resourceId": "sg-6c7fa917"
+                "resourceId": "sg-6c7fa917", 
+                "resourceName": "default"
             }
         ]
     }

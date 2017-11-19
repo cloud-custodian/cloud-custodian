@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "status": {
+            "checkId": "eW7HH0l7J9", 
+            "status": "enqueued", 
+            "millisUntilNextRefreshable": 3599992
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cf3750f7-2118-11e7-9938-f15d99801c37", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cf3750f7-2118-11e7-9938-f15d99801c37", 
+                "date": "Fri, 14 Apr 2017 13:46:48 GMT", 
+                "content-length": "92", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

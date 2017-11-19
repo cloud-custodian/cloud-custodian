@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b011dc6a-2be6-4d92-9010-019d01156f77", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 04 May 2017 17:08:56 GMT"
+            }
+        }, 
+        "Tags": [
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-04ec879cd823dc92a", 
+                "Value": "ubuntu", 
+                "Key": "Platform"
+            }, 
+            {
+                "ResourceType": "instance", 
+                "ResourceId": "i-04ec879cd823dc92a", 
+                "Value": "scot-asg-test", 
+                "Key": "aws:autoscaling:groupName"
+            }
+        ]
+    }
+}

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -28,6 +29,7 @@ class SnowballCluster(QueryResourceManager):
         name = 'Description'
         date = 'CreationDate'
         dimension = None
+        filter_name = None
 
 
 @resources.register('snowball')
@@ -42,3 +44,4 @@ class Snowball(QueryResourceManager):
         name = 'Description'
         date = 'CreationDate'
         dimension = None
+        filter_name = None

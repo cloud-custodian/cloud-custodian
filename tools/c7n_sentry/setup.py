@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from setuptools import setup
 
@@ -19,8 +20,8 @@ setup(
     version='0.1',
     description="Cloud Custodian - Sentry",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -30,4 +31,3 @@ setup(
             'c7n-sentry = c7n_sentry.c7nsentry:main']},
     install_requires=["c7n"],
 )
-

@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyId": "arn:aws:kms:us-east-1:123456789012:key/78b73bc3-b72f-4051-8eb3-e83d82e63c69", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "99553f74-9b02-11e7-b7e5-8fcba9aa064e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "99553f74-9b02-11e7-b7e5-8fcba9aa064e", 
+                "content-length": "114", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sat, 16 Sep 2017 17:15:12 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "DeletionDate": {
+            "hour": 20, 
+            "__class__": "datetime", 
+            "month": 9, 
+            "second": 0, 
+            "microsecond": 0, 
+            "year": 2017, 
+            "day": 23, 
+            "minute": 0
+        }
+    }
+}

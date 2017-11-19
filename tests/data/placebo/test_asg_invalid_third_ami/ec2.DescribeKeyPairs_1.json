@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyPairs": [
+            {
+                "KeyName": "sonny", 
+                "KeyFingerprint": "7c:08:f5:95:13:82:86:dd:51:49:77:28:95:9d:09:b8:7a:0d:95:63"
+            }, 
+            {
+                "KeyName": "test", 
+                "KeyFingerprint": "ee:95:bf:69:ce:24:ac:f1:88:1a:23:40:62:90:13:f2:4e:c2:d4:f3"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cbcff485-08b1-483a-9f21-76665430e266", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 31 Oct 2017 08:45:28 GMT"
+            }
+        }
+    }
+}

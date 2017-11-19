@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Sid\":\"SharedInvoke\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-1:644160558196:function:func-b\"}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "fe879f84-932a-11e7-9aee-2baee057a3c6", 
+            "HTTPHeaders": {
+                "date": "Wed, 06 Sep 2017 17:44:11 GMT", 
+                "x-amzn-requestid": "fe879f84-932a-11e7-9aee-2baee057a3c6", 
+                "content-length": "230", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

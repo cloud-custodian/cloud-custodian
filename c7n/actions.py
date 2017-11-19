@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,73 @@
 """
 Actions to take on resources
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import base64
+from datetime import datetime
+import jmespath
 import logging
 import zlib
 
+import six
 from botocore.exceptions import ClientError
 
-from c7n.registry import PluginRegistry
 from c7n.executor import ThreadPoolExecutor
+from c7n.manager import resources
+from c7n.registry import PluginRegistry
+from c7n.resolver import ValuesFrom
 from c7n import utils
 from c7n.version import version as VERSION
+
+
+def average(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
+
+
+def distinct_count(values):
+    return float(len(set(values)))
+
+
+METRIC_OPS = {
+    'count': len,
+    'distinct_count': distinct_count,
+    'sum': sum,
+    'average': average,
+}
+
+METRIC_UNITS = [
+    # Time
+    'Seconds',
+    'Microseconds',
+    'Milliseconds',
+    # Bytes and Bits
+    'Bytes',
+    'Kilobytes',
+    'Megabytes',
+    'Gigabytes',
+    'Terabytes',
+    'Bits',
+    'Kilobits',
+    'Megabits',
+    'Gigabits',
+    'Terabits',
+    # Rates
+    'Bytes/Second',
+    'Kilobytes/Second',
+    'Megabytes/Second',
+    'Gigabytes/Second',
+    'Terabytes/Second',
+    'Bits/Second',
+    'Kilobits/Second',
+    'Megabits/Second',
+    'Gigabits/Second',
+    'Terabits/Second',
+    'Count/Second',
+    # Other Scalars
+    'Percent',
+    'Count',
+    'None'
+]
 
 
 class ActionRegistry(PluginRegistry):
@@ -32,6 +89,7 @@ class ActionRegistry(PluginRegistry):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
         self.register('invoke-lambda', LambdaInvoke)
+        self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
         results = []
@@ -53,7 +111,7 @@ class ActionRegistry(PluginRegistry):
         if action_class is None:
             raise ValueError(
                 "Invalid action type %s, valid actions %s" % (
-                    action_type, self.keys()))
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager).validate()
 
@@ -91,10 +149,10 @@ class Action(object):
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
-        except ClientError, e:
-            if (e.response['Error']['Code'] == 'DryRunOperation'
-                    and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
-                    and 'would have succeeded' in e.message):
+        except ClientError as e:
+            if (e.response['Error']['Code'] == 'DryRunOperation' and
+            e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
+            'would have succeeded' in e.response['Error']['Message']):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))
@@ -140,11 +198,11 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string', 'pattern': '^sg-*'},
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
-        }
+        'anyOf': [
+            {'required': ['isolation-group', 'remove', 'type']},
+            {'required': ['add', 'remove', 'type']},
+            {'required': ['add', 'type']}]
+    }
 
     def get_groups(self, resources, metadata_key=None):
         """Parse policies to get lists of security groups to attach to each resource
@@ -205,18 +263,18 @@ class ModifyVpcSecurityGroupsAction(Action):
 
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
-                remove_groups = r.get('c7n.matched-security-groups', ())
+                remove_groups = r.get('c7n:matched-security-groups', ())
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
                 remove_groups = remove_target_group_ids
-            elif isinstance(remove_target_group_ids, basestring):
+            elif isinstance(remove_target_group_ids, six.string_types):
                 remove_groups = [remove_target_group_ids]
 
             # Parse add_groups
             if isinstance(add_target_group_ids, list):
                 add_groups = add_target_group_ids
-            elif isinstance(add_target_group_ids, basestring):
+            elif isinstance(add_target_group_ids, six.string_types):
                 add_groups = [add_target_group_ids]
 
             # seems extraneous with list?
@@ -343,11 +401,15 @@ class Notify(EventAction):
 
     schema = {
         'type': 'object',
-        'required': ['type', 'transport', 'to'],
+        'anyOf': [
+            {'required': ['type', 'transport', 'to']},
+            {'required': ['type', 'transport', 'to_from']}],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_from': ValuesFrom.schema,
             'cc_manager': {'type': 'boolean'},
             'from': {'type': 'string'},
             'subject': {'type': 'string'},
@@ -364,12 +426,17 @@ class Notify(EventAction):
                      'properties': {
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
-                         }}]
-            }
+                     }}]
+            },
+            'assume_role': {'type': 'boolean'}
         }
     }
 
     batch_size = 250
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Notify, self).__init__(data, manager, log_dir)
+        self.assume_role = data.get('assume_role', True)
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -378,17 +445,37 @@ class Notify(EventAction):
             return ('sqs:SendMessage',)
         return ()
 
+    def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
+        p = self.data.copy()
+        if 'to_from' in self.data:
+            to_from = self.data['to_from'].copy()
+            to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
+        if 'cc_from' in self.data:
+            cc_from = self.data['cc_from'].copy()
+            cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
+        return p
+
     def process(self, resources, event=None):
-        aliases = self.manager.session_factory().client(
-            'iam').list_account_aliases().get('AccountAliases', ())
-        account_name = aliases and aliases[0] or ''
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
+        message = {
+            'event': event,
+            'account_id': self.manager.config.account_id,
+            'account': alias,
+            'region': self.manager.config.region,
+            'policy': self.manager.data}
+        message['action'] = self.expand_variables(message)
+
         for batch in utils.chunks(resources, self.batch_size):
-            message = {'resources': batch,
-                       'event': event,
-                       'account': account_name,
-                       'action': self.data,
-                       'region': self.manager.config.region,
-                       'policy': self.manager.data}
+            message['resources'] = batch
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
@@ -400,28 +487,57 @@ class Notify(EventAction):
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
 
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
     def send_sns(self, message):
         topic = self.data['transport']['topic']
-        region = topic.split(':', 5)[3]
-        client = self.manager.session_factory(region=region).client('sns')
-        client.publish(
-            TopicArn=topic,
-            Message=base64.b64encode(zlib.compress(utils.dumps(message)))
-            )
+        if topic.startswith('arn:aws:sns'):
+            region = region = topic.split(':', 5)[3]
+            topic_arn = topic
+        else:
+            region = message['region']
+            topic_arn = "arn:aws:sns:%s:%s:%s" % (
+                message['region'], message['account_id'], topic)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sns')
+        client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue']
-        region = queue.split('.', 2)[1]
-        client = self.manager.session_factory(region=region).client('sqs')
+        if queue.startswith('https://queue.amazonaws.com'):
+            region = 'us-east-1'
+            queue_url = queue
+        elif queue.startswith('https://sqs.'):
+            region = queue.split('.', 2)[1]
+            queue_url = queue
+        elif queue.startswith('arn:sqs'):
+            queue_arn_split = queue.split(':', 5)
+            region = queue_arn_split[3]
+            owner_id = queue_arn_split[4]
+            queue_name = queue_arn_split[5]
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
+        else:
+            region = self.manager.config.region
+            owner_id = self.manager.config.account_id
+            queue_name = queue
+            queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
+                region, owner_id, queue_name)
+        client = self.manager.session_factory(
+            region=region, assume=self.assume_role).client('sqs')
         attrs = {
             'mtype': {
                 'DataType': 'String',
                 'StringValue': self.C7N_DATA_MESSAGE,
-                },
-            }
+            },
+        }
         result = client.send_message(
-            QueueUrl=queue,
-            MessageBody=base64.b64encode(zlib.compress(utils.dumps(message))),
+            QueueUrl=queue_url,
+            MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
 
@@ -432,16 +548,25 @@ class AutoTagUser(EventAction):
     .. code-block:: yaml
 
       policies:
-        - name: ec2-auto-tag-owner
+        - name: ec2-auto-tag-ownercontact
           resource: ec2
+          description: |
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the OwnerContact tag. If missing it gets created
+            with the value of the ID of whomever called the RunInstances API
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
           filters:
-           - tag:Owner: absent
+           - tag:OwnerContact: absent
           actions:
-           - type: auto-tag-creator
+           - type: auto-tag-user
              tag: OwnerContact
 
-    There's a number of caveats to usage, resources which don't
-    include tagging as part of their api, may have some delay before
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
     automation kicks in to create a tag. Real world delay may be several
     minutes, with worst case into hours[0]. This creates a race condition
     between auto tagging and automation.
@@ -452,7 +577,7 @@ class AutoTagUser(EventAction):
 
     References
      - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
-     - CloudTrail User - http://goo.gl/XQhIG6 q
+     - CloudTrail User - http://goo.gl/XQhIG6
     """
 
     schema = utils.type_schema(
@@ -468,6 +593,7 @@ class AutoTagUser(EventAction):
                       ]}},
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
+           'principal_id_tag': {'type': 'string'}
            }
     )
 
@@ -493,32 +619,190 @@ class AutoTagUser(EventAction):
         user = None
         if utype == "IAMUser":
             user = event['userIdentity']['userName']
+            principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole":
             user = event['userIdentity']['arn']
             prefix, user = user.rsplit('/', 1)
+            principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):
                 return
-            # lambda function
+            # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
         if user is None:
             return
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
-            untagged = []
-            for r in resources:
-                found = False
-                for t in r.get('Tags', ()):
-                    if t['Key'] == self.data['tag']:
-                        found = True
+            untagged_resources = []
+            # iterating over all the resources the user spun up in this event
+            for resource in resources:
+                tag_already_set = False
+                for tag in resource.get('Tags', ()):
+                    if tag['Key'] == self.data['tag']:
+                        tag_already_set = True
                         break
-                if not found:
-                    untagged.append(r)
+                if not tag_already_set:
+                    untagged_resources.append(resource)
+        # if update is set to True, we will overwrite the userName tag even if
+        # the user already set a value
         else:
-            untagged = resources
+            untagged_resources = resources
 
         tag_action = self.manager.action_registry.get('tag')
-        tag_action(
-            {'key': self.data['tag'], 'value': user},
-            self.manager).process(untagged)
-        return untagged
+        new_tags = {
+            self.data['tag']: user
+        }
+        # if principal_id_key is set (and value), we'll set the principalId tag.
+        principal_id_key = self.data.get('principal_id_tag', None)
+        if principal_id_key and principal_id_value:
+            new_tags[principal_id_key] = principal_id_value
+        for key, value in six.iteritems(new_tags):
+            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        return new_tags
+
+
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
+            klass.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
+
+
+class PutMetric(BaseAction):
+    """Action to put metrics based on an expression into CloudWatch metrics
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: track-attached-ebs
+                resource: ec2
+                comment: |
+                  Put the count of the number of EBS attached disks to an instance
+                filters:
+                  - Name: tracked-ec2-instance
+                actions:
+                  - type: put-metric
+                    key: Reservations[].Instances[].BlockDeviceMappings[].DeviceName
+                    namespace: Usage Metrics
+                    metric_name: Attached Disks
+                    op: count
+                    units: Files
+
+    op and units are optional and will default to simple Counts.
+    """
+    # permissions are typically lowercase servicename:TitleCaseActionName
+    permissions = {'cloudwatch:PutMetricData', }
+    schema = {
+        'type': 'object',
+        'required': ['type', 'key', 'namespace', 'metric_name'],
+        'properties': {
+            'type': {'enum': ['put-metric', ]},
+            'key': {'type': 'string'},  # jmes path
+            'namespace': {'type': 'string'},
+            'metric_name': {'type': 'string'},
+            'dimensions':
+                {'type':'array',
+                'items': {
+                    'type':'object'
+                },
+            },
+            'op': {'enum': list(METRIC_OPS.keys())},
+            'units': {'enum': METRIC_UNITS}
+        }
+    }
+
+    def process(self, resources):
+        ns = self.data['namespace']
+        metric_name = self.data['metric_name']
+        key_expression = self.data.get('key', 'Resources[]')
+        operation = self.data.get('op', 'count')
+        units = self.data.get('units', 'Count')
+        # dimensions are passed as a list of dicts
+        dimensions = self.data.get('dimensions', [])
+
+        now = datetime.utcnow()
+
+        # reduce the resources by the key expression, and apply the operation to derive the value
+        values = []
+        self.log.debug("searching for %s in %s", key_expression, resources)
+        try:
+            values = jmespath.search("Resources[]." + key_expression,
+                                     {'Resources': resources})
+            # I had to wrap resourses in a dict like this in order to not have jmespath expressions
+            # start with [] in the yaml files.  It fails to parse otherwise.
+        except TypeError as oops:
+            self.log.error(oops.message)
+
+        value = 0
+        try:
+            f = METRIC_OPS[operation]
+            value = f(values)
+        except KeyError:
+            self.log.error("Bad op for put-metric action: %s", operation)
+
+        # for demo purposes
+        # from math import sin, pi
+        # value = sin((now.minute * 6 * 4 * pi) / 180) * ((now.hour + 1) * 4.0)
+
+        metrics_data = [
+            {
+                'MetricName': metric_name,
+                'Dimensions': [{'Name': i[0], 'Value': i[1]}
+                               for d in dimensions
+                               for i in d.items()],
+                'Timestamp': now,
+                'Value': value,
+                # TODO: support an operation of 'stats' to include this
+                # structure instead of a single Value
+                # Value and StatisticValues are mutually exclusive.
+                # 'StatisticValues': {
+                #     'SampleCount': 1,
+                #     'Sum': 123.0,
+                #     'Minimum': 123.0,
+                #     'Maximum': 123.0
+                # },
+                'Unit': units,
+            },
+        ]
+
+        client = self.manager.session_factory().client('cloudwatch')
+        client.put_metric_data(Namespace=ns, MetricData=metrics_data)
+
+        return resources
+
+
+class RemovePolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    def process_policy(self, policy, resource, matched_key):
+        statement_ids = self.data.get('statement_ids')
+
+        found = []
+        statements = policy.get('Statement', [])
+        resource_statements = resource.get(
+            matched_key, ())
+
+        for s in list(statements):
+            if statement_ids == 'matched':
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['statement_ids']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return None, found
+        return statements, found

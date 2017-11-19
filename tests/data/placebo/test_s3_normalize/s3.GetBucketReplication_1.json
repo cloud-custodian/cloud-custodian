@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "wLUkh6L6J1UrEgNoSvt8UU0+Xss2iOtHaLnpGca3l7UUJOWbzzWmQ8yub+u6YTzWQwOxJ5q/5dE=", 
+            "RequestId": "CE29429D961FF918", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "wLUkh6L6J1UrEgNoSvt8UU0+Xss2iOtHaLnpGca3l7UUJOWbzzWmQ8yub+u6YTzWQwOxJ5q/5dE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "CE29429D961FF918", 
+                "date": "Thu, 10 Aug 2017 14:12:41 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The replication configuration was not found", 
+            "Code": "ReplicationConfigurationNotFoundError", 
+            "BucketName": "custodian-test-data-23"
+        }
+    }
+}

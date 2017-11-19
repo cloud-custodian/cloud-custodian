@@ -37,5 +37,5 @@ Instance Age Filter
        - name: old-instances
          resource: ec2
          filters:
-           type: instance-age
-           days: 90
+           - type: instance-age
+             days: 90

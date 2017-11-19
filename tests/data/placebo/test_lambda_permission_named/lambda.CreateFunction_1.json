@@ -1,0 +1,32 @@
+{
+    "status_code": 201, 
+    "data": {
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        }, 
+        "CodeSha256": "NLea8ZDC16RKlQpOPkJ3qYnYL4u5eUGsGw9SZGrB910=", 
+        "FunctionName": "func-d", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "47cb3da9-932e-11e7-8141-a18cd72cfa6e", 
+            "HTTPHeaders": {
+                "date": "Wed, 06 Sep 2017 18:07:43 GMT", 
+                "x-amzn-requestid": "47cb3da9-932e-11e7-8141-a18cd72cfa6e", 
+                "content-length": "561", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "CodeSize": 168, 
+        "MemorySize": 128, 
+        "FunctionArn": "arn:aws:lambda:us-west-1:644160558196:function:func-d", 
+        "Version": "7", 
+        "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+        "Timeout": 3, 
+        "LastModified": "2017-09-06T18:07:44.060+0000", 
+        "Handler": "index.handler", 
+        "Runtime": "python2.7", 
+        "Description": ""
+    }
+}

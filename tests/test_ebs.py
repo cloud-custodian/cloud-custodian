@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
+import sys
 
 from botocore.exceptions import ClientError
 
-from common import BaseTest
+from .common import BaseTest
 from c7n.resources.ebs import (
     CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot, Delete)
 from c7n.executor import MainThreadExecutor
@@ -136,6 +139,58 @@ class AttachedInstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class ResizeTest(BaseTest):
+
+    def test_resize_action(self):
+        factory = self.replay_flight_data('test_ebs_modifyable_action')
+        client = factory().client('ec2')
+        # Change a volume from 32 gb gp2 and 100 iops (sized based) to
+        # 64gb and 500 iops.
+        vol_id = 'vol-0073dcd216489ea1b'
+        p = self.load_policy({
+            'name': 'resizable',
+            'resource': 'ebs',
+            'filters': [
+                'modifyable', {'VolumeId': vol_id}],
+            'actions': [{
+                'type': 'modify',
+                'volume-type': 'io1',
+                'size-percent': 200,
+                'iops-percent': 500
+                }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['Iops'], 100)
+        self.assertEqual(resources[0]['Size'], 32)
+        vol = client.describe_volumes(VolumeIds=[vol_id])['Volumes'][0]
+        self.assertEqual(vol['Iops'], 500)
+        self.assertEqual(vol['Size'], 64)
+        
+    def test_resize_filter(self):
+        # precondition, 6 volumes, 4 not modifyable.
+        factory = self.replay_flight_data('test_ebs_modifyable_filter')
+        output = self.capture_logging('custodian.filters', level=logging.DEBUG)
+        p = self.load_policy({
+            'name': 'resizable',
+            'resource': 'ebs',
+            'filters': ['modifyable']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(
+            {r['VolumeId'] for r in resources},
+            set(('vol-0073dcd216489ea1b', 'vol-0e4cba7adc4764f79')))
+
+        # normalizing on str/unicode repr output between versions.. punt
+        if sys.version_info[0] > 2:
+            return
+
+        self.assertEqual(
+            output.getvalue().strip(),
+            ("filtered 4 of 6 volumes due to [(u'instance-type', 2), "
+             "(u'vol-mutation', 1), (u'vol-type', 1)]"))
+
+
+
 class CopyInstanceTagsTest(BaseTest):
 
     def test_copy_instance_tags(self):
@@ -168,6 +223,31 @@ class CopyInstanceTagsTest(BaseTest):
         self.assertEqual(tags['Name'], 'CompileLambda')
 
 
+class VolumeSnapshotTest(BaseTest):
+
+    def test_volume_snapshot(self):
+        factory = self.replay_flight_data('test_ebs_snapshot')
+        policy = self.load_policy(
+            {
+                'name': 'test-ebs-snapshot',
+                'resource': 'ebs',
+                'filters': [{'VolumeId': 'vol-01adbb6a4f175941d'}],
+                'actions': ['snapshot'],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        snapshot_data = factory().client('ec2').describe_snapshots(
+            Filters=[
+                {
+                    'Name': 'volume-id',
+                    'Values': ['vol-01adbb6a4f175941d'],
+                },
+            ]
+        )
+        self.assertEqual(len(snapshot_data['Snapshots']), 1)
+
+
 class VolumeDeleteTest(BaseTest):
 
     def test_volume_delete_force(self):
@@ -197,26 +277,36 @@ class EncryptExtantVolumesTest(BaseTest):
     def test_encrypt_volumes(self):
         self.patch(
             EncryptInstanceVolumes, 'executor_factory', MainThreadExecutor)
-        output = self.capture_logging(level=logging.DEBUG)
-
         session_factory = self.replay_flight_data('test_encrypt_volumes')
-
         policy = self.load_policy({
             'name': 'ebs-remediate-attached',
             'resource': 'ebs',
             'filters': [
                 {'Encrypted': False},
-                {'VolumeId': 'vol-fdd1f844'}],
+                {'VolumeId': 'vol-0f53c81b92b4ecfce'}],
             'actions': [
                 {'type': 'encrypt-instance-volumes',
-                 'delay': 0.1,
-                 'key': 'alias/ebs/crypto'}]},
+                 'delay': 0.001,
+                 'key': 'alias/encryptebs'}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['Encrypted'], False)
-
+        for r in resources:
+            volumes = session_factory().client('ec2').describe_volumes(
+                Filters=[{
+                    'Name':'attachment.instance-id',
+                    'Values': [
+                        r['Attachments'][0]['InstanceId']
+                    ]
+                }]
+            )
+            for v in volumes['Volumes']:
+                self.assertTrue(v['Attachments'][0]['DeleteOnTermination'])
+                self.assertTrue(v['Encrypted'])
+                if 'Tags' in v:
+                    self.assertNotIn('maid-crypt-remediation', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-origin-volume', [i['Key'] for i in v['Tags']])
+                    self.assertNotIn('maid-instance-device', [i['Key'] for i in v['Tags']])
 
 class TestKmsAlias(BaseTest):
 

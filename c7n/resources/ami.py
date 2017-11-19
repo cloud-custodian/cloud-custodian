@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
 import logging
 
@@ -20,8 +22,6 @@ from c7n.filters import FilterRegistry, AgeFilter, Filter, OPERATORS
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
-
-from c7n.resources.asg import ASG, LaunchConfig
 
 
 log = logging.getLogger('custodian.ami')
@@ -38,7 +38,7 @@ class AMI(QueryResourceManager):
         service = 'ec2'
         type = 'image'
         enum_spec = (
-            'describe_images', 'Images', {'Owners': ['self']})
+            'describe_images', 'Images', None)
         detail_spec = None
         id = 'ImageId'
         filter_name = 'ImageIds'
@@ -49,6 +49,12 @@ class AMI(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+    def resources(self, query=None):
+        query = query or {}
+        if query.get('Owners') is None:
+            query['Owners'] = ['self']
+        return super(AMI, self).resources(query=query)
 
 
 @actions.register('deregister')
@@ -139,7 +145,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': OPERATORS.keys()},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
         days={'type': 'number', 'minimum': 0})
 
 

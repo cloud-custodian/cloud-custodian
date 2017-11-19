@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ concurrent.futures implementation over sqs
 Scatter/Gather or Map/Reduce style over two sqs queues.
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import random
 import logging
@@ -64,7 +65,7 @@ class SQSExecutor(Executor):
                 'op': {
                     'StringValue': named(func),
                     'DataType': 'String',
-                    },
+                },
                 'ser': {
                     'StringValue': 'json',
                     'DataType': 'String'}}
@@ -77,15 +78,13 @@ class SQSExecutor(Executor):
     def gather(self):
         """Fetch results from separate queue
         """
-        client = utils.local_session(self.session_factory).client('sqs')
         limit = self.op_sequence - self.op_sequence_start
         results = MessageIterator(self.sqs, self.reduce_queue, limit)
         for m in results:
             # sequence_id from above
             msg_id = int(m['MessageAttributes']['sequence_id']['StringValue'])
-            if (not msg_id > self.op_sequence_start
-                or not msg_id <= self.op_sequence
-                or not msg_id in self.futures):
+            if (not msg_id > self.op_sequence_start or not msg_id <= self.op_sequence or
+            msg_id not in self.futures):
                 raise RuntimeError(
                     "Concurrent queue user from different "
                     "process or previous results")
@@ -114,12 +113,7 @@ class MessageIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.client.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.client.receive_message(
@@ -133,6 +127,13 @@ class MessageIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # back-compat
+
+    def ack(self, m):
+        self.client.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class SQSWorker(object):
@@ -160,7 +161,7 @@ class SQSWorker(object):
 
         try:
             func(*msg['args'], **msg['kwargs'])
-        except Exception, e:
+        except Exception as e:
             log.exception(
                 "Error invoking %s %s" % (
                     op_name, e))

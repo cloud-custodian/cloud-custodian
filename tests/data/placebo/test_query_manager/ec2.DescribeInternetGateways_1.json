@@ -4,38 +4,26 @@
         "InternetGateways": [
             {
                 "Tags": [], 
-                "InternetGatewayId": "igw-3d9e3d56", 
                 "Attachments": [
                     {
                         "State": "available", 
-                        "VpcId": "vpc-399e3d52"
+                        "VpcId": "vpc-d2d616b5"
                     }
-                ]
-            }, 
-            {
-                "Tags": [], 
-                "InternetGatewayId": "igw-5bce113e", 
-                "Attachments": [
-                    {
-                        "State": "available", 
-                        "VpcId": "vpc-cb3e8cae"
-                    }
-                ]
-            }, 
-            {
-                "Tags": [], 
-                "InternetGatewayId": "igw-e74b2b82", 
-                "Attachments": [
-                    {
-                        "State": "available", 
-                        "VpcId": "vpc-1cc8e779"
-                    }
-                ]
+                ], 
+                "InternetGatewayId": "igw-2e65104a"
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "cf33d5da-5bbd-47ba-810e-277d1be64cfa"
+            "RequestId": "2777007b-6525-463d-b96b-7db19c7520ad", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 27 Jun 2017 18:55:21 GMT"
+            }
         }
     }
 }

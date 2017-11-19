@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 
+import six
 from unittest import TestCase
 
 from c7n.logs_support import (
@@ -37,7 +40,7 @@ def log_lines():
 
 class TestLogsSupport(TestCase):
 
-    def test_normailization(self):
+    def test_normalization(self):
         raw_entries = log_lines()
         log_gen = normalized_log_entries(raw_entries)
         nrm_entries = list(log_gen)
@@ -48,8 +51,8 @@ class TestLogsSupport(TestCase):
         entry = nrm_entries[1]
         self.assertIn('timestamp', entry)
         self.assertIn('message', entry)
-        self.assertIsInstance(entry['timestamp'], long)
-        self.assertIsInstance(entry['message'], str)
+        self.assertIsInstance(entry['timestamp'], six.integer_types)
+        self.assertIsInstance(entry['message'], six.text_type)
 
     def test_entries_in_range(self):
         raw_entries = log_lines()
@@ -70,5 +73,5 @@ class TestLogsSupport(TestCase):
     def test_timestamp_from_string(self):
         tfs = _timestamp_from_string
         date_text = '2016-11-21 13:13:41'
-        self.assertIsInstance(tfs(date_text), long)
+        self.assertIsInstance(tfs(date_text), six.integer_types)
         self.assertEqual(tfs('not a date'), 0)

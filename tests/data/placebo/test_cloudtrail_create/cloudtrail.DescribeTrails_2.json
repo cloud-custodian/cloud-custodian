@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "trailList": [
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "nosetest", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/nosetest", 
+                "LogFileValidationEnabled": false, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": false, 
+                "S3BucketName": "nosetest-bucket", 
+                "HomeRegion": "us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "989f2739-ed81-11e6-9205-e16fedb50da3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "989f2739-ed81-11e6-9205-e16fedb50da3", 
+                "date": "Tue, 07 Feb 2017 22:05:54 GMT", 
+                "content-length": "288", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

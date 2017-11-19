@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import os
 
@@ -23,40 +25,23 @@ from c7n.mu import (
 
 entry_source = """\
 import logging
-logging.root.setLevel(logging.DEBUG)
 
 from c7n_mailer import handle
 
+logger = logging.getLogger('custodian.mailer')
+log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(level=logging.INFO, format=log_format)
+logging.getLogger('botocore').setLevel(logging.WARNING)
+
 def dispatch(event, context):
-    return handle.run(event, context)
+    return handle.start_c7n_mailer(logger)
 """
 
 
 def get_archive(config):
-
-    required = ['ldap3', 'pyasn1', 'jinja2', 'markupsafe','yaml', 'memcached']
-    remove = ['_yaml.so', 'c7n.egg-link']
-
-    def lib_filter(root, dirs, files):
-        for f in tuple(files):
-            if f.endswith('.pyo'):
-                files.remove(f)
-        for r in remove:
-            if r in files:
-                files.remove(r)
-
-        if os.path.basename(root) == 'site-packages':
-            for n in tuple(dirs):
-                if n not in required:
-                    dirs.remove(n)
-        return dirs, files
-
     archive = PythonPackageArchive(
-        os.path.dirname(__file__),
-        skip='*.pyc',
-        lib_filter=lib_filter)
-
-    archive.create()
+        'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'ruamel',
+        'redis')
 
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'msg-templates'))
@@ -77,12 +62,13 @@ def provision(config, session_factory):
         name='cloud-custodian-mailer',
         description='Cloud Custodian Mailer',
         handler='periodic.dispatch',
-        runtime='python2.7',
+        runtime=config['runtime'],
         memory_size=config['memory'],
         timeout=config['timeout'],
         role=config['role'],
         subnets=config['subnets'],
         security_groups=config['security_groups'],
+        dead_letter_config=config.get('dead_letter_config', {}),
         events=[
             CloudWatchEventSource(
                 {'type': 'periodic',
@@ -90,7 +76,6 @@ def provision(config, session_factory):
                 session_factory,
                 prefix="")
         ])
-
 
     archive = get_archive(config)
     func = LambdaFunction(func_config, archive)
