@@ -640,9 +640,9 @@ class Delete(BaseAction):
 @actions.register('set-snapshot-copy-tags')
 class CopySnapshotTags(BaseAction):
     """Enables copying tags from rds instance to snapshot
-    
+
         .. code-block: yaml
-        
+
             policies:
               - name: enable-rds-snapshot-tags
                 resource: rds
@@ -678,8 +678,7 @@ class CopySnapshotTags(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
         c.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
-            CopyTagsToSnapshot=self.data.get('enable', True)
-)
+            CopyTagsToSnapshot=self.data.get('enable', True))
 
 
 @actions.register('snapshot')
