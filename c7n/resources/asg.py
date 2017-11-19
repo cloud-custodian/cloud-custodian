@@ -709,27 +709,36 @@ class PropagatedTagFilter(Filter):
                   - type: propagated-tags
                     keys: ["ABC", "BCD"]
                     match: false
+                    propagate: true
     """
     schema = type_schema(
         'progagated-tags',
         keys={'type': 'array', 'items': {'type': 'string'}},
-        match={'type': 'boolean'})
+        match={'type': 'boolean'},
+        propagate={'type': 'boolean'})
     permissions = (
         "autoscaling:DescribeLaunchConfigurations",
         "autoscaling:DescribeAutoScalingGroups")
 
     def process(self, asgs, event=None):
         keys = self.data.get('keys', [])
+        match = self.data.get('match', True)
         results = []
         for asg in asgs:
-            tags = [
-                t['Key'] for t in asg.get(
-                    'Tags', []) if t['Key'] in keys and t['PropagateAtLaunch']]
-            if all(k in tags for k in keys) == self.data.get('match', True):
-                results.append(asg)
-
-        self.log.info("Filtered %s to %s asg" % (
-            len(asgs), len(results)))
+            if self.data.get('propagate', True):
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+            else:
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and not t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
         return results
 
 
