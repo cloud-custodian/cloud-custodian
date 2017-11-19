@@ -625,7 +625,7 @@ class RDSSnapshotTest(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
         p = self.load_policy({
@@ -641,7 +641,7 @@ class RDSSnapshotTest(BaseTest):
                 'enable': True}]}, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
         p = self.load_policy({
@@ -653,7 +653,7 @@ class RDSSnapshotTest(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
     def test_rds_snapshot_copy_tags_disable(self):
@@ -668,7 +668,7 @@ class RDSSnapshotTest(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
         p = self.load_policy({
@@ -684,7 +684,7 @@ class RDSSnapshotTest(BaseTest):
                 'enable': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
         p = self.load_policy({
@@ -696,7 +696,7 @@ class RDSSnapshotTest(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources),
+        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
                         ['c7n-aurora-index', 'c7n-aurora-test'])
 
     def test_rds_snapshot_access(self):
