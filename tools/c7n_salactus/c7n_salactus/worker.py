@@ -304,6 +304,10 @@ def process_account(account_info):
     buckets = [n['Name'] for n in buckets
                if not account_buckets or
                n['Name'] in account_buckets]
+    account_not_buckets = account_info.pop('not-buckets', None)
+    buckets = [n for n in buckets
+               if not account_not_buckets or
+               n not in account_not_buckets]
     log.info("processing %d buckets in account %s",
              len(buckets), account_info['name'])
     for bucket_set in chunks(buckets, 50):
@@ -914,7 +918,7 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
         except ClientError as e:
             #  https://goo.gl/HZLv9b
             code = e.response['Error']['Code']
-            if code in ('403', 'AccessDenied'):  # Permission Denied
+            if code in ('403', 'AccessDenied', '405', 'MethodNotAllowed'):  # Permission Denied
                 stats['denied'] += 1
                 if object_reporting:
                     stats['objects_denied'].append(k)

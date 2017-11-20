@@ -166,7 +166,7 @@ class QueryMeta(type):
                 '%s.filters' % name.lower())
         if 'action_registry' not in attrs:
             attrs['action_registry'] = ActionRegistry(
-                '%s.filters' % name.lower())
+                '%s.actions' % name.lower())
 
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])

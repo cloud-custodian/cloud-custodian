@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/c7n-delete-bucket-notification-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "XZ1DulqMqgEXE9MWBD0RyA5oLFW6aJxT1cXbFQMgu262+KJH6P9aSA1IuuO38fbGZf9SiAkgbEA=", 
+            "RequestId": "1F262BF47CDF2872", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "XZ1DulqMqgEXE9MWBD0RyA5oLFW6aJxT1cXbFQMgu262+KJH6P9aSA1IuuO38fbGZf9SiAkgbEA=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "1F262BF47CDF2872", 
+                "location": "/c7n-delete-bucket-notification-test", 
+                "date": "Fri, 15 Sep 2017 19:55:12 GMT"
+            }
+        }
+    }
+}

@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 import unittest
+import time
 
 from datetime import datetime
 from dateutil import tz
@@ -492,6 +493,42 @@ class TestStop(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+
+class TestReboot(BaseTest):
+
+    def test_ec2_reboot(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_reboot')
+        policy = self.load_policy({
+            'name': 'ec2-test-reboot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'reboot'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        running = []
+        for i in resources:
+            if i['State']['Name'] == 'running':
+                running.append(i['InstanceId'])
+        if self.recording:
+            time.sleep(25)  
+        instances = utils.query_instances(
+            session_factory(),
+            InstanceIds=[r['InstanceId'] for r in resources])
+
+        cur_running = []
+        for i in instances:
+            if i['State']['Name'] == 'running':
+                cur_running.append(i['InstanceId'])
+
+        cur_running.sort()
+        running.sort()
+
+        self.assertEqual(cur_running, running)
+   
 
 class TestStart(BaseTest):
 

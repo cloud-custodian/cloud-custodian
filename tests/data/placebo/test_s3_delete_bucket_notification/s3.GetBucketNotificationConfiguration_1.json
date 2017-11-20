@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "+Ya03jbhZuD7BzOUyya0hK/VQwjNrrt7IL4pDhBKNS0iQRYZNdSKxB+3HfCIsvcuwuWz/Xjpono=", 
+            "RequestId": "22AB8864FA9C4D43", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "+Ya03jbhZuD7BzOUyya0hK/VQwjNrrt7IL4pDhBKNS0iQRYZNdSKxB+3HfCIsvcuwuWz/Xjpono=", 
+                "date": "Fri, 15 Sep 2017 19:55:13 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "22AB8864FA9C4D43", 
+                "server": "AmazonS3"
+            }
+        }, 
+        "TopicConfigurations": [
+            {
+                "Id": "c7n-notify-1", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:bucket-notification-test", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }, 
+            {
+                "Id": "another1", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:bucket-notification-test", 
+                "Events": [
+                    "s3:ObjectRemoved:*"
+                ]
+            }
+        ]
+    }
+}

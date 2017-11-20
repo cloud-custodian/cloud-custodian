@@ -5,7 +5,7 @@ import boto3
 import functools
 import jsonschema
 import logging
-import yaml
+from ruamel import yaml
 
 from c7n_mailer import deploy, utils
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
@@ -22,6 +22,7 @@ CONFIG_SCHEMA = {
         # Standard Lambda Function Config
         'region': {'type': 'string'},
         'role': {'type': 'string'},
+        'runtime': {'type': 'string'},
         'memory': {'type': 'integer'},
         'timeout': {'type': 'integer'},
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
