@@ -110,3 +110,39 @@ class NotifyTest(BaseTest):
 
         resources = policy.poll()
         self.assertJmes('[]."c7n:MatchedFilters"', resources, [['tag:Testing']])
+
+    def test_notify_region_var(self):
+        session_factory = self.replay_flight_data(
+            "test_notify_region_var")
+        client = session_factory().client('sqs')
+
+        queue_url = 'https://sqs.{region}.amazonaws.com/123456789012/test-q'
+        region_format = {'region': 'us-east-1'}
+        client.purge_queue(QueueUrl=queue_url.format(**region_format))
+
+        policy = self.load_policy({
+            'name': 'instance-check',
+            'resource': 'ec2',
+            'filters': [{'tag:k1': 'v1'}],
+            'actions': [
+                {'type': 'notify',
+                 'to': ['someon@example.com'],
+                 'transport' : {
+                     'type': 'sqs',
+                     'queue': queue_url,
+                     }
+                 }
+                ]
+            },
+            config={'region': 'us-east-1'},
+            session_factory=session_factory)
+
+        resources = policy.poll()
+        self.assertJmes('[]."c7n:MatchedFilters"', resources, [['tag:k1']])
+
+        messages = client.receive_message(
+            QueueUrl=queue_url.format(**region_format),
+            AttributeNames=['All']).get('Messages', [])
+        self.assertEqual(len(messages), 1)
+        body = json.loads(zlib.decompress(base64.b64decode(messages[0]['Body'])))
+        self.assertTrue("tag:k1" in body.get('resources')[0].get('c7n:MatchedFilters'))
