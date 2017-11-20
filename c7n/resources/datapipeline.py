@@ -17,9 +17,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
+from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import chunks, local_session, get_retry
+from c7n.utils import chunks, local_session, get_retry, type_schema
 
 
 @resources.register('datapipeline')
@@ -77,3 +78,37 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
     with executor_factory(max_workers=2) as w:
         return list(w.map(process_tags, chunks(pipes, 20)))
+
+
+@DataPipeline.action_registry.register('delete')
+class Delete(BaseAction):
+    """Action to delete DataPipeline
+
+    It is recommended to use a filter to avoid unwanted deletion of DataPipeline
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: datapipeline-delete
+                resource: datapipeline
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("datapipeline:DeletePipeline",)
+
+    def process(self, pipelines):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_pipeline, pipelines))
+
+    def process_pipeline(self, pipeline):
+        client = local_session(
+            self.manager.session_factory).client('datapipeline')
+        try:
+            client.delete_pipeline(pipelineId=pipeline['id'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting pipeline:\n %s" % e)
