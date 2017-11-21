@@ -18,6 +18,7 @@ from .common import BaseTest, functional
 import base64
 import json
 import tempfile
+import time
 import zlib
 
 
@@ -111,14 +112,24 @@ class NotifyTest(BaseTest):
         resources = policy.poll()
         self.assertJmes('[]."c7n:MatchedFilters"', resources, [['tag:Testing']])
 
+    @functional
     def test_notify_region_var(self):
         session_factory = self.replay_flight_data(
             "test_notify_region_var")
-        client = session_factory().client('sqs')
 
-        queue_url = 'https://sqs.{region}.amazonaws.com/123456789012/test-q'
+        ec2 = session_factory().resource('ec2')
+        instance = ec2.create_instances(ImageId='ami-6057e21a', MinCount=1, MaxCount=1)[0].id
+        ec2_client = session_factory().client('ec2')
+        ec2_client.create_tags(Resources=[instance], Tags=[{'Key':'k1', 'Value':'v1'}])
+        self.addCleanup(ec2_client.terminate_instances, InstanceIds=[instance])
+
+        sqs_client = session_factory().client('sqs')
+        queue_url = sqs_client.create_queue(
+            QueueName='c7n-test-q')['QueueUrl']
+        self.addCleanup(sqs_client.delete_queue, QueueUrl=queue_url)
         region_format = {'region': 'us-east-1'}
-        client.purge_queue(QueueUrl=queue_url.format(**region_format))
+
+        if self.recording: time.sleep(30)
 
         policy = self.load_policy({
             'name': 'instance-check',
@@ -129,7 +140,7 @@ class NotifyTest(BaseTest):
                  'to': ['someon@example.com'],
                  'transport' : {
                      'type': 'sqs',
-                     'queue': queue_url,
+                     'queue': 'arn:aws:sqs:{region}:123456789012:c7n-test-q'
                      }
                  }
                 ]
@@ -140,7 +151,7 @@ class NotifyTest(BaseTest):
         resources = policy.poll()
         self.assertJmes('[]."c7n:MatchedFilters"', resources, [['tag:k1']])
 
-        messages = client.receive_message(
+        messages = sqs_client.receive_message(
             QueueUrl=queue_url.format(**region_format),
             AttributeNames=['All']).get('Messages', [])
         self.assertEqual(len(messages), 1)

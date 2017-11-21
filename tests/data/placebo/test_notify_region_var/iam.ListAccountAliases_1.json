@@ -2,16 +2,16 @@
     "status_code": 200, 
     "data": {
         "AccountAliases": [
-            "custodian-skunk-works"
+            "test-account-alias"
         ], 
         "IsTruncated": false, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "de7b718c-ce40-11e7-864e-27066e4731d9", 
+            "RequestId": "692b0391-ced2-11e7-a864-69b79066abd1", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "de7b718c-ce40-11e7-864e-27066e4731d9", 
-                "date": "Mon, 20 Nov 2017 22:19:26 GMT", 
+                "x-amzn-requestid": "692b0391-ced2-11e7-a864-69b79066abd1", 
+                "date": "Tue, 21 Nov 2017 15:41:15 GMT", 
                 "content-length": "400", 
                 "content-type": "text/xml"
             }

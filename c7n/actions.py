@@ -514,7 +514,7 @@ class Notify(EventAction):
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]
