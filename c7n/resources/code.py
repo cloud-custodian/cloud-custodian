@@ -13,9 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
+from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import get_retry
+from c7n.utils import local_session, get_retry, type_schema
 
 
 @resources.register('codecommit')
@@ -36,6 +39,40 @@ class CodeRepository(QueryResourceManager):
         filter_name = None
 
 
+@CodeRepository.action_registry.register('delete')
+class DeleteRepository(BaseAction):
+    """Action to delete code commit
+
+    It is recommended to use a filter to avoid unwanted deletion of repos
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: codecommit-delete
+                resource: codecommit
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("codecommit:DeleteRepository",)
+
+    def process(self, repositories):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_repository, repositories))
+
+    def process_repository(self, repository):
+        client = local_session(
+            self.manager.session_factory).client('codecommit')
+        try:
+            client.delete_repository(repositoryName=repository['repositoryName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting repo:\n %s" % e)
+
+
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
 
@@ -48,6 +85,40 @@ class CodeBuildProject(QueryResourceManager):
         date = 'created'
         dimension = None
         filter_name = None
+
+
+@CodeBuildProject.action_registry.register('delete')
+class DeleteProject(BaseAction):
+    """Action to delete code build
+
+    It is recommended to use a filter to avoid unwanted deletion of builds
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: codebuild-delete
+                resource: codebuild
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("codebuild:DeleteProject",)
+
+    def process(self, projects):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_project, projects))
+
+    def process_project(self, project):
+        client = local_session(
+            self.manager.session_factory).client('codebuild')
+        try:
+            client.delete_project(name=project['name'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting project:\n %s" % e)
 
 
 @resources.register('codepipeline')

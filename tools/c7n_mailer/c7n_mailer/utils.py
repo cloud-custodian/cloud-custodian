@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import jinja2
 import json
 import os
-import yaml
+from ruamel import yaml
 
-from io import StringIO
 from dateutil import parser
 from dateutil.tz import gettz
 
@@ -92,6 +93,7 @@ def setup_defaults(config):
     config.setdefault('region', 'us-east-1')
     config.setdefault('ses_region', config.get('region'))
     config.setdefault('memory', 1024)
+    config.setdefault('runtime', 'python2.7')
     config.setdefault('timeout', 300)
     config.setdefault('subnets', None)
     config.setdefault('security_groups', None)
@@ -111,9 +113,7 @@ def get_date_time_delta(delta):
 
 
 def format_struct(evt):
-    buf = StringIO()
-    json.dump(evt, buf, indent=2)
-    return buf.getvalue()
+    return json.dumps(evt, indent=2, ensure_ascii=False)
 
 
 def get_resource_tag_value(resource, k):
@@ -268,5 +268,4 @@ def resource_format(resource, resource_type):
             resource['CreationDateTime'],
             resource['TableStatus'])
     else:
-        print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)
