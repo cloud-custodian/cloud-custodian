@@ -175,11 +175,11 @@ class KMSTest(BaseTest):
 class KMSTagging(BaseTest):
 
     def test_kms_key_tag(self):
-        session_factory = self.record_flight_data('test_kms_key_tag')
+        session_factory = self.replay_flight_data('test_kms_key_tag')
         client = session_factory().client('kms')
         key_id = client.create_key()['KeyMetadata']['KeyId']
-        self.addCleanup(
-            client.schedule_key_deletion, KeyId=key_id, PendingWindowInDays=7)
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id,
+                        PendingWindowInDays=7)
         policy = self.load_policy({
             'name': 'kms-key-tag',
             'resource': 'kms-key',
@@ -192,4 +192,31 @@ class KMSTagging(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.list_resource_tags(KeyId=key_id)['Tags']
         self.assertEqual(tags[0]['TagKey'], 'RequisiteKey')
-        self.assertEqual(tags[0]['TagValue'], 'Required')
+
+    def test_kms_key_remove_tag(self):
+        session_factory = self.replay_flight_data('test_kms_key_remove_tag')
+        client = session_factory().client('kms')
+        key_id = client.create_key()['KeyMetadata']['KeyId']
+        client.tag_resource(
+            KeyId=key_id,
+            Tags=[{'TagKey': 'ExpiredTag', 'TagValue': 'Cleanup'}])
+
+        tags = client.list_resource_tags(KeyId=key_id)['Tags']
+        self.assertEqual(len(tags), 1)
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id,
+                        PendingWindowInDays=7)
+
+        policy = self.load_policy({
+            'name': 'kms-key-remove-tag',
+            'resource': 'kms-key',
+            'filters': [
+                {'KeyId': key_id},
+                {'tag:ExpiredTag': 'Cleanup'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['ExpiredTag']}]}, session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertTrue(len(resources), 1)
+        tags = client.list_resource_tags(KeyId=key_id)['Tags']
+        self.assertEqual(len(tags), 0)
