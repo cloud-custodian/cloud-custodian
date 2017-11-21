@@ -20,7 +20,7 @@ import os
 import tempfile
 from six import binary_type
 
-from .common import Bag, BaseTest
+from .common import Bag, BaseTest, Config
 from .test_s3 import destroyBucket
 
 from c7n.resolver import ValuesFrom, URIResolver
@@ -94,7 +94,8 @@ class UrlValueTest(BaseTest):
         os.chdir(self.old_dir)
 
     def get_values_from(self, data, content):
-        mgr = Bag({'session_factory': None, '_cache': None})
+        config = Config.empty()
+        mgr = Bag({'session_factory': None, '_cache': None, 'config': config})
         values = ValuesFrom(data, mgr)
         values.resolver = FakeResolver(content)
         return values

@@ -15,13 +15,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import io
+import jmespath
 import json
 import os.path
 from six import text_type
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
 
-import jmespath
+from c7n.utils import format_string_values
 
 
 class URIResolver(object):
@@ -104,7 +105,11 @@ class ValuesFrom(object):
     }
 
     def __init__(self, data, manager):
-        self.data = data
+        config_args = {
+            'account_id': manager.config.account_id,
+            'region': manager.config.region
+        }
+        self.data = format_string_values(data, **config_args)
         self.manager = manager
         self.resolver = URIResolver(manager.session_factory, manager._cache)
 

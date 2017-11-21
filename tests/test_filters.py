@@ -16,12 +16,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from dateutil import tz
 
 from datetime import datetime, timedelta
+import json
+import tempfile
+import time
 import unittest
 
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from .common import instance, event_data, Bag
+from .common import Bag, BaseTest, event_data, functional, instance
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -181,6 +184,43 @@ class TestValueFilter(unittest.TestCase):
         sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 1))
+
+
+class TestValueFromFilter(BaseTest):
+
+    @functional
+    def test_value_from(self):
+        session_factory = self.replay_flight_data('test_value_from')
+
+        ec2 = session_factory().resource('ec2')
+        instance = ec2.create_instances(ImageId='ami-6057e21a', MinCount=1, MaxCount=1)[0].id
+        ec2_client = session_factory().client('ec2')
+        self.addCleanup(ec2_client.terminate_instances, InstanceIds=[instance])
+
+        temp_file = tempfile.NamedTemporaryFile(mode='w')
+        json.dump({"us-east-1": [instance]}, temp_file)
+        temp_file.flush()
+        self.addCleanup(temp_file.close)
+
+        if self.recording: time.sleep(30)
+
+        policy = self.load_policy({
+            'name': 'value_from_filter',
+            'resource': 'ec2',
+            'filters': [{
+                'type': 'value',
+                'key': 'InstanceId',
+                'op': 'in',
+                'value_from':{
+                    'url': 'file://%s' % temp_file.name,
+                    'format': 'json',
+                    'expr': '["{region}"][]'
+                }
+            }]}, session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('InstanceId',''), instance)
 
 
 class TestAgeFilter(unittest.TestCase):
