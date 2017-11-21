@@ -8,7 +8,7 @@ flake8
 redis
 ldap3
 sphinx-rtd-theme==0.2.4
-nose-timer==0.7.0
+nose-timer==0.7.1
 twine
 fakeredis
 pytest>=3.2.1
