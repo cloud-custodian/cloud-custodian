@@ -38,6 +38,7 @@ class Distribution(QueryResourceManager):
         dimension = "DistributionId"
         universal_taggable = True
         filter_name = None
+        config_type = "AWS::CloudFront::Distribution"
 
     augment = universal_augment
 
@@ -73,6 +74,7 @@ class StreamingDistribution(QueryResourceManager):
         dimension = "DistributionId"
         universal_taggable = True
         filter_name = None
+        config_type = "AWS::CloudFront::StreamingDistribution"
 
     augment = universal_augment
 
