@@ -4,16 +4,7 @@
         "PaginationToken": "", 
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:c7n-aurora-test", 
-                "Tags": [
-                    {
-                        "Value": "other", 
-                        "Key": "workload-type"
-                    }
-                ]
-            }, 
-            {
-                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:c7n-data-index", 
+                "ResourceARN": "arn:aws:rds:us-east-1:385131497716:db:mydbinstance", 
                 "Tags": [
                     {
                         "Value": "other", 
@@ -25,11 +16,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "58f9c8f9-ccf8-11e7-997c-732dae2e6a1c", 
+            "RequestId": "7ebb567d-cef7-11e7-bade-e73a12746909", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "58f9c8f9-ccf8-11e7-997c-732dae2e6a1c", 
-                "date": "Sun, 19 Nov 2017 07:07:46 GMT", 
-                "content-length": "290", 
+                "x-amzn-requestid": "7ebb567d-cef7-11e7-bade-e73a12746909", 
+                "date": "Tue, 21 Nov 2017 20:06:43 GMT", 
+                "content-length": "167", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

@@ -616,17 +616,10 @@ class RDSSnapshotTest(BaseTest):
     def test_rds_snapshot_copy_tags_enable(self):
         session_factory = self.replay_flight_data(
             'test_rds_snapshot_copy_tags_enable')
-        p = self.load_policy({
-            'name': 'aurora-no-copy-tags',
-            'resource': 'rds',
-            'filters': [
-                {'type': 'value', 'key': 'Engine', 'value': 'aurora'},
-                {'type': 'value', 'key': 'CopyTagsToSnapshot', 'value': False}]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
         p = self.load_policy({
             'name': 'rds-enable-snapshot-tag-copy',
@@ -634,42 +627,26 @@ class RDSSnapshotTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'aurora',
+                 'value': 'mysql',
                  'op': 'eq'}],
             'actions': [{
                 'type': 'set-snapshot-copy-tags',
                 'enable': True}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
 
-        p = self.load_policy({
-            'name': 'aurora-no-copy-tags',
-            'resource': 'rds',
-            'filters': [
-                {'type': 'value', 'key': 'Engine', 'value': 'aurora'},
-                {'type': 'value', 'key': 'CopyTagsToSnapshot', 'value': True}]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
     def test_rds_snapshot_copy_tags_disable(self):
         session_factory = self.replay_flight_data(
             'test_rds_snapshot_copy_tags_disable')
-        p = self.load_policy({
-            'name': 'aurora-no-copy-tags',
-            'resource': 'rds',
-            'filters': [
-                {'type': 'value', 'key': 'Engine', 'value': 'aurora'},
-                {'type': 'value', 'key': 'CopyTagsToSnapshot', 'value': True}]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
         p = self.load_policy({
             'name': 'rds-enable-snapshot-tag-copy',
@@ -677,27 +654,18 @@ class RDSSnapshotTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'Engine',
-                 'value': 'aurora',
+                 'value': 'mysql',
                  'op': 'eq'}],
             'actions': [{
                 'type': 'set-snapshot-copy-tags',
                 'enable': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
 
-        p = self.load_policy({
-            'name': 'aurora-no-copy-tags',
-            'resource': 'rds',
-            'filters': [
-                {'type': 'value', 'key': 'Engine', 'value': 'aurora'},
-                {'type': 'value', 'key': 'CopyTagsToSnapshot', 'value': False}]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertTrue(len(resources), 2)
-        self.assertTrue(sorted(resources, key=lambda x: sorted(x.keys())),
-                        ['c7n-aurora-index', 'c7n-aurora-test'])
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
     def test_rds_snapshot_access(self):
         factory = self.replay_flight_data('test_rds_snapshot_access')
