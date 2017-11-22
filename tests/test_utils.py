@@ -21,10 +21,9 @@ import tempfile
 import time
 
 from botocore.exceptions import ClientError
-import ipaddress
 import six
 
-from c7n import utils
+from c7n import ipaddress, utils
 
 from .common import BaseTest
 
