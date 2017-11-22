@@ -662,7 +662,7 @@ class CopySnapshotTags(BaseAction):
     permissions = ('rds:ModifyDBInstances',)
 
     def process(self, resources):
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for r in resources:
                 futures.append(w.submit(
@@ -676,9 +676,9 @@ class CopySnapshotTags(BaseAction):
 
     def set_snapshot_tags(self, r):
         c = local_session(self.manager.session_factory).client('rds')
-        c.modify_db_instance(
+        self.manager.retry(c.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
-            CopyTagsToSnapshot=self.data.get('enable', True))
+            CopyTagsToSnapshot=self.data.get('enable', True)))
 
 
 @actions.register('snapshot')
