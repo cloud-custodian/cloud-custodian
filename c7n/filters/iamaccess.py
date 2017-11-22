@@ -204,7 +204,15 @@ class PolicyChecker(object):
         return bool(set(map(_account, values)).difference(self.allowed_accounts))
 
     def handle_aws_sourceip(self, s, op, key, values):
-        return False
+        if any(v not in a for a in self.allowed_accounts for v in values):
+            return bool(set(map(_account, values)).difference(self.allowed_accounts))
+        return True
+
+    def handle_aws_sourcevpce(self, s, op, key, values):
+        return bool(set(map(_account, values)).difference(self.allowed_accounts))
+
+    def handle_aws_sourcevpc(self, s, op, key, values):
+        return bool(set(map(_account, values)).difference(self.allowed_accounts))
 
 
 class CrossAccountAccessFilter(Filter):
