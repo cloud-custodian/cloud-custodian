@@ -20,7 +20,7 @@ import os
 import tempfile
 from six import binary_type
 
-from .common import Bag, BaseTest, Config
+from .common import Bag, BaseTest, Config, ACCOUNT_ID
 from .test_s3 import destroyBucket
 
 from c7n.resolver import ValuesFrom, URIResolver
@@ -168,3 +168,10 @@ class UrlValueTest(BaseTest):
         self.assertEqual(
             values.get_values(),
             [['3'], ['3'], ['3'], ['3'], ['3']])
+
+    def test_value_from_vars(self):
+        values = self.get_values_from(
+            {'url': '{account_id}', 'expr': '["{region}"][]', 'format': 'json'},
+            json.dumps({'us-east-1': 'east-resource'}))
+        self.assertEqual(values.get_values(), ['east-resource'])
+        self.assertEqual(values.data.get('url',''), ACCOUNT_ID)
