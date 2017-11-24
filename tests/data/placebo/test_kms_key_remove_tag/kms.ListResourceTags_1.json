@@ -5,9 +5,9 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2dcbe14c-cec3-11e7-be4d-313c22482cb1", 
+            "RequestId": "e95bee92-d134-11e7-a82d-4751df3cefa5", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2dcbe14c-cec3-11e7-be4d-313c22482cb1", 
+                "x-amzn-requestid": "e95bee92-d134-11e7-a82d-4751df3cefa5", 
                 "content-length": "73", 
                 "content-type": "application/x-amz-json-1.1"
             }
@@ -15,7 +15,7 @@
         "Tags": [
             {
                 "TagKey": "ExpiredTag", 
-                "TagValue": "Cleanup"
+                "TagValue": "Invalid"
             }
         ]
     }

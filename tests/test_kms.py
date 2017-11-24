@@ -196,13 +196,9 @@ class KMSTagging(BaseTest):
     def test_kms_key_remove_tag(self):
         session_factory = self.replay_flight_data('test_kms_key_remove_tag')
         client = session_factory().client('kms')
-        key_id = client.create_key()['KeyMetadata']['KeyId']
-        client.tag_resource(
-            KeyId=key_id,
-            Tags=[{'TagKey': 'ExpiredTag', 'TagValue': 'Cleanup'}])
-
-        tags = client.list_resource_tags(KeyId=key_id)['Tags']
-        self.assertEqual(len(tags), 1)
+        key_id = client.create_key(
+            Tags=[{'TagKey': 'ExpiredTag', 'TagValue': 'Invalid'}]
+        )['KeyMetadata']['KeyId']
         self.addCleanup(client.schedule_key_deletion, KeyId=key_id,
                         PendingWindowInDays=7)
 
@@ -210,13 +206,15 @@ class KMSTagging(BaseTest):
             'name': 'kms-key-remove-tag',
             'resource': 'kms-key',
             'filters': [
-                {'KeyId': key_id},
-                {'tag:ExpiredTag': 'Cleanup'}],
+                {'KeyState': 'Enabled'},
+                {'tag:ExpiredTag': 'Invalid'}
+            ],
             'actions': [{
                 'type': 'remove-tag',
                 'tags': ['ExpiredTag']}]}, session_factory=session_factory)
 
         resources = policy.run()
         self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['KeyId'], key_id)
         tags = client.list_resource_tags(KeyId=key_id)['Tags']
         self.assertEqual(len(tags), 0)
