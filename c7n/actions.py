@@ -494,7 +494,7 @@ class Notify(EventAction):
         return b64encoded.decode('ascii')
 
     def send_sns(self, message):
-        topic = self.data['transport']['topic']
+        topic = self.data['transport']['topic'].format(**message)
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -507,14 +507,14 @@ class Notify(EventAction):
         client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
-        queue = self.data['transport']['queue']
+        queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]

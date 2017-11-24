@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from setuptools import setup, find_packages
 
-requires = ["Jinja2", "boto3", "jsonschema"]
+requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15"]
 try:
     from concurrent import futures
 except ImportError:
