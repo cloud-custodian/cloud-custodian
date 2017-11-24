@@ -752,11 +752,10 @@ class CrossAccountChecker(TestCase):
     def test_s3_policies(self):
         policies = load_data('iam/s3-policies.json')
         checker = PolicyChecker(
-            {'allowed_accounts': set(['vpce-12345678', 'vpc-12345678',
-                     '10.0.0.0/8', '123456789012'])})
+            {'allowed_accounts': set(
+                ['vpce-12345678', 'vpc-12345678', '123456789012'])})
         for p, expected in zip(
-                policies, [False, True, True, True, False, False, True,
+                policies, [True, False, False, True,
                            False, True, False, True, False, True, False, True]):
             violations = checker.check(p)
-            print(violations)
             self.assertEqual(bool(violations), expected)

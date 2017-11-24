@@ -204,9 +204,7 @@ class PolicyChecker(object):
         return bool(set(map(_account, values)).difference(self.allowed_accounts))
 
     def handle_aws_sourceip(self, s, op, key, values):
-        if any(v not in a for a in self.allowed_accounts for v in values):
-            return bool(set(map(_account, values)).difference(self.allowed_accounts))
-        return True
+        return False
 
     def handle_aws_sourcevpce(self, s, op, key, values):
         return bool(set(map(_account, values)).difference(self.allowed_accounts))
