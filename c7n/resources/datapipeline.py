@@ -67,9 +67,12 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
                     results = {'TagDescriptions': []}
                     break
                 continue
+
         for pipe_desc in results['pipelineDescriptionList']:
             pipe = pipe_map[pipe_desc['pipelineId']]
-            pipe['tags'] = pipe_desc['tags']
+            pipe['Tags'] = [
+                {'Key': t['key'], 'Value': t['value']}
+                for t in pipe_desc['tags']]
             for field in pipe_desc['fields']:
                 key = field['key']
                 if not key.startswith('@'):
