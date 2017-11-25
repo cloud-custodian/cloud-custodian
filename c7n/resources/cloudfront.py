@@ -85,8 +85,6 @@ class StreamingDistribution(QueryResourceManager):
         filter_name = None
         config_type = "AWS::CloudFront::StreamingDistribution"
 
-    augment = universal_augment
-
     def get_arn(self, r):
         return r['ARN']
 
