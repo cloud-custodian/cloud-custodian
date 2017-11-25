@@ -55,7 +55,7 @@ class DataPipelineTest(BaseTest):
             'name': 'datapipeline-report',
             'resource': 'datapipeline',
             'filters': [
-                {'name': 'PipelinesFTW'}],
+                {'tag:foo': 'bar'}],
             },
             config={'region': 'us-west-2'},
             session_factory=factory)
@@ -63,7 +63,7 @@ class DataPipelineTest(BaseTest):
         self.assertEqual(len(resources), 1)
         resource = resources[0]
         self.assertEqual(resource['name'], 'PipelinesFTW')
-        self.assertEqual(resource['tags'], [{'key': 'foo', 'value': 'bar'}])
+        self.assertEqual(resource['Tags'], [{'Key': 'foo', 'Value': 'bar'}])
         self.assertEqual(resource['lastActivationTime'], '2017-03-13T11:37:36')
         self.assertEqual(resource['creationTime'], '2017-03-13T11:37:34')
         self.assertEqual(resource['sphere'], 'PIPELINE')
