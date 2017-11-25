@@ -31,7 +31,7 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, chunks, type_schema, get_retry, worker
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -63,7 +63,7 @@ class ELB(QueryResourceManager):
         name = 'DNSName'
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
-
+        config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -87,9 +87,20 @@ class ELB(QueryResourceManager):
             self.config.account_id,
             r[self.resource_type.id])
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeELB(self)
+        return super(ELB, self).get_source(source_type)
+
+
+class DescribeELB(DescribeSource):
+
     def augment(self, resources):
         _elb_tags(
-            resources, self.session_factory, self.executor_factory, self.retry)
+            resources,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry)
         return resources
 
 
