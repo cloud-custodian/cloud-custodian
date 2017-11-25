@@ -85,6 +85,7 @@ class CodeBuildProject(QueryResourceManager):
         date = 'created'
         dimension = None
         filter_name = None
+        config_type = "AWS::CodeBuild::Project"
 
 
 @CodeBuildProject.action_registry.register('delete')
