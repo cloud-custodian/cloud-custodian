@@ -169,7 +169,7 @@
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
           "StringEquals": {
-            "aws:sourceVpc": "vpce-12345678"
+            "aws:sourceVpce": "vpce-12345678"
           }
         },
         "Principal": "*"
@@ -189,7 +189,7 @@
         "Resource": "arn:aws:s3:::cross-account-invalid/*",
         "Condition": {
           "StringEquals": {
-            "aws:sourceVpc": "vpce-01234567"
+            "aws:sourceVpce": "vpce-01234567"
           }
         },
         "Principal": "*"
