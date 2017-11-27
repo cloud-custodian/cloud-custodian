@@ -526,12 +526,20 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
-                if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
-                    msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    self.log.warning("Snapshot not found %s" % e_snap_id)
-                    snap_ids.remove(e_snap_id)
-                    continue
+                if e.response['Error']['Code'] in (
+                        'InvalidSnapshot.NotFound', 'InvalidSnapshotID.Malformed'):
+                    if e.response['Error']['Code'] == 'InvalidSnapshotID.Malformed':
+                        msg = e.response['Error']['Message']
+                        e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+                        self.log.warning("Snapshot ID is not valid %s" % e_snap_id)
+                        snap_ids.remove(e_snap_id)
+                        continue
+                    else:
+                        msg = e.response['Error']['Message']
+                        e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+                        self.log.warning("Snapshot does not exist %s" % e_snap_id)
+                        snap_ids.remove(e_snap_id)
+                        continue
                 raise
             else:
                 return result.get('Snapshots', ())
