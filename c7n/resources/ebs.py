@@ -230,7 +230,7 @@ class SnapshotDelete(BaseAction):
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
