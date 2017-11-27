@@ -18,7 +18,7 @@ import functools
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import generate_arn, local_session, type_schema, get_retry
 
@@ -38,8 +38,7 @@ class Distribution(QueryResourceManager):
         dimension = "DistributionId"
         universal_taggable = True
         filter_name = None
-
-    augment = universal_augment
+        config_type = "AWS::CloudFront::Distribution"
 
     def get_arn(self, r):
         return r['ARN']
@@ -56,6 +55,17 @@ class Distribution(QueryResourceManager):
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeDistribution(self)
+        return super(Distribution, self).get_source(source_type)
+
+
+class DescribeDistribution(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('streaming-distribution')
@@ -73,8 +83,7 @@ class StreamingDistribution(QueryResourceManager):
         dimension = "DistributionId"
         universal_taggable = True
         filter_name = None
-
-    augment = universal_augment
+        config_type = "AWS::CloudFront::StreamingDistribution"
 
     def get_arn(self, r):
         return r['ARN']
@@ -91,6 +100,17 @@ class StreamingDistribution(QueryResourceManager):
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeStreamingDistribution(self)
+        return super(StreamingDistribution, self).get_source(source_type)
+
+
+class DescribeStreamingDistribution(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
