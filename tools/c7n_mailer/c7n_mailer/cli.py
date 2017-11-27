@@ -28,6 +28,10 @@ CONFIG_SCHEMA = {
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
         'security_groups': {'type': 'array', 'items': {'type': 'string'}},
         'dead_letter_config': {'type': 'object'},
+        'lambda_name': {'type': 'string'},
+        'lambda_description': {'type': 'string'},
+        'lambda_tags': {'type': 'object'},
+        'lambda_schedule': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
