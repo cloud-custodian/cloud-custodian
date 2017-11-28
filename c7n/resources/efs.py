@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 import functools
+import logging
 
 from c7n.actions import Action
 from c7n.manager import resources
@@ -102,11 +103,8 @@ class SecurityGroup(SecurityGroupFilter):
         for r in resources:
             #groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups(
             #    MountTargetId=r['MountTargetId'])).get('SecurityGroups')
-            response = client.describe_mount_target_security_groups(
-                MountTargetId=r['MountTargetId'])
-            self.log.info(
-                    "Response %",
-                    response)
+            response = client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])
+            self.log.info("Response %", response)
             groups[r['MountTargetId']] = response['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
