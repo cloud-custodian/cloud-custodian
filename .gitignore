@@ -25,3 +25,4 @@ out/
 .DS_STORE
 .tox/
 results.xml
+.idea/

@@ -838,6 +838,70 @@ class Stop(BaseAction, StateTransitionFilter):
                 raise
 
 
+@actions.register('reboot')
+class Reboot(BaseAction, StateTransitionFilter):
+    """reboots a previously running EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-reboot-instances
+            resource: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - reboot
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/reboot-instances.html
+    """
+
+    valid_origin_states = ('running',)
+    schema = type_schema('reboot')
+    permissions = ('ec2:RebootInstances',)
+    batch_size = 10
+    exception = None
+
+    def _filter_ec2_with_volumes(self, instances):
+        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
+
+    def process(self, instances):
+        instances = self._filter_ec2_with_volumes(
+            self.filter_instance_state(instances))
+        if not len(instances):
+            return
+
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        failures = {}
+
+        for batch in utils.chunks(instances, self.batch_size):
+            fails = self.process_instance_set(client, batch)
+            if fails:
+                failures = [i['InstanceId'] for i in batch]
+
+        if failures:
+            fail_count = sum(map(len, failures.values()))
+            msg = "Could not reboot %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
+
+    def process_instance_set(self, client, instances):
+        # Setup retry with insufficient capacity as well
+        retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+                     'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(retryable, max_attempts=5)
+        instance_ids = [i['InstanceId'] for i in instances]
+        try:
+            retry(client.reboot_instances, InstanceIds=instance_ids)
+        except ClientError as e:
+            if e.response['Error']['Code'] in retryable:
+                return True
+            raise
+
+
 @actions.register('terminate')
 class Terminate(BaseAction, StateTransitionFilter):
     """ Terminate a set of instances.

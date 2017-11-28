@@ -308,6 +308,80 @@ class AutoScalingTest(BaseTest):
                 'AutoScalingGroups'].pop()
         self.assertFalse(result['SuspendedProcesses'])
 
+    def test_asg_resize_save_to_tag(self):
+        factory = self.replay_flight_data('test_asg_resize_save_to_tag')
+        p = self.load_policy({
+            'name': 'asg-resize',
+            'resource': 'asg',
+            'filters': [
+                {'tag:CustodianUnitTest': 'not-null'}],
+            'actions': [
+                {'type': 'resize', 'min-size': 0, 'desired-size': 0,
+                 'save-options-tag': 'OffHoursPrevious'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we set ASG size to zero
+        self.assertEqual(result['MinSize'], 0)
+        self.assertEqual(result['DesiredCapacity'], 0)
+        tag_map = {t['Key']: t['Value'] for t in result['Tags']}
+        # test that we saved state to a tag
+        self.assertTrue('OffHoursPrevious' in tag_map)
+        self.assertEqual(tag_map['OffHoursPrevious'],
+            'DesiredCapacity=2;MinSize=2;MaxSize=2')
+
+    def test_asg_resize_restore_from_tag(self):
+        factory = self.replay_flight_data('test_asg_resize_restore_from_tag')
+        p = self.load_policy({
+            'name': 'asg-resize',
+            'resource': 'asg',
+            'filters': [
+                {'tag:CustodianUnitTest': 'not-null'},
+                {'tag:OffHoursPrevious': 'not-null'}],
+            'actions': [
+                {'type': 'resize', 'restore-options-tag': 'OffHoursPrevious'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we set ASG min and desired back from 0 to 2
+        self.assertEqual(result['MinSize'], 2)
+        self.assertEqual(result['DesiredCapacity'], 2)
+
+    def test_asg_resize_to_current(self):
+        factory = self.replay_flight_data('test_asg_resize_to_current')
+        # test scenario:
+        # - create ASG with min=2, desired=2 running in account A
+        # - launch config specifies a test AMI in account B
+        # - remove permissions on the AMI for account A
+        # - kill one of the 2 running instances, wait until the ASG sees that
+        # - leaves min=2, desired=2, running=1 and it's unable to launch more
+        p = self.load_policy({
+            'name': 'asg-resize',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'capacity-delta'},
+                {'tag:CustodianUnitTest': 'not-null'}],
+            'actions': [
+                {'type': 'resize', 'desired-size': 'current'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('autoscaling')
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]['AutoScalingGroupName']])[
+                'AutoScalingGroups'].pop()
+        # test that we changed ASG min and desired from 2 to 1
+        self.assertEqual(result['MinSize'], 1)
+        self.assertEqual(result['DesiredCapacity'], 1)
+
     def test_asg_third_ami_filter(self):
         factory = self.replay_flight_data('test_asg_invalid_third_ami')
         p = self.load_policy({
@@ -388,3 +462,27 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')
+
+    def test_asg_filter_capacity_delta_match(self):
+        factory = self.replay_flight_data('test_asg_filter_capacity_delta_match')
+        p = self.load_policy({
+            'name': 'asg-capacity-delta',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'capacity-delta'},
+                {'tag:CustodianUnitTest': 'not-null'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_filter_capacity_delta_nomatch(self):
+        factory = self.replay_flight_data('test_asg_filter_capacity_delta_nomatch')
+        p = self.load_policy({
+            'name': 'asg-capacity-delta',
+            'resource': 'asg',
+            'filters': [
+                {'type': 'capacity-delta'},
+                {'tag:CustodianUnitTest': 'not-null'}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

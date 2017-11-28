@@ -35,6 +35,26 @@ class ElasticSearch(BaseTest):
             resources[0]['Endpoint'].startswith(
                 'search-c7n-test-ug4l2nqtnwwrktaeagxsqso'))
 
+    def test_metrics_domain(self):
+        config = Config.empty(account_id='644160558196')        
+        factory = self.replay_flight_data('test_elasticsearch_delete')
+        p = self.load_policy({
+            'name': 'es-query',
+            'resource': 'elasticsearch',
+            'filters': [{
+                'type': 'metrics',
+                'name': 'SearchableDocuments',
+                'days': 4,
+                'period': 86400,
+                'value': 1000,
+                'op': 'less-than'}]},
+            session_factory=factory, config=config)
+        self.assertEqual(
+            p.resource_manager.filters[0].get_dimensions(
+                {'DomainName': 'foo'}),
+            [{'Name': 'ClientId', 'Value': '644160558196'},
+             {'Name': 'DomainName', 'Value': 'foo'}])
+
     def test_delete_search(self):
         config = Config.empty(account_id='644160558196')        
         factory = self.replay_flight_data('test_elasticsearch_delete')

@@ -1308,12 +1308,101 @@ class RDSSubnetGroup(QueryResourceManager):
         dimension = None
         date = None
 
+    def augment(self, resources):
+        _db_subnet_group_tags(
+            resources, self.session_factory, self.executor_factory, self.retry)
+        return resources
+
+
+def _db_subnet_group_tags(subnet_groups, session_factory, executor_factory, retry):
+
+    def process_tags(subnet_group):
+        client = local_session(session_factory).client('rds')
+
+        arn = subnet_group['DBSubnetGroupArn']
+        tag_list = None
+
+        try:
+            tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidParameterValue':
+                log.warning("Exception getting db subnet group tags\n %s", e)
+            return None
+
+        subnet_group['Tags'] = tag_list or []
+        return subnet_group
+
+    with executor_factory(max_workers=1) as w:
+        list(w.map(process_tags, subnet_groups))
+
+
+@RDSSubnetGroup.action_registry.register('delete')
+class RDSSubnetGroupDeleteAction(BaseAction):
+    """Action to delete RDS Subnet Group
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any rds subnet groups.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
+                filters:
+                  - Instances: []
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteDBSubnetGroup',)
+
+    def process(self, subnet_group):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_subnetgroup, subnet_group))
+
+    def process_subnetgroup(self, subnet_group):
+        client = local_session(self.manager.session_factory).client('rds')
+        client.delete_db_subnet_group(DBSubnetGroupName=subnet_group['DBSubnetGroupName'])
+
+
+@RDSSubnetGroup.filter_registry.register('unused')
+class UnusedRDSSubnetGroup(Filter):
+    """Filters all launch rds subnet groups that are not in use but exist
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: rds-subnet-group-delete-unused
+                resource: rds-subnet-group
+                filters:
+                  - unused
+    """
+
+    schema = type_schema('unused')
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds').get_permissions()
+
+    def process(self, configs, event=None):
+        rds = self.manager.get_resource_manager('rds').resources()
+        self.used = set([
+            r.get('DBSubnetGroupName', r['DBInstanceIdentifier'])
+            for r in rds])
+        return super(UnusedRDSSubnetGroup, self).process(configs)
+
+    def __call__(self, config):
+        return config['DBSubnetGroupName'] not in self.used
+
 
 @filters.register('db-parameter')
 class ParameterFilter(ValueFilter):
     """
     Applies value type filter on set db parameter values.
-
     :example:
 
         .. code-block: yaml
