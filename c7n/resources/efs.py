@@ -97,7 +97,7 @@ class SecurityGroup(SecurityGroupFilter):
         groups = {}
         group_ids = set()
         for r in resources:
-            groups[r['MountTargetId'] = client.describe_mount_target_security_groups(
+            groups[r['MountTargetId']] = client.describe_mount_target_security_groups(
                 FileSystemId=r['MountTargetId']).get('SecurityGroups')
             group_ids.update(groups[r['MountTargetId']])
         self.efs_group_cache = groups
