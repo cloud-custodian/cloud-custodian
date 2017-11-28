@@ -100,9 +100,16 @@ class SecurityGroup(SecurityGroupFilter):
         group_ids = set()
         retry = get_retry(('Throttled',))
         for r in resources:
-            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups(
-                MountTargetId=r['MountTargetId'])).get('SecurityGroups')
+            #groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups(
+            #    MountTargetId=r['MountTargetId'])).get('SecurityGroups')
+            response = retry(client.describe_mount_target_security_groups(
+                MountTargetId=r['MountTargetId']))
+            self.log.info(
+                    "Response %",
+                    response)
+            groups[r['MountTargetId']] = response['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
+
         self.efs_group_cache = groups
         return list(group_ids)
         
