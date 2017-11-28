@@ -156,7 +156,7 @@ def report_account(account, region, policies_config, output_path, debug):
             r['policy'] = p.name
             r['region'] = p.options.region
             r['account'] = account['name']
-            for t in account['tags']:
+            for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
                     r[k] = v
