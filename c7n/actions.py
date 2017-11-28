@@ -464,13 +464,12 @@ class Notify(EventAction):
         return p
 
     def process(self, resources, event=None):
-        aliases = self.manager.session_factory().client(
-            'iam').list_account_aliases().get('AccountAliases', ())
-        account_name = aliases and aliases[0] or ''
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
-            'account': account_name,
+            'account': alias,
             'region': self.manager.config.region,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
@@ -495,7 +494,7 @@ class Notify(EventAction):
         return b64encoded.decode('ascii')
 
     def send_sns(self, message):
-        topic = self.data['transport']['topic']
+        topic = self.data['transport']['topic'].format(**message)
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -508,14 +507,14 @@ class Notify(EventAction):
         client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
-        queue = self.data['transport']['queue']
+        queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]

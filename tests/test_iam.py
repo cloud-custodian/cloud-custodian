@@ -24,7 +24,7 @@ from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
-from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
@@ -732,15 +732,19 @@ class CrossAccountChecker(TestCase):
                 {'Action': 'SQS:SendMessage',
                  'Effect': 'Allow',
                  'NotPrincipal': '90120'}]}
-        self.assertTrue(
-            bool(check_cross_account(
-                policy, set(['221800032964']), False, (), None)))
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
+
+        self.assertTrue(bool(checker.check(policy)))
 
     def test_sqs_policies(self):
         policies = load_data('iam/sqs-policies.json')
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
         for p, expected in zip(
                 policies, [False, True, True, False,
                            False, False, False, False]):
-            violations = check_cross_account(
-                p, set(['221800032964']), False, (), None)
+            violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

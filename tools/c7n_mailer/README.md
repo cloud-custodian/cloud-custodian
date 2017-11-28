@@ -71,7 +71,7 @@ c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.y
 You should see output similar to the following:
 
 ```
-(env) $ c7n-mailer -c mailer.yml && custodian run -c test-policy.yml -s .
+(env) $ c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 DEBUG:custodian.lambda:Created custodian lambda archive size: 3.01mb
 2017-01-12 07:55:16,227: custodian.policy:INFO Running policy c7n-mailer-test resource: sqs region:default c7n:0.8.22.0
 2017-01-12 07:55:16,229: custodian.policy:INFO policy: c7n-mailer-test resource:sqs has count:1 time:0.00
@@ -121,9 +121,11 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 | Required? | Key                  | Type             |
 |:---------:|:---------------------|:-----------------|
+|           | `dead_letter_config` | object           |
 |           | `memory`             | integer          |
 |           | `region`             | string           |
 | &#x2705;  | `role`               | string           |
+|           | `runtime`            | string           |
 |           | `security_groups`    | array of strings |
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
@@ -133,16 +135,22 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 | Required? | Key                        | Type             | Notes                               |
 |:---------:|:---------------------------|:-----------------|:------------------------------------|
-|           | `cache`                    | string           | memcached for caching ldap lookups  |
+|           | `cache_engine`             | string           | cache engine; either sqlite or redis|
 |           | `cross_accounts`           | object           | account to assume back into for sending to SNS topics |
+|           | `debug`                    | boolean          | debug on/off                        |
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
-|           | `ldap_email_key`     | string           | eg 'mail'     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_email_attribute`     | string           |                                     |
+|           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
-|           | `ldap_username_attribute`  | string           | eg 'sAMAccountName'     |
-|           | `ldap_bind_password_in_kms`| boolean           | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_uid_attribute`       | string           |                                     |
+|           | `ldap_uid_regex`           | string           |                                     |
+|           | `ldap_uid_tags`            | string           |                                     |
+|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
+|           | `redis_host`               | string           | redis host if cache_engine == redis |
+|           | `redis_port`               | integer          | redis port, default: 6369           |
 |           | `ses_region`               | string           | AWS region that handles SES API calls |
 
 

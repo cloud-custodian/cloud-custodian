@@ -102,10 +102,10 @@ class NullMetricsOutput(MetricsOutput):
                 log.debug(self.format_metric(m))
 
     def format_metric(self, m):
-        l = "metric:%s %s:%s" % (m['MetricName'], m['Unit'], m['Value'])
+        label = "metric:%s %s:%s" % (m['MetricName'], m['Unit'], m['Value'])
         for d in m['Dimensions']:
-            l += " %s:%s" % (d['Name'].lower(), d['Value'].lower())
-        return l
+            label += " %s:%s" % (d['Name'].lower(), d['Value'].lower())
+        return label
 
 
 class LogOutput(object):

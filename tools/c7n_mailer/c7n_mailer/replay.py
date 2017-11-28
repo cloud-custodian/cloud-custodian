@@ -18,7 +18,7 @@ import base64
 import json
 
 import jsonschema
-import yaml
+from ruamel import yaml
 
 from c7n_mailer.utils import setup_defaults
 from c7n_mailer.cli import CONFIG_SCHEMA

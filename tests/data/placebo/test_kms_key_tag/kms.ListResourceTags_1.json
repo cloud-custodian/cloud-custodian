@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Truncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2950df75-cef3-11e7-9479-fb2a5fb123cc", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2950df75-cef3-11e7-9479-fb2a5fb123cc", 
+                "content-length": "29", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": []
+    }
+}

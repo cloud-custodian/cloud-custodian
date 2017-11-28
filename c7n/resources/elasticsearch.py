@@ -16,8 +16,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 import logging
 import itertools
+
 from c7n.actions import Action
 from c7n.manager import resources
+from c7n.filters import MetricsFilter
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     chunks, local_session, get_retry, type_schema, generate_arn)
@@ -75,6 +77,16 @@ class ElasticSearchDomain(QueryResourceManager):
         with self.executor_factory(max_workers=1) as w:
             return list(itertools.chain(
                 *w.map(_augment, chunks(domains, 5))))
+
+
+@ElasticSearchDomain.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'ClientId',
+                 'Value': self.manager.account_id},
+                {'Name': 'DomainName',
+                 'Value': resource['DomainName']}]
 
 
 @ElasticSearchDomain.action_registry.register('delete')
