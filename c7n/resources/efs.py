@@ -85,6 +85,8 @@ class SecurityGroup(SecurityGroupFilter):
 
     efs_group_cache = None
 
+    RelatedIdsExpression = ""
+
     def get_related_ids(self, resources):
 
         if self.efs_group_cache:
