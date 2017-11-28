@@ -23,7 +23,7 @@ get deleted so you always have a rolling 7 days worth of snapshots.
                 - Name
 
      - name: ebs-delete-old-ebs-snapshots
-       resource: ebs
+       resource: ebs-snapshot
        filters:
            - type: age
              days: 7
