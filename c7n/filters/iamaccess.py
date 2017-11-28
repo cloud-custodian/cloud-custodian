@@ -215,9 +215,13 @@ class PolicyChecker(object):
         return False
 
     def handle_aws_sourcevpce(self, s, op, key, values):
+        if key in self.whitelist_conditions:
+            return False
         return bool(set(map(_account, values)).difference(self.allowed_vpce))
 
     def handle_aws_sourcevpc(self, s, op, key, values):
+        if key in self.whitelist_conditions:
+            return False
         return bool(set(map(_account, values)).difference(self.allowed_vpc))
 
 

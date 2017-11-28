@@ -759,3 +759,16 @@ class CrossAccountChecker(TestCase):
                            True, False, True, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_null_vpc(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'whitelist_conditions': ["aws:sourcevpce", "aws:sourcevpc"],
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678']),
+            'allowed_vpce': set(['vpce-12345678'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, False, False, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
