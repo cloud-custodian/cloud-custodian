@@ -24,12 +24,11 @@ from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, TagCountFilter
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
 filters = FilterRegistry('sqs.filters')
 filters.register('marked-for-op', TagActionFilter)
-filters.register('tag-count', TagCountFilter)
 
 
 @resources.register('sqs')
@@ -210,7 +209,6 @@ class MarkForOpQueue(TagDelayedAction):
                 continue
 
 
-@SQS.action_registry.register('mark')
 @SQS.action_registry.register('tag')
 class TagQueue(Tag):
     """Action to create tag(s) on a queue
@@ -249,8 +247,6 @@ class TagQueue(Tag):
                 continue
 
 
-@SQS.action_registry.register('unmark')
-@SQS.action_registry.register('untag')
 @SQS.action_registry.register('remove-tag')
 class UntagQueue(RemoveTag):
     """Action to remove tag(s) on a queue
