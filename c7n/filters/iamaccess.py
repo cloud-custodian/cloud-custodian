@@ -215,12 +215,12 @@ class PolicyChecker(object):
         return False
 
     def handle_aws_sourcevpce(self, s, op, key, values):
-        if key in self.whitelist_conditions:
+        if not self.allowed_vpce:
             return False
         return bool(set(map(_account, values)).difference(self.allowed_vpce))
 
     def handle_aws_sourcevpc(self, s, op, key, values):
-        if key in self.whitelist_conditions:
+        if not self.allowed_vpc:
             return False
         return bool(set(map(_account, values)).difference(self.allowed_vpc))
 
@@ -252,7 +252,7 @@ class CrossAccountAccessFilter(Filter):
         self.everyone_only = self.data.get('everyone_only', False)
         self.conditions = set(self.data.get(
             'whitelist_conditions',
-            ("aws:sourcevpce", "aws:sourcevpc", "aws:userid", "aws:username")))
+            ("aws:userid", "aws:username")))
         self.actions = self.data.get('actions', ())
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
