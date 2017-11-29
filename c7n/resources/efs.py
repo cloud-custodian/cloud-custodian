@@ -104,8 +104,8 @@ class SecurityGroup(SecurityGroupFilter):
         for r in resources:
             #groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups(
             #    MountTargetId=r['MountTargetId'])).get('SecurityGroups')
-            groups[r['MountTargetId']] = retry((client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
-#            self.log.info("Response %s", response)
+            groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
+
 
             group_ids.update(groups[r['MountTargetId']])
 
