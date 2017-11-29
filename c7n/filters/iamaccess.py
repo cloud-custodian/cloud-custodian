@@ -240,7 +240,9 @@ class CrossAccountAccessFilter(Filter):
         # white list accounts
         whitelist_from=ValuesFrom.schema,
         whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_vpce_from=ValuesFrom.schema,
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
+        whitepist_vpc_from=ValuesFrom.schema,
         whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
@@ -276,10 +278,18 @@ class CrossAccountAccessFilter(Filter):
         return accounts
 
     def get_vpcs(self):
-        return set(self.data.get('whitelist_vpc', ()))
+        vpc = set(self.data.get('whitelist_vpc', ()))
+        if 'whitelist_vpc_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpc_from'], self.manager)
+            vpc = vpc.union(values.get_values())
+        return vpc
 
     def get_vpces(self):
-        return set(self.data.get('whitelist_vpce', ()))
+        vpce = set(self.data.get('whitelist_vpce', ()))
+        if 'whitelist_vpce_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpce_from'], self.manager)
+            vpce = vpce.union(values.get_values())
+        return vpce
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)
