@@ -100,10 +100,10 @@ class SecurityGroup(SecurityGroupFilter):
         client = local_session(self.manager.session_factory).client('efs')
         groups = {}
         group_ids = set()
-        retry = get_retry(('Throttled',))
+        retry = get_retry(('Throttled',),12)
         for r in resources:
             # fails with "'dict' object is not callable" error: groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
-            groups[r['MountTargetId']] = (client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId']))['SecurityGroups']
+            groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
         self.efs_group_cache = groups
