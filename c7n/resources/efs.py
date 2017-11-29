@@ -23,6 +23,7 @@ from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
 log = logging.getLogger('custodian.efs')
+retry = staticmethod(get_retry(('Throttling',)))
 
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
