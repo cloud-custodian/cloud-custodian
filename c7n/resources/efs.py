@@ -104,7 +104,8 @@ class SecurityGroup(SecurityGroupFilter):
         for r in resources:
             # fails with "'dict' object is not callable" error: groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
             #groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
-            response = retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId']))
+            mountTargetId = r['MountTargetId']
+            response = retry(client.describe_mount_target_security_groups(MountTargetId=mountTargetId))
             groups[r['MountTargetId']] = response['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
