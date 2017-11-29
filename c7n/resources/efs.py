@@ -23,7 +23,6 @@ from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
 log = logging.getLogger('custodian.efs')
-retry = staticmethod(get_retry(('Throttling',)))
 
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
@@ -105,8 +104,7 @@ class SecurityGroup(SecurityGroupFilter):
         for r in resources:
             # fails with "'dict' object is not callable" error: groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
             #groups[r['MountTargetId']] = (retry(client.describe_mount_target_security_groups(MountTargetId=r['MountTargetId'])))['SecurityGroups']
-            mountTargetId = r['MountTargetId']
-            response = retry(client.describe_mount_target_security_groups(MountTargetId=mountTargetId))
+            response = retry(client.describe_mount_target_security_groups, MountTargetId=r['MountTargetId'])
             groups[r['MountTargetId']] = response['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
