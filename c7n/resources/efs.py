@@ -22,6 +22,7 @@ from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
+log = logging.getLogger('custodian.efs')
 
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
