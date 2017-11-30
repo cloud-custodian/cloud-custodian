@@ -1,0 +1,70 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Results": [
+            {
+                "Status": "INPROGRESS", 
+                "Name": "test-delete-model", 
+                "Algorithm": "sgd", 
+                "TrainingParameters": {
+                    "sgd.maxPasses": "10", 
+                    "algorithm": "sgd", 
+                    "sgd.l2RegularizationAmount": "1e-6", 
+                    "sgd.shuffleType": "auto", 
+                    "sgd.maxMLModelSizeInBytes": "104857600", 
+                    "sgd.l1RegularizationAmount": "0.0"
+                }, 
+                "MLModelType": "BINARY", 
+                "CreatedByIamUser": "arn:aws:iam::644160558196:user/Harrison.Voslow@capitalone.com", 
+                "EndpointInfo": {
+                    "PeakRequestsPerSecond": 0, 
+                    "EndpointStatus": "NONE"
+                }, 
+                "MLModelId": "ml-e4ZZkN9ERTU", 
+                "InputDataLocationS3": "s3://aml-sample-data/banking.csv", 
+                "LastUpdatedAt": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 53, 
+                    "microsecond": 54000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 11
+                }, 
+                "TrainingDataSourceId": "ds-xTFyG3jnEx2", 
+                "StartedAt": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 810000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 9
+                }, 
+                "CreatedAt": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 177000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 6
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f1a635e2-c95e-11e7-8666-253ed2d42857", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f1a635e2-c95e-11e7-8666-253ed2d42857", 
+                "date": "Tue, 14 Nov 2017 17:12:07 GMT", 
+                "content-length": "669", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

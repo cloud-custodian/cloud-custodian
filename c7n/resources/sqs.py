@@ -18,12 +18,17 @@ from botocore.exceptions import ClientError
 import json
 
 from c7n.actions import RemovePolicyBase
-from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters import CrossAccountAccessFilter, MetricsFilter, FilterRegistry
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+
+
+filters = FilterRegistry('sqs.filters')
+filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('sqs')
@@ -47,6 +52,8 @@ class SQS(QueryResourceManager):
             'ApproximateNumberOfMessages',
         )
 
+    filter_registry = filters
+
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
@@ -60,13 +67,20 @@ class SQS(QueryResourceManager):
                 queue = client.get_queue_attributes(
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
+                # Augment Tags
+                tag_dict = client.list_queue_tags(
+                    QueueUrl=r).get('Tags', {})
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDenied':
                     self.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
+            tag_list = []
+            for k, v in tag_dict.items():
+                tag_list.append({'Key': k, 'Value': v})
 
             queue['QueueUrl'] = r
+            queue['Tags'] = tag_list
             return queue
 
         self.log.debug('retrieving details for %d queues' % len(resources))
@@ -153,6 +167,118 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['QueueUrl'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@SQS.action_registry.register('mark-for-op')
+class MarkForOpQueue(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: sqs-delete-unused
+                resource: sqs
+                filters:
+                  - "tag:custodian_cleanup": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Unused queues"
+                    op: delete
+                    days: 7
+    """
+
+    permissions = ('sqs:TagQueue',)
+
+    def process_resource_set(self, queues, tags):
+        client = local_session(self.manager.session_factory).client(
+            'sqs')
+        tag_dict = {}
+        for t in tags:
+            tag_dict[t['Key']] = t['Value']
+        for queue in queues:
+            queue_url = queue['QueueUrl']
+            try:
+                client.tag_queue(QueueUrl=queue_url, Tags=tag_dict)
+            except Exception as err:
+                self.log.exception(
+                    'Exception tagging queue %s: %s',
+                    queue['QueueArn'], err)
+                continue
+
+
+@SQS.action_registry.register('tag')
+class TagQueue(Tag):
+    """Action to create tag(s) on a queue
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: tag-sqs
+                resource: sqs
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('sqs:TagQueue',)
+
+    def process_resource_set(self, queues, tags):
+        client = local_session(self.manager.session_factory).client(
+            'sqs')
+        tag_dict = {}
+        for t in tags:
+            tag_dict[t['Key']] = t['Value']
+        for queue in queues:
+            queue_url = queue['QueueUrl']
+            try:
+                client.tag_queue(QueueUrl=queue_url, Tags=tag_dict)
+            except Exception as err:
+                self.log.exception(
+                    'Exception tagging queue %s: %s',
+                    queue['QueueArn'], err)
+                continue
+
+
+@SQS.action_registry.register('remove-tag')
+class UntagQueue(RemoveTag):
+    """Action to remove tag(s) on a queue
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: sqs-remove-tag
+                resource: sqs
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+
+    permissions = ('sqs:UntagQueue',)
+
+    def process_resource_set(self, queues, tags):
+        client = local_session(self.manager.session_factory).client(
+            'sqs')
+        for queue in queues:
+            queue_url = queue['QueueUrl']
+            try:
+                client.untag_queue(QueueUrl=queue_url, TagKeys=tags)
+            except Exception as err:
+                self.log.exception(
+                    'Exception while removing tags from queue %s: %s',
+                    queue['QueueArn'], err)
+                continue
 
 
 @SQS.action_registry.register('delete')

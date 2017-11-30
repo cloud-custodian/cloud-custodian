@@ -584,6 +584,31 @@ class RDSTest(BaseTest):
         }
         self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
 
+    def test_rds_db_subnetgroup_delete(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_delete')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-delete',
+            'resource': 'rds-subnet-group',
+            'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should delete db subnetgroup")
+
+    def test_rds_db_subnetgroup_unused(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_unused')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-unused',
+            'resource': 'rds-subnet-group',
+            'filters': [{'type': 'unused'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEquals(len(resources), 1, "Resources should be unused")
 
 class RDSSnapshotTest(BaseTest):
 

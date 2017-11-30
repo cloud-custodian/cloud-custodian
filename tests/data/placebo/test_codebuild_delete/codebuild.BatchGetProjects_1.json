@@ -1,0 +1,157 @@
+{
+    "status_code": 200, 
+    "data": {
+        "projectsNotFound": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "693ff8a0-c956-11e7-ba4e-51771f7b574f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "693ff8a0-c956-11e7-ba4e-51771f7b574f", 
+                "date": "Tue, 14 Nov 2017 16:11:02 GMT", 
+                "content-length": "2248", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "projects": [
+            {
+                "name": "test-delete-codebuild", 
+                "serviceRole": "arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role", 
+                "tags": [], 
+                "artifacts": {
+                    "type": "NO_ARTIFACTS"
+                }, 
+                "lastModified": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 50, 
+                    "microsecond": 926000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 10
+                }, 
+                "timeoutInMinutes": 60, 
+                "created": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 50, 
+                    "microsecond": 926000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 10
+                }, 
+                "environment": {
+                    "computeType": "BUILD_GENERAL1_SMALL", 
+                    "privilegedMode": false, 
+                    "image": "aws/codebuild/python:2.7.12", 
+                    "type": "LINUX_CONTAINER", 
+                    "environmentVariables": []
+                }, 
+                "source": {
+                    "buildspec": "buildspec.yml", 
+                    "type": "GITHUB", 
+                    "location": "https://github.com/capitalone/cloud-custodian", 
+                    "auth": {
+                        "type": "OAUTH"
+                    }
+                }, 
+                "encryptionKey": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3", 
+                "arn": "arn:aws:codebuild:us-east-1:644160558196:project/test-delete-codebuild", 
+                "description": "placebo"
+            }, 
+            {
+                "name": "test-delete-codebuild2", 
+                "serviceRole": "arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role", 
+                "tags": [], 
+                "artifacts": {
+                    "type": "NO_ARTIFACTS"
+                }, 
+                "lastModified": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 9, 
+                    "microsecond": 508000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 5
+                }, 
+                "timeoutInMinutes": 60, 
+                "created": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 9, 
+                    "microsecond": 508000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 5
+                }, 
+                "environment": {
+                    "computeType": "BUILD_GENERAL1_SMALL", 
+                    "privilegedMode": false, 
+                    "image": "aws/codebuild/python:2.7.12", 
+                    "type": "LINUX_CONTAINER", 
+                    "environmentVariables": []
+                }, 
+                "source": {
+                    "buildspec": "buildspec.yml", 
+                    "type": "GITHUB", 
+                    "location": "https://github.com/capitalone/cloud-custodian", 
+                    "auth": {
+                        "type": "OAUTH"
+                    }
+                }, 
+                "encryptionKey": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3", 
+                "arn": "arn:aws:codebuild:us-east-1:644160558196:project/test-delete-codebuild2"
+            }, 
+            {
+                "name": "test", 
+                "serviceRole": "arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role", 
+                "tags": [], 
+                "artifacts": {
+                    "type": "NO_ARTIFACTS"
+                }, 
+                "lastModified": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 40, 
+                    "microsecond": 880000, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 40
+                }, 
+                "timeoutInMinutes": 60, 
+                "created": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 40, 
+                    "microsecond": 880000, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 40
+                }, 
+                "environment": {
+                    "computeType": "BUILD_GENERAL1_SMALL", 
+                    "privilegedMode": false, 
+                    "image": "aws/codebuild/python:2.7.12", 
+                    "type": "LINUX_CONTAINER", 
+                    "environmentVariables": []
+                }, 
+                "source": {
+                    "type": "GITHUB", 
+                    "location": "https://github.com/kapilt/cloud-custodian.git", 
+                    "auth": {
+                        "type": "OAUTH"
+                    }
+                }, 
+                "encryptionKey": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3", 
+                "arn": "arn:aws:codebuild:us-east-1:644160558196:project/test"
+            }
+        ]
+    }
+}

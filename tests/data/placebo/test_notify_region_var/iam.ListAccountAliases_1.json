@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccountAliases": [
+            "test-account-alias"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "692b0391-ced2-11e7-a864-69b79066abd1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "692b0391-ced2-11e7-a864-69b79066abd1", 
+                "date": "Tue, 21 Nov 2017 15:41:15 GMT", 
+                "content-length": "400", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
