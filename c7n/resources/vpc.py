@@ -234,29 +234,28 @@ class SecurityGroup(query.QueryResourceManager):
 
 class ConfigSG(query.ConfigSource):
 
-    def augment(self, resources):
-        for r in resources:
-            for rset in ('IpPermissions', 'IpPermissionsEgress'):
-                for p in r.get(rset, ()):
-                    if p.get('FromPort', '') is None:
-                        p.pop('FromPort')
-                    if p.get('ToPort', '') is None:
-                        p.pop('ToPort')
-                    if 'Ipv6Ranges' not in p:
-                        p[u'Ipv6Ranges'] = []
-                    for i in p.get('UserIdGroupPairs', ()):
-                        for k, v in list(i.items()):
-                            if v is None:
-                                i.pop(k)
-
-                    # legacy config form, still version 1.2
-                    for attribute, element_key in (('IpRanges', u'CidrIp'),):
-                        if attribute not in p:
-                            continue
-                        p[attribute] = [{element_key: v} for v in p[attribute]]
-                    if 'Ipv4Ranges' in p:
-                        p['IpRanges'] = p.pop('Ipv4Ranges')
-        return resources
+    def load_resource(self, item):
+        r = super(ConfigSG, self).load_resource(item)
+        for rset in ('IpPermissions', 'IpPermissionsEgress'):
+            for p in r.get(rset, ()):
+                if p.get('FromPort', '') is None:
+                    p.pop('FromPort')
+                if p.get('ToPort', '') is None:
+                    p.pop('ToPort')
+                if 'Ipv6Ranges' not in p:
+                    p[u'Ipv6Ranges'] = []
+                for i in p.get('UserIdGroupPairs', ()):
+                    for k, v in list(i.items()):
+                        if v is None:
+                            i.pop(k)
+                # legacy config form, still version 1.2
+                for attribute, element_key in (('IpRanges', u'CidrIp'),):
+                    if attribute not in p:
+                        continue
+                    p[attribute] = [{element_key: v} for v in p[attribute]]
+                if 'Ipv4Ranges' in p:
+                    p['IpRanges'] = p.pop('Ipv4Ranges')
+        return r
 
 
 @SecurityGroup.filter_registry.register('locked')
@@ -768,10 +767,7 @@ class SGPermission(Filter):
     def process_cidrs(self, perm):
         found = None
         if 'Cidr' in self.data:
-            if 'Ipv4Ranges' in perm:
-                ip_perms = perm.get('Ipv4Ranges', [])
-            else:
-                ip_perms = perm.get('IpRanges', [])
+            ip_perms = perm.get('IpRanges', [])
             if not ip_perms:
                 return False
 
