@@ -74,3 +74,72 @@ class ElasticSearch(BaseTest):
             DomainName='c7n-test')['DomainStatus']
         self.assertEqual(state['Deleted'], True)
 
+    def test_domain_add_tag(self):
+        session_factory = self.replay_flight_data('test_elasticsearch_add_tag')
+        client = session_factory(region='us-east-1').client('es')
+        p = self.load_policy({
+            'name': 'tag-elasticsearch-domain',
+            'resource': 'elasticsearch',
+            'filters': [{'tag:MyTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'MyTag',
+                'value': 'MyValue'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DomainName'], 'c7n-test')
+        tags = client.list_tags(ARN=resources[0]['ARN'])['TagList'][0]
+        self.assertEqual(tags, {'Key': 'MyTag', 'Value': 'MyValue'})
+
+    def test_domain_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_remove_tag')
+        client = session_factory(region='us-east-1').client('es')
+        p = self.load_policy({
+            'name': 'remove-tag-elasticsearch-domain',
+            'resource': 'elasticsearch',
+            'filters': [{'tag:MyTag': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['MyTag']}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DomainName'], 'c7n-test')
+        tags = client.list_tags(ARN=resources[0]['ARN'])['TagList']
+        self.assertEqual(len(tags), 0)
+
+    def test_domain_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_markforop')
+        client = session_factory(region='us-east-1').client('es')
+        p = self.load_policy({
+            'name': 'markforop-elasticsearch-domain',
+            'resource': 'elasticsearch',
+            'filters': [{'tag:MyTag': 'absent'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'days': 1,
+                'tag': 'es_custodian_cleanup',
+                'op': 'delete'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DomainName'], 'c7n-test')
+        tags = client.list_tags(ARN=resources[0]['ARN'])['TagList'][0]
+        self.assertEqual(tags, {
+            'Key': 'es_custodian_cleanup',
+            'Value': 'Resource does not meet policy: delete@2017/11/30'})
+
+    def test_domain_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_markedforop')
+        p = self.load_policy({
+            'name': 'markedforop-elasticsearch-domain',
+            'resource': 'elasticsearch',
+            'filters': [{
+                'type': 'marked-for-op',
+                'tag': 'es_custodian_cleanup',
+                'skew': 1,
+                'op': 'delete'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DomainName'], 'c7n-test')
