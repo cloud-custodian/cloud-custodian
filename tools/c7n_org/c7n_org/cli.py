@@ -171,7 +171,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--field', multiple=True)
-@click.option('--no_default_fields', default=False, is_flag=True)
+@click.option('--no-default-fields', default=False, is_flag=True)
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
 @click.option('--debug', default=False, is_flag=True)
@@ -230,7 +230,7 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not(no-default-fields),
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
