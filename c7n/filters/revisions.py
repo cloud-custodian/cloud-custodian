@@ -148,7 +148,7 @@ class Diff(Filter):
     def transform_revision(self, revision):
         """make config revision look like describe output."""
         config = self.manager.get_source('config')
-        return config.augment([camelResource(json.loads(revision['configuration']))])[0]
+        return config.load_resource(revision)
 
     def diff(self, source, target):
         raise NotImplementedError("Subclass responsibility")
