@@ -179,7 +179,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-p', '--policy', multiple=True)
 @click.option('--format', default='csv', type=click.Choice(['csv', 'json']))
 @click.option('--resource', default=None)
-def report(config, output, use, output_dir, accounts, field, no_default_fields, tags, region, debug, verbose, policy, format, resource):
+def report(config, output, use, output_dir, accounts, field, no-default-fields, tags, region, debug, verbose, policy, format, resource):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, resource=resource)
