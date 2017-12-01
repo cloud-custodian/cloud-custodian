@@ -768,7 +768,10 @@ class SGPermission(Filter):
     def process_cidrs(self, perm):
         found = None
         if 'Cidr' in self.data:
-            ip_perms = perm.get('IpRanges', [])
+            if 'Ipv4Ranges' in perm:
+                ip_perms = perm.get('Ipv4Ranges', [])
+            else:
+                ip_perms = perm.get('IpRanges', [])
             if not ip_perms:
                 return False
 
