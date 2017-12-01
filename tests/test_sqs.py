@@ -181,6 +181,24 @@ class TestSqsAction(BaseTest):
         data = json.loads(client.get_queue_attributes(QueueUrl=resources[0]['QueueUrl'], AttributeNames=['Policy'])['Attributes']['Policy'])
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
 
+    def test_sqs_remove_all(self):
+        factory = self.replay_flight_data('test_sqs_remove_named_all')
+        queue_url = 'https://queue.amazonaws.com/644160558196/test-sqs-remove-named'
+        p = self.load_policy({
+            'name': 'sqs-rm-all',
+            'resource': 'sqs',
+            'filters': [{'QueueUrl': queue_url}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': ['RemoveMe']}]
+            }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('sqs')
+        d2 = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=['All'])['Attributes']
+        self.assertNotIn('Policy', d2)
+        
 
     @functional
     def test_sqs_mark_for_op(self):
