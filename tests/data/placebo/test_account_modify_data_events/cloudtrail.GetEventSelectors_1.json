@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EventSelectors": [
+            {
+                "IncludeManagementEvents": false, 
+                "DataResources": [
+                    {
+                        "Values": [
+                            "arn:aws:s3:::custodian-log-archive/", 
+                            "arn:aws:s3:::c7n-fire-logs/", 
+                            "arn:aws:s3:::custodian-skunk-trails/", 
+                            "arn:aws:s3:::config-bucket-644160558196/"
+                        ], 
+                        "Type": "AWS::S3::Object"
+                    }
+                ], 
+                "ReadWriteType": "All"
+            }
+        ], 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvent-1", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "519c47aa-a6b4-11e7-8a74-d9e2f481e156", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "519c47aa-a6b4-11e7-8a74-d9e2f481e156", 
+                "date": "Sun, 01 Oct 2017 14:25:04 GMT", 
+                "content-length": "358", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

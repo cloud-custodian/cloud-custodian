@@ -341,8 +341,9 @@ class PullMode(PolicyExecutionMode):
                     " execution_time: %0.2f" % (
                         self.policy.name, a.name,
                         len(resources), time.time() - s))
-                self.policy._write_file(
-                    "action-%s" % a.name, utils.dumps(results))
+                if results:
+                    self.policy._write_file(
+                        "action-%s" % a.name, utils.dumps(results))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
@@ -471,6 +472,17 @@ class LambdaMode(PolicyExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
+    def expand_variables(self, variables):
+        """expand variables in the mode role fields.
+        """
+        p = variables['policy'].copy()
+        if 'mode' in variables['policy']:
+            if 'role' in variables['policy']['mode']:
+                mode = variables['policy']['mode'].copy()
+                mode['role'] = mode['role'].format(**variables)
+                p['mode'] = mode
+        return p
+
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
@@ -478,6 +490,11 @@ class LambdaMode(PolicyExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
+            variables = {
+                'account_id': self.policy.options.account_id,
+                'policy': self.policy.data
+            }
+            self.policy.data = self.expand_variables(variables)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:

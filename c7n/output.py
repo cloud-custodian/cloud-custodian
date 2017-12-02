@@ -102,10 +102,10 @@ class NullMetricsOutput(MetricsOutput):
                 log.debug(self.format_metric(m))
 
     def format_metric(self, m):
-        l = "metric:%s %s:%s" % (m['MetricName'], m['Unit'], m['Value'])
+        label = "metric:%s %s:%s" % (m['MetricName'], m['Unit'], m['Value'])
         for d in m['Dimensions']:
-            l += " %s:%s" % (d['Name'].lower(), d['Value'].lower())
-        return l
+            label += " %s:%s" % (d['Name'].lower(), d['Value'].lower())
+        return label
 
 
 class LogOutput(object):
@@ -188,7 +188,7 @@ class FSOutput(LogOutput):
             for f in files:
                 fp = os.path.join(root, f)
                 with gzip.open(fp + ".gz", "wb", compresslevel=7) as zfh:
-                    with open(fp) as sfh:
+                    with open(fp, "rb") as sfh:
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 

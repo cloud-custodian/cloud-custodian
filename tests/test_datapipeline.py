@@ -55,7 +55,7 @@ class DataPipelineTest(BaseTest):
             'name': 'datapipeline-report',
             'resource': 'datapipeline',
             'filters': [
-                {'name': 'PipelinesFTW'}],
+                {'tag:foo': 'bar'}],
             },
             config={'region': 'us-west-2'},
             session_factory=factory)
@@ -63,7 +63,7 @@ class DataPipelineTest(BaseTest):
         self.assertEqual(len(resources), 1)
         resource = resources[0]
         self.assertEqual(resource['name'], 'PipelinesFTW')
-        self.assertEqual(resource['tags'], [{'key': 'foo', 'value': 'bar'}])
+        self.assertEqual(resource['Tags'], [{'Key': 'foo', 'Value': 'bar'}])
         self.assertEqual(resource['lastActivationTime'], '2017-03-13T11:37:36')
         self.assertEqual(resource['creationTime'], '2017-03-13T11:37:34')
         self.assertEqual(resource['sphere'], 'PIPELINE')
@@ -73,3 +73,19 @@ class DataPipelineTest(BaseTest):
         self.assertEqual(resource['accountId'], '644160558196')
         self.assertEqual(resource['userId'], 'AIDAIXI7ULG2SDYI3RBNM')
         self.assertEqual(resource['firstActivationTime'], '2017-03-13T11:37:36')
+
+
+    def test_delete_datapipeline(self):
+        factory = self.replay_flight_data('test_datapipeline_delete')
+        p = self.load_policy({
+            'name': 'delete-datapipeline',
+            'resource': 'datapipeline',
+            'filters': [{'name': 'test-delete-pipeline'}],
+            'actions': ['delete']
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-delete-pipeline')
+        client = factory().client('datapipeline')
+        removed = client.describe_pipelines(pipelineIds=[resources[0]['id']])
+        self.assertEqual(removed['pipelineDescriptionList'][0]['fields'][12]['stringValue'], 'DELETING')

@@ -283,7 +283,7 @@ class TagActionFilter(Filter):
 
         try:
             action_date = parse(action_date_str)
-        except:
+        except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
 
@@ -534,7 +534,7 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': True},
+        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': True},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)

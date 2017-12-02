@@ -26,6 +26,7 @@ import six
 from botocore.exceptions import ClientError
 
 from c7n.executor import ThreadPoolExecutor
+from c7n.manager import resources
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n import utils
@@ -151,7 +152,7 @@ class Action(object):
         except ClientError as e:
             if (e.response['Error']['Code'] == 'DryRunOperation' and
             e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
-            'would have succeeded' in e.message):
+            'would have succeeded' in e.response['Error']['Message']):
                 return self.log.info(
                     "Dry run operation %s succeeded" % (
                         self.__class__.__name__.lower()))
@@ -197,10 +198,10 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string', 'pattern': '^sg-*'},
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}}]}},
-        'oneOf': [
-            {'required': ['isolation-group', 'remove']},
-            {'required': ['add', 'remove']},
-            {'required': ['add']}]
+        'anyOf': [
+            {'required': ['isolation-group', 'remove', 'type']},
+            {'required': ['add', 'remove', 'type']},
+            {'required': ['add', 'type']}]
     }
 
     def get_groups(self, resources, metadata_key=None):
@@ -463,13 +464,12 @@ class Notify(EventAction):
         return p
 
     def process(self, resources, event=None):
-        aliases = self.manager.session_factory().client(
-            'iam').list_account_aliases().get('AccountAliases', ())
-        account_name = aliases and aliases[0] or ''
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
-            'account': account_name,
+            'account': alias,
             'region': self.manager.config.region,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
@@ -494,7 +494,7 @@ class Notify(EventAction):
         return b64encoded.decode('ascii')
 
     def send_sns(self, message):
-        topic = self.data['transport']['topic']
+        topic = self.data['transport']['topic'].format(**message)
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -507,14 +507,14 @@ class Notify(EventAction):
         client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
-        queue = self.data['transport']['queue']
+        queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]
@@ -548,15 +548,19 @@ class AutoTagUser(EventAction):
     .. code-block:: yaml
 
       policies:
-        - name: ec2-auto-tag-owner
+        - name: ec2-auto-tag-ownercontact
           resource: ec2
+          description: |
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the OwnerContact tag. If missing it gets created
+            with the value of the ID of whomever called the RunInstances API
           mode:
             type: cloudtrail
             role: arn:aws:iam::123456789000:role/custodian-auto-tagger
             events:
               - RunInstances
           filters:
-           - tag:Owner: absent
+           - tag:OwnerContact: absent
           actions:
            - type: auto-tag-user
              tag: OwnerContact
@@ -657,6 +661,16 @@ class AutoTagUser(EventAction):
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
+
+
+def add_auto_tag_user(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
+            klass.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
 class PutMetric(BaseAction):
@@ -762,3 +776,33 @@ class PutMetric(BaseAction):
         client.put_metric_data(Namespace=ns, MetricData=metrics_data)
 
         return resources
+
+
+class RemovePolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    def process_policy(self, policy, resource, matched_key):
+        statement_ids = self.data.get('statement_ids')
+
+        found = []
+        statements = policy.get('Statement', [])
+        resource_statements = resource.get(
+            matched_key, ())
+
+        for s in list(statements):
+            if statement_ids == 'matched':
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['statement_ids']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return None, found
+        return statements, found

@@ -15,9 +15,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from setuptools import setup, find_packages
 
+requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15"]
+try:
+    from concurrent import futures
+except ImportError:
+    # The backport has SyntaxErrors under py36, so avoid installing it.
+    # https://github.com/agronholm/pythonfutures/issues/41
+    requires += ['futures']
+
 setup(
     name="c7n_mailer",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Reference Mailer",
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -32,5 +40,5 @@ setup(
             'c7n-mailer-replay = c7n_mailer.replay:main'
         ]
     },
-    install_requires=["Jinja2", "boto3", "jsonschema"],
+    install_requires=requires,
 )

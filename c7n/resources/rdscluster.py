@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
+import functools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -25,7 +26,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks, get_retry)
+    type_schema, local_session, snapshot_identifier, chunks,
+    get_retry, generate_arn)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -55,6 +57,15 @@ class RDSCluster(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds', region=self.config.region,
+                account_id=self.account_id,
+                resource_type=self.resource_type.type, separator=':')
+        return self._generate_arn
 
     def augment(self, dbs):
         filter(None, _rds_cluster_tags(

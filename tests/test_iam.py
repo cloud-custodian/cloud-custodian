@@ -19,12 +19,12 @@ import os
 import tempfile
 
 from unittest import TestCase
-from .common import load_data, BaseTest
+from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
-from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
@@ -186,7 +186,24 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 6)
 
 
-class IamUserFilterUsage(BaseTest):
+class IamUserTest(BaseTest):
+
+    @functional
+    def test_iam_user_delete(self):
+        factory = self.replay_flight_data('test_iam_user_delete')
+        name = 'alice'
+        client = factory().client('iam')
+        client.create_user(UserName=name, Path="/test/")
+        p = self.load_policy({
+            'name': 'iam-user-delete',
+            'resource': 'iam-user',
+            'filters': [{'UserName': name}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.list_users(PathPrefix="/test/").get('Users', [])
+        self.assertEqual(users, [])
 
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
@@ -352,6 +369,7 @@ class IamGroupFilterUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
@@ -676,7 +694,6 @@ class SNSCrossAccount(BaseTest):
         arn = client.create_topic(Name=topic_name)['TopicArn']
         self.addCleanup(client.delete_topic, TopicArn=arn)
 
-
         policy = {
             'Id': 'Foo',
             "Version": "2012-10-17",
@@ -714,15 +731,41 @@ class CrossAccountChecker(TestCase):
                 {'Action': 'SQS:SendMessage',
                  'Effect': 'Allow',
                  'NotPrincipal': '90120'}]}
-        self.assertTrue(
-            bool(check_cross_account(
-                policy, set(['221800032964']), False, (), None)))
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
+
+        self.assertTrue(bool(checker.check(policy)))
 
     def test_sqs_policies(self):
         policies = load_data('iam/sqs-policies.json')
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
         for p, expected in zip(
                 policies, [False, True, True, False,
                            False, False, False, False]):
-            violations = check_cross_account(
-                p, set(['221800032964']), False, (), None)
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678']),
+            'allowed_vpce': set(['vpce-12345678'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, True, False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_vpc(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, False, False, False]):
+            violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

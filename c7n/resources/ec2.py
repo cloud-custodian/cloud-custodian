@@ -34,7 +34,7 @@ from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 
 from c7n import utils
 from c7n.utils import type_schema
@@ -47,7 +47,7 @@ filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
-class EC2(QueryResourceManager):
+class EC2(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -106,6 +106,16 @@ class EC2(QueryResourceManager):
                 qf.append(qd)
         return qf
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeEC2(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeEC2(query.DescribeSource):
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
@@ -119,11 +129,11 @@ class EC2(QueryResourceManager):
         name), so there isn't a good default to ensure that we will
         always get tags from describe_x calls.
         """
-
         # First if we're in event based lambda go ahead and skip this,
         # tags can't be trusted in ec2 instances immediately post creation.
-        if not resources or self.data.get('mode', {}).get('type', '') in (
-                'cloudtrail', 'ec2-instance-state'):
+        if not resources or self.manager.data.get(
+                'mode', {}).get('type', '') in (
+                    'cloudtrail', 'ec2-instance-state'):
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -141,8 +151,8 @@ class EC2(QueryResourceManager):
             return resources
 
         # Okay go and do the tag lookup
-        client = utils.local_session(self.session_factory).client('ec2')
-        tag_set = self.retry(
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        tag_set = self.manager.retry(
             client.describe_tags,
             Filters=[{'Name': 'resource-type',
                       'Values': ['instance']}])['Tags']
@@ -152,7 +162,7 @@ class EC2(QueryResourceManager):
             rid = t.pop('ResourceId')
             resource_tags.setdefault(rid, []).append(t)
 
-        m = self.get_model()
+        m = self.manager.get_model()
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
@@ -643,41 +653,39 @@ class Start(BaseAction, StateTransitionFilter):
         if not len(instances):
             return
 
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        failures = {}
 
         # Play nice around aws having insufficient capacity...
         for itype, t_instances in utils.group_by(
                 instances, 'InstanceType').items():
             for izone, z_instances in utils.group_by(
-                    t_instances, 'AvailabilityZone').items():
+                    t_instances, 'Placement.AvailabilityZone').items():
                 for batch in utils.chunks(z_instances, self.batch_size):
-                    self.process_instance_set(client, batch, itype, izone)
+                    fails = self.process_instance_set(client, batch, itype, izone)
+                    if fails:
+                        failures["%s %s" % (itype, izone)] = [i['InstanceId'] for i in batch]
 
-        # Raise an exception after all batches process
-        if self.exception:
-            if self.exception.response['Error']['Code'] not in ('InsufficientInstanceCapacity'):
-                self.log.exception("Error while starting instances error %s", self.exception)
-                raise self.exception
+        if failures:
+            fail_count = sum(map(len, failures.values()))
+            msg = "Could not start %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
 
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
-        retry = utils.get_retry((
-            'InsufficientInstanceCapacity',
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'),
-            max_attempts=5)
+        retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+                     'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         try:
             retry(client.start_instances, InstanceIds=instance_ids)
         except ClientError as e:
-            # Saving exception
-            self.exception = e
-            self.log.exception(
-                ("Could not start instances:%d type:%s"
-                 " zone:%s instances:%s error:%s"),
-                len(instances), itype, izone,
-                ", ".join(instance_ids), e)
-            return
+            if e.response['Error']['Code'] in retryable:
+                return True
+            raise
 
 
 @actions.register('resize')
@@ -828,6 +836,70 @@ class Stop(BaseAction, StateTransitionFilter):
                         return
                     continue
                 raise
+
+
+@actions.register('reboot')
+class Reboot(BaseAction, StateTransitionFilter):
+    """reboots a previously running EC2 instance.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-reboot-instances
+            resource: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - reboot
+
+    http://docs.aws.amazon.com/cli/latest/reference/ec2/reboot-instances.html
+    """
+
+    valid_origin_states = ('running',)
+    schema = type_schema('reboot')
+    permissions = ('ec2:RebootInstances',)
+    batch_size = 10
+    exception = None
+
+    def _filter_ec2_with_volumes(self, instances):
+        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
+
+    def process(self, instances):
+        instances = self._filter_ec2_with_volumes(
+            self.filter_instance_state(instances))
+        if not len(instances):
+            return
+
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        failures = {}
+
+        for batch in utils.chunks(instances, self.batch_size):
+            fails = self.process_instance_set(client, batch)
+            if fails:
+                failures = [i['InstanceId'] for i in batch]
+
+        if failures:
+            fail_count = sum(map(len, failures.values()))
+            msg = "Could not reboot %d of %d instances %s" % (
+                fail_count, len(instances),
+                utils.dumps(failures))
+            self.log.warning(msg)
+            raise RuntimeError(msg)
+
+    def process_instance_set(self, client, instances):
+        # Setup retry with insufficient capacity as well
+        retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
+                     'Client.RequestLimitExceeded'),
+        retry = utils.get_retry(retryable, max_attempts=5)
+        instance_ids = [i['InstanceId'] for i in instances]
+        try:
+            retry(client.reboot_instances, InstanceIds=instance_ids)
+        except ClientError as e:
+            if e.response['Error']['Code'] in retryable:
+                return True
+            raise
 
 
 @actions.register('terminate')
@@ -1090,7 +1162,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         policies:
           - name: set-default-instance-profile
             resource: ec2
-            query:
+            filters:
               - IamInstanceProfile: absent
             actions:
               - type: set-instance-profile
@@ -1166,6 +1238,7 @@ EC2_VALID_FILTERS = {
     'tag-key': str,
     'tag-value': str,
     'tag:': str,
+    'tenancy': ('dedicated', 'default', 'host'),
     'vpc-id': str}
 
 

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-enable-bucket-encryption-aes256", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ZF7i4o3Uwc8GfY4+8YYhN3sIIg1+6m3wBv9KQlMTOjoa46TVVAKmxSJD1SQ3WDOohZ/u2d59ORw=", 
+            "RequestId": "15B540DA248D9374", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "ZF7i4o3Uwc8GfY4+8YYhN3sIIg1+6m3wBv9KQlMTOjoa46TVVAKmxSJD1SQ3WDOohZ/u2d59ORw=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "15B540DA248D9374", 
+                "location": "/custodian-enable-bucket-encryption-aes256", 
+                "date": "Wed, 15 Nov 2017 16:15:29 GMT"
+            }
+        }
+    }
+}

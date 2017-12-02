@@ -34,6 +34,7 @@ scalar operators:
     - ``or`` or ``Or``
     - ``and`` or ``And``
     - ``not``
+    - ``intersect`` - Provides comparison between 2 lists
 - Special operators:
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case
@@ -114,6 +115,34 @@ JMESPath Filter
        value_type: resource_count
        op: lt
        value: 2
+
+      # This policy will use `intersect` op to compare rds instances subnet group list
+      # against a user provided list of public subnets from a s3 txt file.
+      - name: find-rds-on-public-subnets-using-s3-list
+        comment:  |
+           The txt file needs to be in utf-8 no BOM format and contain one
+           subnet per line in the file no quotes around the subnets either.
+        resource: rds
+        filters:
+            - type: value
+              key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
+              op: intersect
+              value_from:
+                  url: s3://cloud-custodian-bucket/PublicSubnets.txt
+                  format: txt
+
+     # This policy will compare rds instances subnet group list against a
+     # inline user provided list of public subnets.
+     - name: find-rds-on-public-subnets-using-inline-list
+       resource: rds
+       filters:
+           - type: value
+             key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
+             op: intersect
+             value:
+                 - subnet-2a8374658
+                 - subnet-1b8474522
+                 - subnet-2d2736444
 
 
 `EventFilter`

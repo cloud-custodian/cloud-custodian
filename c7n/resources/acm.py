@@ -31,3 +31,4 @@ class Certificate(QueryResourceManager):
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
+        filter_name = None

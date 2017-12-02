@@ -15,12 +15,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import io
+import jmespath
 import json
 import os.path
+from six import text_type
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
 
-import jmespath
+from c7n.utils import format_string_values
 
 
 class URIResolver(object):
@@ -36,7 +38,7 @@ class URIResolver(object):
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
             fh = urlopen(uri)
-            contents = fh.read()
+            contents = fh.read().decode('utf-8')
             fh.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
@@ -103,7 +105,11 @@ class ValuesFrom(object):
     }
 
     def __init__(self, data, manager):
-        self.data = data
+        config_args = {
+            'account_id': manager.config.account_id,
+            'region': manager.config.region
+        }
+        self.data = format_string_values(data, **config_args)
         self.manager = manager
         self.resolver = URIResolver(manager.session_factory, manager._cache)
 
@@ -119,7 +125,7 @@ class ValuesFrom(object):
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = self.resolver.resolve(self.data['url'])
+        contents = text_type(self.resolver.resolve(self.data['url']))
         return contents, format
 
     def get_values(self):
@@ -130,7 +136,7 @@ class ValuesFrom(object):
             if 'expr' in self.data:
                 return jmespath.search(self.data['expr'], data)
         elif format == 'csv' or format == 'csv2dict':
-            data = csv.reader(io.BytesIO(contents))
+            data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
             else:
@@ -141,5 +147,4 @@ class ValuesFrom(object):
                 return jmespath.search(self.data['expr'], data)
             return data
         elif format == 'txt':
-            return [s.strip().decode('utf8')
-                    for s in io.BytesIO(contents).readlines()]
+            return [s.strip() for s in io.StringIO(contents).readlines()]

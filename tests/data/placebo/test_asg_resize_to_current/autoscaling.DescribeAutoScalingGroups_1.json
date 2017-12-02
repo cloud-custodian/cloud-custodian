@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:eu-central-1:123456789012:autoScalingGroup:17cb6300-e41e-402b-9e17-9bbbad0d7cf2:autoScalingGroupName/MyTestASG",
+                "TargetGroupARNs": [],
+                "SuspendedProcesses": [],
+                "DesiredCapacity": 2,
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyTestASG",
+                        "PropagateAtLaunch": false,
+                        "Value": "yes",
+                        "Key": "CustodianUnitTest"
+                    },
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "MyTestASG",
+                        "PropagateAtLaunch": true,
+                        "Value": "MyTestASG",
+                        "Key": "Name"
+                    }
+                ],
+                "EnabledMetrics": [],
+                "LoadBalancerNames": [],
+                "AutoScalingGroupName": "MyTestASG",
+                "DefaultCooldown": 300,
+                "MinSize": 2,
+                "Instances": [
+                    {
+                        "InstanceId": "i-059e6734ab895d257",
+                        "ProtectedFromScaleIn": false,
+                        "AvailabilityZone": "eu-central-1a",
+                        "HealthStatus": "Healthy",
+                        "LifecycleState": "InService"
+                    }
+                ],
+                "MaxSize": 2,
+                "VPCZoneIdentifier": "subnet-a19706c9,subnet-c510cabf,subnet-b2e7e1f8",
+                "HealthCheckGracePeriod": 300,
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "LaunchConfigurationName": "MyTestASGapp.20171107110021201200000001",
+                "CreatedTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 11,
+                    "second": 35,
+                    "microsecond": 569000,
+                    "year": 2017,
+                    "day": 7,
+                    "minute": 9
+                },
+                "AvailabilityZones": [
+                    "eu-central-1a",
+                    "eu-central-1c",
+                    "eu-central-1b"
+                ],
+                "HealthCheckType": "EC2",
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "379065e0-c3b0-11e7-90c1-5d6a692c6de3",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "379065e0-c3b0-11e7-90c1-5d6a692c6de3",
+                "vary": "Accept-Encoding",
+                "content-length": "7648",
+                "content-type": "text/xml",
+                "date": "Tue, 07 Nov 2017 11:38:46 GMT"
+            }
+        }
+    }
+}

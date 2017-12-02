@@ -13,7 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+import json, time
+
+from .common import BaseTest, functional
 
 
 class KMSTest(BaseTest):
@@ -42,3 +44,177 @@ class KMSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+    @functional
+    def test_kms_remove_matched(self):
+        session_factory = self.replay_flight_data('test_kms_remove_matched')
+        client = session_factory().client('kms')
+        key_id = client.create_key()['KeyMetadata']['KeyId']
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id, PendingWindowInDays=7)
+
+        client.put_key_policy(
+            KeyId=key_id,
+            PolicyName='default',
+            Policy=json.dumps({
+                "Version": "2008-10-17",
+                "Statement": [
+                    {
+                      "Sid": "DefaultRoot",
+                      "Effect": "Allow",
+                      "Principal": {
+                        "AWS": "arn:aws:iam::123456789012:root"
+                      },
+                      "Action": "kms:*",
+                      "Resource": "*"
+                    },
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::123456789012:root"
+                        },
+                        "Action": [
+                            "kms:*"
+                        ]
+                    },
+                    {
+                        "Sid": "Public",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": [
+                            "kms:Put*"
+                        ]
+                    }
+                ]
+            })
+        )
+
+        p = self.load_policy({
+            'name': 'kms-rm-matched',
+            'resource': 'kms-key',
+            'filters': [
+                {'KeyId': key_id},
+                {'type': 'cross-account',
+                 'whitelist': ["123456789012"]}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': 'matched'}]
+            },
+            session_factory=session_factory)
+        
+        resources = p.run()
+        self.assertEqual([r['KeyId'] for r in resources], [key_id])
+
+        if self.recording:
+            time.sleep(60) # takes time before new policy reflected
+
+        data = json.loads(
+            client.get_key_policy(
+                KeyId=resources[0]['KeyId'],PolicyName='default').get('Policy'))
+        self.assertEqual(
+            [s['Sid'] for s in data.get('Statement', ())],
+            ['DefaultRoot','SpecificAllow'])
+
+
+    @functional
+    def test_kms_remove_named(self):
+        session_factory = self.replay_flight_data('test_kms_remove_named')
+        client = session_factory().client('kms')
+        key_id = client.create_key()['KeyMetadata']['KeyId']
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id, PendingWindowInDays=7)
+
+        client.put_key_policy(
+            KeyId=key_id,
+            PolicyName='default',
+            Policy=json.dumps({
+                "Version": "2008-10-17",
+                "Statement": [
+                    {
+                      "Sid": "DefaultRoot",
+                      "Effect": "Allow",
+                      "Principal": {
+                        "AWS": "arn:aws:iam::123456789012:root"
+                      },
+                      "Action": "kms:*",
+                      "Resource": "*"
+                    },
+                    {
+                        "Sid": "RemoveMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["kms:*"]
+                    }
+                ]
+            })
+        )
+
+        p = self.load_policy({
+            'name': 'kms-rm-named',
+            'resource': 'kms-key',
+            'filters': [{'KeyId': key_id}],
+            'actions': [
+                {'type': 'remove-statements',
+                 'statement_ids': ['RemoveMe']}]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)  
+
+        if self.recording:
+            time.sleep(60) # takes time before new policy reflected
+
+        data = json.loads(
+            client.get_key_policy(
+                KeyId=resources[0]['KeyId'],PolicyName='default').get('Policy'))
+
+        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
+
+
+class KMSTagging(BaseTest):
+
+    def test_kms_key_tag(self):
+        session_factory = self.replay_flight_data('test_kms_key_tag')
+        client = session_factory().client('kms')
+        key_id = client.create_key()['KeyMetadata']['KeyId']
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id,
+                        PendingWindowInDays=7)
+        policy = self.load_policy({
+            'name': 'kms-key-tag',
+            'resource': 'kms-key',
+            'filters': [{'KeyId': key_id}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'RequisiteKey',
+                'value': 'Required'}]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_resource_tags(KeyId=key_id)['Tags']
+        self.assertEqual(tags[0]['TagKey'], 'RequisiteKey')
+
+    def test_kms_key_remove_tag(self):
+        session_factory = self.replay_flight_data('test_kms_key_remove_tag')
+        client = session_factory().client('kms')
+        key_id = client.create_key(
+            Tags=[{'TagKey': 'ExpiredTag', 'TagValue': 'Invalid'}]
+        )['KeyMetadata']['KeyId']
+        self.addCleanup(client.schedule_key_deletion, KeyId=key_id,
+                        PendingWindowInDays=7)
+
+        policy = self.load_policy({
+            'name': 'kms-key-remove-tag',
+            'resource': 'kms-key',
+            'filters': [
+                {'KeyState': 'Enabled'},
+                {'tag:ExpiredTag': 'Invalid'}
+            ],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['ExpiredTag']}]}, session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['KeyId'], key_id)
+        tags = client.list_resource_tags(KeyId=key_id)['Tags']
+        self.assertEqual(len(tags), 0)

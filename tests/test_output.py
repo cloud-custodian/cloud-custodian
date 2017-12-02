@@ -97,7 +97,7 @@ class S3OutputTest(unittest.TestCase):
                 self.assertTrue(f.endswith('.gz'))
 
                 with gzip.open(os.path.join(root, f)) as fh:
-                    self.assertEqual(fh.read(), 'abc')
+                    self.assertEqual(fh.read(), b'abc')
 
     def test_upload(self):
         output = self.get_s3_output()

@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import functools
 import json
 import os
@@ -23,6 +24,7 @@ import time  # NOQA needed for some recordings
 from unittest import TestCase
 
 from botocore.exceptions import ClientError
+from dateutil.tz import tzutc
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
@@ -53,15 +55,17 @@ class BucketScanLogTests(TestCase):
         self.log = s3.BucketScanLog(self.log_dir, 'test')
 
     def test_scan_log(self):
+        first_five = list(range(5))
+        next_five = list(range(5, 10))
         with self.log:
-            self.log.add(range(10)[:5])
-            self.log.add(range(10)[5:])
+            self.log.add(first_five)
+            self.log.add(next_five)
 
         with open(self.log.path) as fh:
             data = json.load(fh)
             self.assertEqual(
                 data,
-                [range(10)[:5], range(10)[5:], []])
+                [first_five, next_five, []])
 
 
 def destroyBucket(client, bucket):
@@ -119,6 +123,114 @@ class BucketMetrics(BaseTest):
 
 class BucketInventory(BaseTest):
 
+    def test_s3_set_encrypted_inventory_sses3(self):
+        bname = 'custodian-inventory-test'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_set_encrypted_inventory_sses3')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'enabled',
+                    'encryption': 'SSES3',
+                    'fields': ['Size', 'EncryptionStatus']
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        invs = client.list_bucket_inventory_configurations(
+            Bucket=bname).get('InventoryConfigurationList')
+        self.assertTrue(invs)
+        self.assertTrue('SSES3' in invs[0]['Destination']['S3BucketDestination']['Encryption'])
+        self.assertTrue('EncryptionStatus' in invs[0]['OptionalFields'])
+
+    def test_s3_set_encrypted_inventory_ssekms(self):
+        bname = 'custodian-inventory-test'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_set_encrypted_inventory_ssekms')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'enabled',
+                    'encryption': 'SSEKMS',
+                    'key_id': 'arn:valid:kms',
+                    'fields': ['Size', 'EncryptionStatus']
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        invs = client.list_bucket_inventory_configurations(
+            Bucket=bname).get('InventoryConfigurationList')
+        self.assertTrue(invs)
+        self.assertTrue('SSEKMS' in invs[0]['Destination']['S3BucketDestination']['Encryption'])
+        self.assertTrue('EncryptionStatus' in invs[0]['OptionalFields'])
+
+    def test_s3_delete_inventory_inventory_not_set(self):
+        bname = 'delete_inventory'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_delete_inventory_inventory_not_set')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-inv',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [
+                {
+                    'type': 'set-inventory',
+                    'destination': 'inv-dest',
+                    'name': 'inv-name',
+                    'state': 'absent',
+                }
+            ]
+        }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        inventoryConfigList = client.list_bucket_inventory_configurations(Bucket=bname).get('InventoryConfigurationList')
+        self.assertFalse(inventoryConfigList)
+
+    @functional
     def test_inventory(self):
         bname = 'custodian-test-data'
         inv_bname = 'custodian-inv'
@@ -219,6 +331,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_versioned_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE',
@@ -258,6 +371,7 @@ class BucketDelete(BaseTest):
         buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
         self.assertFalse(bname in buckets)
 
+    @functional
     def test_delete_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -333,6 +447,7 @@ class BucketDelete(BaseTest):
 
 class BucketTag(BaseTest):
 
+    @functional
     def test_tag_bucket(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(
@@ -536,6 +651,20 @@ class S3ConfigSource(ConfigTest):
                   u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
                   u'Events': ['s3:ObjectCreated:*']}]})
 
+    def test_config_normalize_lifecycle_null_predicate(self):
+        event = event_data('s3-lifecycle-null-predicate.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        rule = resource['Lifecycle']['Rules'][0]
+        self.assertEqual(
+            rule,
+            {'AbortIncompleteMultipartUpload': {'DaysAfterInitiation': 1},
+             'Expiration': {'Days': 1},
+             'ID': 'RemoveAbortedUploads',
+             'NoncurrentVersionExpiration': {'NoncurrentDays': -1},
+             'Status': 'Enabled'})
+
     def test_config_normalize_lifecycle_and_predicate(self):
         event = event_data('s3-lifecycle-and-predicate.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -604,6 +733,16 @@ class S3ConfigSource(ConfigTest):
                         '/custodian-replicated-custodian-replicated'
                         '-west-s3-repl-role')}})
 
+    def test_config_normalize_website_redirect(self):
+        event = event_data('s3-website-redirect.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {'RedirectAllRequestsTo': {'HostName': 'www.google.com/', 'Protocol': 'https'}})
+        
     def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -656,6 +795,115 @@ class S3ConfigSource(ConfigTest):
                      }
                  ]}
              })
+
+
+    def test_load_item_resource_config_event(self):
+        event = event_data('s3-from-rule.json', 'config')
+        p = self.load_policy({
+            'name': 's3cfg',
+            'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource,
+            {u'Acl': {
+                u'Grants': [{
+                    u'Grantee': {
+                        u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15',
+                        u'Type': u'CanonicalUser'},
+                        u'Permission': u'FULL_CONTROL'}],
+                u'Owner': {u'DisplayName': u'mandeep.bal',
+                           u'ID': u'e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15'}},
+             u'CreationDate': datetime.datetime(2017, 9, 15, 2, 5, 40, tzinfo=tzutc()),
+             u'Lifecycle': None,
+             u'Location': None,
+             u'Logging': None,
+             u'Name': u'c7n-fire-logs',
+             u'Notification': {},
+             u'Policy': None,
+             u'Replication': None,
+             u'Tags': [],
+             u'Versioning': None,
+             u'Website': None})
+
+
+class BucketPolicyStatements(BaseTest):
+
+    @functional
+    def test_policy(self):
+        bname = 'custodian-test-data'
+        sid = 'CustodianTest'
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_policy_statements')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-policy-statements',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [
+                {'type': 'set-statements',
+                 'statements': [{
+                    'Sid': sid,
+                    'Effect': 'Deny',
+                    'Action': 's3:GetObject',
+                    'Principal': {
+                        'AWS': '*'
+                    },
+                    'Resource': 'arn:aws:s3:::{bucket_name}/*',
+                    'Condition': {
+                        'Bool': {
+                            'aws:SecureTransport': False
+                        }
+                    }
+                }]}]
+            }, session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
+
+        policy = client.get_bucket_policy(Bucket=bname).get('Policy')
+        policy = json.loads(policy)
+
+        self.assertTrue(len(policy['Statement']) > 0)
+        self.assertTrue(len([
+            s for s in policy['Statement'] if s['Sid'] == sid and s['Resource'] == 'arn:aws:s3:::%s/*' % (bname)
+        ]) == 1)
+
+    @functional
+    def test_policy_no_change(self):
+        bname = 'custodian-test-data'
+        sid = 'CustodianTest'
+
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [('get_bucket_policy', 'Policy', None, 'Policy')])
+
+        session_factory = self.replay_flight_data('test_s3_policy_statements_no_change')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-policy-statements',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}],
+            'actions': [
+                {'type': 'set-statements',
+                 'statements': []}]
+            }, session_factory=session_factory)
+        self.assertEqual(len(p.run()), 1)
 
 
 class S3Test(BaseTest):
@@ -1557,6 +1805,47 @@ class S3Test(BaseTest):
         report_resources = report_policy.run()
         self.assertEqual(report_resources[0]['KeyRemediated'], 0)
 
+    def test_encrypt_keys_aes256_sufficient(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data(
+            'test_s3_encrypt_aes256_sufficient')
+        bname = "custodian-encrypt-sufficient-test"
+
+        session = session_factory()
+        client = session.client('s3')
+        kms = session.client('kms')
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        key_id = [
+            k for k in kms.list_aliases().get('Aliases', ())
+            if k['AliasName'] == 'alias/aws/s3'][0]['AliasArn']
+
+        client.put_object(
+            Bucket=bname, Key='testing-abc', ServerSideEncryption='aws:kms',
+            SSEKMSKeyId=key_id)
+        client.put_object(
+            Bucket=bname, Key='testing-123', ServerSideEncryption='AES256')
+
+        p = self.load_policy({
+            'name': 'encrypt-keys',
+            'resource': 's3',
+            'filters': [{'Name': bname}],
+            'actions': [{'type': 'encrypt-keys'}]},
+            session_factory=session_factory)
+
+        p.run()
+
+        result = client.head_object(Bucket=bname, Key='testing-123')
+        self.assertTrue(result['ServerSideEncryption'] == 'AES256')
+
+        result = client.head_object(Bucket=bname, Key='testing-abc')
+        self.assertTrue(result['ServerSideEncryption'] == 'aws:kms')
+        data = json.load(open(
+            os.path.join(p.ctx.output_path, 'action-encryptextantkeys')))
+        self.assertEqual(
+            [{'Count': 2, 'Remediated': 0, 'Bucket': bname}], data)
+
     def test_encrypt_keys_key_id_option(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [])
         session_factory = self.replay_flight_data(
@@ -1768,3 +2057,360 @@ class S3Test(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_delete_bucket_notification(self):
+        self.patch(s3, 'S3_AUGMENT_TABLE', [(
+            'get_bucket_notification_configuration', 'Notification', None,
+            None)])
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_s3_delete_bucket_notification')
+        bname = 'custodian-delete-bucket-notification-test'
+        config_id = 'c7n-notify-1'
+        self.maxDiff = None
+        session = session_factory(region='us-east-1')
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket-notification',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'bucket-notification',
+                 'kind': 'sns',
+                 'key': 'Id',
+                 'value': config_id,
+                 'op': 'eq'}
+            ],
+            'actions': [{'type': 'delete-bucket-notification',
+                         'statement_ids': 'matched'}]
+            }, session_factory=session_factory)
+
+        topic_arn = session.client('sns').create_topic(Name='bucket-notification-test')['TopicArn']
+        self.addCleanup(session.client('sns').delete_topic, TopicArn=topic_arn)
+        topic_policy = {
+            'Statement': [{
+                'Action': 'SNS:Publish',
+                'Effect': 'Allow',
+                'Resource': topic_arn,
+                'Principal': {'Service': 's3.amazonaws.com'}}]}
+        session.client('sns').set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName='Policy',
+            AttributeValue=json.dumps(topic_policy))
+        client.put_bucket_notification_configuration(
+            Bucket=bname,
+            NotificationConfiguration={
+                'TopicConfigurations': [
+                    {'TopicArn': topic_arn, 'Events': ['s3:ObjectCreated:*'], 'Id': config_id},
+                     {'TopicArn': topic_arn, 'Events': ['s3:ObjectRemoved:*'], 'Id': 'another1'}
+                ]
+            })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        #time.sleep(10)
+        topic_notifications = client.get_bucket_notification_configuration(
+            Bucket=bname).get('TopicConfigurations', [])
+        us = [t for t in topic_notifications if t.get('TopicArn') == topic_arn]
+        self.assertEqual(len(us), 1)
+
+    def test_enable_bucket_encryption_kms(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_enable_bucket_encryption_kms')
+        session = session_factory()
+        client = session.client('s3')
+        kms_client = session.client('kms')
+        bname = 'custodian-enable-bucket-encryption-kms'
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        with self.assertRaises(Exception) as context:
+            response = client.get_bucket_encryption(Bucket=bname)
+
+        key = kms_client.list_keys()['Keys'][0]
+        key_arn = kms_client.describe_key(KeyId=key['KeyId'])['KeyMetadata']['Arn']
+        p = self.load_policy({
+            'name': 's3-enable-bucket-encryption',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption',
+                'key': str(key['KeyId']),
+                'crypto': 'aws:kms'
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording: time.sleep(5)
+
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
+        self.assertEqual(rules['SSEAlgorithm'], 'aws:kms')
+        self.assertEqual(rules['KMSMasterKeyID'], key_arn)
+
+    def test_enable_bucket_encryption_kms_alias(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_enable_bucket_encryption_kms_alias')
+        session = session_factory()
+        client = session.client('s3')
+        kms_client = session.client('kms')
+        bname = 'custodian-enable-bucket-encryption-kms-alias'
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        kms_alias = 'alias/some-key'
+        kms_alias_id = kms_client.describe_key(KeyId=kms_alias)['KeyMetadata']['Arn']
+        p = self.load_policy({
+            'name': 's3-enable-bucket-encryption-alias',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption',
+                'crypto': 'aws:kms',
+                'key': kms_alias
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording: time.sleep(5)
+
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
+        self.assertEqual(rules['SSEAlgorithm'], 'aws:kms')
+        self.assertEqual(rules['KMSMasterKeyID'], kms_alias_id)
+
+        p = self.load_policy({
+            'name': 's3-enable-bucket-encryption-bad-alias',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption',
+                'crypto': 'aws:kms',
+                'key': 'alias/some-nonexistant-alias'
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording: time.sleep(5)
+
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
+        self.assertEqual(rules['SSEAlgorithm'], 'aws:kms')
+        self.assertIsNone(rules.get('KMSMasterKeyID'))
+
+    def test_enable_bucket_encryption_aes256(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_enable_bucket_encryption_aes256')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-enable-bucket-encryption-aes256'
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        with self.assertRaises(Exception) as context:
+            client.get_bucket_encryption(Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-enable-bucket-encryption',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption'
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording: time.sleep(5)
+
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
+        self.assertEqual(rules['SSEAlgorithm'], 'AES256')
+
+        client.delete_bucket_encryption(Bucket=bname)
+        if self.recording: time.sleep(5)
+
+        with self.assertRaises(Exception) as context:
+            client.get_bucket_encryption(Bucket=bname)
+
+        p = self.load_policy({
+            'name': 's3-enable-bucket-encryption',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption',
+                'crypto': 'AES256'
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording: time.sleep(5)
+
+        response = client.get_bucket_encryption(Bucket=bname)
+        rules = response['ServerSideEncryptionConfiguration']['Rules'][0]['ApplyServerSideEncryptionByDefault']
+        self.assertEqual(rules['SSEAlgorithm'], 'AES256')
+
+    def test_delete_bucket_encryption(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        session_factory = self.replay_flight_data('test_s3_delete_bucket_encryption')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-delete-bucket-encryption-aes256'
+
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+
+        with self.assertRaises(Exception) as context:
+            response = client.get_bucket_encryption(Bucket=bname)
+
+        client.put_bucket_encryption(
+                Bucket=bname,
+                ServerSideEncryptionConfiguration={
+                    'Rules': [
+                        {
+                            'ApplyServerSideEncryptionByDefault': {
+                                'SSEAlgorithm': 'AES256'
+                                }
+                        }
+                    ]
+                })
+
+        p = self.load_policy({
+            'name': 's3-delete-bucket-encryption',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname}
+            ],
+            'actions': [{
+                'type': 'set-bucket-encryption',
+                'enabled': False
+             }]
+            }, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording: time.sleep(5)
+        with self.assertRaises(Exception) as context:
+            client.get_bucket_encryption(Bucket=bname)
+
+class S3LifecycleTest(BaseTest):
+
+    def test_lifecycle(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3, 'S3_AUGMENT_TABLE',
+            [('get_bucket_lifecycle_configuration', 'Lifecycle', None, None)])
+        session_factory = self.replay_flight_data('test_s3_lifecycle')
+        session = session_factory()
+        client = session.client('s3')
+        bname = 'custodian-lifecycle-test'
+
+        # Make a bucket
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        self.assertIn(bname, buckets)
+
+        def get_policy(**kwargs):
+            rule = {
+                'Status': 'Enabled',
+                'Prefix': 'foo/',
+                'Transitions': [{
+                    'Days': 60,
+                    'StorageClass': 'GLACIER',
+                }],
+            }
+            rule.update(**kwargs)
+
+            policy = {
+                'name': 's3-lifecycle',
+                'resource': 's3',
+                'filters': [{'Name': bname}],
+                'actions': [{
+                    'type': 'configure-lifecycle',
+                    'rules': [rule],
+                }]
+            }
+            return policy
+
+        def run_policy(policy):
+            p = self.load_policy(policy, session_factory=session_factory)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+            if self.recording:
+                time.sleep(5)
+
+        #
+        # Add the first lifecycle
+        #
+        lifecycle_id1 = 'test-lifecycle'
+        policy = get_policy(ID=lifecycle_id1)
+        run_policy(policy)
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id1)
+
+        #
+        # Now add another lifecycle rule to ensure it doesn't clobber the first one
+        #
+        lifecycle_id2 = 'test-lifecycle-two'
+        policy = get_policy(ID=lifecycle_id2, Prefix='bar/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        #
+        # Next, overwrite one of the lifecycles and make sure it changed
+        #
+        policy = get_policy(ID=lifecycle_id2, Prefix='baz/')
+        run_policy(policy)
+
+        # Verify the lifecycle
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 2)
+        self.assertSetEqual(set([x['ID'] for x in lifecycle['Rules']]),
+                            set([lifecycle_id1, lifecycle_id2]))
+
+        for rule in lifecycle['Rules']:
+            if rule['ID'] == lifecycle_id2:
+                self.assertEqual(rule['Prefix'], 'baz/')
+
+        #
+        # Test deleting a lifecycle
+        #
+        policy = get_policy(ID=lifecycle_id1, Status='absent')
+        run_policy(policy)
+
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertEqual(len(lifecycle['Rules']), 1)
+        self.assertEqual(lifecycle['Rules'][0]['ID'], lifecycle_id2)

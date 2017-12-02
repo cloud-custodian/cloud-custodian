@@ -27,23 +27,23 @@ class ResourceQueryTest(BaseTest):
     def test_query_filter(self):
         session_factory = self.replay_flight_data('test_query_filter')
         q = ResourceQuery(session_factory)
-        resources = q.filter(EC2.resource_type)
+        resources = q.filter(EC2)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_get(self):
         session_factory = self.replay_flight_data('test_query_get')
         q = ResourceQuery(session_factory)
-        resources = q.get(EC2.resource_type, ['i-9432cb49'])
+        resources = q.get(EC2, ['i-9432cb49'])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['InstanceId'], 'i-9432cb49')
 
     def test_query_model_get(self):
         session_factory = self.replay_flight_data('test_query_model')
         q = ResourceQuery(session_factory)
-        resources = q.filter(InternetGateway.resource_type)
+        resources = q.filter(InternetGateway)
         self.assertEqual(len(resources), 3)
-        resources = q.get(InternetGateway.resource_type, ['igw-3d9e3d56'])
+        resources = q.get(InternetGateway, ['igw-3d9e3d56'])
         self.assertEqual(len(resources), 1)
 
 

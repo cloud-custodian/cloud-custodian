@@ -15,9 +15,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session
+
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
 class Route53Base(object):
@@ -33,6 +35,9 @@ class Route53Base(object):
                 self.get_model().service,
                 resource_type=self.get_model().type)
         return self._generate_arn
+
+    def get_arn(self, r):
+        return self.generate_arn(r[self.get_model().id].split("/")[-1])
 
     def augment(self, resources):
         _describe_route53_tags(
@@ -90,6 +95,10 @@ class HostedZone(Route53Base, QueryResourceManager):
         return arns
 
 
+HostedZone.filter_registry.register('shield-enabled', IsShieldProtected)
+HostedZone.action_registry.register('set-shield', SetShieldProtection)
+
+
 @resources.register('healthcheck')
 class HealthCheck(Route53Base, QueryResourceManager):
 
@@ -105,11 +114,12 @@ class HealthCheck(Route53Base, QueryResourceManager):
 
 
 @resources.register('rrset')
-class ResourceRecordSet(QueryResourceManager):
+class ResourceRecordSet(ChildResourceManager):
 
     class resource_type(object):
         service = 'route53'
         type = 'rrset'
+        parent_spec = ('hostedzone', 'HostedZoneId')
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         filter_name = None

@@ -26,6 +26,7 @@ import fnmatch
 import functools
 import jsonschema
 import logging
+import sys
 import time
 import os
 import operator
@@ -46,6 +47,17 @@ CONFIG_SCHEMA = {
     '$schema': 'http://json-schema.org/schema#',
     'id': 'http://schema.cloudcustodian.io/v0/logexporter.json',
     'definitions': {
+        'subscription': {
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['destination-arn'],
+            'properties': {
+                'destination-arn': {'type': 'string'},
+                'destination-role': {'type': 'string'},
+                'managed-policy': {'type': 'boolean'},
+                'name': {'type': 'string'},
+                },
+        },
         'destination': {
             'type': 'object',
             'additionalProperties': False,
@@ -78,7 +90,8 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
         },
-        'destination': {'$ref': '#/definitions/destination'}
+        'destination': {'$ref': '#/definitions/destination'},
+        'subscription': {'$ref': '#/definitions/subscription'}
     }
 }
 
@@ -126,6 +139,75 @@ def validate(config):
 
     log.info("config file valid, accounts:%d", len(data['accounts']))
     return data
+
+
+@cli.command()
+@click.option('--config', type=click.Path(), required=True)
+@click.option('-a', '--accounts', multiple=True)
+@click.option('--force', is_flag=True, default=False)
+@click.option('--debug', is_flag=True, default=False)
+def subscribe(config, accounts, force, debug):
+    """subscribe accounts log groups to target account log group destination"""
+    config = validate.callback(config)
+    subscription = config.get('subscription')
+
+    if subscription is None:
+        log.error("config file: logs subscription missing")
+        sys.exit(1)
+
+    def converge_destination_policy(client, config):
+        destination_name = subscription['destination-arn'].rsplit(':', 1)[-1]
+        try:
+            client.get_get_destinations(
+                DestinationNamePrefix=destination_name)
+        except ClientError:
+            log.error("Log group destination not found: %s",
+                      subscription['destination-arn'])
+            sys.exit(1)
+        account_ids = [a['role'].split(':')[4] for a in config.get('accounts')]
+        client.put_destination_policy(
+            destinationName=destination_name,
+            accessPolicy=json.dumps({
+                'Statement': [{
+                    'Action': 'logs:PutSubscriptionFilter',
+                    'Effect': 'Allow',
+                    'Principal': {'AWS': account_ids},
+                    'Resource': subscription['destination-arn'],
+                    'Sid': 'CrossAccountDelivery'}]}))
+
+    def subscribe_account(account, subscription):
+        session = get_session(account['role'])
+        client = session.client('logs')
+
+        for g in account.get('groups'):
+            client.put_subscription_filter(
+                logGroupName=g,
+                filterName=subscription.get('name', 'FlowLogStream'),
+                filterPattern="",
+                distribution=subscription.get('distribution', 'ByLogStream'))
+
+    if subscription.get('managed-policy'):
+        if subscription.get('destination-role'):
+            session = get_session(subscription['destination-role'])
+        else:
+            session = boto3.Session()
+        converge_destination_policy(session.client('logs'), config)
+
+    executor = debug and MainThreadExecutor or ThreadPoolExecutor
+
+    with executor(max_workers=32) as w:
+        futures = {}
+        for account in config.get('accounts', ()):
+            if accounts and account['name'] not in accounts:
+                continue
+            futures[w.submit(subscribe_account, account, subscription)] = account
+
+        for f in as_completed(futures):
+            account = futures[f]
+            if f.exception():
+                log.error("Error on account %s err: %s",
+                          account['name'], f.exception())
+            log.info("Completed %s", account['name'])
 
 
 @cli.command()
@@ -640,7 +722,6 @@ def get_exports(client, bucket, prefix, latest=True):
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end')
 @click.option('--role', help="sts role to assume for log group access")
-@click.option('--role', help="sts role to assume for log group access")
 @click.option('--poll-period', type=float, default=300)
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
@@ -657,12 +738,17 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         session = get_session(role)
 
     client = session.client('logs')
+    for _group in client.describe_log_groups()['logGroups']:
+        if _group['logGroupName'] == group:
+            break
+    else:
+        raise ValueError('Log group not found.')
+    group = _group
 
     if prefix:
-        prefix = "%s/%s" % (prefix.rstrip('/'),
-            group['logGroupName'].strip('/'))
+        prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
     else:
-        prefix = group
+        prefix = group['logGroupName']
 
     named_group = "%s:%s" % (name, group['logGroupName'])
     log.info(
@@ -675,14 +761,16 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         group['storedBytes'])
 
     t = time.time()
-    days = [(start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+    days = [(start + timedelta(i)).replace(
+                minute=0, hour=0, second=0, microsecond=0)
             for i in range((end - start).days)]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)
 
     log.info("Group:%s filtering s3 extant keys from %d to %d start:%s end:%s",
-             named_group, day_count, len(days), days[0], days[-1])
+             named_group, day_count, len(days),
+             days[0] if days else '', days[-1] if days else '')
     t = time.time()
 
     retry = get_retry(('SlowDown',))
@@ -709,7 +797,7 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         try:
             s3.head_object(Bucket=bucket, Key=prefix)
         except ClientError as e:
-            if e.response['Error']['Code'] != 'NotFound':
+            if e.response['Error']['Code'] != '404':  # Not Found
                 raise
             s3.put_object(
                 Bucket=bucket,

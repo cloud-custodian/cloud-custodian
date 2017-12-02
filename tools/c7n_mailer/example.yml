@@ -29,7 +29,8 @@ dead_letter_config:
 ## Mailer Infrastructure Config
 
 # memcached for caching ldap lookups
-cache: "c7n-somewhere.out.there.cache.amazonaws.com"
+cache_engine: redis
+redis_host: "c7n-somewhere.out.there.cache.amazonaws.com"
 
 # ldap server for resolving users
 ldap_uri: "ldap://your_active_directory"

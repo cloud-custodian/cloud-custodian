@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import os
 import unittest
+import sys
 import tempfile
 import time
 
@@ -106,6 +107,22 @@ class WorkerDecorator(BaseTest):
 
 class UtilTest(unittest.TestCase):
 
+    def test_group_by(self):
+        sorter = lambda x: x
+        sorter = sys.version_info.major is 2 and sorted or sorter
+        items = [{}, {'Type': 'a'}, {'Type': 'a'}, {'Type': 'b'}]
+        self.assertEqual(
+            sorter(list(utils.group_by(items, 'Type').keys())),
+            [None, 'a', 'b'])
+        items = [
+            {},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'a'}},
+            {'Type': {'Part': 'b'}}]
+        self.assertEqual(
+            sorter(list(utils.group_by(items, 'Type.Part').keys())),
+            [None, 'a', 'b'])
+
     def write_temp_file(self, contents, suffix='.tmp'):
         """ Write a temporary file and return the filename.
 
@@ -138,13 +155,16 @@ class UtilTest(unittest.TestCase):
     def test_chunks(self):
         self.assertEqual(
             list(utils.chunks(range(100), size=50)),
-            [range(50), range(50, 100, 1)])
+            [list(range(50)), list(range(50, 100, 1))],
+        )
         self.assertEqual(
             list(utils.chunks(range(1), size=50)),
-            [range(1)])
+            [[0]],
+        )
         self.assertEqual(
             list(utils.chunks(range(60), size=50)),
-            [range(50), range(50, 60, 1)])
+            [list(range(50)), list(range(50, 60, 1))],
+        )
 
     def test_type_schema(self):
         self.assertEqual(
@@ -210,7 +230,7 @@ class UtilTest(unittest.TestCase):
               u'PrefixListIds': [],
               u'UserIdGroupPairs': [{u'GroupId': u'sg-6c7fa917',
                                      u'UserId': u'644160558196'}]}])
-                         
+
     def test_camel_case(self):
         d = {'zebraMoon': [{'instanceId': 123}, 'moon'],
              'color': {'yellow': 1, 'green': 2}}
@@ -318,3 +338,11 @@ class UtilTest(unittest.TestCase):
         json_file = os.path.join(os.path.dirname(__file__), 'data', 'ec2-instance.json')
         data = utils.load_file(json_file)
         self.assertTrue(data['InstanceId'] == 'i-1aebf7c0')
+
+    def test_format_string_values(self):
+        obj = {'Key1': 'Value1', 'Key2': 42, 'Key3': '{xx}', u'Key4': [True, {u'K': u'{yy}'}, '{xx}']}
+        fmt = utils.format_string_values(obj, **{'xx': 'aa', 'yy': 'bb'})
+
+        self.assertEqual(fmt['Key3'], 'aa')
+        self.assertEqual(fmt['Key4'][2], 'aa')
+        self.assertEqual(fmt['Key4'][1]['K'], 'bb')

@@ -78,7 +78,7 @@ def load_file(path, format=None, vars=None):
                 msg = 'Failed to substitute variable by positional argument.'
                 raise VarsSubstitutionError(msg)
             except KeyError as e:
-                msg = 'Failed to substitute variables.  KeyError on "{}"'.format(e.message)
+                msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
@@ -169,9 +169,19 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 def group_by(resources, key):
+    """Return a mapping of key value to resources with the corresponding value.
+
+    Key may be specified as dotted form for nested dictionary lookup
+    """
     resource_map = {}
+    parts = key.split('.')
     for r in resources:
-        resource_map.setdefault(r.get(key), []).append(r)
+        v = r
+        for k in parts:
+            v = v.get(k)
+            if not isinstance(v, dict):
+                break
+        resource_map.setdefault(v, []).append(r)
     return resource_map
 
 
@@ -207,6 +217,12 @@ def camelResource(obj):
 def get_account_id_from_sts(session):
     response = session.client('sts').get_caller_identity()
     return response.get('Account')
+
+
+def get_account_alias_from_sts(session):
+    response = session.client('iam').list_account_aliases()
+    aliases = response.get('AccountAliases', ())
+    return aliases and aliases[0] or ''
 
 
 def query_instances(session, client=None, **query):
@@ -375,6 +391,26 @@ class IPv4Network(ipaddress.IPv4Network):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
 
+    # Redefine from ipaddress backport to address that this is not
+    # in the python 3.6 stdlib implementation.
+    # Note this is copyright 2007 Google, 2007 and licensed to the PSF
+    # and released under the python license.
+    # https://docs.python.org/3/license.html
+
+    def supernet_of(self, other):
+        # always false if one is v4 and the other is v6.
+        if self._version != other._version:
+            return False
+        # dealing with another network.
+        if (hasattr(other, 'network_address') and
+                hasattr(other, 'broadcast_address')):
+            return (other.network_address >= self.network_address and
+                    other.broadcast_address <= self.broadcast_address)
+        # dealing with another address
+        else:
+            raise TypeError('Unable to test subnet containment with element '
+                            'of type %s' % type(other))
+
 
 worker_log = logging.getLogger('c7n.worker')
 
@@ -391,7 +427,7 @@ def worker(f):
     def _f(*args, **kw):
         try:
             return f(*args, **kw)
-        except:
+        except Exception:
             worker_log.exception(
                 'Error invoking %s',
                 "%s.%s" % (f.__module__, f.__name__))
@@ -431,3 +467,24 @@ def get_profile_session(options):
     profile = getattr(options, 'profile', None)
     _profile_session = boto3.Session(profile_name=profile)
     return _profile_session
+
+
+def format_string_values(obj, *args, **kwargs):
+    """
+    Format all string values in an object.
+    Return the updated object
+    """
+    if isinstance(obj, dict):
+        new = {}
+        for key in obj.keys():
+            new[key] = format_string_values(obj[key], *args, **kwargs)
+        return new
+    elif isinstance(obj, list):
+        new = []
+        for item in obj:
+            new.append(format_string_values(item, *args, **kwargs))
+        return new
+    elif isinstance(obj, six.string_types):
+        return obj.format(*args, **kwargs)
+    else:
+        return obj

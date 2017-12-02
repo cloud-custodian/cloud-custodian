@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, event_data
 from c7n.filters import FilterValidationError
 
 
@@ -892,6 +892,36 @@ class SecurityGroupTest(BaseTest):
         self.maxDiff = None
         self.assertEqual(c_resources, d_resources)
 
+        p = self.load_policy({
+            'name': 'sg-test',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '108.56.181.242/32'},
+                 }]},
+            session_factory=factory)
+        c_resources = p.run()
+        self.assertEqual(len(c_resources), 1)
+        self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
+
+    def test_config_rule(self):
+        factory = self.replay_flight_data(
+            'test_security_group_config_rule')
+        p = self.load_policy({
+            'name': 'sg-test',
+            'mode': {'type': 'config-rule'},
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '0.0.0.0/0'},
+                 }]},
+            session_factory=factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-config-rule-security-group.json')
+        resources = mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-e2fb6999')
+
     def test_only_ports_ingress(self):
         p = self.load_policy({
             'name': 'ingress-access',
@@ -972,6 +1002,145 @@ class SecurityGroupTest(BaseTest):
                       {'Key': 'Key', 'Value': 'Name'}],
              'VpcId': 'vpc-1234abcd'}
         ]
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_self_reference_ingress_false_positives(self):
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd1234'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'SelfReference': True}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'SelfReference': False}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [
+                                    {'CidrIp': '10.42.2.0/24'},
+                                    {'CidrIp': '10.42.4.0/24'},
+                                ],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd5678'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.4.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'ne',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'in',
+                    'value_type': 'cidr'
+                 }}
+                ]})
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
@@ -1163,3 +1332,53 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')
+
+
+class NATGatewayTest(BaseTest):
+
+    def test_query_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_query')
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['State'],
+            "available")
+
+    def test_tag_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_tag')
+        p = self.load_policy({
+            'name': 'tag-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:xyz': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_delete')
+        p = self.load_policy({
+            'name': 'delete-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'delete'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
