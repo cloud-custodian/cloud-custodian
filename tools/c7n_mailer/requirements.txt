@@ -1,5 +1,5 @@
-boto3>=1.4.7
-botocore>=1.7.41
+boto3>=1.4.8
+botocore>=1.8.6
 docutils>=0.12
 Jinja2>=2.8
 jmespath>=0.9.0

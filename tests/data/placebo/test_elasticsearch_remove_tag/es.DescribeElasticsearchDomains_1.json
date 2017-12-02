@@ -1,0 +1,57 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatusList": [
+            {
+                "ElasticsearchClusterConfig": {
+                    "DedicatedMasterEnabled": false, 
+                    "InstanceCount": 1, 
+                    "ZoneAwarenessEnabled": false, 
+                    "InstanceType": "t2.small.elasticsearch"
+                }, 
+                "DomainId": "644160558196/c7n-test", 
+                "VPCOptions": {
+                    "SubnetIds": [
+                        "subnet-3a334610"
+                    ], 
+                    "VPCId": "vpc-d2d616b5", 
+                    "SecurityGroupIds": [
+                        "sg-6c7fa917"
+                    ], 
+                    "AvailabilityZones": [
+                        "us-east-1d"
+                    ]
+                }, 
+                "Created": true, 
+                "Deleted": false, 
+                "EBSOptions": {
+                    "VolumeSize": 10, 
+                    "VolumeType": "gp2", 
+                    "EBSEnabled": true
+                }, 
+                "Processing": true, 
+                "DomainName": "c7n-test", 
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                }, 
+                "ElasticsearchVersion": "5.5", 
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/c7n-test/*\"}]}", 
+                "AdvancedOptions": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }, 
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/c7n-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "453ffc38-d515-11e7-a6b7-53431c2e5165", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "453ffc38-d515-11e7-a6b7-53431c2e5165", 
+                "date": "Wed, 29 Nov 2017 14:54:59 GMT", 
+                "content-length": "1118", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

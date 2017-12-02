@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "ApproximateNumberOfMessagesNotVisible": "0", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}", 
+            "MessageRetentionPeriod": "345600", 
+            "ApproximateNumberOfMessagesDelayed": "0", 
+            "MaximumMessageSize": "262144", 
+            "CreatedTimestamp": "1511970973", 
+            "ApproximateNumberOfMessages": "0", 
+            "ReceiveMessageWaitTimeSeconds": "0", 
+            "DelaySeconds": "0", 
+            "VisibilityTimeout": "30", 
+            "LastModifiedTimestamp": "1511970992", 
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test-sqs-remove-named"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9ad16d1e-d6a3-52c0-9394-3f860dbebd94", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9ad16d1e-d6a3-52c0-9394-3f860dbebd94", 
+                "content-length": "1466", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 29 Nov 2017 15:57:17 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

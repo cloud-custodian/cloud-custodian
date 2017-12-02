@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, event_data
 from c7n.filters import FilterValidationError
 
 
@@ -891,6 +891,36 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
         self.maxDiff = None
         self.assertEqual(c_resources, d_resources)
+
+        p = self.load_policy({
+            'name': 'sg-test',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '108.56.181.242/32'},
+                 }]},
+            session_factory=factory)
+        c_resources = p.run()
+        self.assertEqual(len(c_resources), 1)
+        self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
+
+    def test_config_rule(self):
+        factory = self.replay_flight_data(
+            'test_security_group_config_rule')
+        p = self.load_policy({
+            'name': 'sg-test',
+            'mode': {'type': 'config-rule'},
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '0.0.0.0/0'},
+                 }]},
+            session_factory=factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-config-rule-security-group.json')
+        resources = mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-e2fb6999')
 
     def test_only_ports_ingress(self):
         p = self.load_policy({
