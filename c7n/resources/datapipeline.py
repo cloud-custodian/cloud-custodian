@@ -128,8 +128,11 @@ class Delete(BaseAction):
 @DataPipeline.action_registry.register('mark-for-op')
 class MarkForOpPipeline(TagDelayedAction):
     """Action to specify an action to occur at a later date
+
     :example:
+
         .. code-block: yaml
+
             policies:
               - name: pipeline-delete-unused
                 resource: datapipeline
@@ -164,7 +167,9 @@ class MarkForOpPipeline(TagDelayedAction):
 @DataPipeline.action_registry.register('tag')
 class TagPipeline(Tag):
     """Action to create tag(s) on a pipeline
+
     :example:
+
         .. code-block: yaml
             policies:
               - name: tag-pipeline
@@ -198,7 +203,9 @@ class TagPipeline(Tag):
 @DataPipeline.action_registry.register('remove-tag')
 class UntagPipeline(RemoveTag):
     """Action to remove tag(s) on a pipeline
+
     :example:
+
         .. code-block: yaml
             policies:
               - name: pipeline-remove-tag
