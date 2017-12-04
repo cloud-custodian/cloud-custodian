@@ -2623,13 +2623,14 @@ class KMSKeyResolverMixin(object):
 
         regions = {get_region(b) for b in buckets}
         for r in regions:
+            client = local_session(self.manager.session_factory).client('kms', region_name=r)
             try:
-                client = local_session(self.manager.session_factory).client('kms', region_name=r)
                 self.arns[r] = client.describe_key(
                     KeyId=self.data.get('key')
                 ).get('KeyMetadata').get('Arn')
             except ClientError as e:
-                self.log.error('Error validating ARNs for set-bucket-encryption: %s' % e)
+                self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
+                    e, self.data.get('key')))
 
     def get_key(self, bucket):
         if 'key' not in self.data:
@@ -2637,7 +2638,8 @@ class KMSKeyResolverMixin(object):
         region = get_region(bucket)
         key = self.arns.get(region)
         if not key:
-            self.log.warning('Unable to resolve key %s for bucket %s', key, bucket.get('Name'))
+            self.log.warning('Unable to resolve key %s for bucket %s in region %s',
+                             key, bucket.get('Name'), region)
         return key
 
 
@@ -2662,7 +2664,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 filters
                   - type: bucket-encryption
                     crypto: aws:kms
-                    key: 1234abcd-12ab-34cd-56ef-1234567890ab
+                    key: alias/some/alias/key
 
     """
     schema = type_schema('bucket-encryption',
@@ -2688,9 +2690,9 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         return results
 
     def process_bucket(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
         rules = []
         try:
-            client = bucket_client(local_session(self.manager.session_factory), b)
             be = client.get_bucket_encryption(Bucket=b['Name'])
             b['c7n:bucket-encryption'] = be
             rules = be.get('ServerSideEncryptionConfiguration', []).get('Rules', [])
