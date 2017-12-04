@@ -742,7 +742,7 @@ class S3ConfigSource(ConfigTest):
         self.assertEqual(
             resource['Website'],
             {'RedirectAllRequestsTo': {'HostName': 'www.google.com/', 'Protocol': 'https'}})
-        
+
     def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -838,7 +838,9 @@ class BucketPolicyStatements(BaseTest):
         sid = 'CustodianTest'
 
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
 
         session_factory = self.replay_flight_data('test_s3_policy_statements')
 
