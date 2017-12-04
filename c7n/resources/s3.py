@@ -2681,12 +2681,12 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             futures = {w.submit(self.process_bucket, b): b for b in buckets}
             for future in as_completed(futures):
                 b = futures[future]
-                try:
-                    if future.result():
-                        results.append(b)
-                except Exception as e:
-                    self.log.error("Message: %s Bucket: %s", e,
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(),
                                    b['Name'])
+                    continue
+                if future.results():
+                    results.append(b)
         return results
 
     def process_bucket(self, b):
