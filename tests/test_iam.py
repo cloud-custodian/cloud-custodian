@@ -756,7 +756,7 @@ class CrossAccountChecker(TestCase):
             'allowed_vpce': set(['vpce-12345678', 'vpce-87654321'])})
         for p, expected in zip(
                 policies, [True, False, False, True, False,
-                           True, False, True, False, True, False]):
+                           True, False, True, False, True, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
@@ -766,6 +766,6 @@ class CrossAccountChecker(TestCase):
             'allowed_accounts': set(['123456789012'])})
         for p, expected in zip(
                 policies, [True, False, False, True, False,
-                           True, False, False, False, False, False]):
+                           True, False, False, False, False, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

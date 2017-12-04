@@ -216,5 +216,26 @@
         "Principal": "arn:aws:iam::123456789012:root"
       }
     ]
+  },
+  {
+    "Id": "ForAllValuesInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "ForAllValues": {
+            "s3:PutObject": [
+              "server-side-encryption", "body"]
+          }
+        },
+        "Principal": "*"
+      }
+    ]
   }
 ]
