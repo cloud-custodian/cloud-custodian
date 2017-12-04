@@ -22,6 +22,5 @@
         "**/*.pyc": true,
         "**/*.pyo": true,
         "**/*.dist-info": true
-    },
-    "python.pythonPath": "${workspaceRoot}/venv/bin/python"
+    }
 }

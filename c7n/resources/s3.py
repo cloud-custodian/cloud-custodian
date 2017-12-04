@@ -970,8 +970,7 @@ class SetPolicyStatement(BucketActionBase):
                     'properties': {
                         'Sid': {'type': 'string'},
                         'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'string'},
-                            {'type': 'object'}, {'type': 'array'}]},
+                        'Principal': {'anyOf': [{'type': 'string'}, {'type': 'object'}, {'type': 'array'}]},
                         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
                         'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                         'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
