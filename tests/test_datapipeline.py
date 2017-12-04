@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from .common import BaseTest, functional
 
 
 class DataPipelineTest(BaseTest):
@@ -89,3 +89,121 @@ class DataPipelineTest(BaseTest):
         client = factory().client('datapipeline')
         removed = client.describe_pipelines(pipelineIds=[resources[0]['id']])
         self.assertEqual(removed['pipelineDescriptionList'][0]['fields'][12]['stringValue'], 'DELETING')
+
+
+    @functional
+    def test_tag_datapipeline(self):
+        factory = self.replay_flight_data('test_datapipeline_tag')
+
+        session = factory()
+        client = session.client('datapipeline')
+        pipeline = client.create_pipeline(
+            name='PipelineTagTest', uniqueId='PipelineTagTest1')
+        pipe_id = pipeline['pipelineId']
+        self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
+        p = self.load_policy({
+            'name': 'datapipeline-tag-test',
+            'resource': 'datapipeline',
+            'filters': [
+                {'name': 'PipelineTagTest'}],
+            'actions': [
+                {'type': 'tag',
+                 'key': 'key1',
+                 'value': 'value1'
+                }]
+            },
+            session_factory=factory)
+        resources = p.run()
+        response = client.describe_pipelines(
+            pipelineIds=[pipe_id])
+        self.assertEqual(response['pipelineDescriptionList'][0]['tags'], [{'key': 'key1', 'value': 'value1'}])
+
+    @functional
+    def test_mark_datapipeline(self):
+        factory = self.replay_flight_data('test_datapipeline_mark')
+
+        session = factory()
+        client = session.client('datapipeline')
+        pipeline = client.create_pipeline(
+            name='PipelineMarkTest', uniqueId='PipelineMarkTest1')
+        pipe_id = pipeline['pipelineId']
+        self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
+        p = self.load_policy({
+            'name': 'datapipeline-mark-test',
+            'resource': 'datapipeline',
+            'filters': [
+                {'name': 'PipelineMarkTest'}],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'tag': 'custodian_mark',
+                 'op': 'delete',
+                 'msg': 'marked for op with no date',
+                 'days': 7
+                }]
+            },
+            session_factory=factory)
+        resources = p.run()
+        response = client.describe_pipelines(
+            pipelineIds=[pipe_id])
+        self.assertEqual(response['pipelineDescriptionList'][0]['tags'], [{'key': 'custodian_mark', 'value': 'marked for op with no date'}])
+
+
+    @functional
+    def test_remove_tag_datapipeline(self):
+        factory = self.replay_flight_data('test_datapipeline_remove_tag')
+
+        session = factory()
+        client = session.client('datapipeline')
+        pipeline = client.create_pipeline(
+            name='PipelineRemoveTagTest', uniqueId='PipelineRemoveTagTest1')
+        pipe_id = pipeline['pipelineId']
+
+        self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
+
+        client.add_tags(pipelineId=pipe_id, tags=[{'key':'tag_to_remove','value':'value of tag to remove'}])
+        response1 = client.describe_pipelines(
+            pipelineIds=[pipe_id])
+        num_tags = len(response1['pipelineDescriptionList'][0]['tags'])
+        
+        p = self.load_policy({
+            'name': 'datapipeline-remove-tag-test',
+            'resource': 'datapipeline',
+            'filters': [
+                {'name': 'PipelineRemoveTagTest'}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'tags': ['tag_to_remove']
+                }]
+            },
+            session_factory=factory)
+        resources = p.run()
+        response2 = client.describe_pipelines(
+            pipelineIds=[pipe_id])
+        self.assertEqual(len(response2['pipelineDescriptionList'][0]['tags']), num_tags-1)
+
+    @functional
+    def test_marked_for_op_datapipeline(self):
+        factory = self.replay_flight_data('test_datapipeline_marked_for_op')
+
+        session = factory()
+        client = session.client('datapipeline')
+        pipeline = client.create_pipeline(
+            name='PipelineMarkedForOpTest', uniqueId='PipelineMarkedForOpTest1')
+        pipe_id = pipeline['pipelineId']
+
+        self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
+
+        client.add_tags(pipelineId=pipe_id, tags=[{'key':'pipeline_marked_for_op','value':'Pipeline marked for op: delete@2017-12-01'}])
+        
+        p = self.load_policy({
+            'name': 'datapipeline-marked-for-op-test',
+            'resource': 'datapipeline',
+            'filters': [
+                {'type': 'marked-for-op',
+                 'tag': 'pipeline_marked_for_op',
+                 'op': 'delete'
+                }]
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
