@@ -171,6 +171,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--field', multiple=True)
+@click.option('--no-default-fields', default=False, is_flag=True)
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
 @click.option('--debug', default=False, is_flag=True)
@@ -178,7 +179,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-p', '--policy', multiple=True)
 @click.option('--format', default='csv', type=click.Choice(['csv', 'json']))
 @click.option('--resource', default=None)
-def report(config, output, use, output_dir, accounts, field, tags, region, debug, verbose, policy, format, resource):
+def report(config, output, use, output_dir, accounts, field, no_default_fields, tags, region, debug, verbose, policy, format, resource):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, resource=resource)
@@ -229,7 +230,7 @@ def report(config, output, use, output_dir, accounts, field, tags, region, debug
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=True,
+        include_default_fields=not(no_default_fields),
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
