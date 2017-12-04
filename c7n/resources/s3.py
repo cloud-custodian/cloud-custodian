@@ -996,7 +996,7 @@ class SetPolicyStatement(BucketActionBase):
     )
 
     def process_bucket(self, bucket):
-        policy = bucket['Policy'] or '{}'
+        policy = bucket.get('Policy') or '{}'
 
         fmtargs = self.get_std_format_args(bucket)
 
