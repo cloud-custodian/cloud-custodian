@@ -29,7 +29,7 @@ import yaml
 
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps, load_file
+from c7n.utils import Bag, dumps, load_file, init_deprecation_warnings
 from c7n.manager import resources
 from c7n.resources import load_resources
 from c7n import schema
@@ -42,6 +42,8 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
+        init_deprecation_warnings(options)
+
         load_resources()
         vars = _load_vars(options)
 

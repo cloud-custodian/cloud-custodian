@@ -20,8 +20,8 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
-from c7n.resources.ec2 import EC2
-from c7n.utils import dumps
+from c7n.resources.ec2 import EC2, Stop
+from c7n.utils import dumps, init_deprecation_warnings
 from c7n.query import ConfigSource
 
 from .common import BaseTest, Config, Bag, event_data
@@ -233,7 +233,7 @@ class TestPolicyCollection(BaseTest):
 
         collection = original.expand_regions(['all'])
         self.assertEqual(len(collection.resource_types), 2)
-        self.assertEqual(len(collection), 15)        
+        self.assertEqual(len(collection), 15)
         iam = [p for p in collection if p.resource_type == 'iam-user']
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, 'us-east-1')
@@ -278,6 +278,22 @@ class TestPolicy(BaseTest):
         self.assertTrue(
             repr(policy).startswith(
                 "<Policy resource: ec2 name: ec2-utilization"))
+
+    def test_policy_deprecated_action(self):
+        policy = self.load_policy({
+            'name': 'ec2-utilization',
+            'resource': 'ec2',
+            'tags': ['abc'],
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'CPUUtilization',
+                 'days': 3,
+                 'value': 1.5}],
+            'actions': ['stop']},
+            config={'deprecation': 'error'})
+        self.patch(Stop, 'deprecated', True)
+        init_deprecation_warnings(policy.options)
+        self.assertRaises(PendingDeprecationWarning, policy.validate)
 
     def test_policy_name_filtering(self):
 

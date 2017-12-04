@@ -20,6 +20,7 @@ import itertools
 import logging
 import os
 import time
+import warnings
 
 import boto3
 from botocore.client import ClientError
@@ -700,12 +701,35 @@ class Policy(object):
         return True
 
     def validate(self):
+        self._check_deprecation('resource', self.resource_manager)
+
         m = self.get_execution_mode()
         m.validate()
+
+        parent_element_name = self.resource_manager.type
         for f in self.resource_manager.filters:
             f.validate()
+            self._check_deprecation('filter', f, parent_element_name=parent_element_name)
+
         for a in self.resource_manager.actions:
             a.validate()
+            self._check_deprecation('action', a, parent_element_name=parent_element_name)
+
+    def _check_deprecation(self, element_type, element, parent_element_name=None):
+        """Check whether the specified policy element is deprecated."""
+        if getattr(element, 'deprecated', False) and self.options.deprecation != 'ignore':
+            if parent_element_name:
+                msg = '%s %s:%s is deprecated (policy: %s)' % (
+                    element_type,
+                    parent_element_name,
+                    element.type,
+                    self.name)
+            else:
+                msg = '%s %s is deprecated (policy: %s)' % (
+                    element_type,
+                    element.type,
+                    self.name)
+            warnings.warn(msg, PendingDeprecationWarning)
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()

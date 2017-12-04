@@ -13,20 +13,21 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from botocore.exceptions import ClientError
-
-import boto3
-import copy
 from datetime import datetime
+import copy
 import functools
-import json
+import ipaddress
 import itertools
+import json
 import logging
 import os
 import random
 import threading
 import time
-import ipaddress
+import warnings
+
+from botocore.exceptions import ClientError
+import boto3
 import six
 
 # Try to place nice in lambda exec environment
@@ -488,3 +489,24 @@ def format_string_values(obj, *args, **kwargs):
         return obj.format(*args, **kwargs)
     else:
         return obj
+
+
+def init_deprecation_warnings(options):
+    def _deprecation_message(message, category, filename, lineno, file=None, line=None):
+        return '%s: %s' % (category.__name__, message)
+
+    logging.captureWarnings(True)
+    warnings.formatwarning = _deprecation_message
+    deprecation = getattr(options, 'deprecation', None)
+    action = 'error' if deprecation == 'error' else 'always'
+    warnings.simplefilter(action, PendingDeprecationWarning)
+
+
+# TODO What does deprecation mean? Major vs. minor
+# TODO Unit tests
+# TODO Integration with custodian schema
+def deprecated(c):
+    """Decorator for deprecated policy elements."""
+    setattr(c, 'deprecated', True)
+
+    return c

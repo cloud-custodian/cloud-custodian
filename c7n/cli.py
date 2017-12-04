@@ -234,6 +234,12 @@ def _dryrun_option(p):
         help="Don't execute actions but filter resources")
 
 
+def _deprecation_option(p):
+    p.add_argument(
+        '--deprecation', default='warn', choices=['warn', 'error', 'ignore'],
+        help="Action when any policy element is deprecated")
+
+
 def _key_val_pair(value):
     """
     Type checker to ensure that --field values are of the format key=val
@@ -331,6 +337,7 @@ def setup_parser():
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
+    _deprecation_option(run)
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
