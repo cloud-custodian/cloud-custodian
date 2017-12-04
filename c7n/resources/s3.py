@@ -2672,7 +2672,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
-    permissions = ('s3:GetBucketEncryption',)
+    permissions = ('s3:GetBucketEncryption', 's3:DescribeKey')
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -2783,7 +2783,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     }
 
     permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
-                   'kms:ListAliases')
+                   'kms:ListAliases', 's3:DescribeKey')
 
     def process(self, buckets):
         if self.data.get('enabled', True):
