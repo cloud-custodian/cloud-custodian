@@ -694,7 +694,6 @@ class SNSCrossAccount(BaseTest):
         arn = client.create_topic(Name=topic_name)['TopicArn']
         self.addCleanup(client.delete_topic, TopicArn=arn)
 
-
         policy = {
             'Id': 'Foo',
             "Version": "2012-10-17",
@@ -746,5 +745,27 @@ class CrossAccountChecker(TestCase):
         for p, expected in zip(
                 policies, [False, True, True, False,
                            False, False, False, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678']),
+            'allowed_vpce': set(['vpce-12345678'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, True, False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_vpc(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, False, False, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

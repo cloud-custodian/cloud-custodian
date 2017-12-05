@@ -2498,7 +2498,7 @@ class Lifecycle(BucketActionBase):
                                 'And': {
                                     'type': 'object',
                                     'additionalProperties': False,
-                                    'items': {
+                                    'properties': {
                                         'Prefix': {'type': 'string'},
                                         'Tags': {
                                             'type': 'array',
@@ -2506,7 +2506,7 @@ class Lifecycle(BucketActionBase):
                                                 'type': 'object',
                                                 'required': ['Key', 'Value'],
                                                 'additionalProperties': False,
-                                                'items': {
+                                                'properties': {
                                                     'Key': {'type': 'string'},
                                                     'Value': {'type': 'string'},
                                                 },
@@ -2542,14 +2542,14 @@ class Lifecycle(BucketActionBase):
                         'NoncurrentVersionExpiration': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
                             },
                         },
                         'AbortIncompleteMultipartUpload': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'DaysAfterInitiation': {'type': 'integer'},
                             },
                         },
@@ -2581,8 +2581,12 @@ class Lifecycle(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
+        if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading lifecycle" % bucket['Name'])
+            return
+
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
-        config = (bucket['Lifecycle'] or {}).get('Rules', [])
+        config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
                 if rule['ID'] == existing_rule['ID']:
@@ -2595,11 +2599,17 @@ class Lifecycle(BucketActionBase):
                 if rule['Status'] != 'absent':
                     config.append(rule)
 
-        # The extra `list` conversion if required for python3
+        # The extra `list` conversion is required for python3
         config = list(filter(None, config))
 
-        s3.put_bucket_lifecycle_configuration(
-            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        try:
+            s3.put_bucket_lifecycle_configuration(
+                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])
+            else:
+                raise e
 
 
 @actions.register('set-bucket-encryption')

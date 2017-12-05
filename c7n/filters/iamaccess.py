@@ -80,6 +80,14 @@ class PolicyChecker(object):
     def whitelist_conditions(self):
         return self.checker_config.get('whitelist_conditions', ())
 
+    @property
+    def allowed_vpce(self):
+        return self.checker_config.get('allowed_vpce', ())
+
+    @property
+    def allowed_vpc(self):
+        return self.checker_config.get('allowed_vpc', ())
+
     # Policy statement handling
     def check(self, policy_text):
         if isinstance(policy_text, six.string_types):
@@ -206,6 +214,16 @@ class PolicyChecker(object):
     def handle_aws_sourceip(self, s, op, key, values):
         return False
 
+    def handle_aws_sourcevpce(self, s, op, key, values):
+        if not self.allowed_vpce:
+            return False
+        return bool(set(map(_account, values)).difference(self.allowed_vpce))
+
+    def handle_aws_sourcevpc(self, s, op, key, values):
+        if not self.allowed_vpc:
+            return False
+        return bool(set(map(_account, values)).difference(self.allowed_vpc))
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
@@ -221,7 +239,11 @@ class CrossAccountAccessFilter(Filter):
         whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
         # white list accounts
         whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_vpce_from=ValuesFrom.schema,
+        whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
+        whitepist_vpc_from=ValuesFrom.schema,
+        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
@@ -232,11 +254,15 @@ class CrossAccountAccessFilter(Filter):
         self.everyone_only = self.data.get('everyone_only', False)
         self.conditions = set(self.data.get(
             'whitelist_conditions',
-            ("aws:sourcevpce", "aws:sourcevpc", "aws:userid", "aws:username")))
+            ("aws:userid", "aws:username")))
         self.actions = self.data.get('actions', ())
         self.accounts = self.get_accounts()
+        self.vpcs = self.get_vpcs()
+        self.vpces = self.get_vpces()
         self.checker = self.checker_factory(
             {'allowed_accounts': self.accounts,
+             'allowed_vpc': self.vpcs,
+             'allowed_vpce': self.vpces,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
@@ -250,6 +276,20 @@ class CrossAccountAccessFilter(Filter):
             accounts = accounts.union(values.get_values())
         accounts.add(owner_id)
         return accounts
+
+    def get_vpcs(self):
+        vpc = set(self.data.get('whitelist_vpc', ()))
+        if 'whitelist_vpc_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpc_from'], self.manager)
+            vpc = vpc.union(values.get_values())
+        return vpc
+
+    def get_vpces(self):
+        vpce = set(self.data.get('whitelist_vpce', ()))
+        if 'whitelist_vpce_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpce_from'], self.manager)
+            vpce = vpce.union(values.get_values())
+        return vpce
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)
