@@ -970,7 +970,8 @@ class SetPolicyStatement(BucketActionBase):
                     'properties': {
                         'Sid': {'type': 'string'},
                         'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Principal': {'anyOf': [{'type': 'string'},
+                            {'type': 'object'}, {'type': 'array'}]},
                         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
                         'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                         'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
@@ -980,10 +981,14 @@ class SetPolicyStatement(BucketActionBase):
                     },
                     'required': ['Sid', 'Effect'],
                     'oneOf': [
-                        {'required': ['Action', 'Resource']},
-                        {'required': ['NotAction', 'Resource']},
-                        {'required': ['Action', 'NotResource']},
-                        {'required': ['NotAction', 'NotResource']}
+                        {'required': ['Principal', 'Action', 'Resource']},
+                        {'required': ['NotPrincipal', 'Action', 'Resource']},
+                        {'required': ['Principal', 'NotAction', 'Resource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'Resource']},
+                        {'required': ['Principal', 'Action', 'NotResource']},
+                        {'required': ['NotPrincipal', 'Action', 'NotResource']},
+                        {'required': ['Principal', 'NotAction', 'NotResource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
                     ]
                 }
             }
@@ -991,7 +996,7 @@ class SetPolicyStatement(BucketActionBase):
     )
 
     def process_bucket(self, bucket):
-        policy = bucket.get('Policy', '{}')
+        policy = bucket.get('Policy') or '{}'
 
         fmtargs = self.get_std_format_args(bucket)
 
