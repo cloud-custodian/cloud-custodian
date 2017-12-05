@@ -302,6 +302,56 @@ class AttachedVolume(ValueFilter):
         return self.operator(map(self.match, volumes))
 
 
+@filters.register('termination-protected')
+class DisableApiTermination(Filter):
+    """EC2 instances with ``disableApiTermination`` attribute set
+
+    Filters EC2 instances with ``disableApiTermination`` attribute set to true.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: termination-protection-enabled
+            resource: ec2
+            filters:
+              - type: termination-protected
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: termination-protection-NOT-enabled
+            resource: ec2
+            filters:
+              - not:
+                - type: termination-protected
+    """
+
+    schema = type_schema('termination-protected')
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def get_permissions(self):
+        perms = list(self.permissions)
+        perms.extend(self.manager.get_permissions())
+        return perms
+
+    def is_termination_protection_enabled(self, inst):
+        res_id = self.manager.get_model().id
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        attr_val = self.manager.retry(
+            client.describe_instance_attribute,
+            Attribute='disableApiTermination',
+            InstanceId=inst[res_id]
+        )
+        return attr_val['DisableApiTermination']['Value']
+
+    def __call__(self, i):
+        return self.is_termination_protection_enabled(i)
+
+
 class InstanceImageBase(object):
 
     def prefetch_instance_images(self, instances):
