@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ApplicationName": "re-jenkins", 
+        "EnvironmentName": "c7n-eb-term-test", 
+        "Status": "Terminating", 
+        "Description": "test for c7n EB termination", 
+        "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-term-test", 
+        "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+        "EndpointURL": "awseb-e-c-AWSEBLoa-VDPIGTI558U-1484559782.us-east-1.elb.amazonaws.com", 
+        "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+        "EnvironmentId": "e-cpvmgjjyip", 
+        "CNAME": "c7n-eb-term-test.us-east-1.elasticbeanstalk.com", 
+        "AbortableOperationInProgress": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "083c0d61-d925-11e7-bfa4-d11ccdba1b03", 
+            "HTTPHeaders": {
+                "date": "Mon, 04 Dec 2017 18:57:52 GMT", 
+                "x-amzn-requestid": "083c0d61-d925-11e7-bfa4-d11ccdba1b03", 
+                "content-length": "1387", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tier": {
+            "Version": " ", 
+            "Type": "Standard", 
+            "Name": "WebServer"
+        }, 
+        "Health": "Grey", 
+        "DateUpdated": {
+            "hour": 18, 
+            "__class__": "datetime", 
+            "month": 12, 
+            "second": 53, 
+            "microsecond": 569000, 
+            "year": 2017, 
+            "day": 4, 
+            "minute": 57
+        }, 
+        "DateCreated": {
+            "hour": 18, 
+            "__class__": "datetime", 
+            "month": 12, 
+            "second": 38, 
+            "microsecond": 330000, 
+            "year": 2017, 
+            "day": 4, 
+            "minute": 52
+        }
+    }
+}
