@@ -1,0 +1,70 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6187450e-d7ca-11e7-84c6-b3cabb5a47df", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6187450e-d7ca-11e7-84c6-b3cabb5a47df", 
+                "date": "Sun, 03 Dec 2017 01:36:26 GMT", 
+                "content-length": "764", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "pipelineDescriptionList": [
+            {
+                "fields": [
+                    {
+                        "stringValue": "[{\"key\":\"tag_to_remove\",\"value\":\"value of tag to remove\"}]", 
+                        "key": "*tags"
+                    }, 
+                    {
+                        "stringValue": "2017-12-03T01:36:27", 
+                        "key": "@creationTime"
+                    }, 
+                    {
+                        "stringValue": "PIPELINE", 
+                        "key": "@sphere"
+                    }, 
+                    {
+                        "stringValue": "AIDATHISISTHEAWSUSER1", 
+                        "key": "pipelineCreator"
+                    }, 
+                    {
+                        "stringValue": "PipelineRemoveTagTest", 
+                        "key": "name"
+                    }, 
+                    {
+                        "stringValue": "df-01485291C0IZAVYM8W6G", 
+                        "key": "@id"
+                    }, 
+                    {
+                        "stringValue": "PENDING", 
+                        "key": "@pipelineState"
+                    }, 
+                    {
+                        "stringValue": "123456789012", 
+                        "key": "@accountId"
+                    }, 
+                    {
+                        "stringValue": "PipelineRemoveTagTest1", 
+                        "key": "uniqueId"
+                    }, 
+                    {
+                        "stringValue": "AIDATHISISTHEAWSUSER1", 
+                        "key": "@userId"
+                    }
+                ], 
+                "pipelineId": "df-01485291C0IZAVYM8W6G", 
+                "name": "PipelineRemoveTagTest", 
+                "tags": [
+                    {
+                        "value": "value of tag to remove", 
+                        "key": "tag_to_remove"
+                    }
+                ]
+            }
+        ]
+    }
+}

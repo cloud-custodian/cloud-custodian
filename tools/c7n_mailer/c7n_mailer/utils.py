@@ -13,14 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import datetime
 import jinja2
 import json
 import os
 from ruamel import yaml
 
 from dateutil import parser
-from dateutil.tz import gettz
+from dateutil.tz import gettz, tzutc
+from datetime import datetime, timedelta
 
 
 def get_jinja_env():
@@ -28,6 +28,7 @@ def get_jinja_env():
     env.filters['yaml_safe'] = yaml.safe_dump
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
+    env.filters['get_date_age'] = get_date_age
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
     env.globals['get_resource_tag_value'] = get_resource_tag_value
@@ -109,8 +110,10 @@ def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
 
 
 def get_date_time_delta(delta):
-    return str(datetime.datetime.now().replace(tzinfo=gettz('UTC')) + datetime.timedelta(delta))
+    return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
+def get_date_age(date):
+    return (datetime.now(tz=tzutc()) - parser.parse(date)).days
 
 def format_struct(evt):
     return json.dumps(evt, indent=2, ensure_ascii=False)
