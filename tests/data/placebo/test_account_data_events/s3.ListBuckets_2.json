@@ -109,19 +109,32 @@
                     "minute": 23
                 }, 
                 "Name": "scot-test-3"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 45
+                }, 
+                "Name": "skunk-trails-test-us-east-1"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "Qkof9UWnuSQLoYVikRHLCoXwkMax3vsDcJJlOwK/ntvyrgc9vnRcqYYofU7QbSOM+7g13qN5N+c=", 
-            "RequestId": "B93994A66AEFE183", 
+            "HostId": "3Pzvp9FyzF3ImgMKaNrbUL9smehzo/tn8FRE0OmfGeTTQPeIqCbVcPPF3a/jC6ZXMFTmc5WXnVw=", 
+            "RequestId": "A68EE778F40340C4", 
             "HTTPHeaders": {
-                "x-amz-id-2": "Qkof9UWnuSQLoYVikRHLCoXwkMax3vsDcJJlOwK/ntvyrgc9vnRcqYYofU7QbSOM+7g13qN5N+c=", 
+                "x-amz-id-2": "3Pzvp9FyzF3ImgMKaNrbUL9smehzo/tn8FRE0OmfGeTTQPeIqCbVcPPF3a/jC6ZXMFTmc5WXnVw=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "B93994A66AEFE183", 
-                "date": "Thu, 02 Nov 2017 04:45:01 GMT", 
+                "x-amz-request-id": "A68EE778F40340C4", 
+                "date": "Thu, 02 Nov 2017 04:45:03 GMT", 
                 "content-type": "application/xml"
             }
         }

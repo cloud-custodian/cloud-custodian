@@ -273,6 +273,7 @@ class PillTest(unittest.TestCase):
 
     def replay_flight_data(self, test_case, zdata=False):
         if os.environ.get('C7N_FUNCTIONAL') == 'yes':
+            self.recording = True
             return lambda region=None, assume=None: boto3.Session(
                 region_name=region)
 

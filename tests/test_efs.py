@@ -27,16 +27,16 @@ class ElasticFileSystem(BaseTest):
         token = str(uuid.uuid4())
         fs_id = client.create_file_system(
             CreationToken=token).get('FileSystemId')
+        self.addCleanup(client.delete_file_system, FileSystemId=fs_id)
         tags = [{'Key': 'Name', 'Value': 'Somewhere'}]
         client.create_tags(FileSystemId=fs_id, Tags=tags)
         if self.recording:
             time.sleep(5)
-            self.addCleanup(client.delete_file_system, FileSystemId=fs_id)
 
         p = self.load_policy({
             'name': 'efs-query',
             'resource': 'efs',
-            'filters': [{'tag:Name': 'Somewhere'}],
+            'filters': [{'FileSystemId': fs_id}, {'tag:Name': 'Somewhere'}],
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
