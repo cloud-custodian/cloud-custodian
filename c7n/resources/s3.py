@@ -2685,7 +2685,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                     self.log.error("Message: %s Bucket: %s", future.exception(),
                                    b['Name'])
                     continue
-                if future.results():
+                if future.result():
                     results.append(b)
         return results
 
