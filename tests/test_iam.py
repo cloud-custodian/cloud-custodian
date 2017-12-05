@@ -190,6 +190,19 @@ class IamUserTest(BaseTest):
 
     @functional
     def test_iam_user_delete(self):
+        # To get this test to work against live AWS I had to attach the
+        # following explicit policy.  Even root accounts don't work
+        # without this policy:
+        #
+        # {
+        #     "Version": "2012-10-17",
+        #     "Statement": [{
+        #         "Effect": "Allow",
+        #         "Action": ["iam:*"],
+        #         "Resource": "*"
+        #     }]
+        # }
+
         factory = self.replay_flight_data('test_iam_user_delete')
         name = 'alice'
         client = factory().client('iam')

@@ -2,20 +2,20 @@
     "status_code": 200, 
     "data": {
         "SizeInBytes": 0, 
-        "VaultARN": "arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-matched", 
+        "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/test-glacier-remove-matched", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "uxvJGTnuLUkZZ-_LTokmXh2nm9yijHrA342Oeoe9YyuvJ7M", 
+            "RequestId": "oAXeKIM5E4BWAjcXSwmKpKeX8SokU6X7NVkFGIT6jn4JFno", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "uxvJGTnuLUkZZ-_LTokmXh2nm9yijHrA342Oeoe9YyuvJ7M", 
-                "date": "Sat, 16 Sep 2017 19:28:15 GMT", 
+                "x-amzn-requestid": "oAXeKIM5E4BWAjcXSwmKpKeX8SokU6X7NVkFGIT6jn4JFno", 
+                "date": "Wed, 01 Nov 2017 17:29:24 GMT", 
                 "content-length": "234", 
                 "content-type": "application/json"
             }
         }, 
         "NumberOfArchives": 0, 
-        "CreationDate": "2017-09-16T19:28:15.878Z", 
+        "CreationDate": "2017-11-01T17:29:24.584Z", 
         "VaultName": "test-glacier-remove-matched"
     }
 }

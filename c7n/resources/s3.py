@@ -2121,14 +2121,19 @@ class DataEvents(Filter):
         'cloudtrail:DescribeTrails',
         'cloudtrail:GetEventSelectors')
 
-    def get_event_buckets(self, client, trails):
+    def get_event_buckets(self, session, trails):
         """Return a mapping of bucket name to cloudtrail.
 
         For wildcard trails the bucket name is ''.
         """
+        regions = {t.get('HomeRegion') for t in trails}
+        clients = {}
+        for region in regions:
+            clients[region] = session.client('cloudtrail', region_name=region)
+
         event_buckets = {}
         for t in trails:
-            for events in client.get_event_selectors(
+            for events in clients[t.get('HomeRegion')].get_event_selectors(
                     TrailName=t['Name']).get('EventSelectors', ()):
                 if 'DataResources' not in events:
                     continue
@@ -2141,9 +2146,8 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
-        event_buckets = self.get_event_buckets(client, trails)
+        session = local_session(self.manager.session_factory)
+        event_buckets = self.get_event_buckets(session, trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),

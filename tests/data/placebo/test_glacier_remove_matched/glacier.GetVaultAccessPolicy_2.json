@@ -2,15 +2,15 @@
     "status_code": 200, 
     "data": {
         "policy": {
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"glacier:AddTagsToVault\",\"Resource\":\"arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-matched\"}]}"
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"glacier:AddTagsToVault\",\"Resource\":\"arn:aws:glacier:us-east-1:644160558196:vaults/test-glacier-remove-matched\"}]}"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "C4V1lkh0cNMZuF9CXW0qTj5x6ueN1Vry79zfIZo5Ff83BuY", 
+            "RequestId": "IGytpxAaD8FgWVlfelHCkedR7FEopG_3LSnuLFvvtVWZIgY", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "C4V1lkh0cNMZuF9CXW0qTj5x6ueN1Vry79zfIZo5Ff83BuY", 
-                "date": "Sat, 16 Sep 2017 19:28:16 GMT", 
+                "x-amzn-requestid": "IGytpxAaD8FgWVlfelHCkedR7FEopG_3LSnuLFvvtVWZIgY", 
+                "date": "Wed, 01 Nov 2017 17:29:25 GMT", 
                 "content-length": "294", 
                 "content-type": "application/json"
             }
