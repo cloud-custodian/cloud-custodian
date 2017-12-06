@@ -832,6 +832,51 @@ class RetentionWindow(BaseAction):
             CopyTagsToSnapshot=copy_tags)
 
 
+@actions.register('set-publicly-accessible')
+class RDSSetPublicAvailability(BaseAction):
+    """
+    This action allows for toggling an RDS instance
+    'PubliclyAccessible' flag to true or false
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: enable-rds-public-accessibility
+                resource: rds
+                filters:
+                  - PubliclyAccessible: false
+                actions:
+                  - type: set-publicly-accessible
+                    accessbile: true
+    """
+
+    schema = type_schema(
+        "set-publicly-accessible",
+        accessible={'type': 'boolean'})
+    permissions = ('rds:ModifyDBInstanbce',)
+
+    def set_accessibility(self, r):
+        client = local_session(self.manager.session_factory).client('rds')
+        client.modify_db_instance(
+            DBInstanceIdentifier=r['DBInstanceIdentifier'],
+            PubliclyAccessible=self.data.get('accessible', False))
+
+    def process(self, rds):
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for r in rds:
+                futures.append(w.submit(
+                    self.set_accessibility, r))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting public accessibility  \n %s",
+                        f.exception())
+        return rds
+
+
 @resources.register('rds-subscription')
 class RDSSubscription(QueryResourceManager):
 
