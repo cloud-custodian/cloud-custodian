@@ -70,3 +70,33 @@ class ElasticBeanstalkEnvironment(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 2)
 
+
+class TestTerminate(BaseTest):
+
+    def query_env_status(self, session, env_name):
+        client = session.client('elasticbeanstalk')
+        res = client.describe_environments(
+            EnvironmentNames=[env_name]
+        )
+        if len(res['Environments']) > 0:
+            return res['Environments'][0]['Status']
+        return None
+
+    def test_eb_env_terminate(self):
+        envname = 'c7n-eb-term-test'
+        session_factory = self.replay_flight_data('test_eb_env_terminate')
+        assert self.query_env_status(session_factory(), envname) == 'Ready'
+        p = self.load_policy({
+            'name': 'eb-env-term',
+            'resource': 'elasticbeanstalk-environment',
+            'filters': [{'EnvironmentName': envname}],
+            'actions': [
+                {'type': 'terminate'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['EnvironmentName'] == envname
+        assert self.query_env_status(
+            session_factory(), envname
+        ) == 'Terminating'

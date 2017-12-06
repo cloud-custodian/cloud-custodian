@@ -98,10 +98,13 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(data[0]['InstanceId'], 'i-0a619b58a7e704a9f')
 
     def test_validate(self):
+        url_test = 's3://test-dest/holidays.csv'
         self.assertRaises(
             FilterValidationError, OffHour({'default_tz': 'zmta'}).validate)
         self.assertRaises(
             FilterValidationError, OffHour({'offhour': 25}).validate)
+        self.assertRaises(
+            FilterValidationError, OffHour({'skip-days': ['2017-01-01'], 'skip-days-from': {'expr': 0, 'format': 'csv', 'url': url_test}}).validate)
         i = OffHour({})
         self.assertEqual(i.validate(), i)
 
@@ -538,3 +541,26 @@ class ScheduleParserTest(BaseTest):
         parser = ScheduleParser({'tz': 'et'})
         for value, expected in self.table:
             self.assertEqual(parser.parse(value), expected)
+
+    def test_offhours_skip(self):
+        t = datetime.datetime(year=2015, month=12, day=1, hour=19, minute=5,
+                              tzinfo=zoneinfo.gettz('America/New_York'))
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[
+                {'Key': 'maid_offhours', 'Value': 'tz=est'}])
+            self.assertEqual(OffHour({})(i), True)
+            self.assertEqual(OffHour({'skip-days': ['2015-12-01']})(i), False)
+            self.assertEqual(OffHour({'skip-days': ['2017-01-01','2015-12-01']})(i), False)
+            self.assertEqual(OffHour({'skip-days': ['2015-12-02']})(i), True)
+
+    def test_onhour_skip(self):
+        t = datetime.datetime(year=2015, month=12, day=1, hour=7, minute=5,
+                              tzinfo=zoneinfo.gettz('America/New_York'))
+        with mock_datetime_now(t, datetime):
+            i = instance(Tags=[
+                {'Key': 'maid_offhours', 'Value': 'tz=est'}])
+            self.assertEqual(OnHour({})(i), True)
+            self.assertEqual(OnHour({'onhour': 8})(i), False)
+            self.assertEqual(OnHour({'skip-days': ['2015-12-01']})(i), False)
+            self.assertEqual(OnHour({'skip-days': ['2017-01-01','2015-12-01']})(i), False)
+            self.assertEqual(OnHour({'skip-days': ['2015-12-02']})(i), True)
