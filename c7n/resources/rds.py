@@ -832,7 +832,7 @@ class RetentionWindow(BaseAction):
             CopyTagsToSnapshot=copy_tags)
 
 
-@actions.register('set-publicly-accessible')
+@actions.register('set-public-access')
 class RDSSetPublicAvailability(BaseAction):
     """
     This action allows for toggling an RDS instance
@@ -848,20 +848,20 @@ class RDSSetPublicAvailability(BaseAction):
                 filters:
                   - PubliclyAccessible: false
                 actions:
-                  - type: set-publicly-accessible
-                    accessbile: true
+                  - type: set-public-access
+                    state: true
     """
 
     schema = type_schema(
-        "set-publicly-accessible",
-        accessible={'type': 'boolean'})
+        "set-public-access",
+        state={'type': 'boolean'})
     permissions = ('rds:ModifyDBInstanbce',)
 
     def set_accessibility(self, r):
         client = local_session(self.manager.session_factory).client('rds')
         client.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
-            PubliclyAccessible=self.data.get('accessible', False))
+            PubliclyAccessible=self.data.get('state', False))
 
     def process(self, rds):
         with self.executor_factory(max_workers=2) as w:
