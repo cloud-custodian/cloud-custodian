@@ -19,12 +19,15 @@ import itertools
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.filters import MetricsFilter
+from c7n.filters import MetricsFilter, FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     chunks, local_session, get_retry, type_schema, generate_arn)
+from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 
 log = logging.getLogger('custodian.es')
+filters = FilterRegistry('es.filters')
+filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('elasticsearch')
@@ -40,6 +43,7 @@ class ElasticSearchDomain(QueryResourceManager):
         dimension = "DomainName"
         filter_name = None
 
+    filter_registry = filters
     _generate_arn = _account_id = None
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -99,3 +103,105 @@ class Delete(Action):
         client = local_session(self.manager.session_factory).client('es')
         for r in resources:
             client.delete_elasticsearch_domain(DomainName=r['DomainName'])
+
+
+@ElasticSearchDomain.action_registry.register('tag')
+class ElasticSearchAddTag(Tag):
+    """Action to create tag(s) on an existing elasticsearch domain
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: es-add-tag
+                    resource: elasticsearch
+                    filters:
+                      - "tag:DesiredTag": absent
+                    actions:
+                      - type: tag
+                        key: DesiredTag
+                        value: DesiredValue
+    """
+    permissions = ('es:AddTags',)
+
+    def process_resource_set(self, domains, tags):
+        client = local_session(self.manager.session_factory).client('es')
+        tag_list = []
+        for t in tags:
+            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
+        for d in domains:
+            try:
+                client.add_tags(ARN=d['ARN'], TagList=tag_list)
+            except Exception as e:
+                self.log.exception(
+                    'Exception tagging es domain %s: %s',
+                    d['DomainName'], e)
+                continue
+
+
+@ElasticSearchDomain.action_registry.register('remove-tag')
+class ElasticSearchRemoveTag(RemoveTag):
+    """Removes tag(s) on an existing elasticsearch domain
+
+            :example:
+
+                .. code-block: yaml
+
+                    policies:
+                      - name: es-remove-tag
+                        resource: elasticsearch
+                        filters:
+                          - "tag:ExpiredTag": present
+                        actions:
+                          - type: remove-tag
+                            tags: ['ExpiredTag']
+        """
+    permissions = ('es:RemoveTags',)
+
+    def process_resource_set(self, domains, tags):
+        client = local_session(self.manager.session_factory).client('es')
+        for d in domains:
+            try:
+                client.remove_tags(ARN=d['ARN'], TagKeys=tags)
+            except Exception as e:
+                self.log.exception(
+                    'Exception while removing tags from queue %s: %s',
+                    d['DomainName'], e)
+                continue
+
+
+@ElasticSearchDomain.action_registry.register('mark-for-op')
+class ElasticSearchMarkForOp(TagDelayedAction):
+    """Tag an elasticsearch domain for action later
+
+        :example:
+
+            .. code-block: yaml
+
+                policies:
+                  - name: es-delete-missing
+                    resource: elasticsearch
+                    filters:
+                      - "tag:DesiredTag": absent
+                    actions:
+                      - type: mark-for-op
+                        days: 7
+                        op: delete
+                        tag: c7n_es_delete
+    """
+    permissions = ('es:AddTags',)
+
+    def process_resource_set(self, domains, tags):
+        client = local_session(self.manager.session_factory).client('es')
+        tag_list = []
+        for t in tags:
+            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
+        for d in domains:
+            try:
+                client.add_tags(ARN=d['ARN'], TagList=tag_list)
+            except Exception as e:
+                self.log.exception(
+                    'Exception tagging es domain %s: %s',
+                    d['DomainName'], e)
+                continue

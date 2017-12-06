@@ -27,4 +27,4 @@ Werkzeug>=0.11.11
 wsgiref==0.1.2
 procname==0.3
 msgpack-python>=0.4.8
-lz4==0.10.1
+lz4==0.11.1

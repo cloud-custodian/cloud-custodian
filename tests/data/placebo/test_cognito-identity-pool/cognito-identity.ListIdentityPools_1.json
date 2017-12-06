@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4eb3387c-c959-11e7-bb23-bf6d31764066", 
+            "HTTPHeaders": {
+                "date": "Tue, 14 Nov 2017 16:31:46 GMT", 
+                "x-amzn-requestid": "4eb3387c-c959-11e7-bb23-bf6d31764066", 
+                "content-length": "245", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "IdentityPools": [
+            {
+                "IdentityPoolId": "us-east-1:7af6af21-0a2b-49fb-98e6-07d8a39a3f7a", 
+                "IdentityPoolName": "origin_MOBILEHUB_1667653900"
+            }, 
+            {
+                "IdentityPoolId": "us-east-1:dee8f727-00d8-468d-9309-cf1ef485b96c", 
+                "IdentityPoolName": "test_delete_id_pool"
+            }
+        ]
+    }
+}
