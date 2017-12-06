@@ -2624,8 +2624,10 @@ class Lifecycle(BucketActionBase):
 class KMSKeyResolverMixin(object):
     """Builds a dictionary of region specific ARNs"""
 
-    def __init__(self):
+    def __init__(self, data, manager=None):
         self.arns = dict()
+        self.data = data
+        self.manager = manager
 
     def resolve_keys(self, buckets):
         if 'key' not in self.data:
