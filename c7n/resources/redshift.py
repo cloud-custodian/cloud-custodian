@@ -404,7 +404,7 @@ class EnhancedVpcRoutine(BaseAction):
 class RedshiftSetPublicAccess(BaseAction):
     """
     Action to set the 'PubliclyAccessible' setting on a redshift cluster
-    
+
     :example:
 
         .. code-block: yaml
