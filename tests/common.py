@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import boto3
 import io
 import json
 import logging
@@ -174,6 +175,11 @@ class BaseTest(PillTest):
     @property
     def account_id(self):
         return ACCOUNT_ID
+
+    @property
+    def current_user_arn(self):
+        iam = boto3.resource('iam')
+        current_user_arn = iam.CurrentUser().arn
 
 
 class ConfigTest(BaseTest):

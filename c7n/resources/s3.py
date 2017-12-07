@@ -970,7 +970,8 @@ class SetPolicyStatement(BucketActionBase):
                     'properties': {
                         'Sid': {'type': 'string'},
                         'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Principal': {'anyOf': [{'type': 'string'},
+                            {'type': 'object'}, {'type': 'array'}]},
                         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
                         'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                         'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
@@ -980,10 +981,14 @@ class SetPolicyStatement(BucketActionBase):
                     },
                     'required': ['Sid', 'Effect'],
                     'oneOf': [
-                        {'required': ['Action', 'Resource']},
-                        {'required': ['NotAction', 'Resource']},
-                        {'required': ['Action', 'NotResource']},
-                        {'required': ['NotAction', 'NotResource']}
+                        {'required': ['Principal', 'Action', 'Resource']},
+                        {'required': ['NotPrincipal', 'Action', 'Resource']},
+                        {'required': ['Principal', 'NotAction', 'Resource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'Resource']},
+                        {'required': ['Principal', 'Action', 'NotResource']},
+                        {'required': ['NotPrincipal', 'Action', 'NotResource']},
+                        {'required': ['Principal', 'NotAction', 'NotResource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
                     ]
                 }
             }
@@ -991,7 +996,7 @@ class SetPolicyStatement(BucketActionBase):
     )
 
     def process_bucket(self, bucket):
-        policy = bucket.get('Policy', '{}')
+        policy = bucket.get('Policy') or '{}'
 
         fmtargs = self.get_std_format_args(bucket)
 
@@ -2116,14 +2121,19 @@ class DataEvents(Filter):
         'cloudtrail:DescribeTrails',
         'cloudtrail:GetEventSelectors')
 
-    def get_event_buckets(self, client, trails):
+    def get_event_buckets(self, session, trails):
         """Return a mapping of bucket name to cloudtrail.
 
         For wildcard trails the bucket name is ''.
         """
+        regions = {t.get('HomeRegion') for t in trails}
+        clients = {}
+        for region in regions:
+            clients[region] = session.client('cloudtrail', region_name=region)
+
         event_buckets = {}
         for t in trails:
-            for events in client.get_event_selectors(
+            for events in clients[t.get('HomeRegion')].get_event_selectors(
                     TrailName=t['Name']).get('EventSelectors', ()):
                 if 'DataResources' not in events:
                     continue
@@ -2136,9 +2146,8 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
-        event_buckets = self.get_event_buckets(client, trails)
+        session = local_session(self.manager.session_factory)
+        event_buckets = self.get_event_buckets(session, trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2498,7 +2507,7 @@ class Lifecycle(BucketActionBase):
                                 'And': {
                                     'type': 'object',
                                     'additionalProperties': False,
-                                    'items': {
+                                    'properties': {
                                         'Prefix': {'type': 'string'},
                                         'Tags': {
                                             'type': 'array',
@@ -2506,7 +2515,7 @@ class Lifecycle(BucketActionBase):
                                                 'type': 'object',
                                                 'required': ['Key', 'Value'],
                                                 'additionalProperties': False,
-                                                'items': {
+                                                'properties': {
                                                     'Key': {'type': 'string'},
                                                     'Value': {'type': 'string'},
                                                 },
@@ -2542,14 +2551,14 @@ class Lifecycle(BucketActionBase):
                         'NoncurrentVersionExpiration': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
                             },
                         },
                         'AbortIncompleteMultipartUpload': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'DaysAfterInitiation': {'type': 'integer'},
                             },
                         },
@@ -2581,8 +2590,12 @@ class Lifecycle(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
+        if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading lifecycle" % bucket['Name'])
+            return
+
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
-        config = (bucket['Lifecycle'] or {}).get('Rules', [])
+        config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
                 if rule['ID'] == existing_rule['ID']:
@@ -2595,11 +2608,17 @@ class Lifecycle(BucketActionBase):
                 if rule['Status'] != 'absent':
                     config.append(rule)
 
-        # The extra `list` conversion if required for python3
+        # The extra `list` conversion is required for python3
         config = list(filter(None, config))
 
-        s3.put_bucket_lifecycle_configuration(
-            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        try:
+            s3.put_bucket_lifecycle_configuration(
+                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])
+            else:
+                raise e
 
 
 @actions.register('set-bucket-encryption')

@@ -14,6 +14,9 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.actions import BaseAction
+from c7n.utils import type_schema
+from c7n import utils
 
 
 @resources.register('elasticbeanstalk')
@@ -51,3 +54,41 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         )
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
+
+
+@ElasticBeanstalkEnvironment.action_registry.register('terminate')
+class Terminate(BaseAction):
+    """ Terminate an ElasticBeanstalk Environment.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: eb-env-termination
+            resource: elasticbeanstalk-environment
+            filters:
+              - type: marked-for-op
+                op: terminate
+            actions:
+              - terminate
+    """
+
+    schema = type_schema(
+        'terminate',
+        force={'type': 'boolean', 'default': False},
+        terminate_resources={'type': 'boolean', 'default': True}
+    )
+    permissions = ("elasticbeanstalk:TerminateEnvironment",)
+
+    def process(self, envs):
+        force_terminate = self.data.get('force', False)
+        terminate_resources = self.data.get('terminate_resources', True)
+        client = utils.local_session(
+            self.manager.session_factory).client('elasticbeanstalk')
+        for e in envs:
+            client.terminate_environment(
+                EnvironmentName=e["EnvironmentName"],
+                TerminateResources=terminate_resources,
+                ForceTerminate=force_terminate
+            )

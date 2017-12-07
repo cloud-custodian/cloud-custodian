@@ -19,9 +19,9 @@ from c7n.utils import local_session
 from c7n.filters import FilterValidationError
 from jsonschema.exceptions import ValidationError
 
-
 import datetime
 from dateutil import parser
+import json
 
 from .test_offhours import mock_datetime_now
 from .common import Config, functional
@@ -519,29 +519,90 @@ class AccountTests(BaseTest):
 
 class AccountDataEvents(BaseTest):
 
+    def make_bucket(self, session_factory, name):
+        client = session_factory().client('s3')
+
+        buckets = set([b['Name'] for b in client.list_buckets()['Buckets']])
+        if name in buckets:
+            self.destroyBucket(client, name)
+
+        # It is not accepted to pass us-east-1 to create_bucket
+        region = client._client_config.region_name
+        if region == 'us-east-1':
+            client.create_bucket(Bucket=name)
+        else:
+            config = {'LocationConstraint':client._client_config.region_name}
+            client.create_bucket(Bucket=name, CreateBucketConfiguration=config)
+
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "AWSCloudTrailAclCheck20150319",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "cloudtrail.amazonaws.com"
+                    },
+                    "Action": "s3:GetBucketAcl",
+                    "Resource": "arn:aws:s3:::{}".format(name),
+                },
+                {
+                    "Sid": "AWSCloudTrailWrite20150319",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "cloudtrail.amazonaws.com"
+                    },
+                    "Action": "s3:PutObject",
+                    "Resource": "arn:aws:s3:::{}/*".format(name),
+                    "Condition": {
+                        "StringEquals": {
+                            "s3:x-amz-acl": "bucket-owner-full-control"
+                        }
+                    }
+                }
+            ]
+        }
+
+        client.put_bucket_policy(Bucket=name, Policy=json.dumps(policy))
+        self.addCleanup(self.destroyBucket, client, name)
+
+    def destroyBucket(self, client, bucket):
+        for o in client.list_objects(Bucket=bucket).get('Contents', ()):
+            client.delete_object(Bucket=bucket, Key=o['Key'])
+        client.delete_bucket(Bucket=bucket)
+        
     def test_modify_data_events(self):
-        session_factory = self.replay_flight_data(
-            'test_account_modify_data_events')
+        session_factory = self.replay_flight_data('test_account_modify_data_events')
+        client = session_factory().client('cloudtrail')
+
+        region = client._client_config.region_name
+        trail_name = 'S3-DataEvents-test1'
+        bucket_name = 'skunk-trails-test-{}'.format(region)
+
+        self.make_bucket(session_factory, bucket_name)
+        self.addCleanup(client.delete_trail, Name=trail_name)
+
         p = self.load_policy({
             'name': 's3-data-events',
             'resource': 'account',
-            'actions': [
-                {'type': 'enable-data-events',
-                 'data-trail': {
-                     'create': True,
-                     'name': 'S3-DataEvent-1',
-                     's3-bucket': 'custodian-skunk-trails',
-                     's3-prefix': 'DataEvents',
-                     'multi-region': 'us-east-1'}}]},
+            'actions': [{
+                'type': 'enable-data-events',
+                'data-trail': {
+                    'create': True,
+                    'name': trail_name,
+                    's3-bucket': bucket_name,
+                    's3-prefix': 'DataEvents',
+                    'multi-region': region,
+                }
+            }]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n_data_trail']['Name'], 'S3-DataEvent-1')
-        client = session_factory().client('cloudtrail')
+            resources[0]['c7n_data_trail']['Name'], trail_name)
         self.assertEqual(
             client.get_event_selectors(
-                TrailName='S3-DataEvent-1').get('EventSelectors')[-1],
+                TrailName=trail_name).get('EventSelectors')[-1],
             {'DataResources': [{'Type': 'AWS::S3::Object',
                                 'Values': ['arn:aws:s3:::']}],
              'IncludeManagementEvents': False,
@@ -551,10 +612,18 @@ class AccountDataEvents(BaseTest):
     def test_data_events(self):
         session_factory = self.replay_flight_data('test_account_data_events')
         client = session_factory().client('cloudtrail')
-        self.assertFalse(
-            'S3-DataEvents' in {t['Name'] for t in
-                                client.describe_trails().get('trailList')})
-        self.addCleanup(client.delete_trail, Name='S3-DataEvents')
+
+        region = client._client_config.region_name
+        trail_name = 'S3-DataEvents-test2'
+        bucket_name = 'skunk-trails-test-{}'.format(region)
+
+        self.make_bucket(session_factory, bucket_name)
+
+        existing_trails = {t['Name'] for t in client.describe_trails().get('trailList')}
+        if trail_name in existing_trails:
+            client.delete_trail(Name=trail_name)
+
+        self.addCleanup(client.delete_trail, Name=trail_name)
 
         p = self.load_policy({
             'name': 's3-data-events',
@@ -563,15 +632,15 @@ class AccountDataEvents(BaseTest):
                 {'type': 'enable-data-events',
                  'data-trail': {
                      'create': True,
-                     'name': 'S3-DataEvents',
-                     's3-bucket': 'custodian-skunk-trails',
+                     'name': trail_name,
+                     's3-bucket': bucket_name,
                      's3-prefix': 'DataEvents',
-                     'multi-region': 'us-east-1'}}]},
+                     'multi-region': region}}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(
             client.get_event_selectors(
-                TrailName='S3-DataEvents').get('EventSelectors')[0],
+                TrailName=trail_name).get('EventSelectors')[0],
             {'DataResources': [{'Type': 'AWS::S3::Object',
                                 'Values': ['arn:aws:s3:::']}],
              'IncludeManagementEvents': False,
@@ -585,7 +654,7 @@ class AccountDataEvents(BaseTest):
             'name': 's3-data-check',
             'resource': 's3',
             'filters': [
-                {'Name': 'custodian-skunk-trails'},
+                {'Name': bucket_name},
                 {'type': 'data-events',
                  'state': 'present'}]},
             session_factory=session_factory)
