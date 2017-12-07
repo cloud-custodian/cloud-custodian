@@ -190,6 +190,19 @@ class IamUserTest(BaseTest):
 
     @functional
     def test_iam_user_delete(self):
+        # To get this test to work against live AWS I had to attach the
+        # following explicit policy.  Even root accounts don't work
+        # without this policy:
+        #
+        # {
+        #     "Version": "2012-10-17",
+        #     "Statement": [{
+        #         "Effect": "Allow",
+        #         "Action": ["iam:*"],
+        #         "Resource": "*"
+        #     }]
+        # }
+
         factory = self.replay_flight_data('test_iam_user_delete')
         name = 'alice'
         client = factory().client('iam')
@@ -753,10 +766,11 @@ class CrossAccountChecker(TestCase):
         checker = PolicyChecker({
             'allowed_accounts': set(['123456789012']),
             'allowed_vpc': set(['vpc-12345678']),
-            'allowed_vpce': set(['vpce-12345678'])})
+            'allowed_vpce': set(['vpce-12345678', 'vpce-87654321'])})
         for p, expected in zip(
                 policies, [True, False, False, True, False,
-                           True, False, True, False, True]):
+                           True, False, True, False, True, False,
+                           True, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
@@ -766,6 +780,7 @@ class CrossAccountChecker(TestCase):
             'allowed_accounts': set(['123456789012'])})
         for p, expected in zip(
                 policies, [True, False, False, True, False,
-                           True, False, False, False, False]):
+                           True, False, False, False, False, False,
+                           True, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
