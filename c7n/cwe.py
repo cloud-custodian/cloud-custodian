@@ -77,7 +77,7 @@ class CloudWatchEvents(object):
 
         'CreateTable': {
             'ids': 'requestParameters.tableName',
-            'source': 'dynamodb.amazonaws.com"'},
+            'source': 'dynamodb.amazonaws.com'},
 
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
