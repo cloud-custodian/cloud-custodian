@@ -865,15 +865,12 @@ class RDSSetPublicAvailability(BaseAction):
 
     def process(self, rds):
         with self.executor_factory(max_workers=2) as w:
-            futures = {}
-            for r in rds:
-                futures[w.submit(self.set_accessibility, r)] = r
+            futures = {w.submit(self.set_accessibility, r): r for r in rds}
             for f in as_completed(futures):
-                r = futures[f]
                 if f.exception():
                     self.log.error(
                         "Exception setting public access on %s  \n %s",
-                        r['DBInstanceIdentifier'], f.exception())
+                        futures[f]['DBInstanceIdentifier'], f.exception())
         return rds
 
 

@@ -844,7 +844,6 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)
 
-
     def test_rds_public_accessible_disable(self):
         session_factory = self.replay_flight_data(
             'test_rds_public_accessible_disable')
@@ -864,7 +863,6 @@ class RDSSnapshotTest(BaseTest):
         self.assertFalse(client.describe_db_instances(
             DBInstanceIdentifier='c7n-test-pa')[
                              'DBInstances'][0]['PubliclyAccessible'])
-
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
