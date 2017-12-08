@@ -432,15 +432,12 @@ class RedshiftSetPublicAccess(BaseAction):
 
     def process(self, clusters):
         with self.executor_factory(max_workers=2) as w:
-            futures = {}
-            for c in clusters:
-                futures[w.submit(self.set_access, c)] = c
+            futures = {w.submit(self.set_access, c): c for c in clusters}
             for f in as_completed(futures):
-                c = futures[f]
                 if f.exception():
                     self.log.error(
                         "Exception setting Redshift public access on %s  \n %s",
-                        c['ClusterIdentifier'], f.exception())
+                        futures[f]['ClusterIdentifier'], f.exception())
         return clusters
 
 
