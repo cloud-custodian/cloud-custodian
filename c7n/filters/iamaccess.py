@@ -184,9 +184,8 @@ class PolicyChecker(object):
         s_cond_op = list(s['Condition'].keys())[0]
 
         if s_cond_op not in conditions:
-            for s in set_conditions:
-                if not s_cond_op.startswith(s_cond_op):
-                    return None, None, None
+            if not any(s_cond_op.startswith(c) for c in set_conditions):
+                return None, None, None
 
         assert len(s['Condition'][s_cond_op]) == 1, "Multiple keys on condition"
         s_cond_key = list(s['Condition'][s_cond_op].keys())[0]

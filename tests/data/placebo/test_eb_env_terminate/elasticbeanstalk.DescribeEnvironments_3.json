@@ -1,0 +1,60 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0883ec25-d925-11e7-9b02-1325c16678ca", 
+            "HTTPHeaders": {
+                "date": "Mon, 04 Dec 2017 18:57:53 GMT", 
+                "x-amzn-requestid": "0883ec25-d925-11e7-9b02-1325c16678ca", 
+                "content-length": "1680", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Environments": [
+            {
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-term-test", 
+                "VersionLabel": "app-477e-170601_115505", 
+                "Status": "Terminating", 
+                "Description": "test for c7n EB termination", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "EndpointURL": "awseb-e-c-AWSEBLoa-VDPIGTI558U-1484559782.us-east-1.elb.amazonaws.com", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "EnvironmentId": "e-cpvmgjjyip", 
+                "CNAME": "c7n-eb-term-test.us-east-1.elasticbeanstalk.com", 
+                "AbortableOperationInProgress": false, 
+                "Tier": {
+                    "Version": " ", 
+                    "Type": "Standard", 
+                    "Name": "WebServer"
+                }, 
+                "Health": "Grey", 
+                "DateUpdated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 53, 
+                    "microsecond": 569000, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 57
+                }, 
+                "DateCreated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 38, 
+                    "microsecond": 330000, 
+                    "year": 2017, 
+                    "day": 4, 
+                    "minute": 52
+                }, 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-term-test"
+            }
+        ]
+    }
+}

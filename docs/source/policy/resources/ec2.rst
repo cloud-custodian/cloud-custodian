@@ -91,6 +91,12 @@ Filter by State Transition Filter
   .. c7n-schema:: InstanceAgeFilter
       :module: c7n.resources.ec2
 
+``termination-protected``
+  Filter based on the ``disableApiTermination`` instance attribute.
+
+  .. c7n-schema:: DisableApiTermination
+      :module: c7n.resources.ec2
+
 Actions
 -------
 

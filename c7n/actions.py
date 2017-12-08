@@ -17,6 +17,7 @@ Actions to take on resources
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+import copy
 from datetime import datetime
 import jmespath
 import logging
@@ -448,7 +449,7 @@ class Notify(EventAction):
     def expand_variables(self, message):
         """expand any variables in the action to_from/cc_from fields.
         """
-        p = self.data.copy()
+        p = copy.deepcopy(self.data)
         if 'to_from' in self.data:
             to_from = self.data['to_from'].copy()
             to_from['url'] = to_from['url'].format(**message)

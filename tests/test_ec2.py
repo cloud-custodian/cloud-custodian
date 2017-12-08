@@ -79,6 +79,63 @@ class TestMetricFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestDisableApiTermination(BaseTest):
+
+    def test_term_prot_enabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_termination-protected_filter')
+        policy = self.load_policy({
+            'name': 'ec2-termination-enabled',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'termination-protected'}
+            ]},
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-092f500eaad726b71')
+
+    def test_term_prot_not_enabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_termination-protected_filter')
+        policy = self.load_policy({
+            'name': 'ec2-termination-NOT-enabled',
+            'resource': 'ec2',
+            'filters': [
+                {'not': [
+                    {'type': 'termination-protected'}
+                ]}
+            ]},
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([x['InstanceId'] for x in resources]),
+            ['i-02117c13e1d21b229', 'i-0718418de3bb4ae2a']
+        )
+
+    def test_policy_permissions(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_termination-protected_filter')
+        policy = self.load_policy({
+            'name': 'ec2-termination-enabled',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'termination-protected'}
+            ]},
+            session_factory=session_factory
+        )
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            set(('ec2:DescribeInstances',
+                 'ec2:DescribeTags',
+                 'ec2:DescribeInstanceAttribute'))
+        )
+
+
 class TestHealthEventsFilter(BaseTest):
     def test_ec2_health_events_filter(self):
         session_factory = self.replay_flight_data(
