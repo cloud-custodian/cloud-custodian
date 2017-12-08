@@ -843,19 +843,19 @@ class RDSSetPublicAvailability(BaseAction):
         .. code-block: yaml
 
             policies:
-              - name: enable-rds-public-accessibility
+              - name: disable-rds-public-accessibility
                 resource: rds
                 filters:
-                  - PubliclyAccessible: false
+                  - PubliclyAccessible: true
                 actions:
                   - type: set-public-access
-                    state: true
+                    state: false
     """
 
     schema = type_schema(
         "set-public-access",
         state={'type': 'boolean'})
-    permissions = ('rds:ModifyDBInstanbce',)
+    permissions = ('rds:ModifyDBInstance',)
 
     def set_accessibility(self, r):
         client = local_session(self.manager.session_factory).client('rds')
@@ -865,15 +865,15 @@ class RDSSetPublicAvailability(BaseAction):
 
     def process(self, rds):
         with self.executor_factory(max_workers=2) as w:
-            futures = []
+            futures = {}
             for r in rds:
-                futures.append(w.submit(
-                    self.set_accessibility, r))
+                futures[w.submit(self.set_accessibility, r)] = r
             for f in as_completed(futures):
+                r = futures[f]
                 if f.exception():
                     self.log.error(
-                        "Exception setting public accessibility  \n %s",
-                        f.exception())
+                        "Exception setting public access on %s  \n %s",
+                        r['DBInstanceIdentifier'], f.exception())
         return rds
 
 
