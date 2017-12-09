@@ -961,6 +961,21 @@ class RemovePermissions(BaseAction):
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
 
+@resources.register('eip')
+class ElasticIp(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'eip'
+        enum_spec = ('describe_adresses', 'Addresses', None)
+        detail_spec = None
+        name = id = 'Addresses'
+        filter_name = "Addresses"
+        filter_type = 'list'
+        date = None
+        dimension = None
+        config_type = "AWS::EC2::ElasticIp"
+        id_prefix = "eipalloc-"
 
 @resources.register('eni')
 class NetworkInterface(query.QueryResourceManager):
