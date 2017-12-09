@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 import json
+import mock
 import shutil
 import tempfile
 
@@ -23,7 +24,7 @@ from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 from c7n.query import ConfigSource
 
-from .common import BaseTest, Config, Bag
+from .common import BaseTest, Config, Bag, event_data
 
 
 class DummyResource(manager.ResourceManager):
@@ -500,3 +501,89 @@ class PullModeTest(BaseTest):
         self.assertIn(
             "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(policy_name),
             lines)
+
+
+class GuardModeTest(BaseTest):
+
+    def test_unsupported_resource(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {'name': 'vpc',
+             'resource': 'vpc',
+             'mode': {'type': 'guard-duty'}},
+            validate=True)
+
+    @mock.patch('c7n.mu.LambdaManager.publish')
+    def test_ec2_guard_event_pattern(self, publish):
+
+        def assert_publish(policy_lambda, alias, role):
+            events = policy_lambda.get_events(mock.MagicMock())
+            self.assertEqual(len(events), 1)
+            pattern = json.loads(events[0].render_event_pattern())
+            expected = {"source": ["aws.guardduty"],
+                "detail": {"resource": {"resourceType": ["Instance"]}},
+                "detail-type": ["GuardDuty Finding"]}
+            self.assertEqual(pattern, expected)
+
+        publish.side_effect = assert_publish
+        p = self.load_policy(
+            {'name': 'ec2-instance-guard',
+             'resource': 'ec2',
+             'mode': {'type': 'guard-duty'}})
+        p.run()
+
+    @mock.patch('c7n.mu.LambdaManager.publish')
+    def test_iam_guard_event_pattern(self, publish):
+
+        def assert_publish(policy_lambda, alias, role):
+            events = policy_lambda.get_events(mock.MagicMock())
+            self.assertEqual(len(events), 1)
+            pattern = json.loads(events[0].render_event_pattern())
+            expected = {"source": ["aws.guardduty"],
+                "detail": {"resource": {"resourceType": ["AccessKey"]}},
+                "detail-type": ["GuardDuty Finding"]}
+            self.assertEqual(pattern, expected)
+
+        publish.side_effect = assert_publish
+        p = self.load_policy(
+            {'name': 'iam-user-guard',
+             'resource': 'iam-user',
+             'mode': {'type': 'guard-duty'}})
+        p.run()
+
+    @mock.patch('c7n.query.QueryResourceManager.get_resources')
+    def test_ec2_instance_guard(self, get_resources):
+
+        def instances(ids, cache=False):
+            return [{'InstanceId': ids[0]}]
+
+        get_resources.side_effect = instances
+
+        p = self.load_policy(
+            {'name': 'ec2-instance-guard',
+             'resource': 'ec2',
+             'mode': {'type': 'guard-duty'}})
+
+        event = event_data('ec2-duty-event.json')
+        results = p.push(event, None)
+        self.assertEqual(results, [{'InstanceId': 'i-99999999'}])
+
+    @mock.patch('c7n.query.QueryResourceManager.get_resources')
+    def test_iam_user_access_key_annotate(self, get_resources):
+
+        def users(ids, cache=False):
+            return [{'UserName': ids[0]}]
+
+        get_resources.side_effect = users
+
+        p = self.load_policy(
+            {'name': 'user-key-guard',
+             'resource': 'iam-user',
+             'mode': {'type': 'guard-duty'}})
+
+        event = event_data('iam-duty-event.json')
+        results = p.push(event, None)
+        self.assertEqual(results, [{
+            u'UserName': u'GeneratedFindingUserName',
+            u'c7n:AccessKeys': {u'AccessKeyId': u'GeneratedFindingAccessKeyId'}}])

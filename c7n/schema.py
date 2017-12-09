@@ -193,6 +193,7 @@ def generate(resource_types=()):
                         'ec2-instance-state',
                         'asg-instance-state',
                         'config-rule',
+                        'guard-duty',
                         'periodic'
                     ]},
                 'events': {'type': 'array', 'items': {

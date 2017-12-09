@@ -81,7 +81,6 @@ CONFIG_SCHEMA = {
 }
 
 
-
 @click.group()
 def cli():
     """custodian organization multi-account runner."""
@@ -117,8 +116,19 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None):
         filtered_policies.append(p)
     custodian_config['policies'] = filtered_policies
 
+    filter_accounts(accounts_config, tags, accounts)
+
+    load_resources()
+    MainThreadExecutor.async = False
+    executor = debug and MainThreadExecutor or ProcessPoolExecutor
+    return accounts_config, custodian_config, executor
+
+
+def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     filtered_accounts = []
     for a in accounts_config.get('accounts', ()):
+        if not_accounts and a['name'] in not_accounts:
+            continue
         if accounts and a['name'] not in accounts:
             continue
         if tags:
@@ -130,10 +140,6 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None):
                 continue
         filtered_accounts.append(a)
     accounts_config['accounts'] = filtered_accounts
-    load_resources()
-    MainThreadExecutor.async = False
-    executor = debug and MainThreadExecutor or ProcessPoolExecutor
-    return accounts_config, custodian_config, executor
 
 
 def report_account(account, region, policies_config, output_path, debug):
