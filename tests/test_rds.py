@@ -844,6 +844,26 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)
 
+    def test_rds_public_accessible_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_public_accessible_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        policy = self.load_policy({
+            'name': 'disable-publicly-accessibility',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': "c7n-test-pa"},
+                {'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'c7n-test-pa')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='c7n-test-pa')[
+                             'DBInstances'][0]['PubliclyAccessible'])
+
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_rds_remove_matched_security_groups(self):
