@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test", 
+        "ResourceTags": [
+            {
+                "Value": "other-key-value", 
+                "Key": "other-key"
+            }, 
+            {
+                "Value": "SomeKeyValue", 
+                "Key": "SomeKey"
+            }, 
+            {
+                "Value": "c7n-eb-tag-test", 
+                "Key": "elasticbeanstalk:environment-name"
+            }, 
+            {
+                "Value": "e-rdthyjww23", 
+                "Key": "elasticbeanstalk:environment-id"
+            }, 
+            {
+                "Value": "c7n-eb-tag-test", 
+                "Key": "Name"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9bf9d14d-d9e8-11e7-b124-679fa4c6ba3f", 
+            "HTTPHeaders": {
+                "date": "Tue, 05 Dec 2017 18:17:52 GMT", 
+                "x-amzn-requestid": "9bf9d14d-d9e8-11e7-b124-679fa4c6ba3f", 
+                "content-length": "977", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}
