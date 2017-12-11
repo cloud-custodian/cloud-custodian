@@ -179,7 +179,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('--field', multiple=True)
 @click.option('--no-default-fields', default=False, is_flag=True)
 @click.option('-t', '--tags', multiple=True, default=None)
-@click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
+@click.option('-r', '--region', default=None, multiple=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-p', '--policy', multiple=True)
@@ -200,8 +200,7 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions']
-            for r in account_regions:
+            for r in region or a['regions'] or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     report_account,
                     a, r,
