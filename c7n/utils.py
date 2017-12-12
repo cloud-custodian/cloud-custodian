@@ -317,7 +317,7 @@ def snapshot_identifier(prefix, db_identifier):
     """Return an identifier for a snapshot of a database or cluster.
     """
     now = datetime.now()
-    return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
+    return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d-%H-%M'))
 
 
 def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
