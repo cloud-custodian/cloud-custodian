@@ -268,9 +268,9 @@ class LambdaManager(object):
         return result
 
     def remove(self, func, alias=None):
-        log.info("Removing lambda function %s", func.name)
         for e in func.get_events(self.session_factory):
             e.remove(func)
+        log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
         except ClientError as e:
@@ -950,6 +950,7 @@ class CloudWatchEventSource(object):
 
     def remove(self, func):
         if self.get(func.name):
+            log.info("Removing cwe targets and rule %s", func.name)
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
@@ -1341,6 +1342,7 @@ class ConfigRule(object):
         rule = self.get(func.name)
         if not rule:
             return
+        log.info("Removing config rule for %s", func.name)
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)
