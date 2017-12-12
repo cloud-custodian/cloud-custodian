@@ -51,7 +51,15 @@ class HealthEventFilter(Filter):
 
         for resource_set in chunks(resource_map.keys(), 100):
             f['entityValues'] = resource_set
-            events = client.describe_events(filter=f)['events']
+            events = []
+            if 'eventTypeCodes' in f and len(f['eventTypeCodes']) > 10:
+                # paginate event requests, since the api limit is 10 for
+                # eventTypeCodes
+                for event_type_codes in chunks(f['eventTypeCodes'], 10):
+                    f['eventTypeCodes'] = event_type_codes
+                    events += client.describe_events(filter=f)['events']
+            else:
+                events = client.describe_events(filter=f)['events']
             events = [e for e in events if e['arn'] not in seen]
             entities = self.process_event(events)
 
