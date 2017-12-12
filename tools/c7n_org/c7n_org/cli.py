@@ -179,7 +179,7 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('--field', multiple=True)
 @click.option('--no-default-fields', default=False, is_flag=True)
 @click.option('-t', '--tags', multiple=True, default=None)
-@click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
+@click.option('-r', '--region', default=None, multiple=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-p', '--policy', multiple=True)
@@ -200,8 +200,7 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions']
-            for r in account_regions:
+            for r in region or a.get('regions', ()) or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     report_account,
                     a, r,
@@ -285,7 +284,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None)
-@click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
+@click.option('-r', '--region', default=None, multiple=True)
 @click.option('--echo', default=False, is_flag=True)
 @click.option('--serial', default=False, is_flag=True)
 @click.argument('script_args', nargs=-1, type=click.UNPROCESSED)
@@ -302,8 +301,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions']
-            for r in account_regions:
+            for r in region or a.get('regions', ()) or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     run_account_script, a, r, output_dir, serial, script_args)
                             ] = (a, r)
@@ -385,7 +383,7 @@ def run_account(account, region, policies_config, output_path, cache_period, met
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None)
-@click.option('-r', '--region', default=['us-east-1', 'us-west-2'], multiple=True)
+@click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
 @click.option('--cache-period', default=15, type=int)
 @click.option("--metrics", default=False, is_flag=True)
@@ -401,8 +399,7 @@ def run(config, use, output_dir, accounts, tags,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions']
-            for r in account_regions:
+            for r in region or a.get('regions', ()) or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     run_account,
                     a, r,
