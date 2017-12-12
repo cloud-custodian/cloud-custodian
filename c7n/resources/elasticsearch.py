@@ -18,8 +18,9 @@ import logging
 import itertools
 
 from c7n.actions import Action
-from c7n.manager import resources
 from c7n.filters import MetricsFilter, FilterRegistry
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     chunks, local_session, get_retry, type_schema, generate_arn)
@@ -81,6 +82,18 @@ class ElasticSearchDomain(QueryResourceManager):
         with self.executor_factory(max_workers=1) as w:
             return list(itertools.chain(
                 *w.map(_augment, chunks(domains, 5))))
+
+
+@ElasticSearchDomain.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = "VPCOptions.SubnetIds"
+
+
+@ElasticSearchDomain.filter_registry.register('security-group')
+class SecurityGroup(SecurityGroupFilter):
+
+    RelatedIdsExpression = "VPCOptions.SecurityGroupIds"
 
 
 @ElasticSearchDomain.filter_registry.register('metrics')
