@@ -301,8 +301,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions'] or ('us-east-1', 'us-west-2')
-            for r in account_regions:
+            for r in region or a['regions'] or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     run_account_script, a, r, output_dir, serial, script_args)
                             ] = (a, r)
@@ -400,8 +399,7 @@ def run(config, use, output_dir, accounts, tags,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            account_regions = region or a['regions'] or ('us-east-1', 'us-west-2')
-            for r in account_regions:
+            for r in region or a['regions'] or ('us-east-1', 'us-west-2'):
                 futures[w.submit(
                     run_account,
                     a, r,
