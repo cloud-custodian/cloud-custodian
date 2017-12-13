@@ -2,15 +2,228 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ecce9ea8-612f-11e6-a41f-35bbc28408bd", 
+            "RequestId": "3e36391e-d4a6-11e7-91ac-75bffbc9c3dd", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "ecce9ea8-612f-11e6-a41f-35bbc28408bd", 
-                "date": "Sat, 13 Aug 2016 08:28:33 GMT", 
-                "content-length": "16", 
+                "x-amzn-requestid": "3e36391e-d4a6-11e7-91ac-75bffbc9c3dd", 
+                "date": "Wed, 29 Nov 2017 01:40:12 GMT", 
+                "content-length": "6390", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
-        "logGroups": []
+        "logGroups": [
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/custodian-dev:*", 
+                "creationTime": 1480273227168, 
+                "metricFilterCount": 0, 
+                "logGroupName": "/custodian-dev", 
+                "storedBytes": 464
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_0fjbaq9uz6/dev:*", 
+                "creationTime": 1484003446359, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_0fjbaq9uz6/dev", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_5xhc1cnb7h/latest:*", 
+                "creationTime": 1485084485992, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_5xhc1cnb7h/latest", 
+                "storedBytes": 5897100
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_5xhc1cnb7h/noop:*", 
+                "creationTime": 1485084482152, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_5xhc1cnb7h/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_bjswh8i7kj/latest:*", 
+                "creationTime": 1485045110338, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_bjswh8i7kj/latest", 
+                "storedBytes": 881
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_bjswh8i7kj/noop:*", 
+                "creationTime": 1485045106033, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_bjswh8i7kj/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_e3rf63z980/Prod:*", 
+                "creationTime": 1484003461966, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_e3rf63z980/Prod", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_e3rf63z980/Stage:*", 
+                "creationTime": 1484003476749, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_e3rf63z980/Stage", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_iml2ks0f46/latest:*", 
+                "creationTime": 1484018796837, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_iml2ks0f46/latest", 
+                "storedBytes": 13766
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_iml2ks0f46/noop:*", 
+                "creationTime": 1484018792243, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_iml2ks0f46/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_ipbx2xfhvj/latest:*", 
+                "creationTime": 1484020297985, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_ipbx2xfhvj/latest", 
+                "storedBytes": 189132
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_ipbx2xfhvj/noop:*", 
+                "creationTime": 1484020293574, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_ipbx2xfhvj/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_ncs45jrbtl/Prod:*", 
+                "creationTime": 1493382660268, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_ncs45jrbtl/Prod", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_ncs45jrbtl/Stage:*", 
+                "creationTime": 1493382655428, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_ncs45jrbtl/Stage", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_prpl74j959/Dev:*", 
+                "creationTime": 1484003491470, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_prpl74j959/Dev", 
+                "storedBytes": 3978
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_prpl74j959/Development:*", 
+                "creationTime": 1484003507615, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_prpl74j959/Development", 
+                "storedBytes": 1978
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_reehrks2p7/latest:*", 
+                "creationTime": 1484966661286, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_reehrks2p7/latest", 
+                "storedBytes": 146305
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_reehrks2p7/noop:*", 
+                "creationTime": 1484966657128, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_reehrks2p7/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_rtmgxfiay5/prod:*", 
+                "creationTime": 1491402932747, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_rtmgxfiay5/prod", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_u8bxjrt0o2/latest:*", 
+                "creationTime": 1484018040831, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_u8bxjrt0o2/latest", 
+                "storedBytes": 2289
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_u8bxjrt0o2/noop:*", 
+                "creationTime": 1484018036183, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_u8bxjrt0o2/noop", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_umlfmhc523/dev:*", 
+                "creationTime": 1484003522759, 
+                "metricFilterCount": 0, 
+                "logGroupName": "API-Gateway-Execution-Logs_umlfmhc523/dev", 
+                "storedBytes": 0
+            }, 
+            {
+                "storedBytes": 0, 
+                "metricFilterCount": 0, 
+                "creationTime": 1482396306884, 
+                "logGroupName": "RDSOSMetrics", 
+                "retentionInDays": 30, 
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:RDSOSMetrics:*"
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:Sphere11.Dev.Audit:*", 
+                "creationTime": 1485767064644, 
+                "metricFilterCount": 0, 
+                "logGroupName": "Sphere11.Dev.Audit", 
+                "storedBytes": 2703
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-test-b:*", 
+                "creationTime": 1511919612096, 
+                "metricFilterCount": 0, 
+                "logGroupName": "c7n-test-b", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:custodian:*", 
+                "creationTime": 1494788646547, 
+                "metricFilterCount": 0, 
+                "logGroupName": "custodian", 
+                "storedBytes": 1273
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:demo:*", 
+                "creationTime": 1478876251481, 
+                "metricFilterCount": 0, 
+                "logGroupName": "demo", 
+                "storedBytes": 794
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:flow-logs:*", 
+                "creationTime": 1505440043824, 
+                "metricFilterCount": 0, 
+                "logGroupName": "flow-logs", 
+                "storedBytes": 20275344
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:obsolete:*", 
+                "creationTime": 1471079565059, 
+                "metricFilterCount": 0, 
+                "logGroupName": "obsolete", 
+                "storedBytes": 0
+            }, 
+            {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:sphere11:*", 
+                "creationTime": 1485766347015, 
+                "metricFilterCount": 0, 
+                "logGroupName": "sphere11", 
+                "storedBytes": 919
+            }
+        ]
     }
 }

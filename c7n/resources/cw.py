@@ -20,6 +20,7 @@ from c7n.filters import Filter
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import type_schema, local_session, chunks, get_retry
+from c7n.tags import Tag, RemoveTag
 
 
 @resources.register('alarm')
@@ -157,6 +158,76 @@ class Delete(BaseAction):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
             client.delete_log_group(logGroupName=r['logGroupName'])
+
+
+@LogGroup.action_registry.register('tag')
+class TagLogGroup(Tag):
+    """Action to create tag(s) on a log group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: tag-log-group
+                resource: log-group
+                filters:
+                  - "tag:Required-Tag": absent
+                actions:
+                  - type: tag
+                    key: Required-Tag
+                    value: Tag-Value
+    """
+
+    permissions = ('logs:TagLogGroup',)
+
+    def process_resource_set(self, loggroups, tags):
+        client = local_session(self.manager.session_factory).client('logs')
+        tag_dict = {}
+        for t in tags:
+            tag_dict[t['Key']] = t['Value']
+        for lg in loggroups:
+            try:
+                client.tag_log_group(
+                    logGroupName=lg['logGroupName'], tags=tag_dict)
+            except Exception as e:
+                self.log.exception(
+                    'Exception tagging queue %s: %s',
+                    lg['logGroupName'], e)
+                continue
+
+
+@LogGroup.action_registry.register('remove-tag')
+class UntagLogGroup(RemoveTag):
+    """Action to remove tag(s) on a log group
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: log-group-remove-tags
+                resource: log-group
+                filters:
+                  - "tag:ExpiredTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["ExpiredTag"]
+    """
+
+    permissions = ('logs:UntagLogGroup',)
+
+    def process_resource_set(self, loggroups, tags):
+        client = local_session(self.manager.session_factory).client('logs')
+        for lg in loggroups:
+            try:
+                client.untag_log_group(
+                    logGroupName=lg['logGroupName'], tags=tags)
+            except Exception as e:
+                self.log.exception(
+                    'Exception while removing tags from log group %s: %s',
+                    lg['logGroupName'], e)
+                continue
 
 
 @LogGroup.filter_registry.register('last-write')

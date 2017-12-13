@@ -21,17 +21,15 @@ class LogGroupTest(BaseTest):
     def test_last_write(self):
         factory = self.replay_flight_data('test_log_group_last_write')
         p = self.load_policy(
-            {'name': 'set-retention',
+            {'name': 'stale-log-groups',
              'resource': 'log-group',
              'filters': [
-                 {'logGroupName': '/aws/lambda/ec2-instance-type'},
-                 {'type':'last-write', 'days': 0.1}]
+                 {'type': 'last-write', 'days': 365}]
              },
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['logGroupName'],
-                         '/aws/lambda/ec2-instance-type')
+        self.assertEqual(resources[0]['logGroupName'], 'obsolete')
 
     def test_retention(self):
         log_group = 'c7n-test-a'
@@ -73,3 +71,49 @@ class LogGroupTest(BaseTest):
         self.assertEqual(
             client.describe_log_groups(
                 logGroupNamePrefix=log_group)['logGroups'], [])
+
+    def test_add_tags(self):
+        log_group = 'c7n-tagging-test'
+        session_factory = self.replay_flight_data('test_log_group_tag')
+        session = session_factory(region='us-east-1')
+        client = session.client('logs')
+        client.create_log_group(logGroupName=log_group)
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+
+        p = self.load_policy({
+            'name': 'tag-log-group',
+            'resource': 'log-group',
+            'filters': [{'logGroupName': log_group}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'RequiredTag',
+                'value': 'TagValue'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            client.list_tags_log_group(logGroupName=log_group)['tags'],
+            {'RequiredTag': 'TagValue'})
+
+    def test_remove_tags(self):
+        log_group = 'c7n-remove-tagging-test'
+        session_factory = self.replay_flight_data('test_log_group_remove_tag')
+        session = session_factory(region='us-east-1')
+        client = session.client('logs')
+        client.create_log_group(
+            logGroupName=log_group, tags={'ExpiredTag': 'TagValue'})
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+
+        tags = client.list_tags_log_group(logGroupName=log_group)['tags']
+        self.assertEqual(tags, {'ExpiredTag': 'TagValue'})
+
+        p = self.load_policy({
+            'name': 'untag-log-group',
+            'resource': 'log-group',
+            'filters': [{'logGroupName': log_group}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['ExpiredTag']}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            len(client.list_tags_log_group(logGroupName=log_group)['tags']), 0)

@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3f9c58d4-d4a6-11e7-9427-b1b596fdb678", 
+            "RequestId": "0da13e18-d4a6-11e7-a2dc-19ca644f6073", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3f9c58d4-d4a6-11e7-9427-b1b596fdb678", 
-                "date": "Wed, 29 Nov 2017 01:40:15 GMT", 
-                "content-length": "6390", 
+                "x-amzn-requestid": "0da13e18-d4a6-11e7-a2dc-19ca644f6073", 
+                "date": "Wed, 29 Nov 2017 01:38:50 GMT", 
+                "content-length": "6416", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
@@ -183,10 +183,10 @@
                 "storedBytes": 2703
             }, 
             {
-                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-test-a:*", 
-                "creationTime": 1511919614713, 
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-remove-tagging-test:*", 
+                "creationTime": 1511919530760, 
                 "metricFilterCount": 0, 
-                "logGroupName": "c7n-test-a", 
+                "logGroupName": "c7n-remove-tagging-test", 
                 "storedBytes": 0
             }, 
             {
