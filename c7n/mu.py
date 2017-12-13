@@ -240,8 +240,7 @@ def custodian_archive(packages=None):
           name: lambda-archive-example
           resource: s3
           mode:
-            - packages:
-              - boto3
+            packages:
               - botocore
 
     Kwargs:

@@ -217,6 +217,7 @@ def generate(resource_types=()):
                 'kms_key_arn': {'type': 'string'},
                 'tracing_config': {'type': 'object'},
                 'tags': {'type': 'object'},
+                'packages': {'type': 'array'},
             },
         },
     }
