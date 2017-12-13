@@ -226,9 +226,31 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def custodian_archive():
-    """Create a lambda code archive for running custodian."""
-    return PythonPackageArchive('c7n', 'pkg_resources', 'ipaddress')
+def custodian_archive(packages=None):
+    """Create a lambda code archive for running custodian.
+
+    Lambda archive currently always includes `c7n, pkg_resources and ipaddress`. Add additional
+    packages in the mode block
+
+    Example policy that includes additional packages
+
+    .. code-block:: yaml
+
+        policy:
+          name: lambda-archive-example
+          resource: s3
+          mode:
+            - packages:
+              - boto3
+              - botocore
+
+    Kwargs:
+        packages (set): List of additional packages to include in the lambda archive.
+    """
+    modules = {'c7n', 'pkg_resources', 'ipaddress'}
+    if packages:
+        modules = filter(None, modules.union(packages))
+    return PythonPackageArchive(*modules)
 
 
 class LambdaManager(object):
@@ -657,7 +679,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     def __init__(self, policy):
         self.policy = policy
-        self.archive = custodian_archive()
+        self.archive = custodian_archive(packages=self.packages)
 
     @property
     def name(self):
@@ -711,6 +733,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def packages(self):
+        return self.policy.data['mode'].get('packages')
 
     def get_events(self, session_factory):
         events = []

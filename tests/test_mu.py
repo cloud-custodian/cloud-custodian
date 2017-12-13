@@ -521,6 +521,21 @@ class PolicyLambdaProvision(BaseTest):
         tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
         self.assert_items(tags, {'Foo': 'Baz', 'Bah': 'Bug'})
 
+    def test_optional_packages(self):
+        p = Policy({
+            'resources': 's3',
+            'name': 's3-lambda-extra',
+            'resource': 's3',
+            'mode': {
+                'type': 'cloudtrail',
+                'packages': ['boto3', 'botocore'],
+                'events': ['CreateBucket'],
+                }}, Config.empty())
+        pl = PolicyLambda(p)
+        pl.archive.close()
+        self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
+        self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
+
 
 class PythonArchiveTest(unittest.TestCase):
 
