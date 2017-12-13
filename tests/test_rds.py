@@ -240,15 +240,26 @@ class RDSTest(BaseTest):
 
     def test_rds_snapshot(self):
         session_factory = self.replay_flight_data('test_rds_snapshot')
+        dt = datetime.datetime.now().replace(
+            year=2017, month=12, day=11, hour=14, minute=9)
+        suffix = dt.strftime('%Y-%m-%d-%H-%M')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
+             'filters': [{
+                 'DBInstanceIdentifier': 'c7n-snapshot-test'}],
              'actions': [
                  {'type':'snapshot'}]},
-            config={'region': 'us-west-2'},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        client = session_factory(region='us-east-1').client('rds')
+        snapshot = client.describe_db_snapshots(
+            DBInstanceIdentifier=resources[0][
+                'DBInstanceIdentifier'])['DBSnapshots'][0]
+        self.assertEqual(snapshot['DBSnapshotIdentifier'], 'backup-%s-%s' % (
+            resources[0]['DBInstanceIdentifier'], suffix))
 
     def test_rds_retention(self):
         session_factory = self.replay_flight_data('test_rds_retention')
@@ -898,6 +909,26 @@ class RDSSnapshotTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)
+
+    def test_rds_public_accessible_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_public_accessible_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        policy = self.load_policy({
+            'name': 'disable-publicly-accessibility',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': "c7n-test-pa"},
+                {'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'c7n-test-pa')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='c7n-test-pa')[
+                             'DBInstances'][0]['PubliclyAccessible'])
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

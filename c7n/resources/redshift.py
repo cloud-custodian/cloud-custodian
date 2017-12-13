@@ -400,6 +400,47 @@ class EnhancedVpcRoutine(BaseAction):
                 EnhancedVpcRouting=new_routing)
 
 
+@actions.register('set-public-access')
+class RedshiftSetPublicAccess(BaseAction):
+    """
+    Action to set the 'PubliclyAccessible' setting on a redshift cluster
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+                - name: redshift-set-public-access
+                  resource: redshift
+                  filters:
+                    - PubliclyAccessible: true
+                  actions:
+                    - type: set-public-access
+                      state: false
+    """
+
+    schema = type_schema(
+        'set-public-access',
+        state={'type': 'boolean'})
+    permissions = ('redshift:ModifyCluster',)
+
+    def set_access(self, c):
+        client = local_session(self.manager.session_factory).client('redshift')
+        client.modify_cluster(
+            ClusterIdentifier=c['ClusterIdentifier'],
+            PubliclyAccessible=self.data.get('state', False))
+
+    def process(self, clusters):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.set_access, c): c for c in clusters}
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting Redshift public access on %s  \n %s",
+                        futures[f]['ClusterIdentifier'], f.exception())
+        return clusters
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Action to create an action to be performed at a later time

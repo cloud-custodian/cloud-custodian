@@ -241,7 +241,7 @@ class CrossAccountAccessFilter(Filter):
         whitelist={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpce_from=ValuesFrom.schema,
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
-        whitepist_vpc_from=ValuesFrom.schema,
+        whitelist_vpc_from=ValuesFrom.schema,
         whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'

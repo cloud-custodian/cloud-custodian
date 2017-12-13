@@ -43,6 +43,8 @@ class DataPipeline(QueryResourceManager):
         name = 'name'
         date = None
         dimension = 'name'
+        batch_detail_spec = (
+            'describe_pipeline', 'pipelineIds', 'id', 'pipelineDescriptionList')
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
         filter_name = None
 
