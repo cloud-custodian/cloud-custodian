@@ -175,7 +175,7 @@ class PolicyLambdaProvision(BaseTest):
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
         #time.sleep(15) -- turn this back on when recording flight data
-        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        log_events = manager.logs(func, '1970-1-1 UTC', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
         self.addCleanup(
