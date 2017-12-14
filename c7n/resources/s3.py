@@ -534,7 +534,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-acl
@@ -616,7 +616,7 @@ class GlobalGrantsFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-delete-global-grants
@@ -702,7 +702,7 @@ class HasStatementFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-has-statement
@@ -749,7 +749,7 @@ class EncryptionEnabledFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-not-encrypted
@@ -797,7 +797,7 @@ class MissingPolicyStatementFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-missing-statement
@@ -836,7 +836,7 @@ class BucketNotificationFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-incorrect-notification
@@ -938,7 +938,7 @@ class SetPolicyStatement(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: force-s3-https
@@ -1024,7 +1024,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-remove-encrypt-put
@@ -1085,7 +1085,7 @@ class ToggleVersioning(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-versioning
@@ -1140,7 +1140,7 @@ class ToggleLogging(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-logging
@@ -1195,7 +1195,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-logging-buckets
@@ -1296,7 +1296,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enforce-encryption
@@ -1586,7 +1586,7 @@ class EncryptExtantKeys(ScanBucket):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-encrypt-objects
@@ -1840,7 +1840,7 @@ class LogTarget(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-log-bucket
@@ -1972,7 +1972,7 @@ class DeleteGlobalGrants(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-delete-global-grants
@@ -2041,7 +2041,7 @@ class BucketTag(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-tag-region
@@ -2065,7 +2065,7 @@ class MarkBucketForOp(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-encrypt
@@ -2093,7 +2093,7 @@ class RemoveBucketTag(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-remove-owner-tag
@@ -2316,7 +2316,7 @@ class DeleteBucket(ScanBucket):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-unencrypted-buckets
@@ -2447,7 +2447,7 @@ class Lifecycle(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-apply-lifecycle
@@ -2661,7 +2661,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
 
     :example
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-encryption-AES256
@@ -2742,7 +2742,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-default-encryption-kms

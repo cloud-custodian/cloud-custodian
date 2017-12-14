@@ -78,7 +78,7 @@ class DefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-default-vpc
@@ -131,7 +131,7 @@ class Parameter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-no-ssl
@@ -191,7 +191,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-no-ssl
@@ -249,7 +249,7 @@ class RetentionWindow(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot-retention
@@ -306,7 +306,7 @@ class Snapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot
@@ -355,7 +355,7 @@ class EnhancedVpcRoutine(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-enable-enhanced-routing
@@ -407,7 +407,7 @@ class RedshiftSetPublicAccess(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: redshift-set-public-access
@@ -447,7 +447,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-terminate-unencrypted
@@ -482,7 +482,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-tag
@@ -513,7 +513,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-remove-tag
@@ -545,7 +545,7 @@ class TagTrim(tags.TagTrim):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-tag-trim
@@ -642,7 +642,7 @@ class RedshiftSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-old-snapshots
@@ -666,7 +666,7 @@ class RedshiftSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-delete-old-snapshots
@@ -710,7 +710,7 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot-expiring
@@ -745,7 +745,7 @@ class RedshiftSnapshotTag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-required-tags
@@ -777,7 +777,7 @@ class RedshiftSnapshotRemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-remove-tags

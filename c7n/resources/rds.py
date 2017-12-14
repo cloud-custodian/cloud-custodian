@@ -277,7 +277,7 @@ class DefaultVpc(net_filters.DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: default-vpc-rds
@@ -324,7 +324,7 @@ class AutoPatch(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: enable-rds-autopatch
@@ -368,7 +368,7 @@ class UpgradeAvailable(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-upgrade-available
@@ -413,7 +413,7 @@ class UpgradeMinor(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: upgrade-rds-minor
@@ -547,7 +547,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-delete
@@ -687,7 +687,7 @@ class Snapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot
@@ -731,11 +731,12 @@ class ResizeInstance(BaseAction):
 
     :example:
 
-       This will find databases using over 85% of their allocated
-       storage, and resize them to have an additional 30% storage
-       the resize here is async during the next maintenance.
+    This will find databases using over 85% of their allocated
+    storage, and resize them to have an additional 30% storage
+    the resize here is async during the next maintenance.
 
-       .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: rds-snapshot-retention
                 resource: rds
@@ -751,11 +752,12 @@ class ResizeInstance(BaseAction):
                     percent: 30
 
 
-       This will find databases using under 20% of their allocated
-       storage, and resize them to be 30% smaller, the resize here
-       is configured to be immediate.
+    This will find databases using under 20% of their allocated
+    storage, and resize them to be 30% smaller, the resize here
+    is configured to be immediate.
 
-       .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: rds-snapshot-retention
                 resource: rds
@@ -798,7 +800,7 @@ class RetentionWindow(BaseAction):
     enforce (min, max, exact) sets retention days occordingly.
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-retention
@@ -884,7 +886,7 @@ class RDSSetPublicAvailability(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: disable-rds-public-accessibility
@@ -1032,7 +1034,7 @@ class RDSSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-expired
@@ -1313,7 +1315,7 @@ class RDSSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-delete-stale
@@ -1431,7 +1433,7 @@ class RDSSubnetGroupDeleteAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-subnet-group-delete-unused
@@ -1460,7 +1462,7 @@ class UnusedRDSSubnetGroup(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-subnet-group-delete-unused
@@ -1491,7 +1493,7 @@ class ParameterFilter(ValueFilter):
     Applies value type filter on set db parameter values.
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-pg

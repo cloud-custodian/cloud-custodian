@@ -66,7 +66,7 @@ class Deregister(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-deregister-old
@@ -100,7 +100,7 @@ class RemoveLaunchPermissions(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-remove-launch-permissions
@@ -132,7 +132,7 @@ class ImageAgeFilter(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-remove-launch-permissions
@@ -158,7 +158,7 @@ class ImageUnusedFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-unused

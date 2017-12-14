@@ -97,7 +97,7 @@ class CloudTrailEnabled(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: account-cloudtrail-enabled
@@ -165,7 +165,7 @@ class ConfigEnabled(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: account-check-config-services
@@ -262,7 +262,7 @@ class IAMSummary(ValueFilter):
     For example to determine if an account has either not been
     enabled with root mfa or has root api keys.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       policies:
         - name: root-keys-or-no-mfa
@@ -299,7 +299,7 @@ class AccountPasswordPolicy(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: password-policy-check
@@ -378,7 +378,7 @@ class ServiceLimit(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: account-service-limits
@@ -469,7 +469,7 @@ class RequestLimitIncrease(BaseAction):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: account-service-limits
@@ -609,7 +609,7 @@ class EnableTrail(BaseAction):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: trail-test
@@ -723,7 +723,7 @@ class HasVirtualMFA(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: account-with-virtual-mfa
@@ -769,7 +769,7 @@ class EnableDataEvents(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-remove-owner-tag

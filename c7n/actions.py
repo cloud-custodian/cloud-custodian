@@ -679,7 +679,7 @@ class PutMetric(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: track-attached-ebs

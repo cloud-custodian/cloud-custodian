@@ -122,9 +122,9 @@ class Delete(Action):
 class ElasticSearchAddTag(Tag):
     """Action to create tag(s) on an existing elasticsearch domain
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
                 policies:
                   - name: es-add-tag
@@ -157,18 +157,18 @@ class ElasticSearchAddTag(Tag):
 class ElasticSearchRemoveTag(RemoveTag):
     """Removes tag(s) on an existing elasticsearch domain
 
-            :example:
+    :example:
 
-                .. code-block: yaml
+    .. code-block:: yaml
 
-                    policies:
-                      - name: es-remove-tag
-                        resource: elasticsearch
-                        filters:
-                          - "tag:ExpiredTag": present
-                        actions:
-                          - type: remove-tag
-                            tags: ['ExpiredTag']
+        policies:
+          - name: es-remove-tag
+            resource: elasticsearch
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
         """
     permissions = ('es:RemoveTags',)
 
@@ -188,9 +188,9 @@ class ElasticSearchRemoveTag(RemoveTag):
 class ElasticSearchMarkForOp(TagDelayedAction):
     """Tag an elasticsearch domain for action later
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
                 policies:
                   - name: es-delete-missing

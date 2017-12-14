@@ -290,7 +290,7 @@ class SpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles with 'admin-policy':
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-roles-have-admin
        resource: iam-role
@@ -320,7 +320,7 @@ class NoSpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles without 'ip-restriction':
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-roles-no-ip-restriction
        resource: iam-role
@@ -398,7 +398,7 @@ class AllowAllIamPolicies(Filter):
     For example, if the user wants to check all used policies and filter on
     allow all:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-no-used-all-all-policy
        resource: iam-policy
@@ -496,7 +496,7 @@ class CredentialReport(Filter):
     never used their password but have active access keys from the
     last month
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-mfa-active-keys-no-login
        resource: iam-user
@@ -691,7 +691,7 @@ class UserPolicy(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-admin-access
@@ -737,7 +737,7 @@ class GroupMembership(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-admin-access
@@ -781,7 +781,7 @@ class UserAccessKey(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-active-keys
@@ -865,7 +865,7 @@ class UserDelete(BaseAction):
 
     :example:
 
-      .. code-block: yaml
+      .. code-block:: yaml
 
         # using a 'credential' filter'
         - name: iam-only-whitelisted-users
@@ -992,7 +992,7 @@ class UserRemoveAccessKey(BaseAction):
     For example if we wanted to disable keys after 90 days of non-use and
     delete them after 180 days of nonuse:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-mfa-active-keys-no-login
        resource: iam-user

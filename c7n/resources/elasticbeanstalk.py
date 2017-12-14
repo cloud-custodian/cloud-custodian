@@ -115,7 +115,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: mark-for-delete
@@ -158,7 +158,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: eb-env-tag-owner-tag
@@ -194,7 +194,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: eb-env-unmark
@@ -226,7 +226,7 @@ class Terminate(BaseAction):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: eb-env-termination

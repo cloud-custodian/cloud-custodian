@@ -48,7 +48,7 @@ class DeleteRepository(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: codecommit-delete
@@ -107,7 +107,7 @@ class DeleteProject(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: codebuild-delete
