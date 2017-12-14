@@ -621,7 +621,62 @@ class RDSTest(BaseTest):
 
         self.assertEquals(len(resources), 1, "Resources should be unused")
 
+
 class RDSSnapshotTest(BaseTest):
+
+    def test_rds_snapshot_copy_tags_enable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_enable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+    def test_rds_snapshot_copy_tags_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
     def test_rds_snapshot_access(self):
         factory = self.replay_flight_data('test_rds_snapshot_access')

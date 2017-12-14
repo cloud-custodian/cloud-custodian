@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:385131497716:db:mydbinstance", 
+                "Tags": [
+                    {
+                        "Value": "other", 
+                        "Key": "workload-type"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a3d26cbb-cef7-11e7-bade-e73a12746909", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a3d26cbb-cef7-11e7-bade-e73a12746909", 
+                "date": "Tue, 21 Nov 2017 20:07:45 GMT", 
+                "content-length": "167", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

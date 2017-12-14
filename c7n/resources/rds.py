@@ -637,6 +637,50 @@ class Delete(BaseAction):
             Tags=tags)
 
 
+@actions.register('set-snapshot-copy-tags')
+class CopySnapshotTags(BaseAction):
+    """Enables copying tags from rds instance to snapshot
+
+        .. code-block: yaml
+
+            policies:
+              - name: enable-rds-snapshot-tags
+                resource: rds
+                filters:
+                  - type: value
+                    key: Engine
+                    value: aurora
+                    op: eq
+                actions:
+                  - type: set-snapshot-copy-tags
+                    enable: True
+    """
+
+    schema = type_schema(
+        'set-snapshot-copy-tags',
+        enable={'type': 'boolean'})
+    permissions = ('rds:ModifyDBInstances',)
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for r in resources:
+                futures.append(w.submit(
+                    self.set_snapshot_tags, r))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        'Exception updating rds CopyTagsToSnapshot  \n %s',
+                        f.exception())
+        return resources
+
+    def set_snapshot_tags(self, r):
+        c = local_session(self.manager.session_factory).client('rds')
+        self.manager.retry(c.modify_db_instance(
+            DBInstanceIdentifier=r['DBInstanceIdentifier'],
+            CopyTagsToSnapshot=self.data.get('enable', True)))
+
+
 @actions.register('snapshot')
 class Snapshot(BaseAction):
     """Creates a manual snapshot of a RDS instance
