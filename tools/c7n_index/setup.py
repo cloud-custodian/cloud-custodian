@@ -28,5 +28,6 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-indexer = c7n_index.metrics:cli']},
+    tests_require = ['elasticmock'],
     install_requires=["c7n", "click", "influxdb", "elasticsearch"],
 )

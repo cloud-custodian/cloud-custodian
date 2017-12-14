@@ -1,0 +1,4 @@
+c7n
+influxdb
+click>=6.7
+elasticsearch>=6.0.0

@@ -1,0 +1,5 @@
+indexer:
+  type: es
+  host: localhost
+  port: 9200
+

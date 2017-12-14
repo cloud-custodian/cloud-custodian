@@ -17,18 +17,22 @@ import logging
 import math
 import random
 import time
+import base64
+import json
+import zlib
 
 import boto3
 import click
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
-from elasticsearch import Elasticsearch, helpers, RequestsHttpConnection
+import elasticsearch
 import jsonschema
 from influxdb import InfluxDBClient
 
 import yaml
 
 from c7n import schema
+from c7n import sqsexec
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.registry import PluginRegistry
 from c7n.reports import csvout as s3_resource_parser
@@ -47,14 +51,15 @@ log = logging.getLogger('c7n.metrics')
 
 CONFIG_SCHEMA = {
     'type': 'object',
-    'additionalProperties': True,
-    'required': ['indexer', 'accounts'],
+    'additionalProperties': False,
+    'required': ['indexer'],
     'properties': {
         'indexer': {
             'oneOf': [
                 {
                     'type': 'object',
-                    'required': ['host', 'port', 'idx_name'],
+                    'additionalProperties': False,
+                    'required': ['host', 'port'],
                     'properties': {
                         'type': {'enum': ['es']},
                         'host': {'type': 'string'},
@@ -62,11 +67,14 @@ CONFIG_SCHEMA = {
                         'user': {'type': 'string'},
                         'password': {'type': 'string'},
                         'idx_name': {'type': 'string'},
+                        'doc_type': {'type': 'string'},
+                        'kms_decrypt_password': {'type': 'string'},
                         'query': {'type': 'string'}
                     }
                 },
                 {
                     'type': 'object',
+                    'additionalProperties': False,
                     'required': ['host', 'db', 'user', 'password'],
                     'properties': {
                         'type': {'enum': ['influx']},
@@ -78,6 +86,7 @@ CONFIG_SCHEMA = {
                 },
                 {
                     'type': 'object',
+                    'additionalProperties': False,
                     'required': ['template', 'Bucket'],
                     'properties': {
                         'type': {'enum': ['s3']},
@@ -131,10 +140,9 @@ class ElasticSearchIndexer(Indexer):
     def __init__(self, config, **kwargs):
         self.config = config
         self.es_type = kwargs.get('type', 'policy-metric')
-
         host = [config['indexer'].get('host', 'localhost')]
         kwargs = {}
-        kwargs['connection_class'] = RequestsHttpConnection
+        kwargs['connection_class'] = elasticsearch.RequestsHttpConnection
 
         user = config['indexer'].get('user', False)
         password = config['indexer'].get('password', False)
@@ -143,7 +151,7 @@ class ElasticSearchIndexer(Indexer):
 
         kwargs['port'] = config['indexer'].get('port', 9200)
 
-        self.client = Elasticsearch(
+        self.client = elasticsearch.Elasticsearch(
             host,
             **kwargs
         )
@@ -153,10 +161,22 @@ class ElasticSearchIndexer(Indexer):
             p['_index'] = self.config['indexer']['idx_name']
             p['_type'] = self.es_type
 
-        results = helpers.streaming_bulk(self.client, points)
+        results = elasticsearch.helpers.streaming_bulk(self.client, points)
         for status, r in results:
             if not status:
                 log.debug("index err result %s", r)
+
+    def index_sqs(self, queue_msg):
+        try:
+            res = self.client.index(
+                index=self.config.get('idx_name','c7n'),
+                doc_type=self.config.get('doc_type', 'c7n'),
+                body=queue_msg)
+            log.info("results: {}, index_created:{}".format(
+                res, queue_msg['policy']['resource']))
+            return res
+        except Exception as e:
+            log.debug("Error while Indexing: {}".format(e))
 
 
 @indexers.register('s3')
@@ -382,6 +402,18 @@ def valid_date(date, delta=0):
     return date
 
 
+def index_sqs_msgs(config, msg_json):
+
+    indexer = get_indexer(config)
+
+    # Reformat tags for ease of index/search
+    for resource in msg_json['resources']:
+        if 'Tags' in resource and len(resource['Tags']) != 0:
+            resource['Tags'] = {
+                t['Key']: t['Value'] for t in resource['Tags']}
+    indexer.index_sqs(queue_msg=msg_json)
+
+
 @click.group()
 def cli():
     """Custodian Indexing"""
@@ -413,6 +445,12 @@ def index_metrics(
     with open(config) as fh:
         config = yaml.safe_load(fh.read())
     jsonschema.validate(config, CONFIG_SCHEMA)
+
+    # Since `accounts` and `idx_name`is no longer a required property
+    # in the schema, validate it explicitly
+    if "accounts" not in config and "idx_name" not in config["indexer"]:
+        log.info("accounts/idx_name is a required property")
+        return
 
     start, end = get_date_range(start, end)
 
@@ -500,6 +538,12 @@ def index_resources(
         config = yaml.safe_load(fh.read())
     jsonschema.validate(config, CONFIG_SCHEMA)
 
+    # Since `accounts` and `idx_name`is no longer a required property
+    # in the schema, validate it explicitly
+    if "accounts" not in config and "idx_name" not in config["indexer"]:
+        log.info("accounts and idx_name is a required property")
+        return
+
     with open(policies) as fh:
         policies = yaml.safe_load(fh.read())
     load_resources()
@@ -544,10 +588,62 @@ def index_resources(
                 account['name'], region, policy['name']))
 
 
+@cli.command(name='sqs-consumer')
+@click.option('-c', '--config', required=True, help="Config file")
+@click.option('-u', '--url', required=True, help="Queue URL")
+@click.option('--concurrency', default=5)
+@click.option('--verbose/--no-verbose', default=False)
+def sqs_consumer(config, url,concurrency, verbose=False):
+    """Receive messages from SQS -> push to ES"""
+    logging.basicConfig(level=(verbose and logging.DEBUG or logging.INFO))
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('elasticsearch').setLevel(logging.WARNING)
+
+    # validating config.
+    with open(config) as fh:
+        config = yaml.safe_load(fh.read())
+    jsonschema.validate(config, CONFIG_SCHEMA)
+
+    # decrypt KMS password
+    if config.get('kms_decrypt_password', True):
+        kms = boto3.client('kms')
+        config['indexer']['password'] = kms.decrypt(
+            CiphertextBlob=base64.b64decode(config['indexer']['password']))['Plaintext']
+
+    # setup variables
+    region = url.split('.')[1]
+    client = boto3.Session(region_name=region).client('sqs')
+    msg_iterator = sqsexec.MessageIterator(client=client, queue_url=url)
+
+    try:
+        with ProcessPoolExecutor(max_workers=concurrency) as w:
+            futures = {}
+
+            for msg in msg_iterator:
+                msg_json = json.loads(zlib.decompress(base64.b64decode(msg['Body'])))
+                log.info("submit account: {} region: {}, policy_name {}".format(
+                    msg_json['account'], msg_json['region'], msg_json['policy']['name']))
+                futures[w.submit(index_sqs_msgs, config, msg_json)] = (msg, msg_json)
+
+            # Processes completed
+            for f in futures:
+                msg, msg_json = futures[f]
+                if f.exception():
+                    log.warning(
+                        "error account:{} region:{} policy:{} error:{}".format(
+                            msg_json['account'], msg_json['region'], msg_json['policy']['name'], f.exception()))
+                    continue
+                msg_iterator.ack(msg)
+                log.info("completed account:{} region:{} policy:{}".format(
+                    msg_json['account'], msg_json['region'], msg_json['policy']['name']))
+    except Exception as e:
+        log.exception("Exception: {}".format(e))
+
+
 if __name__ == '__main__':
     try:
         cli()
     except Exception as e:
         import traceback, pdb, sys
-        print traceback.print_exc()
+        traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
