@@ -1322,7 +1322,7 @@ class CustomerGateway(query.QueryResourceManager):
     class resource_type(object):
         service = 'ec2'
         type = 'customer-gateway'
-        enum_spec = ('describe_customer_gateways', 'CustomerGateway', None)
+        enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
         detail_spec = None
         id = 'CustomerGatewayId'
         filter_name = 'CustomerGatewayIds'
