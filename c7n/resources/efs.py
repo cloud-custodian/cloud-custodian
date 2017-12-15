@@ -24,6 +24,7 @@ from c7n.utils import local_session, type_schema, get_retry, generate_arn
 
 log = logging.getLogger('custodian.efs')
 
+
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
 
@@ -76,6 +77,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
 
+
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')
 class Subnet(SubnetFilter):
 
@@ -102,12 +104,12 @@ class SecurityGroup(SecurityGroupFilter):
         group_ids = set()
         retry = get_retry(('Throttled',),12)
         for r in resources:
-            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups, MountTargetId=r['MountTargetId'])['SecurityGroups']
+            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups, 
+                                               MountTargetId=r['MountTargetId'])['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
         self.efs_group_cache = groups
         return list(group_ids)
-        
 
 
 @ElasticFileSystem.action_registry.register('delete')
