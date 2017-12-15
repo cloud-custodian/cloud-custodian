@@ -44,6 +44,7 @@ class NotifyTest(BaseTest):
                 {'QueueUrl': queue_url}],
             'actions': [{
                 'type': 'notify',
+                'to': ['to@example.com'],
                 'to_from': {
                     'url': 'file://%s' % temp_file.name,
                     'format': 'json',
@@ -57,6 +58,7 @@ class NotifyTest(BaseTest):
                     'queue': queue_url}}]
             }, session_factory=session_factory)
         resources = policy.run()
+        self.assertEqual(policy.data.get('actions')[0].get('to'), ['to@example.com'])
         self.assertEqual(len(resources), 1)
         messages = client.receive_message(
             QueueUrl=queue_url,

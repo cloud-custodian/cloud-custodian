@@ -66,7 +66,7 @@ class DeleteStack(BaseAction, StateTransitionFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: opswork-delete
@@ -129,7 +129,7 @@ class StopStack(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: opswork-stop
@@ -177,7 +177,7 @@ class CMDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: opsworks-cm-delete

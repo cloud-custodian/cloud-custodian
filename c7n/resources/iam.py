@@ -28,7 +28,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -71,12 +71,31 @@ class User(QueryResourceManager):
         service = 'iam'
         type = 'user'
         enum_spec = ('list_users', 'Users', None)
-        id = 'UserId'
         filter_name = None
-        name = 'UserName'
+        id = name = 'UserName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::User"
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeUser(self)
+        return super(User, self).get_source(source_type)
+
+
+class DescribeUser(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                resources.append(client.get_user(UserName=rid).get('User'))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntityException':
+                    continue
+                raise
+        return resources
 
 
 @resources.register('iam-policy')
@@ -95,15 +114,24 @@ class Policy(QueryResourceManager):
 
     arn_path_prefix = "aws:policy/"
 
-    def get_resources(self, resource_ids):
-        client = local_session(self.session_factory).client('iam')
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribePolicy(self)
+        return super(Policy, self).get_source(source_type)
+
+
+class DescribePolicy(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
         results = []
-        try:
-            for r in resource_ids:
+
+        for r in resource_ids:
+            try:
                 results.append(client.get_policy(PolicyArn=r)['Policy'])
-        except Exception as e:
-            self.log.warning("unable to resolve ids %s, err: %s",
-                             resource_ids, e)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntityException':
+                    continue
         return results
 
 
@@ -262,7 +290,7 @@ class SpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles with 'admin-policy':
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-roles-have-admin
        resource: iam-role
@@ -292,7 +320,7 @@ class NoSpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles without 'ip-restriction':
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-roles-no-ip-restriction
        resource: iam-role
@@ -370,7 +398,7 @@ class AllowAllIamPolicies(Filter):
     For example, if the user wants to check all used policies and filter on
     allow all:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-no-used-all-all-policy
        resource: iam-policy
@@ -468,7 +496,7 @@ class CredentialReport(Filter):
     never used their password but have active access keys from the
     last month
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-mfa-active-keys-no-login
        resource: iam-user
@@ -663,7 +691,7 @@ class UserPolicy(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-admin-access
@@ -709,7 +737,7 @@ class GroupMembership(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-admin-access
@@ -753,7 +781,7 @@ class UserAccessKey(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: iam-users-with-active-keys
@@ -837,7 +865,7 @@ class UserDelete(BaseAction):
 
     :example:
 
-      .. code-block: yaml
+      .. code-block:: yaml
 
         # using a 'credential' filter'
         - name: iam-only-whitelisted-users
@@ -964,7 +992,7 @@ class UserRemoveAccessKey(BaseAction):
     For example if we wanted to disable keys after 90 days of non-use and
     delete them after 180 days of nonuse:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-mfa-active-keys-no-login
        resource: iam-user
@@ -991,10 +1019,10 @@ class UserRemoveAccessKey(BaseAction):
             threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
 
         for r in resources:
-            if 'AccessKeys' not in r:
-                r['AccessKeys'] = client.list_access_keys(
+            if 'c7n:AccessKeys' not in r:
+                r['c7n:AccessKeys'] = client.list_access_keys(
                     UserName=r['UserName'])['AccessKeyMetadata']
-            keys = r['AccessKeys']
+            keys = r['c7n:AccessKeys']
             for k in keys:
                 if age:
                     if not k['CreateDate'] < threshold_date:

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/c7n-bucket-with-encryption", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "cxsufgoRZKvS01NDPqYkbCfXNATS1+bKqT1gBK9p1nt1ytqJz++qy3xLzYYy7v8H70awx0nHEmE=", 
+            "RequestId": "BDC3249522ED5BED", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "cxsufgoRZKvS01NDPqYkbCfXNATS1+bKqT1gBK9p1nt1ytqJz++qy3xLzYYy7v8H70awx0nHEmE=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "BDC3249522ED5BED", 
+                "location": "/c7n-bucket-with-encryption", 
+                "date": "Mon, 20 Nov 2017 19:38:08 GMT"
+            }
+        }
+    }
+}

@@ -288,7 +288,7 @@ class SetS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elbv2-test
@@ -354,7 +354,7 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-failed-mark-for-op
@@ -386,7 +386,7 @@ class AppELBTagAction(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-create-required-tag
@@ -415,7 +415,7 @@ class AppELBRemoveTagAction(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-delete-expired-tag
@@ -446,7 +446,7 @@ class AppELBDeleteAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-delete-failed-elb
@@ -542,7 +542,7 @@ class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: alb-is-logging-test
@@ -585,7 +585,7 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: alb-is-not-logging-test
@@ -642,7 +642,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: app-elb-invalid-ciphers
@@ -703,7 +703,7 @@ class AppELBModifyListenerPolicy(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-modify-listener
@@ -768,7 +768,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-healthcheck-mismatch
@@ -815,7 +815,7 @@ class AppELBDefaultVpcFilter(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-in-default-vpc
@@ -938,7 +938,7 @@ class AppELBTargetGroupTagAction(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroup-add-required-tag
@@ -967,7 +967,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroup-remove-expired-tag
@@ -995,7 +995,7 @@ class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroups-default-vpc
@@ -1020,7 +1020,7 @@ class AppELBTargetGroupDeleteAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroups-delete-unused

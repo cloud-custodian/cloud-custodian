@@ -139,7 +139,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-delete-unused
@@ -171,7 +171,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-add-owner-tag
@@ -201,7 +201,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-remove-old-tag
@@ -233,7 +233,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-delete-unused
@@ -264,7 +264,7 @@ class SetSslListenerPolicy(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-set-listener-policy
@@ -362,7 +362,7 @@ class EnableS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-test
@@ -407,7 +407,7 @@ class DisableS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: turn-off-elb-logs
@@ -463,7 +463,7 @@ class Instance(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-image-filter
@@ -508,7 +508,7 @@ class IsSSLFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-using-ssl
@@ -540,7 +540,7 @@ class SSLPolicyFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-ssl-policies
@@ -727,7 +727,7 @@ class HealthCheckProtocolMismatch(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-healthcheck-mismatch
@@ -761,7 +761,7 @@ class DefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-default-vpc
@@ -800,7 +800,7 @@ class IsLoggingFilter(Filter, ELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
             - name: elb-is-logging-test
@@ -843,7 +843,7 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: elb-is-not-logging-test

@@ -175,7 +175,7 @@ class PolicyLambdaProvision(BaseTest):
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
         #time.sleep(15) -- turn this back on when recording flight data
-        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        log_events = manager.logs(func, '1970-1-1 UTC', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
         self.addCleanup(
@@ -520,6 +520,21 @@ class PolicyLambdaProvision(BaseTest):
              'TracingConfig': {'Mode': 'Active'}})
         tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
         self.assert_items(tags, {'Foo': 'Baz', 'Bah': 'Bug'})
+
+    def test_optional_packages(self):
+        p = Policy({
+            'resources': 's3',
+            'name': 's3-lambda-extra',
+            'resource': 's3',
+            'mode': {
+                'type': 'cloudtrail',
+                'packages': ['boto3', 'botocore'],
+                'events': ['CreateBucket'],
+                }}, Config.empty())
+        pl = PolicyLambda(p)
+        pl.archive.close()
+        self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
+        self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
 
 
 class PythonArchiveTest(unittest.TestCase):

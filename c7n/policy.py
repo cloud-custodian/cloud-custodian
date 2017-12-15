@@ -546,6 +546,41 @@ class ASGInstanceState(LambdaMode):
     """a lambda policy that executes on an asg's ec2 instance state changes."""
 
 
+class GuardDutyMode(LambdaMode):
+    """Incident Response for AWS Guard Duty"""
+
+    supported_resources = ('account', 'ec2', 'iam-user')
+
+    id_exprs = {
+        'account': jmespath.compile('account'),
+        'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
+        'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
+
+    def resolve_resources(self, event):
+        rid = self.id_exprs[self.policy.resource_type].search(event)
+        resources = self.policy.resource_manager.get_resources([rid])
+        # For iam users annotate with the access key specified in the finding event
+        if resources and self.policy.resource_type == 'iam-user':
+            resources[0]['c7n:AccessKeys'] = {
+                'AccessKeyId': event['detail']['resource']['accessKeyDetails']['accessKeyId']}
+        return resources
+
+    def validate(self):
+        if self.policy.data['resource'] not in self.supported_resources:
+            raise ValueError(
+                "Policy:%s resource:%s Guard duty mode only supported for %s" % (
+                    self.policy.data['name'],
+                    self.policy.data['resource'],
+                    self.supported_resources))
+
+    def provision(self):
+        if self.policy.data['resource'] == 'ec2':
+            self.policy.data['mode']['resource-filter'] = 'Instance'
+        elif self.policy.data['resource'] == 'iam-user':
+            self.policy.data['mode']['resource-filter'] = 'AccessKey'
+        return super(GuardDutyMode, self).provision()
+
+
 class ConfigRuleMode(LambdaMode):
     """a lambda policy that executes as a config service rule.
         http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
@@ -611,6 +646,7 @@ class Policy(object):
         'cloudtrail': CloudTrailMode,
         'ec2-instance-state': EC2InstanceState,
         'asg-instance-state': ASGInstanceState,
+        'guard-duty': GuardDutyMode,
         'config-rule': ConfigRuleMode}
 
     log = logging.getLogger('custodian.policy')

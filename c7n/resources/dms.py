@@ -19,6 +19,7 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, chunks, type_schema
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
 @resources.register('dms-instance')
@@ -27,12 +28,13 @@ class ReplicationInstance(QueryResourceManager):
     class resource_type(object):
         service = 'dms'
         type = 'rep'
-        enum_spec = ('describe_replication_instances', 'ReplicationInstances', None)
+        enum_spec = (
+            'describe_replication_instances', 'ReplicationInstances', None)
         name = id = 'ReplicationInstanceIdentifier'
         date = 'InstanceCreateTime'
         dimension = None
 
-        # The api supports filtering which we handle via custom describe source.
+        # The api supports filtering which we handle via describe source.
         filter_name = filter_type = None
 
     def get_source(self, source_type):
@@ -58,12 +60,14 @@ class InstanceDescribe(DescribeSource):
         with self.manager.executor_factory(max_workers=2) as w:
             futures = []
             for resource_set in chunks(resources, 20):
-                futures.append(w.submit(self.process_resource_set, client, resources))
+                futures.append(
+                    w.submit(self.process_resource_set, client, resources))
 
             for f in as_completed(futures):
                 if f.exception():
                     self.manager.log.warning(
-                        "Error retrieving replinstance tags: %s" % f.exception())
+                        "Error retrieving replinstance tags: %s",
+                        f.exception())
         return resources
 
     def process_resource_set(self, client, resources):
@@ -77,6 +81,18 @@ class InstanceDescribe(DescribeSource):
                     continue
                 raise
             r['Tags'] = tags
+
+
+@ReplicationInstance.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = 'ReplicationSubnetGroup.Subnets[].SubnetIdentifier'
+
+
+@ReplicationInstance.filter_registry.register('security-group')
+class SecurityGroup(SecurityGroupFilter):
+
+    RelatedIdsExpression = 'VpcSecurityGroups[].VpcSecurityGroupId'
 
 
 @ReplicationInstance.action_registry.register('delete')

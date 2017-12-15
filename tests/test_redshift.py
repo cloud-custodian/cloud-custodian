@@ -231,6 +231,27 @@ class TestRedshift(BaseTest):
         self.assertTrue(
             cluster['PendingModifiedValues']['EnhancedVpcRouting'])
 
+    def test_redshift_public_access(self):
+        session_factory = self.replay_flight_data(
+            'test_redshift_public_access')
+        client = session_factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-set-public-access',
+            'resource': 'redshift',
+            'filters': [{
+                'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        cluster = client.describe_clusters(
+            ClusterIdentifier='c7n-rs')['Clusters'][0]
+        self.assertEqual(
+            cluster['ClusterIdentifier'], resources[0]['ClusterIdentifier'])
+        self.assertFalse(cluster['PubliclyAccessible'])
+
 
 class TestRedshiftSnapshot(BaseTest):
 
