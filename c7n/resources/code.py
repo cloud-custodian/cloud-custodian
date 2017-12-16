@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, get_retry, type_schema
@@ -47,7 +48,7 @@ class DeleteRepository(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: codecommit-delete
@@ -88,6 +89,16 @@ class CodeBuildProject(QueryResourceManager):
         config_type = "AWS::CodeBuild::Project"
 
 
+class BuildSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "vpcConfig.subnets[]"
+
+
+class BuildSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "vpcConfig.securityGroupIds[]"
+
+
 @CodeBuildProject.action_registry.register('delete')
 class DeleteProject(BaseAction):
     """Action to delete code build
@@ -96,7 +107,7 @@ class DeleteProject(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: codebuild-delete

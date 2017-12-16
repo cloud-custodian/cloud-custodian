@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
 @resources.register('directory')
@@ -28,6 +29,18 @@ class Directory(QueryResourceManager):
         dimension = None
         filter_name = 'DirectoryIds'
         filter_type = 'list'
+
+
+@Directory.filter_registry.register('subnet')
+class DirectorySubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "VpcSettings.SubnetIds"
+
+
+@Directory.filter_registry.register('security-group')
+class DirectorySecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSettings.SecurityGroupId"
 
 
 @resources.register('cloud-directory')

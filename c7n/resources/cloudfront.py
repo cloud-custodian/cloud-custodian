@@ -125,7 +125,7 @@ class DistributionMetrics(MetricsFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudfront-distribution-errors
@@ -223,7 +223,7 @@ class DistributionDisableAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: distribution-delete
@@ -269,7 +269,7 @@ class StreamingDistributionDisableAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: streaming-distribution-delete
@@ -315,7 +315,7 @@ class DistributionSSLAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: distribution-set-ssl

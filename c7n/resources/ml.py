@@ -43,7 +43,7 @@ class DeleteMLModel(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ml-model-delete

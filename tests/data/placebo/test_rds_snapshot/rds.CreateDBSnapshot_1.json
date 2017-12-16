@@ -2,36 +2,45 @@
     "status_code": 200, 
     "data": {
         "DBSnapshot": {
-            "Engine": "postgres", 
+            "Engine": "mysql", 
             "Status": "creating", 
-            "AvailabilityZone": "us-west-2a", 
+            "AvailabilityZone": "us-east-1e", 
+            "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:backup-c7n-snapshot-test-2017-12-11-14-09", 
             "PercentProgress": 0, 
-            "MasterUsername": "superduper", 
+            "MasterUsername": "user", 
             "Encrypted": false, 
-            "LicenseModel": "postgresql-license", 
+            "LicenseModel": "general-public-license", 
             "StorageType": "gp2", 
-            "VpcId": "vpc-399e3d52", 
-            "DBSnapshotIdentifier": "backup-oneness-postgres", 
+            "VpcId": "vpc-d2d616b5", 
+            "DBSnapshotIdentifier": "backup-c7n-snapshot-test-2017-12-11-14-09", 
             "InstanceCreateTime": {
-                "hour": 0, 
+                "hour": 19, 
                 "__class__": "datetime", 
-                "month": 5, 
-                "second": 10, 
-                "microsecond": 155000, 
-                "year": 2016, 
-                "day": 8, 
-                "minute": 22
+                "month": 12, 
+                "second": 23, 
+                "microsecond": 983000, 
+                "year": 2017, 
+                "day": 11, 
+                "minute": 1
             }, 
-            "OptionGroupName": "default:postgres-9-4", 
-            "AllocatedStorage": 5, 
-            "EngineVersion": "9.4.7", 
+            "OptionGroupName": "default:mysql-5-6", 
+            "AllocatedStorage": 20, 
+            "EngineVersion": "5.6.37", 
             "SnapshotType": "manual", 
-            "Port": 5432, 
-            "DBInstanceIdentifier": "oneness"
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "Port": 3306, 
+            "DBInstanceIdentifier": "c7n-snapshot-test"
         }, 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "5b4d300a-14b5-11e6-aea6-37b8a0fa4a31"
+            "RequestId": "2a46dfab-ddba-4401-903e-a06f3e494186", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2a46dfab-ddba-4401-903e-a06f3e494186", 
+                "date": "Mon, 11 Dec 2017 19:09:59 GMT", 
+                "content-length": "1320", 
+                "content-type": "text/xml"
+            }
         }
     }
 }

@@ -111,7 +111,7 @@ class TagDelayedAction(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: dynamo-mark-tag-compliance
@@ -143,7 +143,7 @@ class TagTable(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: dynamodb-tag-table
@@ -172,7 +172,7 @@ class UntagTable(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: dynamodb-remove-tag
@@ -203,7 +203,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-empty-tables

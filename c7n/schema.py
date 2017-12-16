@@ -193,6 +193,7 @@ def generate(resource_types=()):
                         'ec2-instance-state',
                         'asg-instance-state',
                         'config-rule',
+                        'guard-duty',
                         'periodic'
                     ]},
                 'events': {'type': 'array', 'items': {
@@ -216,6 +217,7 @@ def generate(resource_types=()):
                 'kms_key_arn': {'type': 'string'},
                 'tracing_config': {'type': 'object'},
                 'tags': {'type': 'object'},
+                'packages': {'type': 'array'},
             },
         },
     }

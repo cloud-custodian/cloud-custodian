@@ -103,7 +103,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-cross-account
@@ -120,7 +120,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
               - name: sqs-cross-account
@@ -132,7 +132,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                     statement_ids: matched
     """
 
-    permissions = ('sqs:GetQueueAttributes', 'sqs:SetQueueAttributes')
+    permissions = ('sqs:GetQueueAttributes', 'sqs:RemovePermission')
 
     def process(self, resources):
         results = []
@@ -157,12 +157,10 @@ class RemovePolicyStatement(RemovePolicyBase):
         if not found:
             return
 
-        client.set_queue_attributes(
-            QueueUrl=resource['QueueUrl'],
-            Attributes={
-                'Policy':json.dumps(p)
-            }
-        )
+        for f in found:
+            client.remove_permission(
+                QueueUrl=resource['QueueUrl'],
+                Label=f['Sid'])
 
         return {'Name': resource['QueueUrl'],
                 'State': 'PolicyRemoved',
@@ -175,7 +173,7 @@ class MarkForOpQueue(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete-unused
@@ -215,7 +213,7 @@ class TagQueue(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: tag-sqs
@@ -253,7 +251,7 @@ class UntagQueue(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-remove-tag
@@ -290,7 +288,7 @@ class DeleteSqsQueue(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete
@@ -323,7 +321,7 @@ class SetEncryption(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-set-encrypt

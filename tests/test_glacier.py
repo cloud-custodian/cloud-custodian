@@ -127,7 +127,7 @@ class GlacierStatementTest(BaseTest):
                         "Sid": "SpecificAllow",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::123456789012:root"
+                            "AWS": "arn:aws:iam::185106417252:root"
                         },
                         "Action": "glacier:AddTagsToVault",
                         "Resource": vault_arn
@@ -150,7 +150,7 @@ class GlacierStatementTest(BaseTest):
             'filters': [
                 {'VaultName': name},
                 {'type': 'cross-account',
-                 'whitelist': ["123456789012"]}],
+                 'whitelist': ["185106417252"]}],
             'actions': [
                 {'type': 'remove-statements',
                  'statement_ids': 'matched'}]
@@ -260,4 +260,3 @@ class GlacierStatementTest(BaseTest):
             client.get_vault_access_policy(
                 vaultName=resources[0]['VaultName']).get('policy')['Policy'])
         self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
-    

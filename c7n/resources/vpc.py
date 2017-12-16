@@ -56,7 +56,7 @@ class FlowLogFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: flow-logs-enabled
@@ -69,7 +69,7 @@ class FlowLogFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: flow-mis-configured
@@ -163,7 +163,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: gray-vpcs
@@ -234,29 +234,28 @@ class SecurityGroup(query.QueryResourceManager):
 
 class ConfigSG(query.ConfigSource):
 
-    def augment(self, resources):
-        for r in resources:
-            for rset in ('IpPermissions', 'IpPermissionsEgress'):
-                for p in r.get(rset, ()):
-                    if p.get('FromPort', '') is None:
-                        p.pop('FromPort')
-                    if p.get('ToPort', '') is None:
-                        p.pop('ToPort')
-                    if 'Ipv6Ranges' not in p:
-                        p[u'Ipv6Ranges'] = []
-                    for i in p.get('UserIdGroupPairs', ()):
-                        for k, v in list(i.items()):
-                            if v is None:
-                                i.pop(k)
-
-                    # legacy config form, still version 1.2
-                    for attribute, element_key in (('IpRanges', u'CidrIp'),):
-                        if attribute not in p:
-                            continue
-                        p[attribute] = [{element_key: v} for v in p[attribute]]
-                    if 'Ipv4Ranges' in p:
-                        p['IpRanges'] = p.pop('Ipv4Ranges')
-        return resources
+    def load_resource(self, item):
+        r = super(ConfigSG, self).load_resource(item)
+        for rset in ('IpPermissions', 'IpPermissionsEgress'):
+            for p in r.get(rset, ()):
+                if p.get('FromPort', '') is None:
+                    p.pop('FromPort')
+                if p.get('ToPort', '') is None:
+                    p.pop('ToPort')
+                if 'Ipv6Ranges' not in p:
+                    p[u'Ipv6Ranges'] = []
+                for i in p.get('UserIdGroupPairs', ()):
+                    for k, v in list(i.items()):
+                        if v is None:
+                            i.pop(k)
+                # legacy config form, still version 1.2
+                for attribute, element_key in (('IpRanges', u'CidrIp'),):
+                    if attribute not in p:
+                        continue
+                    p[attribute] = [{element_key: v} for v in p[attribute]]
+                if 'Ipv4Ranges' in p:
+                    p['IpRanges'] = p.pop('Ipv4Ranges')
+        return r
 
 
 @SecurityGroup.filter_registry.register('locked')
@@ -531,7 +530,7 @@ class UnusedSecurityGroup(SGUsage):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-unused
@@ -558,7 +557,7 @@ class UsedSecurityGroup(SGUsage):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-in-use
@@ -588,7 +587,7 @@ class Stale(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: stale-security-groups
@@ -630,7 +629,7 @@ class SGDefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-group-default-vpc
@@ -667,7 +666,7 @@ class SGPermission(Filter):
     permission From/To range. The following example matches on ingress
     rules which allow for a range that includes all of the given ports.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         Ports: [22, 443, 80]
@@ -678,7 +677,7 @@ class SGPermission(Filter):
     then the rule will match. ie. OnlyPorts is a negative assertion match,
     it matches when a permission includes ports outside of the specified set.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         OnlyPorts: [22]
@@ -688,7 +687,7 @@ class SGPermission(Filter):
     against each of the rules. If any iprange cidr match then the permission
     matches.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         IpProtocol: -1
@@ -698,7 +697,7 @@ class SGPermission(Filter):
     ingress/egress permissions. The following example matches on ingress
     rules which allow traffic its own same security group.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         SelfReference: True
@@ -706,7 +705,7 @@ class SGPermission(Filter):
     As well for assertions that a ingress/egress permission only matches
     a given set of ports, *note* OnlyPorts is an inverse match.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: egress
         OnlyPorts: [22, 443, 80]
@@ -889,7 +888,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-unused-delete
@@ -915,7 +914,7 @@ class RemovePermissions(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-group-revoke-8080
@@ -1005,7 +1004,7 @@ class InterfaceSubnetFilter(net_filters.SubnetFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-in-subnet
@@ -1025,7 +1024,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-ssh
@@ -1055,7 +1054,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-remove-group
@@ -1230,7 +1229,7 @@ class AclSubnetFilter(net_filters.SubnetFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: subnet-acl
@@ -1254,7 +1253,7 @@ class AclAwsS3Cidrs(Filter):
 
         Find all nacls that do not allow communication with s3.
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-not-allowed-nacl
@@ -1323,7 +1322,7 @@ class CustomerGateway(query.QueryResourceManager):
     class resource_type(object):
         service = 'ec2'
         type = 'customer-gateway'
-        enum_spec = ('describe_customer_gateways', 'CustomerGateway', None)
+        enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
         detail_spec = None
         id = 'CustomerGatewayId'
         filter_name = 'CustomerGatewayIds'

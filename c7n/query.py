@@ -214,6 +214,8 @@ class DescribeSource(object):
         perms = ['%s:%s' % (m.service, _napi(m.enum_spec[0]))]
         if getattr(m, 'detail_spec', None):
             perms.append("%s:%s" % (m.service, _napi(m.detail_spec[0])))
+        if getattr(m, 'batch_detail_spec', None):
+            perms.append("%s:%s" % (m.service, _napi(m.batch_detail_spec[0])))
         return perms
 
     def augment(self, resources):
