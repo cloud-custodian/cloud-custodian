@@ -1157,20 +1157,18 @@ class ToggleLogging(BucketActionBase):
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-
+        # code to support expand_variables()
+        session = local_session(self.manager.session_factory)
+        iam_client = session.client('iam')
+        aliases = iam_client.list_account_aliases().get('AccountAliases', ('',))
+        account_name = aliases and aliases[0] or ""
         for r in resources:
-            client = bucket_client(local_session(self.manager.session_factory), r)
+            client = bucket_client(session, r)
             if 'TargetBucket' in r['Logging']:
                 r['Logging'] = {'Status': 'Enabled'}
             else:
                 r['Logging'] = {'Status': 'Disabled'}
             if enabled and (r['Logging']['Status'] == 'Disabled'):
-                # code to support expand_variables()
-                session = local_session(self.manager.session_factory)
-                iam_client = session.client('iam')
-                aliases = iam_client.list_account_aliases().get('AccountAliases', ('',))
-                account_name = aliases and aliases[0] or ""
-
                 variables = {
                     'account_id': self.manager.config.account_id,
                     'account': account_name,
