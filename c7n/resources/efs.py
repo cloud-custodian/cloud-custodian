@@ -104,7 +104,7 @@ class SecurityGroup(SecurityGroupFilter):
         group_ids = set()
         retry = get_retry(('Throttled',),12)
         for r in resources:
-            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups, 
+            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups,
                                                MountTargetId=r['MountTargetId'])['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
