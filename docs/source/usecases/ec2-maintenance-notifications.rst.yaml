@@ -19,47 +19,63 @@ There is an example HealthEvent below:
 
    policies:
    
+   - name: ec2-unmark-event
+     resource: ec2
+     mode:
+       type: periodic
+       role: arn:aws:iam::{account_id}:role/custodian-auto-tag-lambda
+       schedule: rate(1 day)
+     filters:
+       - type: marked-for-op
+         tag: auto:event
+         op: unmark
+     actions:
+          - type: unmark
+            tags: ['auto:event']
+   
    - name: ec2-email-about-scheduled-maintenance
      resource: ec2
      mode:
        type: periodic
-       role: arn:aws:iam::{account_id}:role/custodian-lambda-role
+       role: arn:aws:iam::{account_id}:role/custodian-auto-tag-lambda
        schedule: rate(1 day)
      filters:
-       - type: health-event
-         statuses:
-           - upcoming
-           - open
-         types:
-           - AWS_EC2_API_ISSUE
-           - AWS_EC2_BILLING_NOTIFICATION
-           - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTERNET_ISSUE
-           - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTER_AZ_ISSUE
-           - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTRA_AZ_ISSUE
-           - AWS_EC2_DEDICATED_HOST_NETWORK_MAINTENANCE_SCHEDULED
-           - AWS_EC2_DEDICATED_HOST_POWER_MAINTENANCE_SCHEDULED
-           - AWS_EC2_DEDICATED_HOST_RETIREMENT_SCHEDULED
-           - AWS_EC2_DEDICATED_HOST_UNDER_RESERVATION_REPLACE
-           - AWS_EC2_DNS_RESOLUTION_ISSUE
-           - AWS_EC2_INSTANCE_AUTO_RECOVERY_FAILURE
-           - AWS_EC2_INSTANCE_AUTO_RECOVERY_NO_ACTION
-           - AWS_EC2_INSTANCE_AUTO_RECOVERY_SUCCESS
-           - AWS_EC2_INSTANCE_NETWORK_MAINTENANCE_SCHEDULED
-           - AWS_EC2_INSTANCE_POWER_MAINTENANCE_SCHEDULED
-           - AWS_EC2_INSTANCE_RETIREMENT_EXPEDITED
-           - AWS_EC2_INSTANCE_RETIREMENT_SCHEDULED
-           - AWS_EC2_INSTANCE_STORE_DRIVE_PERFORMANCE_DEGRADED
-           - AWS_EC2_NETWORK_CONNECTIVITY_ISSUE
-           - AWS_EC2_OPERATIONAL_ISSUE
-           - AWS_EC2_OPERATIONAL_NOTIFICATION
-           - AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_EXPEDITED
-           - AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED
-           - AWS_EC2_POWER_CONNECTIVITY_ISSUE
-           - AWS_EC2_RI_MARKETPLACE_BANK_ACCOUNT_UPDATE_REQUIRED
-           - AWS_EC2_SYSTEM_REBOOT_MAINTENANCE_SCHEDULED
-           - AWS_EC2_VPC_NETWORK_HEALTH_INTERNET_ISSUE
-           - AWS_EC2_VPC_NETWORK_HEALTH_INTER_AZ_ISSUE
-           - AWS_EC2_VPC_NETWORK_HEALTH_INTRA_AZ_ISSUE
+       - and:
+         - tag:auto:event: absent
+         - type: health-event
+           statuses:
+             - upcoming
+             - open
+           types:
+             - AWS_EC2_API_ISSUE
+             - AWS_EC2_BILLING_NOTIFICATION
+             - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTERNET_ISSUE
+             - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTER_AZ_ISSUE
+             - AWS_EC2_CLASSIC_NETWORK_HEALTH_INTRA_AZ_ISSUE
+             - AWS_EC2_DEDICATED_HOST_NETWORK_MAINTENANCE_SCHEDULED
+             - AWS_EC2_DEDICATED_HOST_POWER_MAINTENANCE_SCHEDULED
+             - AWS_EC2_DEDICATED_HOST_RETIREMENT_SCHEDULED
+             - AWS_EC2_DEDICATED_HOST_UNDER_RESERVATION_REPLACE
+             - AWS_EC2_DNS_RESOLUTION_ISSUE
+             - AWS_EC2_INSTANCE_AUTO_RECOVERY_FAILURE
+             - AWS_EC2_INSTANCE_AUTO_RECOVERY_NO_ACTION
+             - AWS_EC2_INSTANCE_AUTO_RECOVERY_SUCCESS
+             - AWS_EC2_INSTANCE_NETWORK_MAINTENANCE_SCHEDULED
+             - AWS_EC2_INSTANCE_POWER_MAINTENANCE_SCHEDULED
+             - AWS_EC2_INSTANCE_RETIREMENT_EXPEDITED
+             - AWS_EC2_INSTANCE_RETIREMENT_SCHEDULED
+             - AWS_EC2_INSTANCE_STORE_DRIVE_PERFORMANCE_DEGRADED
+             - AWS_EC2_NETWORK_CONNECTIVITY_ISSUE
+             - AWS_EC2_OPERATIONAL_ISSUE
+             - AWS_EC2_OPERATIONAL_NOTIFICATION
+             - AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_EXPEDITED
+             - AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED
+             - AWS_EC2_POWER_CONNECTIVITY_ISSUE
+             - AWS_EC2_RI_MARKETPLACE_BANK_ACCOUNT_UPDATE_REQUIRED
+             - AWS_EC2_SYSTEM_REBOOT_MAINTENANCE_SCHEDULED
+             - AWS_EC2_VPC_NETWORK_HEALTH_INTERNET_ISSUE
+             - AWS_EC2_VPC_NETWORK_HEALTH_INTER_AZ_ISSUE
+             - AWS_EC2_VPC_NETWORK_HEALTH_INTRA_AZ_ISSUE
      actions:
        - type: notify
          priority_header: '1'
@@ -70,7 +86,10 @@ There is an example HealthEvent below:
          to:
            - resource-owner
            - ldap_uid_tags
-           - custodian@example.com
          transport:
            type: sqs
            queue: https://sqs.us-east-1.amazonaws.com/12345/cloudcustodian-mailer
+       - type: mark-for-op
+         tag: auto:event
+         op: unmark
+         days: 45
