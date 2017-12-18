@@ -271,10 +271,15 @@ class PillTest(unittest.TestCase):
 
         return factory
 
-    def replay_flight_data(self, test_case, zdata=False):
+    def replay_flight_data(self, test_case, zdata=False, region=None):
+        """
+        The `region` argument is to allow functional tests to override the
+        default region. It is unused when replaying stored data.
+        """
+
         if os.environ.get('C7N_FUNCTIONAL') == 'yes':
             self.recording = True
-            return lambda region=None, assume=None: boto3.Session(
+            return lambda region=region, assume=None: boto3.Session(
                 region_name=region)
 
         if not zdata:
