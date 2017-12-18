@@ -40,8 +40,8 @@ CLOUDTRAIL_EVENT = {
 
 
 class MockEmailDelivery(EmailDelivery):
-    def get_ldap_connection(self):
-        return get_ldap_lookup(cache_engine='redis')
+    def get_ldap_connection(self, session):
+        return get_ldap_lookup(cache_engine='redis', session=self.session)
 
 
 class EmailTest(unittest.TestCase):

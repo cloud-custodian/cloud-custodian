@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import boto3
 import unittest
 
 from common import get_ldap_lookup, PETER, BILL
@@ -20,7 +21,8 @@ from common import get_ldap_lookup, PETER, BILL
 class MailerLdapTest(unittest.TestCase):
 
     def setUp(self):
-        self.ldap_lookup = get_ldap_lookup(cache_engine='sqlite')
+        self.aws_session = boto3.Session()
+        self.ldap_lookup = get_ldap_lookup(cache_engine='sqlite', session=self.aws_session)
 
     def test_sqlite_cached_get_mail(self):
         michael_bolton = self.ldap_lookup.caching.get('michael_bolton')
