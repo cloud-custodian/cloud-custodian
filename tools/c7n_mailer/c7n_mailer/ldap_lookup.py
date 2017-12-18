@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import base64
 import json
 import redis
 import re
@@ -26,7 +27,17 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 
 class LdapLookup(object):
 
-    def __init__(self, config, logger):
+    def __init__(self, config, session, logger):
+        try:
+            if config['ldap_bind_password'] and config.get('ldap_bind_password_in_kms', True):
+                kms = session.client('kms')
+                config['ldap_bind_password'] = kms.decrypt(
+                    CiphertextBlob=base64.b64decode(config['ldap_bind_password']))[
+                        'Plaintext']
+        except Exception as error:
+            logger.warning(
+                "Error unable to decrypt ldap_bind_password with kms: %s" % (error)
+            )
         self.connection = self.get_connection(
             config.get('ldap_uri'),
             config.get('ldap_bind_user', None),

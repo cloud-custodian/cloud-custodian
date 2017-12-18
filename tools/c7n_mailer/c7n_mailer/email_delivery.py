@@ -27,13 +27,14 @@ class EmailDelivery(object):
 
     def __init__(self, config, session, logger):
         self.config      = config
+        self.session     = session
         self.logger      = logger
         self.aws_ses     = session.client('ses', region_name=config.get('ses_region'))
-        self.ldap_lookup = self.get_ldap_connection()
+        self.ldap_lookup = self.get_ldap_connection(self.session)
 
-    def get_ldap_connection(self):
+    def get_ldap_connection(self, session):
         if self.config.get('ldap_uri'):
-            return LdapLookup(self.config, self.logger)
+            return LdapLookup(self.config, self.session, self.logger)
         return None
 
     def priority_header_is_valid(self, priority_header):
