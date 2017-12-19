@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import base64
 import smtplib
 
 from email.mime.text import MIMEText
@@ -35,7 +36,7 @@ class EmailDelivery(object):
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
             try:
-                if self.config.get('ldap_bind_password', None) and config.get('ldap_bind_password_in_kms', True):
+                if self.config.get('ldap_bind_password', None) and self.config.get('ldap_bind_password_in_kms', True):
                     kms = self.session.client('kms')
                     self.config['ldap_bind_password'] = kms.decrypt(
                         CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
