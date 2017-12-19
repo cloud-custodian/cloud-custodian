@@ -27,14 +27,24 @@ class EmailDelivery(object):
 
     def __init__(self, config, session, logger):
         self.config      = config
-        self.session     = session
         self.logger      = logger
+        self.session     = session
         self.aws_ses     = session.client('ses', region_name=config.get('ses_region'))
-        self.ldap_lookup = self.get_ldap_connection(self.session)
+        self.ldap_lookup = self.get_ldap_connection()
 
-    def get_ldap_connection(self, session):
+    def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
-            return LdapLookup(self.config, self.session, self.logger)
+            try:
+                if self.config.get('ldap_bind_password', None) and config.get('ldap_bind_password_in_kms', True):
+                    kms = self.session.client('kms')
+                    self.config['ldap_bind_password'] = kms.decrypt(
+                        CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
+                            'Plaintext']
+            except Exception as error:
+                logger.warning(
+                    "Error unable to decrypt ldap_bind_password with kms: %s" % (error)
+                )
+            return LdapLookup(self.config, self.logger)
         return None
 
     def priority_header_is_valid(self, priority_header):

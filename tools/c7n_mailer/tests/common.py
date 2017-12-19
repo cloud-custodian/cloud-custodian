@@ -126,7 +126,7 @@ def get_fake_ldap_connection():
     return connection
 
 
-def get_ldap_lookup(cache_engine=None, uid_regex=None, session=None):
+def get_ldap_lookup(cache_engine=None, uid_regex=None):
         if cache_engine == 'sqlite':
             config = {
                 'cache_engine': 'sqlite',
@@ -139,7 +139,7 @@ def get_ldap_lookup(cache_engine=None, uid_regex=None, session=None):
             }
         if uid_regex:
             config['ldap_uid_regex'] = uid_regex
-        ldap_lookup = MockLdapLookup(config, session, logger)
+        ldap_lookup = MockLdapLookup(config, logger)
         michael_bolton = {
             'dn': 'CN=Michael Bolton,cn=users,dc=initech,dc=com',
             'mail': 'michael_bolton@initech.com',
