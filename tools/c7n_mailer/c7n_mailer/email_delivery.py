@@ -41,7 +41,7 @@ class EmailDelivery(object):
                         CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
                             'Plaintext']
             except Exception as error:
-                logger.warning(
+                self.logger.warning(
                     "Error unable to decrypt ldap_bind_password with kms: %s" % (error)
                 )
             return LdapLookup(self.config, self.logger)
