@@ -69,16 +69,26 @@ class BucketScanLogTests(TestCase):
 
 
 def destroyBucket(client, bucket):
-    for o in client.list_objects(Bucket=bucket).get('Contents', ()):
+    for o in client.list_objects(Bucket=bucket).get('Contents', []):
         client.delete_object(Bucket=bucket, Key=o['Key'])
     client.delete_bucket(Bucket=bucket)
 
 
 def destroyVersionedBucket(client, bucket):
-    for o in client.list_object_versions(Bucket=bucket).get('Versions'):
+    for o in client.list_object_versions(Bucket=bucket).get('Versions', []):
         client.delete_object(
             Bucket=bucket, Key=o['Key'], VersionId=o['VersionId'])
     client.delete_bucket(Bucket=bucket)
+
+
+def destroyBucketIfPresent(client, bucket):
+    try:
+        destroyVersionedBucket(client, bucket)
+    except Exception as exc:
+        response = getattr(exc, 'response',
+            {'ResponseMetadata': {'HTTPStatusCode': None}})
+        if response['ResponseMetadata']['HTTPStatusCode'] != 404:
+            raise
 
 
 def generateBucketContents(s3, bucket, contents=None):
@@ -318,6 +328,9 @@ class BucketInventory(BaseTest):
         session_factory = self.replay_flight_data('test_s3_inventory')
 
         client = session_factory().client('s3')
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
+            destroyBucketIfPresent(client, inv_bname)
         client.create_bucket(Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         client.create_bucket(Bucket=inv_bname,
@@ -420,6 +433,8 @@ class BucketDelete(BaseTest):
         client = session.client('s3')
         s3_resource = session.resource('s3')
         bname = 'custodian-byebye'
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
         client.create_bucket(Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         client.put_bucket_versioning(
@@ -462,6 +477,9 @@ class BucketDelete(BaseTest):
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-byebye'
+
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
         client.create_bucket(Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         generateBucketContents(session.resource('s3'), bname)
@@ -540,6 +558,8 @@ class BucketTag(BaseTest):
         session = session_factory()
         client = session.client('s3')
         bname = 'custodian-tagger'
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
         client.create_bucket(Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         self.addCleanup(destroyBucket, client, bname)
@@ -587,6 +607,8 @@ class S3ConfigSource(ConfigTest):
 
         queue_url = self.initialize_config_subscriber(session)
         client = session.client('s3')
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
         client.create_bucket(Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         self.addCleanup(destroyBucket, client, bname)
@@ -929,7 +951,10 @@ class BucketPolicyStatements(BaseTest):
         session_factory = self.replay_flight_data('test_s3_policy_statements')
 
         client = session_factory().client('s3')
-        client.create_bucket(Bucket=bname)
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
+        client.create_bucket(Bucket=bname,
+            CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
 
         self.addCleanup(client.delete_bucket, Bucket=bname)
 
@@ -976,7 +1001,10 @@ class BucketPolicyStatements(BaseTest):
         session_factory = self.replay_flight_data('test_s3_policy_statements_no_change')
 
         client = session_factory().client('s3')
-        client.create_bucket(Bucket=bname)
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
+        client.create_bucket(Bucket=bname,
+            CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
 
         self.addCleanup(client.delete_bucket, Bucket=bname)
 
