@@ -14,6 +14,7 @@
 import base64
 import smtplib
 
+from botocore.exceptions import ClientError
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 
@@ -36,14 +37,16 @@ class EmailDelivery(object):
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
             try:
-                if self.config.get('ldap_bind_password', None) and self.config.get('ldap_bind_password_in_kms', True):
+                if self.config.get('ldap_bind_password', None):
                     kms = self.session.client('kms')
                     self.config['ldap_bind_password'] = kms.decrypt(
                         CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
                             'Plaintext']
-            except Exception as error:
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidCiphertextException':
+                    raise
                 self.logger.warning(
-                    "Error unable to decrypt ldap_bind_password with kms: %s" % (error)
+                    "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % (e)
                 )
             return LdapLookup(self.config, self.logger)
         return None
