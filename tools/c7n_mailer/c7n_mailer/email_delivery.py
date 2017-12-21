@@ -42,6 +42,10 @@ class EmailDelivery(object):
                     self.config['ldap_bind_password'] = kms.decrypt(
                         CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
                             'Plaintext']
+            except (TypeError, base64.binascii.Error) as e:
+                self.logger.warning(
+                    "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % (e)
+                )
             except ClientError as e:
                 if e.response['Error']['Code'] != 'InvalidCiphertextException':
                     raise
