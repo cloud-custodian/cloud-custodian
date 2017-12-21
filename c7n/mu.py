@@ -229,7 +229,7 @@ def checksum(fh, hasher, blocksize=65536):
 def custodian_archive(packages=None):
     """Create a lambda code archive for running custodian.
 
-    Lambda archive currently always includes `c7n, pkg_resources and ipaddress`. Add additional
+    Lambda archive currently always includes `c7n` and `pkg_resources`. Add additional
     packages in the mode block
 
     Example policy that includes additional packages
@@ -246,7 +246,7 @@ def custodian_archive(packages=None):
     Kwargs:
         packages (set): List of additional packages to include in the lambda archive.
     """
-    modules = {'c7n', 'pkg_resources', 'ipaddress'}
+    modules = {'c7n', 'pkg_resources'}
     if packages:
         modules = filter(None, modules.union(packages))
     return PythonPackageArchive(*modules)

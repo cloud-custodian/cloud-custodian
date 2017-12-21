@@ -12,7 +12,7 @@ lib64
 .Python
 pip-selfcheck.json
 coverage/
-.coverage*
+.coverage
 tmp/
 docs/source/generated/
 docs/build/

@@ -33,7 +33,7 @@ from c7n.mu import (
     CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data
+from .common import BaseTest, Config, event_data, functional
 from .data import helloworld
 
 
@@ -149,9 +149,11 @@ class PolicyLambdaProvision(BaseTest):
         #params['sns_topic'] = "arn:123"
         #manager.publish(func)
 
-    def test_sns_subscriber(self):
+    @functional
+    def test_sns_subscriber_and_ipaddress(self):
         self.patch(SNSSubscription, 'iam_delay', 0.01)
-        session_factory = self.replay_flight_data('test_sns_subscriber')
+        session_factory = self.replay_flight_data(
+            'test_sns_subscriber_and_ipaddress')
         session = session_factory()
         client = session.client('sns')
 
@@ -174,7 +176,8 @@ class PolicyLambdaProvision(BaseTest):
 
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
-        #time.sleep(15) -- turn this back on when recording flight data
+        if self.recording:
+            time.sleep(30)
         log_events = manager.logs(func, '1970-1-1 UTC', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
@@ -558,8 +561,8 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('webbrowser.py' in filenames)
 
     def test_handles_third_party_modules(self):
-        filenames = self.get_filenames('ipaddress')
-        self.assertTrue('ipaddress.py' in filenames)
+        filenames = self.get_filenames('botocore')
+        self.assertTrue('botocore/__init__.py' in filenames)
 
     def test_handles_packages(self):
         filenames = self.get_filenames('c7n')
@@ -653,7 +656,6 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = archive.get_filenames()
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
-        self.assertTrue('ipaddress.py' in filenames)
 
 
     def make_file(self):
