@@ -38,23 +38,15 @@ class Directory(QueryResourceManager):
 
         def _add_tags(d):
             client = local_session(self.session_factory).client('ds')
-            try:
-                tags = client.list_tags_for_resource(
-                    ResourceId=d['DirectoryId']).get('Tags', [])
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning(
-                        "Denied access to directory %s" % d['DirectoryId'])
-                    return
-                raise
-
+            tags = client.list_tags_for_resource(
+                ResourceId=d['DirectoryId']).get('Tags', [])
             tag_list = []
             for t in tags:
                 tag_list.append({'Key': t['Key'], 'Value': t['Value']})
             d['Tags'] = tag_list
             return d
 
-        self.log.debug('collecting tags for %d directories' % (
+        self.log.debug('collecting tags for %d Directories' % (
             len(directories)))
         with self.executor_factory(max_workers=2) as w:
             return list(filter(None, w.map(_add_tags, directories)))
@@ -100,12 +92,10 @@ class DirectoryTag(Tag):
         for d in directories:
             try:
                 client.add_tags_to_resource(
-                    ResourceId=d['DirectoryId'],
-                    Tags=tag_list)
-            except Exception as err:
+                    ResourceId=d['DirectoryId'], Tags=tag_list)
+            except ClientError as e:
                 self.log.exception(
-                    'Exception tagging directory %s: %s',
-                    d['DirectoryId'], err)
+                    'Exception tagging Directory %s: %s', d['DirectoryId'], e)
                 continue
 
 
@@ -133,12 +123,11 @@ class DirectoryRemoveTag(RemoveTag):
         for d in directories:
             try:
                 client.remove_tags_from_resource(
-                    ResourceId=d['DirectoryId'],
-                    TagKeys=tags)
-            except Exception as err:
+                    ResourceId=d['DirectoryId'], TagKeys=tags)
+            except ClientError as e:
                 self.log.exception(
-                    'Exception removing tags from directory %s: %s',
-                    d['DirectoryId'], err)
+                    'Exception removing tags from Directory %s: %s',
+                    d['DirectoryId'], e)
                 continue
 
 
