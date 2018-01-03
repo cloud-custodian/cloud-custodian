@@ -34,20 +34,17 @@ class Directory(QueryResourceManager):
         filter_name = 'DirectoryIds'
         filter_type = 'list'
 
-    def augment(self, directories):
+    permissions = ('ds:ListTagsForResource',)
 
+    def augment(self, directories):
         def _add_tags(d):
             client = local_session(self.session_factory).client('ds')
-            tags = client.list_tags_for_resource(
-                ResourceId=d['DirectoryId']).get('Tags', [])
-            tag_list = []
-            for t in tags:
-                tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-            d['Tags'] = tag_list
+            for t in client.list_tags_for_resource(
+                    ResourceId=d['DirectoryId']).get('Tags', []):
+                d.setdefault('Tags', []).append(
+                    {'Key': t['Key'], 'Value': t['Value']})
             return d
 
-        self.log.debug('collecting tags for %d Directories' % (
-            len(directories)))
         with self.executor_factory(max_workers=2) as w:
             return list(filter(None, w.map(_add_tags, directories)))
 
