@@ -135,6 +135,36 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
+    def test_attributes_filter_all(self):
+        self.session_factory = self.replay_flight_data('test_vpc_attributes')
+        p = self.load_policy({
+            'name': 'dns-hostnames-and-support-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True,
+                'dnssupport': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
+    def test_attributes_filter_hostnames(self):
+        self.session_factory = self.replay_flight_data(
+            'test_vpc_attributes_hostnames')
+        p = self.load_policy({
+            'name': 'dns-hostnames-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
 
 class NetworkLocationTest(BaseTest):
 
