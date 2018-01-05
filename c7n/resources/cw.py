@@ -46,7 +46,7 @@ class AlarmDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-delete-stale-alarms
@@ -110,7 +110,7 @@ class Retention(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-set-log-group-retention
@@ -138,7 +138,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-delete-stale-log-group
@@ -165,7 +165,7 @@ class LastWriteDays(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-stale-groups

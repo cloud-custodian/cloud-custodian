@@ -172,7 +172,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-cross-account
@@ -214,7 +214,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-remove-cross-accounts
@@ -279,7 +279,7 @@ class TagDelayedAction(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-delete-unused
@@ -306,7 +306,7 @@ class Tag(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-add-owner-tag
@@ -331,7 +331,7 @@ class RemoveTag(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-remove-old-tag
@@ -358,7 +358,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lambda-delete-dotnet-functions

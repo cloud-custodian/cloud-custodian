@@ -187,7 +187,7 @@ filters.register('network-location', net_filters.NetworkLocation)
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-state-running-7-days
@@ -386,7 +386,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-ancient-ami
@@ -454,7 +454,7 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: offhour-evening-stop
@@ -511,7 +511,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: onhour-morning-start
@@ -566,7 +566,7 @@ class EphemeralInstanceFilter(Filter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-ephemeral-instances
@@ -609,7 +609,7 @@ class InstanceAgeFilter(AgeFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-30-days-plus
@@ -664,7 +664,7 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-recover-instances
@@ -729,7 +729,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-start-stopped-instances
@@ -879,7 +879,7 @@ class Stop(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-stop-running-instances
@@ -948,7 +948,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-reboot-instances
@@ -1018,7 +1018,7 @@ class Terminate(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-process-termination
@@ -1082,7 +1082,7 @@ class Snapshot(BaseAction):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-snapshots
@@ -1200,7 +1200,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-autorecover-alarm
@@ -1261,7 +1261,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: set-default-instance-profile

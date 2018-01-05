@@ -26,9 +26,9 @@ import re
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
-import ipaddress
 import six
 
+from c7n import ipaddress
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom

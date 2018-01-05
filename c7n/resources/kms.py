@@ -90,7 +90,7 @@ class KeyRotationStatus(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-key-disabled-rotation
@@ -128,7 +128,7 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-key-cross-account
@@ -164,7 +164,7 @@ class GrantCount(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-grants
@@ -230,7 +230,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
               - name: kms-key-cross-account
@@ -294,19 +294,19 @@ class RemovePolicyStatement(RemovePolicyBase):
 class TagKmsKey(Tag):
     """Action to create tag(s) on KMS keys
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
-                policies:
-                  - name: tag-kms-keys
-                    resource: kms-key
-                    filters:
-                      - "tag:RequiredTag": absent
-                    actions:
-                      - type: tag
-                        key: RequiredTag
-                        value: tag-value
+        policies:
+          - name: tag-kms-keys
+            resource: kms-key
+            filters:
+              - "tag:RequiredTag": absent
+            actions:
+              - type: tag
+                key: RequiredTag
+                value: tag-value
         """
 
     permissions = ('kms:TagResource',)
@@ -328,18 +328,18 @@ class TagKmsKey(Tag):
 class RemoveTagKmsKey(RemoveTag):
     """Action to remove tag(s) on KMS keys
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
-                policies:
-                  - name: kms-key-remove-tag
-                    resource: kms-key
-                    filters:
-                      - "tag:ExpiredTag": present
-                    actions:
-                      - type: remove-tag
-                        tags: ["ExpiredTag"]
+        policies:
+          - name: kms-key-remove-tag
+            resource: kms-key
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ["ExpiredTag"]
         """
 
     permissions = ('kms:UntagResource',)

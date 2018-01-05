@@ -155,7 +155,7 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: launch-config-public-ip
@@ -404,7 +404,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -543,7 +543,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-older-image
@@ -588,7 +588,7 @@ class ImageFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-image-tag
@@ -645,7 +645,7 @@ class VpcIdFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-vpc-xyz
@@ -748,7 +748,7 @@ class GroupTagTrim(TagTrim):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-tag-trim
@@ -784,7 +784,7 @@ class CapacityDelta(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-capacity-delta
@@ -809,7 +809,7 @@ class Resize(Action):
 
     1. set min/desired to current running instances
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resize
@@ -823,7 +823,7 @@ class Resize(Action):
     2. apply a fixed resize of min, max or desired, optionally saving the
        previous values to a named tag (for restoring later):
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: offhours-asg-off
@@ -840,7 +840,7 @@ class Resize(Action):
 
     3. restore previous values for min/max/desired from a tag:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: offhours-asg-on
@@ -967,7 +967,7 @@ class RemoveTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-remove-unnecessary-tags
@@ -1026,7 +1026,7 @@ class Tag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-add-owner-tag
@@ -1102,7 +1102,7 @@ class PropagateTags(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-propagate-required
@@ -1210,7 +1210,7 @@ class RenameTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-rename-owner-tag
@@ -1307,7 +1307,7 @@ class MarkForOp(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-schedule
@@ -1364,7 +1364,7 @@ class Suspend(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-processes
@@ -1446,7 +1446,7 @@ class Resume(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resume-processes
@@ -1523,7 +1523,7 @@ class Delete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -1601,7 +1601,7 @@ class LaunchConfigAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-launch-config-old
@@ -1625,7 +1625,7 @@ class UnusedLaunchConfig(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config
@@ -1656,7 +1656,7 @@ class LaunchConfigDelete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config-delete

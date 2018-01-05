@@ -113,7 +113,7 @@ class PGCopy(PGMixin, Copy):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-param-group-copy
@@ -141,7 +141,7 @@ class PGClusterCopy(PGClusterMixin, Copy):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-param-group-copy
@@ -188,7 +188,7 @@ class PGDelete(PGMixin, Delete):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-param-group-delete
@@ -211,7 +211,7 @@ class PGClusterDelete(PGClusterMixin, Delete):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-param-group-delete
@@ -286,7 +286,7 @@ class PGModify(PGMixin, Modify):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-param-group-modify
@@ -321,7 +321,7 @@ class PGClusterModify(PGClusterMixin, Modify):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-param-group-modify

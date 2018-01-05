@@ -43,6 +43,8 @@ class DataPipeline(QueryResourceManager):
         name = 'name'
         date = None
         dimension = 'name'
+        batch_detail_spec = (
+            'describe_pipeline', 'pipelineIds', 'id', 'pipelineDescriptionList')
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
         filter_name = None
 
@@ -99,7 +101,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: datapipeline-delete
@@ -131,7 +133,7 @@ class MarkForOpPipeline(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: pipeline-delete-unused
@@ -170,7 +172,8 @@ class TagPipeline(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: tag-pipeline
                 resource: datapipeline
@@ -206,7 +209,8 @@ class UntagPipeline(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: pipeline-remove-tag
                 resource: datapipeline

@@ -103,7 +103,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-cross-account
@@ -120,7 +120,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
               - name: sqs-cross-account
@@ -173,7 +173,7 @@ class MarkForOpQueue(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete-unused
@@ -213,7 +213,7 @@ class TagQueue(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: tag-sqs
@@ -251,7 +251,7 @@ class UntagQueue(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-remove-tag
@@ -288,7 +288,7 @@ class DeleteSqsQueue(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete
@@ -321,7 +321,7 @@ class SetEncryption(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-set-encrypt

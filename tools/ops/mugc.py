@@ -81,6 +81,9 @@ def resources_gc_prefix(options, policy_collection):
                 if principal == {'Service': 'events.amazonaws.com'}:
                     events.append(
                         mu.CloudWatchEventSource({}, session_factory))
+                elif principal == {'Service': 'config.amazonaws.com'}:
+                    events.append(
+                        mu.ConfigRule({}, session_factory))
 
         f = mu.LambdaFunction({
             'name': n['FunctionName'],

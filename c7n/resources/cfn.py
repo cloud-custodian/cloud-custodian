@@ -47,7 +47,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudformation-delete-failed-stacks

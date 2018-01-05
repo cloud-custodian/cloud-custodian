@@ -1,0 +1,7 @@
+[run]
+omit =
+    # vendored file
+	c7n/ipaddress.py
+
+    # coverage too thin
+	tools/
