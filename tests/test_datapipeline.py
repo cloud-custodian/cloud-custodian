@@ -15,6 +15,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest, functional
 
+# datapipeline is not available in us-east-2 where we run our functional tests
+# so we do a forced override here.
+REGION = 'us-west-2'
+
 
 class DataPipelineTest(BaseTest):
 
@@ -57,7 +61,7 @@ class DataPipelineTest(BaseTest):
             'filters': [
                 {'tag:foo': 'bar'}],
             },
-            config={'region': 'us-west-2'},
+            config={'region': REGION},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -93,7 +97,7 @@ class DataPipelineTest(BaseTest):
 
     @functional
     def test_tag_datapipeline(self):
-        factory = self.replay_flight_data('test_datapipeline_tag')
+        factory = self.replay_flight_data('test_datapipeline_tag', region=REGION)
 
         session = factory()
         client = session.client('datapipeline')
@@ -120,7 +124,7 @@ class DataPipelineTest(BaseTest):
 
     @functional
     def test_mark_datapipeline(self):
-        factory = self.replay_flight_data('test_datapipeline_mark')
+        factory = self.replay_flight_data('test_datapipeline_mark', region=REGION)
 
         session = factory()
         client = session.client('datapipeline')
@@ -150,7 +154,7 @@ class DataPipelineTest(BaseTest):
 
     @functional
     def test_remove_tag_datapipeline(self):
-        factory = self.replay_flight_data('test_datapipeline_remove_tag')
+        factory = self.replay_flight_data('test_datapipeline_remove_tag', region=REGION)
 
         session = factory()
         client = session.client('datapipeline')
@@ -183,7 +187,7 @@ class DataPipelineTest(BaseTest):
 
     @functional
     def test_marked_for_op_datapipeline(self):
-        factory = self.replay_flight_data('test_datapipeline_marked_for_op')
+        factory = self.replay_flight_data('test_datapipeline_marked_for_op', region=REGION)
 
         session = factory()
         client = session.client('datapipeline')

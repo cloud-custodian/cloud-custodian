@@ -233,7 +233,9 @@ class TestPolicyCollection(BaseTest):
 
         collection = original.expand_regions(['all'])
         self.assertEqual(len(collection.resource_types), 2)
-        self.assertEqual(len(collection), 15)        
+        s3_regions = [p.options.region for p in collection if p.resource_type == 's3']
+        self.assertTrue('us-east-1' in s3_regions)
+        self.assertTrue('us-east-2' in s3_regions)
         iam = [p for p in collection if p.resource_type == 'iam-user']
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, 'us-east-1')

@@ -689,6 +689,59 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
+@filters.register('progagated-tags')
+class PropagatedTagFilter(Filter):
+    """Filter ASG based on propagated tags
+
+    This filter is designed to find all autoscaling groups that have a list
+    of tag keys (provided) that are set to propagate to new instances. Using
+    this will allow for easy validation of asg tag sets are in place across an
+    account for compliance.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-non-propagated-tags
+                resource: asg
+                filters:
+                  - type: propagated-tags
+                    keys: ["ABC", "BCD"]
+                    match: false
+                    propagate: true
+    """
+    schema = type_schema(
+        'progagated-tags',
+        keys={'type': 'array', 'items': {'type': 'string'}},
+        match={'type': 'boolean'},
+        propagate={'type': 'boolean'})
+    permissions = (
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeAutoScalingGroups")
+
+    def process(self, asgs, event=None):
+        keys = self.data.get('keys', [])
+        match = self.data.get('match', True)
+        results = []
+        for asg in asgs:
+            if self.data.get('propagate', True):
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+            else:
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and not t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+        return results
+
+
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
