@@ -27,12 +27,12 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 class LdapLookup(object):
 
     def __init__(self, config, logger):
+        self.log          = logger
         self.connection = self.get_connection(
             config.get('ldap_uri'),
             config.get('ldap_bind_user', None),
             config.get('ldap_bind_password', None)
         )
-        self.log          = logger
         self.base_dn      = config.get('ldap_bind_dn')
         self.email_key    = config.get('ldap_email_key', 'mail')
         self.manager_attr = config.get('ldap_manager_attribute', 'manager')
