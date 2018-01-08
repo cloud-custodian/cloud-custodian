@@ -27,11 +27,12 @@ from botocore.client import ClientError
 import jmespath
 import six
 
-from c7n.actions import EventAction
+from c7n.actions import Action, EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.credentials import SessionFactory
-from c7n.manager import resources
+from c7n.filters import Filter
+from c7n.manager import resources, ResourceManager
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n import mu
@@ -78,6 +79,9 @@ def load(options, path, format='yaml', validate=True, vars=None):
     if validate:
         # non schema validation of policies
         [p.validate() for p in collection]
+        for visitor in [CheckDeprecation(options)]:
+            [visitor.process_policy(p) for p in collection]
+
     return collection
 
 
@@ -701,35 +705,14 @@ class Policy(object):
         return True
 
     def validate(self):
-        self._check_deprecation('resource', self.resource_manager)
-
         m = self.get_execution_mode()
         m.validate()
 
-        parent_element_name = self.resource_manager.type
         for f in self.resource_manager.filters:
             f.validate()
-            self._check_deprecation('filter', f, parent_element_name=parent_element_name)
 
         for a in self.resource_manager.actions:
             a.validate()
-            self._check_deprecation('action', a, parent_element_name=parent_element_name)
-
-    def _check_deprecation(self, element_type, element, parent_element_name=None):
-        """Check whether the specified policy element is deprecated."""
-        if getattr(element, 'deprecated', False) and self.options.deprecation != 'ignore':
-            if parent_element_name:
-                msg = '%s %s:%s is deprecated (policy: %s)' % (
-                    element_type,
-                    parent_element_name,
-                    element.type,
-                    self.name)
-            else:
-                msg = '%s %s is deprecated (policy: %s)' % (
-                    element_type,
-                    element.type,
-                    self.name)
-            warnings.warn(msg, PendingDeprecationWarning)
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
@@ -789,3 +772,36 @@ class Policy(object):
             raise ValueError(
                 "Invalid resource type: %s" % resource_type)
         return factory(self.ctx, self.data)
+
+
+class CheckDeprecation(object):
+    """Policy visitor to check deprecation."""
+    def __init__(self, options):
+        self.options = options
+
+    def process_policy(self, policy):
+        msgs = []
+        msgs.extend(self._check_deprecation(policy, policy.resource_manager))
+        for f in policy.resource_manager.filters:
+            msgs.extend(self._check_deprecation(policy, f))
+        for a in policy.resource_manager.actions:
+            msgs.extend(self._check_deprecation(policy, a))
+
+        if msgs:
+            warnings.warn('\n'.join(msgs), PendingDeprecationWarning)
+
+    def _check_deprecation(self, policy, element):
+        """Check whether the specified policy element is deprecated."""
+        if getattr(element, 'deprecated', False) and self.options.deprecation != 'ignore':
+            if isinstance(element, ResourceManager):
+                prefix = 'Resource '
+            elif isinstance(element, Filter):
+                prefix = 'Filter %s/' % (policy.resource_manager.type)
+            elif isinstance(element, Action):
+                prefix = 'Action %s/' % (policy.resource_manager.type)
+            return ('%s%s is deprecated (policy: %s)' % (
+                prefix,
+                element.type,
+                policy.name),)
+
+        return ()
