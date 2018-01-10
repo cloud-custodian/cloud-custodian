@@ -390,6 +390,8 @@ class Notify(EventAction):
               - event-user
               - resource-creator
               - email@address
+             owner_absent_contact:
+              - other_email@address
              # which template for the email should we use
              template: policy-template
              transport:
@@ -408,6 +410,7 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
             'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_from': ValuesFrom.schema,
