@@ -38,7 +38,8 @@ def cli():
 
 
 @cli.command()
-@click.option('-c', '--config', required=True, help="Accounts config file", type=click.Path())
+@click.option('-c', '--config',
+              required=True, help="Accounts config file", type=click.Path())
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
@@ -79,7 +80,8 @@ def report(config, tags, accounts, master, debug):
 
 
 @cli.command()
-@click.option('-c', '--config', required=True, help="Accounts config file", type=click.Path())
+@click.option('-c', '--config',
+              required=True, help="Accounts config file", type=click.Path())
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
