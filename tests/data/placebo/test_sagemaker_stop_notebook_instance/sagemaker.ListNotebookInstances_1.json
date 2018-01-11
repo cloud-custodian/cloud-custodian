@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NotebookInstances": [
+            {
+                "NotebookInstanceStatus": "InService", 
+                "Url": "c7n-test-2.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-test-2", 
+                "CreationTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 26, 
+                    "microsecond": 151000, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 46
+                }, 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test-2", 
+                "LastModifiedTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 19, 
+                    "microsecond": 533000, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 2
+                }, 
+                "InstanceType": "ml.t2.medium"
+            }, 
+            {
+                "NotebookInstanceStatus": "Stopped", 
+                "Url": "c7n-test.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-test", 
+                "CreationTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 35, 
+                    "microsecond": 498000, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 25
+                }, 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test", 
+                "LastModifiedTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 14, 
+                    "microsecond": 913000, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 56
+                }, 
+                "InstanceType": "ml.t2.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e35bb08a-dddb-4da2-98e0-7dbece2722ec", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Jan 2018 21:05:27 GMT", 
+                "x-amzn-requestid": "e35bb08a-dddb-4da2-98e0-7dbece2722ec", 
+                "content-length": "653", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4490cb35-cdea-491b-99d5-8c3b9b59147d", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Jan 2018 21:16:40 GMT", 
+                "x-amzn-requestid": "4490cb35-cdea-491b-99d5-8c3b9b59147d", 
+                "content-length": "133", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "DeleteMe", 
+                "Key": "DeleteMe"
+            }, 
+            {
+                "Value": "Resource does not meet policy: stop@2018/01/09", 
+                "Key": "custodian_cleanup"
+            }
+        ]
+    }
+}
