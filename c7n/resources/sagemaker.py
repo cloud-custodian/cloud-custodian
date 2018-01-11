@@ -53,7 +53,7 @@ class NotebookInstance(QueryResourceManager):
             r.setdefault('Tags', []).extend(tags)
             return r
 
-        with self.executor_factory(max_workers=2) as w:
+        with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, resources)))
 
 

@@ -4,55 +4,55 @@
         "NotebookInstances": [
             {
                 "NotebookInstanceStatus": "Stopped", 
-                "Url": "c7n-test-2.notebook.us-east-1.sagemaker.aws", 
-                "NotebookInstanceName": "c7n-test-2", 
+                "Url": "c7n-sage-02.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-sage-02", 
                 "CreationTime": {
-                    "hour": 15, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 26, 
-                    "microsecond": 151000, 
+                    "second": 58, 
+                    "microsecond": 746000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 46
+                    "day": 11, 
+                    "minute": 35
                 }, 
-                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test-2", 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-sage-02", 
                 "LastModifiedTime": {
-                    "hour": 16, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 18, 
-                    "microsecond": 395000, 
+                    "second": 46, 
+                    "microsecond": 521000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 7
+                    "day": 11, 
+                    "minute": 44
                 }, 
                 "InstanceType": "ml.t2.medium"
             }, 
             {
                 "NotebookInstanceStatus": "InService", 
-                "Url": "c7n-test.notebook.us-east-1.sagemaker.aws", 
-                "NotebookInstanceName": "c7n-test", 
+                "Url": "c7n-sage-01.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-sage-01", 
                 "CreationTime": {
-                    "hour": 15, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 35, 
-                    "microsecond": 498000, 
+                    "second": 40, 
+                    "microsecond": 833000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 25
+                    "day": 11, 
+                    "minute": 35
                 }, 
-                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test", 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-sage-01", 
                 "LastModifiedTime": {
-                    "hour": 16, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 47, 
-                    "microsecond": 81000, 
+                    "second": 11, 
+                    "microsecond": 484000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 10
+                    "day": 11, 
+                    "minute": 42
                 }, 
                 "InstanceType": "ml.t2.medium"
             }
@@ -60,11 +60,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "86b3f78f-d20a-4437-bbe4-91408c61fb10", 
+            "RequestId": "9cf910af-56bb-4c5e-af27-0fc1aa9caaa7", 
             "HTTPHeaders": {
-                "date": "Mon, 08 Jan 2018 21:14:53 GMT", 
-                "x-amzn-requestid": "86b3f78f-d20a-4437-bbe4-91408c61fb10", 
-                "content-length": "653", 
+                "date": "Thu, 11 Jan 2018 15:57:33 GMT", 
+                "x-amzn-requestid": "9cf910af-56bb-4c5e-af27-0fc1aa9caaa7", 
+                "content-length": "665", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
