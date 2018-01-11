@@ -182,6 +182,8 @@ policies:
         subject: fix your tags
         to:
           - resource-owner
+        owner_absent_contact:
+          - foo@example.com
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/80101010101/cloud-custodian-message-relay
@@ -205,6 +207,10 @@ Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
 `event-owner` an instance role or system account will not result in an email.
 
+The optional `owner_absent_contact` list specifies email addresses to notify only if
+the `resource-owner` special option was unable to find any matching owner contact
+tags.
+
 For reference purposes, the JSON Schema of the `notify` action:
 
 ```json
@@ -214,6 +220,7 @@ For reference purposes, the JSON Schema of the `notify` action:
   "properties": {
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
+    "owner_absent_contact": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
     "priority_header": {"type": "string"},
     "template": {"type": "string"},
