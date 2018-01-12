@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "618799a0-265f-46fe-a59d-56d34cc68818", 
+            "HTTPHeaders": {
+                "date": "Fri, 12 Jan 2018 20:18:49 GMT", 
+                "x-amzn-requestid": "618799a0-265f-46fe-a59d-56d34cc68818", 
+                "content-length": "407", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "EndpointConfigName": "c7n-endpoint-config-002", 
+        "CreationTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 49, 
+            "microsecond": 745000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 59
+        }, 
+        "ProductionVariants": [
+            {
+                "DesiredInstanceCount": 1, 
+                "DesiredWeight": 1.0, 
+                "VariantName": "variant-name-1", 
+                "CurrentWeight": 1.0, 
+                "CurrentInstanceCount": 1
+            }
+        ], 
+        "EndpointName": "c7n-endpoint-002", 
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-002", 
+        "LastModifiedTime": {
+            "hour": 15, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 49, 
+            "microsecond": 537000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 18
+        }, 
+        "EndpointStatus": "Deleting"
+    }
+}
