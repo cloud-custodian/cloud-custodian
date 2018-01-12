@@ -435,7 +435,7 @@ class SagemakerJobStop(BaseAction):
 @SagemakerEndpoint.action_registry.register('delete')
 class SagemakerEndpointDelete(BaseAction):
     """Delete a SageMaker endpoint
-    
+
     :example:
 
     .. code-block: yaml
