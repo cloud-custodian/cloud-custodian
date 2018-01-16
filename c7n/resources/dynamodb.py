@@ -17,12 +17,12 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
-    local_session, get_retry, chunks, type_schema)
+    local_session, get_retry, chunks, type_schema, snapshot_identifier)
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -239,6 +239,138 @@ class DeleteTable(BaseAction, StatusFilter):
                             "Exception deleting dynamodb table set \n %s" % (
                                 f.exception()))
 
+
+@Table.action_registry.register('create-backup')
+class CreateBackup(BaseAction, StatusFilter):
+    """Creates a manual backup of a DynamoDB table
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-create-backup
+                resource: dynamodb-table
+                actions:
+                  - type: create-backup
+    """
+
+    valid_status = ('ACTIVE',)
+    schema = type_schema('create-backup')
+    permissions = ('dynamodb:CreateBackup',)
+
+    def process(self, tables):
+        tables = self.filter_table_state(
+            tables, self.valid_status)
+        if not len(tables):
+            return
+
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for t in tables:
+                futures.append(w.submit(
+                    self.process_dynamodb_tables,
+                    tables))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception creating dynamodb table backup \n %s",
+                        f.exception())
+        return tables
+
+    def process_dynamodb_tables(self, tables):
+
+        c = local_session(self.manager.session_factory).client('dynamodb')
+        for t in tables:
+            arn = c.create_backup(
+                BackupName=snapshot_identifier(
+                    'Backup', t['TableName']),
+                TableName=t['TableName'])['BackupDetails']['BackupArn']
+            t['c7n:BackupArn'] = arn
+
+
+@resources.register('dynamodb-backup')
+class Backup(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dynamodb'
+        type = 'table'
+        enum_spec = ('list_backups', 'BackupSummaries', None)
+        detail_spec = None
+        id = 'Table'
+        filter_name = None
+        name = 'TableName'
+        date = 'BackupCreationDateTime'
+        dimension = 'TableName'
+        config_type = 'AWS::DynamoDB::Table'
+
+
+@Backup.filter_registry.register('age')
+class DynamodbTableBackupAge(AgeFilter):
+    """Filters DynamoDB table backups based on age (in days)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-backup-age
+                resource: dynamodb-backup
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - delete
+    """
+
+    schema = type_schema(
+        'age', days={'type': 'number'},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+
+    date_attribute = 'BackupCreationDateTime'
+
+@Backup.action_registry.register('delete-backup')
+class DeleteBackup(BaseAction):
+    """Deletes backups of a DynamoDB table
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-delete-backup
+                resource: dynamodb-table
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                actions:
+                  - type: delete-backup
+    """
+
+    schema = type_schema('delete-backup')
+    permissions = ('dynamodb:DeleteBackup',)
+
+    def process(self, tables):
+
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for t in tables:
+                futures.append(w.submit(
+                    self.process_dynamodb_backups,
+                    t))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting dynamodb table backup \n %s",
+                        f.exception())
+
+    def process_dynamodb_backups(self, table):
+
+        c = local_session(self.manager.session_factory).client('dynamodb')
+        arn = c.delete_backup(
+            BackupArn=table['BackupArn'])
 
 @resources.register('dynamodb-stream')
 class Stream(query.QueryResourceManager):

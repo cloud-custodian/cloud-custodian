@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "AE48SELDSA048BJLQGQL4ME59BVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "AE48SELDSA048BJLQGQL4ME59BVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "67", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "2989988731", 
+                "date": "Tue, 16 Jan 2018 20:18:18 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }, 
+        "TableNames": [
+            "c7n-dynamodb-backup"
+        ]
+    }
+}

@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+import datetime
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -135,3 +136,40 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.list_tags_of_resource(ResourceArn=arn)
         self.assertFalse('test_key' in tags)
+
+    def test_dynamodb_create_backup(self):
+        dt = datetime.datetime.now().replace(
+            year=2018, month=1, day=16, hour=15, minute=18)
+        suffix = dt.strftime('%Y-%m-%d-%H-%M')
+
+        session_factory = self.replay_flight_data(
+            'test_dynamodb_create_backup')
+
+        p = self.load_policy({
+                'name': 'c7n-dynamodb-create-backup',
+                'resource': 'dynamodb-table',
+                'filters': [{'TableName': 'c7n-dynamodb-backup'}],
+                'actions': [{
+                    'type': 'create-backup'}]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('dynamodb')
+        arn = resources[0]['c7n:BackupArn']
+        table = client.describe_backup(
+            BackupArn=arn)
+        self.assertEqual(table['BackupDescription']['BackupDetails']['BackupName'],
+            'Backup-c7n-dynamodb-backup-%s' % (suffix))
+
+    def test_dynamodb_delete_backup(self):
+        factory = self.replay_flight_data('test_dynamodb_delete_backup')
+        p = self.load_policy({
+            'name': 'c7n-dynamodb-delete-backup',
+            'resource': 'dynamodb-backup',
+            'filters': [{'TableName': 'c7n-dynamodb-backup'}],
+            'actions': ['delete-backup']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
