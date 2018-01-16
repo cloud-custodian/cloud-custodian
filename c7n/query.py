@@ -116,13 +116,15 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. efs mount targets (parent efs), route53 resource
     records (parent hosted zone), ecs services (ecs cluster).
     """
+
+    capture_parent_id = False
+
     def __init__(self, session_factory, manager):
         self.session_factory = session_factory
         self.manager = manager
 
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
-
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(m.service)
 
@@ -149,9 +151,10 @@ class ChildResourceQuery(ResourceQuery):
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path)
-            if subset:
+            if subset and self.capture_parent_id:
+                results.extend([(parent_id, s) for s in subset])
+            elif subset:
                 results.extend(subset)
-
         return results
 
 
