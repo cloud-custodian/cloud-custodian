@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinition": {
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:1",
+            "containerDefinitions": [
+                {
+                    "name": "db",
+                    "image": "postgres:latest",
+                    "cpu": 0,
+                    "portMappings": [],
+                    "essential": true,
+                    "environment": [],
+                    "mountPoints": [],
+                    "volumesFrom": [],
+                    "readonlyRootFilesystem": false,
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": "/ecs/launch-me",
+                            "awslogs-region": "us-east-1",
+                            "awslogs-stream-prefix": "ecs"
+                        }
+                    }
+                }
+            ],
+            "family": "launch-me",
+            "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "networkMode": "awsvpc",
+            "revision": 1,
+            "volumes": [],
+            "status": "ACTIVE",
+            "requiresAttributes": [
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "ecs.capability.task-eni"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                },
+                {
+                    "name": "ecs.capability.execution-role-awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+                }
+            ],
+            "placementConstraints": [],
+            "compatibilities": [
+                "EC2",
+                "FARGATE"
+            ],
+            "requiresCompatibilities": [
+                "FARGATE"
+            ],
+            "cpu": "512",
+            "memory": "1024"
+        },
+        "ResponseMetadata": {
+            "RequestId": "087546d7-fa5f-11e7-bb88-717c0fe1a433",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:46:12 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1148",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "087546d7-fa5f-11e7-bb88-717c0fe1a433"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
