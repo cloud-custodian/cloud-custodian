@@ -166,6 +166,9 @@ class ServiceTaskFilter(ValueFilter):
 class DeleteService(BaseAction):
     """Delete service(s)."""
 
+    schema = type_schema('delete')
+    permissions = ('ecs:DeleteService',)
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
