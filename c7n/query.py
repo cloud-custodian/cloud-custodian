@@ -380,11 +380,13 @@ class QueryResourceManager(ResourceManager):
             perms.extend(self.permissions)
         return perms
 
-    def resources(self, query=None):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': query}
+    def get_cache_key(self, query):
+        return {'region': self.config.region,
+                'resource': str(self.__class__.__name__),
+                'q': query}
 
+    def resources(self, query=None):
+        key = self.get_cache_key(query)
         if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
@@ -402,9 +404,7 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def get_resources(self, ids, cache=True):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': None}
+        key = self.get_cache_key(None)
         if cache and self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:

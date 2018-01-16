@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "083b9917-fa5f-11e7-80d9-edbefe524002",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:46:12 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "237",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "083b9917-fa5f-11e7-80d9-edbefe524002"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
