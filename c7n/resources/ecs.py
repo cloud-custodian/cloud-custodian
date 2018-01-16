@@ -280,5 +280,6 @@ class DeleteTaskDefinition(BaseAction):
                       taskDefinition=r['taskDefinitionArn'])
             except ClientError as e:
                 # No error code for not found.
-                if e.response['Error']['Message'] != 'The specified task definition does not exist.':
+                if e.response['Error'][
+                        'Message'] != 'The specified task definition does not exist.':
                     raise
