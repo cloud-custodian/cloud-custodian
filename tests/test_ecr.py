@@ -36,8 +36,7 @@ class TestECR(BaseTest):
         session_factory = self.replay_flight_data('test_ecr_no_policy')
         client = session_factory().client('ecr')
         name = 'test-ecr-no-policy'
-        client.create_repository(repositoryName=name)
-        self.addCleanup(client.delete_repository, repositoryName=name)
+        self.create_repository(client, name)
         p = self.load_policy({
             'name': 'ecr-stat-3',
             'resource': 'ecr',
@@ -55,8 +54,7 @@ class TestECR(BaseTest):
         session_factory = self.replay_flight_data('test_ecr_remove_matched')
         client = session_factory().client('ecr')
         name = 'test-ecr-remove-matched'
-        client.create_repository(repositoryName=name)
-        self.addCleanup(client.delete_repository, repositoryName=name)
+        self.create_repository(client, name)
         client.set_repository_policy(
             repositoryName=name,
             policyText=json.dumps({
@@ -117,9 +115,7 @@ class TestECR(BaseTest):
         session_factory = self.replay_flight_data('test_ecr_remove_named')
         client = session_factory().client('ecr')
         name = 'test-xyz'
-
-        client.create_repository(repositoryName=name)
-        self.addCleanup(client.delete_repository, repositoryName=name)
+        self.create_repository(client, name)
         client.set_repository_policy(
             repositoryName=name,
             policyText=json.dumps({
@@ -146,4 +142,3 @@ class TestECR(BaseTest):
             ClientError,
             client.get_repository_policy,
             repositoryName=resources[0]['repositoryArn'])
-    
