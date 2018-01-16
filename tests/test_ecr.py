@@ -21,6 +21,15 @@ from botocore.exceptions import ClientError
 
 class TestECR(BaseTest):
 
+    def create_repository(self, client, name):
+        """ Create the named repository. Delete existing one first if applicable. """
+        existing_repos = {r['repositoryName'] for r in client.describe_repositories().get('repositories')}
+        if name in existing_repos:
+            client.delete_repository(repositoryName=name)
+
+        client.create_repository(repositoryName=name)
+        self.addCleanup(client.delete_repository, repositoryName=name)
+
     @functional
     def test_ecr_no_policy(self):
         # running against a registry with no policy causes no issues.
