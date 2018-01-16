@@ -152,3 +152,110 @@ class TestNotebookInstance(BaseTest):
         notebook = client.describe_notebook_instance(
             NotebookInstanceName=resources[0]['NotebookInstanceName'])
         self.assertTrue(notebook['NotebookInstanceStatus'], 'Deleting')
+
+
+class TestSagemakerJob(BaseTest):
+    def test_list_jobs(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_training_jobs')
+        p = self.load_policy({
+            'name': 'list-training-jobs',
+            'resource': 'sagemaker-job'
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_job_value_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_training_jobs_value_filter')
+        p = self.load_policy({
+            'name': 'unencrypted-training-jobs',
+            'resource': 'sagemaker-job',
+            'filters': [{
+                'type': 'value',
+                'key': 'OutputDataConfig.KmsKeyId',
+                'value': 'empty'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_stop_job(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_training_job_stop')
+        p = self.load_policy({
+            'name': 'stop-training-job',
+            'resource': 'sagemaker-job',
+            'filters': [
+                {'TrainingJobName': 'c7n-job-2018-01-12-16-06-41'}],
+            'actions': [{
+                'type': 'stop'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        client = session_factory(region='us-east-1').client('sagemaker')
+        status = client.describe_training_job(
+            TrainingJobName='c7n-job-2018-01-12-16-06-41'
+        )['TrainingJobStatus']
+        self.assertEqual(status, 'Stopping')
+
+
+class TestSagemakerEndpoint(BaseTest):
+
+    def test_sagemaker_endpoints(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoints')
+        p = self.load_policy({
+            'name': 'list-endpoints',
+            'resource': 'sagemaker-endpoint',
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_sagemaker_endpoint_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_delete')
+        client = session_factory(region='us-east-1').client('sagemaker')
+        p = self.load_policy({
+            'name': 'list-endpoints',
+            'resource': 'sagemaker-endpoint',
+            'filters': [{
+                'EndpointName': 'c7n-endpoint-002'
+            }],
+            'actions': [{
+                'type': 'delete'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        status = client.describe_endpoint(
+            EndpointName='c7n-endpoint-002')['EndpointStatus']
+        self.assertEqual(status, 'Deleting')
+
+
+class TestSagemakerEndpointConfig(BaseTest):
+
+    def test_sagemaker_endpoint_config(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config')
+        p = self.load_policy({
+            'name': 'list-endpoint-configs',
+            'resource': 'sagemaker-endpoint-config'
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_sagemaker_endpoint_config_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config_delete')
+        client = session_factory(region='us-east-1').client('sagemaker')
+        p = self.load_policy({
+            'name': 'delete-endpoint-config',
+            'resource': 'sagemaker-endpoint-config',
+            'filters': [{
+                'EndpointConfigName': 'c7n-endpoint-config-002'
+            }],
+            'actions': [{
+                'type': 'delete'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        configs = client.list_endpoint_configs()['EndpointConfigs']
+        self.assertEqual(len(configs), 0)

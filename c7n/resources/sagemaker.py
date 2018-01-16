@@ -57,6 +57,96 @@ class NotebookInstance(QueryResourceManager):
             return list(filter(None, w.map(_augment, resources)))
 
 
+@resources.register('sagemaker-job')
+class SagemakerJob(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
+        detail_spec = (
+            'describe_training_job', 'TrainingJobName',
+            'TrainingJobName', None)
+        id = 'TrainingJobArn'
+        name = 'TrainingJobName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, resources):
+        def _augment(r):
+            client = local_session(self.session_factory).client('sagemaker')
+            tags = client.list_tags(
+                ResourceArn=r['TrainingJobArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, resources)))
+
+
+@resources.register('sagemaker-endpoint')
+class SagemakerEndpoint(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_endpoints', 'Endpoints', None)
+        detail_spec = (
+            'describe_endpoint', 'EndpointName',
+            'EndpointName', None)
+        id = 'EndpointArn'
+        name = 'EndpointName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, endpoints):
+        def _augment(e):
+            client = local_session(self.session_factory).client('sagemaker')
+            tags = client.list_tags(
+                ResourceArn=e['EndpointArn'])['Tags']
+            e.setdefault('Tags', []).extend(tags)
+            return e
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, endpoints)))
+
+
+@resources.register('sagemaker-endpoint-config')
+class SagemakerEndpointConfig(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_endpoint_configs', 'EndpointConfigs', None)
+        detail_spec = (
+            'describe_endpoint_config', 'EndpointConfigName',
+            'EndpointConfigName', None)
+        id = 'EndpointConfigArn'
+        name = 'EndpointConfigName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, endpoints):
+        def _augment(e):
+            client = local_session(self.session_factory).client('sagemaker')
+            tags = client.list_tags(
+                ResourceArn=e['EndpointConfigArn'])['Tags']
+            e.setdefault('Tags', []).extend(tags)
+            return e
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, endpoints)))
+
+
 class StateTransitionFilter(object):
     """Filter instances by state.
 
@@ -305,3 +395,109 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
+
+
+@SagemakerJob.action_registry.register('stop')
+class SagemakerJobStop(BaseAction):
+    """Stops a SageMaker job
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: stop-ml-job
+            resource: sagemaker-job
+            filters:
+              - TrainingJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopTrainingJob',)
+
+    def process_job(self, job):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        try:
+            client.stop_training_job(
+                TrainingJobName=job['TrainingJobName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception stopping sagemaker job %s:\n %s" % (
+                    job['TrainingJobName'], e))
+
+    def process(self, jobs):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_job, jobs))
+
+
+@SagemakerEndpoint.action_registry.register('delete')
+class SagemakerEndpointDelete(BaseAction):
+    """Delete a SageMaker endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-sagemaker-endpoint
+            resource: sagemaker-endpoint
+            filters:
+              - EndpointName: sagemaker-ep--2018-01-01-00-00-00
+            actions:
+              - type: delete
+    """
+    permissions = (
+        'sagemaker:DeleteEndpoint', 'sagemaker:DeleteEndpointConfig')
+    schema = type_schema('delete')
+
+    def process_endpoint(self, endpoint):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        try:
+            client.delete_endpoint(
+                EndpointName=endpoint['EndpointName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting endpoint %s:\n %s" % (
+                    endpoint['EndpointName'], e))
+
+    def process(self, endpoints):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_endpoint, endpoints))
+
+
+@SagemakerEndpointConfig.action_registry.register('delete')
+class SagemakerEndpointConfigDelete(BaseAction):
+    """Delete a SageMaker endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-sagemaker-endpoint-config
+            resource: sagemaker-endpoint-config
+            filters:
+              - EndpointConfigName: sagemaker-2018-01-01-00-00-00-T00
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteEndpointConfig',)
+
+    def process_endpoint_config(self, endpoint):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        try:
+            client.delete_endpoint_config(
+                EndpointConfigName=endpoint['EndpointConfigName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting endpoint config %s:\n %s" % (
+                    endpoint['EndpointConfigName'], e))
+
+    def process(self, endpoints):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_endpoint_config, endpoints))
