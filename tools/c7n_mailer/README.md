@@ -121,9 +121,11 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 | Required? | Key                  | Type             |
 |:---------:|:---------------------|:-----------------|
+|           | `dead_letter_config` | object           |
 |           | `memory`             | integer          |
 |           | `region`             | string           |
 | &#x2705;  | `role`               | string           |
+|           | `runtime`            | string           |
 |           | `security_groups`    | array of strings |
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
@@ -133,16 +135,22 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 | Required? | Key                        | Type             | Notes                               |
 |:---------:|:---------------------------|:-----------------|:------------------------------------|
-|           | `cache`                    | string           | memcached for caching ldap lookups  |
+|           | `cache_engine`             | string           | cache engine; either sqlite or redis|
 |           | `cross_accounts`           | object           | account to assume back into for sending to SNS topics |
+|           | `debug`                    | boolean          | debug on/off                        |
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
-|           | `ldap_email_key`     | string           | eg 'mail'     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_email_attribute`     | string           |                                     |
+|           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
-|           | `ldap_username_attribute`  | string           | eg 'sAMAccountName'     |
-|           | `ldap_bind_password_in_kms`| boolean           | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_uid_attribute`       | string           |                                     |
+|           | `ldap_uid_regex`           | string           |                                     |
+|           | `ldap_uid_tags`            | string           |                                     |
+|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
+|           | `redis_host`               | string           | redis host if cache_engine == redis |
+|           | `redis_port`               | integer          | redis port, default: 6369           |
 |           | `ses_region`               | string           | AWS region that handles SES API calls |
 
 
@@ -174,6 +182,8 @@ policies:
         subject: fix your tags
         to:
           - resource-owner
+        owner_absent_contact:
+          - foo@example.com
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/80101010101/cloud-custodian-message-relay
@@ -197,6 +207,10 @@ Both of these special values are best effort, i.e., if no `OwnerContact` tag is
 specified then `resource-owner` email will not be delivered, and in the case of
 `event-owner` an instance role or system account will not result in an email.
 
+The optional `owner_absent_contact` list specifies email addresses to notify only if
+the `resource-owner` special option was unable to find any matching owner contact
+tags.
+
 For reference purposes, the JSON Schema of the `notify` action:
 
 ```json
@@ -206,6 +220,7 @@ For reference purposes, the JSON Schema of the `notify` action:
   "properties": {
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
+    "owner_absent_contact": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
     "priority_header": {"type": "string"},
     "template": {"type": "string"},

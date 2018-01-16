@@ -21,7 +21,7 @@ build:
      image: python:2-alpine
      commands:
        - apk update
-       - apk add git make
+       - apk add git make build-base python-dev
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
        - pip install tox

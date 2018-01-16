@@ -1,14 +1,15 @@
 import os
+from io import open
 from setuptools import setup, find_packages
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
 
 
 setup(
     name="c7n",
-    version='0.8.27.0',
+    version='0.8.27.2',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
@@ -26,7 +27,6 @@ setup(
         "botocore>=1.7.37",
         "pyyaml",
         "jsonschema",
-        "ipaddress",
         "argcomplete",
         "tabulate",
     ],

@@ -257,7 +257,8 @@ class ConfigS3(query.ConfigSource):
             if 'filter' not in r or not r['filter']:
                 continue
 
-            rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
+            if r['filter']['predicate']:
+                rr['Filter'] = self.convertLifePredicate(r['filter']['predicate'])
 
         resource['Lifecycle'] = {'Rules': rules}
 
@@ -281,6 +282,7 @@ class ConfigS3(query.ConfigSource):
     NotifyTypeMap = {
         'QueueConfiguration': 'QueueConfigurations',
         'LambdaConfiguration': 'LambdaFunctionConfigurations',
+        'CloudFunctionConfiguration': 'LambdaFunctionConfigurations',
         'TopicConfiguration': 'TopicConfigurations'}
 
     def handle_BucketNotificationConfiguration(self, resource, item_value):
@@ -345,8 +347,8 @@ class ConfigS3(query.ConfigSource):
                 'Key': item_value['errorDocument']}
         if item_value['redirectAllRequestsTo']:
             website['RedirectAllRequestsTo'] = {
-                'HostName': item_value['redirectsAllRequestsTo']['hostName'],
-                'Protocol': item_value['redirectsAllRequestsTo']['protocol']}
+                'HostName': item_value['redirectAllRequestsTo']['hostName'],
+                'Protocol': item_value['redirectAllRequestsTo']['protocol']}
         for r in item_value['routingRules']:
             redirect = {}
             rule = {'Redirect': redirect}
@@ -532,7 +534,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-acl
@@ -614,7 +616,7 @@ class GlobalGrantsFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-delete-global-grants
@@ -700,7 +702,7 @@ class HasStatementFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-has-statement
@@ -747,7 +749,7 @@ class EncryptionEnabledFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-not-encrypted
@@ -795,7 +797,7 @@ class MissingPolicyStatementFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-bucket-missing-statement
@@ -834,7 +836,7 @@ class BucketNotificationFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-incorrect-notification
@@ -936,7 +938,7 @@ class SetPolicyStatement(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: force-s3-https
@@ -968,7 +970,8 @@ class SetPolicyStatement(BucketActionBase):
                     'properties': {
                         'Sid': {'type': 'string'},
                         'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Principal': {'anyOf': [{'type': 'string'},
+                            {'type': 'object'}, {'type': 'array'}]},
                         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
                         'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                         'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
@@ -978,10 +981,14 @@ class SetPolicyStatement(BucketActionBase):
                     },
                     'required': ['Sid', 'Effect'],
                     'oneOf': [
-                        {'required': ['Action', 'Resource']},
-                        {'required': ['NotAction', 'Resource']},
-                        {'required': ['Action', 'NotResource']},
-                        {'required': ['NotAction', 'NotResource']}
+                        {'required': ['Principal', 'Action', 'Resource']},
+                        {'required': ['NotPrincipal', 'Action', 'Resource']},
+                        {'required': ['Principal', 'NotAction', 'Resource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'Resource']},
+                        {'required': ['Principal', 'Action', 'NotResource']},
+                        {'required': ['NotPrincipal', 'Action', 'NotResource']},
+                        {'required': ['Principal', 'NotAction', 'NotResource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
                     ]
                 }
             }
@@ -989,7 +996,7 @@ class SetPolicyStatement(BucketActionBase):
     )
 
     def process_bucket(self, bucket):
-        policy = bucket.get('Policy', '{}')
+        policy = bucket.get('Policy') or '{}'
 
         fmtargs = self.get_std_format_args(bucket)
 
@@ -1017,7 +1024,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-remove-encrypt-put
@@ -1078,7 +1085,7 @@ class ToggleVersioning(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-versioning
@@ -1133,7 +1140,7 @@ class ToggleLogging(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-logging
@@ -1188,7 +1195,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-logging-buckets
@@ -1289,7 +1296,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enforce-encryption
@@ -1579,7 +1586,7 @@ class EncryptExtantKeys(ScanBucket):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-encrypt-objects
@@ -1833,7 +1840,7 @@ class LogTarget(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-log-bucket
@@ -1965,7 +1972,7 @@ class DeleteGlobalGrants(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-delete-global-grants
@@ -2034,7 +2041,7 @@ class BucketTag(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-tag-region
@@ -2058,7 +2065,7 @@ class MarkBucketForOp(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-encrypt
@@ -2086,7 +2093,7 @@ class RemoveBucketTag(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-remove-owner-tag
@@ -2114,14 +2121,19 @@ class DataEvents(Filter):
         'cloudtrail:DescribeTrails',
         'cloudtrail:GetEventSelectors')
 
-    def get_event_buckets(self, client, trails):
+    def get_event_buckets(self, session, trails):
         """Return a mapping of bucket name to cloudtrail.
 
         For wildcard trails the bucket name is ''.
         """
+        regions = {t.get('HomeRegion') for t in trails}
+        clients = {}
+        for region in regions:
+            clients[region] = session.client('cloudtrail', region_name=region)
+
         event_buckets = {}
         for t in trails:
-            for events in client.get_event_selectors(
+            for events in clients[t.get('HomeRegion')].get_event_selectors(
                     TrailName=t['Name']).get('EventSelectors', ()):
                 if 'DataResources' not in events:
                     continue
@@ -2134,9 +2146,8 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
-        event_buckets = self.get_event_buckets(client, trails)
+        session = local_session(self.manager.session_factory)
+        event_buckets = self.get_event_buckets(session, trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2305,7 +2316,7 @@ class DeleteBucket(ScanBucket):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-unencrypted-buckets
@@ -2436,7 +2447,7 @@ class Lifecycle(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-apply-lifecycle
@@ -2496,7 +2507,7 @@ class Lifecycle(BucketActionBase):
                                 'And': {
                                     'type': 'object',
                                     'additionalProperties': False,
-                                    'items': {
+                                    'properties': {
                                         'Prefix': {'type': 'string'},
                                         'Tags': {
                                             'type': 'array',
@@ -2504,7 +2515,7 @@ class Lifecycle(BucketActionBase):
                                                 'type': 'object',
                                                 'required': ['Key', 'Value'],
                                                 'additionalProperties': False,
-                                                'items': {
+                                                'properties': {
                                                     'Key': {'type': 'string'},
                                                     'Value': {'type': 'string'},
                                                 },
@@ -2540,14 +2551,14 @@ class Lifecycle(BucketActionBase):
                         'NoncurrentVersionExpiration': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
                             },
                         },
                         'AbortIncompleteMultipartUpload': {
                             'type': 'object',
                             'additionalProperties': False,
-                            'items': {
+                            'properties': {
                                 'DaysAfterInitiation': {'type': 'integer'},
                             },
                         },
@@ -2579,8 +2590,12 @@ class Lifecycle(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
+        if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading lifecycle" % bucket['Name'])
+            return
+
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
-        config = (bucket['Lifecycle'] or {}).get('Rules', [])
+        config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
                 if rule['ID'] == existing_rule['ID']:
@@ -2593,15 +2608,132 @@ class Lifecycle(BucketActionBase):
                 if rule['Status'] != 'absent':
                     config.append(rule)
 
-        # The extra `list` conversion if required for python3
+        # The extra `list` conversion is required for python3
         config = list(filter(None, config))
 
-        s3.put_bucket_lifecycle_configuration(
-            Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        try:
+            s3.put_bucket_lifecycle_configuration(
+                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])
+            else:
+                raise e
+
+
+class KMSKeyResolverMixin(object):
+    """Builds a dictionary of region specific ARNs"""
+
+    def __init__(self, data, manager=None):
+        self.arns = dict()
+        self.data = data
+        self.manager = manager
+
+    def resolve_keys(self, buckets):
+        if 'key' not in self.data:
+            return None
+
+        regions = {get_region(b) for b in buckets}
+        for r in regions:
+            client = local_session(self.manager.session_factory).client('kms', region_name=r)
+            try:
+                self.arns[r] = client.describe_key(
+                    KeyId=self.data.get('key')
+                ).get('KeyMetadata').get('Arn')
+            except ClientError as e:
+                self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
+                    e, self.data.get('key')))
+
+    def get_key(self, bucket):
+        if 'key' not in self.data:
+            return None
+        region = get_region(bucket)
+        key = self.arns.get(region)
+        if not key:
+            self.log.warning('Unable to resolve key %s for bucket %s in region %s',
+                             key, bucket.get('Name'), region)
+        return key
+
+
+@filters.register('bucket-encryption')
+class BucketEncryption(KMSKeyResolverMixin, Filter):
+    """Filters for S3 buckets that have bucket-encryption
+
+    :example
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-encryption-AES256
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: bucket-encryption
+                    crypto: AES256
+              - name: s3-bucket-encryption-KMS
+                resource: s3
+                region: us-east-1
+                filters
+                  - type: bucket-encryption
+                    crypto: aws:kms
+                    key: alias/some/alias/key
+
+    """
+    schema = type_schema('bucket-encryption',
+                         required=['crypto'],
+                         crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
+                         key={'type': 'string'})
+
+    permissions = ('s3:GetBucketEncryption', 's3:DescribeKey')
+
+    def process(self, buckets, event=None):
+        self.resolve_keys(buckets)
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(),
+                                   b['Name'])
+                    continue
+                if future.result():
+                    results.append(b)
+        return results
+
+    def process_bucket(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        rules = []
+        try:
+            be = client.get_bucket_encryption(Bucket=b['Name'])
+            b['c7n:bucket-encryption'] = be
+            rules = be.get('ServerSideEncryptionConfiguration', []).get('Rules', [])
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ServerSideEncryptionConfigurationNotFoundError':
+                raise
+
+        for sse in rules:
+            if self.filter_bucket(b, sse):
+                return True
+
+    def filter_bucket(self, b, sse):
+        allowed = ['AES256', 'aws:kms']
+        key = self.get_key(b)
+        crypto = self.data.get('crypto')
+        rule = sse.get('ApplyServerSideEncryptionByDefault')
+        algo = rule.get('SSEAlgorithm')
+
+        if not crypto and algo in allowed:
+            return True
+
+        if crypto == 'AES256' and algo == 'AES256':
+            return True
+        elif crypto == 'aws:kms' and algo == 'aws:kms' and rule.get('KMSMasterKeyID') == key:
+            return True
 
 
 @actions.register('set-bucket-encryption')
-class SetBucketEncryption(BucketActionBase):
+class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     """Action enables default encryption on S3 buckets
 
     `enabled`: boolean Optional: Defaults to True
@@ -2610,7 +2742,7 @@ class SetBucketEncryption(BucketActionBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: s3-enable-default-encryption-kms
@@ -2662,52 +2794,36 @@ class SetBucketEncryption(BucketActionBase):
         }
     }
 
-    permissions = ('s3:PutEncryptionConfiguration',
-                's3:GetEncryptionConfiguration',
-                'kms:ListAliases')
+    permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
+                   'kms:ListAliases', 's3:DescribeKey')
 
     def process(self, buckets):
-        keys = {}
-        regions = set()
-        regions = {get_region(b) for b in buckets}
-        key = self.data.get('key')
-
-        if self.data.get('enabled', True) and key:
-            keys = self.resolve_keys(regions, key)
+        if self.data.get('enabled', True):
+            self.resolve_keys(buckets)
 
         with self.executor_factory(max_workers=3) as w:
-            results = []
-            futures = {w.submit(self.process_bucket, b, keys) : b for b in buckets}
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
             for future in as_completed(futures):
                 if future.exception():
-                    bucket = futures[future]
-                    self.log.error('error enabling bucket encryption: %s\n%s',
-                                   bucket['Name'], future.exception())
-                results += filter(None, [future.result()])
+                    self.log.error('Message: %s Bucket: %s', future.exception(),
+                                   futures[future]['Name'])
 
-    def resolve_keys(self, regions, key):
-        arns = {}
-        for r in regions:
-            client = local_session(self.manager.session_factory).client('kms', region_name=r)
-            try:
-                arns[r] = client.describe_key(KeyId=key).get('KeyMetadata').get('Arn')
-            except ClientError as e:
-                self.log.error('Error validating ARNs for set-bucket-encryption: %s' % e)
-        return arns
-
-    def process_bucket(self, bucket, keys):
-        config = {'Rules': [
-            {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': self.data.get('crypto','AES256')}}
-        ]}
-        region = get_region(bucket)
-        if self.data.get('key') and region in keys:
-            (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
-                ['KMSMasterKeyID']) = keys[region]
+    def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         if not self.data.get('enabled', True):
             s3.delete_bucket_encryption(Bucket=bucket['Name'])
             return
+        algo = self.data.get('crypto', 'AES256')
+        config = {'Rules': [
+            {'ApplyServerSideEncryptionByDefault': {
+                'SSEAlgorithm': algo}}
+        ]}
+        if algo == 'aws:kms':
+            key = self.get_key(bucket)
+            if not key:
+                raise Exception('Valid KMS Key required but does not exist')
+            (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
+                ['KMSMasterKeyID']) = key
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config

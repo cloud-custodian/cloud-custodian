@@ -226,9 +226,30 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def custodian_archive():
-    """Create a lambda code archive for running custodian."""
-    return PythonPackageArchive('c7n', 'pkg_resources', 'ipaddress')
+def custodian_archive(packages=None):
+    """Create a lambda code archive for running custodian.
+
+    Lambda archive currently always includes `c7n` and `pkg_resources`. Add additional
+    packages in the mode block
+
+    Example policy that includes additional packages
+
+    .. code-block:: yaml
+
+        policy:
+          name: lambda-archive-example
+          resource: s3
+          mode:
+            packages:
+              - botocore
+
+    Kwargs:
+        packages (set): List of additional packages to include in the lambda archive.
+    """
+    modules = {'c7n', 'pkg_resources'}
+    if packages:
+        modules = filter(None, modules.union(packages))
+    return PythonPackageArchive(*modules)
 
 
 class LambdaManager(object):
@@ -268,9 +289,9 @@ class LambdaManager(object):
         return result
 
     def remove(self, func, alias=None):
-        log.info("Removing lambda function %s", func.name)
         for e in func.get_events(self.session_factory):
             e.remove(func)
+        log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
         except ClientError as e:
@@ -657,7 +678,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     def __init__(self, policy):
         self.policy = policy
-        self.archive = custodian_archive()
+        self.archive = custodian_archive(packages=self.packages)
 
     @property
     def name(self):
@@ -711,6 +732,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def packages(self):
+        return self.policy.data['mode'].get('packages')
 
     def get_events(self, session_factory):
         events = []
@@ -849,6 +874,12 @@ class CloudWatchEventSource(object):
         if event_type == 'cloudtrail':
             if 'signin.amazonaws.com' in payload['detail']['eventSource']:
                 payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
+        elif event_type == 'guard-duty':
+            payload['source'] = ['aws.guardduty']
+            payload['detail-type'] = ['GuardDuty Finding']
+            if 'resource-filter' in self.data:
+                payload.update({
+                    'detail': {'resource': {'resourceType': [self.data['resource-filter']]}}})
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [
@@ -944,6 +975,7 @@ class CloudWatchEventSource(object):
 
     def remove(self, func):
         if self.get(func.name):
+            log.info("Removing cwe targets and rule %s", func.name)
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
@@ -1335,6 +1367,7 @@ class ConfigRule(object):
         rule = self.get(func.name)
         if not rule:
             return
+        log.info("Removing config rule for %s", func.name)
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)

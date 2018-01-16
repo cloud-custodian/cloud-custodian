@@ -121,6 +121,82 @@ class BucketMetrics(BaseTest):
             'AWS/S3.NumberOfObjects.Average' in resources[0]['c7n.metrics'])
 
 
+class BucketEncryption(BaseTest):
+
+    def test_s3_bucket_encryption_filter(self):
+        bname = 'c7n-bucket-with-encryption'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_bucket_encryption_filter')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        enc = {
+            'Rules': [{
+                'ApplyServerSideEncryptionByDefault': {
+                    'SSEAlgorithm': 'AES256'
+                }
+            }]
+        }
+
+        client.put_bucket_encryption(Bucket=bname, ServerSideEncryptionConfiguration=enc)
+
+        p = self.load_policy({
+            'name': 's3-enc',
+            'resource': 's3',
+            'filters': [
+                {
+                    'type': 'bucket-encryption',
+                    'crypto': 'AES256'
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run() or []
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], bname)
+
+    def test_s3_bucket_encryption_filter_kms(self):
+        bname = 'c7n-bucket-with-encryption'
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+
+        session_factory = self.replay_flight_data('test_s3_bucket_encryption_filter_kms')
+
+        client = session_factory().client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(client.delete_bucket, Bucket=bname)
+
+        aws_alias = 'arn:aws:kms:us-east-1:108891588060:key/079a6f7d-5f8a-4da1-a465-30aa099b9688'
+        enc = {
+            'Rules': [{
+                'ApplyServerSideEncryptionByDefault': {
+                    'SSEAlgorithm': 'aws:kms',
+                    'KMSMasterKeyID': aws_alias
+                }
+            }]
+        }
+
+        client.put_bucket_encryption(Bucket=bname, ServerSideEncryptionConfiguration=enc)
+
+        p = self.load_policy({
+            'name': 's3-enc-kms',
+            'resource': 's3',
+            'filters': [
+                {
+                    'type': 'bucket-encryption',
+                    'crypto': 'aws:kms',
+                    'key': 'alias/aws/s3'
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = p.run() or []
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], bname)
+
+
 class BucketInventory(BaseTest):
 
     def test_s3_set_encrypted_inventory_sses3(self):
@@ -651,6 +727,20 @@ class S3ConfigSource(ConfigTest):
                   u'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:test-queue',
                   u'Events': ['s3:ObjectCreated:*']}]})
 
+    def test_config_normalize_lifecycle_null_predicate(self):
+        event = event_data('s3-lifecycle-null-predicate.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        resource = source.load_resource(event)
+        rule = resource['Lifecycle']['Rules'][0]
+        self.assertEqual(
+            rule,
+            {'AbortIncompleteMultipartUpload': {'DaysAfterInitiation': 1},
+             'Expiration': {'Days': 1},
+             'ID': 'RemoveAbortedUploads',
+             'NoncurrentVersionExpiration': {'NoncurrentDays': -1},
+             'Status': 'Enabled'})
+
     def test_config_normalize_lifecycle_and_predicate(self):
         event = event_data('s3-lifecycle-and-predicate.json', 'config')
         p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
@@ -718,6 +808,16 @@ class S3ConfigSource(ConfigTest):
                         'arn:aws:iam::644160558196:role'
                         '/custodian-replicated-custodian-replicated'
                         '-west-s3-repl-role')}})
+
+    def test_config_normalize_website_redirect(self):
+        event = event_data('s3-website-redirect.json', 'config')
+        p = self.load_policy({'name': 's3cfg', 'resource': 's3'})
+        source = p.resource_manager.get_source('config')
+        self.maxDiff = None
+        resource = source.load_resource(event)
+        self.assertEqual(
+            resource['Website'],
+            {'RedirectAllRequestsTo': {'HostName': 'www.google.com/', 'Protocol': 'https'}})
 
     def test_config_normalize_website(self):
         event = event_data('s3-website.json', 'config')
@@ -814,7 +914,9 @@ class BucketPolicyStatements(BaseTest):
         sid = 'CustodianTest'
 
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
 
         session_factory = self.replay_flight_data('test_s3_policy_statements')
 

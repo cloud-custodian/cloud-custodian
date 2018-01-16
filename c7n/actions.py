@@ -17,6 +17,7 @@ Actions to take on resources
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+import copy
 from datetime import datetime
 import jmespath
 import logging
@@ -389,6 +390,8 @@ class Notify(EventAction):
               - event-user
               - resource-creator
               - email@address
+             owner_absent_contact:
+              - other_email@address
              # which template for the email should we use
              template: policy-template
              transport:
@@ -407,6 +410,7 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
             'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_from': ValuesFrom.schema,
@@ -448,7 +452,7 @@ class Notify(EventAction):
     def expand_variables(self, message):
         """expand any variables in the action to_from/cc_from fields.
         """
-        p = self.data.copy()
+        p = copy.deepcopy(self.data)
         if 'to_from' in self.data:
             to_from = self.data['to_from'].copy()
             to_from['url'] = to_from['url'].format(**message)
@@ -494,7 +498,7 @@ class Notify(EventAction):
         return b64encoded.decode('ascii')
 
     def send_sns(self, message):
-        topic = self.data['transport']['topic']
+        topic = self.data['transport']['topic'].format(**message)
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -507,14 +511,14 @@ class Notify(EventAction):
         client.publish(TopicArn=topic_arn, Message=self.pack(message))
 
     def send_sqs(self, message):
-        queue = self.data['transport']['queue']
+        queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]
@@ -678,7 +682,7 @@ class PutMetric(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: track-attached-ebs

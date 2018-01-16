@@ -463,6 +463,67 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['AutoScalingGroupName'], 'ContainersFTW')
 
+    def test_asg_propagate_tag_filter(self):
+        session = self.replay_flight_data('test_asg_propagate_tag_filter')
+        policy = self.load_policy({
+            'name': 'asg-propagated-tag-filter',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'progagated-tags',
+                'keys': ['Tag01', 'Tag02', 'Tag03']}
+            ]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['AutoScalingGroupName'], 'c7n.asg.ec2.01')
+
+    def test_asg_propagate_tag_missing(self):
+        session = self.replay_flight_data('test_asg_propagate_tag_missing')
+        policy = self.load_policy({
+            'name': 'asg-propagated-tag-filter',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'progagated-tags',
+                'match': False,
+                'keys': ['Tag01', 'Tag02', 'Tag03']}
+            ]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r['AutoScalingGroupName'] for r in resources]),
+            ['c7n.asg.ec2.02', 'c7n.asg.ec2.03'])
+
+    def test_asg_not_propagate_tag_match(self):
+        session = self.replay_flight_data('test_asg_not_propagate_match')
+        policy = self.load_policy({
+            'name': 'asg-propagated-tag-filter',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'progagated-tags',
+                'keys': ['Tag01', 'Tag02', 'Tag03'],
+                'propagate': False}
+            ]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['AutoScalingGroupName'], 'c7n-asg-np-match')
+
+    def test_asg_not_propagate_tag_missing(self):
+        session = self.replay_flight_data('test_asg_not_propagate_missing')
+        policy = self.load_policy({
+            'name': 'asg-propagated-tag-filter',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'progagated-tags',
+                'keys': ['Tag01', 'Tag02', 'Tag03'],
+                'match': False,
+                'propagate': False}
+            ]}, session_factory=session)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['AutoScalingGroupName'], 'c7n-asg-np-missing')
+
     def test_asg_filter_capacity_delta_match(self):
         factory = self.replay_flight_data('test_asg_filter_capacity_delta_match')
         p = self.load_policy({

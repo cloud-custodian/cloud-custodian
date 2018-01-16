@@ -45,7 +45,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ecr-cross-account
@@ -85,7 +85,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ecr-remove-cross-accounts

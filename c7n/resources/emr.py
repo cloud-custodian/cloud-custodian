@@ -125,7 +125,7 @@ class TagDelayedAction(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-mark-for-op
@@ -157,7 +157,7 @@ class TagTable(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-tag-table
@@ -186,7 +186,7 @@ class UntagTable(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-remove-tag
@@ -219,7 +219,7 @@ class Terminate(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-terminate

@@ -1,166 +1,98 @@
 {
-    "status_code": 200,
+    "status_code": 200, 
     "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9ba5e567-d9e8-11e7-8ca2-f73bf96b095d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9ba5e567-d9e8-11e7-8ca2-f73bf96b095d", 
+                "content-length": "2816", 
+                "vary": "Accept-Encoding", 
+                "connection": "keep-alive", 
+                "date": "Tue, 05 Dec 2017 18:17:52 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
         "Environments": [
             {
-                "ApplicationName": "app1",
-                "EnvironmentName": "dev-blue-01c6d11",
-                "VersionLabel": "app1_rc03",
-                "Status": "Ready",
-                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/Locations/dev-blue-01c6d11",
-                "EnvironmentLinks": [],
-                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Tomcat 8 with Java 8 running on 64bit Amazon Linux/2.0.0",
-                "EndpointURL": "awseb-e-a-AWSEBLoa-UF3UAJ3JPQV7-1543515031.us-east-1.elb.amazonaws.com",
-                "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.0 running Tomcat 8 Java 8",
-                "EnvironmentId": "e-agn2qayx8k",
-                "CNAME": "app1-dev.elasticbeanstalk.com",
-                "AbortableOperationInProgress": false,
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test-inactive", 
+                "Status": "Launching", 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "CNAME": "c7n-eb-tag-test-inactive.us-east-1.elasticbeanstalk.com", 
+                "Health": "Grey", 
+                "AbortableOperationInProgress": false, 
                 "Tier": {
-                    "Version": "1.0",
-                    "Type": "Standard",
+                    "Version": " ", 
+                    "Type": "Standard", 
                     "Name": "WebServer"
-                },
-                "Health": "Green",
+                }, 
                 "DateUpdated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 20,
-                    "minute": 0
-                },
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 41, 
+                    "microsecond": 758000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 17
+                }, 
                 "DateCreated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 19,
-                    "minute": 0
-                }
-            },
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 35, 
+                    "microsecond": 235000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 17
+                }, 
+                "EnvironmentId": "e-pmpgbxpgsc"
+            }, 
             {
-                "ApplicationName": "app1",
-                "EnvironmentName": "dev-green-a1d44n3",
-                "VersionLabel": "app1_rc02",
-                "Status": "Ready",
-                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/Locations/dev-green-a1d44n3",
-                "EnvironmentLinks": [],
-                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Tomcat 8 with Java 8 running on 64bit Amazon Linux/2.0.0",
-                "EndpointURL": "awseb-e-a-AWSEBLoa-UF3UAJ3JPQV7-1543515031.us-east-1.elb.amazonaws.com",
-                "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.0 running Tomcat 8 Java 8",
-                "EnvironmentId": "e-agn2qayx8k",
-                "CNAME": "app1-dev-inactive.elasticbeanstalk.com",
-                "AbortableOperationInProgress": false,
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test", 
+                "VersionLabel": "app-477e-170601_115505", 
+                "Status": "Ready", 
+                "Description": "Test for c7n EB Env tagging PR", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "EndpointURL": "awseb-e-r-AWSEBLoa-1AP6BTJDB7GEL-1575897575.us-east-1.elb.amazonaws.com", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "EnvironmentId": "e-rdthyjww23", 
+                "CNAME": "c7n-eb-tag-test.us-east-1.elasticbeanstalk.com", 
+                "AbortableOperationInProgress": false, 
                 "Tier": {
-                    "Version": "1.0",
-                    "Type": "Standard",
+                    "Version": " ", 
+                    "Type": "Standard", 
                     "Name": "WebServer"
-                },
-                "Health": "Green",
+                }, 
+                "Health": "Green", 
                 "DateUpdated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 20,
-                    "minute": 0
-                },
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 34, 
+                    "microsecond": 561000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 2
+                }, 
                 "DateCreated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 19,
-                    "minute": 0
-                }
-            },
-            {
-                "ApplicationName": "app2",
-                "EnvironmentName": "dev-blue-11a5f2a",
-                "VersionLabel": "app2_rc03",
-                "Status": "Ready",
-                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/Locations/dev-blue-11a5f2a",
-                "EnvironmentLinks": [],
-                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Tomcat 8 with Java 8 running on 64bit Amazon Linux/2.0.0",
-                "EndpointURL": "awseb-e-a-AWSEBLoa-UF3UAJ3JPQV7-1543515031.us-east-1.elb.amazonaws.com",
-                "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.0 running Tomcat 8 Java 8",
-                "EnvironmentId": "e-agn2qayx8k",
-                "CNAME": "app2-dev.elasticbeanstalk.com",
-                "AbortableOperationInProgress": false,
-                "Tier": {
-                    "Version": "1.0",
-                    "Type": "Standard",
-                    "Name": "WebServer"
-                },
-                "Health": "",
-                "DateUpdated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 18,
-                    "minute": 0
-                },
-                "DateCreated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 17,
-                    "minute": 0
-                }
-            },
-            {
-                "ApplicationName": "app2",
-                "EnvironmentName": "dev-green-5a15y13",
-                "VersionLabel": "app2_rc02",
-                "Status": "Ready",
-                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/Locations/dev-green-5a15y13",
-                "EnvironmentLinks": [],
-                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Tomcat 8 with Java 8 running on 64bit Amazon Linux/2.0.0",
-                "EndpointURL": "awseb-e-a-AWSEBLoa-UF3UAJ3JPQV7-1543515031.us-east-1.elb.amazonaws.com",
-                "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.0 running Tomcat 8 Java 8",
-                "EnvironmentId": "e-agn2qayx8k",
-                "CNAME": "app2-dev-inactive.elasticbeanstalk.com",
-                "AbortableOperationInProgress": false,
-                "Tier": {
-                    "Version": "1.0",
-                    "Type": "Standard",
-                    "Name": "WebServer"
-                },
-                "Health": "Green",
-                "DateUpdated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 18,
-                    "minute": 0
-                },
-                "DateCreated": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 10,
-                    "second": 0,
-                    "microsecond": 0,
-                    "year": 2017,
-                    "day": 17,
-                    "minute": 0
-                }
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 48, 
+                    "microsecond": 789000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 57
+                }, 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test"
             }
         ]
     }

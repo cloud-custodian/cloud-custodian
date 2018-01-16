@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UserPools": [
+            {
+                "CreationDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 27, 
+                    "microsecond": 100000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 20
+                }, 
+                "LastModifiedDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 27, 
+                    "microsecond": 100000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 20
+                }, 
+                "LambdaConfig": {}, 
+                "Id": "us-east-1_hK13zaUU3", 
+                "Name": "test-delete-user-pool2"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1eb60659-c958-11e7-b4fd-652d44bc0138", 
+            "HTTPHeaders": {
+                "date": "Tue, 14 Nov 2017 16:23:16 GMT", 
+                "x-amzn-requestid": "1eb60659-c958-11e7-b4fd-652d44bc0138", 
+                "content-length": "158", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

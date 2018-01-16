@@ -277,7 +277,7 @@ class DefaultVpc(net_filters.DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: default-vpc-rds
@@ -324,7 +324,7 @@ class AutoPatch(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: enable-rds-autopatch
@@ -368,7 +368,7 @@ class UpgradeAvailable(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-upgrade-available
@@ -413,7 +413,7 @@ class UpgradeMinor(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: upgrade-rds-minor
@@ -547,7 +547,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-delete
@@ -637,13 +637,57 @@ class Delete(BaseAction):
             Tags=tags)
 
 
+@actions.register('set-snapshot-copy-tags')
+class CopySnapshotTags(BaseAction):
+    """Enables copying tags from rds instance to snapshot
+
+        .. code-block: yaml
+
+            policies:
+              - name: enable-rds-snapshot-tags
+                resource: rds
+                filters:
+                  - type: value
+                    key: Engine
+                    value: aurora
+                    op: eq
+                actions:
+                  - type: set-snapshot-copy-tags
+                    enable: True
+    """
+
+    schema = type_schema(
+        'set-snapshot-copy-tags',
+        enable={'type': 'boolean'})
+    permissions = ('rds:ModifyDBInstances',)
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for r in resources:
+                futures.append(w.submit(
+                    self.set_snapshot_tags, r))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        'Exception updating rds CopyTagsToSnapshot  \n %s',
+                        f.exception())
+        return resources
+
+    def set_snapshot_tags(self, r):
+        c = local_session(self.manager.session_factory).client('rds')
+        self.manager.retry(c.modify_db_instance(
+            DBInstanceIdentifier=r['DBInstanceIdentifier'],
+            CopyTagsToSnapshot=self.data.get('enable', True)))
+
+
 @actions.register('snapshot')
 class Snapshot(BaseAction):
     """Creates a manual snapshot of a RDS instance
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot
@@ -687,11 +731,12 @@ class ResizeInstance(BaseAction):
 
     :example:
 
-       This will find databases using over 85% of their allocated
-       storage, and resize them to have an additional 30% storage
-       the resize here is async during the next maintenance.
+    This will find databases using over 85% of their allocated
+    storage, and resize them to have an additional 30% storage
+    the resize here is async during the next maintenance.
 
-       .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: rds-snapshot-retention
                 resource: rds
@@ -707,11 +752,12 @@ class ResizeInstance(BaseAction):
                     percent: 30
 
 
-       This will find databases using under 20% of their allocated
-       storage, and resize them to be 30% smaller, the resize here
-       is configured to be immediate.
+    This will find databases using under 20% of their allocated
+    storage, and resize them to be 30% smaller, the resize here
+    is configured to be immediate.
 
-       .. code-block: yaml
+    .. code-block:: yaml
+
             policies:
               - name: rds-snapshot-retention
                 resource: rds
@@ -754,7 +800,7 @@ class RetentionWindow(BaseAction):
     enforce (min, max, exact) sets retention days occordingly.
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-retention
@@ -830,6 +876,48 @@ class RetentionWindow(BaseAction):
             DBInstanceIdentifier=resource['DBInstanceIdentifier'],
             BackupRetentionPeriod=retention,
             CopyTagsToSnapshot=copy_tags)
+
+
+@actions.register('set-public-access')
+class RDSSetPublicAvailability(BaseAction):
+    """
+    This action allows for toggling an RDS instance
+    'PubliclyAccessible' flag to true or false
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disable-rds-public-accessibility
+                resource: rds
+                filters:
+                  - PubliclyAccessible: true
+                actions:
+                  - type: set-public-access
+                    state: false
+    """
+
+    schema = type_schema(
+        "set-public-access",
+        state={'type': 'boolean'})
+    permissions = ('rds:ModifyDBInstance',)
+
+    def set_accessibility(self, r):
+        client = local_session(self.manager.session_factory).client('rds')
+        client.modify_db_instance(
+            DBInstanceIdentifier=r['DBInstanceIdentifier'],
+            PubliclyAccessible=self.data.get('state', False))
+
+    def process(self, rds):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.set_accessibility, r): r for r in rds}
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting public access on %s  \n %s",
+                        futures[f]['DBInstanceIdentifier'], f.exception())
+        return rds
 
 
 @resources.register('rds-subscription')
@@ -946,7 +1034,7 @@ class RDSSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-expired
@@ -1227,7 +1315,7 @@ class RDSSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-snapshot-delete-stale
@@ -1345,7 +1433,7 @@ class RDSSubnetGroupDeleteAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-subnet-group-delete-unused
@@ -1374,7 +1462,7 @@ class UnusedRDSSubnetGroup(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-subnet-group-delete-unused
@@ -1405,7 +1493,7 @@ class ParameterFilter(ValueFilter):
     Applies value type filter on set db parameter values.
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-pg

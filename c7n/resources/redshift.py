@@ -78,7 +78,7 @@ class DefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-default-vpc
@@ -131,7 +131,7 @@ class Parameter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-no-ssl
@@ -191,7 +191,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-no-ssl
@@ -249,7 +249,7 @@ class RetentionWindow(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot-retention
@@ -306,7 +306,7 @@ class Snapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot
@@ -355,7 +355,7 @@ class EnhancedVpcRoutine(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-enable-enhanced-routing
@@ -400,13 +400,54 @@ class EnhancedVpcRoutine(BaseAction):
                 EnhancedVpcRouting=new_routing)
 
 
+@actions.register('set-public-access')
+class RedshiftSetPublicAccess(BaseAction):
+    """
+    Action to set the 'PubliclyAccessible' setting on a redshift cluster
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: redshift-set-public-access
+                  resource: redshift
+                  filters:
+                    - PubliclyAccessible: true
+                  actions:
+                    - type: set-public-access
+                      state: false
+    """
+
+    schema = type_schema(
+        'set-public-access',
+        state={'type': 'boolean'})
+    permissions = ('redshift:ModifyCluster',)
+
+    def set_access(self, c):
+        client = local_session(self.manager.session_factory).client('redshift')
+        client.modify_cluster(
+            ClusterIdentifier=c['ClusterIdentifier'],
+            PubliclyAccessible=self.data.get('state', False))
+
+    def process(self, clusters):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.set_access, c): c for c in clusters}
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting Redshift public access on %s  \n %s",
+                        futures[f]['ClusterIdentifier'], f.exception())
+        return clusters
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Action to create an action to be performed at a later time
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-terminate-unencrypted
@@ -441,7 +482,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-tag
@@ -472,7 +513,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-remove-tag
@@ -504,7 +545,7 @@ class TagTrim(tags.TagTrim):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-tag-trim
@@ -601,7 +642,7 @@ class RedshiftSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-old-snapshots
@@ -625,7 +666,7 @@ class RedshiftSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-delete-old-snapshots
@@ -669,7 +710,7 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-snapshot-expiring
@@ -704,7 +745,7 @@ class RedshiftSnapshotTag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-required-tags
@@ -736,7 +777,7 @@ class RedshiftSnapshotRemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: redshift-remove-tags
