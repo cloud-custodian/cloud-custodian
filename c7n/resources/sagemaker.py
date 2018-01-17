@@ -425,6 +425,7 @@ class Model(QueryResourceManager):
         with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, resources)))
 
+
 @Model.action_registry.register('delete')
 class DeleteModel(BaseAction, StateTransitionFilter):
     """Deletes sagemaker-model(s)
@@ -461,6 +462,7 @@ class DeleteModel(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
+
 
 @Model.action_registry.register('tag')
 class TagModel(Tag):
@@ -533,7 +535,8 @@ class RemoveTagModel(RemoveTag):
                 self.log.exception(
                     'Exception tagging notebook instance %s: %s',
                     r['ModelName'], e)
-                    
+
+
 @SagemakerJob.action_registry.register('stop')
 class SagemakerJobStop(BaseAction):
     """Stops a SageMaker job
