@@ -152,3 +152,78 @@ class TestNotebookInstance(BaseTest):
         notebook = client.describe_notebook_instance(
             NotebookInstanceName=resources[0]['NotebookInstanceName'])
         self.assertTrue(notebook['NotebookInstanceStatus'], 'Deleting')
+
+
+class TestModelInstance(BaseTest):
+    def test_list_model(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_model')
+        p = self.load_policy({
+            'name': 'list-sagemaker-model',
+            'resource': 'sagemaker-model'
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertGreaterEqual(len(resources), 1)
+
+    def test_delete_model(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_delete_model')
+        p = self.load_policy({
+            'name': 'delete-invalid-sagemaker-model',
+            'resource': 'sagemaker-model',
+            'filters': [
+                {'tag:DeleteMe': 'present'}],
+            'actions': [{'type': 'delete'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'list-sagemaker-model',
+            'resource': 'sagemaker-model',
+            'filters': [
+                {'tag:DeleteMe': 'present'}]
+        }, session_factory=session_factory)
+        resources2 = p.run()
+        self.assertEqual(len(resources2), 0)
+
+    def test_tag_model(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_tag_model')
+        p = self.load_policy({
+            'name': 'tag-sagemaker-model',
+            'resource': 'sagemaker-model',
+            'filters': [{
+                'tag:Category': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'Category',
+                'value': 'TestValue'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['ModelArn'])['Tags']
+        self.assertEqual(tags[0]['Value'], 'TestValue')
+
+    def test_remove_tag_model(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_remove_tag_model')
+        p = self.load_policy({
+            'name': 'untag-sagemaker-model',
+            'resource': 'sagemaker-model',
+            'filters': [{
+                'tag:Category': 'TestValue'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['Category']}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['ModelArn'])['Tags']
+        self.assertEqual(len(tags), 0)
+    

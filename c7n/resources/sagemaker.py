@@ -126,7 +126,7 @@ class RemoveTagNotebookInstance(RemoveTag):
 
             policies:
               - name: sagemaker-notebook-remove-tag
-                resource: notebook-instabce
+                resource: notebook-instance
                 filters:
                   - "tag:BadTag": present
                 actions:
@@ -305,3 +305,141 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
+
+
+@resources.register('sagemaker-model')
+class Model(QueryResourceManager):
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_models', 'Models', None)
+        detail_spec = (
+            'describe_model', 'ModelName',
+            'ModelName', None)
+        id = 'ModelArn'
+        name = 'ModelName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, resources):
+        def _augment(r):
+            client = local_session(self.session_factory).client('sagemaker')
+            tags = client.list_tags(
+                ResourceArn=r['ModelArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, resources)))
+
+@Model.action_registry.register('delete')
+class DeleteModel(BaseAction, StateTransitionFilter):
+    """Deletes sagemaker-model(s)
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-sagemaker-model
+            resource: sagemaker-model
+            filters:
+              - "tag:DeleteMe": present
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModel',)
+
+    def process_instance(self, resource):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        try:
+            client.delete_model(
+                ModelName=resource['ModelName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting model %s:\n %s" % (
+                    resource['ModelName'], e))
+
+    def process(self, resources):
+        if not len(resources):
+            return
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_instance, resources))
+
+@Model.action_registry.register('tag')
+class TagModel(Tag):
+    """Action to create tag(s) on a sagemaker-model
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: tag-sagemaker-model
+                resource: sagemaker-model
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-value
+    """
+    permissions = ('sagemaker:AddTags',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+
+        tag_list = []
+        for t in tags:
+            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
+
+        for r in resources:
+            try:
+                client.add_tags(
+                    ResourceArn=r['ModelArn'],
+                    Tags=tag_list)
+            except ClientError as e:
+                self.log.exception(
+                    'Exception tagging model %s: %s',
+                    r['ModelName'], e)
+
+
+@Model.action_registry.register('remove-tag')
+class RemoveTagModel(RemoveTag):
+    """Remove tag(s) from sagemaker-model(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sagemaker-model-remove-tag
+                resource: sagemaker-model
+                filters:
+                  - "tag:BadTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["BadTag"]
+    """
+    permissions = ('sagemaker:DeleteTags',)
+
+    def process_resource_set(self, resources, keys):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+
+        for r in resources:
+            try:
+                client.delete_tags(
+                    ResourceArn=r['ModelArn'],
+                    TagKeys=keys)
+            except ClientError as e:
+                self.log.exception(
+                    'Exception tagging notebook instance %s: %s',
+                    r['ModelName'], e)
