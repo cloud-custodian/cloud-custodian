@@ -540,6 +540,12 @@ class RemoveTagModel(RemoveTag):
 @SagemakerJob.action_registry.register('stop')
 class SagemakerJobStop(BaseAction):
     """Stops a SageMaker job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
           - name: stop-ml-job
             resource: sagemaker-job
             filters:
