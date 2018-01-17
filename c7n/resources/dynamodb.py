@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
+from c7n.filters import FilterRegistry
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
@@ -327,6 +327,7 @@ class DeleteBackup(BaseAction):
             c.delete_backup(
                 BackupArn=t['BackupArn'])
 
+            
 @resources.register('dynamodb-stream')
 class Stream(query.QueryResourceManager):
 
