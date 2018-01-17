@@ -218,6 +218,8 @@ def generate(resource_types=()):
                 'tracing_config': {'type': 'object'},
                 'tags': {'type': 'object'},
                 'packages': {'type': 'array'},
+                'subnets': {'type': 'array'},
+                'security_groups': {'type': 'array'},
             },
         },
     }
