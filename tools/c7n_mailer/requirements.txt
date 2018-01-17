@@ -1,5 +1,5 @@
-boto3>=1.5.12
-botocore>=1.8.26
+boto3>=1.5.15
+botocore>=1.8.29
 docutils>=0.12
 Jinja2>=2.8
 jmespath>=0.9.0
@@ -10,6 +10,6 @@ Markup
 MarkupSafe==1.0
 python-dateutil>=2.5.2
 ldap3
-ruamel.yaml<0.15
+ruamel.yaml<0.15 # rq.filter: <0.15
 six==1.11.0
 redis

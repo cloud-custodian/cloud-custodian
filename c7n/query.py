@@ -116,13 +116,15 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. efs mount targets (parent efs), route53 resource
     records (parent hosted zone), ecs services (ecs cluster).
     """
+
+    capture_parent_id = False
+
     def __init__(self, session_factory, manager):
         self.session_factory = session_factory
         self.manager = manager
 
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
-
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(m.service)
 
@@ -149,9 +151,10 @@ class ChildResourceQuery(ResourceQuery):
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path)
-            if subset:
+            if subset and self.capture_parent_id:
+                results.extend([(parent_id, s) for s in subset])
+            elif subset:
                 results.extend(subset)
-
         return results
 
 
@@ -377,11 +380,13 @@ class QueryResourceManager(ResourceManager):
             perms.extend(self.permissions)
         return perms
 
-    def resources(self, query=None):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': query}
+    def get_cache_key(self, query):
+        return {'region': self.config.region,
+                'resource': str(self.__class__.__name__),
+                'q': query}
 
+    def resources(self, query=None):
+        key = self.get_cache_key(query)
         if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
@@ -399,9 +404,7 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def get_resources(self, ids, cache=True):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': None}
+        key = self.get_cache_key(None)
         if cache and self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
