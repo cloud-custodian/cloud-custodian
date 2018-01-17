@@ -4,19 +4,19 @@
         "BackupDescription": {
             "BackupDetails": {
                 "BackupCreationDateTime": {
-                    "hour": 15, 
+                    "hour": 19, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 19, 
-                    "microsecond": 513000, 
+                    "second": 2, 
+                    "microsecond": 9000, 
                     "year": 2018, 
                     "day": 16, 
-                    "minute": 18
+                    "minute": 39
                 }, 
                 "BackupSizeBytes": 0, 
-                "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516133899513-0a5a586a", 
+                "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516149542009-0bbfb894", 
                 "BackupStatus": "AVAILABLE", 
-                "BackupName": "Backup-c7n-dynamodb-backup-2018-01-16-15-18"
+                "BackupName": "Backup-c7n-dynamodb-backup-2018-01-16-19-39"
             }, 
             "SourceTableDetails": {
                 "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup", 
@@ -49,14 +49,14 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "S9U87ADHMADSRI46O0BF7SDP13VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "CU1QJT4N1CNG2OAJNOS2B61CHRVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "S9U87ADHMADSRI46O0BF7SDP13VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "x-amzn-requestid": "CU1QJT4N1CNG2OAJNOS2B61CHRVV4KQNSO5AEMVJF66Q9ASUAAJG", 
                 "content-length": "686", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "x-amz-crc32": "1410280162", 
-                "date": "Tue, 16 Jan 2018 20:18:19 GMT", 
+                "x-amz-crc32": "1459745811", 
+                "date": "Wed, 17 Jan 2018 00:39:02 GMT", 
                 "content-type": "application/x-amz-json-1.0"
             }
         }

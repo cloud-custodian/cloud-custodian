@@ -139,7 +139,7 @@ class DynamodbTest(BaseTest):
 
     def test_dynamodb_create_backup(self):
         dt = datetime.datetime.now().replace(
-            year=2018, month=1, day=16, hour=15, minute=18)
+            year=2018, month=1, day=16, hour=19, minute=39)
         suffix = dt.strftime('%Y-%m-%d-%H-%M')
 
         session_factory = self.replay_flight_data(
@@ -150,7 +150,7 @@ class DynamodbTest(BaseTest):
                 'resource': 'dynamodb-table',
                 'filters': [{'TableName': 'c7n-dynamodb-backup'}],
                 'actions': [{
-                    'type': 'create-backup'}]
+                    'type': 'backup'}]
             },
             session_factory=session_factory)
         resources = p.run()
@@ -169,7 +169,7 @@ class DynamodbTest(BaseTest):
             'name': 'c7n-dynamodb-delete-backup',
             'resource': 'dynamodb-backup',
             'filters': [{'TableName': 'c7n-dynamodb-backup'}],
-            'actions': ['delete-backup']},
+            'actions': ['delete']},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

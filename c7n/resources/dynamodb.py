@@ -240,7 +240,7 @@ class DeleteTable(BaseAction, StatusFilter):
                                 f.exception()))
 
 
-@Table.action_registry.register('create-backup')
+@Table.action_registry.register('backup')
 class CreateBackup(BaseAction, StatusFilter):
     """Creates a manual backup of a DynamoDB table
 
@@ -252,11 +252,11 @@ class CreateBackup(BaseAction, StatusFilter):
               - name: dynamodb-create-backup
                 resource: dynamodb-table
                 actions:
-                  - type: create-backup
+                  - type: backup
     """
 
     valid_status = ('ACTIVE',)
-    schema = type_schema('create-backup')
+    schema = type_schema('backup')
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, tables):
@@ -265,28 +265,15 @@ class CreateBackup(BaseAction, StatusFilter):
         if not len(tables):
             return
 
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for t in tables:
-                futures.append(w.submit(
-                    self.process_dynamodb_tables,
-                    tables))
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception creating dynamodb table backup \n %s",
-                        f.exception())
-        return tables
-
-    def process_dynamodb_tables(self, tables):
-
         c = local_session(self.manager.session_factory).client('dynamodb')
-        for t in tables:
-            arn = c.create_backup(
-                BackupName=snapshot_identifier(
-                    'Backup', t['TableName']),
-                TableName=t['TableName'])['BackupDetails']['BackupArn']
-            t['c7n:BackupArn'] = arn
+
+        for table_set in chunks(tables, 20):
+            for t in table_set:
+                arn = c.create_backup(
+                    BackupName=snapshot_identifier(
+                        'Backup', t['TableName']),
+                    TableName=t['TableName'])['BackupDetails']['BackupArn']
+                t['c7n:BackupArn'] = arn
 
 
 @resources.register('dynamodb-backup')
@@ -305,32 +292,7 @@ class Backup(query.QueryResourceManager):
         config_type = 'AWS::DynamoDB::Table'
 
 
-@Backup.filter_registry.register('age')
-class DynamodbTableBackupAge(AgeFilter):
-    """Filters DynamoDB table backups based on age (in days)
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-backup-age
-                resource: dynamodb-backup
-                filters:
-                  - type: age
-                    days: 28
-                    op: ge
-                actions:
-                  - delete
-    """
-
-    schema = type_schema(
-        'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
-
-    date_attribute = 'BackupCreationDateTime'
-
-@Backup.action_registry.register('delete-backup')
+@Backup.action_registry.register('delete')
 class DeleteBackup(BaseAction):
     """Deletes backups of a DynamoDB table
 
@@ -340,37 +302,30 @@ class DeleteBackup(BaseAction):
 
             policies:
               - name: dynamodb-delete-backup
-                resource: dynamodb-table
+                resource: dynamodb-backup
                 filters:
                   - type: age
                     days: 28
                     op: ge
                 actions:
-                  - type: delete-backup
+                  - type: delete
     """
 
-    schema = type_schema('delete-backup')
+    schema = type_schema('delete')
     permissions = ('dynamodb:DeleteBackup',)
 
     def process(self, tables):
 
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for t in tables:
-                futures.append(w.submit(
-                    self.process_dynamodb_backups,
-                    t))
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception deleting dynamodb table backup \n %s",
-                        f.exception())
-
-    def process_dynamodb_backups(self, table):
-
         c = local_session(self.manager.session_factory).client('dynamodb')
-        arn = c.delete_backup(
-            BackupArn=table['BackupArn'])
+
+        for table_set in chunks(tables, 20):
+            self.process_dynamodb_backups(table_set, c)
+
+    def process_dynamodb_backups(self, table_set, c):
+
+        for t in table_set:
+            c.delete_backup(
+                BackupArn=t['BackupArn'])
 
 @resources.register('dynamodb-stream')
 class Stream(query.QueryResourceManager):
