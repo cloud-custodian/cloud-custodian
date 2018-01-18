@@ -1292,6 +1292,7 @@ class S3Test(BaseTest):
         versioning = client.get_bucket_versioning(Bucket=bname)['Status']
         self.assertEqual('Suspended', versioning)
 
+    @functional
     def test_enable_logging(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
@@ -1302,29 +1303,47 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client('s3')
         client.create_bucket(Bucket=bname)
+        client.put_bucket_acl(
+            Bucket=bname,
+            AccessControlPolicy={
+                "Owner": {
+                    "DisplayName": "mandeep.bal",
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                },
+                'Grants': [
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'WRITE'},
+                    {'Grantee': {
+                        'Type': 'Group',
+                        'URI': 'http://acs.amazonaws.com/groups/s3/LogDelivery'},
+                     'Permission': 'READ_ACP'}]})
+                    
         self.addCleanup(destroyBucket, client, bname)
+
         p = self.load_policy({
             'name': 's3-version',
             'resource': 's3',
             'filters': [{'Name': bname}],
             'actions': [
                 {'type': 'toggle-logging',
-                 'target_bucket': bname}]
+                 'target_bucket': bname,
+                 'target_prefix': '{account}/{source_bucket_name}'}]
             }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], bname)
 
         # eventual consistency fun for recording
-        #time.sleep(10)
-        logging = client.get_bucket_logging(Bucket=bname)['Status']
-        self.assertEqual('Enabled', logging)
+        if self.recording:
+            time.sleep(5)
 
-        # running against a bucket with logging already on
-        # is idempotent
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        logging = client.get_bucket_logging(Bucket=bname).get('LoggingEnabled')
+        self.assertTrue(logging)
+        self.assertEqual(logging['TargetPrefix'], 'custodian-skunk-works/superduper-and-magic')
 
+        # Flip the switch
         p = self.load_policy({
             'name': 's3-version',
             'resource': 's3',
@@ -1337,9 +1356,11 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
 
         # eventual consistency fun for recording
-        #time.sleep(10)
-        logging = client.get_bucket_logging(Bucket=bname)['Status']
-        self.assertEqual('Disabled', logging)
+        if self.recording:
+            time.sleep(12)
+
+        logging = client.get_bucket_logging(Bucket=bname).get('LoggingEnabled')
+        self.assertFalse(logging)
 
     def test_encrypt_policy(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [

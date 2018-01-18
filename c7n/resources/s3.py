@@ -69,7 +69,7 @@ from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema,
-    dumps, format_string_values)
+    dumps, format_string_values, get_account_alias_from_sts)
 
 
 log = logging.getLogger('custodian.s3')
@@ -1152,58 +1152,75 @@ class ToggleLogging(BucketActionBase):
                     target_bucket: log-bucket
                     target_prefix: logs123
     """
-
     schema = type_schema(
         'toggle-logging',
         enabled={'type': 'boolean'},
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'})
-    permissions = ("s3:PutBucketLogging",)
+
+    permissions = ("s3:PutBucketLogging", "iam:ListAccountAliases")
+
+    def validate(self):
+        if self.data.get('enabled', True):
+            if not self.data.get('target_bucket'):
+                raise ValueError("target_bucket must be specified")
+        return self
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
 
+        # Account name for variable expansion
+        session = local_session(self.manager.session_factory)
+        account_name = get_account_alias_from_sts(session)
+
         for r in resources:
-            client = bucket_client(local_session(self.manager.session_factory), r)
-            target_prefix = self.data.get('target_prefix', r['Name'] + '/')
-            if 'TargetBucket' in r['Logging']:
-                r['Logging'] = {'Status': 'Enabled'}
-            else:
-                r['Logging'] = {'Status': 'Disabled'}
-            if enabled and (r['Logging']['Status'] == 'Disabled'):
+            client = bucket_client(session, r)
+            is_logging = bool(r['Logging'])
+
+            if enabled and not is_logging:
+                variables = {
+                    'account_id': self.manager.config.account_id,
+                    'account': account_name,
+                    'region': self.manager.config.region,
+                    'source_bucket_name': r['Name'],
+                    'target_bucket_name': self.data.get('target_bucket'),
+                    'target_prefix': self.data.get('target_prefix'),
+                }
+                data = format_string_values(self.data, **variables)
+                target_prefix = data.get('target_prefix', r['Name'] + '/')
                 client.put_bucket_logging(
                     Bucket=r['Name'],
                     BucketLoggingStatus={
                         'LoggingEnabled': {
-                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetBucket': data.get('target_bucket'),
                             'TargetPrefix': target_prefix}})
                 continue
-            if not enabled and r['Logging']['Status'] == 'Enabled':
+            elif not enabled and is_logging:
                 client.put_bucket_logging(
-                    Bucket=r['Name'],
-                    BucketLoggingStatus={})
+                    Bucket=r['Name'], BucketLoggingStatus={})
                 continue
 
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
     """Action attaches lambda encryption policy to S3 bucket
+       supports attachment via lambda bucket notification or sns notification
+       to invoke lambda. a special topic value of `default` will utilize an
+       extant notification or create one matching the bucket name.
 
-    supports attachment via lambda bucket notification or sns notification
-    to invoke lambda. a special topic value of `default` will utilize
-    an extant notification or create one matching the bucket name.
+       :example:
 
-    :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: s3-logging-buckets
-                resource: s3
-                filters:
-                  - type: missing-policy-statement
-                actions:
-                  - attach-encrypt
+
+                policies:
+                  - name: s3-logging-buckets
+                    resource: s3
+                    filters:
+                      - type: missing-policy-statement
+                    actions:
+                      - attach-encrypt
     """
     schema = type_schema(
         'attach-encrypt',
@@ -1293,6 +1310,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 @actions.register('encryption-policy')
 class EncryptionRequiredPolicy(BucketActionBase):
     """Action to apply an encryption policy to S3 buckets
+
 
     :example:
 
