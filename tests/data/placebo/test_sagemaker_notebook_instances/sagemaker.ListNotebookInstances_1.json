@@ -3,34 +3,7 @@
     "data": {
         "NotebookInstances": [
             {
-                "NotebookInstanceStatus": "InService", 
-                "Url": "c7n-ni-test-2.notebook.us-east-1.sagemaker.aws", 
-                "NotebookInstanceName": "c7n-ni-test-2", 
-                "CreationTime": {
-                    "hour": 11, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 56, 
-                    "microsecond": 52000, 
-                    "year": 2018, 
-                    "day": 18, 
-                    "minute": 18
-                }, 
-                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test-2", 
-                "LastModifiedTime": {
-                    "hour": 11, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 49, 
-                    "microsecond": 729000, 
-                    "year": 2018, 
-                    "day": 18, 
-                    "minute": 22
-                }, 
-                "InstanceType": "ml.t2.medium"
-            }, 
-            {
-                "NotebookInstanceStatus": "InService", 
+                "NotebookInstanceStatus": "Stopped", 
                 "Url": "c7n-ni-test.notebook.us-east-1.sagemaker.aws", 
                 "NotebookInstanceName": "c7n-ni-test", 
                 "CreationTime": {
@@ -45,26 +18,26 @@
                 }, 
                 "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test", 
                 "LastModifiedTime": {
-                    "hour": 11, 
+                    "hour": 17, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 16, 
-                    "microsecond": 543000, 
+                    "second": 45, 
+                    "microsecond": 64000, 
                     "year": 2018, 
                     "day": 18, 
-                    "minute": 5
+                    "minute": 9
                 }, 
                 "InstanceType": "ml.t2.medium"
             }
         ], 
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
+            "RetryAttempts": 1, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3f971c08-311d-4b71-b804-8b9da01b22f6", 
+            "RequestId": "375d7f2e-4016-4119-9530-5e6d9f9da4aa", 
             "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 17:02:16 GMT", 
-                "x-amzn-requestid": "3f971c08-311d-4b71-b804-8b9da01b22f6", 
-                "content-length": "673", 
+                "date": "Thu, 18 Jan 2018 22:17:19 GMT", 
+                "x-amzn-requestid": "375d7f2e-4016-4119-9530-5e6d9f9da4aa", 
+                "content-length": "343", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }

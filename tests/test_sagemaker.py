@@ -22,10 +22,14 @@ class TestNotebookInstance(BaseTest):
             'test_sagemaker_notebook_instances')
         p = self.load_policy({
             'name': 'list-sagemaker-notebooks',
-            'resource': 'sagemaker-notebook'
+            'resource': 'sagemaker-notebook',
+            'filters': [{
+                'type': 'value',
+                'key': 'SubnetId',
+                'value': 'subnet-efbcccb7'}]
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_tag_notebook_instances(self):
         session_factory = self.replay_flight_data(
@@ -164,23 +168,25 @@ class TestSagemakerJob(BaseTest):
             'resource': 'sagemaker-job'
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
 
     def test_stop_job(self):
         session_factory = self.replay_flight_data(
             'test_sagemaker_training_job_stop')
         p = self.load_policy({
-            'name': 'stop-unencrypted-training-job',
+            'name': 'stop-training-job',
             'resource': 'sagemaker-job',
             'filters': [
                 {'TrainingJobStatus': 'InProgress'},
                 {'type': 'value',
-                 'key': 'OutputDataConfig.KmsKeyId',
-                 'value': 'empty'}],
+                 'key': 'InputDataConfig[].ChannelName',
+                 'value': 'train',
+                 'op': 'contains'}],
             'actions': [{
                 'type': 'stop'}]
         }, session_factory=session_factory)
         resources = p.run()
+        self.assertTrue(len(resources), 1)
         client = session_factory(region='us-east-1').client('sagemaker')
         status = client.describe_training_job(
             TrainingJobName='kmeans-2018-01-18-19-21-19-098'

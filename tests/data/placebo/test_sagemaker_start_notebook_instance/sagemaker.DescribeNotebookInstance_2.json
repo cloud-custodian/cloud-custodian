@@ -1,48 +1,42 @@
 {
     "status_code": 200, 
     "data": {
-        "NetworkInterfaceId": "eni-532fe48f", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b9e7215d-99d0-4e25-a06b-48824278dfa9", 
+            "RequestId": "693e675b-8a6f-476c-b135-9f2be75aea8e", 
             "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 17:33:22 GMT", 
-                "x-amzn-requestid": "b9e7215d-99d0-4e25-a06b-48824278dfa9", 
-                "content-length": "608", 
+                "date": "Thu, 18 Jan 2018 17:33:24 GMT", 
+                "x-amzn-requestid": "693e675b-8a6f-476c-b135-9f2be75aea8e", 
+                "content-length": "428", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
         }, 
-        "NotebookInstanceStatus": "Stopped", 
-        "Url": "c7n-ni-test.notebook.us-east-1.sagemaker.aws", 
+        "NotebookInstanceStatus": "InService", 
+        "Url": "c7n-ni-test-2.notebook.us-east-1.sagemaker.aws", 
         "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
-        "NotebookInstanceName": "c7n-ni-test", 
+        "NotebookInstanceName": "c7n-ni-test-2", 
         "CreationTime": {
-            "hour": 10, 
+            "hour": 12, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 51, 
-            "microsecond": 486000, 
+            "second": 3, 
+            "microsecond": 380000, 
             "year": 2018, 
             "day": 18, 
-            "minute": 59
+            "minute": 28
         }, 
-        "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test", 
-        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49", 
-        "SecurityGroups": [
-            "sg-6c7fa917"
-        ], 
-        "SubnetId": "subnet-efbcccb7", 
+        "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test-2", 
         "LastModifiedTime": {
             "hour": 12, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 16, 
-            "microsecond": 133000, 
+            "second": 27, 
+            "microsecond": 91000, 
             "year": 2018, 
             "day": 18, 
-            "minute": 33
+            "minute": 31
         }, 
         "InstanceType": "ml.t2.medium"
     }

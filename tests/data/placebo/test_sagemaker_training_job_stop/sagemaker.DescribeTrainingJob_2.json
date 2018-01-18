@@ -1,11 +1,20 @@
 {
     "status_code": 200, 
     "data": {
-        "TrainingJobName": "kmeans-2018-01-12-19-50-08-721", 
-        "StoppingCondition": {
-            "MaxRuntimeInSeconds": 86400
+        "TrainingJobName": "kmeans-2018-01-18-19-21-19-098", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "48bb02bf-008a-4314-a62a-0cf92dfcd84a", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 19:23:28 GMT", 
+                "x-amzn-requestid": "48bb02bf-008a-4314-a62a-0cf92dfcd84a", 
+                "content-length": "1138", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
         }, 
-        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-12-19-50-08-721", 
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-18-19-21-19-098", 
         "InputDataConfig": [
             {
                 "CompressionType": "None", 
@@ -14,7 +23,7 @@
                     "S3DataSource": {
                         "S3DataType": "ManifestFile", 
                         "S3DataDistributionType": "ShardedByS3Key", 
-                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data/KMeans-2018-01-12-19-49-41-857/.amazon.manifest"
+                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data/KMeans-2018-01-18-19-20-52-198/.amazon.manifest"
                     }
                 }, 
                 "RecordWrapperType": "None"
@@ -35,67 +44,35 @@
             "hour": 14, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 8, 
-            "microsecond": 908000, 
+            "second": 19, 
+            "microsecond": 378000, 
             "year": 2018, 
-            "day": 12, 
-            "minute": 50
+            "day": 18, 
+            "minute": 21
         }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "48787da3-e85b-4d5e-8fea-0cebe7ca6c1e", 
-            "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 19:23:22 GMT", 
-                "x-amzn-requestid": "48787da3-e85b-4d5e-8fea-0cebe7ca6c1e", 
-                "content-length": "1479", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }, 
-        "TrainingJobStatus": "Completed", 
+        "TrainingJobStatus": "Stopping", 
         "OutputDataConfig": {
             "KmsKeyId": "", 
             "S3OutputPath": "s3://c7n-sm-test/kmeans_example/output"
         }, 
-        "ModelArtifacts": {
-            "S3ModelArtifacts": "s3://c7n-sm-test/kmeans_example/output/kmeans-2018-01-12-19-50-08-721/output/model.tar.gz"
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 86400
         }, 
         "ResourceConfig": {
             "VolumeSizeInGB": 30, 
             "InstanceCount": 2, 
             "InstanceType": "ml.c4.8xlarge"
         }, 
-        "TrainingEndTime": {
-            "hour": 14, 
-            "__class__": "datetime", 
-            "month": 1, 
-            "second": 48, 
-            "microsecond": 769000, 
-            "year": 2018, 
-            "day": 12, 
-            "minute": 56
-        }, 
         "LastModifiedTime": {
             "hour": 14, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 49, 
-            "microsecond": 35000, 
+            "second": 28, 
+            "microsecond": 248000, 
             "year": 2018, 
-            "day": 12, 
-            "minute": 56
+            "day": 18, 
+            "minute": 23
         }, 
-        "SecondaryStatus": "Completed", 
-        "TrainingStartTime": {
-            "hour": 14, 
-            "__class__": "datetime", 
-            "month": 1, 
-            "second": 45, 
-            "microsecond": 661000, 
-            "year": 2018, 
-            "day": 12, 
-            "minute": 53
-        }
+        "SecondaryStatus": "Starting"
     }
 }
