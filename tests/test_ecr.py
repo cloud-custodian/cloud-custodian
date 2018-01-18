@@ -142,4 +142,3 @@ class TestECR(BaseTest):
             ClientError,
             client.get_repository_policy,
             repositoryName=resources[0]['repositoryArn'])
-    

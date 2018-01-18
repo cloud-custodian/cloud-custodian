@@ -2612,8 +2612,11 @@ class Lifecycle(BucketActionBase):
         config = list(filter(None, config))
 
         try:
-            s3.put_bucket_lifecycle_configuration(
-                Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
+            if not config:
+                s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
+            else:
+                s3.put_bucket_lifecycle_configuration(
+                    Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
         except ClientError as e:
             if e.response['Error']['Code'] == 'AccessDenied':
                 log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])

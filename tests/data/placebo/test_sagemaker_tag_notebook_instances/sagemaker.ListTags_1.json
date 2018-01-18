@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b36096a9-fe53-4aa5-91ea-6e482036e90a", 
+            "HTTPHeaders": {
+                "date": "Mon, 08 Jan 2018 18:33:05 GMT", 
+                "x-amzn-requestid": "b36096a9-fe53-4aa5-91ea-6e482036e90a", 
+                "content-length": "44", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "c7n-test", 
+                "Key": "Name"
+            }
+        ]
+    }
+}

@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobSummaries": [
+            {
+                "TrainingJobName": "c7n-sagemaker-job", 
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-sagemaker-job", 
+                "CreationTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 21, 
+                    "microsecond": 688000, 
+                    "year": 2018, 
+                    "day": 11, 
+                    "minute": 34
+                }, 
+                "TrainingJobStatus": "Failed", 
+                "TrainingEndTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 42, 
+                    "microsecond": 569000, 
+                    "year": 2018, 
+                    "day": 11, 
+                    "minute": 38
+                }, 
+                "LastModifiedTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 42, 
+                    "microsecond": 827000, 
+                    "year": 2018, 
+                    "day": 11, 
+                    "minute": 38
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "240a146d-c1e6-4d5a-af21-7550ae8a2e8f", 
+            "HTTPHeaders": {
+                "date": "Fri, 12 Jan 2018 15:01:29 GMT", 
+                "x-amzn-requestid": "240a146d-c1e6-4d5a-af21-7550ae8a2e8f", 
+                "content-length": "289", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

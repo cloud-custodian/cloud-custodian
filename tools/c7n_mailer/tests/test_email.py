@@ -195,6 +195,32 @@ class EmailTest(unittest.TestCase):
         self.assertEqual(emails_to_resources_map[email_1_to_addrs], [RESOURCE_1])
         self.assertEqual(emails_to_resources_map[email_2_to_addrs], [RESOURCE_2])
 
+    def test_emails_resource_mapping_no_owner(self):
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['action'].pop('priority_header', None)
+        SQS_MESSAGE['action']['owner_absent_contact'] = ['foo@example.com']
+        RESOURCE_2 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': 'peter',
+                    'Key': 'CreatorName'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b89f0099'
+        }
+        SQS_MESSAGE['resources'] = [RESOURCE_2]
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
+        )
+        email_1_to_addrs = (
+            'bill_lumberg@initech.com', 'foo@example.com', 'peter@initech.com'
+        )
+        self.assertEqual(
+            emails_to_resources_map[email_1_to_addrs], [RESOURCE_2]
+        )
+
     def test_no_mapping_if_no_valid_emails(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
         SQS_MESSAGE['action']['to'].remove('ldap_uid_tags')

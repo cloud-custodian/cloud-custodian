@@ -1,0 +1,121 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobName": "c7n-sagemaker-job", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8dfb5b09-6b42-40d5-9ecf-2cdee76da264", 
+            "HTTPHeaders": {
+                "date": "Fri, 12 Jan 2018 14:47:05 GMT", 
+                "x-amzn-requestid": "8dfb5b09-6b42-40d5-9ecf-2cdee76da264", 
+                "content-length": "1750", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-sagemaker-job", 
+        "InputDataConfig": [
+            {
+                "CompressionType": "None", 
+                "ChannelName": "train", 
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "S3Prefix", 
+                        "S3DataDistributionType": "FullyReplicated", 
+                        "S3Uri": "s3://c7n-sm-test/"
+                    }
+                }, 
+                "RecordWrapperType": "None"
+            }
+        ], 
+        "AlgorithmSpecification": {
+            "TrainingInputMode": "File", 
+            "TrainingImage": "382416733822.dkr.ecr.us-east-1.amazonaws.com/linear-learner:latest"
+        }, 
+        "HyperParameters": {
+            "epochs": "10", 
+            "feature_dim": "1", 
+            "init_bias": "0.0", 
+            "lr_scheduler_factor": "0.99", 
+            "num_calibration_samples": "10000000", 
+            "use_bias": "true", 
+            "num_point_for_scaler": "10000", 
+            "bias_lr_mult": "10", 
+            "lr_scheduler_step": "100", 
+            "init_method": "uniform", 
+            "lr_scheduler_minimum_lr": "0.00001", 
+            "use_lr_scheduler": "true", 
+            "num_models": "auto", 
+            "unbias_label": "auto", 
+            "optimizer": "adam", 
+            "binary_classifier_model_selection_criteria": "accuracy", 
+            "normalize_label": "auto", 
+            "unbias_data": "auto", 
+            "init_scale": "0.07", 
+            "bias_wd_mult": "0.0", 
+            "mini_batch_size": "1000", 
+            "beta_1": "0.9", 
+            "loss": "auto", 
+            "beta_2": "0.999", 
+            "predictor_type": "binary_classifier", 
+            "normalize_data": "true"
+        }, 
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
+        "CreationTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 21, 
+            "microsecond": 688000, 
+            "year": 2018, 
+            "day": 11, 
+            "minute": 34
+        }, 
+        "TrainingJobStatus": "Failed", 
+        "OutputDataConfig": {
+            "KmsKeyId": "", 
+            "S3OutputPath": "s3://c7n-sm-test/"
+        }, 
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 86400
+        }, 
+        "ResourceConfig": {
+            "VolumeSizeInGB": 1, 
+            "InstanceCount": 1, 
+            "InstanceType": "ml.m4.xlarge"
+        }, 
+        "TrainingEndTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 42, 
+            "microsecond": 569000, 
+            "year": 2018, 
+            "day": 11, 
+            "minute": 38
+        }, 
+        "LastModifiedTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 42, 
+            "microsecond": 827000, 
+            "year": 2018, 
+            "day": 11, 
+            "minute": 38
+        }, 
+        "SecondaryStatus": "Failed", 
+        "TrainingStartTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 11, 
+            "microsecond": 127000, 
+            "year": 2018, 
+            "day": 11, 
+            "minute": 38
+        }, 
+        "FailureReason": "ClientError: Data download failed:S3 key: s3://c7n-sm-test/ matched no files on s3"
+    }
+}
