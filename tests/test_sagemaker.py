@@ -170,7 +170,7 @@ class TestSagemakerJob(BaseTest):
         session_factory = self.replay_flight_data(
             'test_sagemaker_training_job_stop')
         p = self.load_policy({
-            'name': 'stop-unencrypted=training-job',
+            'name': 'stop-unencrypted-training-job',
             'resource': 'sagemaker-job',
             'filters': [
                 {'TrainingJobStatus': 'InProgress'},
