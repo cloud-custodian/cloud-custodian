@@ -327,7 +327,7 @@ class DeleteBackup(BaseAction):
             c.delete_backup(
                 BackupArn=t['BackupArn'])
 
-            
+
 @resources.register('dynamodb-stream')
 class Stream(query.QueryResourceManager):
 
