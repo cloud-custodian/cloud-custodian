@@ -1297,7 +1297,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_logging', 'Logging', None, None)])
-        session_factory = self.record_flight_data('test_s3_enable_logging')
+        session_factory = self.replay_flight_data('test_s3_enable_logging')
         bname = 'superduper-and-magic'
 
         session = session_factory()
