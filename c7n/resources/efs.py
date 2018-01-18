@@ -96,16 +96,19 @@ class SecurityGroup(SecurityGroupFilter):
         if self.efs_group_cache:
             group_ids = set()
             for r in resources:
-                group_ids.update(self.efs_group_cache.get(r['MountTargetId'], ()))
+                group_ids.update(
+                    self.efs_group_cache.get(r['MountTargetId'], ()))
             return list(group_ids)
 
         client = local_session(self.manager.session_factory).client('efs')
         groups = {}
         group_ids = set()
-        retry = get_retry(('Throttled',),12)
+        retry = get_retry(('Throttled',), 12)
+
         for r in resources:
-            groups[r['MountTargetId']] = retry(client.describe_mount_target_security_groups,
-                                               MountTargetId=r['MountTargetId'])['SecurityGroups']
+            groups[r['MountTargetId']] = retry(
+                client.describe_mount_target_security_groups,
+                MountTargetId=r['MountTargetId'])['SecurityGroups']
             group_ids.update(groups[r['MountTargetId']])
 
         self.efs_group_cache = groups

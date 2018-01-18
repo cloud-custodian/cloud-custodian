@@ -62,7 +62,12 @@ class ElasticFileSystem(BaseTest):
             'filters': [
                 {'type': 'security-group',
                  'key': 'GroupId',
-                 'value': 'sg-ccf3a8a4'}]}, session_factory=factory)
+                 'value': 'sg-ccf3a8a4'},
+                # Use the same filter twice to excercise cache code
+                {'type': 'security-group',
+                 'key': 'GroupId',
+                 'value': 'sg-ccf3a8a4'},
+            ]}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
         resources = sorted(resources, key=itemgetter('MountTargetId'))
