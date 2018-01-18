@@ -69,7 +69,7 @@ from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema,
-    dumps, format_string_values)
+    dumps, format_string_values, get_account_alias_from_sts)
 
 
 log = logging.getLogger('custodian.s3')
@@ -1152,28 +1152,32 @@ class ToggleLogging(BucketActionBase):
                     target_bucket: log-bucket
                     target_prefix: logs123
     """
-
     schema = type_schema(
         'toggle-logging',
         enabled={'type': 'boolean'},
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'})
-    permissions = ("s3:PutBucketLogging",)
+
+    permissions = ("s3:PutBucketLogging", "iam:ListAccountAliases")
+
+    def validate(self):
+        if self.data.get('enabled', True):
+            if not self.data.get('target_bucket'):
+                raise ValueError("target_bucket must be specified")
+        return self
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-        # code to support expand_variables()
+
+        # Account name for variable expansion
         session = local_session(self.manager.session_factory)
-        iam_client = session.client('iam')
-        aliases = iam_client.list_account_aliases().get('AccountAliases', ('',))
-        account_name = aliases and aliases[0] or ""
+        account_name = get_account_alias_from_sts(session)
+
         for r in resources:
             client = bucket_client(session, r)
-            if 'TargetBucket' in r['Logging']:
-                r['Logging'] = {'Status': 'Enabled'}
-            else:
-                r['Logging'] = {'Status': 'Disabled'}
-            if enabled and (r['Logging']['Status'] == 'Disabled'):
+            is_logging = bool(r['Logging'])
+
+            if enabled and not is_logging:
                 variables = {
                     'account_id': self.manager.config.account_id,
                     'account': account_name,
@@ -1181,37 +1185,20 @@ class ToggleLogging(BucketActionBase):
                     'source_bucket_name': r['Name'],
                     'target_bucket_name': self.data.get('target_bucket'),
                     'target_prefix': self.data.get('target_prefix'),
-                    'data': self.data.copy()
                 }
-                self.data = self.expand_variables(variables)
-                # log.info("target_bucket=%s" % target_bucket)
-
-                # code to support expand_variables()
-                target_prefix = self.data.get('target_prefix', r['Name'] + '/')
+                data = format_string_values(self.data, **variables)
+                target_prefix = data.get('target_prefix', r['Name'] + '/')
                 client.put_bucket_logging(
                     Bucket=r['Name'],
                     BucketLoggingStatus={
                         'LoggingEnabled': {
-                            'TargetBucket': self.data.get('target_bucket'),
+                            'TargetBucket': data.get('target_bucket'),
                             'TargetPrefix': target_prefix}})
                 continue
-            if not enabled and r['Logging']['Status'] == 'Enabled':
+            elif not enabled and is_logging:
                 client.put_bucket_logging(
-                    Bucket=r['Name'],
-                    BucketLoggingStatus={})
+                    Bucket=r['Name'], BucketLoggingStatus={})
                 continue
-
-    def expand_variables(self, variables):
-        """expand variables
-        """
-        data = variables['data'].copy()
-        # log.info("variables %s" % variables)
-        target_bucket_name = variables['target_bucket_name']
-        data['target_bucket'] = target_bucket_name.format(**variables)
-        target_prefix = variables['target_prefix']
-        if target_prefix:
-            data['target_prefix'] = target_prefix.format(**variables)
-        return data
 
 
 @actions.register('attach-encrypt')
