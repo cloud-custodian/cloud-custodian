@@ -1,0 +1,101 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobName": "kmeans-2018-01-12-19-50-08-721", 
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 86400
+        }, 
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-12-19-50-08-721", 
+        "InputDataConfig": [
+            {
+                "CompressionType": "None", 
+                "ChannelName": "train", 
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "ManifestFile", 
+                        "S3DataDistributionType": "ShardedByS3Key", 
+                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data/KMeans-2018-01-12-19-49-41-857/.amazon.manifest"
+                    }
+                }, 
+                "RecordWrapperType": "None"
+            }
+        ], 
+        "AlgorithmSpecification": {
+            "TrainingInputMode": "File", 
+            "TrainingImage": "382416733822.dkr.ecr.us-east-1.amazonaws.com/kmeans:1"
+        }, 
+        "HyperParameters": {
+            "feature_dim": "784", 
+            "mini_batch_size": "500", 
+            "k": "10", 
+            "force_dense": "True"
+        }, 
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
+        "CreationTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 8, 
+            "microsecond": 908000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 50
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cf66b5b9-c5ef-448c-acbc-0aef877e32a0", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 19:48:34 GMT", 
+                "x-amzn-requestid": "cf66b5b9-c5ef-448c-acbc-0aef877e32a0", 
+                "content-length": "1479", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "TrainingJobStatus": "Completed", 
+        "OutputDataConfig": {
+            "KmsKeyId": "", 
+            "S3OutputPath": "s3://c7n-sm-test/kmeans_example/output"
+        }, 
+        "ModelArtifacts": {
+            "S3ModelArtifacts": "s3://c7n-sm-test/kmeans_example/output/kmeans-2018-01-12-19-50-08-721/output/model.tar.gz"
+        }, 
+        "ResourceConfig": {
+            "VolumeSizeInGB": 30, 
+            "InstanceCount": 2, 
+            "InstanceType": "ml.c4.8xlarge"
+        }, 
+        "TrainingEndTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 48, 
+            "microsecond": 769000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 56
+        }, 
+        "LastModifiedTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 49, 
+            "microsecond": 35000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 56
+        }, 
+        "SecondaryStatus": "Completed", 
+        "TrainingStartTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 45, 
+            "microsecond": 661000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 53
+        }
+    }
+}

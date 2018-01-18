@@ -3,74 +3,74 @@
     "data": {
         "TrainingJobSummaries": [
             {
-                "TrainingJobStatus": "InProgress",
-                "TrainingJobName": "c7n-job-2018-01-12-16-06-41", 
+                "TrainingJobStatus": "InProgress", 
+                "TrainingJobName": "kmeans-2018-01-18-19-21-19-098", 
                 "LastModifiedTime": {
-                    "hour": 11, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 21, 
-                    "microsecond": 634000, 
+                    "second": 19, 
+                    "microsecond": 984000, 
                     "year": 2018, 
-                    "day": 12, 
-                    "minute": 8
+                    "day": 18, 
+                    "minute": 21
                 }, 
                 "CreationTime": {
-                    "hour": 11, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 41, 
-                    "microsecond": 545000, 
+                    "second": 19, 
+                    "microsecond": 378000, 
                     "year": 2018, 
-                    "day": 12, 
-                    "minute": 6
+                    "day": 18, 
+                    "minute": 21
                 }, 
-                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-2018-01-12-16-06-41"
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-18-19-21-19-098"
             }, 
             {
-                "TrainingJobName": "c7n-job-2018-01-12-15-53-31", 
-                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-2018-01-12-15-53-31", 
+                "TrainingJobName": "kmeans-2018-01-12-19-50-08-721", 
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-12-19-50-08-721", 
                 "CreationTime": {
-                    "hour": 10, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 31, 
-                    "microsecond": 590000, 
+                    "second": 8, 
+                    "microsecond": 908000, 
                     "year": 2018, 
                     "day": 12, 
-                    "minute": 53
+                    "minute": 50
                 }, 
-                "TrainingJobStatus": "Failed", 
+                "TrainingJobStatus": "Completed", 
                 "TrainingEndTime": {
-                    "hour": 10, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 47, 
-                    "microsecond": 623000, 
+                    "second": 48, 
+                    "microsecond": 769000, 
                     "year": 2018, 
                     "day": 12, 
-                    "minute": 59
+                    "minute": 56
                 }, 
                 "LastModifiedTime": {
-                    "hour": 10, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 47, 
-                    "microsecond": 795000, 
+                    "second": 49, 
+                    "microsecond": 35000, 
                     "year": 2018, 
                     "day": 12, 
-                    "minute": 59
+                    "minute": 56
                 }
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "bd7f6abd-10e4-44e8-a982-b2cab33c01e3", 
+            "RequestId": "eb43d672-025a-4266-8a27-841c3ba37216", 
             "HTTPHeaders": {
-                "date": "Fri, 12 Jan 2018 16:09:53 GMT", 
-                "x-amzn-requestid": "bd7f6abd-10e4-44e8-a982-b2cab33c01e3", 
-                "content-length": "1120", 
+                "date": "Thu, 18 Jan 2018 19:23:21 GMT", 
+                "x-amzn-requestid": "eb43d672-025a-4266-8a27-841c3ba37216", 
+                "content-length": "2562", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
