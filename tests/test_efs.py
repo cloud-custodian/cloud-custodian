@@ -18,6 +18,9 @@ from .common import BaseTest, functional
 import uuid
 import time
 
+from operator import itemgetter
+
+
 class ElasticFileSystem(BaseTest):
 
     @functional
@@ -50,6 +53,25 @@ class ElasticFileSystem(BaseTest):
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_mount_target_security_group(self):
+        factory = self.replay_flight_data('test_efs_mount_secgroup')
+        p = self.load_policy({
+            'name': 'test-mount-secgroup',
+            'resource': 'efs-mount-target',
+            'filters': [
+                {'type': 'security-group',
+                 'key': 'GroupId',
+                 'value': 'sg-ccf3a8a4'},
+                # Use the same filter twice to excercise cache code
+                {'type': 'security-group',
+                 'key': 'GroupId',
+                 'value': 'sg-ccf3a8a4'},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        resources = sorted(resources, key=itemgetter('MountTargetId'))
+        self.assertEqual(resources[0]['MountTargetId'], 'fsmt-a47385dd')
 
     def test_delete(self):
         factory = self.replay_flight_data('test_efs_delete')

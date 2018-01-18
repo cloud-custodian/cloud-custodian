@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e167c3af-d477-11e7-81e4-a7e35a529114", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e167c3af-d477-11e7-81e4-a7e35a529114", 
+                "date": "Tue, 28 Nov 2017 20:08:20 GMT", 
+                "content-length": "373", 
+                "content-type": "application/json"
+            }
+        }, 
+        "FileSystems": [
+            {
+                "SizeInBytes": {
+                    "Value": 6144
+                }, 
+                "Name": "TestSecGroups", 
+                "CreationToken": "console-e953c8e7-d309-4235-9c98-f8091c444e74", 
+                "Encrypted": false, 
+                "CreationTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 54
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "FileSystemId": "fs-66f3051f", 
+                "NumberOfMountTargets": 3, 
+                "LifeCycleState": "available", 
+                "OwnerId": "117134021140"
+            }
+        ]
+    }
+}
