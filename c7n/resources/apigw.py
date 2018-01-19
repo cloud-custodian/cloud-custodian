@@ -17,12 +17,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 
-from c7n.manager import resources
+from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 
 
 @resources.register('rest-account')
-class RestAccount(resources.ResourceManager):
+class RestAccount(ResourceManager):
     filter_registry = FilterRegistry()
     action_registry = ActionRegistry()
 
