@@ -14,8 +14,40 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 
+from c7n.actions import ActionRegistry
+from c7n.filters import FilterRegistry
+
 from c7n.manager import resources
-from c7n import query
+from c7n import query, utils
+
+
+@resources.register('rest-account')
+class RestAccount(resources.ResourceManager):
+    filter_registry = FilterRegistry()
+    action_registry = ActionRegistry()
+
+    class resource_type(object):
+        name = id = 'fake-id'
+        dimensions = None
+
+    @classmethod
+    def get_permissions(cls):
+        return ('iam:ListAccountAliases',)
+
+    def get_model(self):
+        return self.resource_type
+
+    def _get_account(self):
+        client = utils.local_session(self.session_factory).client('apigateway')
+        account = client.get_account()
+        account['fake-id'] = 'apigw-settings'
+        return account
+
+    def resources(self):
+        return self.filter_resources([self._get_account()])
+
+    def get_resources(self, resource_ids):
+        return [self._get_account()]
 
 
 @resources.register('rest-api')
@@ -52,6 +84,3 @@ class RestStage(query.ChildResourceManager):
                     'Key': k,
                     'Value': v})
         return resources
-
-            
-        
