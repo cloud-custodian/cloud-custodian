@@ -13,8 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 
 from c7n.manager import resources, ResourceManager
@@ -23,16 +22,17 @@ from c7n import query, utils
 
 @resources.register('rest-account')
 class RestAccount(ResourceManager):
-    filter_registry = FilterRegistry()
-    action_registry = ActionRegistry()
+    filter_registry = FilterRegistry('rest-account.filters')
+    action_registry = ActionRegistry('rest-account.actions')
 
     class resource_type(object):
-        name = id = 'fake-id'
+        service = 'apigateway'
+        name = id = 'account_id'
         dimensions = None
 
     @classmethod
     def get_permissions(cls):
-        return ('iam:ListAccountAliases',)
+        return ('apigateway:GET',)
 
     def get_model(self):
         return self.resource_type
@@ -40,7 +40,8 @@ class RestAccount(ResourceManager):
     def _get_account(self):
         client = utils.local_session(self.session_factory).client('apigateway')
         account = client.get_account()
-        account['fake-id'] = 'apigw-settings'
+        account.pop('ResponseMetadata', None)
+        account['account_id'] = 'apigw-settings'
         return account
 
     def resources(self):
@@ -48,6 +49,34 @@ class RestAccount(ResourceManager):
 
     def get_resources(self, resource_ids):
         return [self._get_account()]
+
+
+OP_SCHEMA = {
+    'type': 'object',
+    'required': ['op', 'path'],
+    'additonalProperties': False,
+    'properties': {
+        'op': {'enum': ['add', 'remove', 'update', 'copy']},
+        'path': {'type': 'string'},
+        'value': {'type': 'string'},
+        'from': {'type': 'string'}
+        }
+    }
+
+
+@RestAccount.action_registry.register('update')
+class UpdateAccount(BaseAction):
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['ops'])
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        client.update_account(patchOperations=self.data['patch'])
 
 
 @resources.register('rest-api')
