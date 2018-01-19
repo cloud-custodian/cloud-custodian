@@ -671,7 +671,7 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []}])
 
     @functional
-    def test_self_reference(self):
+    def test_self_reference_once(self):
         factory = self.replay_flight_data(
             'test_security_group_self_reference')
         client = factory().client('ec2')
@@ -737,12 +737,14 @@ class SecurityGroupTest(BaseTest):
             'name': 'sg-find0',
             'resource': 'security-group',
             'filters': [
+                {'GroupName': 'sg1'},
                 {'type': 'ingress',
-                 'SelfReference': False},
-                {'GroupName': 'sg1'}]
+                 'match-operator': 'and',
+                 'Ports': [80],
+                 'SelfReference': False}]
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
         p = self.load_policy({
             'name': 'sg-find1',
@@ -1061,6 +1063,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': True}
                 ]})
         manager = p.get_resource_manager()
@@ -1072,6 +1075,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': False}
                 ]})
         manager = p.get_resource_manager()
@@ -1083,6 +1087,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '0.0.0.0/0',
                     'op': 'eq',
@@ -1135,6 +1140,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '10.42.3.0/24',
                     'op': 'eq',
