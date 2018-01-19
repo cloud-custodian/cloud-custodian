@@ -875,7 +875,7 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         sg_id = resource['GroupId']
-        match_op = self.data.get('match-operator', 'or') == 'or' and any or all
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
 
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
             perm_matches = {}
@@ -884,7 +884,15 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
-            match = match_op(filter(lambda x: x is not None, perm_matches.values()))
+
+            perm_match_values = list(filter(
+                lambda x: x is not None, perm_matches.values()))
+
+            # account for one python behavior any([]) == False, all([]) == True
+            if match_op == all and not perm_match_values:
+                continue
+
+            match = match_op(perm_match_values)
             if match:
                 matched.append(perm)
 
