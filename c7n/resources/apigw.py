@@ -13,12 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 
 
 @resources.register('rest-api')
-class RestAPI(QueryResourceManager):
+class RestAPI(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
@@ -29,3 +30,28 @@ class RestAPI(QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
+
+
+@resources.register('rest-stage')
+class RestStage(query.ChildResourceManager):
+
+    class resource_type(object):
+        service = 'apigateway'
+        parent_spec = ('rest-api', 'restApiId')
+        enum_spec = ('get_stages', 'item', None)
+        name = id = 'stageName'
+        date = 'createdDate'
+        dimension = None
+
+    def augment(self, resources):
+        # Normalize stage tags to look like other resources
+        for r in resources:
+            tags = r.setdefault('Tags', [])
+            for k, v in r.pop('tags', {}).items():
+                tags.append({
+                    'Key': k,
+                    'Value': v})
+        return resources
+
+            
+        
