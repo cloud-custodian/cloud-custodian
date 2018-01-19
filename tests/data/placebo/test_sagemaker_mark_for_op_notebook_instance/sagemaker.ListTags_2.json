@@ -4,15 +4,20 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "302e463e-cef4-4ea7-a072-d0e79dcaa447", 
+            "RequestId": "4727d0be-87d2-4063-9bef-eaef29a2226e", 
             "HTTPHeaders": {
-                "date": "Thu, 11 Jan 2018 15:57:04 GMT", 
-                "x-amzn-requestid": "302e463e-cef4-4ea7-a072-d0e79dcaa447", 
-                "content-length": "11", 
+                "date": "Thu, 18 Jan 2018 17:27:13 GMT", 
+                "x-amzn-requestid": "4727d0be-87d2-4063-9bef-eaef29a2226e", 
+                "content-length": "95", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
         }, 
-        "Tags": []
+        "Tags": [
+            {
+                "Value": "Resource does not meet policy: stop@2018/01/19", 
+                "Key": "custodian_cleanup"
+            }
+        ]
     }
 }

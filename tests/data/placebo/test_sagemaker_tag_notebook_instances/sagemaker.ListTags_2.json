@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "df6eeb4d-0730-404d-9bf3-4f7ff571284b", 
+            "RequestId": "a4ffef84-df92-4ff3-a78c-d3b12763d5d7", 
             "HTTPHeaders": {
-                "date": "Mon, 08 Jan 2018 18:33:06 GMT", 
-                "x-amzn-requestid": "df6eeb4d-0730-404d-9bf3-4f7ff571284b", 
-                "content-length": "83", 
+                "date": "Thu, 18 Jan 2018 17:26:11 GMT", 
+                "x-amzn-requestid": "a4ffef84-df92-4ff3-a78c-d3b12763d5d7", 
+                "content-length": "49", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
@@ -17,10 +17,6 @@
             {
                 "Value": "TestValue", 
                 "Key": "Category"
-            }, 
-            {
-                "Value": "c7n-test", 
-                "Key": "Name"
             }
         ]
     }

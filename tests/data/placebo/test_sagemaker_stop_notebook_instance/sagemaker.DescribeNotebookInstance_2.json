@@ -4,16 +4,16 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "6e98346c-7a52-48d3-871d-d27e85ef6093", 
+            "RequestId": "f6cafc30-b5a6-4828-a961-b59407cefcc5", 
             "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 17:39:23 GMT", 
-                "x-amzn-requestid": "6e98346c-7a52-48d3-871d-d27e85ef6093", 
+                "date": "Thu, 18 Jan 2018 17:31:12 GMT", 
+                "x-amzn-requestid": "f6cafc30-b5a6-4828-a961-b59407cefcc5", 
                 "content-length": "426", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
         }, 
-        "NotebookInstanceStatus": "Stopped", 
+        "NotebookInstanceStatus": "Pending", 
         "Url": "c7n-ni-test-2.notebook.us-east-1.sagemaker.aws", 
         "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
         "NotebookInstanceName": "c7n-ni-test-2", 
@@ -32,11 +32,11 @@
             "hour": 12, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 44, 
-            "microsecond": 829000, 
+            "second": 6, 
+            "microsecond": 173000, 
             "year": 2018, 
             "day": 18, 
-            "minute": 35
+            "minute": 28
         }, 
         "InstanceType": "ml.t2.medium"
     }

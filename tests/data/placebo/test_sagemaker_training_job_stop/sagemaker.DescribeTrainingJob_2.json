@@ -5,11 +5,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "26f36277-c1a2-4621-b8e9-fe356dbb9776", 
+            "RequestId": "48bb02bf-008a-4314-a62a-0cf92dfcd84a", 
             "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 19:23:22 GMT", 
-                "x-amzn-requestid": "26f36277-c1a2-4621-b8e9-fe356dbb9776", 
-                "content-length": "1140", 
+                "date": "Thu, 18 Jan 2018 19:23:28 GMT", 
+                "x-amzn-requestid": "48bb02bf-008a-4314-a62a-0cf92dfcd84a", 
+                "content-length": "1138", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
@@ -50,7 +50,7 @@
             "day": 18, 
             "minute": 21
         }, 
-        "TrainingJobStatus": "InProgress", 
+        "TrainingJobStatus": "Stopping", 
         "OutputDataConfig": {
             "KmsKeyId": "", 
             "S3OutputPath": "s3://c7n-sm-test/kmeans_example/output"
@@ -67,11 +67,11 @@
             "hour": 14, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 19, 
-            "microsecond": 984000, 
+            "second": 28, 
+            "microsecond": 248000, 
             "year": 2018, 
             "day": 18, 
-            "minute": 21
+            "minute": 23
         }, 
         "SecondaryStatus": "Starting"
     }
