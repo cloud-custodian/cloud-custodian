@@ -71,7 +71,7 @@ class UpdateAccount(BaseAction):
     schema = utils.type_schema(
         'update',
         patch={'type': 'array', 'items': OP_SCHEMA},
-        required=['ops'])
+        required=['op'])
 
     def process(self, resources):
         client = utils.local_session(
