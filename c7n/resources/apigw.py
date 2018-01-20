@@ -60,8 +60,8 @@ OP_SCHEMA = {
         'path': {'type': 'string'},
         'value': {'type': 'string'},
         'from': {'type': 'string'}
-        }
     }
+}
 
 
 @RestAccount.action_registry.register('update')
@@ -158,10 +158,3 @@ class RestResource(query.ChildResourceManager):
         id = 'id'
         name = 'path'
         dimension = None
-
-
-#@resources.register('rest-method')
-#class RestMethod(query.ChildResourceManager):
-#    class resource_type(object):
-#        service = 'apigateway'
-#        parent_spec = ('rest-resource')
