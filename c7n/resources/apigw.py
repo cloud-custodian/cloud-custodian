@@ -56,7 +56,7 @@ OP_SCHEMA = {
     'required': ['op', 'path'],
     'additonalProperties': False,
     'properties': {
-        'op': {'enum': ['add', 'remove', 'update', 'copy']},
+        'op': {'enum': ['add', 'remove', 'update', 'copy', 'replace']},
         'path': {'type': 'string'},
         'value': {'type': 'string'},
         'from': {'type': 'string'}
@@ -71,7 +71,7 @@ class UpdateAccount(BaseAction):
     schema = utils.type_schema(
         'update',
         patch={'type': 'array', 'items': OP_SCHEMA},
-        required=['ops'])
+        required=['op'])
 
     def process(self, resources):
         client = utils.local_session(
