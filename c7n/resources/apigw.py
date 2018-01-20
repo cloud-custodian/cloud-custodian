@@ -13,12 +13,74 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.actions import ActionRegistry, BaseAction
+from c7n.filters import FilterRegistry
+
+from c7n.manager import resources, ResourceManager
+from c7n import query, utils
+
+
+@resources.register('rest-account')
+class RestAccount(ResourceManager):
+    filter_registry = FilterRegistry('rest-account.filters')
+    action_registry = ActionRegistry('rest-account.actions')
+
+    class resource_type(object):
+        service = 'apigateway'
+        name = id = 'account_id'
+        dimensions = None
+
+    @classmethod
+    def get_permissions(cls):
+        return ('apigateway:GET',)
+
+    def get_model(self):
+        return self.resource_type
+
+    def _get_account(self):
+        client = utils.local_session(self.session_factory).client('apigateway')
+        account = client.get_account()
+        account.pop('ResponseMetadata', None)
+        account['account_id'] = 'apigw-settings'
+        return account
+
+    def resources(self):
+        return self.filter_resources([self._get_account()])
+
+    def get_resources(self, resource_ids):
+        return [self._get_account()]
+
+
+OP_SCHEMA = {
+    'type': 'object',
+    'required': ['op', 'path'],
+    'additonalProperties': False,
+    'properties': {
+        'op': {'enum': ['add', 'remove', 'update', 'copy', 'replace']},
+        'path': {'type': 'string'},
+        'value': {'type': 'string'},
+        'from': {'type': 'string'}
+        }
+    }
+
+
+@RestAccount.action_registry.register('update')
+class UpdateAccount(BaseAction):
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['op'])
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        client.update_account(patchOperations=self.data['patch'])
 
 
 @resources.register('rest-api')
-class RestAPI(QueryResourceManager):
+class RestAPI(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
@@ -29,3 +91,25 @@ class RestAPI(QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
+
+
+@resources.register('rest-stage')
+class RestStage(query.ChildResourceManager):
+
+    class resource_type(object):
+        service = 'apigateway'
+        parent_spec = ('rest-api', 'restApiId')
+        enum_spec = ('get_stages', 'item', None)
+        name = id = 'stageName'
+        date = 'createdDate'
+        dimension = None
+
+    def augment(self, resources):
+        # Normalize stage tags to look like other resources
+        for r in resources:
+            tags = r.setdefault('Tags', [])
+            for k, v in r.pop('tags', {}).items():
+                tags.append({
+                    'Key': k,
+                    'Value': v})
+        return resources
