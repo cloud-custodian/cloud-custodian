@@ -27,7 +27,7 @@ class TestRestAccount(BaseTest):
             'actions': [
                 {'type': 'update',
                  'patch': [
-                     {'op': 'replace',
+                     {'op': 'update',
                       'path': '/cloudwatchRoleArn',
                       'value': log_role}
                  ]}]}, session_factory=session_factory)
