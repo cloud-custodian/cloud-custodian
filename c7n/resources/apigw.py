@@ -56,7 +56,7 @@ OP_SCHEMA = {
     'required': ['op', 'path'],
     'additonalProperties': False,
     'properties': {
-        'op': {'enum': ['add', 'remove', 'update', 'copy']},
+        'op': {'enum': ['add', 'remove', 'update', 'copy', 'replace', 'test']},
         'path': {'type': 'string'},
         'value': {'type': 'string'},
         'from': {'type': 'string'}
@@ -71,7 +71,7 @@ class UpdateAccount(BaseAction):
     schema = utils.type_schema(
         'update',
         patch={'type': 'array', 'items': OP_SCHEMA},
-        required=['ops'])
+        required=['patch'])
 
     def process(self, resources):
         client = utils.local_session(
@@ -96,6 +96,8 @@ class RestAPI(query.QueryResourceManager):
 @resources.register('rest-stage')
 class RestStage(query.ChildResourceManager):
 
+    child_source = 'describe-rest-stage'
+
     class resource_type(object):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId')
@@ -104,12 +106,62 @@ class RestStage(query.ChildResourceManager):
         date = 'createdDate'
         dimension = None
 
+
+@query.sources.register('describe-rest-stage')
+class DescribeRestStage(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super(DescribeRestStage, self).get_query()
+        query.capture_parent_id = True
+        return query
+
     def augment(self, resources):
-        # Normalize stage tags to look like other resources
-        for r in resources:
+        results = []
+        # Using capture parent id, changes the protocol
+        for parent_id, r in resources:
+            r['restApiId'] = parent_id
             tags = r.setdefault('Tags', [])
             for k, v in r.pop('tags', {}).items():
                 tags.append({
                     'Key': k,
                     'Value': v})
-        return resources
+            results.append(r)
+        return results
+
+
+@RestStage.action_registry.register('update')
+class UpdateStage(BaseAction):
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['patch'])
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            client.update_stage(
+                restApiId=r['restApiId'],
+                stageName=r['stageName'],
+                patchOperations=self.data['patch'])
+
+
+@resources.register('rest-resource')
+class RestResource(query.ChildResourceManager):
+
+    class resource_type(object):
+        service = 'apigateway'
+        parent_spec = ('rest-api', 'restApiId')
+        enum_spec = ('get_resources', 'items', None)
+        id = 'id'
+        name = 'path'
+        dimension = None
+
+
+#@resources.register('rest-method')
+#class RestMethod(query.ChildResourceManager):
+#    class resource_type(object):
+#        service = 'apigateway'
+#        parent_spec = ('rest-resource')

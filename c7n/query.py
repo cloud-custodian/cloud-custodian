@@ -243,9 +243,14 @@ class DescribeSource(object):
 @sources.register('describe-child')
 class ChildDescribeSource(DescribeSource):
 
+    resource_query_factory = ChildResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ChildResourceQuery(
+        self.query = self.get_query()
+
+    def get_query(self):
+        return self.resource_query_factory(
             self.manager.session_factory, self.manager)
 
 
@@ -464,11 +469,13 @@ class QueryResourceManager(ResourceManager):
 
 class ChildResourceManager(QueryResourceManager):
 
+    child_source = 'describe-child'
+
     @property
     def source_type(self):
-        source = self.data.get('source', 'describe-child')
+        source = self.data.get('source', self.child_source)
         if source == 'describe':
-            source = 'describe-child'
+            source = self.child_source
         return source
 
 

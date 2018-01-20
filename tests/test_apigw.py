@@ -57,3 +57,41 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['stageName'], 'latest')
+
+    def test_rest_stage_update(self):
+        session_factory = self.replay_flight_data('test_rest_stage_update')
+        p = self.load_policy({
+            'name': 'rest-stage-update',
+            'resource': 'rest-stage',
+            'filters': [
+                {'methodSettings."*/*".loggingLevel': 'absent'}],
+            'actions': [
+                {'type': 'update',
+                 'patch': [
+                     {'op': 'replace',
+                      'path': '/*/*/logging/dataTrace',
+                      'value': 'true'},
+                     {'op': 'replace',
+                      'path': '/*/*/logging/loglevel',
+                      'value': 'info'}
+                 ]},
+            ]}, session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        client = session_factory().client('apigateway')
+
+        stage = client.get_stage(
+            restApiId=resources[0]['restApiId'],
+            stageName=resources[0]['stageName'])
+
+        found = False
+        for k, m in stage.get('methodSettings', {}).items():
+            found = True
+            self.assertEqual(m['loggingLevel'], 'INFO')
+            self.assertEqual(m['dataTraceEnabled'], True)
+        self.assertTrue(found)
+                            
+        
+        
+        
