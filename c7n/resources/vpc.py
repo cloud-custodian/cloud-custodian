@@ -876,7 +876,6 @@ class SGPermission(Filter):
         matched = []
         sg_id = resource['GroupId']
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
-
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
             perm_matches = {}
             for idx, f in enumerate(self.vfilters):
@@ -884,7 +883,6 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
-
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
