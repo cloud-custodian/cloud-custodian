@@ -773,6 +773,7 @@ class SGPermission(Filter):
         'IpRanges', 'PrefixListIds'))
     filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
+    attrs.add('match-operator')
 
     def validate(self):
         delta = set(self.data.keys()).difference(self.attrs)
@@ -835,10 +836,16 @@ class SGPermission(Filter):
 
     def process_self_reference(self, perm, sg_id):
         found = None
+        ref_match = self.data.get('SelfReference')
+        if ref_match is not None:
+            found = False
         if 'UserIdGroupPairs' in perm and 'SelfReference' in self.data:
             self_reference = sg_id in [p['GroupId']
                                        for p in perm['UserIdGroupPairs']]
-            found = self_reference & self.data['SelfReference']
+            if ref_match is False and not self_reference:
+                found = True
+            if ref_match is True and self_reference:
+                found = True
         return found
 
     def expand_permissions(self, permissions):
@@ -866,34 +873,28 @@ class SGPermission(Filter):
                     yield ep
 
     def __call__(self, resource):
-        def _accumulate(f, x):
-            '''
-            Accumulate an intermediate found value into the overall result.
-            '''
-            if x is not None:
-                f = (f is not None and x & f or x)
-            return f
-
         matched = []
         sg_id = resource['GroupId']
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
 
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
-            found = None
-            for f in self.vfilters:
-                if f(perm):
-                    found = True
-                else:
-                    found = False
-                    break
-            if found is None or found:
-                found = _accumulate(found, self.process_ports(perm))
-            if found is None or found:
-                found = _accumulate(found, self.process_cidrs(perm))
-            if found is None or found:
-                found = _accumulate(found, self.process_self_reference(perm, sg_id))
-            if not found:
+            perm_matches = {}
+            for idx, f in enumerate(self.vfilters):
+                perm_matches[idx] = bool(f(perm))
+            perm_matches['ports'] = self.process_ports(perm)
+            perm_matches['cidrs'] = self.process_cidrs(perm)
+            perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
+
+            perm_match_values = list(filter(
+                lambda x: x is not None, perm_matches.values()))
+
+            # account for one python behavior any([]) == False, all([]) == True
+            if match_op == all and not perm_match_values:
                 continue
-            matched.append(perm)
+
+            match = match_op(perm_match_values)
+            if match:
+                matched.append(perm)
 
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
@@ -909,6 +910,7 @@ class IPPermission(SGPermission):
         # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
+            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'SelfReference': {'type': 'boolean'}
         },
@@ -924,6 +926,7 @@ class IPPermissionEgress(SGPermission):
         # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['egress']},
+            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
             'SelfReference': {'type': 'boolean'}
         },
         'required': ['type']}
