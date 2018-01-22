@@ -46,8 +46,9 @@ class TestRestAccount(BaseTest):
 
 class TestRestResource(BaseTest):
 
-    def test_rest_resource(self):
-        session_factory = self.replay_flight_data('test_rest_resource_resource')
+    def test_rest_resource_query(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_resource_resource')
         p = self.load_policy({
             'name': 'all-rest-resources',
             'resource': 'rest-resource',
@@ -62,8 +63,8 @@ class TestRestResource(BaseTest):
              ('rtmgxfiay5', '/glenns_test')])
 
     def test_rest_resource_method_update(self):
-        session_factory = self.record_flight_data(
-            'test_rest_resource_resource')
+        session_factory = self.replay_flight_data(
+            'test_rest_resource_method_update')
         p = self.load_policy({
             'name': 'rest-method-iam',
             'resource': 'rest-resource',
@@ -75,18 +76,21 @@ class TestRestResource(BaseTest):
             'actions': [{
                 'type': 'update-method',
                 'patch': [{
-                    'op': 'patch',
-                    'path': 'authorizationType',
+                    'op': 'replace',
+                    'path': '/authorizationType',
                     'value': 'AWS_IAM'},
                 ]}],
         }, session_factory=session_factory)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
         methods = []
-        methods.extend([
-            r['c7n-matched-resource-methods'] for r in resources])
+        for r in resources:
+            methods.extend(r['c7n-matched-resource-methods'])
+        resource = resources.pop()
 
-        client = session_factory().client('apigateway')
         m = methods.pop()
+        client = session_factory().client('apigateway')
+
         method = client.get_method(
             restApiId=m['restApiId'],
             resourceId=m['resourceId'],

@@ -247,6 +247,7 @@ class FilterRestMethod(ValueFilter):
         return results
 
 
+@RestResource.action_registry.register('update-method')
 class UpdateRestMethod(BaseAction):
 
     schema = utils.type_schema(
@@ -265,13 +266,17 @@ class UpdateRestMethod(BaseAction):
             raise ValueError(
                 ("update-method action requires ",
                  "rest-method filter usage in policy"))
+        return self
 
     def process(self, resources):
-        client = utils.local_manager(
+        client = utils.local_session(
             self.manager.session_factory).client('apigateway')
+        ops = self.data['patch']
         for r in resources:
             for m in r.get(ANNOTATION_KEY, []):
                 client.update_method(
-                    restApiId=r['restApiId'],
-                    resourceId=r['resourceId'],
-                    httpMethod=m['httpMethod'])
+                    restApiId=m['restApiId'],
+                    resourceId=m['resourceId'],
+                    httpMethod=m['httpMethod'],
+                    patchOperations=ops)
+
