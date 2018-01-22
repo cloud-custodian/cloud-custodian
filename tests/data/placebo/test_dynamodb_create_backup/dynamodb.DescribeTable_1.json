@@ -2,92 +2,50 @@
     "status_code": 200, 
     "data": {
         "Table": {
-            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/Sphere11.Dev.ResourceLocks", 
-            "LocalSecondaryIndexes": [
-                {
-                    "IndexSizeBytes": 1444, 
-                    "IndexName": "PendingLocks", 
-                    "Projection": {
-                        "ProjectionType": "INCLUDE", 
-                        "NonKeyAttributes": [
-                            "LockDate"
-                        ]
-                    }, 
-                    "IndexArn": "arn:aws:dynamodb:us-east-1:644160558196:table/Sphere11.Dev.ResourceLocks/index/PendingLocks", 
-                    "KeySchema": [
-                        {
-                            "KeyType": "HASH", 
-                            "AttributeName": "AccountId"
-                        }, 
-                        {
-                            "KeyType": "RANGE", 
-                            "AttributeName": "LockStatus"
-                        }
-                    ], 
-                    "ItemCount": 20
-                }
-            ], 
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup", 
             "AttributeDefinitions": [
                 {
-                    "AttributeName": "AccountId", 
-                    "AttributeType": "S"
-                }, 
-                {
-                    "AttributeName": "LockStatus", 
-                    "AttributeType": "S"
-                }, 
-                {
-                    "AttributeName": "ResourceId", 
+                    "AttributeName": "test", 
                     "AttributeType": "S"
                 }
             ], 
             "ProvisionedThroughput": {
                 "NumberOfDecreasesToday": 0, 
-                "WriteCapacityUnits": 1, 
+                "WriteCapacityUnits": 5, 
                 "ReadCapacityUnits": 5
             }, 
-            "TableSizeBytes": 1804, 
-            "TableName": "Sphere11.Dev.ResourceLocks", 
+            "TableSizeBytes": 0, 
+            "TableName": "c7n-dynamodb-backup", 
             "TableStatus": "ACTIVE", 
-            "StreamSpecification": {
-                "StreamViewType": "NEW_IMAGE", 
-                "StreamEnabled": true
-            }, 
-            "TableId": "8825a0cf-eb68-479d-b45a-6f2a8a9e7d53", 
-            "LatestStreamLabel": "2017-01-25T12:47:29.703", 
+            "TableId": "d4f0100b-96ea-4429-8cf4-53cce61719dd", 
             "KeySchema": [
                 {
                     "KeyType": "HASH", 
-                    "AttributeName": "AccountId"
-                }, 
-                {
-                    "KeyType": "RANGE", 
-                    "AttributeName": "ResourceId"
+                    "AttributeName": "test"
                 }
             ], 
-            "ItemCount": 20, 
+            "ItemCount": 0, 
             "CreationDateTime": {
-                "hour": 7, 
+                "hour": 19, 
                 "__class__": "datetime", 
                 "month": 1, 
-                "second": 29, 
-                "microsecond": 700000, 
-                "year": 2017, 
-                "day": 25, 
-                "minute": 47
-            }, 
-            "LatestStreamArn": "arn:aws:dynamodb:us-east-1:644160558196:table/Sphere11.Dev.ResourceLocks/stream/2017-01-25T12:47:29.703"
+                "second": 40, 
+                "microsecond": 237000, 
+                "year": 2018, 
+                "day": 9, 
+                "minute": 56
+            }
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "IHVNJQFKKEJB90AP7AHFV52K2VVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "H1DCKE6QCKINLCC1LSDAI4SDQVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "IHVNJQFKKEJB90AP7AHFV52K2VVV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "content-length": "1291", 
+                "x-amzn-requestid": "H1DCKE6QCKINLCC1LSDAI4SDQVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "489", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "x-amz-crc32": "2343633655", 
+                "x-amz-crc32": "1152212742", 
                 "date": "Wed, 17 Jan 2018 00:39:00 GMT", 
                 "content-type": "application/x-amz-json-1.0"
             }

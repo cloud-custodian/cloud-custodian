@@ -16,7 +16,6 @@
             }
         }, 
         "TableNames": [
-            "Sphere11.Dev.ResourceLocks", 
             "c7n-dynamodb-backup"
         ]
     }
