@@ -279,13 +279,6 @@ def schema_completer(prefix):
     load_resources()
     components = prefix.split('.')
 
-    # Completions for resource
-    if len(components) == 1:
-        choices = [r for r in provider.resources().keys() if r.startswith('aws.%s' % prefix)]
-        if len(choices) == 1:
-            choices += ['{}{}'.format(choices[0], '.')]
-        return choices
-
     if components[0] in provider.clouds.keys():
         cloud_provider = components.pop(0)
         provider_resources = provider.resources(cloud_provider)
@@ -293,6 +286,14 @@ def schema_completer(prefix):
         cloud_provider = 'aws'
         provider_resources = provider.resources('aws')
         components[0] = "aws.%s" % components[0]
+
+    # Completions for resource
+    if len(components) == 1:
+        choices = [r for r in provider.resources().keys()
+                   if r.startswith(components[0])]
+        if len(choices) == 1:
+            choices += ['{}{}'.format(choices[0], '.')]
+        return choices
 
     if components[0] not in provider_resources.keys():
         return []
