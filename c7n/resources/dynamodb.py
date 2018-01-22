@@ -337,7 +337,7 @@ class DeleteBackup(BaseAction, StatusFilter):
                   - type: delete
     """
 
-    valid_status = ('ACTIVE',)
+    valid_status = ('AVAILABLE',)
     schema = type_schema('delete')
     permissions = ('dynamodb:DeleteBackup',)
 
