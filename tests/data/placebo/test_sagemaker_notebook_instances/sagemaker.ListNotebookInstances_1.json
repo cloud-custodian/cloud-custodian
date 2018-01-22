@@ -3,41 +3,41 @@
     "data": {
         "NotebookInstances": [
             {
-                "NotebookInstanceStatus": "InService", 
-                "Url": "c7n-test.notebook.us-east-1.sagemaker.aws", 
-                "NotebookInstanceName": "c7n-test", 
+                "NotebookInstanceStatus": "Stopped", 
+                "Url": "c7n-ni-test.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-ni-test", 
                 "CreationTime": {
-                    "hour": 15, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 35, 
-                    "microsecond": 498000, 
+                    "second": 51, 
+                    "microsecond": 486000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 25
+                    "day": 18, 
+                    "minute": 59
                 }, 
-                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test", 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test", 
                 "LastModifiedTime": {
-                    "hour": 15, 
+                    "hour": 17, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 23, 
-                    "microsecond": 173000, 
+                    "second": 45, 
+                    "microsecond": 64000, 
                     "year": 2018, 
-                    "day": 8, 
-                    "minute": 30
+                    "day": 18, 
+                    "minute": 9
                 }, 
                 "InstanceType": "ml.t2.medium"
             }
         ], 
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
+            "RetryAttempts": 1, 
             "HTTPStatusCode": 200, 
-            "RequestId": "cc1e679c-144d-4194-b2c2-b666ba95dbac", 
+            "RequestId": "375d7f2e-4016-4119-9530-5e6d9f9da4aa", 
             "HTTPHeaders": {
-                "date": "Mon, 08 Jan 2018 20:30:58 GMT", 
-                "x-amzn-requestid": "cc1e679c-144d-4194-b2c2-b666ba95dbac", 
-                "content-length": "336", 
+                "date": "Thu, 18 Jan 2018 22:17:19 GMT", 
+                "x-amzn-requestid": "375d7f2e-4016-4119-9530-5e6d9f9da4aa", 
+                "content-length": "343", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }

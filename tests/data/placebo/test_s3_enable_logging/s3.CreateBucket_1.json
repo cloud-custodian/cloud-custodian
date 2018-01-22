@@ -5,15 +5,15 @@
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "PdqazOCSuwE+Yp9EwqKc/thzRM0QNlgredV2QUs9PZo81mmEdTf80nfRCNTu8HZZ4fCBMZx16Kg=", 
-            "RequestId": "CCFBEAC13B8054A7", 
+            "HostId": "kV6ije6WIGfzpyC2/k3676bbiR8Xe8XhhRx2nzzO2hEziHemLTW6yA+APU35/nY8dDItQGUjYrc=", 
+            "RequestId": "C1C28651CB105AC3", 
             "HTTPHeaders": {
                 "content-length": "0", 
-                "x-amz-id-2": "PdqazOCSuwE+Yp9EwqKc/thzRM0QNlgredV2QUs9PZo81mmEdTf80nfRCNTu8HZZ4fCBMZx16Kg=", 
+                "x-amz-id-2": "kV6ije6WIGfzpyC2/k3676bbiR8Xe8XhhRx2nzzO2hEziHemLTW6yA+APU35/nY8dDItQGUjYrc=", 
                 "server": "AmazonS3", 
-                "x-amz-request-id": "CCFBEAC13B8054A7", 
+                "x-amz-request-id": "C1C28651CB105AC3", 
                 "location": "/superduper-and-magic", 
-                "date": "Tue, 04 Oct 2016 15:25:34 GMT"
+                "date": "Thu, 18 Jan 2018 09:46:19 GMT"
             }
         }
     }
