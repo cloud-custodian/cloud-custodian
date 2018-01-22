@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bf227919-2957-4604-b278-a26b89959e2b", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 20:27:02 GMT", 
+                "x-amzn-requestid": "bf227919-2957-4604-b278-a26b89959e2b", 
+                "content-length": "437", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "EndpointConfigName": "kmeans-2018-01-18-19-25-36-887", 
+        "CreationTime": {
+            "hour": 15, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 36, 
+            "microsecond": 710000, 
+            "year": 2018, 
+            "day": 18, 
+            "minute": 7
+        }, 
+        "ProductionVariants": [
+            {
+                "DesiredInstanceCount": 1, 
+                "DesiredWeight": 1.0, 
+                "VariantName": "AllTraffic", 
+                "CurrentWeight": 1.0, 
+                "CurrentInstanceCount": 1
+            }
+        ], 
+        "EndpointName": "kmeans-2018-01-18-19-25-36-887", 
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/kmeans-2018-01-18-19-25-36-887", 
+        "LastModifiedTime": {
+            "hour": 15, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 1, 
+            "microsecond": 935000, 
+            "year": 2018, 
+            "day": 18, 
+            "minute": 27
+        }, 
+        "EndpointStatus": "Deleting"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "f73d7a74-fd58-11e7-86bb-91cba7ad0737",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 19 Jan 2018 20:40:20 GMT",
+                "content-type": "application/json",
+                "content-length": "172",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "f73d7a74-fd58-11e7-86bb-91cba7ad0737"
+            },
+            "RetryAttempts": 0
+        },
+        "cloudwatchRoleArn": "arn:aws:iam::644160558196:role/ApiGwLogger",
+        "throttleSettings": {
+            "burstLimit": 5000,
+            "rateLimit": 10000.0
+        },
+        "features": [
+            "UsagePlans"
+        ],
+        "apiKeyVersion": "4"
+    }
+}

@@ -3,49 +3,49 @@
     "data": {
         "TrainingJobSummaries": [
             {
-                "TrainingJobName": "c7n-sagemaker-job", 
-                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-sagemaker-job", 
+                "TrainingJobName": "kmeans-2018-01-18-19-25-36-887", 
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-18-19-25-36-887", 
                 "CreationTime": {
-                    "hour": 13, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 21, 
-                    "microsecond": 688000, 
+                    "second": 37, 
+                    "microsecond": 95000, 
                     "year": 2018, 
-                    "day": 11, 
-                    "minute": 34
+                    "day": 18, 
+                    "minute": 25
                 }, 
-                "TrainingJobStatus": "Failed", 
+                "TrainingJobStatus": "Completed", 
                 "TrainingEndTime": {
-                    "hour": 13, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 42, 
-                    "microsecond": 569000, 
+                    "second": 59, 
+                    "microsecond": 833000, 
                     "year": 2018, 
-                    "day": 11, 
-                    "minute": 38
+                    "day": 18, 
+                    "minute": 31
                 }, 
                 "LastModifiedTime": {
-                    "hour": 13, 
+                    "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 42, 
-                    "microsecond": 827000, 
+                    "second": 59, 
+                    "microsecond": 845000, 
                     "year": 2018, 
-                    "day": 11, 
-                    "minute": 38
+                    "day": 18, 
+                    "minute": 31
                 }
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "df97e814-7026-45b8-a7b4-c41dd35f922e", 
+            "RequestId": "0388d414-2daa-40b2-a162-7caea211814b", 
             "HTTPHeaders": {
-                "date": "Fri, 12 Jan 2018 15:01:45 GMT", 
-                "x-amzn-requestid": "df97e814-7026-45b8-a7b4-c41dd35f922e", 
-                "content-length": "289", 
+                "date": "Thu, 18 Jan 2018 19:48:33 GMT", 
+                "x-amzn-requestid": "0388d414-2daa-40b2-a162-7caea211814b", 
+                "content-length": "2885", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }

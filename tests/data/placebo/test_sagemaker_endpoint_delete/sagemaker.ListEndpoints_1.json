@@ -3,27 +3,27 @@
     "data": {
         "Endpoints": [
             {
-                "EndpointName": "c7n-endpoint-002", 
-                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-002", 
+                "EndpointName": "kmeans-2018-01-18-19-25-36-887", 
+                "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/kmeans-2018-01-18-19-25-36-887", 
                 "CreationTime": {
-                    "hour": 14, 
+                    "hour": 15, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 49, 
-                    "microsecond": 745000, 
+                    "second": 36, 
+                    "microsecond": 710000, 
                     "year": 2018, 
-                    "day": 12, 
-                    "minute": 59
+                    "day": 18, 
+                    "minute": 7
                 }, 
                 "LastModifiedTime": {
                     "hour": 15, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 16, 
-                    "microsecond": 507000, 
+                    "second": 15, 
+                    "microsecond": 242000, 
                     "year": 2018, 
-                    "day": 12, 
-                    "minute": 13
+                    "day": 18, 
+                    "minute": 19
                 }, 
                 "EndpointStatus": "InService"
             }
@@ -31,11 +31,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "4ee0c27a-5f69-4428-9dd9-dba09ca6029c", 
+            "RequestId": "756c7ea3-02ae-40c8-b03b-aa5e10225565", 
             "HTTPHeaders": {
-                "date": "Fri, 12 Jan 2018 20:18:48 GMT", 
-                "x-amzn-requestid": "4ee0c27a-5f69-4428-9dd9-dba09ca6029c", 
-                "content-length": "231", 
+                "date": "Thu, 18 Jan 2018 20:26:59 GMT", 
+                "x-amzn-requestid": "756c7ea3-02ae-40c8-b03b-aa5e10225565", 
+                "content-length": "258", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
