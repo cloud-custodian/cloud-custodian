@@ -343,12 +343,18 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None):
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary():
+def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
     resources = {}
+
     for cname, ctype in clouds.items():
-        for rname, rtype in resources.items():
-            resources['%s.%s' % (cname, rname)] = rtype
+        if cloud_name is not None and cloud_name != cname:
+            continue
+        for rname, rtype in ctype.resources.items():
+            if qualify_name:
+                resources['%s.%s' % (cname, rname)] = rtype
+            else:
+                resources[rname] = rtype
 
     for type_name, resource_type in resources.items():
         classes = {'actions': {}, 'filters': {}}

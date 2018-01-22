@@ -39,3 +39,13 @@ class Azure(object):
 
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+
+
+def resources(cloud_provider=None):
+    results = {}
+    for cname, ctype in clouds.items():
+        if cloud_provider and cname != cloud_provider:
+            continue
+        for rname, rtype in ctype.resources.items():
+            results['%s.%s' % (cname, rname)] = rtype
+    return results
