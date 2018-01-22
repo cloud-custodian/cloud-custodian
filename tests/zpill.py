@@ -240,10 +240,10 @@ class PillTest(unittest.TestCase):
     def cleanUp(self):
         pass
 
-    def record_flight_data(self, test_case, zdata=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False):
         self.recording = True
-        if not zdata:
-            test_dir = os.path.join(self.placebo_dir, test_case)
+        test_dir = os.path.join(self.placebo_dir, test_case)
+        if not (zdata or augment):
             if os.path.exists(test_dir):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)

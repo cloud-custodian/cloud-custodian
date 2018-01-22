@@ -48,11 +48,15 @@ class NotebookInstance(QueryResourceManager):
     def augment(self, resources):
         def _augment(r):
             client = local_session(self.session_factory).client('sagemaker')
+
+            # List tags for the Notebook-Instance & set as attribute
             tags = client.list_tags(
                 ResourceArn=r['NotebookInstanceArn'])['Tags']
-            r.setdefault('Tags', []).extend(tags)
+            r['Tags'] = tags
             return r
 
+        # Describe notebook-instance & then list tags
+        resources = super(NotebookInstance, self).augment(resources)
         with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, resources)))
 
@@ -71,20 +75,6 @@ class SagemakerJob(QueryResourceManager):
         date = 'CreationTime'
         dimension = None
         filter_name = None
-
-    filter_registry = filters
-    permissions = ('sagemaker:ListTags',)
-
-    def augment(self, resources):
-        def _augment(r):
-            client = local_session(self.session_factory).client('sagemaker')
-            tags = client.list_tags(
-                ResourceArn=r['TrainingJobArn'])['Tags']
-            r.setdefault('Tags', []).extend(tags)
-            return r
-
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, resources)))
 
 
 @resources.register('sagemaker-endpoint')
@@ -110,9 +100,11 @@ class SagemakerEndpoint(QueryResourceManager):
             client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointArn'])['Tags']
-            e.setdefault('Tags', []).extend(tags)
+            e['Tags'] = tags
             return e
 
+        # Describe endpoints & then list tags
+        endpoints = super(SagemakerEndpoint, self).augment(endpoints)
         with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, endpoints)))
 
@@ -140,9 +132,10 @@ class SagemakerEndpointConfig(QueryResourceManager):
             client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointConfigArn'])['Tags']
-            e.setdefault('Tags', []).extend(tags)
+            e['Tags'] = tags
             return e
 
+        endpoints = super(SagemakerEndpointConfig, self).augment(endpoints)
         with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, endpoints)))
 
@@ -216,7 +209,7 @@ class RemoveTagNotebookInstance(RemoveTag):
 
             policies:
               - name: sagemaker-notebook-remove-tag
-                resource: notebook-instabce
+                resource: sagemaker-notebook
                 filters:
                   - "tag:BadTag": present
                 actions:
