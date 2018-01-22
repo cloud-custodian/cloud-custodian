@@ -242,11 +242,11 @@ class DeleteTable(BaseAction, StatusFilter):
         with self.executor_factory(max_workers=2) as w:
             for table_set in chunks(resources, 20):
                 futures.append(w.submit(self.delete_table, table_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception deleting dynamodb table set \n %s"
-                            % (f.exception()))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting dynamodb table set \n %s"
+                        % (f.exception()))
 
 
 @Table.action_registry.register('backup')
@@ -281,10 +281,7 @@ class CreateBackup(BaseAction, StatusFilter):
         c = local_session(self.manager.session_factory).client('dynamodb')
         futures = {}
 
-        if self.data.get('prefix'):
-            prefix = self.data.get('prefix')
-        else:
-            prefix = 'Backup'
+        prefix = self.data.get('prefix', 'Backup')
 
         with self.executor_factory(max_workers=2) as w:
             for t in resources:
