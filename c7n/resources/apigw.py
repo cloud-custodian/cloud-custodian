@@ -226,6 +226,7 @@ class FilterRestMethod(ValueFilter):
                         "Error retrieving methods on resources %s",
                         ["%s:%s" % (r['restApiId'], r['path'])
                          for r, mt in task_set])
+                    continue
                 for m in f.result():
                     if self.match(m):
                         results.add(m['resourceId'])
