@@ -42,7 +42,57 @@ class TestRestAccount(BaseTest):
         after_account = p.resource_manager._get_account()
         self.assertEqual(
             after_account['cloudwatchRoleArn'], log_role)
-            
+
+
+class TestRestResource(BaseTest):
+
+    def test_rest_resource(self):
+        session_factory = self.replay_flight_data('test_rest_resource_resource')
+        p = self.load_policy({
+            'name': 'all-rest-resources',
+            'resource': 'rest-resource',
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 4)
+        self.assertEqual(
+            sorted([(r['restApiId'], r['path']) for r in resources]),
+            [('5xhc1cnb7h', '/'),
+             ('5xhc1cnb7h', '/{proxy+}'),
+             ('rtmgxfiay5', '/'),
+             ('rtmgxfiay5', '/glenns_test')])
+
+    def test_rest_resource_method_update(self):
+        session_factory = self.record_flight_data(
+            'test_rest_resource_resource')
+        p = self.load_policy({
+            'name': 'rest-method-iam',
+            'resource': 'rest-resource',
+            'filters': [
+                {'type': 'rest-method',
+                 'key': 'authorizationType',
+                 'value': 'AWS_IAM',
+                 'op': 'not-equal'}],
+            'actions': [{
+                'type': 'update-method',
+                'patch': [{
+                    'op': 'patch',
+                    'path': 'authorizationType',
+                    'value': 'AWS_IAM'},
+                ]}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        methods = []
+        methods.extend([
+            r['c7n-matched-resource-methods'] for r in resources])
+
+        client = session_factory().client('apigateway')
+        m = methods.pop()
+        method = client.get_method(
+            restApiId=m['restApiId'],
+            resourceId=m['resourceId'],
+            httpMethod=m['httpMethod'])
+        self.assertEqual(method['authorizationType'], 'AWS_IAM')
+
 
 class TestRestStage(BaseTest):
 

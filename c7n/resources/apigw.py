@@ -13,15 +13,17 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from concurrent.futures import as_completed
 
+from c7n.actions import ActionRegistry, BaseAction
+from c7n.filters import FilterRegistry, ValueFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 
 
 @resources.register('rest-account')
 class RestAccount(ResourceManager):
+
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
 
@@ -117,7 +119,7 @@ class DescribeRestStage(query.ChildDescribeSource):
 
     def augment(self, resources):
         results = []
-        # Using capture parent id, changes the protocol
+        # Using capture parent, changes the protocol
         for parent_id, r in resources:
             r['restApiId'] = parent_id
             tags = r.setdefault('Tags', [])
@@ -151,6 +153,8 @@ class UpdateStage(BaseAction):
 @resources.register('rest-resource')
 class RestResource(query.ChildResourceManager):
 
+    child_source = 'describe-rest-resource'
+
     class resource_type(object):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId')
@@ -158,3 +162,116 @@ class RestResource(query.ChildResourceManager):
         id = 'id'
         name = 'path'
         dimension = None
+
+
+@query.sources.register('describe-rest-resource')
+class DescribeRestResource(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super(DescribeRestResource, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        results = []
+        # Using capture parent id, changes the protocol
+        for parent_id, r in resources:
+            r['restApiId'] = parent_id
+            results.append(r)
+        return results
+
+
+ANNOTATION_KEY = 'c7n-matched-resource-methods'
+
+
+@RestResource.filter_registry.register('rest-method')
+class FilterRestMethod(ValueFilter):
+
+    schema = utils.type_schema(
+        'rest-method',
+        method={'type': 'string', 'enum': [
+            'all', 'ANY', 'PUT', 'GET', "POST",
+            "DELETE", "OPTIONS", "HEAD", "PATCH"]},
+        rinherit=ValueFilter.schema)
+    permissions = ('apigateway:GET',)
+
+    def process(self, resources, event=None):
+        method_set = self.data.get('method', 'all')
+        # 10 req/s with burst to 40
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+
+        # uniqueness constraint validity across apis?
+        resource_map = {r['id']: r for r in resources}
+
+        futures = {}
+        results = set()
+
+        with self.executor_factory(max_workers=2) as w:
+            tasks = []
+            for r in resources:
+                r_method_set = method_set
+                if method_set == 'all':
+                    r_method_set = r.get('resourceMethods', {}).keys()
+                for m in r_method_set:
+                    tasks.append((r, m))
+            for task_set in utils.chunks(tasks, 20):
+                futures[w.submit(
+                    self.process_task_set, client, task_set)] = task_set
+
+            for f in as_completed(futures):
+                task_set = futures[f]
+                if f.exception():
+                    self.manager.log.warning(
+                        "Error retrieving methods on resources %s",
+                        ["%s:%s" % (r['restApiId'], r['path'])
+                         for r, mt in task_set])
+                for m in f.result():
+                    if self.match(m):
+                        results.add(m['resourceId'])
+                        resource_map[m['resourceId']].setdefault(
+                            ANNOTATION_KEY, []).append(m)
+        return [resource_map[rid] for rid in results]
+
+    def process_task_set(self, client, task_set):
+        results = []
+        for r, m in task_set:
+            method = client.get_method(
+                restApiId=r['restApiId'],
+                resourceId=r['id'],
+                httpMethod=m)
+            method.pop('ResponseMetadata', None)
+            method['restApiId'] = r['restApiId']
+            method['resourceId'] = r['id']
+            results.append(method)
+        return results
+
+
+class UpdateRestMethod(BaseAction):
+
+    schema = utils.type_schema(
+        'update-method',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['patch'])
+    permissions = ('apigateway:GET',)
+
+    def validate(self):
+        found = False
+        for f in self.manager.filters:
+            if isinstance(f, FilterRestMethod):
+                found = True
+                break
+        if not found:
+            raise ValueError(
+                ("update-method action requires ",
+                 "rest-method filter usage in policy"))
+
+    def process(self, resources):
+        client = utils.local_manager(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            for m in r.get(ANNOTATION_KEY, []):
+                client.update_method(
+                    restApiId=r['restApiId'],
+                    resourceId=r['resourceId'],
+                    httpMethod=m['httpMethod'])

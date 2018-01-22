@@ -478,6 +478,9 @@ class ChildResourceManager(QueryResourceManager):
             source = self.child_source
         return source
 
+    def get_parent_manager(self):
+        return self.get_resource_manager(self.resource_type.parent_spec[0])
+
 
 def _batch_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
