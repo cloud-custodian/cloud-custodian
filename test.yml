@@ -1,0 +1,11 @@
+policies:
+
+- name: c7n-dynamodb-create-prefixed-backup
+  resource: dynamodb-table
+  filters:
+    - type: value
+      key: TableName 
+      value: c7n-dynamodb-backup
+  actions:
+    - type: backup
+      prefix: example

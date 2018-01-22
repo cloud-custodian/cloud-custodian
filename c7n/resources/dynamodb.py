@@ -104,6 +104,14 @@ class StatusFilter(object):
             self.__class__.__name__, len(result), orig_count))
         return result
 
+    def filter_backup_state(self, tables, states=None):
+        states = states or self.valid_states
+        orig_count = len(tables)
+        result = [t for t in tables if t['BackupStatus'] in states]
+        self.log.info("%s %d of %d tables" % (
+            self.__class__.__name__, len(result), orig_count))
+        return result
+
 
 @Table.action_registry.register('mark-for-op')
 class TagDelayedAction(TagDelayedAction):
@@ -229,20 +237,23 @@ class DeleteTable(BaseAction, StatusFilter):
         if not len(resources):
             return
 
-        for table_set in chunks(resources, 20):
-            with self.executor_factory(max_workers=3) as w:
-                futures = []
+        futures = []
+
+        with self.executor_factory(max_workers=2) as w:
+            for table_set in chunks(resources, 20):
                 futures.append(w.submit(self.delete_table, table_set))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
-                            "Exception deleting dynamodb table set \n %s" % (
-                                f.exception()))
+                            "Exception deleting dynamodb table set \n %s"
+                            % (f.exception()))
 
 
 @Table.action_registry.register('backup')
 class CreateBackup(BaseAction, StatusFilter):
-    """Creates a manual backup of a DynamoDB table
+    """Creates a manual backup of a DynamoDB table. Use of the optional
+       prefix flag will attach a user specified prefix. Otherwise,
+       the backup prefix will default to 'Backup'.
 
     :example:
 
@@ -253,26 +264,41 @@ class CreateBackup(BaseAction, StatusFilter):
                 resource: dynamodb-table
                 actions:
                   - type: backup
+                    prefix: custom
     """
 
     valid_status = ('ACTIVE',)
-    schema = type_schema('backup')
+    schema = type_schema('backup',
+                prefix={'type': 'string'})
     permissions = ('dynamodb:CreateBackup',)
 
-    def process(self, tables):
-        tables = self.filter_table_state(
-            tables, self.valid_status)
-        if not len(tables):
+    def process(self, resources):
+        resources = self.filter_table_state(
+            resources, self.valid_status)
+        if not len(resources):
             return
 
         c = local_session(self.manager.session_factory).client('dynamodb')
+        futures = {}
 
-        for table_set in chunks(tables, 20):
-            for t in table_set:
-                arn = c.create_backup(
+        if self.data.get('prefix'):
+            prefix = self.data.get('prefix')
+        else:
+            prefix = 'Backup'
+
+        with self.executor_factory(max_workers=2) as w:
+            for t in resources:
+                futures[w.submit(
+                    c.create_backup,
                     BackupName=snapshot_identifier(
-                        'Backup', t['TableName']),
-                    TableName=t['TableName'])['BackupDetails']['BackupArn']
+                        prefix, t['TableName']),
+                    TableName=t['TableName'])] = t
+            for f in as_completed(futures):
+                t = futures[f]
+                if f.exception():
+                    self.manager.log.warning(
+                        "Could not complete DynamoDB backup table:%s", t)
+                arn = f.result()['BackupDetails']['BackupArn']
                 t['c7n:BackupArn'] = arn
 
 
@@ -293,7 +319,7 @@ class Backup(query.QueryResourceManager):
 
 
 @Backup.action_registry.register('delete')
-class DeleteBackup(BaseAction):
+class DeleteBackup(BaseAction, StatusFilter):
     """Deletes backups of a DynamoDB table
 
     :example:
@@ -311,21 +337,31 @@ class DeleteBackup(BaseAction):
                   - type: delete
     """
 
+    valid_status = ('ACTIVE',)
     schema = type_schema('delete')
     permissions = ('dynamodb:DeleteBackup',)
 
-    def process(self, tables):
+    def process(self, backups):
+        backups = self.filter_backup_state(
+            backups, self.valid_status)
+        if not len(backups):
+            return
 
         c = local_session(self.manager.session_factory).client('dynamodb')
 
-        for table_set in chunks(tables, 20):
+        for table_set in chunks(backups, 20):
             self.process_dynamodb_backups(table_set, c)
 
     def process_dynamodb_backups(self, table_set, c):
 
         for t in table_set:
-            c.delete_backup(
-                BackupArn=t['BackupArn'])
+            try:
+                c.delete_backup(
+                    BackupArn=t['BackupArn'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    self.log.warning("Could not complete DynamoDB backup table:%s", t)
+                return
 
 
 @resources.register('dynamodb-stream')
