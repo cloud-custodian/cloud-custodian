@@ -279,4 +279,3 @@ class UpdateRestMethod(BaseAction):
                     resourceId=m['resourceId'],
                     httpMethod=m['httpMethod'],
                     patchOperations=ops)
-

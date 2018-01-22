@@ -145,7 +145,3 @@ class TestRestStage(BaseTest):
             self.assertEqual(m['loggingLevel'], 'INFO')
             self.assertEqual(m['dataTraceEnabled'], True)
         self.assertTrue(found)
-                            
-        
-        
-        
