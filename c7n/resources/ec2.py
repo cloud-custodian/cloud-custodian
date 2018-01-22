@@ -254,7 +254,7 @@ class AttachedVolume(ValueFilter):
             resource: ec2
             filters:
               - type: ebs
-                key: encrypted
+                key: Encrypted
                 value: true
     """
 
