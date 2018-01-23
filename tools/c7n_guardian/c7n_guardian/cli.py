@@ -38,7 +38,8 @@ def cli():
 
 
 @cli.command()
-@click.option('-c', '--config', required=True, help="Accounts config file", type=click.Path())
+@click.option('-c', '--config',
+              required=True, help="Accounts config file", type=click.Path())
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
@@ -79,7 +80,8 @@ def report(config, tags, accounts, master, debug):
 
 
 @cli.command()
-@click.option('-c', '--config', required=True, help="Accounts config file", type=click.Path())
+@click.option('-c', '--config',
+              required=True, help="Accounts config file", type=click.Path())
 @click.option('-t', '--tags', multiple=True, default=None)
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
@@ -226,10 +228,10 @@ def enable(config, master, tags, accounts, debug, message, region):
             a = futures[f]
             if f.exception():
                 log.error("Error processing account:%s error:%s",
-                          f.exception())
+                          a['name'], f.exception())
                 continue
             if f.result():
-                log.info('Enabled guard duty on account:%s' % account['name'])
+                log.info('Enabled guard duty on account:%s' % a['name'])
 
 
 def enable_account(account, master_account_id, region):
