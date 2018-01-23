@@ -1211,7 +1211,7 @@ class KmsKeyActive(Filter):
         return self
 
     def process(self, snapshots, event=None):
-       return _filter_kms_active(self, snapshots)
+        return _filter_kms_active(self, snapshots)
 
 def _filter_kms_active(self, resources):
     if not self.data.get('value', True):
@@ -1229,6 +1229,7 @@ def _filter_kms_active(self, resources):
         if item['Encrypted'] and item['KmsKeyId'] not in key_ids:
             matches.append(item)
     return matches
+
 
 @RDSSnapshot.filter_registry.register('cross-account')
 class CrossAccountAccess(CrossAccountAccessFilter):

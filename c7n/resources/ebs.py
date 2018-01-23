@@ -469,7 +469,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
 
 @Snapshot.filter_registry.register('skip-active-kms')
-class KmsKeyActive(Filter):
+class KmsKeyActiveSnapshot(Filter):
     """
     Filter to ignore snapshots that have an active KMS Key.
 
@@ -514,7 +514,8 @@ class KmsKeyActive(Filter):
         return self
 
     def process(self, snapshots, event=None):
-       return _filter_kms_active(self, snapshots)
+        return _filter_kms_active(self, snapshots)
+
 
 @filters.register('skip-active-kms')
 class KmsKeyActive(Filter):
