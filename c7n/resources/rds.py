@@ -1223,7 +1223,7 @@ def _filter_kms_active(self, resources):
 
     matches = []
     for item in resources:
-        elif item['Encrypted'] and item['KmsKeyId'] not in key_ids:
+        if item['Encrypted'] and item['KmsKeyId'] not in key_ids:
             matches.append(item)
     return matches
 
