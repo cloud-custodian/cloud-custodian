@@ -1213,6 +1213,7 @@ class KmsKeyActive(Filter):
     def process(self, snapshots, event=None):
         return _filter_kms_active(self, snapshots)
 
+
 def _filter_kms_active(self, resources):
     if not self.data.get('value', True):
         return resources
