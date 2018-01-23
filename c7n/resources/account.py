@@ -145,7 +145,7 @@ class CloudTrailEnabled(Filter):
             trails = [t for t in trails if t.get('IsMultiRegionTrail')]
         if self.data.get('notifies'):
             trails = [t for t in trails if t.get('SnsTopicARN')]
-        if self.data.get('running'):
+        if self.data.get('running', True):
             running = []
             for t in list(trails):
                 t['Status'] = status = client.get_trail_status(

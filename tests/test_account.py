@@ -138,8 +138,10 @@ class AccountTests(BaseTest):
                 {'type': 'check-cloudtrail',
                  'notifies': True}
             ]}, session_factory=session_factory)
-        # Skip first DescribeTrail call
-        local_session(session_factory).client('cloudtrail').describe_trails()
+        # Skip first DescribeTrail/GetTrailStatus call
+        client = local_session(session_factory).client('cloudtrail')
+        t = client.describe_trails()['trailList'][0]
+        client.get_trail_status(Name=t['TrailARN'])
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
