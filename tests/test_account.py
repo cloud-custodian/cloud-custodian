@@ -105,10 +105,22 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_cloudtrail_notifies(self):
+    def test_cloudtrail_running(self):
+        session_factory = self.replay_flight_data('test_cloudtrail_enable')
+        p = self.load_policy({
+            'name': 'trail-running',
+            'resource': 'account',
+            'filters': [
+                {'type': 'check-cloudtrail',
+                 'running': True}
+            ]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_notifies_disabled(self):
         session_factory = self.replay_flight_data('test_account_trail')
         p = self.load_policy({
-            'name': 'trail-enabled',
+            'name': 'trail-notifies-disabled',
             'resource': 'account',
             'filters': [
                 {'type': 'check-cloudtrail',
@@ -116,6 +128,22 @@ class AccountTests(BaseTest):
             ]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_cloudtrail_notifies_enabled(self):
+        session_factory = self.replay_flight_data('test_cloudtrail_enable')
+        p = self.load_policy({
+            'name': 'trail-notifies-disabled',
+            'resource': 'account',
+            'filters': [
+                {'type': 'check-cloudtrail',
+                 'notifies': True}
+            ]}, session_factory=session_factory)
+        # Skip first DescribeTrail/GetTrailStatus call
+        client = local_session(session_factory).client('cloudtrail')
+        t = client.describe_trails()['trailList'][0]
+        client.get_trail_status(Name=t['TrailARN'])
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_config_enabled(self):
         session_factory = self.replay_flight_data('test_account_config')

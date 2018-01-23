@@ -144,7 +144,7 @@ class CloudTrailEnabled(Filter):
         if self.data.get('multi-region'):
             trails = [t for t in trails if t.get('IsMultiRegionTrail')]
         if self.data.get('notifies'):
-            trails = [t for t in trails if t.get('SNSTopicArn')]
+            trails = [t for t in trails if t.get('SnsTopicARN')]
         if self.data.get('running', True):
             running = []
             for t in list(trails):
