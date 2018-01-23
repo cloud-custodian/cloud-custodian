@@ -4,42 +4,28 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b825f2c5-52c7-463b-82e7-48309ed18ae1", 
+            "RequestId": "bef7ebce-8d03-439e-9748-a70ea6b5e809", 
             "HTTPHeaders": {
-                "date": "Fri, 12 Jan 2018 20:11:12 GMT", 
-                "x-amzn-requestid": "b825f2c5-52c7-463b-82e7-48309ed18ae1", 
-                "content-length": "403", 
+                "date": "Thu, 18 Jan 2018 19:58:53 GMT", 
+                "x-amzn-requestid": "bef7ebce-8d03-439e-9748-a70ea6b5e809", 
+                "content-length": "219", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
         }, 
         "EndpointConfigs": [
             {
-                "EndpointConfigName": "c7n-endpoint-config-002", 
-                "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-endpoint-config-002", 
+                "EndpointConfigName": "kmeans-2018-01-18-19-25-36-887", 
+                "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/kmeans-2018-01-18-19-25-36-887", 
                 "CreationTime": {
                     "hour": 14, 
                     "__class__": "datetime", 
                     "month": 1, 
-                    "second": 24, 
-                    "microsecond": 529000, 
+                    "second": 40, 
+                    "microsecond": 797000, 
                     "year": 2018, 
-                    "day": 12, 
-                    "minute": 59
-                }
-            }, 
-            {
-                "EndpointConfigName": "kmeans-2018-01-12-19-50-08-721", 
-                "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/kmeans-2018-01-12-19-50-08-721", 
-                "CreationTime": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 19, 
-                    "microsecond": 387000, 
-                    "year": 2018, 
-                    "day": 12, 
-                    "minute": 57
+                    "day": 18, 
+                    "minute": 32
                 }
             }
         ]

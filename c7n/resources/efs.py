@@ -13,12 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 import functools
+import logging
 
 from c7n.actions import Action
 from c7n.manager import resources
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema, get_retry, generate_arn
+
+log = logging.getLogger('custodian.efs')
 
 
 @resources.register('efs')
@@ -72,6 +76,43 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         dimension = None
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
+
+
+@ElasticFileSystemMountTarget.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
+
+
+@ElasticFileSystemMountTarget.filter_registry.register('security-group')
+class SecurityGroup(SecurityGroupFilter):
+
+    efs_group_cache = None
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+
+        if self.efs_group_cache:
+            group_ids = set()
+            for r in resources:
+                group_ids.update(
+                    self.efs_group_cache.get(r['MountTargetId'], ()))
+            return list(group_ids)
+
+        client = local_session(self.manager.session_factory).client('efs')
+        groups = {}
+        group_ids = set()
+        retry = get_retry(('Throttled',), 12)
+
+        for r in resources:
+            groups[r['MountTargetId']] = retry(
+                client.describe_mount_target_security_groups,
+                MountTargetId=r['MountTargetId'])['SecurityGroups']
+            group_ids.update(groups[r['MountTargetId']])
+
+        self.efs_group_cache = groups
+        return list(group_ids)
 
 
 @ElasticFileSystem.action_registry.register('delete')

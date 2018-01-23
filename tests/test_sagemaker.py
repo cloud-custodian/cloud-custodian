@@ -22,7 +22,11 @@ class TestNotebookInstance(BaseTest):
             'test_sagemaker_notebook_instances')
         p = self.load_policy({
             'name': 'list-sagemaker-notebooks',
-            'resource': 'sagemaker-notebook'
+            'resource': 'sagemaker-notebook',
+            'filters': [{
+                'type': 'value',
+                'key': 'SubnetId',
+                'value': 'subnet-efbcccb7'}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -140,10 +144,9 @@ class TestNotebookInstance(BaseTest):
         session_factory = self.replay_flight_data(
             'test_sagemaker_delete_notebook_instance')
         p = self.load_policy({
-            'name': 'delete-invalid-sagemaker-notebook',
+            'name': 'delete-unencrypted-sagemaker-notebook',
             'resource': 'sagemaker-notebook',
-            'filters': [
-                {'tag:DeleteMe': 'present'}],
+            'filters': [{'KmsKeyId': 'empty'}],
             'actions': [{'type': 'delete'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
@@ -160,21 +163,9 @@ class TestSagemakerJob(BaseTest):
             'test_sagemaker_training_jobs')
         p = self.load_policy({
             'name': 'list-training-jobs',
-            'resource': 'sagemaker-job'
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-    def test_job_value_filter(self):
-        session_factory = self.replay_flight_data(
-            'test_sagemaker_training_jobs_value_filter')
-        p = self.load_policy({
-            'name': 'unencrypted-training-jobs',
-            'resource': 'sagemaker-job',
             'filters': [{
-                'type': 'value',
-                'key': 'OutputDataConfig.KmsKeyId',
-                'value': 'empty'}]
+                'TrainingJobStatus': 'Completed'}],
+            'resource': 'sagemaker-job'
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -186,14 +177,19 @@ class TestSagemakerJob(BaseTest):
             'name': 'stop-training-job',
             'resource': 'sagemaker-job',
             'filters': [
-                {'TrainingJobName': 'c7n-job-2018-01-12-16-06-41'}],
+                {'TrainingJobStatus': 'InProgress'},
+                {'type': 'value',
+                 'key': 'InputDataConfig[].ChannelName',
+                 'value': 'train',
+                 'op': 'contains'}],
             'actions': [{
                 'type': 'stop'}]
         }, session_factory=session_factory)
         resources = p.run()
+        self.assertTrue(len(resources), 1)
         client = session_factory(region='us-east-1').client('sagemaker')
         status = client.describe_training_job(
-            TrainingJobName='c7n-job-2018-01-12-16-06-41'
+            TrainingJobName='kmeans-2018-01-18-19-21-19-098'
         )['TrainingJobStatus']
         self.assertEqual(status, 'Stopping')
 
@@ -208,17 +204,17 @@ class TestSagemakerEndpoint(BaseTest):
             'resource': 'sagemaker-endpoint',
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_sagemaker_endpoint_delete(self):
         session_factory = self.replay_flight_data(
             'test_sagemaker_endpoint_delete')
         client = session_factory(region='us-east-1').client('sagemaker')
         p = self.load_policy({
-            'name': 'list-endpoints',
+            'name': 'delete-endpoint-by-config',
             'resource': 'sagemaker-endpoint',
             'filters': [{
-                'EndpointName': 'c7n-endpoint-002'
+                'EndpointConfigName': 'kmeans-2018-01-18-19-25-36-887'
             }],
             'actions': [{
                 'type': 'delete'}]
@@ -226,7 +222,7 @@ class TestSagemakerEndpoint(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         status = client.describe_endpoint(
-            EndpointName='c7n-endpoint-002')['EndpointStatus']
+            EndpointName=resources[0]['EndpointName'])['EndpointStatus']
         self.assertEqual(status, 'Deleting')
 
 
@@ -240,7 +236,7 @@ class TestSagemakerEndpointConfig(BaseTest):
             'resource': 'sagemaker-endpoint-config'
         }, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_sagemaker_endpoint_config_delete(self):
         session_factory = self.replay_flight_data(
@@ -250,8 +246,10 @@ class TestSagemakerEndpointConfig(BaseTest):
             'name': 'delete-endpoint-config',
             'resource': 'sagemaker-endpoint-config',
             'filters': [{
-                'EndpointConfigName': 'c7n-endpoint-config-002'
-            }],
+                'type': 'value',
+                'key': 'ProductionVariants[].InstanceType',
+                'value': 'ml.m4.xlarge',
+                'op': 'contains'}],
             'actions': [{
                 'type': 'delete'}]
         }, session_factory=session_factory)
