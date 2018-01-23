@@ -1201,6 +1201,9 @@ class KmsKeyActive(Filter):
 
     schema = type_schema('skip-active-kms', value={'type': 'boolean'})
 
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds').get_permissions()
+
     def validate(self):
         if not isinstance(self.data.get('value', True), bool):
             raise FilterValidationError(
