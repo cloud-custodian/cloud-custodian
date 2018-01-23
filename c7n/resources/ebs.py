@@ -129,6 +129,24 @@ def _filter_ami_snapshots(self, snapshots):
     return matches
 
 
+def _filter_kms_active(self, resources):
+    if not self.data.get('value', True):
+        return resources
+    # try using cache first to get a listing of all KMS Keys and compares resources to the list
+    # This will populate the cache.
+    kms_keys = self.manager.get_resource_manager('kms-key').resources()
+
+    key_ids = []
+    for key in kms_keys:
+        key_ids.append(key['KeyArn'])
+
+    matches = []
+    for item in resources:
+        if item['Encrypted'] and item['KmsKeyId'] not in key_ids:
+            matches.append(item)
+    return matches
+
+
 @Snapshot.filter_registry.register('cross-account')
 class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
@@ -448,6 +466,97 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
+
+
+@Snapshot.filter_registry.register('skip-active-kms')
+class KmsKeyActive(Filter):
+    """
+    Filter to ignore snapshots that have an active KMS Key.
+
+    This filter is 'true' by default.
+
+    :example:
+
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots-with-missing-keys
+                resource: ebs-snapshot
+                filters:
+                  - skip-active-kms
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: ebs-snapshot
+                filters:
+                  - type: skip-active-kms
+                    value: false
+
+    """
+
+    schema = type_schema('skip-active-kms', value={'type': 'boolean'})
+
+    def validate(self):
+        if not isinstance(self.data.get('value', True), bool):
+            raise FilterValidationError(
+                "invalid config: expected boolean value")
+        return self
+
+    def process(self, snapshots, event=None):
+       return _filter_kms_active(self, snapshots)
+
+@filters.register('skip-active-kms')
+class KmsKeyActive(Filter):
+    """
+    Filter to ignore volumes that have an active KMS Key.
+
+    This filter is 'true' by default.
+
+    :example:
+
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-volumes-with-missing-keys
+                resource: ebs
+                filters:
+                  - skip-active-kms
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-volumes
+                resource: ebs
+                filters:
+                  - type: skip-active-kms
+                    value: false
+
+    """
+
+    schema = type_schema('skip-active-kms', value={'type': 'boolean'})
+
+    def validate(self):
+        if not isinstance(self.data.get('value', True), bool):
+            raise FilterValidationError(
+                "invalid config: expected boolean value")
+        return self
+
+    def process(self, resources, event=None):
+        return _filter_kms_active(self, resources)
 
 
 @filters.register('fault-tolerant')
