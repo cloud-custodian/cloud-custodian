@@ -271,12 +271,15 @@ class SnapshotDelete(BaseAction):
 
     @worker
     def process_snapshot_set(self, snapshots_set):
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+
         c = local_session(self.manager.session_factory).client('ec2')
         for s in snapshots_set:
             if s['SnapshotId'] in self.image_snapshots:
                 continue
             try:
-                c.delete_snapshot(
+                retry(c.delete_snapshot,
                     SnapshotId=s['SnapshotId'],
                     DryRun=self.manager.config.dryrun)
             except ClientError as e:
