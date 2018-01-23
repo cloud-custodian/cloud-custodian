@@ -358,6 +358,7 @@ class DeleteBackup(BaseAction, StatusFilter):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
                     self.log.warning("Could not complete DynamoDB backup table:%s", t)
+                    continue
                 raise
 
 
