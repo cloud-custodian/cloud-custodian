@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobSummaries": [
+            {
+                "TrainingJobStatus": "InProgress", 
+                "TrainingJobName": "kmeans-2018-01-18-19-21-19-098", 
+                "LastModifiedTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 19, 
+                    "microsecond": 984000, 
+                    "year": 2018, 
+                    "day": 18, 
+                    "minute": 21
+                }, 
+                "CreationTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 19, 
+                    "microsecond": 378000, 
+                    "year": 2018, 
+                    "day": 18, 
+                    "minute": 21
+                }, 
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-18-19-21-19-098"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "eb43d672-025a-4266-8a27-841c3ba37216", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 19:23:21 GMT", 
+                "x-amzn-requestid": "eb43d672-025a-4266-8a27-841c3ba37216", 
+                "content-length": "2562", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

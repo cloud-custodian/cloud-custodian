@@ -221,6 +221,61 @@ class NetworkLocationTest(BaseTest):
             }])
 
     @functional
+    def test_network_location_ignore(self):
+        # if we use network-location-with ignore we won't find any resources.
+
+        # Note we're reusing another tests data set, with the exact same
+        # resource creation, just altering our policy filter to examine
+        # a different parameter on results.
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
+        client = self.factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+                'Subnet']['SubnetId']
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        db_sg_id = client.create_security_group(
+            GroupName="db-tier",
+            VpcId=vpc_id,
+            Description="for dbs")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=db_sg_id)
+
+        nic = client.create_network_interface(
+            SubnetId=web_sub_id,
+            Groups=[web_sg_id, db_sg_id])['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id, nic],
+            Tags=[{'Key': 'Location', 'Value': 'web'}])
+        client.create_tags(
+            Resources=[db_sg_id],
+            Tags=[{'Key': 'Location', 'Value': 'db'}])
+
+        p = self.load_policy({
+            'name': 'netloc',
+            'resource': 'eni',
+            'filters': [
+                {'NetworkInterfaceId': nic},
+                {'type': 'network-location',
+                 'ignore': [
+                     {'GroupName': 'db-tier'}],
+                 'key': 'tag:Location'}]
+            }, session_factory=self.factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
     def test_network_location_sg_cardinality(self):
         self.factory = self.replay_flight_data(
             'test_network_location_sg_cardinality')
@@ -671,7 +726,7 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []}])
 
     @functional
-    def test_self_reference(self):
+    def test_self_reference_once(self):
         factory = self.replay_flight_data(
             'test_security_group_self_reference')
         client = factory().client('ec2')
@@ -737,12 +792,14 @@ class SecurityGroupTest(BaseTest):
             'name': 'sg-find0',
             'resource': 'security-group',
             'filters': [
+                {'GroupName': 'sg1'},
                 {'type': 'ingress',
-                 'SelfReference': False},
-                {'GroupName': 'sg1'}]
+                 'match-operator': 'and',
+                 'Ports': [80],
+                 'SelfReference': False}]
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
         p = self.load_policy({
             'name': 'sg-find1',
@@ -1061,6 +1118,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': True}
                 ]})
         manager = p.get_resource_manager()
@@ -1072,6 +1130,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': False}
                 ]})
         manager = p.get_resource_manager()
@@ -1083,6 +1142,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '0.0.0.0/0',
                     'op': 'eq',
@@ -1135,6 +1195,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '10.42.3.0/24',
                     'op': 'eq',

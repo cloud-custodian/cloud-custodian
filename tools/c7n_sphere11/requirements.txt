@@ -4,9 +4,9 @@ botocore>=1.5.2
 click==6.7
 colorama>=0.3.7
 docutils>=0.13.1
-futures==3.1.1
+futures==3.2.0
 jmespath==0.9.3
-pyasn1==0.3.7
+pyasn1==0.4.2
 python-dateutil==2.6.1
 PyYAML==3.12
 requests>=2.12.5

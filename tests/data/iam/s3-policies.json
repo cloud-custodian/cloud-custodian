@@ -213,7 +213,9 @@
               "server-side-encryption", "body"]
           }
         },
-        "Principal": "arn:aws:iam::123456789012:root"
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
       }
     ]
   },
@@ -255,7 +257,9 @@
               "server-side-encryption", "body"]
           }
         },
-        "Principal": "arn:aws:iam::123456789012:root"
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
       }
     ]
   },

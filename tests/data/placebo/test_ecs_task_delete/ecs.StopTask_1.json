@@ -1,0 +1,130 @@
+{
+    "status_code": 200,
+    "data": {
+        "task": {
+            "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/0f3e3546-6973-4d36-82ea-292de5d9fea4",
+            "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+            "overrides": {
+                "containerOverrides": [
+                    {
+                        "name": "webserver"
+                    }
+                ]
+            },
+            "lastStatus": "RUNNING",
+            "desiredStatus": "STOPPED",
+            "cpu": "256",
+            "memory": "1024",
+            "containers": [
+                {
+                    "containerArn": "arn:aws:ecs:us-east-1:644160558196:container/ebe14ec5-4e30-41fa-abdc-4c6938ca81e0",
+                    "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/0f3e3546-6973-4d36-82ea-292de5d9fea4",
+                    "name": "webserver",
+                    "lastStatus": "RUNNING",
+                    "networkBindings": [],
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "563eeadf-3413-4fed-a5d9-3a76e114b254",
+                            "privateIpv4Address": "10.0.0.130"
+                        }
+                    ]
+                }
+            ],
+            "startedBy": "ecs-svc/9223370520926505959",
+            "version": 4,
+            "stoppedReason": "custodian policy",
+            "pullStartedAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 14,
+                "second": 9,
+                "microsecond": 984000
+            },
+            "pullStoppedAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 15,
+                "second": 14,
+                "microsecond": 0
+            },
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 13,
+                "second": 28,
+                "microsecond": 70000
+            },
+            "startedAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 15,
+                "second": 14,
+                "microsecond": 984000
+            },
+            "stoppingAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 15,
+                "second": 40,
+                "microsecond": 881000
+            },
+            "group": "service:home-web",
+            "launchType": "FARGATE",
+            "platformVersion": "1.0.0",
+            "attachments": [
+                {
+                    "id": "563eeadf-3413-4fed-a5d9-3a76e114b254",
+                    "type": "ElasticNetworkInterface",
+                    "status": "ATTACHED",
+                    "details": [
+                        {
+                            "name": "subnetId",
+                            "value": "subnet-1c37ab41"
+                        },
+                        {
+                            "name": "networkInterfaceId",
+                            "value": "eni-0c5dbad0"
+                        },
+                        {
+                            "name": "macAddress",
+                            "value": "0e:c9:88:10:56:18"
+                        },
+                        {
+                            "name": "privateIPv4Address",
+                            "value": "10.0.0.130"
+                        }
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "2644aa34-fa63-11e7-bc99-c5417e0bba44",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 02:15:40 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1416",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2644aa34-fa63-11e7-bc99-c5417e0bba44"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

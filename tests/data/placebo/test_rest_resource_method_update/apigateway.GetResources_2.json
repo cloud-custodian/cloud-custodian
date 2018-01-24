@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "8247cc1a-ff96-11e7-9092-55b4e57b1bc6",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 22 Jan 2018 17:05:55 GMT",
+                "content-type": "application/json",
+                "content-length": "158",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "8247cc1a-ff96-11e7-9092-55b4e57b1bc6"
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "g7vd3d1wzl",
+                "path": "/"
+            },
+            {
+                "id": "rygwz7",
+                "parentId": "g7vd3d1wzl",
+                "pathPart": "glenns_test",
+                "path": "/glenns_test",
+                "resourceMethods": {
+                    "ANY": {}
+                }
+            }
+        ]
+    }
+}
