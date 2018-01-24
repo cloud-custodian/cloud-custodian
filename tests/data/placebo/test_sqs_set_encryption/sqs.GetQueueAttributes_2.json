@@ -3,28 +3,29 @@
     "data": {
         "Attributes": {
             "ApproximateNumberOfMessagesNotVisible": "0", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer/SQSDefaultPolicy\",\"Statement\":[{\"Sid\":\"Sid1483703606926\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:*\",\"Resource\":\"arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer\"}]}", 
+            "KmsDataKeyReusePeriodSeconds": "300", 
+            "KmsMasterKeyId": "b5f0e072-1669-48e5-b110-c4989287ba54", 
             "MessageRetentionPeriod": "345600", 
             "ApproximateNumberOfMessagesDelayed": "0", 
             "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1483525735", 
+            "CreatedTimestamp": "1509792347", 
             "ApproximateNumberOfMessages": "0", 
             "ReceiveMessageWaitTimeSeconds": "0", 
             "DelaySeconds": "0", 
             "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1483703607", 
-            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer"
+            "LastModifiedTimestamp": "1509792378", 
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:sqs-test"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ba2359da-ff72-585c-8330-084d34edb64d", 
+            "RequestId": "5f8d6749-d4f8-55f0-91d0-353e48421f3a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "ba2359da-ff72-585c-8330-084d34edb64d", 
-                "content-length": "1651", 
+                "x-amzn-requestid": "5f8d6749-d4f8-55f0-91d0-353e48421f3a", 
+                "content-length": "1345", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 16:18:39 GMT", 
+                "date": "Sat, 04 Nov 2017 10:46:18 GMT", 
                 "content-type": "text/xml"
             }
         }

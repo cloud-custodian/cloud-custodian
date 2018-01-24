@@ -515,6 +515,9 @@ class Notify(EventAction):
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
             queue_url = queue
+        elif 'queue.amazonaws.com' in queue:
+            region = queue[len('https://'):].split('.', 1)[0]
+            queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
@@ -796,8 +799,7 @@ class RemovePolicyBase(BaseAction):
 
         found = []
         statements = policy.get('Statement', [])
-        resource_statements = resource.get(
-            matched_key, ())
+        resource_statements = resource.get(matched_key, ())
 
         for s in list(statements):
             if statement_ids == 'matched':
