@@ -176,11 +176,6 @@ class BaseTest(PillTest):
     def account_id(self):
         return ACCOUNT_ID
 
-    @property
-    def current_user_arn(self):
-        caller = boto3.client('sts').get_caller_identity()
-        return caller.get('Arn')
-
 
 class ConfigTest(BaseTest):
     """Test base class for integration tests with aws config.
