@@ -178,8 +178,8 @@ class BaseTest(PillTest):
 
     @property
     def current_user_arn(self):
-        iam = boto3.resource('iam')
-        return iam.CurrentUser().arn
+        caller = boto3.client('sts').get_caller_identity()
+        return caller.get('Arn')
 
 
 class ConfigTest(BaseTest):
