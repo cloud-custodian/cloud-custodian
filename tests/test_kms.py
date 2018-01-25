@@ -64,7 +64,7 @@ class KMSTest(BaseTest):
                         "Sid": "DefaultRoot",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::644160558196:role/custodian-mu"
+                            "AWS": self.current_user_arn
                         },
                         "Action": "kms:*",
                         "Resource": "*"
@@ -73,7 +73,7 @@ class KMSTest(BaseTest):
                         "Sid": "SpecificAllow",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::644160558196:role/custodian-mu"
+                            "AWS": self.current_user_arn
                         },
                         "Action": "kms:*",
                         "Resource": "*"
@@ -98,7 +98,7 @@ class KMSTest(BaseTest):
             'filters': [
                 {'KeyId': key_id},
                 {'type': 'cross-account',
-                 'whitelist': ["123456789012"]}],
+                 'whitelist': [self.account_id]}],
             'actions': [
                 {'type': 'remove-statements',
                  'statement_ids': 'matched'}]
@@ -111,7 +111,7 @@ class KMSTest(BaseTest):
         if self.recording:
             time.sleep(60) # takes time before new policy reflected
 
-        self.assertStatementIds(client, key_id, 'Public')
+        self.assertStatementIds(client, key_id, 'DefaultRoot', 'SpecificAllow')
 
 
     def assertStatementIds(self, client, key_id, *expected):

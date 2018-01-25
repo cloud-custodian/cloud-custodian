@@ -179,7 +179,7 @@ class BaseTest(PillTest):
     @property
     def current_user_arn(self):
         iam = boto3.resource('iam')
-        current_user_arn = iam.CurrentUser().arn
+        return iam.CurrentUser().arn
 
 
 class ConfigTest(BaseTest):
