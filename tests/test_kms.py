@@ -48,7 +48,7 @@ class KMSTest(BaseTest):
 
     @functional
     def test_kms_remove_matched(self):
-        session_factory = self.record_flight_data('test_kms_remove_matched')
+        session_factory = self.replay_flight_data('test_kms_remove_matched')
 
         sts = session_factory().client('sts')
         current_user_arn = sts.get_caller_identity()['Arn']
