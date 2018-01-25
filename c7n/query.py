@@ -386,9 +386,12 @@ class QueryResourceManager(ResourceManager):
         return perms
 
     def get_cache_key(self, query):
-        return {'region': self.config.region,
-                'resource': str(self.__class__.__name__),
-                'q': query}
+        return {
+            'profile': self.config.profile,
+            'region': self.config.region,
+            'resource': str(self.__class__.__name__),
+            'q': query
+        }
 
     def resources(self, query=None):
         key = self.get_cache_key(query)
