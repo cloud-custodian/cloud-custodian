@@ -468,7 +468,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(resources)
 
 
-@Snapshot.filter_registry.register('skip-active-kms')
+@Snapshot.filter_registry.register('invalid-kms')
 class KmsKeyActiveSnapshot(Filter):
     """
     Filter to ignore snapshots that have an active KMS Key.
@@ -485,7 +485,7 @@ class KmsKeyActiveSnapshot(Filter):
               - name: delete-snapshots-with-missing-keys
                 resource: ebs-snapshot
                 filters:
-                  - skip-active-kms
+                  - invalid-kms
 
     :example:
 
@@ -497,12 +497,12 @@ class KmsKeyActiveSnapshot(Filter):
               - name: delete-snapshots
                 resource: ebs-snapshot
                 filters:
-                  - type: skip-active-kms
+                  - type: invalid-kms
                     value: false
 
     """
 
-    schema = type_schema('skip-active-kms', value={'type': 'boolean'})
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()
@@ -517,7 +517,7 @@ class KmsKeyActiveSnapshot(Filter):
         return _filter_kms_active(self, snapshots)
 
 
-@filters.register('skip-active-kms')
+@filters.register('invalid-kms')
 class KmsKeyActive(Filter):
     """
     Filter to ignore volumes that have an active KMS Key.
@@ -534,7 +534,7 @@ class KmsKeyActive(Filter):
               - name: delete-volumes-with-missing-keys
                 resource: ebs
                 filters:
-                  - skip-active-kms
+                  - invalid-kms
 
     :example:
 
@@ -546,12 +546,12 @@ class KmsKeyActive(Filter):
               - name: delete-volumes
                 resource: ebs
                 filters:
-                  - type: skip-active-kms
+                  - type: invalid-kms
                     value: false
 
     """
 
-    schema = type_schema('skip-active-kms', value={'type': 'boolean'})
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()

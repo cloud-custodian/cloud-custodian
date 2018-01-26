@@ -1165,7 +1165,7 @@ class RestoreInstance(BaseAction):
         return params, post_modify
 
 
-@RDSSnapshot.filter_registry.register('skip-active-kms')
+@RDSSnapshot.filter_registry.register('invalid-kms')
 class KmsKeyActive(Filter):
     """
     Filter to ignore snapshots that have an active KMS Key.
@@ -1182,7 +1182,7 @@ class KmsKeyActive(Filter):
               - name: delete-snapshots-with-missing-keys
                 resource: rds-snapshot
                 filters:
-                  - skip-active-kms
+                  - invalid-kms
 
     :example:
 
@@ -1194,12 +1194,12 @@ class KmsKeyActive(Filter):
               - name: delete-snapshots
                 resource: rds-snapshot
                 filters:
-                  - type: skip-active-kms
+                  - type: invalid-kms
                     value: false
 
     """
 
-    schema = type_schema('skip-active-kms', value={'type': 'boolean'})
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
 
     def get_permissions(self):
         return self.manager.get_resource_manager('rds').get_permissions()
