@@ -333,7 +333,7 @@ class SetSslListenerPolicy(BaseAction):
                 policy_names.extend(ld.get('PolicyNames', ()))
                 # Remove extant ssl listener policy
                 if ssl_policies:
-                    policy_names.remove(ssl_policies[0])
+                    policy_names = list(set(policy_names).difference(ssl_policies))
                 client.set_load_balancer_policies_of_listener(
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
