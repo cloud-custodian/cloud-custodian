@@ -2749,8 +2749,14 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
 
         if crypto == 'AES256' and algo == 'AES256':
             return True
-        elif crypto == 'aws:kms' and algo == 'aws:kms' and rule.get('KMSMasterKeyID') == key:
-            return True
+        elif crypto == 'aws:kms' and algo == 'aws:kms':
+            if key:
+                if rule.get('KMSMasterKeyID') == key:
+                    return True
+                else:
+                    return False
+            else:
+                return True
 
 
 @actions.register('set-bucket-encryption')
