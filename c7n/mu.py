@@ -707,11 +707,11 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def security_groups(self):
-        return None
+        return self.policy.data['mode'].get('security_groups', None)
 
     @property
     def subnets(self):
-        return None
+        return self.policy.data['mode'].get('subnets', None)
 
     @property
     def dead_letter_config(self):
