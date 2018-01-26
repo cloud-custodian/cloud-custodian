@@ -387,7 +387,7 @@ class QueryResourceManager(ResourceManager):
 
     def get_cache_key(self, query):
         return {
-            'profile': self.config.profile,
+            'account': self.account_id,
             'region': self.config.region,
             'resource': str(self.__class__.__name__),
             'q': query
