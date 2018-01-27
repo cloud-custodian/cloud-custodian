@@ -609,7 +609,7 @@ LAMBDA_EMPTY_VALUES = {
     'TracingConfig': {'Mode': 'PassThrough'},
     'VpcConfig': {'SubnetIds': [], 'SecurityGroupIds': []},
     'KMSKeyArn': '',
-    }
+}
 
 
 class LambdaFunction(AbstractLambdaFunction):
