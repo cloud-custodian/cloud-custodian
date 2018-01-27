@@ -1215,7 +1215,7 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 
                 policies:
-                  - name: s3-logging-buckets
+                  - name: s3-attach-encryption-event
                     resource: s3
                     filters:
                       - type: missing-policy-statement
