@@ -229,8 +229,8 @@ def checksum(fh, hasher, blocksize=65536):
 def custodian_archive(packages=None):
     """Create a lambda code archive for running custodian.
 
-    Lambda archive currently always includes `c7n` and `pkg_resources`. Add additional
-    packages in the mode block
+    Lambda archive currently always includes `c7n` and
+    `pkg_resources`. Add additional packages in the mode block.
 
     Example policy that includes additional packages
 
@@ -243,13 +243,13 @@ def custodian_archive(packages=None):
             packages:
               - botocore
 
-    Kwargs:
-        packages (set): List of additional packages to include in the lambda archive.
+    packages: List of additional packages to include in the lambda archive.
+
     """
     modules = {'c7n', 'pkg_resources'}
     if packages:
         modules = filter(None, modules.union(packages))
-    return PythonPackageArchive(*modules)
+    return PythonPackageArchive(*sorted(modules))
 
 
 class LambdaManager(object):
@@ -389,7 +389,8 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
-            if archive.get_checksum() != old_config['CodeSha256']:
+            if archive.get_checksum() != old_config[
+                    'CodeSha256'].encode('ascii'):
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)

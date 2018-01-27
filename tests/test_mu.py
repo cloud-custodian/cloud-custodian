@@ -58,9 +58,7 @@ class Publish(BaseTest):
             '''def handler(*a, **kw):\n    print("Greetings, program!")''')
         archive.close()
         self.addCleanup(archive.remove)
-
         return LambdaFunction(func_data, archive)
-
 
     def test_publishes_a_lambda(self):
         session_factory = self.replay_flight_data('test_publishes_a_lambda')
