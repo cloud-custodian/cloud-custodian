@@ -29,11 +29,11 @@ import unittest
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda, PythonPackageArchive,
-    CloudWatchLogSubscription, SNSSubscription)
+    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda,
+    PythonPackageArchive, CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data, functional
+from .common import BaseTest, Config, event_data, functional, Bag
 from .data import helloworld
 
 
@@ -537,6 +537,64 @@ class PolicyLambdaProvision(BaseTest):
         self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
         self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
 
+    def get_lambda_func(self, **config):
+        m = {'resources': 's3',
+             'name': 'some-lamb',
+             'mode': {'type': 'cloudtrail', 'events': ['CreateBucket']}}
+        m['mode'].update(config)
+        return PolicyLambda(Policy(m, Config.empty()))
+
+    def test_delta_config_diff(self):
+        delta = LambdaManager.delta_function
+        self.assertFalse(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-2', 'sg-1']}})
+            )
+        self.assertTrue(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-3', 'sg-1']}})
+            )
+        self.assertFalse(
+            delta({}, {'DeadLetterConfig': {'TargetArn': ''}}))
+
+        self.assertTrue(
+            delta({}, {'DeadLetterConfig': {'TargetArn': 'arn'}}))
+
+        self.assertFalse(
+            delta({}, {'Environment': {'Variables': {}}}))
+
+        self.assertTrue(
+            delta({}, {'Environment': {'Variables': {'k': 'v'}}}))
+
+        self.assertFalse(
+            delta({}, {'KMSKeyArn': ''}))
+
+        self.assertFalse(
+            delta({}, {'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}}))
+
+    def test_config_defaults(self):
+        p = PolicyLambda(Bag({'name': 'hello', 'data': {'mode': {}}}))
+        self.maxDiff = None
+        self.assertEqual(
+            p.get_config(),
+            {'DeadLetterConfig': {'TargetArn': ''},
+             'Description': 'cloud-custodian lambda policy',
+             'Environment': {'Variables': {}},
+             'FunctionName': 'custodian-hello',
+             'Handler': 'custodian_policy.run',
+             'KMSKeyArn': '',
+             'MemorySize': 512,
+             'Role': '',
+             'Runtime': 'python2.7',
+             'Tags': {},
+             'Timeout': 60,
+             'TracingConfig': {'Mode': 'PassThrough'},
+             'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}})
+
 
 class PythonArchiveTest(unittest.TestCase):
 
@@ -552,7 +610,6 @@ class PythonArchiveTest(unittest.TestCase):
 
     def get_filenames(self, *a, **kw):
         return self.make_archive(*a, **kw).get_filenames()
-
 
     def test_handles_stdlib_modules(self):
         filenames = self.get_filenames('webbrowser')

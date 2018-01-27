@@ -357,9 +357,23 @@ class LambdaManager(object):
 
     @staticmethod
     def delta_function(old_config, new_config):
+        found = False
         for k in new_config:
-            if k not in old_config or new_config[k] != old_config[k]:
-                return True
+            # Vpc needs special handling as a dict with lists
+            if k == 'VpcConfig' and k in old_config and new_config[k]:
+                if set(old_config[k]['SubnetIds']) != set(
+                        new_config[k]['SubnetIds']):
+                    found = True
+                elif set(old_config[k]['SecurityGroupIds']) != set(
+                        new_config[k]['SecurityGroupIds']):
+                    found = True
+            elif k not in old_config:
+                if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
+                    continue
+                found = True
+            elif new_config[k] != old_config[k]:
+                found = True
+        return found
 
     @staticmethod
     def diff_tags(old_tags, new_tags):
@@ -575,16 +589,27 @@ class AbstractLambdaFunction:
             'Runtime': self.runtime,
             'Handler': self.handler,
             'Timeout': self.timeout,
-            'DeadLetterConfig': self.dead_letter_config,
+            'TracingConfig': self.tracing_config,
             'Environment': self.environment,
             'KMSKeyArn': self.kms_key_arn,
-            'TracingConfig': self.tracing_config,
+            'DeadLetterConfig': self.dead_letter_config,
+            'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
                 'SecurityGroupIds': self.security_groups}
         return conf
+
+
+LAMBDA_EMPTY_VALUES = {
+    'Environment': {'Variables': {}},
+    'DeadLetterConfig': {'TargetArn': ''},
+    'TracingConfig': {'Mode': 'PassThrough'},
+    'VpcConfig': {'SubnetIds': [], 'SecurityGroupIds': []},
+    'KMSKeyArn': '',
+    }
 
 
 class LambdaFunction(AbstractLambdaFunction):
@@ -638,11 +663,13 @@ class LambdaFunction(AbstractLambdaFunction):
 
     @property
     def dead_letter_config(self):
-        return self.func_data.get('dead_letter_config', {})
+        return self.func_data.get(
+            'dead_letter_config', LAMBDA_EMPTY_VALUES['DeadLetterConfig'])
 
     @property
     def environment(self):
-        return self.func_data.get('environment', {})
+        return self.func_data.get(
+            'environment', LAMBDA_EMPTY_VALUES['Environment'])
 
     @property
     def kms_key_arn(self):
@@ -650,7 +677,9 @@ class LambdaFunction(AbstractLambdaFunction):
 
     @property
     def tracing_config(self):
-        return self.func_data.get('tracing_config', {})
+        # Default
+        return self.func_data.get(
+            'tracing_config', LAMBDA_EMPTY_VALUES['TracingConfig'])
 
     @property
     def tags(self):
@@ -716,11 +745,13 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def dead_letter_config(self):
-        return self.policy.data['mode'].get('dead_letter_config', {})
+        return self.policy.data['mode'].get(
+            'dead_letter_config', LAMBDA_EMPTY_VALUES['DeadLetterConfig'])
 
     @property
     def environment(self):
-        return self.policy.data['mode'].get('environment', {})
+        return self.policy.data['mode'].get(
+            'environment', LAMBDA_EMPTY_VALUES['Environment'])
 
     @property
     def kms_key_arn(self):
@@ -728,7 +759,9 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def tracing_config(self):
-        return self.policy.data['mode'].get('tracing_config', {})
+        # Default
+        return self.policy.data['mode'].get(
+            'tracing_config', {'Mode': 'PassThrough'})
 
     @property
     def tags(self):
