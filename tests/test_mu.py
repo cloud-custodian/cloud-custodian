@@ -537,13 +537,6 @@ class PolicyLambdaProvision(BaseTest):
         self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
         self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
 
-    def get_lambda_func(self, **config):
-        m = {'resources': 's3',
-             'name': 'some-lamb',
-             'mode': {'type': 'cloudtrail', 'events': ['CreateBucket']}}
-        m['mode'].update(config)
-        return PolicyLambda(Policy(m, Config.empty()))
-
     def test_delta_config_diff(self):
         delta = LambdaManager.delta_function
         self.assertFalse(
