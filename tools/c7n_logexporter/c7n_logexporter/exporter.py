@@ -144,9 +144,9 @@ def validate(config):
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
-@click.option('--force', is_flag=True, default=False)
+@click.option('--merge', is_flag=True, default=False)
 @click.option('--debug', is_flag=True, default=False)
-def subscribe(config, accounts, force, debug):
+def subscribe(config, accounts, merge, debug):
     """subscribe accounts log groups to target account log group destination"""
     config = validate.callback(config)
     subscription = config.get('subscription')
@@ -158,33 +158,63 @@ def subscribe(config, accounts, force, debug):
     def converge_destination_policy(client, config):
         destination_name = subscription['destination-arn'].rsplit(':', 1)[-1]
         try:
-            client.get_get_destinations(
-                DestinationNamePrefix=destination_name)
+            extant_destinations = client.describe_destinations(
+                DestinationNamePrefix=destination_name).get('destinations')
         except ClientError:
             log.error("Log group destination not found: %s",
                       subscription['destination-arn'])
             sys.exit(1)
-        account_ids = [a['role'].split(':')[4] for a in config.get('accounts')]
+
+        account_ids = set()
+        for a in accounts:
+            if isinstance(a['role'], list):
+                account_ids.add(a['role'][-1].split(':')[4])
+            else:
+                account_ids.add(a['role'].split(':')[4])
+
+        if merge:
+            for d in extant_destinations:
+                if d['destinationName'] == destination_name:
+                    for s in json.loads(d['accessPolicy']):
+                        if s['Sid'] == 'CrossAccountDelivery':
+                            account_ids.update(s['Principal']['AWS'])
+
         client.put_destination_policy(
             destinationName=destination_name,
             accessPolicy=json.dumps({
                 'Statement': [{
                     'Action': 'logs:PutSubscriptionFilter',
                     'Effect': 'Allow',
-                    'Principal': {'AWS': account_ids},
+                    'Principal': {'AWS': list(account_ids)},
                     'Resource': subscription['destination-arn'],
                     'Sid': 'CrossAccountDelivery'}]}))
 
-    def subscribe_account(account, subscription):
-        session = get_session(account['role'])
+    def subscribe_account(t_account, subscription):
+        session = get_session(t_account['role'])
         client = session.client('logs')
 
         for g in account.get('groups'):
+            sub_name = subscription.get('name', 'FlowLogStream')
+            distribution = subscription.get('distribution', 'ByLogStream')
+            filters = client.describe_subscription_filters(
+                logGroupName=g,
+                ).get('subscriptionFilters', ())
+            if filters:
+                f = filters.pop()
+                if (f['filterName'] == sub_name
+                    and f['destinationArn'] == subscription['destination-arn']
+                    and f['roleArn'] == subscription['destination-role']
+                    and f['distribution'] == distribution):
+                    continue
+                client.delete_subscription_filter(
+                    logGroupName=g, filterName=sub_name)
             client.put_subscription_filter(
                 logGroupName=g,
-                filterName=subscription.get('name', 'FlowLogStream'),
+                roleArn=subscription['destination-arn'],
+                destinationArn=subscription['destination-arn'],
+                filterName=sub_name,
                 filterPattern="",
-                distribution=subscription.get('distribution', 'ByLogStream'))
+                distribution=distribution)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
