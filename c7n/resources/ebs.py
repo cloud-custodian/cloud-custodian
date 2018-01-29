@@ -27,7 +27,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, OPERATORS)
+    ANNOTATION_KEY, FilterValidationError, OPERATORS, FilterKmsInvalid)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
@@ -469,7 +469,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
 
 @Snapshot.filter_registry.register('invalid-kms')
-class KmsKeyActiveSnapshot(Filter):
+class KmsKeyActiveSnapshot(FilterKmsInvalid):
     """
     Filter to ignore snapshots that have an active KMS Key.
 
@@ -507,18 +507,9 @@ class KmsKeyActiveSnapshot(Filter):
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()
 
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
-
-    def process(self, snapshots, event=None):
-        return _filter_kms_active(self, snapshots)
-
 
 @filters.register('invalid-kms')
-class KmsKeyActive(Filter):
+class KmsKeyActive(FilterKmsInvalid):
     """
     Filter to ignore volumes that have an active KMS Key.
 
@@ -555,15 +546,6 @@ class KmsKeyActive(Filter):
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()
-
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
-
-    def process(self, resources, event=None):
-        return _filter_kms_active(self, resources)
 
 
 @filters.register('fault-tolerant')

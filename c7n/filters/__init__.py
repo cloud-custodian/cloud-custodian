@@ -27,3 +27,4 @@ from .core import (
 from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase
+from .kms import FilterKmsInvalid

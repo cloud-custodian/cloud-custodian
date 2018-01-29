@@ -60,7 +60,7 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS)
+    OPERATORS, FilterValidationError, FilterKmsInvalid)
 
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.health import HealthEventFilter
@@ -1166,7 +1166,7 @@ class RestoreInstance(BaseAction):
 
 
 @RDSSnapshot.filter_registry.register('invalid-kms')
-class KmsKeyActive(Filter):
+class KmsKeyActive(FilterKmsInvalid):
     """
     Filter to ignore snapshots that have an active KMS Key.
 
@@ -1203,33 +1203,6 @@ class KmsKeyActive(Filter):
 
     def get_permissions(self):
         return self.manager.get_resource_manager('rds').get_permissions()
-
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
-
-    def process(self, snapshots, event=None):
-        return _filter_kms_active(self, snapshots)
-
-
-def _filter_kms_active(self, resources):
-    if not self.data.get('value', True):
-        return resources
-    # try using cache first to get a listing of all KMS Keys and compares resources to the list
-    # This will populate the cache.
-    kms_keys = self.manager.get_resource_manager('kms-key').resources()
-
-    key_ids = []
-    for key in kms_keys:
-        key_ids.append(key['KeyArn'])
-
-    matches = []
-    for item in resources:
-        if item['Encrypted'] and item['KmsKeyId'] not in key_ids:
-            matches.append(item)
-    return matches
 
 
 @RDSSnapshot.filter_registry.register('cross-account')
