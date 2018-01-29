@@ -128,25 +128,6 @@ def _filter_ami_snapshots(self, snapshots):
             matches.append(snap)
     return matches
 
-
-def _filter_kms_active(self, resources):
-    if not self.data.get('value', True):
-        return resources
-    # try using cache first to get a listing of all KMS Keys and compares resources to the list
-    # This will populate the cache.
-    kms_keys = self.manager.get_resource_manager('kms-key').resources()
-
-    key_ids = []
-    for key in kms_keys:
-        key_ids.append(key['KeyArn'])
-
-    matches = []
-    for item in resources:
-        if item['Encrypted'] and item['KmsKeyId'] not in key_ids:
-            matches.append(item)
-    return matches
-
-
 @Snapshot.filter_registry.register('cross-account')
 class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
