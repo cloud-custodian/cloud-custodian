@@ -772,8 +772,8 @@ class EnableDataEvents(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: s3-remove-owner-tag
-                resource: actions
+              - name: s3-enable-data-events-logging
+                resource: account
                 actions:
                  - type: enable-data-events
                    data-trail:
