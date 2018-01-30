@@ -128,6 +128,7 @@ def _filter_ami_snapshots(self, snapshots):
             matches.append(snap)
     return matches
 
+
 @Snapshot.filter_registry.register('cross-account')
 class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
