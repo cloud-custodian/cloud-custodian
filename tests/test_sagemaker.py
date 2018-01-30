@@ -225,6 +225,78 @@ class TestSagemakerEndpoint(BaseTest):
             EndpointName=resources[0]['EndpointName'])['EndpointStatus']
         self.assertEqual(status, 'Deleting')
 
+    def test_sagemaker_endpoint_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_tag')
+        p = self.load_policy({
+            'name': 'endpoint-tag-missing',
+            'resource': 'sagemaker-endpoint',
+            'filters': [{'tag:required-tag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'required-tag',
+                'value': 'required-value'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(ResourceArn=resources[0]['EndpointArn'])['Tags']
+        self.assertTrue(tags[0]['Key'], 'required-tag')
+        self.assertTrue(tags[0]['Key'], 'required-value')
+
+    def test_sagemaker_endpoint_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_remove_tag')
+        p = self.load_policy({
+            'name': 'endpoint-required-tag-obsolete',
+            'resource': 'sagemaker-endpoint',
+            'filters': [{'tag:expired-tag': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['expired-tag']}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['EndpointArn'])['Tags']
+        self.assertEqual(len(tags), 0)
+
+    def test_sagemaker_endpoint_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_mark_for_op')
+        p = self.load_policy({
+            'name': 'mark-failed-endpoints-delete',
+            'resource': 'sagemaker-endpoint',
+            'filters': [{'EndpointStatus': 'Failed'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'days': 1}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['EndpointArn'])['Tags']
+        self.assertTrue(tags[0], 'custodian_cleanup')
+
+    def test_sagemaker_endpoint_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_marked_for_op')
+        p = self.load_policy({
+            'name': 'marked-failed-endpoints-delete',
+            'resource': 'sagemaker-endpoint',
+            'filters': [{
+                'type': 'marked-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'skew': 1}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestSagemakerEndpointConfig(BaseTest):
 
@@ -257,3 +329,81 @@ class TestSagemakerEndpointConfig(BaseTest):
         self.assertEqual(len(resources), 1)
         configs = client.list_endpoint_configs()['EndpointConfigs']
         self.assertEqual(len(configs), 0)
+
+    def test_sagemaker_endpoint_config_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config_tag')
+        p = self.load_policy({
+            'name': 'endpoint-config-tag-missing',
+            'resource': 'sagemaker-endpoint-config',
+            'filters': [{'tag:required-tag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'required-tag',
+                'value': 'required-value'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['EndpointConfigArn'])['Tags']
+        self.assertEqual(
+            [tags[0]['Key'], tags[0]['Value']],
+            ['required-tag', 'required-value'])
+
+    def test_sagemaker_endpoint_config_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config_remove_tag')
+        p = self.load_policy({
+            'name': 'endpoint-config-required-tag-obsolete',
+            'resource': 'sagemaker-endpoint-config',
+            'filters': [{'tag:expired-tag': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['expired-tag']}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['EndpointConfigArn'])['Tags']
+        self.assertEqual(len(tags), 0)
+
+    def test_sagemaker_endpoint_config_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config_mark_for_op')
+        p = self.load_policy({
+            'name': 'mark-endpoint-config-mark-for-op-delete',
+            'resource': 'sagemaker-endpoint-config',
+            'filters': [{
+                'type': 'value',
+                'key': 'ProductionVariants[].InstanceType',
+                'value': 'ml.m4.xlarge',
+                'op': 'contains'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'days': 1}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['EndpointConfigArn'])['Tags']
+        self.assertTrue(tags[0], 'custodian_cleanup')
+
+    def test_sagemaker_endpoint_config_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_endpoint_config_marked_for_op')
+        p = self.load_policy({
+            'name': 'marked-failed-endpoint-config-delete',
+            'resource': 'sagemaker-endpoint-config',
+            'filters': [{
+                'type': 'marked-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'skew': 1}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
