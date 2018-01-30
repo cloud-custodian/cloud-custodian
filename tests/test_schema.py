@@ -105,7 +105,7 @@ class SchemaTest(BaseTest):
         from jsonschema.exceptions import ValidationError
         data = {
                 'policies': [{'name': 'test',
-                 'resource': 'ec2',
+                 'resource': 'aws.ec2',
                  'filters': {
                      'type': 'ebs',
                      'invalid': []}
@@ -117,7 +117,6 @@ class SchemaTest(BaseTest):
         self.assertEqual(len(resp), 2)
         self.assertIsInstance(resp[0], ValidationError)
         self.assertIsInstance(resp[1], ValidationError)
-
 
     def test_vars_and_tags(self):
         data = {
