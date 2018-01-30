@@ -113,9 +113,6 @@ class ElasticSearchModifySG(ModifyVpcSecurityGroupsAction):
     permissions = ('es:UpdateElasticsearchDomainConfig',)
 
     def process(self, domains):
-        if not len(domains):
-            return
-
         groups = super(ElasticSearchModifySG, self).get_groups(domains)
         client = local_session(self.manager.session_factory).client('es')
 
