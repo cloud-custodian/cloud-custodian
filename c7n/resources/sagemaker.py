@@ -44,9 +44,9 @@ class NotebookInstance(QueryResourceManager):
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, resources):
-        def _augment(r):
-            client = local_session(self.session_factory).client('sagemaker')
+        client = local_session(self.session_factory).client('sagemaker')
 
+        def _augment(r):
             # List tags for the Notebook-Instance & set as attribute
             tags = client.list_tags(
                 ResourceArn=r['NotebookInstanceArn'])['Tags']
@@ -96,8 +96,9 @@ class SagemakerEndpoint(QueryResourceManager):
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
+        client = local_session(self.session_factory).client('sagemaker')
+
         def _augment(e):
-            client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointArn'])['Tags']
             e['Tags'] = tags
@@ -130,8 +131,9 @@ class SagemakerEndpointConfig(QueryResourceManager):
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
+        client = local_session(self.session_factory).client('sagemaker')
+
         def _augment(e):
-            client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointConfigArn'])['Tags']
             e['Tags'] = tags
