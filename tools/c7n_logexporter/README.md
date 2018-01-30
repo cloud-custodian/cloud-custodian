@@ -1,11 +1,10 @@
 # Cloud watch log exporter
 
 A small serverless app to archive cloud logs across accounts to an archive bucket. It utilizes
-cloud log export to s3 feature.
+cloud log export to s3 feature for historical exports.
 
-*Note* - For most folks, this functionality would be better achieved using a kinesis
-stream hooked up to kinesis firehose to archive to s3, which would allow for streaming
-archiving.
+It also supports kinesis streams / firehose to move to realtime exports in the same format
+as the periodic historical exports.
 
 
 ## Features
@@ -26,7 +25,6 @@ archiving.
  - Default periodicity for log group archival into s3 is daily.
  - Exporter is run with account credentials that have access to the archive s3 bucket.
  - Catch up archiving is not run in lambda (do a cli run first)
- - Lambda deployment only archives the last day periodically.
 
 
 # Cli usage
@@ -77,21 +75,3 @@ make install
 make deploy
 ```
 
-# TODO
-
-- [ ] switch to structured logging
-
-- [ ] finer grained periods?
-
-- [ ] inner day runs
-
-- [ ] cloud watch metrics stats on log groups?
-
-- [ ] reason on overlapped dates (ie export till current time, need to pickup remainder of the day)
-
-  update current time from the time of the last export, prefix metadata to bucket?
-
-  each export task creates a structure under the day, for last write, we annotate to the s3 key.
-
-
-# SAM issue on tracing as func property

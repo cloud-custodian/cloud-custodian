@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "8275ba31-ff96-11e7-8290-fba8696b2fbb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 22 Jan 2018 17:05:55 GMT",
+                "content-type": "application/json",
+                "content-length": "490",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "8275ba31-ff96-11e7-8290-fba8696b2fbb"
+            },
+            "RetryAttempts": 0
+        },
+        "httpMethod": "ANY",
+        "authorizationType": "AWS_IAM",
+        "apiKeyRequired": false,
+        "requestParameters": {},
+        "requestModels": {},
+        "methodIntegration": {
+            "type": "AWS_PROXY",
+            "httpMethod": "POST",
+            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:644160558196:function:sphere7-dev-ApiFunction-7K03QNRVA8OD/invocations",
+            "requestParameters": {},
+            "requestTemplates": {},
+            "passthroughBehavior": "NEVER",
+            "timeoutInMillis": 29000,
+            "cacheNamespace": "none",
+            "cacheKeyParameters": []
+        }
+    }
+}
