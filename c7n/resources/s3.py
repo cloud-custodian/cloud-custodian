@@ -698,7 +698,7 @@ class BucketActionBase(BaseAction):
 
 @filters.register('has-statement')
 class HasStatementFilter(Filter):
-    """Find buckets with set of named policy statements.
+    """Find buckets with set of policy statements.
 
     :example:
 
@@ -711,10 +711,40 @@ class HasStatementFilter(Filter):
                   - type: has-statement
                     statement_ids:
                       - RequiredEncryptedPutObject
+
+
+            policies:
+              - name: s3-public-policy
+                resource: s3
+                filters:
+                  - type: has-statement
+                    statements:
+                      - Effect: Allow
+                        Action: 's3:*'
+                        Principal: '*'
     """
     schema = type_schema(
         'has-statement',
-        statement_ids={'type': 'array', 'items': {'type': 'string'}})
+        statement_ids={'type': 'array', 'items': {'type': 'string'}},
+        statements={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'Sid': {'type': 'string'},
+                    'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                    'Principal': {'anyOf': [{'type': 'string'},
+                        {'type': 'object'}, {'type': 'array'}]},
+                    'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                    'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'Condition': {'type': 'object'}
+                },
+                'required': ['Effect']
+            }
+        })
 
     def process(self, buckets, event=None):
         return list(filter(None, map(self.process_bucket, buckets)))
@@ -724,12 +754,27 @@ class HasStatementFilter(Filter):
         if p is None:
             return None
         p = json.loads(p)
+
         required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
         for s in list(statements):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
-        if not required:
+
+        required_statements = list(self.data.get('statements', []))
+        statements = p.get('Statement', [])
+        for required_statement in required_statements:
+            for statement in statements:
+                found = True
+                for key, value in required_statement.items():
+                    if key not in statement.keys() or value not in statement[key]:
+                        found = False
+                        break
+                if found:
+                    required_statements.remove(required_statement)
+
+        if self.data.get('statement_ids', []) and not required \
+                or self.data.get('statements', []) and not required_statements:
             return b
         return None
 
