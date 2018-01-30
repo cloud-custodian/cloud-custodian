@@ -51,9 +51,6 @@ class NotebookInstance(QueryResourceManager):
             tags = client.list_tags(
                 ResourceArn=r['NotebookInstanceArn'])['Tags']
             r['Tags'] = tags
-
-            # normalize arn attribute for flat tagging
-            r['ResourceArn'] = r['NotebookInstanceArn']
             return r
 
         # Describe notebook-instance & then list tags
@@ -104,9 +101,6 @@ class SagemakerEndpoint(QueryResourceManager):
             tags = client.list_tags(
                 ResourceArn=e['EndpointArn'])['Tags']
             e['Tags'] = tags
-
-            # normalize arn attribute for flat tagging
-            e['ResourceArn'] = e['EndpointArn']
             return e
 
         # Describe endpoints & then list tags
@@ -141,9 +135,6 @@ class SagemakerEndpointConfig(QueryResourceManager):
             tags = client.list_tags(
                 ResourceArn=e['EndpointConfigArn'])['Tags']
             e['Tags'] = tags
-
-            # normalize arn attribute for flat tagging
-            e['ResourceArn'] = e['EndpointConfigArn']
             return e
 
         endpoints = super(SagemakerEndpointConfig, self).augment(endpoints)
@@ -219,9 +210,8 @@ class TagNotebookInstance(Tag):
         tag_list = []
         for t in tags:
             tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-
         for r in resources:
-            client.add_tags(ResourceArn=r['ResourceArn'], Tags=tag_list)
+            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
 
 
 @SagemakerEndpoint.action_registry.register('remove-tag')
@@ -267,7 +257,7 @@ class RemoveTagNotebookInstance(RemoveTag):
             self.manager.session_factory).client('sagemaker')
 
         for r in resources:
-            client.delete_tags(ResourceArn=r['ResourceArn'], TagKeys=keys)
+            client.delete_tags(ResourceArn=r[self.id_key], TagKeys=keys)
 
 
 @SagemakerEndpoint.action_registry.register('mark-for-op')
@@ -323,7 +313,7 @@ class MarkNotebookInstanceForOp(TagDelayedAction):
             tag_list.append({'Key': t['Key'], 'Value': t['Value']})
 
         for r in resources:
-            client.add_tags(ResourceArn=r['ResourceArn'], Tags=tag_list)
+            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
 
 
 @NotebookInstance.action_registry.register('start')
