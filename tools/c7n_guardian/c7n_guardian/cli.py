@@ -20,7 +20,7 @@ from concurrent.futures import as_completed
 import click
 from tabulate import tabulate
 
-from c7n.credentials import assumed_session
+from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import format_event
 from c7n_org.cli import init, filter_accounts, CONFIG_SCHEMA, WORKER_COUNT
 
@@ -152,6 +152,14 @@ def disable(config, tags, accounts, master, debug,
             log.info("Deleted detector in account:%s", a['name'])
 
 
+def get_session(role, session_name, profile, region):
+
+    if role:
+        return assumed_session(role, session_name, region=region)
+    else:
+        return SessionFactory(region, profile)()
+
+
 @cli.command()
 @click.option('-c', '--config', required=True, help="Accounts config file", type=click.Path())
 @click.option('--master', help='Master account id or name')
@@ -165,7 +173,10 @@ def enable(config, master, tags, accounts, debug, message, region):
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
 
-    master_session = assumed_session(master_info['role'], 'c7n-guardian', region=region)
+    master_session = get_session(
+        master_info.get('role'), 'c7n-guardian',
+        master_info.get('profile'),
+        region=region)
 
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
@@ -236,8 +247,10 @@ def enable(config, master, tags, accounts, debug, message, region):
 
 
 def enable_account(account, master_account_id, region):
-    member_session = assumed_session(
-        account['role'], 'c7n-guardian', region=region)
+    member_session = get_session(
+        account.get('role'), 'c7n-guardian',
+        profile=account.get('profile'),
+        region=region)
     member_client = member_session.client('guardduty')
     m_detector_id = get_or_create_detector_id(member_client)
     invitations = [
