@@ -57,10 +57,10 @@ class FileCacheManagerTest(TestCase):
         self.addCleanup(t.close)
         c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
         self.assertFalse(c.load())
-        k1 = {'region': 'us-west-2', 'resource': 'ec2'}
+        k1 = {'account': '12345678901234', 'region': 'us-west-2', 'resource': 'ec2'}
         c.save(k1, range(5))
         self.assertEqual(c.get(k1), range(5))
-        k2 = {'region': 'eu-west-1', 'resource': 'asg'}
+        k2 = {'account': '98765432101234', 'region': 'eu-west-1', 'resource': 'asg'}
         c.save(k2, range(2))
         self.assertEqual(c.get(k1), range(5))
         self.assertEqual(c.get(k2), range(2))

@@ -34,7 +34,7 @@ import logging
 from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
-from c7n.manager import resources
+from c7n.provider import clouds
 from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
 
@@ -95,7 +95,7 @@ def specific_error(error):
     if r is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if r in v['$ref'].rsplit('/', 2):
+            if r in v['$ref'].rsplit('/', 2)[1]:
                 found = idx
         if found is not None:
             # error context is a flat list of all validation
@@ -225,11 +225,16 @@ def generate(resource_types=()):
     }
 
     resource_refs = []
-    for type_name, resource_type in resources.items():
-        if resource_types and type_name not in resource_types:
-            continue
-        resource_refs.append(
-            process_resource(type_name, resource_type, resource_defs))
+    for cloud_name, cloud_type in clouds.items():
+        for type_name, resource_type in cloud_type.resources.items():
+            if resource_types and type_name not in resource_types:
+                continue
+            alias_name = None
+            r_type_name = "%s.%s" % (cloud_name, type_name)
+            if cloud_name == 'aws':
+                alias_name = type_name
+            resource_refs.append(
+                process_resource(r_type_name, resource_type, resource_defs, alias_name))
 
     schema = {
         '$schema': 'http://json-schema.org/schema#',
@@ -251,7 +256,7 @@ def generate(resource_types=()):
     return schema
 
 
-def process_resource(type_name, resource_type, resource_defs):
+def process_resource(type_name, resource_type, resource_defs, alias_name=None):
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
     seen_actions = set()  # Aliases get processed once
@@ -327,6 +332,10 @@ def process_resource(type_name, resource_type, resource_defs):
         ]
     }
 
+    if alias_name:
+        resource_policy['allOf'][1]['properties'][
+            'resource']['enum'].append(alias_name)
+
     if type_name == 'ec2':
         resource_policy['allOf'][1]['properties']['query'] = {}
 
@@ -334,11 +343,21 @@ def process_resource(type_name, resource_type, resource_defs):
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary():
+def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
+    resources = {}
+
+    for cname, ctype in clouds.items():
+        if cloud_name is not None and cloud_name != cname:
+            continue
+        for rname, rtype in ctype.resources.items():
+            if qualify_name:
+                resources['%s.%s' % (cname, rname)] = rtype
+            else:
+                resources[rname] = rtype
+
     for type_name, resource_type in resources.items():
         classes = {'actions': {}, 'filters': {}}
-
         actions = []
         for action_name, cls in resource_type.action_registry.items():
             actions.append(action_name)

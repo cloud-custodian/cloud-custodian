@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EndpointConfigName": "kmeans-2018-01-18-19-25-36-887", 
+        "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/kmeans-2018-01-18-19-25-36-887", 
+        "CreationTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 40, 
+            "microsecond": 797000, 
+            "year": 2018, 
+            "day": 18, 
+            "minute": 32
+        }, 
+        "ProductionVariants": [
+            {
+                "InitialVariantWeight": 1.0, 
+                "ModelName": "kmeans-2018-01-18-19-32-39-784", 
+                "VariantName": "AllTraffic", 
+                "InitialInstanceCount": 1, 
+                "InstanceType": "ml.m4.xlarge"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "beaf0f2f-84e9-4fc9-b0be-012065a0a1ae", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 20:25:16 GMT", 
+                "x-amzn-requestid": "beaf0f2f-84e9-4fc9-b0be-012065a0a1ae", 
+                "content-length": "376", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

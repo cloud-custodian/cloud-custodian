@@ -66,8 +66,8 @@ Links
 #####
 
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
-- `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer/installing.html>`_
+- `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
+- `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
 
 
 Quick Install

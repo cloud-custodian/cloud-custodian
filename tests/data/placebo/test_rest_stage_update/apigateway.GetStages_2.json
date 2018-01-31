@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "9c758f9b-fdfe-11e7-a190-a392413faa8a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 20 Jan 2018 16:26:04 GMT",
+                "content-type": "application/json",
+                "content-length": "233",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9c758f9b-fdfe-11e7-a190-a392413faa8a"
+            },
+            "RetryAttempts": 0
+        },
+        "item": [
+            {
+                "deploymentId": "r2pi2v",
+                "stageName": "prod",
+                "description": "Created by AWS Lambda",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {},
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 10,
+                    "minute": 35,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 10,
+                    "minute": 35,
+                    "second": 32,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}
