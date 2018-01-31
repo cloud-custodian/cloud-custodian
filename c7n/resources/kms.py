@@ -72,6 +72,8 @@ class Key(QueryResourceManager):
                     self.log.warning(
                         "Access denied when describing key:%s",
                         key_id)
+                else:
+                    raise
 
         return universal_augment(self, resources)
 
@@ -100,8 +102,16 @@ class KeyRotationStatus(ValueFilter):
 
         def _key_rotation_status(resource):
             client = local_session(self.manager.session_factory).client('kms')
-            resource['KeyRotationEnabled'] = client.get_key_rotation_status(
-                KeyId=resource['KeyId'])
+            try:
+                resource['KeyRotationEnabled'] = client.get_key_rotation_status(
+                    KeyId=resource['KeyId'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied when getting rotation status on key:%s",
+                        resource.get('KeyArn'))
+                else:
+                    raise
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
@@ -110,7 +120,7 @@ class KeyRotationStatus(ValueFilter):
                 "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
-        return [r for r in resources if self.match(r['KeyRotationEnabled'])]
+        return [r for r in resources if self.match(r.get('KeyRotationEnabled',{}))]
 
 
 @Key.filter_registry.register('cross-account')

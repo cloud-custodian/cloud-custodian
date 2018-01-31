@@ -1,17 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "KeyRotationEnabled": false, 
+        "KeyRotationEnabled": true, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3e79ae38-36bd-11e7-a993-293f5a140092", 
+            "RequestId": "267dbeb7-06a7-11e8-928a-01d6f433cda2", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3e79ae38-36bd-11e7-a993-293f5a140092", 
-                "content-length": "28", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Fri, 12 May 2017 02:46:48 GMT", 
+                "x-amzn-requestid": "267dbeb7-06a7-11e8-928a-01d6f433cda2", 
+                "content-length": "27", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

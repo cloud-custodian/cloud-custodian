@@ -1,14 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/scot@sixfeetup.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/scot@sixfeetup.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Public\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Public\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "258afb88-018a-11e8-a6b7-f1e232fd3b18", 
+            "RequestId": "17346efa-06cb-11e8-a56e-6d4afc7bb8bd", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "258afb88-018a-11e8-a6b7-f1e232fd3b18", 
-                "content-length": "673", 
+                "x-amzn-requestid": "17346efa-06cb-11e8-a56e-6d4afc7bb8bd", 
+                "content-length": "669", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
