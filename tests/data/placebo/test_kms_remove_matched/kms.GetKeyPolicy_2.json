@@ -1,17 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::123456789012:root\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::123456789012:root\"\n    },\n    \"Action\" : \"kms:*\"\n  } ]\n}", 
+        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/scot@sixfeetup.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/scot@sixfeetup.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Public\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "994c65bd-9b02-11e7-b7e5-8fcba9aa064e", 
+            "RequestId": "258afb88-018a-11e8-a6b7-f1e232fd3b18", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "994c65bd-9b02-11e7-b7e5-8fcba9aa064e", 
-                "content-length": "461", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:15:12 GMT", 
+                "x-amzn-requestid": "258afb88-018a-11e8-a6b7-f1e232fd3b18", 
+                "content-length": "673", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

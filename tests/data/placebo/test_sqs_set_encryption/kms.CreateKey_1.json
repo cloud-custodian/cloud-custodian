@@ -3,34 +3,32 @@
     "data": {
         "KeyMetadata": {
             "Origin": "AWS_KMS", 
-            "KeyId": "1c0ec678-3d0d-456e-83e6-92cae16be81e", 
+            "KeyId": "b5f0e072-1669-48e5-b110-c4989287ba54", 
             "Description": "West SQS encryption key", 
+            "KeyManager": "CUSTOMER", 
             "Enabled": true, 
             "KeyUsage": "ENCRYPT_DECRYPT", 
             "KeyState": "Enabled", 
             "CreationDate": {
-                "hour": 12, 
+                "hour": 6, 
                 "__class__": "datetime", 
-                "month": 5, 
-                "second": 37, 
-                "microsecond": 918000, 
+                "month": 11, 
+                "second": 47, 
+                "microsecond": 647000, 
                 "year": 2017, 
-                "day": 18, 
-                "minute": 18
+                "day": 4, 
+                "minute": 45
             }, 
-            "Arn": "arn:aws:kms:us-west-2:644160558196:key/1c0ec678-3d0d-456e-83e6-92cae16be81e", 
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/b5f0e072-1669-48e5-b110-c4989287ba54", 
             "AWSAccountId": "644160558196"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a60d5389-3be5-11e7-bbe2-9d269cf3e736", 
+            "RequestId": "5115b884-c14d-11e7-a1ad-7d6f3a6f809f", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "a60d5389-3be5-11e7-bbe2-9d269cf3e736", 
-                "content-length": "334", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 16:18:37 GMT", 
+                "x-amzn-requestid": "5115b884-c14d-11e7-a1ad-7d6f3a6f809f", 
+                "content-length": "358", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
