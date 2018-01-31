@@ -190,7 +190,7 @@ class TestModelInstance(BaseTest):
             if e.response['Error']['Code'] != 'ValidationException':
                 self.fail('Bad Error:' + e.response['Error']['Code'])
             else:
-                self.assertTrue(e.response['Error']['Code'], 'ValidationException')
+                self.assertEqual(e.response['Error']['Code'], 'ValidationException')
         else:
             self.fail('Resource still exists')
 
