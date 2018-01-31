@@ -166,6 +166,7 @@ def enable(config, master, tags, accounts, debug, message, region):
         config, debug, master, accounts, tags)
 
     master_session = assumed_session(master_info['role'], 'c7n-guardian', region=region)
+
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
 
