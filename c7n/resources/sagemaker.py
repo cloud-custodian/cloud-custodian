@@ -144,6 +144,38 @@ class SagemakerEndpointConfig(QueryResourceManager):
             return list(filter(None, w.map(_augment, endpoints)))
 
 
+@resources.register('sagemaker-model')
+class Model(QueryResourceManager):
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_models', 'Models', None)
+        detail_spec = (
+            'describe_model', 'ModelName',
+            'ModelName', None)
+        id = 'ModelArn'
+        name = 'ModelName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filters = FilterRegistry('sagemaker-model.filters')
+    filters.register('marked-for-op', TagActionFilter)
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('sagemaker')
+
+        def _augment(r):
+            tags = client.list_tags(
+                ResourceArn=r['ModelArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, resources)))
+
+
 class StateTransitionFilter(object):
     """Filter instances by state.
 
@@ -167,6 +199,7 @@ class StateTransitionFilter(object):
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
+@Model.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
     (notebook-instance, endpoint, endpoint-config)
@@ -219,6 +252,7 @@ class TagNotebookInstance(Tag):
 @SagemakerEndpoint.action_registry.register('remove-tag')
 @SagemakerEndpointConfig.action_registry.register('remove-tag')
 @NotebookInstance.action_registry.register('remove-tag')
+@Model.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources
     (notebook-instance, endpoint, endpoint-config)
@@ -265,6 +299,7 @@ class RemoveTagNotebookInstance(RemoveTag):
 @SagemakerEndpoint.action_registry.register('mark-for-op')
 @SagemakerEndpointConfig.action_registry.register('mark-for-op')
 @NotebookInstance.action_registry.register('mark-for-op')
+@Model.action_registry.register('mark-for-op')
 class MarkNotebookInstanceForOp(TagDelayedAction):
     """Mark SageMaker resources for deferred action
     (notebook-instance, endpoint, endpoint-config)
@@ -421,38 +456,6 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
             list(w.map(self.process_instance, resources))
 
 
-@resources.register('sagemaker-model')
-class Model(QueryResourceManager):
-    class resource_type(object):
-        service = 'sagemaker'
-        enum_spec = ('list_models', 'Models', None)
-        detail_spec = (
-            'describe_model', 'ModelName',
-            'ModelName', None)
-        id = 'ModelArn'
-        name = 'ModelName'
-        date = 'CreationTime'
-        dimension = None
-        filter_name = None
-
-    filters = FilterRegistry('sagemaker-model.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
-    permissions = ('sagemaker:ListTags',)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(r):
-            tags = client.list_tags(
-                ResourceArn=r['ModelArn'])['Tags']
-            r.setdefault('Tags', []).extend(tags)
-            return r
-
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, resources)))
-
-
 @Model.action_registry.register('delete')
 class DeleteModel(BaseAction, StateTransitionFilter):
     """Deletes sagemaker-model(s)
@@ -484,69 +487,6 @@ class DeleteModel(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
-
-
-@Model.action_registry.register('tag')
-class TagModel(Tag):
-    """Action to create tag(s) on a sagemaker-model
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: tag-sagemaker-model
-                resource: sagemaker-model
-                filters:
-                  - "tag:target-tag": absent
-                actions:
-                  - type: tag
-                    key: target-tag
-                    value: target-value
-    """
-    permissions = ('sagemaker:AddTags',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('sagemaker')
-
-        tag_list = []
-        for t in tags:
-            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-
-        for r in resources:
-            client.add_tags(
-                ResourceArn=r['ModelArn'],
-                Tags=tag_list)
-
-
-@Model.action_registry.register('remove-tag')
-class RemoveTagModel(RemoveTag):
-    """Remove tag(s) from sagemaker-model(s)
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: sagemaker-model-remove-tag
-                resource: sagemaker-model
-                filters:
-                  - "tag:BadTag": present
-                actions:
-                  - type: remove-tag
-                    tags: ["BadTag"]
-    """
-    permissions = ('sagemaker:DeleteTags',)
-
-    def process_resource_set(self, resources, keys):
-        client = local_session(
-            self.manager.session_factory).client('sagemaker')
-
-        for r in resources:
-            client.delete_tags(
-                ResourceArn=r['ModelArn'],
-                TagKeys=keys)
 
 
 @SagemakerJob.action_registry.register('stop')
