@@ -73,7 +73,7 @@ class LambdaPermissionTest(BaseTest):
                  'whitelist': ["185106417252"]}],
             'actions': [{
                 'type': 'remove-statements',
-                'statement_ids': ['matched']}]},
+                'statement_ids': 'matched'}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

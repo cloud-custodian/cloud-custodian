@@ -552,7 +552,7 @@ class PolicyLambdaProvision(BaseTest):
                                  'SecurityGroupIds': ['sg-3', 'sg-1']}})
             )
         self.assertFalse(
-            delta({}, {'DeadLetterConfig': {'TargetArn': ''}}))
+            delta({}, {'DeadLetterConfig': {}}))
 
         self.assertTrue(
             delta({}, {'DeadLetterConfig': {'TargetArn': 'arn'}}))
@@ -574,7 +574,7 @@ class PolicyLambdaProvision(BaseTest):
         self.maxDiff = None
         self.assertEqual(
             p.get_config(),
-            {'DeadLetterConfig': {'TargetArn': ''},
+            {'DeadLetterConfig': {},
              'Description': 'cloud-custodian lambda policy',
              'Environment': {'Variables': {}},
              'FunctionName': 'custodian-hello',

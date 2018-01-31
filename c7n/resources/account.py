@@ -519,6 +519,8 @@ class RequestLimitIncrease(BaseAction):
         'EC2': 'amazon-elastic-compute-cloud-linux',
         'RDS': 'amazon-relational-database-service-aurora',
         'VPC': 'amazon-virtual-private-cloud',
+        'IAM': 'aws-identity-and-access-management',
+        'CloudFormation': 'aws-cloudformation',
     }
 
     def process(self, resources):
