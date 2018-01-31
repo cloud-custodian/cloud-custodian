@@ -17,7 +17,7 @@ import functools
 import logging
 import itertools
 
-from c7n.actions import Action
+from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter, FilterRegistry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
@@ -87,13 +87,13 @@ class ElasticSearchDomain(QueryResourceManager):
 @ElasticSearchDomain.filter_registry.register('subnet')
 class Subnet(SubnetFilter):
 
-    RelatedIdsExpression = "VPCOptions.SubnetIds"
+    RelatedIdsExpression = "VPCOptions.SubnetIds[]"
 
 
 @ElasticSearchDomain.filter_registry.register('security-group')
 class SecurityGroup(SecurityGroupFilter):
 
-    RelatedIdsExpression = "VPCOptions.SecurityGroupIds"
+    RelatedIdsExpression = "VPCOptions.SecurityGroupIds[]"
 
 
 @ElasticSearchDomain.filter_registry.register('metrics')
@@ -104,6 +104,23 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.action_registry.register('modify-security-groups')
+class ElasticSearchModifySG(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on an Elasticsearch domain"""
+
+    permissions = ('es:UpdateElasticsearchDomainConfig',)
+
+    def process(self, domains):
+        groups = super(ElasticSearchModifySG, self).get_groups(domains)
+        client = local_session(self.manager.session_factory).client('es')
+
+        for dx, d in enumerate(domains):
+            client.update_elasticsearch_domain_config(
+                DomainName=d['DomainName'],
+                VPCOptions={
+                    'SecurityGroupIds': groups[dx]})
 
 
 @ElasticSearchDomain.action_registry.register('delete')
