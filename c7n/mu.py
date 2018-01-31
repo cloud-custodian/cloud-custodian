@@ -605,7 +605,7 @@ class AbstractLambdaFunction:
 
 LAMBDA_EMPTY_VALUES = {
     'Environment': {'Variables': {}},
-    'DeadLetterConfig': {'TargetArn': ''},
+    'DeadLetterConfig': {},
     'TracingConfig': {'Mode': 'PassThrough'},
     'VpcConfig': {'SubnetIds': [], 'SecurityGroupIds': []},
     'KMSKeyArn': '',

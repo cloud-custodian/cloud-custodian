@@ -28,7 +28,9 @@ class CliTest(BaseTest):
     """ A subclass of BaseTest with some handy functions for CLI related tests. """
 
     def patch_account_id(self):
-        test_account_id = lambda x: self.account_id
+        def test_account_id(options):
+            options.account_id = self.account_id
+
         self.patch(cli, '_default_account_id', test_account_id)
 
     def get_output(self, argv):
