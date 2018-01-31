@@ -34,6 +34,7 @@ from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n import mu
+from c7n import query
 from c7n import utils
 from c7n.logs_support import (
     normalized_log_entries,
@@ -536,6 +537,12 @@ class CloudTrailMode(LambdaMode):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])
+        if isinstance(self.policy.resource_manager, query.ChildResourceManager):
+            if not getattr(self.policy.resource_manager.resource_type,
+                           'supports_trailevents', False):
+                raise ValueError(
+                    "resource:%s does not support cloudtrail mode policies" % (
+                        self.policy.resource_type))
 
 
 class EC2InstanceState(LambdaMode):

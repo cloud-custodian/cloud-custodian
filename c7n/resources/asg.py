@@ -1579,6 +1579,8 @@ class LaunchConfig(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::LaunchConfiguration'
 
+    retry = staticmethod(get_retry(('Throttling',)))
+
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeLaunchConfig(self)

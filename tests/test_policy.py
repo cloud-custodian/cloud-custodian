@@ -249,6 +249,19 @@ class TestPolicyCollection(BaseTest):
 
 class TestPolicy(BaseTest):
 
+    def test_child_resource_trail_validation(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {'name': 'api-resources',
+             'resource': 'rest-resource',
+             'mode': {
+                 'type': 'cloudtrail',
+                 'events': [
+                     {'source': 'apigateway.amazonaws.com',
+                      'event': 'UpdateResource',
+                      'ids': 'requestParameter.stageName'}]}})
+
     def test_load_policy_validation_error(self):
         invalid_policies = {
             'policies':
@@ -261,7 +274,6 @@ class TestPolicy(BaseTest):
             }]
         }
         self.assertRaises(Exception, self.load_policy_set, invalid_policies)
-
 
     def test_policy_validation(self):
         policy = self.load_policy({

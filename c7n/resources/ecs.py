@@ -256,6 +256,8 @@ class TaskDefinition(query.QueryResourceManager):
             'describe_task_definition', 'taskDefinition', None,
             'taskDefinition')
         dimension = None
+        filter_name = None
+        filter_type = None
 
 
 @TaskDefinition.action_registry.register('delete')
