@@ -41,8 +41,9 @@ class KeyBase(object):
                 info = client.describe_key(KeyId=key_id)['KeyMetadata']
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied describing key:%s", key_id)
+                    self.log.warning("Access denied describing key:%s", key_id)
+                else:
+                    raise
             else:
                 r.update(info)
 
@@ -53,6 +54,8 @@ class KeyBase(object):
                     self.log.warning(
                         "Access denied getting tags for key:%s",
                         key_id)
+                else:
+                    raise
 
             tag_list = []
             for t in tags:
