@@ -3,20 +3,17 @@
     "data": {
         "Keys": [
             {
-                "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/78b73bc3-b72f-4051-8eb3-e83d82e63c69", 
-                "KeyId": "78b73bc3-b72f-4051-8eb3-e83d82e63c69"
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/c3c3b8cf-61fc-4f83-ba66-d7f0d923e885", 
+                "KeyId": "c3c3b8cf-61fc-4f83-ba66-d7f0d923e885"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "6cdf691d-9b02-11e7-af0d-3dfa89a167f2", 
+            "RequestId": "21f0e4b2-018a-11e8-b17f-a5b91387b637", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "6cdf691d-9b02-11e7-af0d-3dfa89a167f2", 
-                "content-length": "8066", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:13:57 GMT", 
+                "x-amzn-requestid": "21f0e4b2-018a-11e8-b17f-a5b91387b637", 
+                "content-length": "3986", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 

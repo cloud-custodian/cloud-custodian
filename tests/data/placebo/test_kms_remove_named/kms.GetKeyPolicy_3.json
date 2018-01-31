@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8467b682-f4a5-11e7-b033-97e1a6bf0ed4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8467b682-f4a5-11e7-b033-97e1a6bf0ed4", 
+                "content-length": "224", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

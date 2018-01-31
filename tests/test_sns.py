@@ -38,7 +38,7 @@ class TestSNS(BaseTest):
                         "Sid": "SpecificAllow",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::123456789012:root"
+                            "AWS": "arn:aws:iam::644160558196:root"
                         },
                         "Action": [
                             "SNS:Subscribe"
@@ -75,7 +75,8 @@ class TestSNS(BaseTest):
 
         self.assertEqual([r['TopicArn'] for r in resources], [topic_arn])
 
-        data = json.loads(client.get_topic_attributes(TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])        
+        data = json.loads(client.get_topic_attributes(
+            TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
@@ -123,8 +124,10 @@ class TestSNS(BaseTest):
             session_factory=session_factory)
 
         resources = p.run()
-        self.assertEqual(len(resources), 1) 
+        self.assertEqual(len(resources), 1)
 
-        data = json.loads(client.get_topic_attributes(TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
-        self.assertTrue('RemoveMe' not in [s['Sid'] for s in data.get('Statement', ())])
-    
+        data = json.loads(client.get_topic_attributes(
+            TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
+        self.assertTrue('RemoveMe' not in
+            [s['Sid'] for s in data.get('Statement', ())])
+

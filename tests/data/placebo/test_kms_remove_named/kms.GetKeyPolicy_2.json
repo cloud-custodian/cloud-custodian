@@ -1,17 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::123456789012:root\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"RemoveMe\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "f17c2763-9cc7-11e7-9920-f1dc419c9a59", 
+            "RequestId": "600ec0c1-f4a5-11e7-b732-e9f0ce433111", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "f17c2763-9cc7-11e7-9920-f1dc419c9a59", 
-                "content-length": "279", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Mon, 18 Sep 2017 23:20:22 GMT", 
+                "x-amzn-requestid": "600ec0c1-f4a5-11e7-b732-e9f0ce433111", 
+                "content-length": "373", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

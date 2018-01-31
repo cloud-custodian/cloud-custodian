@@ -37,8 +37,15 @@ class KeyBase(object):
             self.session_factory).client('kms')
         for r in resources:
             key_id = r.get('AliasArn') or r.get('KeyArn')
-            info = client.describe_key(KeyId=key_id)['KeyMetadata']
-            r.update(info)
+            try:
+                info = client.describe_key(KeyId=key_id)['KeyMetadata']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning("Access denied describing key:%s", key_id)
+                else:
+                    raise
+            else:
+                r.update(info)
 
             try:
                 tags = client.list_resource_tags(KeyId=key_id)['Tags']
@@ -47,6 +54,8 @@ class KeyBase(object):
                     self.log.warning(
                         "Access denied getting tags for key:%s",
                         key_id)
+                else:
+                    raise
 
             tag_list = []
             for t in tags:
