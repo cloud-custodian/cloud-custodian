@@ -415,8 +415,9 @@ class Model(QueryResourceManager):
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, resources):
+        client = local_session(self.session_factory).client('sagemaker')
+
         def _augment(r):
-            client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=r['ModelArn'])['Tags']
             r.setdefault('Tags', []).extend(tags)
@@ -448,13 +449,8 @@ class DeleteModel(BaseAction, StateTransitionFilter):
     def process_instance(self, resource):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.delete_model(
-                ModelName=resource['ModelName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting model %s:\n %s" % (
-                    resource['ModelName'], e))
+        client.delete_model(
+            ModelName=resource['ModelName'])
 
     def process(self, resources):
         if not len(resources):
@@ -493,14 +489,9 @@ class TagModel(Tag):
             tag_list.append({'Key': t['Key'], 'Value': t['Value']})
 
         for r in resources:
-            try:
-                client.add_tags(
-                    ResourceArn=r['ModelArn'],
-                    Tags=tag_list)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception tagging model %s: %s',
-                    r['ModelName'], e)
+            client.add_tags(
+                ResourceArn=r['ModelArn'],
+                Tags=tag_list)
 
 
 @Model.action_registry.register('remove-tag')
@@ -527,14 +518,9 @@ class RemoveTagModel(RemoveTag):
             self.manager.session_factory).client('sagemaker')
 
         for r in resources:
-            try:
-                client.delete_tags(
-                    ResourceArn=r['ModelArn'],
-                    TagKeys=keys)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception tagging notebook instance %s: %s',
-                    r['ModelName'], e)
+            client.delete_tags(
+                ResourceArn=r['ModelArn'],
+                TagKeys=keys)
 
 
 @SagemakerJob.action_registry.register('stop')

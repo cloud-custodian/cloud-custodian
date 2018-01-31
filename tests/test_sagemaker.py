@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 
+import botocore.exceptions as b_exc
+
 
 class TestNotebookInstance(BaseTest):
     def test_list_notebook_instances(self):
@@ -177,14 +179,17 @@ class TestModelInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        p = self.load_policy({
-            'name': 'list-sagemaker-model',
-            'resource': 'sagemaker-model',
-            'filters': [
-                {'tag:DeleteMe': 'present'}]
-        }, session_factory=session_factory)
-        resources2 = p.run()
-        self.assertEqual(len(resources2), 0)
+        client = session_factory().client('sagemaker')
+        try:
+            model = client.describe_model(
+                ModelName=resources[0]['ModelName'])
+        except b_exc.ClientError as e:
+            if e.response['Error']['Code'] != 'ValidationException':
+                self.fail('Bad Error:' + e.response['Error']['Code'])
+            else:
+                self.assertTrue(e.response['Error']['Code'], 'ValidationException')
+        else:
+            self.fail('Resource still exists')
 
     def test_tag_model(self):
         session_factory = self.replay_flight_data(
