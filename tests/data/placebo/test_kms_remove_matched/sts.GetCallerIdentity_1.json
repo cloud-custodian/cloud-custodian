@@ -2,18 +2,18 @@
     "status_code": 200, 
     "data": {
         "Account": "644160558196", 
-        "UserId": "AIDAIQF3HRTVXDF7TMNAM", 
+        "UserId": "AIDAIF6CSPD4UCWCSYZZ6", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "20fac55b-018a-11e8-808d-4393488b765e", 
+            "RequestId": "138ac838-06cb-11e8-9a81-717e49e791ce", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "20fac55b-018a-11e8-808d-4393488b765e", 
-                "date": "Thu, 25 Jan 2018 04:42:19 GMT", 
-                "content-length": "415", 
+                "x-amzn-requestid": "138ac838-06cb-11e8-9a81-717e49e791ce", 
+                "date": "Wed, 31 Jan 2018 21:09:51 GMT", 
+                "content-length": "413", 
                 "content-type": "text/xml"
             }
         }, 
-        "Arn": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
+        "Arn": "arn:aws:iam::644160558196:user/AlfredMarcGamulo"
     }
 }

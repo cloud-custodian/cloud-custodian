@@ -39,11 +39,11 @@ class KMSTest(BaseTest):
              'resource': 'kms-key',
              'filters': [
                  {'type': 'key-rotation-status', 'key': 'KeyRotationEnabled',
-                  'value': False}]},
+                  'value': True}]},
             session_factory=session_factory)
 
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
 
     @functional
@@ -62,7 +62,7 @@ class KMSTest(BaseTest):
             KeyId=key_id,
             PolicyName='default',
             Policy=json.dumps({
-                "Version": "2008-10-17",
+                "Version": "2012-10-17",
                 "Statement": [
                     {
                         "Sid": "DefaultRoot",
@@ -179,6 +179,7 @@ class KMSTest(BaseTest):
 
 class KMSTagging(BaseTest):
 
+    @functional
     def test_kms_key_tag(self):
         session_factory = self.replay_flight_data('test_kms_key_tag')
         client = session_factory().client('kms')
@@ -198,6 +199,7 @@ class KMSTagging(BaseTest):
         tags = client.list_resource_tags(KeyId=key_id)['Tags']
         self.assertEqual(tags[0]['TagKey'], 'RequisiteKey')
 
+    @functional
     def test_kms_key_remove_tag(self):
         session_factory = self.replay_flight_data('test_kms_key_remove_tag')
         client = session_factory().client('kms')
