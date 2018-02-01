@@ -43,7 +43,7 @@ def resources_gc_prefix(options, policy_collection):
         options.region, options.profile, options.assume_role)
 
     manager = mu.LambdaManager(session_factory)
-    funcs = list(manager.list_functions('custodian-'))
+    funcs = list(manager.list_functions(options.prefix))
 
     client = session_factory().client('lambda')
 
@@ -114,6 +114,9 @@ def setup_parser():
     parser.add_argument('--dryrun', action="store_true", default=False)
     parser.add_argument(
         "--profile", default=os.environ.get('AWS_PROFILE'),
+        help="AWS Account Config File Profile to utilize")
+    parser.add_argument(
+        "--prefix", default="custodian-",
         help="AWS Account Config File Profile to utilize")
     parser.add_argument(
         "--assume", default=None, dest="assume_role",

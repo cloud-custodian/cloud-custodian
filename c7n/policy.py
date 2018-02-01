@@ -559,7 +559,7 @@ class GuardDutyMode(LambdaMode):
     supported_resources = ('account', 'ec2', 'iam-user')
 
     id_exprs = {
-        'account': jmespath.compile('detail.account'),
+        'account': jmespath.compile('detail.accountId'),
         'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
         'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
 
