@@ -23,10 +23,6 @@ from c7n.actions import BaseAction
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
-filters = FilterRegistry('sagemaker.filters')
-filters.register('marked-for-op', TagActionFilter)
-
-
 @resources.register('sagemaker-notebook')
 class NotebookInstance(QueryResourceManager):
 
@@ -42,13 +38,15 @@ class NotebookInstance(QueryResourceManager):
         dimension = None
         filter_name = None
 
+    filters = FilterRegistry('sagemaker-notebook.filters')
+    filters.register('marked-for-op', TagActionFilter)
     filter_registry = filters
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, resources):
-        def _augment(r):
-            client = local_session(self.session_factory).client('sagemaker')
+        client = local_session(self.session_factory).client('sagemaker')
 
+        def _augment(r):
             # List tags for the Notebook-Instance & set as attribute
             tags = client.list_tags(
                 ResourceArn=r['NotebookInstanceArn'])['Tags']
@@ -92,12 +90,15 @@ class SagemakerEndpoint(QueryResourceManager):
         dimension = None
         filter_name = None
 
+    filters = FilterRegistry('sagemaker-endpoint.filters')
+    filters.register('marked-for-op', TagActionFilter)
     filter_registry = filters
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
+        client = local_session(self.session_factory).client('sagemaker')
+
         def _augment(e):
-            client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointArn'])['Tags']
             e['Tags'] = tags
@@ -124,12 +125,15 @@ class SagemakerEndpointConfig(QueryResourceManager):
         dimension = None
         filter_name = None
 
+    filters = FilterRegistry('sagemaker-endpoint-config.filters')
+    filters.register('marked-for-op', TagActionFilter)
     filter_registry = filters
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
+        client = local_session(self.session_factory).client('sagemaker')
+
         def _augment(e):
-            client = local_session(self.session_factory).client('sagemaker')
             tags = client.list_tags(
                 ResourceArn=e['EndpointConfigArn'])['Tags']
             e['Tags'] = tags
@@ -138,6 +142,38 @@ class SagemakerEndpointConfig(QueryResourceManager):
         endpoints = super(SagemakerEndpointConfig, self).augment(endpoints)
         with self.executor_factory(max_workers=1) as w:
             return list(filter(None, w.map(_augment, endpoints)))
+
+
+@resources.register('sagemaker-model')
+class Model(QueryResourceManager):
+    class resource_type(object):
+        service = 'sagemaker'
+        enum_spec = ('list_models', 'Models', None)
+        detail_spec = (
+            'describe_model', 'ModelName',
+            'ModelName', None)
+        id = 'ModelArn'
+        name = 'ModelName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+    filters = FilterRegistry('sagemaker-model.filters')
+    filters.register('marked-for-op', TagActionFilter)
+    filter_registry = filters
+    permissions = ('sagemaker:ListTags',)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('sagemaker')
+
+        def _augment(r):
+            tags = client.list_tags(
+                ResourceArn=r['ModelArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, resources)))
 
 
 class StateTransitionFilter(object):
@@ -160,9 +196,13 @@ class StateTransitionFilter(object):
         return results
 
 
+@SagemakerEndpoint.action_registry.register('tag')
+@SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
+@Model.action_registry.register('tag')
 class TagNotebookInstance(Tag):
-    """Action to create tag(s) on a sagemaker-notebook
+    """Action to create tag(s) on a SageMaker resource
+    (notebook-instance, endpoint, endpoint-config)
 
     :example:
 
@@ -177,6 +217,24 @@ class TagNotebookInstance(Tag):
                   - type: tag
                     key: target-tag
                     value: target-value
+
+              - name: tag-sagemaker-endpoint
+                resource: sagemaker-endpoint
+                filters:
+                    - "tag:required-tag": absent
+                actions:
+                  - type: tag
+                    key: required-tag
+                    value: required-value
+
+              - name: tag-sagemaker-endpoint-config
+                resource: sagemaker-endpoint-config
+                filters:
+                    - "tag:required-tag": absent
+                actions:
+                  - type: tag
+                    key: required-tag
+                    value: required-value
     """
     permissions = ('sagemaker:AddTags',)
 
@@ -187,21 +245,17 @@ class TagNotebookInstance(Tag):
         tag_list = []
         for t in tags:
             tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-
         for r in resources:
-            try:
-                client.add_tags(
-                    ResourceArn=r['NotebookInstanceArn'],
-                    Tags=tag_list)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception tagging notebook instance %s: %s',
-                    r['NotebookInstanceName'], e)
+            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
 
 
+@SagemakerEndpoint.action_registry.register('remove-tag')
+@SagemakerEndpointConfig.action_registry.register('remove-tag')
 @NotebookInstance.action_registry.register('remove-tag')
+@Model.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
-    """Remove tag(s) from sagemaker-notebook(s)
+    """Remove tag(s) from SageMaker resources
+    (notebook-instance, endpoint, endpoint-config)
 
     :example:
 
@@ -215,6 +269,22 @@ class RemoveTagNotebookInstance(RemoveTag):
                 actions:
                   - type: remove-tag
                     tags: ["BadTag"]
+
+              - name: sagemaker-endpoint-remove-tag
+                resource: sagemaker-endpoint
+                filters:
+                  - "tag:expired-tag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["expired-tag"]
+
+              - name: sagemaker-endpoint-config-remove-tag
+                resource: sagemaker-endpoint-config
+                filters:
+                  - "tag:expired-tag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["expired-tag"]
     """
     permissions = ('sagemaker:DeleteTags',)
 
@@ -223,19 +293,16 @@ class RemoveTagNotebookInstance(RemoveTag):
             self.manager.session_factory).client('sagemaker')
 
         for r in resources:
-            try:
-                client.delete_tags(
-                    ResourceArn=r['NotebookInstanceArn'],
-                    TagKeys=keys)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception tagging notebook instance %s: %s',
-                    r['NotebookInstanceName'], e)
+            client.delete_tags(ResourceArn=r[self.id_key], TagKeys=keys)
 
 
+@SagemakerEndpoint.action_registry.register('mark-for-op')
+@SagemakerEndpointConfig.action_registry.register('mark-for-op')
 @NotebookInstance.action_registry.register('mark-for-op')
+@Model.action_registry.register('mark-for-op')
 class MarkNotebookInstanceForOp(TagDelayedAction):
-    """Mark notebook instance for deferred action
+    """Mark SageMaker resources for deferred action
+    (notebook-instance, endpoint, endpoint-config)
 
     :example:
 
@@ -250,6 +317,27 @@ class MarkNotebookInstanceForOp(TagDelayedAction):
               - type: mark-for-op
                 op: stop
                 days: 1
+
+          - name: sagemaker-endpoint-failure-delete
+            resource: sagemaker-endpoint
+            filters:
+              - 'EndpointStatus': 'Failed'
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+
+          - name: sagemaker-endpoint-config-invalid-size-delete
+            resource: sagemaker-notebook
+            filters:
+              - type: value
+              - key: ProductionVariants[].InstanceType
+              - value: 'ml.m4.10xlarge'
+              - op: contains
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
     """
     permissions = ('sagemaker:AddTags',)
 
@@ -262,14 +350,7 @@ class MarkNotebookInstanceForOp(TagDelayedAction):
             tag_list.append({'Key': t['Key'], 'Value': t['Value']})
 
         for r in resources:
-            try:
-                client.add_tags(
-                    ResourceArn=r['NotebookInstanceArn'],
-                    Tags=tag_list)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception tagging notebook instance %s: %s',
-                    r['NotebookInstanceName'], e)
+            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
 
 
 @NotebookInstance.action_registry.register('start')
@@ -293,13 +374,8 @@ class StartNotebookInstance(BaseAction, StateTransitionFilter):
     def process_instance(self, resource):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.start_notebook_instance(
-                NotebookInstanceName=resource['NotebookInstanceName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception stopping notebook instance %s:\n %s" % (
-                    resource['NotebookInstanceName'], e))
+        client.start_notebook_instance(
+            NotebookInstanceName=resource['NotebookInstanceName'])
 
     def process(self, resources):
         resources = self.filter_instance_state(resources)
@@ -333,13 +409,8 @@ class StopNotebookInstance(BaseAction, StateTransitionFilter):
     def process_instance(self, resource):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.stop_notebook_instance(
-                NotebookInstanceName=resource['NotebookInstanceName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception stopping notebook instance %s:\n %s" % (
-                    resource['NotebookInstanceName'], e))
+        client.stop_notebook_instance(
+            NotebookInstanceName=resource['NotebookInstanceName'])
 
     def process(self, resources):
         resources = self.filter_instance_state(resources)
@@ -373,16 +444,44 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
     def process_instance(self, resource):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.delete_notebook_instance(
-                NotebookInstanceName=resource['NotebookInstanceName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting notebook instance %s:\n %s" % (
-                    resource['NotebookInstanceName'], e))
+        client.delete_notebook_instance(
+            NotebookInstanceName=resource['NotebookInstanceName'])
 
     def process(self, resources):
         resources = self.filter_instance_state(resources)
+        if not len(resources):
+            return
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_instance, resources))
+
+
+@Model.action_registry.register('delete')
+class DeleteModel(BaseAction, StateTransitionFilter):
+    """Deletes sagemaker-model(s)
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-sagemaker-model
+            resource: sagemaker-model
+            filters:
+              - "tag:DeleteMe": present
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModel',)
+
+    def process_instance(self, resource):
+        client = local_session(
+            self.manager.session_factory).client('sagemaker')
+        client.delete_model(
+            ModelName=resource['ModelName'])
+
+    def process(self, resources):
         if not len(resources):
             return
 
@@ -396,7 +495,7 @@ class SagemakerJobStop(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: stop-ml-job
@@ -416,9 +515,12 @@ class SagemakerJobStop(BaseAction):
             client.stop_training_job(
                 TrainingJobName=job['TrainingJobName'])
         except ClientError as e:
-            self.log.exception(
-                "Exception stopping sagemaker job %s:\n %s" % (
-                    job['TrainingJobName'], e))
+            if e.response['Error']['Code'] == 'ResourceNotFound':
+                self.log.exception(
+                    "Exception stopping sagemaker job %s:\n %s" % (
+                        job['TrainingJobName'], e))
+            else:
+                raise
 
     def process(self, jobs):
         with self.executor_factory(max_workers=2) as w:
@@ -448,13 +550,7 @@ class SagemakerEndpointDelete(BaseAction):
     def process_endpoint(self, endpoint):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.delete_endpoint(
-                EndpointName=endpoint['EndpointName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting endpoint %s:\n %s" % (
-                    endpoint['EndpointName'], e))
+        client.delete_endpoint(EndpointName=endpoint['EndpointName'])
 
     def process(self, endpoints):
         with self.executor_factory(max_workers=2) as w:
@@ -483,13 +579,8 @@ class SagemakerEndpointConfigDelete(BaseAction):
     def process_endpoint_config(self, endpoint):
         client = local_session(
             self.manager.session_factory).client('sagemaker')
-        try:
-            client.delete_endpoint_config(
-                EndpointConfigName=endpoint['EndpointConfigName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting endpoint config %s:\n %s" % (
-                    endpoint['EndpointConfigName'], e))
+        client.delete_endpoint_config(
+            EndpointConfigName=endpoint['EndpointConfigName'])
 
     def process(self, endpoints):
         with self.executor_factory(max_workers=2) as w:

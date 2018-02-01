@@ -143,3 +143,31 @@ class ElasticSearch(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DomainName'], 'c7n-test')
+
+    def test_modify_security_groups(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_modify_security_groups')
+        p = self.load_policy({
+            'name': 'modify-es-sg',
+            'resource': 'elasticsearch',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupId',
+                'value': ['sg-6c7fa917', 'sg-3839ec4b'],
+                'op': 'in'}],
+            'actions': [{
+                'type': 'modify-security-groups',
+                'add': ['sg-9a5386e9'],
+                'remove': ['sg-3839ec4b']}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            sorted(resources[0]['VPCOptions']['SecurityGroupIds']),
+            sorted(['sg-6c7fa917', 'sg-3839ec4b']))
+
+        client = session_factory(region='us-east-1').client('es')
+        result = client.describe_elasticsearch_domains(
+            DomainNames=[resources[0]['DomainName']])['DomainStatusList']
+        self.assertEqual(
+            sorted(result[0]['VPCOptions']['SecurityGroupIds']),
+            sorted(['sg-6c7fa917', 'sg-9a5386e9']))

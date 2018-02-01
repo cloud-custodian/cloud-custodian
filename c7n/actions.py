@@ -248,15 +248,25 @@ class ModifyVpcSecurityGroupsAction(Action):
                 else:
                     rgroups = [g['GroupId'] for g in r['Groups']]
             elif r.get('SecurityGroups'):
+                # elb, ec2, elasticache, efs, vpc resource security groups
                 if metadata_key and isinstance(r['SecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['SecurityGroups']]
                 else:
                     rgroups = [g for g in r['SecurityGroups']]
             elif r.get('VpcSecurityGroups'):
+                # rds resource security groups
                 if metadata_key and isinstance(r['VpcSecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['VpcSecurityGroups']]
                 else:
                     rgroups = [g for g in r['VpcSecurityGroups']]
+            elif r.get('VPCOptions', {}).get('SecurityGroupIds', []):
+                # elasticsearch resource security groups
+                if metadata_key and isinstance(
+                        r['VPCOptions']['SecurityGroupIds'][0], dict):
+                    rgroups = [g[metadata_key] for g in r[
+                        'VPCOptions']['SecurityGroupIds']]
+                else:
+                    rgroups = [g for g in r['VPCOptions']['SecurityGroupIds']]
             # use as substitution for 'Groups' or '[Vpc]SecurityGroups'
             # unsure if necessary - defer to coverage report
             elif metadata_key and r.get(metadata_key):
@@ -514,6 +524,9 @@ class Notify(EventAction):
         queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
+            queue_url = queue
+        elif 'queue.amazonaws.com' in queue:
+            region = queue[len('https://'):].split('.', 1)[0]
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
@@ -796,8 +809,7 @@ class RemovePolicyBase(BaseAction):
 
         found = []
         statements = policy.get('Statement', [])
-        resource_statements = resource.get(
-            matched_key, ())
+        resource_statements = resource.get(matched_key, ())
 
         for s in list(statements):
             if statement_ids == 'matched':
