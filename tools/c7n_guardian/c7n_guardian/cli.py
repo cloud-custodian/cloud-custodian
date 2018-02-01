@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import operator
 
@@ -44,12 +45,17 @@ def cli():
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
 @click.option('--debug', help='Run single-threaded', is_flag=True)
-def report(config, tags, accounts, master, debug):
+@click.option('--region', default='us-east-1')
+def report(config, tags, accounts, master, debug, region):
     """report on guard duty enablement by account"""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
 
-    session = assumed_session(master_info['role'], 'c7n-guardian')
+    session = get_session(
+        master_info.get('role'), 'c7n-guardian',
+        master_info.get('profile'),
+        region)
+    
     client = session.client('guardduty')
     detector_id = get_or_create_detector_id(client)
 
@@ -67,7 +73,7 @@ def report(config, tags, accounts, master, debug):
             ar['member'] = False
             ar['status'] = None
             ar['invited'] = None
-            ar['updated'] = None
+            ar['updated'] = datetime.datetime.now().isoformat()
             continue
         m = members[a['account_id']]
         ar['status'] = m['RelationshipStatus']
@@ -93,8 +99,9 @@ def report(config, tags, accounts, master, debug):
               is_flag=True)
 @click.option('--dissociate', help='Disassociate member account',
               is_flag=True)
+@click.option('--region')
 def disable(config, tags, accounts, master, debug,
-            suspend, disable_detector, delete_detector, dissociate):
+            suspend, disable_detector, delete_detector, dissociate, region):
     """suspend guard duty in the given accounts."""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
@@ -104,7 +111,9 @@ def disable(config, tags, accounts, master, debug,
             "One and only of suspend, disable-detector, dissociate"
             "can be specified."))
 
-    master_session = assumed_session(master_info['role'], 'c7n-guardian')
+    master_session = get_session(
+        master_info['role'], 'c7n-guardian',
+        master_info.get('profile'), region)
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
 
@@ -131,7 +140,10 @@ def disable(config, tags, accounts, master, debug,
     # delete the detector (member), disable the detector (master or member),
     # or disassociate members, or from member disassociate from master.
     for a in accounts_config['accounts']:
-        member_session = assumed_session(master_info['role'], 'c7n-guardian')
+        member_session = get_session(
+            a['role'], 'c7n-guardian',
+            a.get('profile'), region)
+
         member_client = member_session.client('guardduty')
         m_detector_id = get_or_create_detector_id(member_client)
         if disable_detector:
