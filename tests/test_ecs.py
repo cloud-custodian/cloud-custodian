@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 
+import fnmatch
+import os
 import time
 
 
@@ -123,7 +125,24 @@ class TestEcsTaskDefinition(BaseTest):
             familyPrefix='launch-me',
             status='ACTIVE').get('taskDefinitionArns')
         self.assertEqual(arns, [])
-    
+
+    def test_task_definition_get_resources(self):
+        session_factory = self.replay_flight_data('test_ecs_task_def_query')
+        p = self.load_policy(
+            {'name': 'task-defs',
+             'resource': 'ecs-task-definition'},
+            session_factory=session_factory)
+        arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1"
+        resources = p.resource_manager.get_resources([arn])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['taskDefinitionArn'], arn)
+        self.assertEqual(
+            len(fnmatch.filter(
+                os.listdir(os.path.join(
+                    self.placebo_dir, 'test_ecs_task_def_query')),
+                '*.json')),
+            1)
+
 
 class TestEcsTask(BaseTest):
 
