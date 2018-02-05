@@ -55,7 +55,7 @@ def report(config, tags, accounts, master, debug, region):
         master_info.get('role'), 'c7n-guardian',
         master_info.get('profile'),
         region)
-    
+
     client = session.client('guardduty')
     detector_id = get_or_create_detector_id(client)
 
@@ -220,9 +220,9 @@ def enable(config, master, tags, accounts, debug, message, region):
             log.info("All accounts already enabled")
         return
 
-    if (len(members) + len(extant_ids)) > 100:
+    if (len(members) + len(extant_ids)) > 1000:
         raise ValueError(
-            "Guard Duty only supports 100 member accounts per master account")
+            "Guard Duty only supports 1000 member accounts per master account")
 
     log.info("Enrolling %d accounts in guard duty" % len(members))
 
