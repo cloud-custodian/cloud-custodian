@@ -212,6 +212,7 @@ def generate(resource_types=()):
                 'memory': {'type': 'number'},
                 'timeout': {'type': 'number'},
                 'schedule': {'type': 'string'},
+                'function-prefix': {'type': 'string'},
                 'dead_letter_config': {'type': 'object'},
                 'environment': {'type': 'object'},
                 'kms_key_arn': {'type': 'string'},
@@ -220,6 +221,8 @@ def generate(resource_types=()):
                 'packages': {'type': 'array'},
                 'subnets': {'type': 'array'},
                 'security_groups': {'type': 'array'},
+                # specific to guard duty
+                'member-role': {'type': 'string'},
             },
         },
     }

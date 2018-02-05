@@ -712,7 +712,8 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def name(self):
-        return "custodian-%s" % self.policy.name
+        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
+        return "%s%s" % (prefix, self.policy.name)
 
     @property
     def description(self):

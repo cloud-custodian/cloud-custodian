@@ -559,11 +559,30 @@ class GuardDutyMode(LambdaMode):
     supported_resources = ('account', 'ec2', 'iam-user')
 
     id_exprs = {
-        'account': jmespath.compile('account'),
+        'account': jmespath.compile('detail.accountId'),
         'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
         'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
 
+    def assume_member(self, event):
+        # if a member role is defined we're being run out of the master, and we need
+        # to assume back into the member for policy execution.
+        member_role = self.policy.data['mode'].get('member-role')
+        if member_role:
+            # In the master account we might be multiplexing a hot lambda across
+            # multiple member accounts for each event/invocation.
+            member_id = event['detail']['accountId']
+            member_role = member_role.format(account_id=member_id)
+            utils.reset_session_cache()
+            self.policy.options['account_id'] = member_id
+            self.policy.session_factory = SessionFactory(
+                assume_role=member_role)
+            self.policy.log.info(
+                "Guard duty assuming member role: %s", member_role)
+            return True
+        return False
+
     def resolve_resources(self, event):
+        self.assume_member(event)
         rid = self.id_exprs[self.policy.resource_type].search(event)
         resources = self.policy.resource_manager.get_resources([rid])
         # For iam users annotate with the access key specified in the finding event

@@ -55,7 +55,7 @@ CONFIG_SCHEMA = {
     'definitions': {
         'account': {
             'type': 'object',
-            'additionalProperties': False,
+            'additionalProperties': True,
             'required': ['role', 'account_id'],
             'properties': {
                 'name': {'type': 'string'},
@@ -73,6 +73,7 @@ CONFIG_SCHEMA = {
     'additionalProperties': False,
     'required': ['accounts'],
     'properties': {
+        'vars': {'type': 'object'},
         'accounts': {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
