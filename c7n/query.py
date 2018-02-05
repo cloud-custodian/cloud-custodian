@@ -424,7 +424,7 @@ class QueryResourceManager(ResourceManager):
 
     def get_resources(self, ids, cache=True):
         if cache:
-            resources = self._get_cached_resources()
+            resources = self._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
