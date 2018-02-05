@@ -572,7 +572,7 @@ class GuardDutyMode(LambdaMode):
             # multiple member accounts for each event/invocation.
             member_id = event['detail']['accountId']
             member_role = member_role.format(account_id=member_id)
-            utils.CONN_CACHE.session = None
+            utils.reset_session_cache()
             self.policy.options['account_id'] = member_id
             self.policy.session_factory = SessionFactory(
                 assume_role=member_role)
