@@ -259,6 +259,18 @@ class TaskDefinition(query.QueryResourceManager):
         filter_name = None
         filter_type = None
 
+    def get_resources(self, ids, cache=True):
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
+        try:
+            resources = self.augment(ids)
+            return resources
+        except ClientError as e:
+            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            return []
+
 
 @TaskDefinition.action_registry.register('delete')
 class DeleteTaskDefinition(BaseAction):
