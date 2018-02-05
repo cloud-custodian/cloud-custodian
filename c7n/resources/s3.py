@@ -733,13 +733,19 @@ class HasStatementFilter(Filter):
                 'properties': {
                     'Sid': {'type': 'string'},
                     'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                    'Principal': {'anyOf': [{'type': 'string'},
+                    'Principal': {'anyOf': [
+                        {'type': 'string'},
                         {'type': 'object'}, {'type': 'array'}]},
-                    'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-                    'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotPrincipal': {
+                        'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                    'Action': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotAction': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'Resource': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotResource': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                     'Condition': {'type': 'object'}
                 },
                 'required': ['Effect']
@@ -762,19 +768,18 @@ class HasStatementFilter(Filter):
                 required.remove(s['Sid'])
 
         required_statements = list(self.data.get('statements', []))
-        statements = p.get('Statement', [])
         for required_statement in required_statements:
             for statement in statements:
-                found = True
+                found = False
                 for key, value in required_statement.items():
-                    if key not in statement.keys() or value not in statement[key]:
-                        found = False
+                    if key in statement and value == statement[key]:
+                        found = True
                         break
                 if found:
                     required_statements.remove(required_statement)
 
-        if self.data.get('statement_ids', []) and not required \
-                or self.data.get('statements', []) and not required_statements:
+        if (self.data.get('statement_ids', []) and not required) or \
+           (self.data.get('statements', []) and not required_statements):
             return b
         return None
 
