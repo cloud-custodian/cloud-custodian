@@ -1906,6 +1906,7 @@ class S3Test(BaseTest):
             'ServerSideEncryption' in client.head_object(
                 Bucket=bname, Key='home.txt'))
 
+    @functional
     def test_encrypt_versioned_bucket_with_existing_keys(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_versioning', 'Versioning', None, None)])
