@@ -905,10 +905,10 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
     for k in kchunk:
         if isinstance(k, str):
             k = {'Key': k}
-        elif isinstance(k, list) and len(k) == 2:
-            k = {'Key': k[0], 'VersionId': k[1], 'IsLatest': False}
+        elif isinstance(k, (list, tuple)) and len(k) == 2:
+            k = {'Key': k[0], 'VersionId': k[1] or 'null', 'IsLatest': False}
         else:
-            k = {'Key': k[0], 'VersionId': k[1], 'IsLatest': True}
+            k = {'Key': k[0], 'VersionId': k[1] or 'null', 'IsLatest': True}
         try:
             result = processor(s3, bucket_name=bucket, key=k)
         except EndpointConnectionError:
