@@ -114,6 +114,8 @@ lambda policies to autotag resources with username and full principal id
     - type: auto-tag-user
       tag: auto:tagging:creator-name
       full_principal_id_tag: auto:tagging:creator-id
+      # If bob spins up an ELB, the ENI ELB spins up will have autotags set to bob
+      elb_autotag_lookup: true
 
 .. code:: yaml
 
@@ -135,7 +137,7 @@ lambda policies to autotag resources with username and full principal id
 .. code:: yaml
 
  policies:
- 
+
  - name: auto-tag-elasticsearch
    description: |
      Autotags any newly created elasticsearch domain
@@ -153,7 +155,7 @@ lambda policies to autotag resources with username and full principal id
 .. code:: yaml
 
  policies:
- 
+
  - name: auto-tag-dynamodb-table
    description: |
      Autotags any newly created dynamodb-table clusters
@@ -171,7 +173,7 @@ lambda policies to autotag resources with username and full principal id
 .. code:: yaml
 
  policies:
- 
+
  - name: auto-tag-cache-cluster
    description: |
      Autotags any newly created cache-cluster domain

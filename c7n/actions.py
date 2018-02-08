@@ -611,7 +611,8 @@ class AutoTagUser(EventAction):
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
            'principal_id_tag': {'type': 'string'},
-           'full_principal_id_tag': {'type': 'string'}
+           'full_principal_id_tag': {'type': 'string'},
+           'elb_autotag_lookup': {'type': 'boolean'}
            }
     )
 
@@ -626,6 +627,23 @@ class AutoTagUser(EventAction):
             raise ValueError("Resource does not support tagging")
         return self
 
+    def eni_get_elb_autotags(self, event, user_tag_key, principal_id_tag_name):
+        create_eni_event = event['eventName'] == 'CreateNetworkInterface'
+        if create_eni_event:
+            elb_name = event['requestParameters']['description'].split("ELB ")[-1]
+            client = utils.local_session(self.manager.session_factory).client('elb')
+            elb_tags = client.describe_tags(LoadBalancerNames = [elb_name])
+            user, principal_id_value = [None, None]
+            if 'TagDescriptions' in elb_tags:
+                for elb_tag_pair in elb_tags['TagDescriptions'][0]['Tags']:
+                    if elb_tag_pair['Key'] == user_tag_key:
+                        user = elb_tag_pair['Value']
+                    elif elb_tag_pair['Key'] == principal_id_tag_name:
+                        principal_id_value = elb_tag_pair['Value']
+            return [user, principal_id_value]
+        else:
+            return [None, None]
+
     def process(self, resources, event):
         if event is None:
             return
@@ -633,27 +651,34 @@ class AutoTagUser(EventAction):
         utype = event['userIdentity']['type']
         if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser']):
             return
-
+        user_tag_key = self.data['tag']
         user = None
         # if old_principal_id_tag is set (and value), we'll set the principalId tag.
         role_principal_id_tag = self.data.get('principal_id_tag', None)
         full_principal_id_tag = self.data.get('full_principal_id_tag', None)
         principal_id_value = event['userIdentity'].get('principalId', '')
+        principal_id_tag_name = role_principal_id_tag or full_principal_id_tag
+        invoked_by_elb = event['userIdentity'].get(
+            'invokedBy', None) == 'elasticloadbalancing.amazonaws.com'
         if utype == "IAMUser":
             user = event['userIdentity']['userName']
         elif utype == "AssumedRole":
-            if role_principal_id_tag:
-                principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             user = event['userIdentity']['arn']
-            prefix, user = user.rsplit('/', 1)
-            # instance role
-            if user.startswith('i-'):
-                return
-            # lambda function (old style)
-            elif user.startswith('awslambda'):
-                return
-        if user is None:
+            user = user.rsplit('/', 1)[-1]
+            # when an ELB creates an ENI, you can lookup the original user tags
+            if invoked_by_elb and self.data.get('elb_autotag_lookup', None):
+                user, principal_id_value = self.eni_get_elb_autotags(event,
+                    user_tag_key, principal_id_tag_name)
+            elif principal_id_tag_name:
+                if role_principal_id_tag:
+                    principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
+                elif full_principal_id_tag:
+                    principal_id_value = event['userIdentity'].get('principalId', '')
+
+        # if the user doesn't exist, or it's an instancerole or lambda role, return
+        if user is None or user.startswith('i-') or user.startswith('awslambda'):
             return
+
         # if the auto-tag-user policy set update to False (or it's unset) then we
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
@@ -662,7 +687,7 @@ class AutoTagUser(EventAction):
             for resource in resources:
                 tag_already_set = False
                 for tag in resource.get('Tags', ()):
-                    if tag['Key'] == self.data['tag']:
+                    if tag['Key'] == user_tag_key:
                         tag_already_set = True
                         break
                 if not tag_already_set:
@@ -674,12 +699,10 @@ class AutoTagUser(EventAction):
 
         tag_action = self.manager.action_registry.get('tag')
         new_tags = {
-            self.data['tag']: user
+            user_tag_key: user
         }
-        if role_principal_id_tag and principal_id_value:
-            new_tags[role_principal_id_tag] = principal_id_value
-        elif full_principal_id_tag and principal_id_value:
-            new_tags[full_principal_id_tag] = principal_id_value
+        if principal_id_tag_name and principal_id_value:
+            new_tags[principal_id_tag_name] = principal_id_value
         for key, value in six.iteritems(new_tags):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
