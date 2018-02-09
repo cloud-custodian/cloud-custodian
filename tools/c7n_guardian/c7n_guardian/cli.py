@@ -23,6 +23,7 @@ from tabulate import tabulate
 
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import format_event, chunks
+
 from c7n_org.cli import init, filter_accounts, CONFIG_SCHEMA, WORKER_COUNT
 
 log = logging.getLogger('c7n-guardian')
@@ -228,7 +229,7 @@ def enable(config, master, tags, accounts, debug, message, region):
 
     log.info("Creating member accounts:%d region:%s", len(members), region)
     unprocessed = []
-    for account_set in chunks(members, 10):
+    for account_set in chunks(members, 25):
         unprocessed.extend(master_client.create_members(
             DetectorId=detector_id, AccountDetails=account_set).get('UnprocessedAccounts', []))
     if unprocessed:
