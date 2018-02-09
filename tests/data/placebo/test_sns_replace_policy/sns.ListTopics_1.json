@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test-sns-replace-policy"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a8729b31-0525-50e6-aaf1-c9c7e259efb1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a8729b31-0525-50e6-aaf1-c9c7e259efb1", 
+                "date": "Fri, 09 Feb 2018 00:03:08 GMT", 
+                "content-length": "1421", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
