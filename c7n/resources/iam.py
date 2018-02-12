@@ -231,6 +231,18 @@ class IamRoleUsage(Filter):
 
 @Role.filter_registry.register('used')
 class UsedIamRole(IamRoleUsage):
+    """Filter IAM roles that are currently being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-role-in-use
+            resource: iam-role
+            filters:
+              - type: used
+    """
 
     schema = type_schema('used')
 
@@ -247,7 +259,18 @@ class UsedIamRole(IamRoleUsage):
 
 @Role.filter_registry.register('unused')
 class UnusedIamRole(IamRoleUsage):
+    """Filter IAM roles that are currently not used
 
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-not-in-use
+            resource: iam-role
+            filters:
+              - type: unused
+        """
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
@@ -263,11 +286,20 @@ class UnusedIamRole(IamRoleUsage):
 
 @Role.filter_registry.register('has-inline-policy')
 class IamRoleInlinePolicy(Filter):
-    """
-        Filter IAM roles that have an inline-policy attached
+    """Filter IAM roles that have an inline-policy attached
+    True: Filter roles that have an inline-policy
+    False: Filter roles that do not have an inline-policy
 
-        True: Filter roles that have an inline-policy
-        False: Filter roles that do not have an inline-policy
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-inline-policies
+            resource: iam-role
+            filters:
+              - type: has-inline-policy
+                value: True
     """
 
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
@@ -297,7 +329,6 @@ class SpecificIamRoleManagedPolicy(Filter):
        filters:
         - type: has-specific-managed-policy
           value: admin-policy
-
     """
 
     schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
@@ -327,7 +358,6 @@ class NoSpecificIamRoleManagedPolicy(Filter):
        filters:
         - type: no-specific-managed-policy
           value: ip-restriction
-
     """
 
     schema = type_schema('no-specific-managed-policy', value={'type': 'string'})
@@ -352,6 +382,18 @@ class NoSpecificIamRoleManagedPolicy(Filter):
 
 @Policy.filter_registry.register('used')
 class UsedIamPolicies(Filter):
+    """Filter IAM policies that are being used
+
+    :example:
+    
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-used
+            resource: iam-policy
+            filters:
+              - type: used
+    """
 
     schema = type_schema('used')
     permissions = ('iam:ListPolicies',)
@@ -362,6 +404,18 @@ class UsedIamPolicies(Filter):
 
 @Policy.filter_registry.register('unused')
 class UnusedIamPolicies(Filter):
+    """Filter IAM policies that are not being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-unused
+            resource: iam-policy
+            filters:
+              - type: unused
+    """
 
     schema = type_schema('unused')
     permissions = ('iam:ListPolicies',)
@@ -448,6 +502,18 @@ class AllowAllIamPolicies(Filter):
 
 @InstanceProfile.filter_registry.register('used')
 class UsedInstanceProfiles(IamRoleUsage):
+    """Filter IAM profiles that are being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profiles-in-use
+            resource: iam-profile
+            filters:
+              - type: used
+    """
 
     schema = type_schema('used')
 
@@ -465,6 +531,18 @@ class UsedInstanceProfiles(IamRoleUsage):
 
 @InstanceProfile.filter_registry.register('unused')
 class UnusedInstanceProfiles(IamRoleUsage):
+    """Filter IAM profiles that are not being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profiles-not-in-use
+            resource: iam-profile
+            filters:
+              - type: unused
+    """
 
     schema = type_schema('unused')
 
@@ -783,13 +861,13 @@ class UserAccessKey(ValueFilter):
 
     .. code-block:: yaml
 
-            policies:
-              - name: iam-users-with-active-keys
-                resource: iam-user
-                filters:
-                  - type: access-key
-                    key: Status
-                    value: Active
+        policies:
+          - name: iam-users-with-active-keys
+            resource: iam-user
+            filters:
+              - type: access-key
+                key: Status
+                value: Active
     """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
