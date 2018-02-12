@@ -249,6 +249,7 @@ class TagActionFilter(Filter):
         'marked-for-op',
         tag={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
+        skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
 
     current_date = None
@@ -263,6 +264,7 @@ class TagActionFilter(Filter):
         tag = self.data.get('tag', DEFAULT_TAG)
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
+        skew_hours = self.data.get('skew_hours', 0)
 
         v = None
         for n in i.get('Tags', ()):
@@ -275,22 +277,23 @@ class TagActionFilter(Filter):
         if ':' not in v or '@' not in v:
             return False
 
-        msg, tgt = v.rsplit(':', 1)
+        msg, tgt = v.split(':', 1)
         action, action_date_str = tgt.strip().split('@', 1)
 
         if action != op:
             return False
 
         try:
-            action_date = parse(action_date_str)
+            action_date = parse(action_date_str, tzinfos=tzutc)
         except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
 
         if self.current_date is None:
-            self.current_date = datetime.now()
+            self.current_date = datetime.now(tz=tzutc()).replace(minute=0)
 
-        return self.current_date >= (action_date - timedelta(skew))
+        return self.current_date >= (
+            action_date - timedelta(days=skew, hours=skew_hours))
 
 
 class TagCountFilter(Filter):
@@ -535,6 +538,7 @@ class TagDelayedAction(Action):
         tag={'type': 'string'},
         msg={'type': 'string'},
         days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
@@ -562,15 +566,32 @@ class TagDelayedAction(Action):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        date = self.data.get('days', 4)
+        days = self.data.get('days')
+        hours = self.data.get('hours')
 
-        n = datetime.now(tz=tzutc())
-        action_date = n + timedelta(days=date)
+        n = datetime.now(tz=tzutc()).replace(minute=0)
+        if not days and hours:
+            # action is to be completed in 0 days and 'n' hours
+            action_date = (n + timedelta(hours=hours)).strftime(
+                '%Y/%m/%d %H:%M')
+        elif days and not hours:
+            # action is to be completed in 'n' days and 0 hours
+            action_date = (n + timedelta(days=days)).strftime(
+                '%Y/%m/%d')
+        elif not days and not hours:
+            # no timeline specified, use defaults
+            action_date = (n + timedelta(days=4)).strftime(
+                '%Y/%m/%d')
+        else:
+            # action is to be completed in 'n' days and 'n' hours
+            action_date = (n + timedelta(days=days, hours=hours)).strftime(
+                '%Y/%m/%d %H:%M')
+
         msg = msg_tmpl.format(
-            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+            op=op, action_date=action_date)
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+            len(resources), op, action_date))
 
         tags = [{'Key': tag, 'Value': msg}]
 
@@ -694,8 +715,8 @@ class NormalizeTag(Action):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for r in resource_set:
-                action    = self.data.get('action')
-                value     = self.data.get('value')
+                action = self.data.get('action')
+                value = self.data.get('value')
                 new_value = False
                 if action == 'lower' and not r.islower():
                     new_value = r.lower()
