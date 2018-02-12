@@ -270,7 +270,7 @@ class UnusedIamRole(IamRoleUsage):
             resource: iam-role
             filters:
               - type: unused
-        """
+    """
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
@@ -322,13 +322,16 @@ class SpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles with 'admin-policy':
 
+    :example:
+
     .. code-block:: yaml
 
-     - name: iam-roles-have-admin
-       resource: iam-role
-       filters:
-        - type: has-specific-managed-policy
-          value: admin-policy
+        policies:
+          - name: iam-roles-have-admin
+            resource: iam-role
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
     """
 
     schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
@@ -351,13 +354,16 @@ class NoSpecificIamRoleManagedPolicy(Filter):
 
     For example, if the user wants to check all roles without 'ip-restriction':
 
+    :example:
+
     .. code-block:: yaml
 
-     - name: iam-roles-no-ip-restriction
-       resource: iam-role
-       filters:
-        - type: no-specific-managed-policy
-          value: ip-restriction
+        policies:
+          - name: iam-roles-no-ip-restriction
+            resource: iam-role
+            filters:
+              - type: no-specific-managed-policy
+                value: ip-restriction
     """
 
     schema = type_schema('no-specific-managed-policy', value={'type': 'string'})
@@ -385,7 +391,7 @@ class UsedIamPolicies(Filter):
     """Filter IAM policies that are being used
 
     :example:
-    
+
     .. code-block:: yaml
 
         policies:
@@ -817,13 +823,13 @@ class GroupMembership(ValueFilter):
 
     .. code-block:: yaml
 
-            policies:
-              - name: iam-users-in-admin-group
-                resource: iam-user
-                filters:
-                  - type: group
-                    key: GroupName
-                    value: Admins
+        policies:
+          - name: iam-users-in-admin-group
+            resource: iam-user
+            filters:
+              - type: group
+                key: GroupName
+                value: Admins
     """
 
     schema = type_schema('group', rinherit=ValueFilter.schema)
@@ -1084,16 +1090,18 @@ class UserRemoveAccessKey(BaseAction):
     For example if we wanted to disable keys after 90 days of non-use and
     delete them after 180 days of nonuse:
 
-    .. code-block:: yaml
+    :example:
 
-     - name: iam-mfa-active-keys-no-login
-       resource: iam-user
-       actions:
-         - type: remove-keys
-           disable: true
-           age: 90
-         - type: remove-keys
-           age: 180
+        .. code-block:: yaml
+
+         - name: iam-mfa-active-keys-no-login
+           resource: iam-user
+           actions:
+             - type: remove-keys
+               disable: true
+               age: 90
+             - type: remove-keys
+               age: 180
     """
 
     schema = type_schema(
