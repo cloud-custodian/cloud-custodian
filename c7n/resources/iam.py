@@ -693,13 +693,13 @@ class UserPolicy(ValueFilter):
 
     .. code-block:: yaml
 
-            policies:
-              - name: iam-users-with-admin-access
-                resource: iam-user
-                filters:
-                  - type: policy
-                    key: 'PolicyName'
-                    value: 'AdministratorAccess'
+        policies:
+          - name: iam-users-with-admin-access
+            resource: iam-user
+            filters:
+              - type: policy
+                key: PolicyName
+                value: AdministratorAccess
     """
 
     schema = type_schema('policy', rinherit=ValueFilter.schema)
@@ -740,12 +740,12 @@ class GroupMembership(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: iam-users-with-admin-access
+              - name: iam-users-in-admin-group
                 resource: iam-user
                 filters:
                   - type: group
-                    key: 'GroupName'
-                    value: 'AWSAdmin'
+                    key: GroupName
+                    value: Admins
     """
 
     schema = type_schema('group', rinherit=ValueFilter.schema)
@@ -788,8 +788,8 @@ class UserAccessKey(ValueFilter):
                 resource: iam-user
                 filters:
                   - type: access-key
-                    key: 'Status'
-                    value: 'Active'
+                    key: Status
+                    value: Active
     """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
@@ -820,6 +820,20 @@ class UserAccessKey(ValueFilter):
 # Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
+    """Filter iam-users based on mfa-device status
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: mfa-enabled-users
+            resource: iam-user
+            filters:
+              - type: mfa-device
+                key: UserName
+                value: not-null
+    """
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
     permissions = ('iam:ListMfaDevices',)
@@ -1045,11 +1059,19 @@ class UserRemoveAccessKey(BaseAction):
 
 @Group.filter_registry.register('has-users')
 class IamGroupUsers(Filter):
-    """
-        Filter IAM groups that have users attached based on True/False value:
+    """Filter IAM groups that have users attached based on True/False value:
+    True: Filter all IAM groups with users assigned to it
+    False: Filter all IAM groups without any users assigned to it
 
-        True: Filter all IAM groups with users assigned to it
-        False: Filter all IAM groups without any users assigned to it
+    :example:
+
+    .. code-block:: yaml
+
+      - name: empty-iam-group
+        resource: iam-group
+        filters:
+          - type: has-users
+            value: False
     """
     schema = type_schema('has-users', value={'type': 'boolean'})
     permissions = ('iam:GetGroup',)
@@ -1066,11 +1088,19 @@ class IamGroupUsers(Filter):
 
 @Group.filter_registry.register('has-inline-policy')
 class IamGroupInlinePolicy(Filter):
-    """
-        Filter IAM groups that have an inline-policy based on boolean value:
+    """Filter IAM groups that have an inline-policy based on boolean value:
+    True: Filter all groups that have an inline-policy attached
+    False: Filter all groups that do not have an inline-policy attached
 
-        True: Filter all groups that have an inline-policy attached
-        False: Filter all groups that do not have an inline-policy attached
+    :example:
+
+    .. code-block:: yaml
+
+      - name: iam-groups-with-inline-policy
+        resource: iam-group
+        filters:
+          - type: has-inline-policy
+            value: True
     """
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
     permissions = ('iam:ListGroupPolicies',)
