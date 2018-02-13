@@ -24,6 +24,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
+from dateutil import zoneinfo
 from dateutil.parser import parse
 from dateutil.tz import tzutc
 
@@ -229,6 +230,12 @@ class TagActionFilter(Filter):
     be sending a final notice email a few days before terminating an
     instance, or snapshotting a volume prior to deletion.
 
+    The optional 'skew_hours' parameter provides for incrementing the current
+    time a number of hours into the future.
+
+    Optionally, the 'default_tz' parameter can get used to specify the timezone
+    in which to interpret the clock (default value is 'gmt')
+
     .. code-block :: yaml
 
       - policies:
@@ -241,6 +248,7 @@ class TagActionFilter(Filter):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
+              default_tz: gmt
           actions:
             - stop
 
@@ -248,6 +256,7 @@ class TagActionFilter(Filter):
     schema = utils.type_schema(
         'marked-for-op',
         tag={'type': 'string'},
+        default_tz={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
@@ -265,6 +274,10 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
+        tz = zoneinfo.gettz(TZ_ALIASES.get(self.data.get('default_tz', 'gmt')))
+        if not tz:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.data.get('tz'))
 
         v = None
         for n in i.get('Tags', ()):
@@ -290,7 +303,7 @@ class TagActionFilter(Filter):
                 tag, v, i['InstanceId']))
 
         if self.current_date is None:
-            self.current_date = datetime.now(tz=tzutc()).replace(minute=0)
+            self.current_date = datetime.now(tz=tz).replace(minute=0)
 
         return self.current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
@@ -514,8 +527,41 @@ class RenameTag(Action):
         return resources
 
 
+TZ_ALIASES = {
+    'pdt': 'America/Los_Angeles',
+    'pt': 'America/Los_Angeles',
+    'pst': 'America/Los_Angeles',
+    'ast': 'America/Phoenix',
+    'at': 'America/Phoenix',
+    'est': 'America/New_York',
+    'edt': 'America/New_York',
+    'et': 'America/New_York',
+    'cst': 'America/Chicago',
+    'cdt': 'America/Chicago',
+    'ct': 'America/Chicago',
+    'mst': 'America/Denver',
+    'mdt': 'America/Denver',
+    'mt': 'America/Denver',
+    'gmt': 'Etc/GMT',
+    'gt': 'Etc/GMT',
+    'bst': 'Europe/London',
+    'ist': 'Europe/Dublin',
+    'cet': 'Europe/Berlin',
+    # Technically IST (Indian Standard Time), but that's the same as Ireland
+    'it': 'Asia/Kolkata',
+    'jst': 'Asia/Tokyo',
+    'kst': 'Asia/Seoul',
+    'sgt': 'Asia/Singapore',
+    'aet': 'Australia/Sydney',
+    'brt': 'America/Sao_Paulo'
+}
+
+
 class TagDelayedAction(Action):
     """Tag resources for future action.
+
+    The optional 'default_tz' parameter can be used to adjust the clock to align
+    with a given timezone. The default value is 'gmt'.
 
     .. code-block :: yaml
 
@@ -529,6 +575,7 @@ class TagDelayedAction(Action):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
+              default_tz: gmt
           actions:
             - stop
     """
@@ -539,6 +586,7 @@ class TagDelayedAction(Action):
         msg={'type': 'string'},
         days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        default_tz={'type': 'string'},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
@@ -555,7 +603,20 @@ class TagDelayedAction(Action):
                 "mark-for-op specifies invalid op:%s" % op)
         return self
 
+    def generate_timestamp(self, days, hours):
+        n = datetime.now(tz=self.default_tz).replace(minute=0)
+        if days == hours == 0:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        return action_date.strftime('%Y/%m/%d %H:%M')
+
     def process(self, resources):
+        self.default_tz = zoneinfo.gettz(
+            TZ_ALIASES.get(self.data.get('default_tz', 'gmt')))
+        if not self.default_tz:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.default_tz)
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -566,26 +627,9 @@ class TagDelayedAction(Action):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days')
-        hours = self.data.get('hours')
-
-        n = datetime.now(tz=tzutc()).replace(minute=0)
-        if not days and hours:
-            # action is to be completed in 0 days and 'n' hours
-            action_date = (n + timedelta(hours=hours)).strftime(
-                '%Y/%m/%d %H:%M')
-        elif days and not hours:
-            # action is to be completed in 'n' days and 0 hours
-            action_date = (n + timedelta(days=days)).strftime(
-                '%Y/%m/%d')
-        elif not days and not hours:
-            # no timeline specified, use defaults
-            action_date = (n + timedelta(days=4)).strftime(
-                '%Y/%m/%d')
-        else:
-            # action is to be completed in 'n' days and 'n' hours
-            action_date = (n + timedelta(days=days, hours=hours)).strftime(
-                '%Y/%m/%d %H:%M')
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
 
         msg = msg_tmpl.format(
             op=op, action_date=action_date)
