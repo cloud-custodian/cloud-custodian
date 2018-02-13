@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 
-from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
+from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -121,64 +121,6 @@ class RemovePolicyStatement(RemovePolicyBase):
                 'Statements': found}
 
 
-@SNS.action_registry.register('replace-statements')
-class ReplacePolicyStatement(BaseAction):
-    """Action to add or update policy statements to S3 buckets
-    :example:
-    .. code-block:: yaml
-            policies:
-              - name: force-sns-policy
-                resource: sns
-                actions:
-                  - type: replace-statements
-                    statements:
-                      - Sid: "SNSAccessPolicy"
-                        Effect: "Deny"
-                        Action: "sns:GetTopicAttributes"
-                        Principal:
-                          AWS: "*"
-                        Resource: "arn:aws:sns:{region}:{account-number}:{topic-name}"
-    """
-
-    permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
-
-    def process(self, resources):
-        results = []
-        client = local_session(self.manager.session_factory).client('sns')
-        for r in resources:
-            try:
-                results += filter(None, [self.process_resource(client, r)])
-            except Exception:
-                self.log.exception(
-                    "Error processing sns:%s", r['TopicArn'])
-        return results
-
-    def process_resource(self, client, resource):
-        p = resource.get('Policy')
-        if p is None:
-            return
- 
-        current = json.loads(resource['Policy'])
-        
-        base = {
-            "Version": "2012-10-17"
-        }
-
-        replacement = {"Statement": s for s in self.data.get('statements', [])}
-        base.update(replacement)
-
-        if current == base:
-            return
-
-        client.set_topic_attributes(
-            TopicArn=resource['TopicArn'],
-            AttributeName='Policy',
-            AttributeValue=json.dumps(base)
-        )
-        return {'Name': resource['TopicArn'],
-                'State': 'PolicyReplaced'}
-
-
 @SNS.action_registry.register('modify-statements')
 class ModifyPolicyStatement(ModifyPolicyBase):
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
@@ -197,14 +139,10 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         for r in resources:
             new_policy = {u'Version': u'2012-10-17', u'Statement': [] }
             try:
-                print(deletions)
-                print(replace)
                 if replace:
                     new_policy = self.process_replace(client, r)
                 if len(additions) and len(deletions) and not replace:
-                    tmp_policy = self.process_add_and_delete(client, r)
-                    print(tmp_policy)
-                    new_policy['Statement'] += tmp_policy
+                    new_policy['Statement'] += self.process_add_and_delete(client, r)
                 if len(additions) and not len(deletions) and not replace:
                     new_policy['Statement'] += self.process_addition(client, r).get('Statement')
                 if not len(additions) and len(deletions) and not replace:
@@ -218,8 +156,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 self.log.exception(
                     "Error processing sns:%s", r['TopicArn'])
             else:
-                print('new_policy')
-                print(new_policy)
                 client.set_topic_attributes(
                     TopicArn=r['TopicArn'],
                     AttributeName='Policy',
