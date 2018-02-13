@@ -826,7 +826,7 @@ class RemovePolicyBase(BaseAction):
 class ModifyPolicyBase(BaseAction):
 
     schema = utils.type_schema(
-        'set-statements',
+        'modify-statements',
         **{
             'statements': {
                 'type': 'array',
