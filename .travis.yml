@@ -2,8 +2,7 @@ language: python
 dist: trusty
 sudo: false
 cache:
-  directories:
-#   - .tox
+  pip: true
 
 python:
   - "2.7"
