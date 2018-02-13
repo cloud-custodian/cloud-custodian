@@ -828,7 +828,7 @@ class ModifyPolicyBase(BaseAction):
     schema = utils.type_schema(
         'modify-statements',
         **{
-            'statements': {
+            'add-statements': {
                 'type': 'array',
                 'required': True,
                 'items': {
@@ -851,6 +851,33 @@ class ModifyPolicyBase(BaseAction):
                         {'type': 'array', 'items': {'type': 'string'}}
                     ]
                 }
+            },
+            'remove-statements': {
+                'type': 'array',
+                'required': True,
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'Sid': {'type': 'string'},
+                        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                        'Principal': {'anyOf': [{'type': 'string'},
+                            {'type': 'object'}, {'type': 'array'}]},
+                        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Condition': {'type': 'object'}
+                    },
+                    'required': ['Sid', 'Effect'],
+                    'oneOf': [
+                        {'enum': ['matched']},
+                        {'type': 'array', 'items': {'type': 'string'}}
+                    ]
+                }
+            },
+            'remove-statements-all': {
+                'type': 'string'
             }
         }
     )

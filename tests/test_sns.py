@@ -157,7 +157,7 @@ class TestSNS(BaseTest):
         )
 
         p = self.load_policy({
-            'name': 'sns-replace-policy',
+            'name': 'sns-modify-replace-policy',
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
@@ -169,7 +169,8 @@ class TestSNS(BaseTest):
                         "Action": ["SNS:GetTopicAttributes"],
                         "Resource": topic_arn
                     }],
-                    'remove-statements': "*"
+                    'remove-statements': [],
+                    'remove-statements-all': "*"
                 }]
             },
             session_factory=session_factory)
@@ -215,7 +216,7 @@ class TestSNS(BaseTest):
         )
 
         p = self.load_policy({
-            'name': 'sns-rm-named',
+            'name': 'sns-modify-remove-policy',
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
@@ -260,7 +261,7 @@ class TestSNS(BaseTest):
         )
 
         p = self.load_policy({
-            'name': 'sns-replace-policy',
+            'name': 'sns-modify-add-policy',
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
@@ -318,7 +319,7 @@ class TestSNS(BaseTest):
         )
 
         p = self.load_policy({
-            'name': 'sns-replace-policy',
+            'name': 'sns-modify-add-and-remove-policy',
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [

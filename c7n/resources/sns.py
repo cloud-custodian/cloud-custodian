@@ -148,9 +148,10 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         client = local_session(self.manager.session_factory).client('sns')
         additions = self.data.get('add-statements', [])
         deletions = self.data.get('remove-statements', [])
+        remove_all = self.data.get('remove-statements-all', [])
 
         
-        if unicode == type(deletions) and deletions == "*":
+        if unicode == type(remove_all) and remove_all == "*":
             replace = True
 
         for r in resources:
