@@ -158,7 +158,7 @@ class FlowLogFilter(Filter):
 
 
 @Vpc.filter_registry.register('security-group')
-class SecurityGroupFilter(RelatedResourceFilter):
+class VpcSecurityGroupFilter(RelatedResourceFilter):
     """Filter VPCs based on Security Group attributes
 
     :example:
@@ -1472,6 +1472,18 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_type = 'list'
         dimension = None
         id_prefix = "vpce-"
+
+
+@VpcEndpoint.filter_registry.register('security-group')
+class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "Groups[].GroupId"
+
+
+@VpcEndpoint.filter_registry.register('subnet')
+class EndpointSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetIds[]"
 
 
 @resources.register('key-pair')

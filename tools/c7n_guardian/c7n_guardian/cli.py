@@ -22,7 +22,8 @@ import click
 from tabulate import tabulate
 
 from c7n.credentials import assumed_session, SessionFactory
-from c7n.utils import format_event
+from c7n.utils import format_event, chunks
+
 from c7n_org.cli import init, filter_accounts, CONFIG_SCHEMA, WORKER_COUNT
 
 log = logging.getLogger('c7n-guardian')
@@ -226,9 +227,11 @@ def enable(config, master, tags, accounts, debug, message, region):
 
     log.info("Enrolling %d accounts in guard duty" % len(members))
 
-    log.info("Creating member accounts")
-    unprocessed = master_client.create_members(
-        DetectorId=detector_id, AccountDetails=members).get('UnprocessedAccounts')
+    log.info("Creating member accounts:%d region:%s", len(members), region)
+    unprocessed = []
+    for account_set in chunks(members, 25):
+        unprocessed.extend(master_client.create_members(
+            DetectorId=detector_id, AccountDetails=account_set).get('UnprocessedAccounts', []))
     if unprocessed:
         log.warning("Following accounts where unprocessed\n %s" % format_event(unprocessed))
 
@@ -245,6 +248,8 @@ def enable(config, master, tags, accounts, debug, message, region):
         futures = {}
         for a in accounts_config['accounts']:
             if a == master_info:
+                continue
+            if a['account_id'] in extant_ids:
                 continue
             futures[w.submit(enable_account, a, master_info['account_id'], region)] = a
 
@@ -270,7 +275,9 @@ def enable_account(account, master_account_id, region):
         if i['AccountId'] == master_account_id]
     invitations.sort(key=operator.itemgetter('InvitedAt'))
     if not invitations:
-        log.warning("No guard duty invitation found for %s id:%s" (account['name']))
+        log.warning(
+            "No guard duty invitation found account:%s region%s id:%s aid:%s",
+            account['name'], region, m_detector_id, account['account_id'])
         return
     member_client.accept_invitation(
         DetectorId=m_detector_id,

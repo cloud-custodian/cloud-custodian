@@ -1425,6 +1425,39 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')
 
 
+class EndpointTest(BaseTest):
+
+    def test_endpoint_subnet(self):
+        factory = self.replay_flight_data('test_vpce_subnet_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'subnet',
+                 'key': 'tag:Name',
+                 'value': 'Pluto'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-914763e7'])
+
+    def test_endpoint_sg(self):
+        factory = self.replay_flight_data('test_vpce_sg_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'security-group',
+                 'key': 'tag:c7n-test-tag',
+                 'value': 'c7n-test-val'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-security-groups'], ['sg-6c7fa917'])
+
+
 class NATGatewayTest(BaseTest):
 
     def test_query_nat_gateways(self):
