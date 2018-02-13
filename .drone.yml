@@ -3,7 +3,6 @@ build:
   unit_tests:
     image: python:2-slim
     commands:
-      - rm -rf .tox
       - pip install tox
       - tox -e py27
 
@@ -54,4 +53,3 @@ notify:
 cache:
   mount:
     - /root/.cache/pip
-    - .tox
